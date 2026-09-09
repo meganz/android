@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
+import mega.privacy.android.domain.entity.environment.ScreenLockState
 import mega.privacy.android.domain.entity.environment.ThermalState
 import java.util.Locale
 
@@ -118,6 +119,13 @@ interface EnvironmentRepository {
      * @return a Flow that emits true when power save mode is enabled
      */
     fun monitorPowerSaveMode(): Flow<Boolean>
+
+    /**
+     * Monitor the device screen lock state
+     *
+     * @return a Flow that emits a [ScreenLockState] whenever the screen is locked or unlocked
+     */
+    fun monitorScreenLockState(): Flow<ScreenLockState>
 
     /**
      * Get the number of available processors

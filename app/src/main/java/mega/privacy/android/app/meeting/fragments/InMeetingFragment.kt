@@ -55,6 +55,7 @@ import mega.privacy.android.app.mediaplayer.AudioPlayerCommands.resumeAudioPlaye
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
+import mega.privacy.android.app.meeting.CallLocalVideoController
 import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.OnDragTouchListener
 import mega.privacy.android.app.meeting.RtcAudioManagerController
@@ -138,6 +139,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     @Inject
     lateinit var chatManagement: ChatManagement
+
+    @Inject
+    lateinit var callLocalVideoController: CallLocalVideoController
 
     @Inject
     lateinit var callServiceStarter: CallServiceStarter
@@ -809,7 +813,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             it?.let { shouldBeEnabled ->
                 if (inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != sharedModel.state.value.camEnabled) {
-                    chatManagement.isDisablingLocalVideo = true
+                    callLocalVideoController.isDisablingLocalVideo = true
                     inMeetingViewModel.onVideoEnabledDueToProximitySensorConsumed()
                     sharedModel.clickCamera(shouldBeEnabled)
                 }
@@ -2562,8 +2566,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         Timber.d("Update Local Video $isCamOn")
         inMeetingViewModel.getCall()?.apply {
             val isVideoOn: Boolean = inMeetingViewModel.state.value.hasLocalVideo
-            if (!chatManagement.isInTemporaryState) {
-                chatManagement.setVideoStatus(chatId, isVideoOn)
+            if (!callLocalVideoController.isInTemporaryState) {
+                callLocalVideoController.setVideoStatus(chatId, isVideoOn)
             }
         }
 

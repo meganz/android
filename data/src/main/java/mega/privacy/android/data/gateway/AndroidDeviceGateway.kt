@@ -22,9 +22,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.extensions.registerReceiverAsFlow
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.environment.ScreenLockState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import java.net.NetworkInterface
@@ -203,6 +205,20 @@ internal class AndroidDeviceGateway @Inject constructor(
             isInPowerSaveMode()
         }.catch {
             Timber.e(it, "An Exception occurred when monitoring the power save mode")
+        }.toSharedFlow(appScope)
+
+    override fun monitorScreenLockState(): Flow<ScreenLockState> =
+        context.registerReceiverAsFlow(
+            flags = ContextCompat.RECEIVER_NOT_EXPORTED,
+            Intent.ACTION_SCREEN_OFF, Intent.ACTION_USER_PRESENT,
+        ).mapNotNull {
+            when (it.action) {
+                Intent.ACTION_SCREEN_OFF -> ScreenLockState.Locked
+                Intent.ACTION_USER_PRESENT -> ScreenLockState.Unlocked
+                else -> null
+            }
+        }.catch {
+            Timber.e(it, "An Exception occurred when monitoring the screen lock state")
         }.toSharedFlow(appScope)
 }
 

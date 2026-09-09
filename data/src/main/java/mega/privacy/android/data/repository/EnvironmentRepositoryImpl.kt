@@ -113,6 +113,8 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
             .onStart { emit(deviceGateway.isInPowerSaveMode()) }
             .flowOn(ioDispatcher)
 
+    override fun monitorScreenLockState() = deviceGateway.monitorScreenLockState()
+
     override fun availableProcessors() =
         deviceGateway.getAvailableProcessors()
 

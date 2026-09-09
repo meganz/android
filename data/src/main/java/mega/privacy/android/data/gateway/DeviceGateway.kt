@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway
 import android.content.Intent
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.environment.ScreenLockState
 
 /**
  * Device gateway
@@ -134,6 +135,14 @@ interface DeviceGateway {
      * Monitor power save mode (Battery Saver) changes
      */
     val monitorPowerSaveState: Flow<Boolean>
+
+    /**
+     * Monitor the device screen lock state.
+     *
+     * Emits [ScreenLockState.Locked] when the screen turns off and [ScreenLockState.Unlocked] when
+     * the user is present again. Event driven: it does not emit an initial state on subscribe.
+     */
+    fun monitorScreenLockState(): Flow<ScreenLockState>
 
     /**
      * Monitor thermal state

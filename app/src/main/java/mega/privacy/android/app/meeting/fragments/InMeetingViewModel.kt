@@ -41,6 +41,7 @@ import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.GetUserEmailListener
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
+import mega.privacy.android.app.meeting.CallLocalVideoController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
@@ -152,6 +153,7 @@ import kotlin.time.DurationUnit
  * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
  * @property megaChatApiGateway                 [MegaChatApiGateway]
  * @property chatManagement                     [ChatManagement]
+ * @property callLocalVideoController            [CallLocalVideoController]
  * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
  * @property enableAudioLevelMonitorUseCase     [EnableAudioLevelMonitorUseCase]
  * @property isAudioLevelMonitorEnabledUseCase  [IsAudioLevelMonitorEnabledUseCase]
@@ -189,6 +191,7 @@ class InMeetingViewModel @Inject constructor(
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val chatManagement: ChatManagement,
+    private val callLocalVideoController: CallLocalVideoController,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,
     private val isAudioLevelMonitorEnabledUseCase: IsAudioLevelMonitorEnabledUseCase,
@@ -1344,7 +1347,7 @@ class InMeetingViewModel @Inject constructor(
             }
 
             getSessionOneToOneCall()?.let { chatSession ->
-                if (chatSession.isOnHold || (!call.hasLocalVideo && !chatManagement
+                if (chatSession.isOnHold || (!call.hasLocalVideo && !callLocalVideoController
                         .getVideoStatus(call.chatId) && !chatSession.hasVideo)
                 ) {
                     return true

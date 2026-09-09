@@ -20,6 +20,7 @@ import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
+import mega.privacy.android.domain.entity.environment.ScreenLockState
 import mega.privacy.android.domain.entity.environment.ThermalState
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.jupiter.api.BeforeAll
@@ -193,6 +194,19 @@ internal class EnvironmentRepositoryImplTest {
         underTest.monitorPowerSaveMode().test {
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the screen lock state is returned from the gateway`() = runTest {
+        whenever(deviceGateway.monitorScreenLockState()).thenReturn(
+            flowOf(ScreenLockState.Locked, ScreenLockState.Unlocked)
+        )
+
+        underTest.monitorScreenLockState().test {
+            assertThat(awaitItem()).isEqualTo(ScreenLockState.Locked)
+            assertThat(awaitItem()).isEqualTo(ScreenLockState.Unlocked)
             cancelAndIgnoreRemainingEvents()
         }
     }

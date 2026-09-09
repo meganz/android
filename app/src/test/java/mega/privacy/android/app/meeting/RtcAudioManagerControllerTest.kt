@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting
 
 import android.os.Build
 import android.os.Looper
-import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import org.junit.Test
@@ -22,19 +21,20 @@ import org.robolectric.annotation.Config
 class RtcAudioManagerControllerTest {
 
     private val rtcAudioManagerGateway = mock<RTCAudioManagerGateway>()
-    private val chatManagement = mock<ChatManagement>()
+    private val callLocalVideoController = mock<CallLocalVideoController>()
 
-    private val underTest = RtcAudioManagerController(rtcAudioManagerGateway, chatManagement)
+    private val underTest =
+        RtcAudioManagerController(rtcAudioManagerGateway, callLocalVideoController)
 
     @Test
-    fun `test that createOrUpdateAudioManager registers the screen receiver and updates the gateway on the main thread`() {
+    fun `test that createOrUpdateAudioManager starts monitoring and updates the gateway on the main thread`() {
         val isSpeakerOn = true
         val type = 42
 
         underTest.createOrUpdateAudioManager(isSpeakerOn, type)
         shadowOf(Looper.getMainLooper()).idle()
 
-        verify(chatManagement).registerScreenReceiver()
+        verify(callLocalVideoController).startMonitoring()
         verify(rtcAudioManagerGateway).createOrUpdateAudioManager(isSpeakerOn, type)
     }
 
@@ -46,12 +46,12 @@ class RtcAudioManagerControllerTest {
     }
 
     @Test
-    fun `test that startProximitySensor routes proximity changes to chat management`() {
+    fun `test that startProximitySensor routes proximity changes to the local video controller`() {
         underTest.startProximitySensor()
 
         val listenerCaptor = argumentCaptor<OnProximitySensorListener>()
         verify(rtcAudioManagerGateway).startProximitySensor(listenerCaptor.capture())
         listenerCaptor.firstValue.needToUpdate(true)
-        verify(chatManagement).controlProximitySensor(true)
+        verify(callLocalVideoController).onProximityChanged(true)
     }
 }

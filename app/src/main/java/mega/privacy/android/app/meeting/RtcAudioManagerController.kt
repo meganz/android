@@ -5,34 +5,34 @@ import android.os.Looper
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Coordinates the call audio-manager lifecycle: registers the screen receiver, creates or
- * updates the RTC audio manager on the main thread, and routes proximity changes to
- * [ChatManagement].
+ * Coordinates the call audio-manager lifecycle: starts the local-video screen-lock monitoring,
+ * creates or updates the RTC audio manager on the main thread, and routes proximity changes to
+ * [CallLocalVideoController].
  */
 @Singleton
 class RtcAudioManagerController @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
-    private val chatManagement: ChatManagement,
+    private val callLocalVideoController: CallLocalVideoController,
 ) {
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
     /**
-     * Register the screen receiver and, on the main thread, create or update the audio manager.
+     * Start the local-video screen-lock monitoring and, on the main thread, create or update the
+     * audio manager.
      *
      * @param isSpeakerOn Whether the speaker should be on.
      * @param type The audio manager type.
      */
     fun createOrUpdateAudioManager(isSpeakerOn: Boolean, type: Int) {
         Timber.d("Create or update audio manager, type is %s", type)
-        chatManagement.registerScreenReceiver()
+        callLocalVideoController.startMonitoring()
         mainHandler.post {
             rtcAudioManagerGateway.createOrUpdateAudioManager(isSpeakerOn, type)
         }
@@ -44,10 +44,10 @@ class RtcAudioManagerController @Inject constructor(
     fun removeRTCAudioManagerRingIn() = rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
 
     /**
-     * Activate the proximity sensor, routing proximity changes to [ChatManagement].
+     * Activate the proximity sensor, routing proximity changes to [CallLocalVideoController].
      */
     fun startProximitySensor() = rtcAudioManagerGateway.startProximitySensor { isNear ->
-        chatManagement.controlProximitySensor(isNear)
+        callLocalVideoController.onProximityChanged(isNear)
     }
 }
 
