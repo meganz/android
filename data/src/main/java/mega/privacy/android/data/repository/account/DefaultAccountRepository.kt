@@ -821,9 +821,6 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun clearSharedPreferences() = withContext(ioDispatcher) {
         with(context) {
-            // Remove time stamp preference
-            getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE).edit { clear() }
-
             //Remove UI preferences
             getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE).edit { clear() }
 
@@ -1641,7 +1638,6 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     companion object {
-        private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
         private const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
         private const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
