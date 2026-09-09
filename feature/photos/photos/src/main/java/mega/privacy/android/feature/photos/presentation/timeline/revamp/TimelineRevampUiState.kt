@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
@@ -45,6 +46,8 @@ sealed interface TimelineRevampUiState {
      * [MediaTimePeriod.Years] or [MediaTimePeriod.Months]; empty otherwise.
      * @property arePeriodCardsLoading whether the Year / Month summary cards are still being built
      * for the current [selectedPeriod]; drives the card shimmer while [periodCards] is empty.
+     * @property selection the multi-selection state of the grid. Owned by the ViewModel so it
+     * survives a configuration change without a saved-state round trip.
      * @property takenDownDialogEvent triggered when a taken-down node is tapped, so the screen can
      * show the dispute dialog.
      */
@@ -58,6 +61,51 @@ sealed interface TimelineRevampUiState {
         val selectedPeriod: MediaTimePeriod = MediaTimePeriod.All,
         val periodCards: List<PhotosNodeListCard> = emptyList(),
         val arePeriodCardsLoading: Boolean = false,
+        val selection: TimelineSelection = TimelineSelection(),
         val takenDownDialogEvent: StateEvent = consumed,
     ) : TimelineRevampUiState
+}
+
+/**
+ * The multi-selection state of the Timeline Revamp grid.
+ *
+ * @property selectedIds the ids of the selected media
+ * @property pendingIndices the global indices of cells selected while their node was not loaded (by
+ * a drag-select sweep or a section select-all). They render as selected placeholders. Once the node
+ * is known its id joins [selectedIds], but the index stays here while the slot is outside the loaded
+ * window so the placeholder keeps its checked state and can still be deselected.
+ * @property count the number of selected media to show in the top bar: [selectedIds] plus the
+ * pending cells whose node has not been resolved yet.
+ */
+@Immutable
+data class TimelineSelection(
+    val selectedIds: Set<Long> = emptySet(),
+    val pendingIndices: Set<Int> = emptySet(),
+    val count: Int = 0,
+) {
+
+    /**
+     * Whether in selection mode
+     */
+    val isActive: Boolean
+        get() = count > 0
+
+    /**
+     * Whether the cell at global [index] renders as selected: by id when its [node] is loaded,
+     * otherwise by its pending mark.
+     */
+    fun isSelected(index: Int, node: PhotosNodeContentItemV2?): Boolean =
+        node?.let { it.id in selectedIds } ?: (index in pendingIndices)
+
+    /**
+     * Whether every cell of [range] is selected, pending selection, or taken down (which cannot be
+     * selected). Drives the section select-all checkbox and decides whether a tap on it selects or
+     * deselects the range.
+     */
+    fun isRangeSelected(range: IntRange, loadedNodes: Map<Int, PhotosNodeContentItemV2>): Boolean =
+        range.all { index ->
+            val node = loadedNodes[index]
+            if (node == null) index in pendingIndices
+            else node.isTakenDown || node.id in selectedIds
+        }
 }

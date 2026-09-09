@@ -90,6 +90,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.revamp.Timeline
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration.Companion.toLegacySort as toLegacyRevampSort
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampUiState
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineSelection
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.component.TimelineRevampSortBottomSheet
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
@@ -146,13 +147,23 @@ fun MediaMainRoute(
     val videosSelectionUiState by videosTabViewModel.selectionUiState.collectAsStateWithLifecycle()
     val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    // The legacy tab's selection. The revamp ViewModel owns its own (see TimelineSelection), so a
+    // selection of thousands is neither parceled nor re-resolved on a configuration change.
     val timelineSelectedPhotoIds = rememberSaveable { mutableStateSetOf<Long>() }
+    val clearTimelineSelection: () -> Unit = {
+        if (isTimelineRevampEnabled) {
+            timelineRevampViewModel.clearSelection()
+        } else {
+            timelineSelectedPhotoIds.clear()
+        }
+    }
 
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler
     )
     val selectionModeType by remember(
+        isTimelineRevampEnabled,
         timelineSelectedPhotoIds,
         albumsTabUiState.selectedUserAlbums,
         videosSelectionUiState,
@@ -160,7 +171,11 @@ fun MediaMainRoute(
     ) {
         derivedStateOf {
             getSelectionModeType(
-                timelineSelectedPhotoCount = timelineSelectedPhotoIds.size,
+                timelineSelectedPhotoCount = if (isTimelineRevampEnabled) {
+                    timelineRevampUiState.selection().count
+                } else {
+                    timelineSelectedPhotoIds.size
+                },
                 albumsSelectedUserAlbumsCount = albumsTabUiState.selectedUserAlbums.size,
                 videosSelectionUiState = videosSelectionUiState,
                 playlistsTabUiState = playlistsTabUiState
@@ -218,25 +233,30 @@ fun MediaMainRoute(
         }
     }
 
-    // Re-resolve on selection-size change and, in the revamp, on section changes so deleted nodes drop.
-    val timelineRevampSections =
-        (timelineRevampUiState as? TimelineRevampUiState.Data)?.sections
-    LaunchedEffect(timelineSelectedPhotoIds.size, timelineRevampSections) {
-        if (timelineSelectedPhotoIds.isNotEmpty()) {
-            val selectedNodes = if (isTimelineRevampEnabled) {
-                timelineRevampViewModel.retrieveTypedNodeFromSelection(timelineSelectedPhotoIds)
-            } else {
-                timelineViewModel.retrieveTypedNodeFromSelection(timelineSelectedPhotoIds)
+    if (isTimelineRevampEnabled) {
+        // The revamp ViewModel resolves its selection itself and keeps the result across a
+        // configuration change, so only refresh the actions when the resolved nodes actually differ
+        // from what the action ViewModel already holds — not on every recreation.
+        LaunchedEffect(timelineRevampSelectedPhotosInTypedNodes) {
+            if (timelineRevampSelectedPhotosInTypedNodes.isNotEmpty() &&
+                nodeActionUiState.selectedNodes != timelineRevampSelectedPhotosInTypedNodes
+            ) {
+                nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+                    selectedNodes = timelineRevampSelectedPhotosInTypedNodes.toSet(),
+                    nodeSourceType = NodeSourceType.TIMELINE,
+                )
             }
-            // Drop any selected id whose node no longer exists. Only prune on a non-empty result, so a
-            // transient resolution failure (which also returns empty) never clears the selection.
-            if (isTimelineRevampEnabled && selectedNodes.isNotEmpty()) {
-                timelineSelectedPhotoIds.retainAll(selectedNodes.map { it.id.longValue }.toSet())
+        }
+    } else {
+        LaunchedEffect(timelineSelectedPhotoIds.size) {
+            if (timelineSelectedPhotoIds.isNotEmpty()) {
+                val selectedNodes =
+                    timelineViewModel.retrieveTypedNodeFromSelection(timelineSelectedPhotoIds)
+                nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+                    selectedNodes = selectedNodes.toSet(),
+                    nodeSourceType = NodeSourceType.TIMELINE,
+                )
             }
-            nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-                selectedNodes = selectedNodes.toSet(),
-                nodeSourceType = NodeSourceType.TIMELINE,
-            )
         }
     }
 
@@ -287,7 +307,7 @@ fun MediaMainRoute(
         nodeActionState = nodeActionUiState,
         onDismissRequest = {
             when (selectionModeType) {
-                MediaSelectionModeType.Timeline -> timelineSelectedPhotoIds.clear()
+                MediaSelectionModeType.Timeline -> clearTimelineSelection()
                 MediaSelectionModeType.Videos -> videosTabViewModel.clearSelection()
                 else -> Unit
             }
@@ -295,7 +315,7 @@ fun MediaMainRoute(
         onDismissEventConsumed = nodeOptionsActionViewModel::resetDismiss,
         onActionTriggered = {
             when (selectionModeType) {
-                MediaSelectionModeType.Timeline -> timelineSelectedPhotoIds.clear()
+                MediaSelectionModeType.Timeline -> clearTimelineSelection()
                 MediaSelectionModeType.Videos -> videosTabViewModel.clearSelection()
                 else -> Unit
             }
@@ -323,7 +343,7 @@ fun MediaMainRoute(
 
     MediaSelectionModelHandler(
         type = selectionModeType,
-        onClearTimelinePhotosSelection = timelineSelectedPhotoIds::clear,
+        onClearTimelinePhotosSelection = clearTimelineSelection,
         onClearAlbumsSelection = albumsTabViewModel::clearAlbumsSelection,
         onClearVideosSelection = videosTabViewModel::clearSelection,
         onClearPlaylistsSelection = videoPlaylistsTabViewModel::clearSelection,
@@ -334,7 +354,9 @@ fun MediaMainRoute(
         timelineTabUiState = timelineTabUiState,
         timelineRevampUiState = timelineRevampUiState,
         onTimelineRevampVisibleRangeChanged = timelineRevampViewModel::onVisibleRangeChanged,
-        loadTimelineRevampMediaRange = timelineRevampViewModel::loadMediaRange,
+        onTimelineRevampCellSelectionChange = timelineRevampViewModel::setCellSelected,
+        onTimelineRevampRangeSelectionToggle = timelineRevampViewModel::toggleRangeSelection,
+        onTimelineRevampDragSelectionEnded = timelineRevampViewModel::resolvePendingSelection,
         onTimelineRevampScrollingChanged = timelineRevampViewModel::onScrollingChanged,
         onTimelineRevampGridSizeChange = timelineRevampViewModel::onGridSizeChange,
         onTimelineRevampZoomIn = timelineRevampViewModel::onZoomIn,
@@ -387,13 +409,13 @@ fun MediaMainRoute(
         onTimelineRevampApplyFilterClick = timelineRevampViewModel::onFilterChange,
         timelineRevampSelectedTimePeriod = timelineRevampSelectedTimePeriod,
         onTimelinePhotoSelected = {
-            if (it in timelineSelectedPhotoIds) {
-                timelineSelectedPhotoIds.remove(it)
-            } else {
-                timelineSelectedPhotoIds.add(it)
+            when {
+                isTimelineRevampEnabled -> timelineRevampViewModel.toggleSelection(it)
+                it in timelineSelectedPhotoIds -> timelineSelectedPhotoIds.remove(it)
+                else -> timelineSelectedPhotoIds.add(it)
             }
         },
-        onClearTimelinePhotosSelection = { timelineSelectedPhotoIds.clear() },
+        onClearTimelinePhotosSelection = clearTimelineSelection,
         onNavigateToTimelinePhotoPreview = onNavigateToTimelinePhotoPreview,
         onPrefetchThumbnail = mediaMainViewModel::prefetchThumbnail,
         clearCameraUploadsCompletedMessage = mediaCameraUploadViewModel::onConsumeUploadCompleteEvent,
@@ -427,7 +449,9 @@ fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
     timelineRevampUiState: TimelineRevampUiState,
     onTimelineRevampVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
-    loadTimelineRevampMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2>,
+    onTimelineRevampCellSelectionChange: (index: Int, selected: Boolean) -> Unit,
+    onTimelineRevampRangeSelectionToggle: (IntRange) -> Unit,
+    onTimelineRevampDragSelectionEnded: () -> Unit,
     onTimelineRevampScrollingChanged: (Boolean) -> Unit,
     onTimelineRevampGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineRevampZoomIn: () -> Unit,
@@ -507,6 +531,11 @@ fun MediaMainScreen(
         if (isTimelineRevampEnabled) onTimelineRevampMediaTimePeriodSelected else onMediaTimePeriodSelected
     val revampCurrentSort = (timelineRevampUiState as? TimelineRevampUiState.Data)?.currentSort
         ?: TimelineRevampSortConfiguration.Default
+    val timelineSelectedCount = if (isTimelineRevampEnabled) {
+        timelineRevampUiState.selection().count
+    } else {
+        selectedPhotoIds.size
+    }
     val showEnableCameraUploadsPageForRevamp = isTimelineRevampEnabled &&
             mediaCameraUploadUiState.enableCameraUploadPageShowing &&
             timelineRevampFilterUiState.mediaSource != FilterMediaSource.CloudDrive
@@ -525,10 +554,6 @@ fun MediaMainScreen(
     var isSearchModeForVideosOrPlaylists by rememberSaveable { mutableStateOf(false) }
 
     var isTimelinePinchActive by remember { mutableStateOf(false) }
-
-    // Timeline cells drag-selected before their nodes load; counted into the top bar's selection
-    // count so drag-selecting placeholders reflects in the count immediately.
-    var timelinePendingSelectionCount by remember { mutableIntStateOf(0) }
 
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
@@ -585,7 +610,7 @@ fun MediaMainScreen(
                 videosSelectionUiState = videosSelectionUiState,
                 playlistsTabUiState = playlistsTabUiState,
                 timelineItemCount = effectiveTimelineItemCount,
-                timelineSelectedCount = selectedPhotoIds.size + timelinePendingSelectionCount,
+                timelineSelectedCount = timelineSelectedCount,
                 selectedTimePeriod = effectiveSelectedTimePeriod,
                 videosTabQuery = videosTabQuery,
                 playlistsTabQuery = playlistsTabQuery,
@@ -710,7 +735,9 @@ fun MediaMainScreen(
                                     timelineTabUiState = timelineTabUiState,
                                     timelineRevampUiState = timelineRevampUiState,
                                     onTimelineRevampVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
-                                    loadTimelineRevampMediaRange = loadTimelineRevampMediaRange,
+                                    onTimelineRevampCellSelectionChange = onTimelineRevampCellSelectionChange,
+                                    onTimelineRevampRangeSelectionToggle = onTimelineRevampRangeSelectionToggle,
+                                    onTimelineRevampDragSelectionEnded = onTimelineRevampDragSelectionEnded,
                                     onTimelineRevampScrollingChanged = onTimelineRevampScrollingChanged,
                                     onTimelineRevampGridSizeChange = onTimelineRevampGridSizeChange,
                                     onTimelineRevampZoomIn = onTimelineRevampZoomIn,
@@ -720,9 +747,6 @@ fun MediaMainScreen(
                                     },
                                     onTimelineRevampNodeClicked = onTimelineRevampNodeClicked,
                                     onTimelineRevampTakenDownDialogConsumed = onTimelineRevampTakenDownDialogConsumed,
-                                    onTimelineRevampPendingSelectionCountChanged = {
-                                        timelinePendingSelectionCount = it
-                                    },
                                     showEnableCameraUploadsPage = showEnableCameraUploadsPageForRevamp,
                                     timelineFilterUiState = timelineFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
@@ -840,7 +864,9 @@ private fun MediaScreen.MediaContent(
     timelineTabUiState: TimelineTabUiState,
     timelineRevampUiState: TimelineRevampUiState,
     onTimelineRevampVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
-    loadTimelineRevampMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2>,
+    onTimelineRevampCellSelectionChange: (index: Int, selected: Boolean) -> Unit,
+    onTimelineRevampRangeSelectionToggle: (IntRange) -> Unit,
+    onTimelineRevampDragSelectionEnded: () -> Unit,
     onTimelineRevampScrollingChanged: (Boolean) -> Unit,
     onTimelineRevampGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineRevampZoomIn: () -> Unit,
@@ -848,7 +874,6 @@ private fun MediaScreen.MediaContent(
     onTimelineRevampPinchActiveChanged: (Boolean) -> Unit,
     onTimelineRevampNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onTimelineRevampTakenDownDialogConsumed: () -> Unit,
-    onTimelineRevampPendingSelectionCountChanged: (Int) -> Unit,
     showEnableCameraUploadsPage: Boolean,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
@@ -892,7 +917,6 @@ private fun MediaScreen.MediaContent(
                             mediaCameraUploadUiState = mediaCameraUploadUiState,
                             showEnableCameraUploadsPage = showEnableCameraUploadsPage,
                             onVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
-                            loadMediaRange = loadTimelineRevampMediaRange,
                             onScrollingChanged = onTimelineRevampScrollingChanged,
                             onGridSizeChange = onTimelineRevampGridSizeChange,
                             onZoomIn = onTimelineRevampZoomIn,
@@ -918,8 +942,9 @@ private fun MediaScreen.MediaContent(
                                 }
                             },
                             onNodeSelected = { node -> onTimelinePhotoSelected(node.id) },
-                            selectedPhotoIds = selectedPhotoIds,
-                            onPendingSelectionCountChanged = onTimelineRevampPendingSelectionCountChanged,
+                            onCellSelectionChange = onTimelineRevampCellSelectionChange,
+                            onRangeSelectionToggle = onTimelineRevampRangeSelectionToggle,
+                            onDragSelectionEnded = onTimelineRevampDragSelectionEnded,
                             onTakenDownDialogEventConsumed = onTimelineRevampTakenDownDialogConsumed,
                             clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                             onNavigateToCameraUploadsSettings = {
@@ -951,7 +976,7 @@ private fun MediaScreen.MediaContent(
                                 .align(Alignment.BottomCenter),
                             isVisible = timelineRevampUiState is TimelineRevampUiState.Data &&
                                     revampSelectorVisible &&
-                                    selectedPhotoIds.isEmpty(),
+                                    !timelineRevampUiState.selection.isActive,
                             selectedTimePeriod = selectedTimePeriod,
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                             periods = listOf(
@@ -1041,6 +1066,12 @@ private fun MediaScreen.MediaContent(
 private fun TimelineRevampUiState.mediaItemCount(): Int =
     (this as? TimelineRevampUiState.Data)?.sections?.sumOf { it.count }?.toInt() ?: 0
 
+/**
+ * The revamp timeline's selection, or an inactive one while it has no loaded sections.
+ */
+private fun TimelineRevampUiState.selection(): TimelineSelection =
+    (this as? TimelineRevampUiState.Data)?.selection ?: TimelineSelection()
+
 private fun getSelectionModeType(
     timelineSelectedPhotoCount: Int,
     albumsSelectedUserAlbumsCount: Int,
@@ -1062,7 +1093,9 @@ private fun PhotosMainScreenPreview() {
             timelineTabUiState = TimelineTabUiState(),
             timelineRevampUiState = TimelineRevampUiState.Loading,
             onTimelineRevampVisibleRangeChanged = { _, _ -> },
-            loadTimelineRevampMediaRange = { _, _ -> emptyMap() },
+            onTimelineRevampCellSelectionChange = { _, _ -> },
+            onTimelineRevampRangeSelectionToggle = {},
+            onTimelineRevampDragSelectionEnded = {},
             onTimelineRevampScrollingChanged = {},
             onTimelineRevampGridSizeChange = {},
             onTimelineRevampZoomIn = {},

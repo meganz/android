@@ -23,15 +23,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -50,11 +47,9 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
@@ -97,7 +92,6 @@ import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.MediaScreenDateHeaderSelectAllPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenDragToSelectStartedEvent
-import timber.log.Timber
 import java.time.Year
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -108,15 +102,16 @@ internal fun TimelineRevampScreen(
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     showEnableCameraUploadsPage: Boolean,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
-    loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2>,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?, Int) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    onCellSelectionChange: (index: Int, selected: Boolean) -> Unit,
+    onRangeSelectionToggle: (IntRange) -> Unit,
+    onDragSelectionEnded: () -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
-    selectedPhotoIds: Set<Long>,
     onTakenDownDialogEventConsumed: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
@@ -130,7 +125,6 @@ internal fun TimelineRevampScreen(
     onSelectorVisibleChanged: (Boolean) -> Unit = {},
     onPinchActiveChanged: (Boolean) -> Unit = {},
     isPinchToZoomEnabled: Boolean = false,
-    onPendingSelectionCountChanged: (Int) -> Unit = {},
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val takenDownDialogEvent =
@@ -189,8 +183,8 @@ internal fun TimelineRevampScreen(
                 selectedPeriod = uiState.selectedPeriod,
                 periodCards = uiState.periodCards,
                 arePeriodCardsLoading = uiState.arePeriodCardsLoading,
+                selection = uiState.selection,
                 onVisibleRangeChanged = onVisibleRangeChanged,
-                loadMediaRange = loadMediaRange,
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
@@ -199,11 +193,12 @@ internal fun TimelineRevampScreen(
                 onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
+                onCellSelectionChange = onCellSelectionChange,
+                onRangeSelectionToggle = onRangeSelectionToggle,
+                onDragSelectionEnded = onDragSelectionEnded,
                 onScrollingChanged = onScrollingChanged,
                 onSelectorVisibleChanged = onSelectorVisibleChanged,
-                onPendingSelectionCountChanged = onPendingSelectionCountChanged,
-                selectedPhotoIds = selectedPhotoIds,
-                bannerContent = if (selectedPhotoIds.isEmpty()) {
+                bannerContent = if (!uiState.selection.isActive) {
                     {
                         CameraUploadsBanner(
                             status = mediaCameraUploadUiState.status,
@@ -243,8 +238,8 @@ private fun TimelineRevampContent(
     selectedPeriod: MediaTimePeriod,
     periodCards: List<PhotosNodeListCard>,
     arePeriodCardsLoading: Boolean,
+    selection: TimelineSelection,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
-    loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2>,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -253,10 +248,11 @@ private fun TimelineRevampContent(
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?, Int) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    onCellSelectionChange: (index: Int, selected: Boolean) -> Unit,
+    onRangeSelectionToggle: (IntRange) -> Unit,
+    onDragSelectionEnded: () -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
     onSelectorVisibleChanged: (Boolean) -> Unit,
-    onPendingSelectionCountChanged: (Int) -> Unit,
-    selectedPhotoIds: Set<Long>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     bannerContent: (@Composable () -> Unit)? = null,
@@ -364,8 +360,8 @@ private fun TimelineRevampContent(
                 columns = columns,
                 locale = locale,
                 lazyGridState = lazyGridState,
+                selection = selection,
                 onVisibleRangeChanged = onVisibleRangeChanged,
-                loadMediaRange = loadMediaRange,
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
@@ -373,9 +369,10 @@ private fun TimelineRevampContent(
                 isPinchToZoomEnabled = isPinchToZoomEnabled,
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
+                onCellSelectionChange = onCellSelectionChange,
+                onRangeSelectionToggle = onRangeSelectionToggle,
+                onDragSelectionEnded = onDragSelectionEnded,
                 onScrollingChanged = onScrollingChanged,
-                onPendingSelectionCountChanged = onPendingSelectionCountChanged,
-                selectedPhotoIds = selectedPhotoIds,
                 contentPadding = contentPaddingWithSelector,
                 bannerContent = bannerContent,
                 modifier = modifier,
@@ -394,8 +391,8 @@ private fun TimelineRevampGrid(
     columns: Int,
     locale: Locale,
     lazyGridState: LazyGridState,
+    selection: TimelineSelection,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
-    loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2>,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -403,9 +400,10 @@ private fun TimelineRevampGrid(
     isPinchToZoomEnabled: Boolean,
     onNodeClicked: (PhotosNodeContentItemV2?, Int) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    onCellSelectionChange: (index: Int, selected: Boolean) -> Unit,
+    onRangeSelectionToggle: (IntRange) -> Unit,
+    onDragSelectionEnded: () -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
-    onPendingSelectionCountChanged: (Int) -> Unit,
-    selectedPhotoIds: Set<Long>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     bannerContent: (@Composable () -> Unit)? = null,
@@ -420,51 +418,11 @@ private fun TimelineRevampGrid(
 
     // The drag-to-select gesture keeps the lambdas it captures when the pointer input starts, so
     // they read the latest data through rememberUpdatedState instead of capturing it directly.
-    // Drag-selecting a cell fires the same onNodeSelected event as long-pressing it; the live
-    // selection makes that toggle idempotent — cells already in the target state are skipped.
     val currentOffsetByGroupId by rememberUpdatedState(offsetByGroupId)
     val currentLoadedNodes by rememberUpdatedState(loadedNodes)
-    val currentSelectedPhotoIds by rememberUpdatedState(selectedPhotoIds)
-    val currentOnNodeSelected by rememberUpdatedState(onNodeSelected)
-    val currentLoadMediaRange by rememberUpdatedState(loadMediaRange)
-
-    // Cells marked for selection while their node is still loading; their shimmer placeholders
-    // render as selected and they join the selection once the node arrives. The value is the node
-    // once a range fetch resolves the cell (its id is then in selectedPhotoIds), null while the
-    // cell is selected but unresolved — so unresolved entries are exactly what the selection count
-    // must add on top of selectedPhotoIds without double counting.
-    val pendingSelection = remember { mutableStateMapOf<Int, PhotosNodeContentItemV2?>() }
-
-    // Removes a cell's pending mark when it is deselected. An entry a range fetch resolved holds
-    // its node and its id is already in the real selection, so toggle it back out too.
-    fun unmarkPendingSelection(index: Int) {
-        pendingSelection.remove(index)?.let { resolved ->
-            if (resolved.id in currentSelectedPhotoIds) currentOnNodeSelected(resolved)
-        }
-    }
-
-    LaunchedEffect(loadedNodes) {
-        pendingSelection.keys.toList().forEach { index ->
-            val node = loadedNodes[index] ?: return@forEach
-            pendingSelection.remove(index)
-            node.takeUnless { it.isTakenDown }
-                ?.takeIf { it.id !in selectedPhotoIds }
-                ?.let(onNodeSelected)
-        }
-    }
-
-    LaunchedEffect(selectedPhotoIds.isEmpty()) {
-        if (selectedPhotoIds.isEmpty()) pendingSelection.clear()
-    }
-
-    val currentOnPendingSelectionCountChanged by rememberUpdatedState(onPendingSelectionCountChanged)
-    LaunchedEffect(Unit) {
-        snapshotFlow { pendingSelection.count { it.value == null } }
-            .collect { currentOnPendingSelectionCountChanged(it) }
-    }
-    DisposableEffect(Unit) {
-        onDispose { currentOnPendingSelectionCountChanged(0) }
-    }
+    val currentSelection by rememberUpdatedState(selection)
+    val currentOnCellSelectionChange by rememberUpdatedState(onCellSelectionChange)
+    val currentOnDragSelectionEnded by rememberUpdatedState(onDragSelectionEnded)
 
     NotifyVisibleMediaRange(
         gridState = lazyGridState,
@@ -493,8 +451,7 @@ private fun TimelineRevampGrid(
         bannerItems + 1 + headerIndexes.size + sections.sumOf { it.count }.toInt()
     }
 
-    val isSelectionMode = selectedPhotoIds.isNotEmpty()
-    val scope = rememberCoroutineScope()
+    val isSelectionMode = selection.isActive
 
     // Global media-index range of each month (keyed by monthKey), backing the month headers'
     // select-all checkboxes.
@@ -516,83 +473,11 @@ private fun TimelineRevampGrid(
         }
     }
 
-    // A range is fully selected when every cell is selected, pending selection, or taken down.
-    fun isRangeSelected(range: IntRange): Boolean = range.all { index ->
-        val node = loadedNodes[index]
-        if (node == null) index in pendingSelection
-        else node.isTakenDown || node.id in currentSelectedPhotoIds
-    }
+    fun isRangeSelected(range: IntRange): Boolean = selection.isRangeSelected(range, loadedNodes)
 
-    // Applies the same per-node toggle a tap fires across the whole range. Cells not in
-    // loadedNodes (which cannot represent a range larger than its cache) resolve through
-    // loadMediaRange, marked pending meanwhile when selecting.
     fun toggleRangeSelection(range: IntRange) {
         Analytics.tracker.trackEvent(MediaScreenDateHeaderSelectAllPressedEvent)
-        val selectAll = !isRangeSelected(range)
-        var hasUnloadedCells = false
-        range.forEach { index ->
-            val node = loadedNodes[index]
-            if (node == null) {
-                hasUnloadedCells = true
-                if (selectAll) {
-                    if (index !in pendingSelection) pendingSelection[index] = null
-                } else {
-                    unmarkPendingSelection(index)
-                }
-            } else {
-                if (!selectAll) pendingSelection.remove(index)
-                node.takeUnless { it.isTakenDown }
-                    ?.takeIf { (it.id in currentSelectedPhotoIds) != selectAll }
-                    ?.let { currentOnNodeSelected(it) }
-            }
-        }
-        if (hasUnloadedCells) {
-            scope.launch {
-                try {
-                    loadMediaRange(range.first, range.last).forEach { (index, node) ->
-                        // Leaving selection mode clears the pending marks; don't revive the selection.
-                        if (!selectAll || index in pendingSelection) {
-                            if (selectAll) pendingSelection[index] = node
-                            node.takeUnless { it.isTakenDown }
-                                ?.takeIf { (it.id in currentSelectedPhotoIds) != selectAll }
-                                ?.let { currentOnNodeSelected(it) }
-                        }
-                    }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Timber.e(e, "Failed to resolve the section selection")
-                }
-            }
-        }
-    }
-
-    // Cells drag-swept while unloaded only sit in pendingSelection, invisible to the selection
-    // count and any action taken on the selection. Resolve them the way toggleRangeSelection does
-    // as soon as the drag ends, instead of waiting for them to scroll into the loading window.
-    fun resolvePendingDragSelection() {
-        // Span only the unresolved cells: resolved entries linger (their nodes never reach
-        // loadedNodes) and would otherwise stretch the fetch across every past drag/select-all.
-        val unresolved = pendingSelection.filterValues { it == null }.keys
-        val first = unresolved.minOrNull() ?: return
-        val last = unresolved.max()
-        scope.launch {
-            try {
-                currentLoadMediaRange(first, last).forEach { (index, node) ->
-                    // Leaving selection mode clears the pending marks; don't revive the selection.
-                    if (index in pendingSelection) {
-                        pendingSelection[index] = node
-                        node.takeUnless { it.isTakenDown }
-                            ?.takeIf { it.id !in currentSelectedPhotoIds }
-                            ?.let(currentOnNodeSelected)
-                    }
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to resolve the drag selection")
-            }
-        }
+        onRangeSelectionToggle(range)
     }
 
     // The month owning the top-most visible media — the month the sticky/top header represents.
@@ -649,29 +534,15 @@ private fun TimelineRevampGrid(
                     isMediaSelected = { index ->
                         // An unloaded cell renders as checked through its pending mark, so treat
                         // it as selected too — anchoring a drag on it must deselect, not reselect.
-                        currentLoadedNodes[index]
-                            ?.let { it.id in currentSelectedPhotoIds }
-                            ?: (index in pendingSelection)
+                        currentSelection.isSelected(index, currentLoadedNodes[index])
                     },
                     onDragSelectStarted = {
                         Analytics.tracker.trackEvent(MediaScreenDragToSelectStartedEvent)
                     },
                     onDragSelectionChange = { index, selected ->
-                        val node = currentLoadedNodes[index]
-                        if (node == null) {
-                            if (selected) {
-                                if (index !in pendingSelection) pendingSelection[index] = null
-                            } else {
-                                unmarkPendingSelection(index)
-                            }
-                        } else {
-                            if (!selected) pendingSelection.remove(index)
-                            node.takeUnless { it.isTakenDown }
-                                ?.takeIf { (it.id in currentSelectedPhotoIds) != selected }
-                                ?.let { currentOnNodeSelected(it) }
-                        }
+                        currentOnCellSelectionChange(index, selected)
                     },
-                    onDragSelectEnded = { resolvePendingDragSelection() },
+                    onDragSelectEnded = { currentOnDragSelectionEnded() },
                 )
                 .then(
                     if (isPinchToZoomEnabled) {
@@ -770,11 +641,7 @@ private fun TimelineRevampGrid(
                         modifier = Modifier
                             .animateItem()
                             .padding(all = 1.dp),
-                        isSelected = if (node != null) {
-                            node.id in selectedPhotoIds
-                        } else {
-                            base + index in pendingSelection
-                        },
+                        isSelected = selection.isSelected(base + index, node),
                         shouldShowFavourite = node?.isFavourite == true,
                         isHiddenNodesEnabled = isHiddenNodesEnabled,
                         onClick = { onNodeClicked(node, base + index) },
@@ -1127,15 +994,16 @@ private fun TimelineRevampScreenPreview() {
                 loadedNodes = emptyMap(),
             ),
             onVisibleRangeChanged = { _, _ -> },
-            loadMediaRange = { _, _ -> emptyMap() },
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
             onMediaTimePeriodSelected = {},
             onNodeClicked = { _, _ -> },
             onNodeSelected = {},
+            onCellSelectionChange = { _, _ -> },
+            onRangeSelectionToggle = {},
+            onDragSelectionEnded = {},
             onScrollingChanged = {},
-            selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             showEnableCameraUploadsPage = false,
@@ -1174,15 +1042,16 @@ private fun TimelineRevampWithBannerPreview() {
                 loadedNodes = emptyMap(),
             ),
             onVisibleRangeChanged = { _, _ -> },
-            loadMediaRange = { _, _ -> emptyMap() },
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
             onMediaTimePeriodSelected = {},
             onNodeClicked = { _, _ -> },
             onNodeSelected = {},
+            onCellSelectionChange = { _, _ -> },
+            onRangeSelectionToggle = {},
+            onDragSelectionEnded = {},
             onScrollingChanged = {},
-            selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
             mediaCameraUploadUiState = MediaCameraUploadUiState(
                 status = CUStatusUiState.Disabled(shouldNotifyUser = true),
@@ -1206,15 +1075,16 @@ private fun TimelineRevampEmptyPreview() {
         TimelineRevampScreen(
             uiState = TimelineRevampUiState.Empty,
             onVisibleRangeChanged = { _, _ -> },
-            loadMediaRange = { _, _ -> emptyMap() },
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
             onMediaTimePeriodSelected = {},
             onNodeClicked = { _, _ -> },
             onNodeSelected = {},
+            onCellSelectionChange = { _, _ -> },
+            onRangeSelectionToggle = {},
+            onDragSelectionEnded = {},
             onScrollingChanged = {},
-            selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             showEnableCameraUploadsPage = false,

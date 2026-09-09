@@ -3,6 +3,7 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
@@ -64,6 +65,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -873,39 +875,300 @@ internal class TimelineRevampViewModelTest {
     }
 
     @Test
-    fun `test that retrieveTypedNodeFromSelection resolves ids to typed nodes and exposes them`() =
-        runTest {
-            val nodes = listOf(mock<TypedNode>(), mock<TypedNode>())
-            whenever(getNodeListByIdsUseCase(any())).thenReturn(nodes)
-            initUnderTest()
+    fun `test that toggleSelection adds the id and removes it when toggled again`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 4)))
+        initUnderTest()
 
-            val result = underTest.retrieveTypedNodeFromSelection(setOf(1L, 2L))
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
 
-            assertThat(result).isEqualTo(nodes)
-            assertThat(underTest.selectedPhotosInTypedNodesFlow.value).isEqualTo(nodes)
-            verify(getNodeListByIdsUseCase).invoke(listOf(NodeId(1L), NodeId(2L)))
+            underTest.toggleSelection(1L)
+            val selected = awaitSelection { it.isActive }
+            assertThat(selected.selectedIds).containsExactly(1L)
+            assertThat(selected.count).isEqualTo(1)
+
+            underTest.toggleSelection(1L)
+            val deselected = awaitSelection { !it.isActive }
+            assertThat(deselected.selectedIds).isEmpty()
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
     @Test
-    fun `test that retrieveTypedNodeFromSelection clears the exposed nodes when selection is empty`() =
-        runTest {
-            whenever(getNodeListByIdsUseCase(any())).thenReturn(emptyList())
-            initUnderTest()
+    fun `test that the selected ids are resolved to typed nodes`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 4)))
+        val node = mock<TypedNode> { on { this.id } doReturn NodeId(1L) }
+        whenever(getNodeListByIdsUseCase(any())).thenReturn(listOf(node))
+        initUnderTest()
 
-            val result = underTest.retrieveTypedNodeFromSelection(emptySet())
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.toggleSelection(1L)
+            awaitSelection { it.isActive }
+            advanceUntilIdle()
 
-            assertThat(result).isEmpty()
+            assertThat(underTest.selectedPhotosInTypedNodesFlow.value).containsExactly(node)
+            verify(getNodeListByIdsUseCase).invoke(listOf(NodeId(1L)))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that clearSelection empties the selection and the resolved typed nodes`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 4)))
+        val node = mock<TypedNode> { on { this.id } doReturn NodeId(1L) }
+        whenever(getNodeListByIdsUseCase(any())).thenReturn(listOf(node))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.toggleSelection(1L)
+            underTest.setCellSelected(index = 3, selected = true)
+            awaitSelection { it.count == 2 }
+            advanceUntilIdle()
+            assertThat(underTest.selectedPhotosInTypedNodesFlow.value).containsExactly(node)
+
+            underTest.clearSelection()
+            val cleared = awaitSelection { !it.isActive }
+            advanceUntilIdle()
+
+            assertThat(cleared.selectedIds).isEmpty()
+            assertThat(cleared.pendingIndices).isEmpty()
             assertThat(underTest.selectedPhotosInTypedNodesFlow.value).isEmpty()
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
     @Test
-    fun `test that retrieveTypedNodeFromSelection returns empty when the fetch fails`() = runTest {
+    fun `test that selected ids that no longer resolve are dropped from the selection`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 4)))
+        val node = mock<TypedNode> { on { this.id } doReturn NodeId(1L) }
+        whenever(getNodeListByIdsUseCase(any())).thenReturn(listOf(node))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.toggleSelection(1L)
+            underTest.toggleSelection(2L)
+            awaitSelection { it.count == 2 }
+            advanceUntilIdle()
+
+            val pruned = awaitSelection { it.count == 1 }
+            assertThat(pruned.selectedIds).containsExactly(1L)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the selection is kept when resolving the typed nodes fails`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 4)))
         whenever(getNodeListByIdsUseCase(any())).thenThrow(RuntimeException("boom"))
         initUnderTest()
 
-        val result = underTest.retrieveTypedNodeFromSelection(setOf(1L))
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.toggleSelection(1L)
+            awaitSelection { it.isActive }
+            advanceUntilIdle()
 
-        assertThat(result).isEmpty()
+            expectNoEvents()
+            assertThat(underTest.uiState.value.selection().selectedIds).containsExactly(1L)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that toggleRangeSelection selects the loaded cells at once and the unloaded ones once fetched`() =
+        runTest {
+            val fetchGate = CompletableDeferred<Unit>()
+            // Only the select-all fetch of the unloaded tail is held back.
+            stubPagedSection(count = 60) { offset -> if (offset > 0) fetchGate.await() }
+            initUnderTest()
+
+            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+                awaitItem()
+                underTest.onVisibleRangeChanged(firstIndex = 0, lastIndex = 1)
+                val loaded = awaitItem().loadedNodes.keys
+                assertThat(loaded).containsExactlyElementsIn((0..25).toList())
+
+                underTest.toggleRangeSelection(0..59)
+
+                // The count covers the whole range right away: loaded cells by id, the rest pending.
+                val pending = awaitSelection { it.count == 60 }
+                assertThat(pending.selectedIds).containsExactlyElementsIn((0L..25L).toList())
+                assertThat(pending.pendingIndices).containsExactlyElementsIn((26..59).toList())
+
+                fetchGate.complete(Unit)
+
+                // The resolved cells join the id selection; their marks stay so the placeholders
+                // outside the loaded window keep rendering as selected.
+                val resolved = awaitSelection { it.selectedIds.size == 60 }
+                assertThat(resolved.count).isEqualTo(60)
+                assertThat(resolved.pendingIndices).containsExactlyElementsIn((26..59).toList())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that toggleRangeSelection deselects a fully selected range including the cells outside the loaded window`() =
+        runTest {
+            stubPagedSection(count = 4)
+            initUnderTest()
+
+            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+                awaitItem()
+                underTest.toggleRangeSelection(0..3)
+                awaitSelection { it.selectedIds.size == 4 }
+
+                // Even when the deselect refetch returns nothing, the marks resolved by the
+                // select-all know their ids.
+                whenever(listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any()))
+                    .thenReturn(emptyList())
+                underTest.toggleRangeSelection(0..3)
+
+                val deselected = awaitSelection { !it.isActive }
+                assertThat(deselected.selectedIds).isEmpty()
+                assertThat(deselected.pendingIndices).isEmpty()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that a drag-selected unloaded cell counts as pending and joins the selection when resolved`() =
+        runTest {
+            stubPagedSection(count = 60)
+            initUnderTest()
+
+            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+                awaitItem()
+
+                underTest.setCellSelected(index = 5, selected = true)
+                val pending = awaitSelection { it.isActive }
+                assertThat(pending.count).isEqualTo(1)
+                assertThat(pending.selectedIds).isEmpty()
+                assertThat(pending.pendingIndices).containsExactly(5)
+
+                underTest.resolvePendingSelection()
+                val resolved = awaitSelection { it.selectedIds.isNotEmpty() }
+                assertThat(resolved.selectedIds).containsExactly(5L)
+                assertThat(resolved.count).isEqualTo(1)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(listMediaNodesByOffsetUseCase).invoke(
+                filter = any(),
+                section = any(),
+                order = any(),
+                maxElements = eq(1),
+                offset = eq(5L),
+            )
+        }
+
+    @Test
+    fun `test that resolvePendingSelection fetches only the cells still unresolved`() = runTest {
+        stubPagedSection(count = 60)
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.setCellSelected(index = 1, selected = true)
+            underTest.setCellSelected(index = 2, selected = true)
+            underTest.resolvePendingSelection()
+            awaitSelection { it.selectedIds.containsAll(listOf(1L, 2L)) }
+
+            // The resolved cells keep their marks; a later sweep must not refetch across them.
+            underTest.setCellSelected(index = 4, selected = true)
+            underTest.setCellSelected(index = 5, selected = true)
+            underTest.resolvePendingSelection()
+            awaitSelection { it.selectedIds.containsAll(listOf(4L, 5L)) }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(listMediaNodesByOffsetUseCase).invoke(any(), any(), any(), eq(2), eq(1L))
+        verify(listMediaNodesByOffsetUseCase).invoke(any(), any(), any(), eq(2), eq(4L))
+        verify(listMediaNodesByOffsetUseCase, never()).invoke(any(), any(), any(), eq(5), eq(1L))
+    }
+
+    @Test
+    fun `test that a pending cell is selected by id once its node loads`() = runTest {
+        stubPagedSection(count = 60)
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.setCellSelected(index = 3, selected = true)
+            awaitSelection { 3 in it.pendingIndices }
+
+            underTest.onVisibleRangeChanged(firstIndex = 0, lastIndex = 1)
+
+            val selection = awaitSelection { it.selectedIds.isNotEmpty() }
+            assertThat(selection.selectedIds).containsExactly(3L)
+            assertThat(selection.pendingIndices).isEmpty()
+            assertThat(selection.count).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that deselecting a resolved pending cell removes its id`() = runTest {
+        stubPagedSection(count = 60)
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.setCellSelected(index = 7, selected = true)
+            underTest.resolvePendingSelection()
+            awaitSelection { it.selectedIds.contains(7L) }
+
+            underTest.setCellSelected(index = 7, selected = false)
+
+            val deselected = awaitSelection { !it.isActive }
+            assertThat(deselected.selectedIds).isEmpty()
+            assertThat(deselected.pendingIndices).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /**
+     * A single section of [count] slots whose pages are served from mocked nodes mapped to items
+     * with id == slot index; [onPage] runs before each page is served, e.g. to hold a fetch back.
+     */
+    private suspend fun stubPagedSection(
+        count: Int,
+        onPage: suspend (offset: Int) -> Unit = {},
+    ) {
+        val nodes = (0 until count).map { mock<TypedFileNode>() }
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = count.toLong())))
+        whenever(getNodeListByIdsUseCase(any())).thenReturn(emptyList())
+        whenever(listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any()))
+            .doSuspendableAnswer { invocation ->
+                val maxElements = invocation.getArgument<Int>(3)
+                val offset = invocation.getArgument<Long>(4).toInt()
+                onPage(offset)
+                nodes.subList(offset, offset + maxElements)
+            }
+        nodes.forEachIndexed { index, node ->
+            whenever(mediaTimelineNodeUiItemMapper(node)).thenReturn(item(id = index.toLong()))
+        }
+    }
+
+    private fun TimelineRevampUiState.selection(): TimelineSelection =
+        (this as TimelineRevampUiState.Data).selection
+
+    private suspend fun ReceiveTurbine<TimelineRevampUiState.Data>.awaitSelection(
+        predicate: (TimelineSelection) -> Boolean,
+    ): TimelineSelection {
+        var selection = awaitItem().selection
+        while (!predicate(selection)) {
+            selection = awaitItem().selection
+        }
+        return selection
     }
 
     @Test
@@ -1049,58 +1312,6 @@ internal class TimelineRevampViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-    @Test
-    fun `test that loadMediaRange returns the requested slots after the visible-window loader has run`() =
-        runTest {
-            val sections = listOf(section(groupId = "May 2026", count = 60))
-            val nodes = (0 until 60).map { mock<TypedFileNode>() }
-            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)
-            whenever(listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any()))
-                .thenAnswer { invocation ->
-                    val maxElements = invocation.getArgument<Int>(3)
-                    val offset = invocation.getArgument<Long>(4).toInt()
-                    nodes.subList(offset, offset + maxElements)
-                }
-            nodes.forEachIndexed { index, node ->
-                whenever(mediaTimelineNodeUiItemMapper(node)).thenReturn(item(id = index.toLong()))
-            }
-            initUnderTest()
-
-            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
-                awaitItem()
-                underTest.onVisibleRangeChanged(firstIndex = 0, lastIndex = 1)
-                awaitItem()
-
-                val loaded = underTest.loadMediaRange(firstIndex = 30, lastIndex = 59)
-                assertThat(loaded.keys).containsExactlyElementsIn((30..59).toList())
-
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `test that loadMediaRange returns the requested slots before any visible range was reported`() =
-        runTest {
-            val sections = listOf(section(groupId = "May 2026", count = 4))
-            val nodes = (0 until 4).map { mock<TypedFileNode>() }
-            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)
-            whenever(listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any()))
-                .thenReturn(nodes)
-            nodes.forEachIndexed { index, node ->
-                whenever(mediaTimelineNodeUiItemMapper(node)).thenReturn(item(id = index.toLong()))
-            }
-            initUnderTest()
-
-            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
-                awaitItem()
-
-                val loaded = underTest.loadMediaRange(firstIndex = 0, lastIndex = 3)
-                assertThat(loaded.keys).containsExactly(0, 1, 2, 3)
-
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
 
     private fun section(groupId: String, count: Long) =
         MediaTimelineSection(groupId = groupId, startDate = 0L, endDate = 0L, count = count)

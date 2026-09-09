@@ -6,6 +6,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.mutate
+import kotlinx.collections.immutable.persistentHashSetOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
@@ -26,6 +33,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
@@ -169,6 +177,22 @@ class TimelineRevampViewModel @Inject constructor(
     internal val selectedPhotosInTypedNodesFlow: StateFlow<List<TypedNode>> =
         _selectedPhotosInTypedNodesFlow.asStateFlow()
 
+    /**
+     * The ids of the selected media. Owned here rather than by the composition so the selection, and
+     * the typed nodes resolved from it, survive a configuration change without a saved-state round
+     * trip — which for a selection of thousands is slow and re-resolves every node.
+     */
+    private val selectedIdsFlow = MutableStateFlow<PersistentSet<Long>>(persistentSetOf())
+
+    /**
+     * Cells selected while their node was not loaded, keyed by slot: null until a fetch resolves the
+     * cell, its node id afterwards so the cell can still be deselected while outside the loaded window.
+     * Kept by slot (not global index) so a section change elsewhere doesn't shift the marks.
+     */
+    private val pendingSelectionFlow =
+        MutableStateFlow<PersistentMap<SlotKey, Long?>>(persistentMapOf())
+    private val selectionResolverStarted = AtomicBoolean(false)
+
     private val selectedFilterFlow = MutableStateFlow<Map<String, String?>?>(null)
 
     /**
@@ -290,12 +314,18 @@ class TimelineRevampViewModel @Inject constructor(
             GridBundle(sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort)
         }
 
+        val selectionFlow = combine(
+            selectedIdsFlow.onStart { ensureSelectionResolverStarted() },
+            pendingSelectionFlow,
+        ) { ids, pending -> Selection(ids, pending) }
+
         combine(
             gridFlow,
             selectedTimePeriodFlow,
             periodCards,
+            selectionFlow,
             _takenDownDialogEvent,
-        ) { grid, period, cards, takenDownDialogEvent ->
+        ) { grid, period, cards, selection, takenDownDialogEvent ->
             when (val sectionsState = grid.sectionsState) {
                 SectionsState.Loading -> TimelineRevampUiState.Loading
                 is SectionsState.Loaded ->
@@ -308,6 +338,7 @@ class TimelineRevampViewModel @Inject constructor(
                         selectedPeriod = period,
                         periodCards = cards.forPeriod(period),
                         arePeriodCardsLoading = cards.isLoading,
+                        selection = selection,
                     ).let { state ->
                         // Inject the taken-down dialog event so the screen observes a single object.
                         if (state is TimelineRevampUiState.Data) {
@@ -573,13 +604,15 @@ class TimelineRevampViewModel @Inject constructor(
         selectedPeriod: MediaTimePeriod,
         periodCards: List<PhotosNodeListCard>,
         arePeriodCardsLoading: Boolean,
+        selection: Selection,
     ): TimelineRevampUiState =
         if (sections.isEmpty()) {
             TimelineRevampUiState.Empty
         } else {
+            val sectionStartOffsets = sectionStartOffsetsOf(sections)
             TimelineRevampUiState.Data(
                 sections = sections,
-                sectionStartOffsets = sectionStartOffsetsOf(sections),
+                sectionStartOffsets = sectionStartOffsets,
                 loadedNodes = loaded,
                 isHiddenNodesEnabled = isHiddenNodesEnabled,
                 gridSize = gridSize,
@@ -587,8 +620,47 @@ class TimelineRevampViewModel @Inject constructor(
                 selectedPeriod = selectedPeriod,
                 periodCards = periodCards,
                 arePeriodCardsLoading = arePeriodCardsLoading,
+                selection = selection.toTimelineSelection(sections, sectionStartOffsets),
             )
         }
+
+    private fun Selection.toTimelineSelection(
+        sections: List<MediaTimelineSection>,
+        sectionStartOffsets: List<Int>,
+    ): TimelineSelection {
+        val offsetByGroupId = offsetByGroupIdOf(sections, sectionStartOffsets)
+        return TimelineSelection(
+            selectedIds = ids,
+            pendingIndices = persistentHashSetOf<Int>().mutate { indices ->
+                pending.keys.forEach { slot ->
+                    offsetByGroupId[slot.groupId]?.let { indices += it + slot.localIndex }
+                }
+            },
+            count = ids.size + pending.values.count { it == null },
+        )
+    }
+
+    private fun offsetByGroupIdOf(
+        sections: List<MediaTimelineSection>,
+        sectionStartOffsets: List<Int>,
+    ): Map<String, Int> =
+        sections.indices.associate { sections[it].groupId to sectionStartOffsets[it] }
+
+    /**
+     * The slot at global [index] in the displayed [layout], or null when the index is out of range
+     * (e.g. the sections changed under a stale gesture).
+     */
+    private fun slotKeyOf(index: Int, layout: TimelineRevampUiState.Data): SlotKey? {
+        val offsets = layout.sectionStartOffsets
+        if (index < 0 || offsets.isEmpty()) return null
+        var sectionIndex = offsets.binarySearch(index).let { if (it >= 0) it else -it - 2 }
+        if (sectionIndex < 0) return null
+        // Sections without slots share their start offset with the next one; take the last match.
+        while (sectionIndex + 1 < offsets.size && offsets[sectionIndex + 1] <= index) sectionIndex++
+        val section = layout.sections[sectionIndex]
+        val localIndex = index - offsets[sectionIndex]
+        return if (localIndex < section.count) SlotKey(section.groupId, localIndex) else null
+    }
 
     /**
      * Called by the screen when the set of visible media slots changes.
@@ -608,21 +680,21 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * Loads and returns the media in the given global slot range, keyed by global index. Used by
-     * section select-all, which needs every node of the range, on-screen or not. The fetched nodes
-     * are deliberately not cached: a range can exceed the LRU cache capacity, where caching would
-     * evict the visible window and lose part of the range before it could ever be observed through
-     * [TimelineRevampUiState.Data.loadedNodes].
+     * Loads and returns the media in the given global slot range, keyed by slot. Used by the section
+     * select-all and the drag-select resolution, which need every node of the range, on-screen or
+     * not. The fetched nodes are deliberately not cached: a range can exceed the LRU cache capacity,
+     * where caching would evict the visible window and lose part of the range before it could ever
+     * be observed through [TimelineRevampUiState.Data.loadedNodes].
      *
      * @param firstIndex the first global media index of the range
      * @param lastIndex the last global media index of the range
      */
-    suspend fun loadMediaRange(
+    private suspend fun loadMediaSlots(
         firstIndex: Int,
         lastIndex: Int,
-    ): Map<Int, PhotosNodeContentItemV2> {
-        if (firstIndex < 0 || firstIndex > lastIndex) return emptyMap()
-        val result = HashMap<Int, PhotosNodeContentItemV2>()
+    ): Map<SlotKey, PhotosNodeContentItemV2> {
+        if (firstIndex !in 0..lastIndex) return emptyMap()
+        val result = HashMap<SlotKey, PhotosNodeContentItemV2>()
         var sectionStartOffset = 0
         for (section in sectionsState.value.sectionsOrEmpty()) {
             if (sectionStartOffset > lastIndex) break
@@ -636,7 +708,7 @@ class TimelineRevampViewModel @Inject constructor(
                     localWindowStart = localWindowStart,
                     localWindowEnd = localWindowEnd,
                 ).forEach { (localIndex, item) ->
-                    result[sectionStartOffset + localIndex] = item
+                    result[SlotKey(section.groupId, localIndex)] = item
                 }
             }
             sectionStartOffset += slotCount
@@ -646,7 +718,7 @@ class TimelineRevampViewModel @Inject constructor(
 
     /**
      * The items of the section-local window `[localWindowStart, localWindowEnd]`: taken from the
-     * cache where already loaded, with the rest fetched — without caching (see [loadMediaRange]).
+     * cache where already loaded, with the rest fetched — without caching (see [loadMediaSlots]).
      */
     private suspend fun fetchSectionWindowItems(
         section: MediaTimelineSection,
@@ -722,6 +794,7 @@ class TimelineRevampViewModel @Inject constructor(
         if (replacements.isEmpty()) return
         replacements.forEach { (slot, item) -> mediaCache[slot] = item }
         loadedNodes.update { getAndUpdateLoadedNodes() }
+        reconcilePendingSelection()
     }
 
     private fun updateMediaCache(newSections: List<MediaTimelineSection>) {
@@ -736,9 +809,14 @@ class TimelineRevampViewModel @Inject constructor(
                     newCount != previousCounts[slot.groupId] ||
                     slot.localIndex >= newCount
         }
+        pendingSelectionFlow.update { pending ->
+            val stale = pending.keys.filter { slot -> (newCounts[slot.groupId] ?: 0) <= slot.localIndex }
+            if (stale.isEmpty()) pending else pending.mutate { it.keys.removeAll(stale) }
+        }
         cachedSections = newSections
         updateSectionOffsets(newSections)
         loadedNodes.update { getAndUpdateLoadedNodes() }
+        reconcilePendingSelection()
     }
 
     private fun updateSectionOffsets(sections: List<MediaTimelineSection>) {
@@ -881,6 +959,7 @@ class TimelineRevampViewModel @Inject constructor(
                 mediaTimelineNodeUiItemMapper(node)
         }
         loadedNodes.update { getAndUpdateLoadedNodes() }
+        reconcilePendingSelection()
     }
 
     /**
@@ -892,15 +971,208 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * Resolves the given selected media ids to [TypedNode]s (fetched by id, since the revamp does not
-     * hold all nodes in memory), publishes them to [selectedPhotosInTypedNodesFlow], and returns them.
+     * Toggles the selection of the media with [id] (a long-press, or a tap while in selection mode).
      */
-    internal suspend fun retrieveTypedNodeFromSelection(selectedIds: Set<Long>): List<TypedNode> {
-        val nodes = runCatching { getNodeListByIdsUseCase(selectedIds.map { NodeId(it) }) }
-            .onFailure { Timber.e(it, "Failed to resolve selected nodes") }
-            .getOrDefault(emptyList())
+    fun toggleSelection(id: Long) {
+        selectedIdsFlow.update { if (id in it) it.remove(id) else it.add(id) }
+    }
+
+    /**
+     * Selects or deselects the cell at global [index] as a drag-select sweep crosses it. A cell whose
+     * node is not loaded is marked pending instead (see [TimelineSelection.pendingIndices]) and is
+     * resolved by [resolvePendingSelection] once the drag ends.
+     */
+    fun setCellSelected(index: Int, selected: Boolean) {
+        val layout = uiState.value as? TimelineRevampUiState.Data ?: return
+        val node = loadedNodes.value[index]
+        if (node == null) {
+            val slot = slotKeyOf(index, layout) ?: return
+            if (selected) markPending(listOf(slot)) else unmarkPending(listOf(slot))
+        } else if (!node.isTakenDown) {
+            selectedIdsFlow.update { if (selected) it.add(node.id) else it.remove(node.id) }
+        }
+    }
+
+    /**
+     * Selects every cell of [range] (a month, from its header checkbox), or deselects them all when
+     * they are all selected already. Loaded cells toggle right away; the others are marked pending and
+     * resolved from a fetch of the range that runs in [viewModelScope], so a configuration change
+     * mid-fetch neither cancels it nor loses the marks.
+     */
+    fun toggleRangeSelection(range: IntRange) {
+        val layout = uiState.value as? TimelineRevampUiState.Data ?: return
+        val selectAll = !isRangeSelected(range, layout)
+        val unloadedSlots = mutableListOf<SlotKey>()
+        val loadedIds = mutableListOf<Long>()
+        val loaded = loadedNodes.value
+        for (index in range) {
+            val node = loaded[index]
+            when {
+                node == null -> slotKeyOf(index, layout)?.let(unloadedSlots::add)
+                !node.isTakenDown -> loadedIds += node.id
+            }
+        }
+        if (selectAll) {
+            markPending(unloadedSlots)
+            selectedIdsFlow.update { it.addAll(loadedIds) }
+        } else {
+            unmarkPending(unloadedSlots)
+            selectedIdsFlow.update { it.removeAll(loadedIds) }
+        }
+        if (unloadedSlots.isEmpty()) return
+        viewModelScope.launch {
+            val resolved = loadMediaSlots(range.first, range.last)
+            if (selectAll) {
+                selectResolvedPending(resolved)
+            } else {
+                // Selected cells outside the loaded window are only reachable through their nodes.
+                val resolvedIds = resolved.values.map { it.id }
+                selectedIdsFlow.update { it.removeAll(resolvedIds) }
+            }
+        }
+    }
+
+    /**
+     * [TimelineSelection.isRangeSelected] evaluated against the source flows rather than the published
+     * [uiState], which can trail them by a dispatch when the header is tapped right after a change.
+     */
+    private fun isRangeSelected(range: IntRange, layout: TimelineRevampUiState.Data): Boolean {
+        val ids = selectedIdsFlow.value
+        val pending = pendingSelectionFlow.value
+        val loaded = loadedNodes.value
+        return range.all { index ->
+            val node = loaded[index]
+            if (node == null) slotKeyOf(index, layout) in pending
+            else node.isTakenDown || node.id in ids
+        }
+    }
+
+    /**
+     * Resolves the cells drag-selected while unloaded (see [setCellSelected]) as soon as the drag
+     * ends, so they join the selection without waiting to scroll into the loading window. Spans only
+     * the unresolved cells, so past selections don't stretch the fetch.
+     */
+    fun resolvePendingSelection() {
+        val layout = uiState.value as? TimelineRevampUiState.Data ?: return
+        val offsetByGroupId = offsetByGroupIdOf(layout.sections, layout.sectionStartOffsets)
+        val unresolved = pendingSelectionFlow.value
+            .filterValues { it == null }
+            .keys
+            .mapNotNull { slot -> offsetByGroupId[slot.groupId]?.plus(slot.localIndex) }
+        if (unresolved.isEmpty()) return
+        viewModelScope.launch {
+            selectResolvedPending(loadMediaSlots(unresolved.min(), unresolved.max()))
+        }
+    }
+
+    /**
+     * Leaves selection mode. A range fetch still in flight finds no pending marks to resolve, so it
+     * cannot revive the selection.
+     */
+    fun clearSelection() {
+        pendingSelectionFlow.update { persistentMapOf() }
+        selectedIdsFlow.update { persistentSetOf() }
+    }
+
+    private fun markPending(slots: List<SlotKey>) {
+        if (slots.isEmpty()) return
+        pendingSelectionFlow.update { pending ->
+            pending.mutate { m -> slots.forEach { slot -> if (slot !in m) m[slot] = null } }
+        }
+    }
+
+    /**
+     * Drops the pending marks of [slots]; a mark already resolved to a node deselects that node too.
+     */
+    private fun unmarkPending(slots: List<SlotKey>) {
+        if (slots.isEmpty()) return
+        val previous = pendingSelectionFlow.getAndUpdate { pending ->
+            pending.mutate { m -> slots.forEach(m::remove) }
+        }
+        val resolvedIds = slots.mapNotNull { previous[it] }
+        if (resolvedIds.isNotEmpty()) selectedIdsFlow.update { it.removeAll(resolvedIds) }
+    }
+
+    /**
+     * Records the node of each still-pending cell in [resolved] and selects it. Cells no longer
+     * pending are skipped, so leaving selection mode mid-fetch doesn't revive the selection.
+     */
+    private fun selectResolvedPending(resolved: Map<SlotKey, PhotosNodeContentItemV2>) {
+        if (resolved.isEmpty()) return
+        val previous = pendingSelectionFlow.getAndUpdate { pending ->
+            pending.mutate { m ->
+                resolved.forEach { (slot, node) ->
+                    if (m.isUnresolved(slot)) m[slot] = node.id
+                }
+            }
+        }
+        val newlySelected = resolved.mapNotNull { (slot, node) ->
+            node.id.takeIf { previous.isUnresolved(slot) && !node.isTakenDown }
+        }
+        if (newlySelected.isNotEmpty()) selectedIdsFlow.update { it.addAll(newlySelected) }
+    }
+
+    private fun Map<SlotKey, Long?>.isUnresolved(slot: SlotKey): Boolean =
+        slot in this && this[slot] == null
+
+    /**
+     * Hands pending cells whose node has reached the cache over to the id-based selection: the cell
+     * is selected by id and its mark dropped, so it behaves like any loaded cell from then on.
+     */
+    private fun reconcilePendingSelection() {
+        val pending = pendingSelectionFlow.value
+        if (pending.isEmpty()) return
+        val loadedSlots = mutableListOf<SlotKey>()
+        val newlySelected = mutableListOf<Long>()
+        for ((slot, resolvedId) in pending) {
+            val node = mediaCache[slot] ?: continue
+            loadedSlots += slot
+            if (resolvedId == null && !node.isTakenDown) newlySelected += node.id
+        }
+        if (loadedSlots.isEmpty()) return
+        pendingSelectionFlow.update { it.mutate { m -> loadedSlots.forEach(m::remove) } }
+        if (newlySelected.isNotEmpty()) selectedIdsFlow.update { it.addAll(newlySelected) }
+    }
+
+    /**
+     * Starts (once) the coroutine resolving the selected ids to [TypedNode]s for the selection-mode
+     * actions. Re-runs on a selection or section change so a node deleted meanwhile drops out of the
+     * selection; debounced so a drag sweep doesn't restart the lookup on every cell.
+     */
+    @OptIn(FlowPreview::class)
+    private fun ensureSelectionResolverStarted() {
+        if (!selectionResolverStarted.compareAndSet(false, true)) return
+        viewModelScope.launch {
+            combine(
+                selectedIdsFlow,
+                sectionsState.map { it.sectionsOrEmpty() }.distinctUntilChanged(),
+            ) { ids, _ -> ids }
+                .debounce(SELECTION_RESOLVE_DEBOUNCE_MS.milliseconds)
+                .collectLatest(::resolveSelectedNodes)
+        }
+    }
+
+    /**
+     * Publishes the [TypedNode]s of [ids] and prunes the ids that no longer resolve. Only ids covered
+     * by this lookup are pruned, never ones selected while it ran, and never on an empty result,
+     * which a transient failure also produces.
+     */
+    private suspend fun resolveSelectedNodes(ids: Set<Long>) {
+        if (ids.isEmpty()) {
+            _selectedPhotosInTypedNodesFlow.update { emptyList() }
+            return
+        }
+        val nodes = runCatching { getNodeListByIdsUseCase(ids.map { NodeId(it) }) }
+            .onFailure {
+                if (it is CancellationException) throw it
+                Timber.e(it, "Failed to resolve selected nodes")
+            }
+            .getOrNull() ?: return
         _selectedPhotosInTypedNodesFlow.update { nodes }
-        return nodes
+        if (nodes.isEmpty()) return
+        val resolvedIds = nodes.mapTo(HashSet()) { it.id.longValue }
+        val missing = ids.filterNot { it in resolvedIds }
+        if (missing.isNotEmpty()) selectedIdsFlow.update { it.removeAll(missing) }
     }
 
     /**
@@ -1062,6 +1334,11 @@ class TimelineRevampViewModel @Inject constructor(
         val currentSort: TimelineRevampSortConfiguration,
     )
 
+    private data class Selection(
+        val ids: PersistentSet<Long>,
+        val pending: PersistentMap<SlotKey, Long?>,
+    )
+
     private data class PeriodCards(
         val yearCards: List<PhotosNodeListCard>,
         val monthCards: List<PhotosNodeListCard>,
@@ -1090,6 +1367,7 @@ class TimelineRevampViewModel @Inject constructor(
         private const val MAX_CACHED_ITEMS = 480
         private const val SCROLL_SETTLE_DEBOUNCE_MS = 250L
         private const val MEDIA_CHANGE_DEBOUNCE_MS = 1_000L
+        private const val SELECTION_RESOLVE_DEBOUNCE_MS = 100L
         private const val MIN_LOAD_BUFFER = 24
 
         /**

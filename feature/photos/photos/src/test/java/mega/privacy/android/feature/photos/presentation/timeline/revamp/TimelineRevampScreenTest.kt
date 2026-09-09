@@ -2,7 +2,6 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.TouchInjectionScope
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CompletableDeferred
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.model.MediaType
@@ -260,7 +258,9 @@ class TimelineRevampScreenTest {
 
     @Test
     fun `test that drag selection extends over the media range when dragging after a long press`() {
-        val selectedIds = mutableStateSetOf<Long>()
+        val longPressed = mutableListOf<Long>()
+        val cellChanges = mutableListOf<Pair<Int, Boolean>>()
+        var dragEnds = 0
         composeRule.setScreen(
             TimelineRevampUiState.Data(
                 sections = listOf(
@@ -274,10 +274,9 @@ class TimelineRevampScreenTest {
                 sectionStartOffsets = listOf(0),
                 loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
             ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { node ->
-                if (node.id in selectedIds) selectedIds.remove(node.id) else selectedIds.add(node.id)
-            },
+            onNodeSelected = { longPressed += it.id },
+            onCellSelectionChange = { index, selected -> cellChanges += index to selected },
+            onDragSelectionEnded = { dragEnds++ },
         )
 
         composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
@@ -289,7 +288,51 @@ class TimelineRevampScreenTest {
                 up()
             }
 
-        assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+        composeRule.runOnIdle {
+            assertThat(longPressed).containsExactly(1L)
+            assertThat(cellChanges.distinct()).containsExactly(0 to true, 1 to true, 2 to true)
+            assertThat(dragEnds).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that a drag anchored on a checked placeholder reports the swept cells as deselected`() {
+        val cellChanges = mutableListOf<Pair<Int, Boolean>>()
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = mapOf(0 to photoNode(id = 1L)),
+                selection = TimelineSelection(
+                    selectedIds = setOf(1L),
+                    pendingIndices = setOf(1, 2),
+                    count = 3,
+                ),
+            ),
+            onCellSelectionChange = { index, selected -> cellChanges += index to selected },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG).assertAll(isSelected())
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat(), 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(cellChanges.distinct()).containsExactly(1 to false, 2 to false)
+        }
     }
 
     @Test
@@ -348,7 +391,6 @@ class TimelineRevampScreenTest {
 
     @Test
     fun `test that a pinch does not zoom when a drag selection is already active`() {
-        val selectedIds = mutableStateSetOf<Long>()
         var zoomIns = 0
         composeRule.setScreen(
             TimelineRevampUiState.Data(
@@ -363,8 +405,6 @@ class TimelineRevampScreenTest {
                 sectionStartOffsets = listOf(0),
                 loadedNodes = (0..29).associateWith { index -> photoNode(id = index + 1L) },
             ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { node -> selectedIds.toggle(node.id) },
             onZoomIn = { zoomIns++ },
         )
 
@@ -390,7 +430,6 @@ class TimelineRevampScreenTest {
 
     @Test
     fun `test that drag selection tracks MediaScreenDragToSelectStartedEvent once per gesture`() {
-        val selectedIds = mutableStateSetOf<Long>()
         composeRule.setScreen(
             TimelineRevampUiState.Data(
                 sections = listOf(
@@ -404,10 +443,6 @@ class TimelineRevampScreenTest {
                 sectionStartOffsets = listOf(0),
                 loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
             ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { node ->
-                if (node.id in selectedIds) selectedIds.remove(node.id) else selectedIds.add(node.id)
-            },
         )
 
         composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
@@ -426,60 +461,9 @@ class TimelineRevampScreenTest {
     }
 
     @Test
-    fun `test that swept cells are selected once their nodes are lazily loaded`() {
-        val selectedIds = mutableStateSetOf<Long>()
-        val initialState = TimelineRevampUiState.Data(
-            sections = listOf(
-                MediaTimelineSection(
-                    groupId = "2026-06-15",
-                    startDate = 1_781_481_600L,
-                    endDate = 1_781_481_600L,
-                    count = 3,
-                ),
-            ),
-            sectionStartOffsets = listOf(0),
-            loadedNodes = mapOf(0 to photoNode(id = 1L)),
-        )
-        var uiState by mutableStateOf(initialState)
-        composeRule.setScreenContent(
-            uiState = { uiState },
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { node ->
-                if (node.id in selectedIds) selectedIds.remove(node.id) else selectedIds.add(node.id)
-            },
-        )
-
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
-            .onFirst()
-            .performTouchInput {
-                down(center)
-                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
-                moveBy(Offset(width.toFloat() * 2, 0f))
-                up()
-            }
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L)
-        }
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG).assertAll(isSelected())
-
-        composeRule.runOnIdle {
-            uiState = initialState.copy(
-                loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
-            )
-        }
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
-        }
-    }
-
-    @Test
-    fun `test that drag-swept unloaded cells are loaded and selected when the drag ends`() {
-        val selectedIds = mutableStateSetOf<Long>()
-        val loadRequests = mutableListOf<IntRange>()
+    fun `test that unloaded cells with a pending mark render as selected placeholders`() {
         composeRule.setScreen(
-            uiState = TimelineRevampUiState.Data(
+            TimelineRevampUiState.Data(
                 sections = listOf(
                     MediaTimelineSection(
                         groupId = "2026-06-15",
@@ -490,278 +474,47 @@ class TimelineRevampScreenTest {
                 ),
                 sectionStartOffsets = listOf(0),
                 loadedNodes = mapOf(0 to photoNode(id = 1L)),
+                selection = TimelineSelection(pendingIndices = setOf(1, 2), count = 2),
             ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-            loadMediaRange = { first, last ->
-                loadRequests.add(first..last)
-                (first..last).associateWith { index -> photoNode(id = index + 1L) }
-            },
         )
-
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
-            .onFirst()
-            .performTouchInput {
-                down(center)
-                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
-                moveBy(Offset(width.toFloat() * 2, 0f))
-                up()
-            }
-
-        composeRule.runOnIdle {
-            assertThat(loadRequests).containsExactly(1..2)
-            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
-        }
-    }
-
-    @Test
-    fun `test that the pending selection count is reported while swept cells are unresolved`() {
-        val selectedIds = mutableStateSetOf<Long>()
-        var pendingCount = 0
-        val loadGate = CompletableDeferred<Unit>()
-        composeRule.setScreen(
-            uiState = TimelineRevampUiState.Data(
-                sections = listOf(
-                    MediaTimelineSection(
-                        groupId = "2026-06-15",
-                        startDate = 1_781_481_600L,
-                        endDate = 1_781_481_600L,
-                        count = 3,
-                    ),
-                ),
-                sectionStartOffsets = listOf(0),
-                loadedNodes = mapOf(0 to photoNode(id = 1L)),
-            ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-            loadMediaRange = { first, last ->
-                loadGate.await()
-                (first..last).associateWith { index -> photoNode(id = index + 1L) }
-            },
-            onPendingSelectionCountChanged = { pendingCount = it },
-        )
-
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
-            .onFirst()
-            .performTouchInput {
-                down(center)
-                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
-                moveBy(Offset(width.toFloat() * 2, 0f))
-                up()
-            }
-
-        // Until the drag-end fetch resolves, the two swept placeholders count as pending.
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L)
-            assertThat(pendingCount).isEqualTo(2)
-        }
-
-        loadGate.complete(Unit)
-
-        // Once resolved they join the real selection and stop counting as pending.
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
-            assertThat(pendingCount).isEqualTo(0)
-        }
-    }
-
-    @Test
-    fun `test that a drag anchored on a checked placeholder deselects the swept pending cells`() {
-        val selectedIds = mutableStateSetOf<Long>()
-        var pendingCount = 0
-        composeRule.setScreen(
-            uiState = TimelineRevampUiState.Data(
-                sections = listOf(
-                    MediaTimelineSection(
-                        groupId = "2026-06-15",
-                        startDate = 1_781_481_600L,
-                        endDate = 1_781_481_600L,
-                        count = 3,
-                    ),
-                ),
-                sectionStartOffsets = listOf(0),
-                loadedNodes = mapOf(0 to photoNode(id = 1L)),
-            ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-            // Never resolves, so the swept cells stay checked, unresolved placeholders.
-            loadMediaRange = { _, _ -> CompletableDeferred<Unit>().await(); emptyMap() },
-            onPendingSelectionCountChanged = { pendingCount = it },
-        )
-
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
-            .onFirst()
-            .performTouchInput {
-                down(center)
-                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
-                moveBy(Offset(width.toFloat() * 2, 0f))
-                up()
-            }
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L)
-            assertThat(pendingCount).isEqualTo(2)
-        }
 
         composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG)
-            .onFirst()
-            .performTouchInput {
-                down(center)
-                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
-                moveBy(Offset(width.toFloat(), 0f))
-                up()
-            }
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L)
-            assertThat(pendingCount).isEqualTo(0)
-        }
-    }
-
-    @Test
-    fun `test that header deselect removes resolved drag-selected ids even when the refetch is partial`() {
-        val selectedIds = mutableStateSetOf<Long>()
-        var loadCalls = 0
-        composeRule.setScreen(
-            uiState = TimelineRevampUiState.Data(
-                sections = listOf(
-                    MediaTimelineSection(
-                        groupId = "2026-06-15",
-                        startDate = 1_781_481_600L,
-                        endDate = 1_781_481_600L,
-                        count = 3,
-                    ),
-                ),
-                sectionStartOffsets = listOf(0),
-                loadedNodes = mapOf(0 to photoNode(id = 1L)),
-            ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-            loadMediaRange = { first, last ->
-                loadCalls++
-                // The drag-end fetch resolves; the header-deselect refetch fails silently.
-                if (loadCalls == 1) {
-                    (first..last).associateWith { index -> photoNode(id = index + 1L) }
-                } else {
-                    emptyMap()
-                }
-            },
-        )
-
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
-            .onFirst()
-            .performTouchInput {
-                down(center)
-                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
-                moveBy(Offset(width.toFloat() * 2, 0f))
-                up()
-            }
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
-        }
-
-        topHeaderCheckbox().performClick()
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).isEmpty()
-        }
-    }
-
-    @Test
-    fun `test that the drag-end fetch spans only unresolved cells`() {
-        val selectedIds = mutableStateSetOf<Long>()
-        val loadRequests = mutableListOf<IntRange>()
-        composeRule.setScreen(
-            uiState = TimelineRevampUiState.Data(
-                sections = listOf(
-                    MediaTimelineSection(
-                        groupId = "2026-06-15",
-                        startDate = 1_781_481_600L,
-                        endDate = 1_781_481_600L,
-                        count = 9,
-                    ),
-                ),
-                sectionStartOffsets = listOf(0),
-                loadedNodes = mapOf(0 to photoNode(id = 1L)),
-            ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-            loadMediaRange = { first, last ->
-                loadRequests.add(first..last)
-                (first..last).associateWith { index -> photoNode(id = index + 1L) }
-            },
-        )
-
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
-            .onFirst()
-            .performTouchInput {
-                down(center)
-                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
-                moveBy(Offset(width.toFloat() * 2, 0f))
-                up()
-            }
-
-        composeRule.runOnIdle {
-            assertThat(loadRequests).containsExactly(1..2)
-        }
-
-        // The resolved cells (1..2) linger as pending marks; a second drag further down must not
-        // stretch its fetch back across them.
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG)[3]
-            .performTouchInput {
-                down(center)
-                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
-                moveBy(Offset(width.toFloat(), 0f))
-                up()
-            }
-
-        composeRule.runOnIdle {
-            assertThat(loadRequests).containsExactly(1..2, 4..5).inOrder()
-        }
+            .assertCountEquals(2)
+            .assertAll(isSelected())
     }
 
     @Test
     fun `test that the month header shows a select-all checkbox only in selection mode`() {
-        val selectedIds = mutableStateSetOf<Long>()
-        composeRule.setScreen(
-            uiState = twoMonthsUiState(),
-            selectedPhotoIds = selectedIds,
-        )
+        var uiState by mutableStateOf(twoMonthsUiState())
+        composeRule.setScreenContent(uiState = { uiState })
 
         composeRule.onAllNodesWithTag(MAY_HEADER_CHECKBOX_TAG, useUnmergedTree = true)
             .assertCountEquals(0)
 
-        composeRule.runOnIdle { selectedIds.add(1L) }
+        composeRule.runOnIdle { uiState = twoMonthsUiState(selection = selectionOf(1L)) }
 
         mayHeaderCheckbox().assertIsDisplayed()
         topHeaderCheckbox().assertIsDisplayed()
     }
 
     @Test
-    fun `test that clicking the month header checkbox selects every photo in that month`() {
-        val selectedIds = mutableStateSetOf(1L)
+    fun `test that clicking the month header checkbox toggles the selection of that month's range`() {
+        val toggledRanges = mutableListOf<IntRange>()
         composeRule.setScreen(
-            uiState = twoMonthsUiState(),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
+            uiState = twoMonthsUiState(selection = selectionOf(1L)),
+            onRangeSelectionToggle = { toggledRanges += it },
         )
 
         mayHeaderCheckbox().performClick()
 
         composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+            assertThat(toggledRanges).containsExactly(1..2)
         }
     }
 
     @Test
     fun `test that clicking the month header checkbox tracks MediaScreenDateHeaderSelectAllPressedEvent`() {
-        val selectedIds = mutableStateSetOf(1L)
-        composeRule.setScreen(
-            uiState = twoMonthsUiState(),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-        )
+        composeRule.setScreen(uiState = twoMonthsUiState(selection = selectionOf(1L)))
 
         mayHeaderCheckbox().performClick()
 
@@ -772,78 +525,19 @@ class TimelineRevampScreenTest {
     }
 
     @Test
-    fun `test that the month header checkbox is checked when all photos in the month are selected and clicking it deselects them`() {
-        val selectedIds = mutableStateSetOf(2L)
-        composeRule.setScreen(
-            uiState = twoMonthsUiState(),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-        )
+    fun `test that the month header checkbox is checked only when every photo in the month is selected`() {
+        var uiState by mutableStateOf(twoMonthsUiState(selection = selectionOf(2L)))
+        composeRule.setScreenContent(uiState = { uiState })
 
         mayHeaderCheckbox().assertIsOff()
 
-        composeRule.runOnIdle { selectedIds.add(3L) }
+        composeRule.runOnIdle { uiState = twoMonthsUiState(selection = selectionOf(2L, 3L)) }
 
         mayHeaderCheckbox().assertIsOn()
-
-        mayHeaderCheckbox().performClick()
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).isEmpty()
-        }
     }
 
     @Test
-    fun `test that clicking the month header row toggles that month's selection in selection mode`() {
-        val selectedIds = mutableStateSetOf<Long>()
-        composeRule.setScreen(
-            uiState = twoMonthsUiState(),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-        )
-        val mayHeader = composeRule.onNodeWithTag("${TIMELINE_REVAMP_SECTION_HEADER_TAG}2026-5")
-
-        mayHeader.performClick()
-        composeRule.runOnIdle {
-            assertThat(selectedIds).isEmpty()
-        }
-
-        composeRule.runOnIdle { selectedIds.add(1L) }
-
-        mayHeader.performClick()
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
-        }
-
-        mayHeader.performClick()
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L)
-        }
-    }
-
-    @Test
-    fun `test that the top header checkbox selects the month at the top of the grid`() {
-        val selectedIds = mutableStateSetOf(3L)
-        composeRule.setScreen(
-            uiState = twoMonthsUiState(),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-        )
-
-        topHeaderCheckbox().performClick()
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L, 3L)
-        }
-    }
-
-    @Test
-    fun `test that month select-all loads the unloaded photos and selects them from the returned items`() {
-        val selectedIds = mutableStateSetOf(1L)
-        val loadRequests = mutableListOf<IntRange>()
-        val loadGate = CompletableDeferred<Unit>()
-        // June: 1 photo (loaded, id 1). May: 3 photos across two day sections, only the first
-        // loaded (id 2); global indexes 2 and 3 are not loaded yet.
+    fun `test that a pending placeholder counts towards the month header checkbox`() {
         composeRule.setScreen(
             uiState = TimelineRevampUiState.Data(
                 sections = listOf(
@@ -859,55 +553,71 @@ class TimelineRevampScreenTest {
                         endDate = 1_778_803_200L,
                         count = 2,
                     ),
-                    MediaTimelineSection(
-                        groupId = "2026-05-10",
-                        startDate = 1_778_371_200L,
-                        endDate = 1_778_371_200L,
-                        count = 1,
-                    ),
                 ),
-                sectionStartOffsets = listOf(0, 1, 3),
+                sectionStartOffsets = listOf(0, 1),
                 loadedNodes = mapOf(0 to photoNode(id = 1L), 1 to photoNode(id = 2L)),
+                selection = TimelineSelection(
+                    selectedIds = setOf(2L),
+                    pendingIndices = setOf(2),
+                    count = 2,
+                ),
             ),
-            selectedPhotoIds = selectedIds,
-            onNodeSelected = { selectedIds.toggle(it.id) },
-            loadMediaRange = { first, last ->
-                loadRequests.add(first..last)
-                loadGate.await()
-                (first..last).associateWith { index -> photoNode(id = index + 1L) }
-            },
         )
 
-        mayHeaderCheckbox().performClick()
+        mayHeaderCheckbox().assertIsOn()
+    }
 
-        // While the load is in flight, the loaded photo is selected and the unloaded cells render
-        // as selected placeholders.
+    @Test
+    fun `test that clicking the month header row toggles that month's range only in selection mode`() {
+        val toggledRanges = mutableListOf<IntRange>()
+        var uiState by mutableStateOf(twoMonthsUiState())
+        composeRule.setScreenContent(
+            uiState = { uiState },
+            onRangeSelectionToggle = { toggledRanges += it },
+        )
+        val mayHeader = composeRule.onNodeWithTag("${TIMELINE_REVAMP_SECTION_HEADER_TAG}2026-5")
+
+        mayHeader.performClick()
         composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L, 2L)
-            assertThat(loadRequests).containsExactly(1..3)
+            assertThat(toggledRanges).isEmpty()
         }
-        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG).assertAll(isSelected())
 
-        loadGate.complete(Unit)
+        composeRule.runOnIdle { uiState = twoMonthsUiState(selection = selectionOf(1L)) }
 
+        mayHeader.performClick()
         composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L, 2L, 3L, 4L)
-        }
-
-        // Deselecting resolves the ids of photos that are not in the loaded window the same way.
-        mayHeaderCheckbox().performClick()
-
-        composeRule.runOnIdle {
-            assertThat(selectedIds).containsExactly(1L)
+            assertThat(toggledRanges).containsExactly(1..2)
         }
     }
+
+    @Test
+    fun `test that the top header checkbox toggles the month at the top of the grid`() {
+        val toggledRanges = mutableListOf<IntRange>()
+        composeRule.setScreen(
+            uiState = twoMonthsUiState(selection = selectionOf(3L)),
+            onRangeSelectionToggle = { toggledRanges += it },
+        )
+
+        topHeaderCheckbox().performClick()
+
+        composeRule.runOnIdle {
+            assertThat(toggledRanges).containsExactly(0..0)
+        }
+    }
+
+    private fun selectionOf(vararg ids: Long) = TimelineSelection(
+        selectedIds = ids.toSet(),
+        count = ids.size,
+    )
 
     /**
      * June 2026 with one photo (id 1) followed by two May 2026 day sections with one photo each
      * (ids 2 and 3), all loaded — May gets an inline month header, June is represented by the top
      * header.
      */
-    private fun twoMonthsUiState() = TimelineRevampUiState.Data(
+    private fun twoMonthsUiState(
+        selection: TimelineSelection = TimelineSelection(),
+    ) = TimelineRevampUiState.Data(
         sections = listOf(
             MediaTimelineSection(
                 groupId = "2026-06-20",
@@ -930,6 +640,7 @@ class TimelineRevampScreenTest {
         ),
         sectionStartOffsets = listOf(0, 1, 2),
         loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
+        selection = selection,
     )
 
     private fun photoNode(id: Long) = PhotosNodeContentItemV2(
@@ -958,10 +669,6 @@ class TimelineRevampScreenTest {
         .onAllNodesWithTag(TIMELINE_REVAMP_NON_STICKY_HEADER_CHECKBOX_TAG, useUnmergedTree = true)
         .onFirst()
 
-    private fun MutableSet<Long>.toggle(id: Long) {
-        if (id in this) remove(id) else add(id)
-    }
-
     /** Spreads two horizontally-opposed pointers from [from] to [to] pixels either side of centre. */
     private fun TouchInjectionScope.spreadFingers(from: Float, to: Float) {
         down(0, center + Offset(-from, 0f))
@@ -978,34 +685,32 @@ class TimelineRevampScreenTest {
 
     private fun ComposeContentTestRule.setScreen(
         uiState: TimelineRevampUiState,
-        selectedPhotoIds: Set<Long> = emptySet(),
         onNodeSelected: (PhotosNodeContentItemV2) -> Unit = {},
-        loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2> =
-            { _, _ -> emptyMap() },
+        onCellSelectionChange: (index: Int, selected: Boolean) -> Unit = { _, _ -> },
+        onRangeSelectionToggle: (IntRange) -> Unit = {},
+        onDragSelectionEnded: () -> Unit = {},
         onZoomIn: () -> Unit = {},
         onPinchActiveChanged: (Boolean) -> Unit = {},
-        onPendingSelectionCountChanged: (Int) -> Unit = {},
         isPinchToZoomEnabled: Boolean = true,
     ) = setScreenContent(
         { uiState },
-        selectedPhotoIds,
         onNodeSelected,
-        loadMediaRange,
+        onCellSelectionChange,
+        onRangeSelectionToggle,
+        onDragSelectionEnded,
         onZoomIn,
         onPinchActiveChanged,
-        onPendingSelectionCountChanged,
         isPinchToZoomEnabled,
     )
 
     private fun ComposeContentTestRule.setScreenContent(
         uiState: () -> TimelineRevampUiState,
-        selectedPhotoIds: Set<Long> = emptySet(),
         onNodeSelected: (PhotosNodeContentItemV2) -> Unit = {},
-        loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2> =
-            { _, _ -> emptyMap() },
+        onCellSelectionChange: (index: Int, selected: Boolean) -> Unit = { _, _ -> },
+        onRangeSelectionToggle: (IntRange) -> Unit = {},
+        onDragSelectionEnded: () -> Unit = {},
         onZoomIn: () -> Unit = {},
         onPinchActiveChanged: (Boolean) -> Unit = {},
-        onPendingSelectionCountChanged: (Int) -> Unit = {},
         isPinchToZoomEnabled: Boolean = true,
     ) {
         setContent {
@@ -1014,18 +719,18 @@ class TimelineRevampScreenTest {
                 mediaCameraUploadUiState = MediaCameraUploadUiState(),
                 showEnableCameraUploadsPage = false,
                 onVisibleRangeChanged = { _, _ -> },
-                loadMediaRange = loadMediaRange,
                 onGridSizeChange = {},
                 onZoomIn = onZoomIn,
                 onZoomOut = {},
                 onPinchActiveChanged = onPinchActiveChanged,
                 isPinchToZoomEnabled = isPinchToZoomEnabled,
-                onPendingSelectionCountChanged = onPendingSelectionCountChanged,
                 onMediaTimePeriodSelected = {},
                 onNodeClicked = { _, _ -> },
                 onNodeSelected = onNodeSelected,
+                onCellSelectionChange = onCellSelectionChange,
+                onRangeSelectionToggle = onRangeSelectionToggle,
+                onDragSelectionEnded = onDragSelectionEnded,
                 onScrollingChanged = {},
-                selectedPhotoIds = selectedPhotoIds,
                 onTakenDownDialogEventConsumed = {},
                 clearCameraUploadsCompletedMessage = {},
                 onNavigateToCameraUploadsSettings = {},
