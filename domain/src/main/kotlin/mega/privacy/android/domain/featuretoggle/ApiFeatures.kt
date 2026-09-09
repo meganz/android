@@ -361,6 +361,8 @@ enum class ApiFeatures(
      * When enabled, the contact surfaces (list, add, groups, info, invite, requests) render their
      * Compose implementations instead of the legacy Activities. Replaces the two former local
      * AppFeatures flags that separately gated the contact-info screen and the rest of the contacts UI.
+     * Also gates the achievements overview surface (AND-24895): when enabled the migrated Compose
+     * overview is shown, otherwise the legacy achievements Activity.
      */
     ContactComposeFeature(
         experimentName = "ccont",

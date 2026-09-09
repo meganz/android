@@ -76,7 +76,7 @@ class LegacyCoreActivityFeatureGraph(
         { navigationHandler, transferHandler ->
             overDiskQuotaPaywallWarning(navigationHandler::back)
             myAccount(navigationHandler::back)
-            achievement(navigationHandler::back)
+            achievement(navigationHandler)
             webDestinations(navigationHandler::back)
             cookieSettingsNavigationDestination(navigationHandler::back)
             startScreenPreferenceScreen(navigationHandler::back)

@@ -9,9 +9,9 @@ import mega.privacy.android.navigation.contract.TransferHandler
 /**
  * My Account feature destination.
  *
- * Registers the achievements info and referral bonus screens. The achievements overview screen is
- * still served by the legacy `:app` shim under `AchievementNavKey`; its migrated view is dormant
- * until that shim is flipped to this destination.
+ * Registers the achievements sub-screens (info, referral bonus, invite friends, MEGA VPN/Pass free
+ * trial). The achievements overview itself is served under `AchievementNavKey` by the `:app`
+ * destination, which renders this module's overview view behind `ApiFeatures.ContactComposeFeature`.
  */
 class MyAccountFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, transferHandler: TransferHandler) -> Unit =

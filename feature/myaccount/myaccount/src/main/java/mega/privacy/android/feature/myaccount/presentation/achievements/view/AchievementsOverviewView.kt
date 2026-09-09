@@ -60,7 +60,7 @@ internal object AchievementsOverviewViewTestTags {
  * Stateless Achievements overview screen in Jetpack Compose.
  */
 @Composable
-internal fun AchievementsOverviewView(
+fun AchievementsOverviewView(
     uiState: AchievementsUIState,
     modifier: Modifier = Modifier,
     onInviteFriendsClicked: (Long) -> Unit = {},
