@@ -683,8 +683,8 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun selectFolderToCopy(activity: Activity, handles: LongArray) {
-        if (getStorageState() == StorageState.PayWall) {
-            AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+        if (getStorageState(activity) == StorageState.PayWall) {
+            AlertsAndWarnings.showOverDiskQuotaPaywallWarning(activity)
             return
         }
 

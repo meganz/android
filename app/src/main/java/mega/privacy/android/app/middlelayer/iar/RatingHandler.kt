@@ -125,7 +125,7 @@ abstract class RatingHandler(val context: Context) {
 
         // Exclude ODQ & OBQ accounts
         if (megaApi.bandwidthOverquotaDelay > 0
-            && getStorageState() == StorageState.PayWall
+            && getStorageState(context) == StorageState.PayWall
         ) {
             return false
         }

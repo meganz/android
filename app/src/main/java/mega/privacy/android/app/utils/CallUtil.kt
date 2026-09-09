@@ -1360,8 +1360,8 @@ object CallUtil {
      */
     @JvmStatic
     fun canCallBeStartedFromContactOption(context: Activity): Boolean {
-        if (getStorageState() == StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+        if (getStorageState(context) == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning(context)
             return false
         }
 

@@ -51,7 +51,7 @@ class GlobalOnEventHandler @Inject constructor(
                 Timber.d("EVENT_STORAGE: $state")
                 when (state) {
                     StorageState.Change -> refreshAccountDetail()
-                    StorageState.PayWall -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                    StorageState.PayWall -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning(appContext)
 
                     else -> sendMyAccountUpdateBroadcast(
                         MyAccountUpdate.Action.STORAGE_STATE_CHANGED,

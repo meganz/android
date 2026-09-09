@@ -34,10 +34,25 @@ object AlertsAndWarnings {
      * Shows the ODQ Paywall warning. It will not be shown if it is already being displayed or if
      * the user is upgrading to PRO (i.e. in any place of the checkout process).
      */
+    @Deprecated(
+        "Reads the current activity from a process-wide Context holder.",
+        ReplaceWith("showOverDiskQuotaPaywallWarning(context)")
+    )
     @JvmStatic
     fun showOverDiskQuotaPaywallWarning() {
+        showOverDiskQuotaPaywallWarning(LegacyStaticAppContext.context)
+    }
+
+    /**
+     * Shows the ODQ Paywall warning. It will not be shown if it is already being displayed or if
+     * the user is upgrading to PRO (i.e. in any place of the checkout process).
+     *
+     * @param context Context used to resolve the currently resumed activity.
+     */
+    @JvmStatic
+    fun showOverDiskQuotaPaywallWarning(context: Context) {
         val activityLifecycleHandler = EntryPointAccessors.fromApplication(
-            LegacyStaticAppContext.context,
+            context,
             GlobalManagementEntryPoint::class.java,
         ).activityLifecycleHandler()
         showOverDiskQuotaPaywallWarning(activityLifecycleHandler.getCurrentActivity(), false)
