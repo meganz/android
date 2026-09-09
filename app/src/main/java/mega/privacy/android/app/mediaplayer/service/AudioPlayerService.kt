@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.service
 
+import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -17,8 +18,16 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.ShuffleOrder
+import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaNotification
@@ -172,6 +181,15 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     @Inject
     lateinit var transferOverQuotaEventQueue: TransferOverQuotaEventQueue
 
+    /**
+     * Disk cache shared with the legacy players; null when the cache directory could not be
+     * initialised, in which case streaming reads go straight upstream. The cache is owned by the
+     * singleton component and must never be released here.
+     */
+    @Inject
+    @JvmField
+    var simpleCache: SimpleCache? = null
+
     private var player: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
 
@@ -195,6 +213,21 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var retryJob: Job? = null
     private var pausedByExternalCommand = false
 
+    private val cacheEventListener = object : CacheDataSource.EventListener {
+        override fun onCachedBytesRead(cacheSizeBytes: Long, cachedBytesRead: Long) {
+            Timber.d("[Cache] HIT: read ${cachedBytesRead / 1024} KB from disk (cache total: ${cacheSizeBytes / 1024 / 1024} MB)")
+        }
+
+        override fun onCacheIgnored(reason: Int) {
+            val reasonText = when (reason) {
+                CacheDataSource.CACHE_IGNORED_REASON_ERROR -> "cache read/write error, falling back to upstream"
+                CacheDataSource.CACHE_IGNORED_REASON_UNSET_LENGTH -> "unset length, cache bypassed"
+                else -> "unknown reason ($reason)"
+            }
+            Timber.d("[Cache] IGNORED: $reasonText")
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         isRunning = true
@@ -210,6 +243,13 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     private fun initializePlayer() {
         player = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(buildDataSourceFactory())
+                    .setLoadErrorHandlingPolicy(
+                        DefaultLoadErrorHandlingPolicy(LOAD_ERROR_RETRY_COUNT)
+                    )
+            )
+            .setLoadControl(buildLoadControl())
             .setAudioAttributes(AudioAttributes.DEFAULT, true)
             .setHandleAudioBecomingNoisy(true)
             .build()
@@ -223,6 +263,46 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                         .firstOrNull() ?: false
                 }
             }
+    }
+
+    /**
+     * Builds the streaming stack with the same characteristics as the legacy player: 5 s HTTP
+     * timeouts so weak-network failures surface quickly into the playback-error flow, wrapped in
+     * the shared disk cache so replaying a streamed track is served from disk instead of the
+     * network. Falls back to the plain upstream factory when the cache is unavailable.
+     */
+    private fun buildDataSourceFactory(): DataSource.Factory {
+        val upstreamFactory = DefaultDataSource.Factory(
+            this,
+            DefaultHttpDataSource.Factory()
+                .setConnectTimeoutMs(HTTP_TIMEOUT_MS)
+                .setReadTimeoutMs(HTTP_TIMEOUT_MS),
+        )
+        val cache = simpleCache ?: return upstreamFactory
+        return CacheDataSource.Factory()
+            .setCache(cache)
+            .setUpstreamDataSourceFactory(upstreamFactory)
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+            .setEventListener(cacheEventListener)
+    }
+
+    private fun buildLoadControl(): DefaultLoadControl {
+        val isLowRam =
+            getSystemService(ActivityManager::class.java)?.isLowRamDevice ?: false
+        return if (isLowRam) {
+            DefaultLoadControl.Builder()
+                .setTargetBufferBytes(LOW_RAM_TARGET_BUFFER_BYTES)
+                .setPrioritizeTimeOverSizeThresholds(false)
+                .setBufferDurationsMs(
+                    LOW_RAM_MIN_BUFFER_MS,
+                    LOW_RAM_MAX_BUFFER_MS,
+                    LOW_RAM_BUFFER_FOR_PLAYBACK_MS,
+                    LOW_RAM_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
+                )
+                .build()
+        } else {
+            DefaultLoadControl() // Normal devices: use ExoPlayer default buffers (50 s)
+        }
     }
 
     /**
@@ -1041,6 +1121,17 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
         private const val MAX_PLAYBACK_RETRIES = 6
         private val PLAYBACK_RETRY_BACKOFF = 500.milliseconds
+
+        private const val HTTP_TIMEOUT_MS = 5_000
+        private const val LOAD_ERROR_RETRY_COUNT = 2
+
+        // ExoPlayer buffer configuration for low-RAM devices (heap growth limit ≤ 128 MB);
+        // values aligned with the legacy MediaPlayerFacade.
+        private const val LOW_RAM_TARGET_BUFFER_BYTES = 12 * 1024 * 1024 // 12 MB
+        private const val LOW_RAM_MIN_BUFFER_MS = 15_000
+        private const val LOW_RAM_MAX_BUFFER_MS = 30_000
+        private const val LOW_RAM_BUFFER_FOR_PLAYBACK_MS = 2_500
+        private const val LOW_RAM_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 5_000
 
         private const val ACTION_STOP =
             "mega.privacy.android.app.mediaplayer.AudioPlayerService.STOP"
