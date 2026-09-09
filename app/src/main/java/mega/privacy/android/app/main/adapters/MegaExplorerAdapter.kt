@@ -613,7 +613,7 @@ class MegaExplorerAdapter(
                         ) {
                             val numChildFolders = megaApi.getNumChildFolders(node)
                             val numChildFiles = megaApi.getNumChildFiles(node)
-                            val folderIconRes = getFolderIcon(megaApi, node, DrawerItem.CLOUD_DRIVE)
+                            val folderIconRes = getFolderIcon(megaApi, node, DrawerItem.CLOUD_DRIVE, context)
                             Triple(numChildFolders, numChildFiles, folderIconRes)
                         }
                         if ((bindingAdapterPosition != RecyclerView.NO_POSITION) &&
@@ -794,7 +794,8 @@ class MegaExplorerAdapter(
                     getFolderIcon(
                         megaApi,
                         node,
-                        DrawerItem.CLOUD_DRIVE
+                        DrawerItem.CLOUD_DRIVE,
+                        context
                     )
                 )
                 itemView.setOnClickListener(::clickItem)

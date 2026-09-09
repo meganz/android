@@ -762,12 +762,15 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             setFolderGridSelected(holder, position)
 
             holder.imageViewIcon?.visibility = View.VISIBLE
-            megaApi?.let {
-                getFolderIcon(
-                    it,
-                    node,
-                    if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
-                )
+            megaApi?.let { api ->
+                context?.let {
+                    getFolderIcon(
+                        api,
+                        node,
+                        if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE,
+                        it
+                    )
+                }
             }?.let {
                 holder.imageViewIcon?.setImageResource(it)
             }
@@ -985,14 +988,17 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             }
             holder.versionsIcon?.visibility = View.GONE
 
-            megaApi?.let {
-                setFolderListSelected(
-                    holder, position, getFolderIcon(
-                        it,
-                        node,
-                        if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
+            megaApi?.let { apiAndroid ->
+                context?.let {
+                    setFolderListSelected(
+                        holder, position, getFolderIcon(
+                            apiAndroid,
+                            node,
+                            if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE,
+                            it
+                        )
                     )
-                )
+                }
             }
 
             if (isMultipleSelect) {

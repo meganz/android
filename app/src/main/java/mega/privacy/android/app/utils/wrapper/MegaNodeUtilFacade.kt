@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -39,6 +40,7 @@ import javax.inject.Singleton
 class MegaNodeUtilFacade @Inject constructor(
     private val streamingGateway: StreamingGateway,
     @ApplicationScope private val coroutineScope: CoroutineScope,
+    @ApplicationContext private val context: Context,
 ) : MegaNodeUtilWrapper {
     override fun getNumberOfFolders(nodes: List<MegaNode?>?) =
         MegaNodeUtil.getNumberOfFolders(nodes)
@@ -61,7 +63,7 @@ class MegaNodeUtilFacade @Inject constructor(
         MegaNodeUtil.shouldContinueWithoutError(context, nodes)
 
     override fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem) =
-        MegaNodeUtil.getFolderIcon(megaApi, node, drawerItem)
+        MegaNodeUtil.getFolderIcon(megaApi, node, drawerItem, context)
 
     override fun isInRootLinksLevel(adapterType: Int, parentHandle: Long) =
         MegaNodeUtil.isInRootLinksLevel(adapterType, parentHandle)

@@ -18,7 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -253,9 +253,12 @@ object MegaNodeUtil {
      * @param node MegaNode to check
      * @return True if the node is "My chat files" attribute, false otherwise
      */
-    private fun isMyChatFilesFolder(megaApi: MegaApiAndroid, node: MegaNode?): Boolean {
+    private fun isMyChatFilesFolder(megaApi: MegaApiAndroid, node: MegaNode?, context: Context): Boolean {
         if (node == null || node.handle == INVALID_HANDLE) return false
-        val storedHandle = getDbHandler().myChatFilesFolderHandle
+        val storedHandle = EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH.myChatFilesFolderHandle
         if (storedHandle == INVALID_HANDLE || node.handle != storedHandle) return false
         val storedNode = megaApi.getNodeByHandle(storedHandle) ?: return false
         return !megaApi.isInRubbish(storedNode)
@@ -270,10 +273,13 @@ object MegaNodeUtil {
      * @param n MegaNode to check
      * @return True if the node is "Camera Uploads" or "Media Uploads" folder, false otherwise
      */
-    private fun isCameraUploads(megaApi: MegaApiAndroid, n: MegaNode): Boolean {
+    private fun isCameraUploads(megaApi: MegaApiAndroid, n: MegaNode, context: Context): Boolean {
         var cameraSyncHandle: String? = null
         var secondaryMediaHandle: String? = null
-        val dbH = getDbHandler()
+        val dbH = EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH
         val prefs = dbH.preferences
 
         //Check if the item is the Camera Uploads folder
@@ -306,16 +312,16 @@ object MegaNodeUtil {
      * @return The icon of the folder to be displayed.
      */
     @JvmStatic
-    fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem): Int {
+    fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem, context: Context): Int {
         return if (node.isInShare) {
             IconPackR.drawable.ic_folder_users_medium_solid
-        } else if (isCameraUploads(megaApi, node)) {
+        } else if (isCameraUploads(megaApi, node, context)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
                 IconPackR.drawable.ic_folder_users_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_camera_uploads_medium_solid
             }
-        } else if (isMyChatFilesFolder(megaApi, node)) {
+        } else if (isMyChatFilesFolder(megaApi, node, context)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
                 IconPackR.drawable.ic_folder_users_medium_solid
             } else {
