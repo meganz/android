@@ -2,7 +2,7 @@
 firebase-crashlytics = "3.0.7"
 firebase-performance = "2.0.2"
 firebase-app-distribution = "5.3.0"
-gradle = "9.2.1"
+gradle = "9.4.0"
 google-services = "4.5.0"
 hilt = "2.60.1"
 jacoco = "0.8.15"
