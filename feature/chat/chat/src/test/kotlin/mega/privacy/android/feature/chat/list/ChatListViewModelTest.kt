@@ -14,11 +14,14 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
@@ -35,6 +38,7 @@ import mega.privacy.android.feature.chat.list.menu.UnarchiveChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
+import mega.privacy.android.navigation.destination.NewChatNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -67,6 +71,9 @@ class ChatListViewModelTest {
     private val archiveChatUseCase = mock<ArchiveChatUseCase>()
     private val clearChatHistoryUseCase = mock<ClearChatHistoryUseCase>()
     private val leaveChatUseCase = mock<LeaveChatUseCase>()
+    private val getContactHandleUseCase = mock<GetContactHandleUseCase>()
+    private val startConversationUseCase = mock<StartConversationUseCase>()
+    private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
 
     private val chatRoomMenuItems: Map<Int, ChatRoomMenuItem> = mapOf(
         0 to ClearHistoryChatRoomMenuItem(clearChatHistoryUseCase),
@@ -102,6 +109,9 @@ class ChatListViewModelTest {
             chatLastMessageFormatter = chatLastMessageFormatter,
             chatRoomTimestampMapper = chatRoomTimestampMapper,
             chatRoomUiItemMapper = chatRoomUiItemMapper,
+            getContactHandleUseCase = getContactHandleUseCase,
+            startConversationUseCase = startConversationUseCase,
+            createGroupChatRoomUseCase = createGroupChatRoomUseCase,
             chatRoomMenuItems = chatRoomMenuItems,
         )
     }
@@ -122,6 +132,9 @@ class ChatListViewModelTest {
             archiveChatUseCase,
             clearChatHistoryUseCase,
             leaveChatUseCase,
+            getContactHandleUseCase,
+            startConversationUseCase,
+            createGroupChatRoomUseCase,
         )
     }
 
@@ -386,6 +399,74 @@ class ChatListViewModelTest {
 
         verifyNoInteractions(muteChatNotificationForChatRoomsUseCase)
     }
+
+    @Test
+    fun `test that onNewChatResult creates a 1to1 chat and emits its id when group settings are null`() =
+        runTest {
+            whenever(getContactHandleUseCase("alice@mega.co.nz")) doReturn 42L
+            whenever(startConversationUseCase(isGroup = false, userHandles = listOf(42L))) doReturn 7L
+
+            underTest.openChatEvents.test {
+                underTest.onNewChatResult(
+                    NewChatNavKey.NewChatResult(
+                        emails = listOf("alice@mega.co.nz"),
+                        groupSettings = null,
+                    )
+                )
+
+                assertThat(awaitItem()).isEqualTo(7L)
+            }
+        }
+
+    @Test
+    fun `test that onNewChatResult does not emit when the contact handle is missing`() = runTest {
+        whenever(getContactHandleUseCase("alice@mega.co.nz")) doReturn null
+
+        underTest.openChatEvents.test {
+            underTest.onNewChatResult(
+                NewChatNavKey.NewChatResult(
+                    emails = listOf("alice@mega.co.nz"),
+                    groupSettings = null,
+                )
+            )
+            advanceUntilIdle()
+
+            expectNoEvents()
+        }
+        verifyNoInteractions(startConversationUseCase)
+    }
+
+    @Test
+    fun `test that onNewChatResult creates a group chat and emits its id when group settings are present`() =
+        runTest {
+            val emails = listOf("alice@mega.co.nz", "bob@mega.co.nz")
+            whenever(
+                createGroupChatRoomUseCase(
+                    emails = emails,
+                    title = "Team",
+                    isEkr = true,
+                    addParticipants = false,
+                    chatLink = false,
+                )
+            ) doReturn 99L
+
+            underTest.openChatEvents.test {
+                underTest.onNewChatResult(
+                    NewChatNavKey.NewChatResult(
+                        emails = emails,
+                        groupSettings = NewChatNavKey.NewChatResult.GroupSettings(
+                            title = "Team",
+                            isEkr = true,
+                            isChatLink = false,
+                            allowAddParticipants = false,
+                            imageUri = null,
+                        ),
+                    )
+                )
+
+                assertThat(awaitItem()).isEqualTo(99L)
+            }
+        }
 
     private fun stubChatRooms(
         chats: List<ChatRoomItem> = listOf(chatRoomItem),

@@ -13,15 +13,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.contact.state.ContactItemStatus
+import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.model.TabItems
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -31,6 +34,7 @@ import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.rememberChatListSelectionState
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.chats.components.ChatsViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -44,6 +48,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param showMeetingTab Whether the Meetings tab should be initially selected.
  * @param onBackClick Callback when back navigation is requested.
  * @param onItemClick Callback when a chat room row is clicked, with the chat id.
+ * @param onNewChatClick Callback when the new-chat floating action button is clicked.
  * @param onSearchQueryChange Callback when the search query changes, with `null` when cleared.
  * @param modifier [Modifier]
  * @param resolveBulkActions Resolves the ordered actions common to the selected chats.
@@ -55,6 +60,7 @@ internal fun ChatListScreen(
     showMeetingTab: Boolean,
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
+    onNewChatClick: () -> Unit,
     onSearchQueryChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
     resolveBulkActions: suspend (Set<Long>) -> List<ChatRoomActionUiItem> = { emptyList() },
@@ -94,6 +100,7 @@ internal fun ChatListScreen(
         searchQuery = searchQuery,
         onBackClick = onBackClick,
         onItemClick = onItemClick,
+        onNewChatClick = onNewChatClick,
         onSearchModeChange = { searchMode = it },
         onQueryChange = {
             searchQuery = it
@@ -196,6 +203,7 @@ private fun ChatListBulkActionsOverlay(
  * @param searchQuery Current search query text.
  * @param onBackClick Callback when back navigation is requested.
  * @param onItemClick Callback when a chat room row is clicked, with the chat id.
+ * @param onNewChatClick Callback when the new-chat floating action button is clicked.
  * @param onSearchModeChange Callback when the search field is opened or closed.
  * @param onQueryChange Callback when the search query text changes.
  * @param modifier [Modifier]
@@ -218,6 +226,7 @@ internal fun ChatListScreenContent(
     searchQuery: String,
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
+    onNewChatClick: () -> Unit,
     onSearchModeChange: (Boolean) -> Unit,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -254,6 +263,18 @@ internal fun ChatListScreenContent(
                     onQueryChanged = onQueryChange,
                     onSearchingModeChanged = onSearchModeChange,
                     searchPlaceholder = stringResource(sharedR.string.search_placeholder_chat),
+                )
+            }
+        },
+        floatingActionButton = {
+            if (uiState is ChatListUiState.Data && !searchMode) {
+                MegaFab(
+                    modifier = Modifier
+                        .testTag(CHAT_LIST_FAB_TAG)
+                        .applyScrollToHideFabBehavior(),
+                    onClick = onNewChatClick,
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+                    contentDescription = stringResource(sharedR.string.new_chat_title),
                 )
             }
         },
@@ -339,6 +360,7 @@ internal const val CHAT_LIST_LOADING_TAG = "chat_list_screen:loading"
 internal const val CHAT_LIST_TAB_ROW_TAG = "chat_list_screen:tab_row"
 internal const val CHAT_LIST_CHATS_TAB_TAG = "chat_list_screen:chats_tab"
 internal const val CHAT_LIST_MEETINGS_TAB_TAG = "chat_list_screen:meetings_tab"
+internal const val CHAT_LIST_FAB_TAG = "chat_list_screen:new_chat_fab"
 
 private val previewChats = persistentListOf(
     ChatRoomUiItem(
@@ -393,6 +415,7 @@ private fun ChatListScreenPreview() {
             showMeetingTab = false,
             onBackClick = {},
             onItemClick = {},
+            onNewChatClick = {},
             onSearchQueryChange = {},
         )
     }
@@ -414,6 +437,7 @@ private fun ChatListScreenSearchActivePreview() {
             searchQuery = "Re",
             onBackClick = {},
             onItemClick = {},
+            onNewChatClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
         )
@@ -436,6 +460,7 @@ private fun ChatListScreenNoResultsPreview() {
             searchQuery = "zzz",
             onBackClick = {},
             onItemClick = {},
+            onNewChatClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
         )
@@ -464,6 +489,7 @@ private fun ChatListScreenSelectionModePreview() {
             selectedChatIds = setOf(1L),
             selectedCount = 1,
             isAllSelected = false,
+            onNewChatClick = {},
         )
     }
 }
@@ -477,6 +503,7 @@ private fun ChatListScreenLoadingPreview() {
             showMeetingTab = false,
             onBackClick = {},
             onItemClick = {},
+            onNewChatClick = {},
             onSearchQueryChange = {},
         )
     }

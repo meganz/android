@@ -26,6 +26,7 @@ class ChatListScreenScreenshotTest {
                 showMeetingTab = false,
                 onBackClick = {},
                 onItemClick = {},
+                onNewChatClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -41,6 +42,7 @@ class ChatListScreenScreenshotTest {
                 showMeetingTab = true,
                 onBackClick = {},
                 onItemClick = {},
+                onNewChatClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -61,6 +63,7 @@ class ChatListScreenScreenshotTest {
                 showMeetingTab = false,
                 onBackClick = {},
                 onItemClick = {},
+                onNewChatClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -81,6 +84,7 @@ class ChatListScreenScreenshotTest {
                 showMeetingTab = true,
                 onBackClick = {},
                 onItemClick = {},
+                onNewChatClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -98,6 +102,7 @@ class ChatListScreenScreenshotTest {
                 searchQuery = "Re",
                 onBackClick = {},
                 onItemClick = {},
+                onNewChatClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
             )
@@ -121,6 +126,7 @@ class ChatListScreenScreenshotTest {
                 searchQuery = "zzz",
                 onBackClick = {},
                 onItemClick = {},
+                onNewChatClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
             )
@@ -139,6 +145,7 @@ class ChatListScreenScreenshotTest {
                 searchQuery = "",
                 onBackClick = {},
                 onItemClick = {},
+                onNewChatClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
                 selectionMode = true,
@@ -159,6 +166,7 @@ class ChatListScreenScreenshotTest {
                 showMeetingTab = false,
                 onBackClick = {},
                 onItemClick = {},
+                onNewChatClick = {},
                 onSearchQueryChange = {},
             )
         }

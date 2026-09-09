@@ -2,15 +2,18 @@ package mega.privacy.android.feature.chat.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.filterNotNull
 import mega.privacy.android.feature.chat.list.ChatListViewModel
 import mega.privacy.android.feature.chat.list.view.ChatListScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.NewChatNavKey
 import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 
 /**
@@ -29,6 +32,22 @@ fun ChatListEntry(
 ) {
     val viewModel = hiltViewModel<ChatListViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        navigationHandler.monitorResult<NewChatNavKey.NewChatResult>(NewChatNavKey.KEY)
+            .filterNotNull()
+            .collect { result ->
+                navigationHandler.clearResult(NewChatNavKey.KEY)
+                viewModel.onNewChatResult(result)
+            }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.openChatEvents.collect { chatId ->
+            navigationHandler.navigate(ShowChatMessagesNavKey(chatId))
+        }
+    }
+
     ChatListScreen(
         uiState = uiState,
         showMeetingTab = showMeetingTab,
@@ -36,6 +55,7 @@ fun ChatListEntry(
         onItemClick = { chatId ->
             navigationHandler.navigate(ShowChatMessagesNavKey(chatId))
         },
+        onNewChatClick = { navigationHandler.navigate(NewChatNavKey) },
         onSearchQueryChange = viewModel::onSearchQueryChange,
         resolveBulkActions = viewModel::getBulkChatRoomActions,
         onBulkActionSelected = viewModel::onBulkChatRoomActionSelected,

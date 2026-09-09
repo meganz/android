@@ -17,8 +17,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
@@ -28,6 +31,7 @@ import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
+import mega.privacy.android.navigation.destination.NewChatNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,10 +44,21 @@ internal class ChatListViewModel @Inject constructor(
     private val chatLastMessageFormatter: ChatLastMessageFormatter,
     private val chatRoomTimestampMapper: ChatRoomTimestampMapper,
     private val chatRoomUiItemMapper: ChatRoomUiItemMapper,
+    private val getContactHandleUseCase: GetContactHandleUseCase,
+    private val startConversationUseCase: StartConversationUseCase,
+    private val createGroupChatRoomUseCase: CreateGroupChatRoomUseCase,
     private val chatRoomMenuItems: Map<Int, @JvmSuppressWildcards ChatRoomMenuItem>,
 ) : ViewModel() {
 
     private val queryChannel = Channel<String?>(Channel.CONFLATED)
+
+    private val openChatChannel = Channel<Long>(Channel.BUFFERED)
+
+    /**
+     * Emits the chat id of a chat that has just been created through the new-chat flow and should
+     * be opened.
+     */
+    val openChatEvents: Flow<Long> = openChatChannel.receiveAsFlow()
 
     /**
      * UI state for the chat list screen.
@@ -75,6 +90,41 @@ internal class ChatListViewModel @Inject constructor(
      */
     fun onSearchQueryChange(query: String?) {
         viewModelScope.launch { queryChannel.send(query) }
+    }
+
+    /**
+     * Create the chat chosen through the new-chat flow and, on success, emit its id through
+     * [openChatEvents] so the screen can open the conversation.
+     *
+     * A [NewChatNavKey.NewChatResult] with null group settings and a single email creates (or
+     * reuses) a 1:1 chat; a non-null group settings creates a group chat with the chosen options.
+     *
+     * @param result The selection returned by the new-chat picker.
+     */
+    fun onNewChatResult(result: NewChatNavKey.NewChatResult) {
+        viewModelScope.launch {
+            runCatching {
+                val groupSettings = result.groupSettings
+                if (groupSettings == null) {
+                    val handle = result.emails.firstOrNull()
+                        ?.let { getContactHandleUseCase(it) }
+                        ?: error("No contact handle for the selected email")
+                    startConversationUseCase(isGroup = false, userHandles = listOf(handle))
+                } else {
+                    createGroupChatRoomUseCase(
+                        emails = result.emails,
+                        title = groupSettings.title,
+                        isEkr = groupSettings.isEkr,
+                        addParticipants = groupSettings.allowAddParticipants,
+                        chatLink = groupSettings.isChatLink,
+                    )
+                }
+            }.onSuccess { chatId ->
+                openChatChannel.send(chatId)
+            }.onFailure {
+                Timber.e(it, "Failed to create chat from new-chat result")
+            }
+        }
     }
 
     /**
