@@ -16,6 +16,7 @@ import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
+import mega.privacy.android.data.database.dao.NonContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
@@ -27,6 +28,7 @@ import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
+import mega.privacy.android.data.database.entity.NonContactEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
@@ -42,6 +44,7 @@ import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesEntityMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesModelMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.contact.NonContactModelMapper
 import mega.privacy.android.data.mapper.home.HomePinnedItemMapper
 import mega.privacy.android.data.mapper.home.HomeWidgetConfigurationMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
@@ -58,6 +61,7 @@ import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMap
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
@@ -91,6 +95,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -99,6 +104,8 @@ internal class MegaLocalRoomFacadeTest {
     private lateinit var underTest: MegaLocalRoomFacade
 
     private val contactDao = mock<ContactDao>()
+    private val nonContactDao = mock<NonContactDao>()
+    private val nonContactModelMapper = mock<NonContactModelMapper>()
     private val contactEntityMapper = mock<ContactEntityMapper>()
     private val contactModelMapper = mock<ContactModelMapper>()
     private val completedTransferDao = mock<CompletedTransferDao>()
@@ -147,6 +154,8 @@ internal class MegaLocalRoomFacadeTest {
     fun setUp() {
         underTest = MegaLocalRoomFacade(
             contactDao = { contactDao },
+            nonContactDao = { nonContactDao },
+            nonContactModelMapper = nonContactModelMapper,
             contactEntityMapper = contactEntityMapper,
             contactModelMapper = contactModelMapper,
             completedTransferDao = { completedTransferDao },
@@ -195,6 +204,8 @@ internal class MegaLocalRoomFacadeTest {
     fun resetMocks() {
         reset(
             contactDao,
+            nonContactDao,
+            nonContactModelMapper,
             contactEntityMapper,
             contactModelMapper,
             completedTransferDao,
@@ -252,6 +263,52 @@ internal class MegaLocalRoomFacadeTest {
             assertThat(underTest.getCompletedTransfers().size)
                 .isEqualTo(completedTransferEntities.size)
         }
+
+    @Test
+    fun `test that getNonContactByHandle returns the mapped non contact`() = runTest {
+        val entity = mock<NonContactEntity>()
+        val expected = mock<NonContactInfo>()
+        whenever(nonContactDao.getNonContactByHandle(NON_CONTACT_HANDLE)).thenReturn(entity)
+        whenever(nonContactModelMapper(entity)).thenReturn(expected)
+
+        assertThat(underTest.getNonContactByHandle(NON_CONTACT_HANDLE)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getNonContactByHandle returns null when the handle is unknown`() = runTest {
+        whenever(nonContactDao.getNonContactByHandle(NON_CONTACT_HANDLE)).thenReturn(null)
+
+        assertThat(underTest.getNonContactByHandle(NON_CONTACT_HANDLE)).isNull()
+        verifyNoInteractions(nonContactModelMapper)
+    }
+
+    @Test
+    fun `test that setNonContactFirstName upserts the first name`() = runTest {
+        underTest.setNonContactFirstName(NON_CONTACT_HANDLE, "Hai")
+
+        verify(nonContactDao).insertOrUpdateFirstName(NON_CONTACT_HANDLE, "Hai")
+    }
+
+    @Test
+    fun `test that setNonContactLastName upserts the last name`() = runTest {
+        underTest.setNonContactLastName(NON_CONTACT_HANDLE, "Luong")
+
+        verify(nonContactDao).insertOrUpdateLastName(NON_CONTACT_HANDLE, "Luong")
+    }
+
+    @Test
+    fun `test that setNonContactEmail upserts the email`() = runTest {
+        underTest.setNonContactEmail(NON_CONTACT_HANDLE, "lh@mega.co.nz")
+
+        verify(nonContactDao).insertOrUpdateEmail(NON_CONTACT_HANDLE, "lh@mega.co.nz")
+    }
+
+    @Test
+    fun `test that deleteAllNonContacts clears the non contacts`() = runTest {
+        underTest.deleteAllNonContacts()
+
+        verify(nonContactDao).deleteAllNonContacts()
+    }
 
     @Test
     fun `test that backupDao delete is invoked with the proper backup when deleteBackupById is invoked`() =
@@ -1125,4 +1182,8 @@ internal class MegaLocalRoomFacadeTest {
             val actual = underTest.getMediaPlaybackInfo(testHandle)
             assertThat(actual).isNull()
         }
+
+    private companion object {
+        const val NON_CONTACT_HANDLE = 1234L
+    }
 }

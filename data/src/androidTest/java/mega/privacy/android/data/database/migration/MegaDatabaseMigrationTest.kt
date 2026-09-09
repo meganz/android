@@ -114,6 +114,21 @@ class MegaDatabaseMigrationTest {
         }
     }
 
+    @Test
+    @Throws(IOException::class)
+    fun migrate124To125() {
+        helper.createDatabase(testDatabaseName, 124).apply {
+            close()
+        }
+
+        val db =
+            helper.runMigrationsAndValidate(testDatabaseName, 125, true, *MegaDatabase.MIGRATIONS)
+
+        db.query("SELECT * FROM non_contacts").use {
+            assert(it.count == 0)
+        }
+    }
+
     companion object {
         const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
         const val KEY_TRANSFER_FILENAME = "transferfilename"

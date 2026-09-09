@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 124
+    const val DATABASE_VERSION = 125
 
     /**
      * Database Name
@@ -19,6 +19,11 @@ object MegaDatabaseConstant {
      * Table Contacts
      */
     const val TABLE_CONTACTS = "contacts"
+
+    /**
+     * Table Non Contacts
+     */
+    const val TABLE_NON_CONTACTS = "non_contacts"
 
     /**
      * Table Completed Transfers

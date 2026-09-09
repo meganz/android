@@ -28,6 +28,7 @@ import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
+import mega.privacy.android.data.database.dao.NonContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.RecentSearchDao
@@ -121,6 +122,11 @@ internal object RoomDatabaseModule {
     @Provides
     @Singleton
     internal fun provideContactDao(database: MegaDatabase): ContactDao = database.contactDao()
+
+    @Provides
+    @Singleton
+    internal fun provideNonContactDao(database: MegaDatabase): NonContactDao =
+        database.nonContactDao()
 
     @Provides
     @Singleton

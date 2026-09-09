@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
@@ -127,6 +128,44 @@ interface MegaLocalRoomGateway {
      * @return
      */
     suspend fun getContactCount(): Int
+
+    /**
+     * Find non contact by handle
+     *
+     * @param handle
+     * @return
+     */
+    suspend fun getNonContactByHandle(handle: Long): NonContactInfo?
+
+    /**
+     * Set non contact first name
+     *
+     * @param handle
+     * @param firstName
+     */
+    suspend fun setNonContactFirstName(handle: Long, firstName: String?)
+
+    /**
+     * Set non contact last name
+     *
+     * @param handle
+     * @param lastName
+     */
+    suspend fun setNonContactLastName(handle: Long, lastName: String?)
+
+    /**
+     * Set non contact email
+     *
+     * @param handle
+     * @param email
+     */
+    suspend fun setNonContactEmail(handle: Long, email: String?)
+
+    /**
+     * Clear non contacts
+     *
+     */
+    suspend fun deleteAllNonContacts()
 
     /**
      * Get all contacts

@@ -19,6 +19,7 @@ import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
+import mega.privacy.android.data.database.dao.NonContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.RecentSearchDao
@@ -42,6 +43,7 @@ import mega.privacy.android.data.database.entity.HomePinnedItemEntity
 import mega.privacy.android.data.database.entity.HomeWidgetConfigurationEntity
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
+import mega.privacy.android.data.database.entity.NonContactEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.RecentSearchEntity
@@ -65,6 +67,7 @@ import timber.log.Timber
 @Database(
     entities = [
         ContactEntity::class,
+        NonContactEntity::class,
         CompletedTransferEntity::class,
         CompletedTransferEntityLegacy::class,
         ActiveTransferActionGroupEntity::class,
@@ -138,6 +141,8 @@ import timber.log.Timber
 )
 internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun contactDao(): ContactDao
+
+    abstract fun nonContactDao(): NonContactDao
 
     abstract fun completedTransferDao(): CompletedTransferDao
 
@@ -468,6 +473,21 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_124_125 = object : Migration(124, 125) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `${MegaDatabaseConstant.TABLE_NON_CONTACTS}` (" +
+                            "`handle` INTEGER NOT NULL, " +
+                            "`full_name` TEXT, " +
+                            "`first_name` TEXT, " +
+                            "`last_name` TEXT, " +
+                            "`email` TEXT, " +
+                            "PRIMARY KEY(`handle`)" +
+                            ")"
+                )
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
@@ -483,6 +503,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_111_112,
             MIGRATION_119_120,
             MIGRATION_120_121,
+            MIGRATION_124_125,
         )
     }
 }

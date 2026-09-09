@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.NonContactDao
 import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
@@ -34,6 +35,7 @@ import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesEntityMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesModelMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.contact.NonContactModelMapper
 import mega.privacy.android.data.mapper.home.HomePinnedItemMapper
 import mega.privacy.android.data.mapper.home.HomeWidgetConfigurationMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
@@ -50,6 +52,7 @@ import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMap
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
@@ -80,6 +83,8 @@ import javax.inject.Inject
 
 internal class MegaLocalRoomFacade @Inject constructor(
     private val contactDao: Lazy<ContactDao>,
+    private val nonContactDao: Lazy<NonContactDao>,
+    private val nonContactModelMapper: NonContactModelMapper,
     private val contactEntityMapper: ContactEntityMapper,
     private val contactModelMapper: ContactModelMapper,
     private val completedTransferDao: Lazy<CompletedTransferDao>,
@@ -199,6 +204,23 @@ internal class MegaLocalRoomFacade @Inject constructor(
         val entities = contactDao.get().getAllContact().first()
         return entities.map { contactModelMapper(it) }
     }
+
+    override suspend fun getNonContactByHandle(handle: Long): NonContactInfo? =
+        nonContactDao.get().getNonContactByHandle(handle)?.let { nonContactModelMapper(it) }
+
+    override suspend fun setNonContactFirstName(handle: Long, firstName: String?) {
+        nonContactDao.get().insertOrUpdateFirstName(handle, firstName)
+    }
+
+    override suspend fun setNonContactLastName(handle: Long, lastName: String?) {
+        nonContactDao.get().insertOrUpdateLastName(handle, lastName)
+    }
+
+    override suspend fun setNonContactEmail(handle: Long, email: String?) {
+        nonContactDao.get().insertOrUpdateEmail(handle, email)
+    }
+
+    override suspend fun deleteAllNonContacts() = nonContactDao.get().deleteAllNonContacts()
 
     override suspend fun getCompletedTransfers() =
         completedTransferDao.get().getAllCompletedTransfers()
