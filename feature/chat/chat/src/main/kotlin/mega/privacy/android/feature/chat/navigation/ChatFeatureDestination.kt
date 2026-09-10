@@ -10,8 +10,8 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 
 class ChatFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, transferHandler: TransferHandler) -> Unit =
-        { navigationHandler, transferHandler ->
-
+        { navigationHandler, _ ->
+            archivedChatsScreen(navigationHandler = navigationHandler)
         }
 }
 

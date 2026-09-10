@@ -4,7 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,10 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.fab.MegaFab
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
@@ -28,6 +32,7 @@ import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.feature.chat.list.model.ChatListBulkActionsUiState
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
@@ -61,6 +66,7 @@ internal fun ChatListScreen(
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
     onNewChatClick: () -> Unit,
+    onArchivedClick: () -> Unit,
     onSearchQueryChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
     resolveBulkActions: suspend (Set<Long>) -> List<ChatRoomActionUiItem> = { emptyList() },
@@ -101,6 +107,7 @@ internal fun ChatListScreen(
         onBackClick = onBackClick,
         onItemClick = onItemClick,
         onNewChatClick = onNewChatClick,
+        onArchivedClick = onArchivedClick,
         onSearchModeChange = { searchMode = it },
         onQueryChange = {
             searchQuery = it
@@ -227,6 +234,7 @@ internal fun ChatListScreenContent(
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
     onNewChatClick: () -> Unit,
+    onArchivedClick: () -> Unit,
     onSearchModeChange: (Boolean) -> Unit,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -263,6 +271,19 @@ internal fun ChatListScreenContent(
                     onQueryChanged = onQueryChange,
                     onSearchingModeChanged = onSearchModeChange,
                     searchPlaceholder = stringResource(sharedR.string.search_placeholder_chat),
+                    trailingIcons = {
+                        IconButton(
+                            modifier = Modifier.testTag(CHAT_LIST_ARCHIVED_TAG),
+                            onClick = onArchivedClick,
+                        ) {
+                            MegaIcon(
+                                modifier = Modifier.size(24.dp),
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Archive),
+                                contentDescription = stringResource(sharedR.string.chat_archived_chats_title),
+                                tint = IconColor.Primary,
+                            )
+                        }
+                    },
                 )
             }
         },
@@ -306,7 +327,7 @@ internal fun ChatListScreenContent(
                             onItemClick = onItemClick,
                             modifier = tabModifier,
                             contentPadding = PaddingValues(
-                                bottom = paddingValues.calculateBottomPadding(),
+                                bottom = paddingValues.calculateBottomPadding() + FAB_BOTTOM_CLEARANCE,
                             ),
                             onItemLongClick = onItemLongClick,
                             selectionMode = selectionMode,
@@ -327,7 +348,7 @@ internal fun ChatListScreenContent(
                             onItemClick = onItemClick,
                             modifier = tabModifier,
                             contentPadding = PaddingValues(
-                                bottom = paddingValues.calculateBottomPadding(),
+                                bottom = paddingValues.calculateBottomPadding() + FAB_BOTTOM_CLEARANCE,
                             ),
                             onItemLongClick = onItemLongClick,
                             selectionMode = selectionMode,
@@ -354,6 +375,8 @@ private fun ChatListTabState.chatIds(): List<Long> = when (this) {
 private const val CHATS_TAB_INDEX = 0
 private const val MEETINGS_TAB_INDEX = 1
 
+private val FAB_BOTTOM_CLEARANCE = 88.dp
+
 internal const val CHAT_LIST_SCREEN_TAG = "chat_list_screen:screen"
 internal const val CHAT_LIST_SEARCH_BAR_TAG = "chat_list_screen:search_bar"
 internal const val CHAT_LIST_LOADING_TAG = "chat_list_screen:loading"
@@ -361,6 +384,7 @@ internal const val CHAT_LIST_TAB_ROW_TAG = "chat_list_screen:tab_row"
 internal const val CHAT_LIST_CHATS_TAB_TAG = "chat_list_screen:chats_tab"
 internal const val CHAT_LIST_MEETINGS_TAB_TAG = "chat_list_screen:meetings_tab"
 internal const val CHAT_LIST_FAB_TAG = "chat_list_screen:new_chat_fab"
+internal const val CHAT_LIST_ARCHIVED_TAG = "chat_list_screen:archived_action"
 
 private val previewChats = persistentListOf(
     ChatRoomUiItem(
@@ -416,6 +440,7 @@ private fun ChatListScreenPreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onArchivedClick = {},
             onSearchQueryChange = {},
         )
     }
@@ -438,6 +463,7 @@ private fun ChatListScreenSearchActivePreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onArchivedClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
         )
@@ -461,6 +487,7 @@ private fun ChatListScreenNoResultsPreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onArchivedClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
         )
@@ -490,6 +517,7 @@ private fun ChatListScreenSelectionModePreview() {
             selectedCount = 1,
             isAllSelected = false,
             onNewChatClick = {},
+            onArchivedClick = {},
         )
     }
 }
@@ -504,6 +532,7 @@ private fun ChatListScreenLoadingPreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onArchivedClick = {},
             onSearchQueryChange = {},
         )
     }

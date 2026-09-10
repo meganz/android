@@ -538,7 +538,14 @@ class FakeMegaChatApiGateway(
 
     override fun getChatListItems(mask: Int, filter: Int): List<MegaChatListItem>? =
         engine.dispatchBlocking(MegaChatApiGateway::getChatListItems, listOf(mask, filter)) {
-            chatState.chatListItems.values.toList()
+            chatState.chatListItems.values.filter { item ->
+                val archived = chatState.chatRooms[item.chatId]?.isArchived == true
+                when (filter) {
+                    MegaChatApi.CHAT_GET_ARCHIVED -> archived
+                    MegaChatApi.CHAT_GET_NON_ARCHIVED -> !archived
+                    else -> true
+                }
+            }
         }
 
     override fun getChatCall(chatId: Long): MegaChatCall? =

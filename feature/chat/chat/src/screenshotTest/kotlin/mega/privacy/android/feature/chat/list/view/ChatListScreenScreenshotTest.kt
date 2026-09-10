@@ -27,6 +27,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onArchivedClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -43,6 +44,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onArchivedClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -64,6 +66,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onArchivedClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -85,6 +88,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onArchivedClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -103,6 +107,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onArchivedClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
             )
@@ -127,6 +132,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onArchivedClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
             )
@@ -146,6 +152,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onArchivedClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
                 selectionMode = true,
@@ -167,6 +174,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onArchivedClick = {},
                 onSearchQueryChange = {},
             )
         }

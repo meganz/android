@@ -56,6 +56,7 @@ fun ChatListEntry(
             navigationHandler.navigate(ShowChatMessagesNavKey(chatId))
         },
         onNewChatClick = { navigationHandler.navigate(NewChatNavKey) },
+        onArchivedClick = { navigationHandler.navigate(ArchivedChatsNavKey) },
         onSearchQueryChange = viewModel::onSearchQueryChange,
         resolveBulkActions = viewModel::getBulkChatRoomActions,
         onBulkActionSelected = viewModel::onBulkChatRoomActionSelected,
