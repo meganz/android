@@ -22,6 +22,7 @@ internal fun AudioPlayerController(
     isPlaying: Boolean,
     isLoading: Boolean,
     controlsEnabled: Boolean,
+    nextEnabled: Boolean,
     isPodcastMode: Boolean,
     shuffleEnabled: Boolean,
     repeatMode: Int,
@@ -71,7 +72,8 @@ internal fun AudioPlayerController(
             MusicPlaybackControls(
                 isPlaying = isPlaying,
                 isLoading = isLoading,
-                controlsEnabled = controlsEnabled,
+                previousEnabled = controlsEnabled,
+                nextEnabled = nextEnabled,
                 shuffleEnabled = shuffleEnabled,
                 repeatMode = repeatMode,
                 onShuffleClicked = onShuffleClicked,

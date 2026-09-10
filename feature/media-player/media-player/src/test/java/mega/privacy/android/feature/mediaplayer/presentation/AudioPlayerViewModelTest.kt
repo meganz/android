@@ -153,6 +153,19 @@ class AudioPlayerViewModelTest {
     }
 
     @Test
+    fun `test that uiState Data carries hasNext from the controller state`() = runTest {
+        underTest.uiState.test {
+            awaitItem() // Loading
+
+            gatewayPlayerState.emit(audioControllerState(hasNext = true))
+            assertThat((awaitItem() as AudioPlayerUiState.Data).hasNext).isTrue()
+
+            gatewayPlayerState.emit(audioControllerState(hasNext = false))
+            assertThat((awaitItem() as AudioPlayerUiState.Data).hasNext).isFalse()
+        }
+    }
+
+    @Test
     fun `test that togglePlayPause calls pause when current state is playing`() = runTest {
         underTest.uiState.test {
             awaitItem() // Loading
@@ -732,6 +745,39 @@ class AudioPlayerViewModelTest {
             assertThat(state.currentPlayingItemName).isEqualTo("track.mp3")
         }
     }
+
+    @Test
+    fun `test that a late node name for a previous track does not overwrite the current track name`() =
+        runTest {
+            val previousNodeFetch = CompletableDeferred<FileNode>()
+            val previousNode = mock<FileNode>()
+            whenever(previousNode.name).thenReturn("previous.mp3")
+            val currentNode = mock<FileNode>()
+            whenever(currentNode.name).thenReturn("current.mp3")
+            whenever(getNodeByHandleUseCase(111L)).doSuspendableAnswer { previousNodeFetch.await() }
+            whenever(getNodeByHandleUseCase(222L)).thenReturn(currentNode)
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(
+                    audioControllerState(currentMediaItemId = "a", currentMediaItemHandle = 111L)
+                )
+                awaitItem() // Data for 111, its name fetch still in flight
+
+                gatewayPlayerState.emit(
+                    audioControllerState(currentMediaItemId = "b", currentMediaItemHandle = 222L)
+                )
+                val current = expectMostRecentItem() as AudioPlayerUiState.Data
+                assertThat(current.currentPlayingItemName).isEqualTo("current.mp3")
+
+                // The fetch for the previous track resolves only now.
+                previousNodeFetch.complete(previousNode)
+
+                expectNoEvents()
+                val latest = underTest.uiState.value as AudioPlayerUiState.Data
+                assertThat(latest.currentPlayingItemName).isEqualTo("current.mp3")
+            }
+        }
 
     @Test
     fun `test that handleSideEffects fetches node name on first emission when media item handle is set`() =
@@ -1321,7 +1367,7 @@ class AudioPlayerViewModelTest {
         underTest.uiState.test {
             awaitItem() // Loading
             gatewayPlayerState.emit(
-                audioControllerState(currentMediaItemHandle = 123L, mediaItemCount = 2)
+                audioControllerState(currentMediaItemHandle = 123L, mediaItemCount = 2, hasNext = true)
             )
             awaitItem() // Data
 
@@ -1330,6 +1376,32 @@ class AudioPlayerViewModelTest {
             verify(gateway).skipToNext()
         }
     }
+
+    @Test
+    fun `test that removal of the playing node stops playback when repeat all would only wrap onto the removed item`() =
+        runTest {
+            val removedNode = mock<FileNode> { on { id }.thenReturn(NodeId(123L)) }
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                // Under repeat-all a single-item queue still reports hasNext: the "next" item is
+                // the removed one itself, so playback must stop instead of skipping.
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemHandle = 123L,
+                        mediaItemCount = 1,
+                        repeatMode = Player.REPEAT_MODE_ALL,
+                        hasNext = true,
+                    )
+                )
+                awaitItem() // Data
+
+                nodeUpdates.emit(NodeUpdate(mapOf<Node, List<NodeChanges>>(removedNode to listOf(NodeChanges.Remove))))
+
+                verify(gateway).stop()
+                verify(gateway, never()).skipToNext()
+            }
+        }
 
     @Test
     fun `test that removal of the playing node stops playback when it is the only queue item`() =
@@ -1386,6 +1458,7 @@ class AudioPlayerViewModelTest {
                         mediaItemCount = 2,
                         currentQueueIndex = 1,
                         repeatMode = Player.REPEAT_MODE_ALL,
+                        hasNext = true,
                     )
                 )
                 awaitItem() // Data
@@ -1671,6 +1744,7 @@ private fun audioControllerState(
     currentMediaItemHandle: Long? = null,
     currentQueueIndex: Int = 0,
     lastItemTransitionWasAuto: Boolean = false,
+    hasNext: Boolean = false,
 ): AudioControllerState = AudioControllerState(
     isPlaying = isPlaying,
     currentPositionMs = currentPositionMs,
@@ -1689,4 +1763,5 @@ private fun audioControllerState(
     currentMediaItemHandle = currentMediaItemHandle,
     currentQueueIndex = currentQueueIndex,
     lastItemTransitionWasAuto = lastItemTransitionWasAuto,
+    hasNext = hasNext,
 )

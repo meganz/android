@@ -161,6 +161,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
             },
             queueItems = buildQueueItems(c),
             currentQueueIndex = c.displayQueueIndex(),
+            hasNext = c.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT),
         )
         _playerState.value = currentState
     }
@@ -202,6 +203,10 @@ internal class AudioMediaControllerFacade @Inject constructor(
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             updateState { copy(isPlaying = isPlaying) }
             if (isPlaying) startPositionPolling() else stopPositionPolling()
+        }
+
+        override fun onAvailableCommandsChanged(availableCommands: Player.Commands) {
+            updateState { copy(hasNext = availableCommands.contains(Player.COMMAND_SEEK_TO_NEXT)) }
         }
 
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
@@ -371,11 +376,11 @@ internal class AudioMediaControllerFacade @Inject constructor(
     }
 
     override fun skipToNext() {
-        controller?.seekToNextMediaItem()
+        controller?.seekToNext()
     }
 
     override fun skipToPrevious() {
-        controller?.seekToPreviousMediaItem()
+        controller?.seekToPrevious()
     }
 
     override fun setShuffleEnabled(enabled: Boolean) {

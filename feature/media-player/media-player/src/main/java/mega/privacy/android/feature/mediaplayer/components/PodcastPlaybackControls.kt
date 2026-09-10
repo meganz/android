@@ -67,7 +67,7 @@ internal fun PodcastPlaybackControls(
         ) {
             MegaIcon(
                 imageVector = IconPack.Medium.Regular.Outline.FifteenBackward,
-                tint = IconColor.Primary,
+                tint = if (controlsEnabled) IconColor.Primary else IconColor.Disabled,
                 contentDescription = "Seek backward 15 seconds",
                 modifier = Modifier.size(32.dp),
             )
@@ -85,7 +85,7 @@ internal fun PodcastPlaybackControls(
         ) {
             MegaIcon(
                 imageVector = IconPack.Medium.Regular.Outline.FifteenForward,
-                tint = IconColor.Primary,
+                tint = if (controlsEnabled) IconColor.Primary else IconColor.Disabled,
                 contentDescription = "Seek forward 15 seconds",
                 modifier = Modifier.size(32.dp),
             )

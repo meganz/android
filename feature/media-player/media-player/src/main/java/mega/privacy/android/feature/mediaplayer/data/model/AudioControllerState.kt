@@ -27,6 +27,7 @@ import androidx.media3.common.Player
  * @property queueItems Snapshot of all items currently in the player's queue. Updated when the timeline changes (items added, removed, or reordered).
  * @property currentQueueIndex Index of the currently playing item within [queueItems]; mapped to `0` when no item is active.
  * @property lastItemTransitionWasAuto True when the most recent media-item change was an automatic advance ([Player.MEDIA_ITEM_TRANSITION_REASON_AUTO]) rather than a user seek/skip or a playlist rebuild. Only meaningful on the emission where [currentMediaItemId] actually changes.
+ * @property hasNext Whether the player can advance to another item, mirroring [Player.COMMAND_SEEK_TO_NEXT]: false on the last item (or a single item) unless repeat-all is on; repeat-one counts as off for navigation.
  */
 data class AudioControllerState(
     val isPlaying: Boolean = false,
@@ -47,4 +48,5 @@ data class AudioControllerState(
     val queueItems: List<AudioQueueItem> = emptyList(),
     val currentQueueIndex: Int = 0,
     val lastItemTransitionWasAuto: Boolean = false,
+    val hasNext: Boolean = false,
 )

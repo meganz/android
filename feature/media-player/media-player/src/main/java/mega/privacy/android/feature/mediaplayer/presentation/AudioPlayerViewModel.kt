@@ -9,6 +9,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import jakarta.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlin.time.Duration
@@ -163,6 +164,8 @@ class AudioPlayerViewModel @Inject constructor(
     private var lastMediaItemId: String? = null
     private var userOverriddenMode: Boolean? = null
     private var prefetchJob: Job? = null
+    private var nodeNameJob: Job? = null
+    private var nodeNameHandle: Long? = null
     private var sleepTimerJob: Job? = null
     private var endOfTrackSourceItemId: String? = null
 
@@ -220,16 +223,15 @@ class AudioPlayerViewModel @Inject constructor(
     }
 
     /**
-     * Explicit navigation treats REPEAT_ONE as OFF, so at the queue boundary skipToNext is a
-     * no-op and the player would keep serving — or, under repeat-one, keep looping — the
-     * removed node; stop playback instead when no other item can take over.
+     * At the queue boundary skipToNext is a no-op and the player would keep serving the removed
+     * node, so stop playback instead when no other item can take over. The item count is checked
+     * as well: under repeat-all a single item reports [AudioControllerState.hasNext], but the only
+     * "next" would be the removed node itself.
      */
     private fun skipPastRemovedNode() {
         val state = currentControllerState
-        val hasNext = state != null && state.mediaItemCount > 1 &&
-                (state.currentQueueIndex < state.mediaItemCount - 1 ||
-                        state.repeatMode == Player.REPEAT_MODE_ALL)
-        if (hasNext) gateway.skipToNext() else gateway.stop()
+        val hasOtherItem = state != null && state.mediaItemCount > 1 && state.hasNext
+        if (hasOtherItem) gateway.skipToNext() else gateway.stop()
     }
 
     private fun observePlaybackErrors() {
@@ -434,6 +436,7 @@ class AudioPlayerViewModel @Inject constructor(
             repeatMode = state.repeatMode,
             shuffleEnabled = state.shuffleEnabled,
             hasPlaylist = state.mediaItemCount > 1,
+            hasNext = state.hasNext,
             isLoading = state.isBuffering,
             title = state.title,
             artist = state.artist,
@@ -452,15 +455,24 @@ class AudioPlayerViewModel @Inject constructor(
     }
 
     private fun fetchNodeName(handle: Long) {
-        viewModelScope.launch {
+        nodeNameJob?.cancel()
+        nodeNameHandle = handle
+        nodeNameJob = viewModelScope.launch {
             runCatching { getNodeByHandleUseCase(handle)?.name }
                 .onSuccess { name ->
+                    // A fetch started for an earlier track can still complete after a quick skip;
+                    // its name must not overwrite the track that is playing now.
+                    if (handle != nodeNameHandle) return@onSuccess
                     playerState.update { state ->
                         if (state is AudioPlayerUiState.Data) state.copy(currentPlayingItemName = name)
                         else state
                     }
                 }
-                .onFailure { Timber.w(it, "Failed to fetch node name for handle=$handle") }
+                .onFailure {
+                    if (it !is CancellationException) {
+                        Timber.w(it, "Failed to fetch node name for handle=$handle")
+                    }
+                }
         }
     }
 

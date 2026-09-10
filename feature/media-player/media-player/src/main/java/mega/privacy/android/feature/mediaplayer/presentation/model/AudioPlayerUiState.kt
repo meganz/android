@@ -28,6 +28,7 @@ sealed interface AudioPlayerUiState {
      * @property currentPlayingHandle Handle of the currently playing node, or `null` if no item is loaded.
      * @property currentPlayingItemName Name of the currently playing item.
      * @property hasPlaylist Whether there is more than one item in the queue.
+     * @property hasNext Whether skip-next can advance to another item; drives the next button's enabled state.
      * @property currentAdapterType The adapter type from the launch intent.
      * @property thumbnailData Thumbnail data for the currently playing node.
      * @property nodeSourceType The node source type derived from the adapter type.
@@ -50,6 +51,7 @@ sealed interface AudioPlayerUiState {
         val currentPlayingHandle: Long?,
         val currentPlayingItemName: String?,
         val hasPlaylist: Boolean,
+        val hasNext: Boolean,
         val currentAdapterType: Int,
         val thumbnailData: ThumbnailData?,
         val nodeSourceType: NodeSourceType,

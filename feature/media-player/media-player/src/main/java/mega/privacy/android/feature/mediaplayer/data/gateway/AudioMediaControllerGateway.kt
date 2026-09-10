@@ -34,10 +34,14 @@ interface AudioMediaControllerGateway {
     /** Seeks to [positionMs] in the current media item. */
     fun seekTo(positionMs: Long)
 
-    /** Skips to the next media item in the queue. */
+    /** Skips to the next media item in the queue. No-op when there is none (see [mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState.hasNext]). */
     fun skipToNext()
 
-    /** Skips to the previous media item in the queue. */
+    /**
+     * Skips to the previous media item when one exists and playback is still within the first
+     * few seconds of the current item; otherwise restarts the current item from the beginning
+     * (Media3 `seekToPrevious` semantics).
+     */
     fun skipToPrevious()
 
     /** Enables or disables shuffle mode. */

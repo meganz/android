@@ -46,6 +46,7 @@ class AudioPlayerScreenTest {
         currentPlayingItemName: String? = null,
         repeatMode: Int = Player.REPEAT_MODE_OFF,
         shuffleEnabled: Boolean = false,
+        hasNext: Boolean = true,
     ) = AudioPlayerUiState.Data(
         isPlaying = isPlaying,
         isLoading = isLoading,
@@ -59,6 +60,7 @@ class AudioPlayerScreenTest {
         currentPlayingHandle = -1L,
         currentPlayingItemName = currentPlayingItemName,
         hasPlaylist = false,
+        hasNext = hasNext,
         currentAdapterType = -1,
         thumbnailData = null,
         nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
@@ -168,6 +170,20 @@ class AudioPlayerScreenTest {
         setContent(uiState = defaultData(isLoading = true), isPodcastMode = false)
 
         composeTestRule.onNodeWithContentDescription("Next").assertIsEnabled()
+    }
+
+    @Test
+    fun `test that next button is disabled when uiState is Data with hasNext false`() {
+        setContent(uiState = defaultData(hasNext = false), isPodcastMode = false)
+
+        composeTestRule.onNodeWithContentDescription("Next").assertIsNotEnabled()
+    }
+
+    @Test
+    fun `test that previous button stays enabled when uiState is Data with hasNext false`() {
+        setContent(uiState = defaultData(hasNext = false), isPodcastMode = false)
+
+        composeTestRule.onNodeWithContentDescription("Previous").assertIsEnabled()
     }
 
     @Test

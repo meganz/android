@@ -225,6 +225,7 @@ class AudioPlayerScreenshotTest {
         currentPlayingHandle = -1L,
         currentPlayingItemName = currentPlayingItemName,
         hasPlaylist = false,
+        hasNext = true,
         currentAdapterType = -1,
         thumbnailData = null,
         currentPlaybackSpeed = 1f,

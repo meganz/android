@@ -186,6 +186,7 @@ fun AudioPlayerScreen(
                     val contentIsPlaying: Boolean
                     val contentIsLoading: Boolean
                     val contentControlsEnabled: Boolean
+                    val contentNextEnabled: Boolean
                     val contentPosition: Long
                     val contentDuration: Long
                     val contentTitle: String
@@ -201,6 +202,7 @@ fun AudioPlayerScreen(
                             contentIsPlaying = false
                             contentIsLoading = true
                             contentControlsEnabled = false
+                            contentNextEnabled = false
                             contentPosition = 0L
                             contentDuration = 0L
                             contentTitle = ""
@@ -216,6 +218,7 @@ fun AudioPlayerScreen(
                             contentIsPlaying = uiState.isPlaying
                             contentIsLoading = uiState.isLoading
                             contentControlsEnabled = true
+                            contentNextEnabled = uiState.hasNext
                             contentPosition = uiState.currentPosition
                             contentDuration = uiState.duration
                             contentTitle = uiState.title ?: uiState.currentPlayingItemName ?: ""
@@ -233,6 +236,7 @@ fun AudioPlayerScreen(
                         isPlaying = contentIsPlaying,
                         isLoading = contentIsLoading,
                         controlsEnabled = contentControlsEnabled,
+                        nextEnabled = contentNextEnabled,
                         currentPosition = contentPosition,
                         duration = contentDuration,
                         title = contentTitle,
@@ -388,6 +392,7 @@ private fun AudioPlayerContent(
     isPlaying: Boolean,
     isLoading: Boolean,
     controlsEnabled: Boolean,
+    nextEnabled: Boolean,
     currentPosition: Long,
     duration: Long,
     title: String,
@@ -431,6 +436,7 @@ private fun AudioPlayerContent(
             isPlaying = isPlaying,
             isLoading = isLoading,
             controlsEnabled = controlsEnabled,
+            nextEnabled = nextEnabled,
             currentPosition = currentPosition,
             duration = duration,
             artworkUri = artworkUri,
@@ -462,6 +468,7 @@ private fun AudioPlayerContent(
             isPlaying = isPlaying,
             isLoading = isLoading,
             controlsEnabled = controlsEnabled,
+            nextEnabled = nextEnabled,
             currentPosition = currentPosition,
             duration = duration,
             title = title,
@@ -529,6 +536,7 @@ private fun PreviewAudioPlayerScreenPodcastMode() {
             duration = 21_600_000L,
             shuffleEnabled = false,
             hasPlaylist = true,
+            hasNext = true,
             repeatMode = Player.REPEAT_MODE_OFF,
             isLoading = false,
             currentPlayingHandle = null,
@@ -573,6 +581,7 @@ private fun PreviewAudioPlayerScreenMusicMode() {
             duration = 354_000L,
             shuffleEnabled = true,
             hasPlaylist = true,
+            hasNext = true,
             repeatMode = Player.REPEAT_MODE_ONE,
             isLoading = false,
             currentPlayingHandle = null,
@@ -621,6 +630,7 @@ private fun PreviewAudioPlayerScreenPaused() {
             currentPlayingHandle = null,
             currentPlayingItemName = "podcast_episode_42.mp3",
             hasPlaylist = false,
+            hasNext = false,
             currentAdapterType = -1,
             thumbnailData = null,
             nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,

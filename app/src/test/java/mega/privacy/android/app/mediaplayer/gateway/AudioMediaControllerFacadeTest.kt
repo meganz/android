@@ -14,6 +14,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.feature.mediaplayer.data.AudioQueueItemFactory
 import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -21,6 +22,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -68,6 +70,50 @@ internal class AudioMediaControllerFacadeTest {
             assertThat(state.currentMediaItemId).isEqualTo("media-id")
             assertThat(state.lastItemTransitionWasAuto).isEqualTo(expected)
         }
+    }
+
+    @Test
+    fun `test that onAvailableCommandsChanged emits hasNext true when seek to next is available`() =
+        runTest {
+            // Player.Commands is backed by SparseBooleanArray, an android.jar stub on the JVM, so
+            // the membership check is mocked instead of built.
+            val commands = mock<Player.Commands> {
+                on { contains(Player.COMMAND_SEEK_TO_NEXT) } doReturn true
+            }
+
+            underTest.playerListener.onAvailableCommandsChanged(commands)
+
+            underTest.playerState.test {
+                assertThat(awaitItem().hasNext).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that onAvailableCommandsChanged emits hasNext false when seek to next is unavailable`() =
+        runTest {
+            val commands = mock<Player.Commands> {
+                on { contains(Player.COMMAND_SEEK_TO_NEXT) } doReturn false
+            }
+
+            underTest.playerListener.onAvailableCommandsChanged(commands)
+
+            underTest.playerState.test {
+                assertThat(awaitItem().hasNext).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that skipToNext calls seekToNext on the controller`() {
+        underTest.skipToNext()
+
+        verify(controller).seekToNext()
+    }
+
+    @Test
+    fun `test that skipToPrevious calls seekToPrevious on the controller`() {
+        underTest.skipToPrevious()
+
+        verify(controller).seekToPrevious()
     }
 
     private fun transitionReasons(): Stream<Arguments> = Stream.of(
