@@ -2979,4 +2979,14 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="audio_player_not_allowed_during_call">通話中はメディアを再生できません</string>
+    <string name="invite_contacts">招待</string>
+    <string name="first_paragraph_achievement_invite_friends">無料のMEGAアカウントをサインアップ（登録）し、MEGAモバイルアプリをインストールするようにお友だちをご招待ください。サインアップされ、アプリがインストールされるたびに、ボーナスとして無料のストレージを受け取ることができます。</string>
+    <string name="second_paragraph_achievement_invite_friends">新規ご招待かつ、MEGAモバイルアプリかMEGAデスクトップアプリをインストールした場合に限り、無料ストレージボーナスが適用されます。</string>
+    <string name="subtitle_confirmation_invite_friends">招待状が送られました</string>
+    <string name="invite_sent_text">そのユーザーさんは招待済みで、受け入れられ次第すぐにあなたの連絡先リストに表示されます。</string>
+    <string name="invite_sent_text_multi">複数のユーザーが招待されています。承認されると連絡先リストに表示されます。</string>
+    <string name="general_close">閉じる</string>
+    <string name="chat_archived_chats_title">アーカイブされたチャット</string>
+    <string name="chat_archived_chats_empty_title">アーカイブされたチャットはありません</string>
 </resources>

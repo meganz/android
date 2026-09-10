@@ -3238,4 +3238,12 @@
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;Po</string>
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;To</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;Eo</string>
+    <string name="audio_player_not_allowed_during_call">Vous ne pouvez pas lire de médias pendant un appel</string>
+    <string name="invite_contacts">Inviter</string>
+    <string name="second_paragraph_achievement_invite_friends">La prime d’espace de stockage gratuit n’est applicable que pour les nouvelles invitations et si l’Appli&#160;MEGA mobile ou l’Appli&#160;MEGA pour ordinateur est installée.</string>
+    <string name="subtitle_confirmation_invite_friends">L’invitation a été envoyée</string>
+    <string name="invite_sent_text">L’utilisateur a été invité et apparaîtra dans votre liste de contacts une fois l’invitation acceptée.</string>
+    <string name="general_close">Fermer</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte MEGA gratuit et à installer une Appli Mobile MEGA. Vous bénéficierez d\’un espace de stockage gratuit en prime pour chaque inscription et chaque installation d\’application.</string>
+    <string name="invite_sent_text_multi">Les utilisateurs ont été invités et apparaîtront dans votre liste de contacts s’ils acceptent.</string>
 </resources>

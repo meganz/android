@@ -3189,11 +3189,11 @@
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] ha aggiornato il meeting[/B]</string>
     <string name="ongoing_call_messages">Chiamata in corso</string>
     <string name="meetings_list_ongoing_call_message">Meeting in corso</string>
-    <string name="subscription_quota_transfer_limited_title">Quota di trasferimento limitata</string>
-    <string name="subscription_quota_transfer_low_subtitle">La tua quota di trasferimento potrebbe essere quasi esaurita. Di conseguenza, i download o gli stream potrebbero essere interrotti. Esegui l’upgrade del tuo piano per ottenere più quota di trasferimento.</string>
-    <string name="subscription_quota_transfer_low_pro_subtitle">Esegui l’upgrade del tuo piano per ottenere più quota di trasferimento.</string>
-    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Gestisci il tuo piano su [A]mega.io[/A] per ottenere più quota di trasferimento</string>
-    <string name="new_text_file_rich_text_formatting_label">Formattazione testo avanzata</string>
+    <string name="subscription_quota_transfer_limited_title">Banda di trasferimento limitata</string>
+    <string name="subscription_quota_transfer_low_subtitle">La tua banda di trasferimento potrebbe essere quasi esaurita. Di conseguenza, i download o gli stream potrebbero essere interrotti. Effettua l’upgrade del tuo piano per ottenere più banda di trasferimento.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">Effettua l’upgrade del tuo piano per ottenere più banda di trasferimento.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Gestisci il tuo piano su [A]mega.io[/A] per ottenere più banda di trasferimento</string>
+    <string name="new_text_file_rich_text_formatting_label">Formattazione RTF</string>
     <string name="meetings_list_header_today">Oggi</string>
     <string name="meetings_list_past_header">Meeting passati</string>
     <string name="meetings_list_upcoming_meeting_label">Meeting in arrivo</string>
@@ -3221,4 +3221,18 @@
     <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="invite_contacts">Invita</string>
+    <string name="first_paragraph_achievement_invite_friends">Invita i tuoi amici a registrare un account gratuito su MEGA e ad installare una delle app per mobile di MEGA. Riceverai spazio di archiviazione gratuito come bonus per ogni registrazione e installazione dell\’app.</string>
+    <string name="second_paragraph_achievement_invite_friends">Bonus dello spazio di archiviazione applicabile ai nuovi inviti solo quando l\’app per mobile o per desktop di MEGA è installata.</string>
+    <string name="subtitle_confirmation_invite_friends">Invito spedito</string>
+    <string name="invite_sent_text">L’utente è stato invitato e apparirà nella tua lista dei contatti una volta accettato l’invito.</string>
+    <string name="invite_sent_text_multi">Gli utenti sono stati invitati e appariranno nell’elenco dei contatti una volta accettati gli inviti.</string>
+    <string name="general_close">Chiudi</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%1$s ogni giorno</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%1$s ogni settimana</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%1$s ogni mese</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Hai ricevuto %1$s di spazio di archiviazione extra per aver installato la nostra app per mobile.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Hai ricevuto %1$s di spazio di archiviazione extra per aver installato la nostra app per desktop.</string>
+    <string name="result_paragraph_info_achievement_registration">Hai ricevuto %1$s di spazio di archiviazione extra come bonus di registrazione.</string>
+    <string name="audio_player_not_allowed_during_call">Non puoi riprodurre un file multimediale durante una chiamata</string>
 </resources>

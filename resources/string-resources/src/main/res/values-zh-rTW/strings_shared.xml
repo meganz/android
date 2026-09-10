@@ -2938,14 +2938,14 @@
     <string name="account_info_expires_today">今天到期</string>
     <string name="account_info_expires_tomorrow_date">明天到期，%1$s</string>
     <string name="account_info_expired_yesterday">昨天已到期</string>
-    <string name="history_cleared_by">%1$s已清除聊天記錄</string>
-    <string name="non_format_history_cleared_by">%1$s已清除聊天記錄</string>
+    <string name="history_cleared_by">%1$s已清除對話記錄</string>
+    <string name="non_format_history_cleared_by">%1$s已清除對話記錄</string>
     <string name="retention_history_changed_by">%1$s已將訊息清除時間變更為%2$s</string>
     <string name="retention_history_disabled">%1$s已關閉訊息清除功能</string>
-    <string name="message_created_chat_link">%1$s已建立聊天連結</string>
-    <string name="message_deleted_chat_link">%1$s已移除聊天連結</string>
+    <string name="message_created_chat_link">%1$s已建立對話連結</string>
+    <string name="message_deleted_chat_link">%1$s已移除對話連結</string>
     <string name="message_set_chat_private">%1$s已開啟加密金鑰輪換</string>
-    <string name="contacts_sent">已傳送%s位聯絡人</string>
+    <string name="contacts_sent">已發送%s個聯絡人</string>
     <string name="error_message_unrecognizable">無法辨識的訊息</string>
     <string name="meetings_list_header_today">今天</string>
     <string name="meetings_list_past_header">過去的會議</string>
@@ -2972,4 +2972,11 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="invite_contacts">邀請</string>
+    <string name="first_paragraph_achievement_invite_friends">邀請您的朋友註冊一個免費的MEGA帳戶並且安裝MEGA行動應用程式。每一個完成註冊和應用程式安裝，您將獲得免費儲存空間作為獎勵。</string>
+    <string name="second_paragraph_achievement_invite_friends">免費儲存空間獎勵只限於新邀請並且有安裝MEGA手機應用程式或MEGA桌面應用程式才有效。</string>
+    <string name="subtitle_confirmation_invite_friends">邀請已發送</string>
+    <string name="invite_sent_text">用戶已被邀請，一旦對方接受邀請，將會出現在您的聯絡人列表。</string>
+    <string name="invite_sent_text_multi">用戶已被邀請。一旦他們接受邀請，將會出現在您的聯絡人列表。</string>
+    <string name="general_close">關閉</string>
 </resources>

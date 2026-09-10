@@ -2932,4 +2932,11 @@
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="invite_contacts">Undang</string>
+    <string name="second_paragraph_achievement_invite_friends">Bonus penyimpanan gratis hanya berlaku untuk undangan baru dan di mana Aplikasi Seluler MEGA atau Aplikasi Desktop MEGA diinstal.</string>
+    <string name="subtitle_confirmation_invite_friends">Undangan dikirim</string>
+    <string name="invite_sent_text">Pengguna telah diundang dan akan muncul di daftar kontak anda setelah diterima.</string>
+    <string name="general_close">Tutup</string>
+    <string name="first_paragraph_achievement_invite_friends">Undang teman anda untuk mendaftar akun MEGA gratis dan menginstal Aplikasi Seluler MEGA. Anda akan menerima penyimpanan gratis sebagai bonus untuk setiap pendaftaran dan instalasi aplikasi.</string>
+    <string name="invite_sent_text_multi">Pengguna telah diundang dan akan muncul dalam daftar kontak anda setelah undangan anda diterima.</string>
 </resources>

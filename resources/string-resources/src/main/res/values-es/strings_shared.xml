@@ -3210,4 +3210,12 @@
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="audio_player_not_allowed_during_call">No puedes reproducir durante una llamada</string>
+    <string name="invite_contacts">Invitar</string>
+    <string name="second_paragraph_achievement_invite_friends">Bono de almacenamiento gratuito aplicable solo a usuarios nuevos que instalen la aplicación móvil o de escritorio de MEGA.</string>
+    <string name="subtitle_confirmation_invite_friends">Invitación enviada</string>
+    <string name="invite_sent_text">El usuario ha sido invitado y aparecerá en tu lista de contactos en cuanto acepte la invitación.</string>
+    <string name="general_close">Cerrar</string>
+    <string name="first_paragraph_achievement_invite_friends">Invita a tus amigos a registrar una cuenta gratuita de MEGA e instalar nuestra aplicación móvil. Por cada registro e instalación de la aplicación, recibirás un bono adicional de almacenamiento.</string>
+    <string name="invite_sent_text_multi">Los usuarios han sido invitados y aparecerán en tu lista de contactos en cuanto acepten la invitación.</string>
 </resources>

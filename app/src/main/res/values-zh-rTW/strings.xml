@@ -2957,7 +2957,7 @@
     <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_renews_on">[B]%s[/B][A]更新[/A]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
-    <string name="account_info_expires_on">[A]到期日期[/A][B]%s[/B]</string>
+    <string name="account_info_expires_on">[A]到期日[/A][B]%s[/B]</string>
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">收藏</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->

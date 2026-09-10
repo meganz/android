@@ -3075,11 +3075,11 @@
         <item quantity="one">[B]%1$d seconde[/B]</item>
         <item quantity="other">[B]%1$d seconden[/B]</item>
     </plurals>
-    <string name="subscription_quota_transfer_limited_title">Beperkt overdrachtsquotum</string>
-    <string name="subscription_quota_transfer_low_subtitle">Je overdrachtsquotum kan bijna op zijn. Hierdoor kunnen je downloads of streams worden onderbroken. Upgrade je abonnement voor meer overdrachtsquotum.</string>
-    <string name="subscription_quota_transfer_low_pro_subtitle">Upgrade je abonnement voor meer overdrachtsquotum.</string>
-    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Beheer je abonnement op [A]mega.io[/A] voor meer overdrachtsquotum</string>
-    <string name="new_text_file_rich_text_formatting_label">Rich Text-opmaak</string>
+    <string name="subscription_quota_transfer_limited_title">Beperkt overdrachtstegoed</string>
+    <string name="subscription_quota_transfer_low_subtitle">Uw overdrachtstegoed kan bijna op zijn. Hierdoor kunnen uw downloads of streams worden onderbroken. Upgrade uw abonnement voor meer overdrachtstegoed.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">Upgrade uw abonnement voor meer overdrachtstegoed.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Beheer uw abonnement op [A]mega.io[/A] voor meer overdrachtstegoed</string>
+    <string name="new_text_file_rich_text_formatting_label">Rijke Text-opmaak</string>
     <string name="meetings_list_header_today">Vandaag</string>
     <string name="meetings_list_past_header">Eerdere vergaderingen</string>
     <string name="meetings_list_upcoming_meeting_label">Inkomende vergadering</string>
@@ -3106,4 +3106,18 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="invite_contacts">Uitnodigen</string>
+    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om zich aan te melden voor een gratis MEGA-account en om een MEGA Mobile Applicatie te installeren. U ontvangt gratis opslag als bonus voor elke aanmelding en applicatie-installatie.</string>
+    <string name="second_paragraph_achievement_invite_friends">Gratis opslagbonus alleen van toepassing op nieuwe uitnodigingen en waar MEGA Mobile Applicatie of MEGA Desktop Applicatie is geïnstalleerd.</string>
+    <string name="subtitle_confirmation_invite_friends">Uitnodiging verstuurd</string>
+    <string name="invite_sent_text">De gebruiker is uitgenodigd en zal na acceptatie in uw contactenlijst verschijnen.</string>
+    <string name="invite_sent_text_multi">De gebruikers zijn uitgenodigd en zullen, eenmaal geaccepteerd, in uw lijst met contactpersonen verschijnen.</string>
+    <string name="general_close">Sluiten</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%1$s dagelijks</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%1$s wekelijks</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%1$s maandelijks</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">U heeft %1$s extra opslagruimte ontvangen voor het installeren van onze mobiele appliucatie.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s extra opslagruimte ontvangen voor het installeren van onze desktop-applicatie.</string>
+    <string name="result_paragraph_info_achievement_registration">U heeft%1$s extra opslagruimte ontvangen als aanmeldingsbonus.</string>
+    <string name="audio_player_not_allowed_during_call">U kunt geen media afspelen tijdens een gesprek</string>
 </resources>

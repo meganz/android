@@ -3344,9 +3344,9 @@
     </plurals>
     <string name="new_text_file_rich_text_formatting_label">Formatowanie tekstu</string>
     <string name="subscription_quota_transfer_limited_title">Ograniczony limit transferu</string>
-    <string name="subscription_quota_transfer_low_subtitle">Twój limit transferu może się wkrótce wyczerpać. W rezultacie pobieranie lub strumieniowanie danych może zostać przerwane. Ulepsz swój plan, aby uzyskać więcej transferu.</string>
-    <string name="subscription_quota_transfer_low_pro_subtitle">Ulepsz swój plan, aby uzyskać więcej transferu.</string>
-    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Zarządzaj swoim planem na [A]mega.io[/A], aby uzyskać więcej transferu</string>
+    <string name="subscription_quota_transfer_low_subtitle">Twój limit transferu może być wyczerpany. W związku z tym pobieranie lub strumieniowanie może być przerwane. Zaktualizuj swój plan, aby uzyskać większy limit transferu.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">Zaktualizuj swój plan, aby uzyskać większy limit transferu.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Zarządzaj swoim planem na [A]mega.io[/A], aby uzyskać większy limit transferu</string>
     <string name="meetings_list_header_today">Dzisiaj</string>
     <string name="meetings_list_past_header">Dotychczasowe spotkania</string>
     <string name="meetings_list_upcoming_meeting_label">Najbliższe spotkanie</string>
@@ -3375,4 +3375,18 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="invite_contacts">Zaproszenie</string>
+    <string name="first_paragraph_achievement_invite_friends">Zaproś znajomych do założenia bezpłatnego konto MEGA i zainstalowania Aplikacja mobilna MEGA. Otrzymasz bezpłatną pamięć jako bonus za każdą rejestrację i instalację aplikacja.</string>
+    <string name="second_paragraph_achievement_invite_friends">Premia za bezpłatne przechowywanie dotyczy tylko nowych zaproszeń, w których zainstalowana jest aplikacja MEGA Mobile lub MEGA Desktop.</string>
+    <string name="subtitle_confirmation_invite_friends">Zaproszenie wysłane</string>
+    <string name="invite_sent_text">Użytkownik został zaproszony i po zaakceptowaniu pojawi się na Twojej liście kontaktów.</string>
+    <string name="invite_sent_text_multi">Użytkownik został zaproszony i pojawi się na liście Twoich kontaktów po akceptacji zaproszenia.</string>
+    <string name="general_close">Zamknij</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%1$s dziennie</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Otrzymałeś %1$s dodatkowego miejsca na przechowywanie za instalację naszej aplikacji mobilnej.</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%1$s każdego tygodnia</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%1$s każdego miesiąca</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Otrzymałeś %1$s dodatkowego miejsca na dysku za zainstalowanie naszej aplikacji desktopowej.</string>
+    <string name="result_paragraph_info_achievement_registration">Otrzymałeś %1$s dodatkowego miejsca na przechowywanie jako bonus powitalny za rejestrację.</string>
+    <string name="audio_player_not_allowed_during_call">Nie możesz odtwarzać mediów podczas rozmowy</string>
 </resources>

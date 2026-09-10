@@ -2934,11 +2934,11 @@
     <plurals name="plural_call_ended_messages_seconds">
         <item quantity="other">[B]%1$d วินาที[/B]</item>
     </plurals>
-    <string name="subscription_quota_transfer_limited_title">โควตาการโอนย้ายมีจำกัด</string>
-    <string name="subscription_quota_transfer_low_subtitle">โควตาการโอนย้ายของคุณอาจใกล้หมด ซึ่งอาจทำให้การดาวน์โหลดหรือสตรีมมิงของคุณหยุดชะงัก อัปเกรดแพ็กเกจของคุณเพื่อรับโควตาการโอนย้ายเพิ่มเติม</string>
-    <string name="subscription_quota_transfer_low_pro_subtitle">อัปเกรดแพ็กเกจของคุณเพื่อรับโควตาการโอนย้ายเพิ่มเติม</string>
-    <string name="subscription_quota_transfer_low_highest_plan_subtitle">จัดการแพ็กเกจของคุณที่ [A]mega.io[/A] เพื่อรับโควตาการโอนย้ายเพิ่มเติม</string>
-    <string name="new_text_file_rich_text_formatting_label">การจัดรูปแบบข้อความสมบูรณ์</string>
+    <string name="subscription_quota_transfer_limited_title">โควตาถ่ายโอนมีจำกัด</string>
+    <string name="subscription_quota_transfer_low_subtitle">โควตาถ่ายโอนของคุณอาจใกล้หมด ซึ่งอาจทำให้การดาวน์โหลดหรือการสตรีมหยุดชะงักได้ อัปเกรดแผนเพื่อรับโควตาถ่ายโอนเพิ่ม</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">อัปเกรดแผนเพื่อรับโควตาถ่ายโอนเพิ่ม</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">จัดการแผนของคุณได้ที่ [A]mega.io[/A] เพื่อรับโควตาถ่ายโอนเพิ่ม</string>
+    <string name="new_text_file_rich_text_formatting_label">การจัดรูปแบบข้อความแบบ Rich Text</string>
     <string name="meetings_list_header_today">วันนี้</string>
     <string name="meetings_list_past_header">การประชุมที่ผ่านมา</string>
     <string name="meetings_list_upcoming_meeting_label">การประชุมที่จะเกิดขึ้น</string>
@@ -2964,4 +2964,18 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="invite_contacts">เชิญ</string>
+    <string name="first_paragraph_achievement_invite_friends">เชิญเพื่อนของคุณลงทะเบียน MEGA ฟรีและติดตั้งแอปมือถือ MEGA คุณจะได้รับพื้นที่เก็บข้อมูลฟรีเป็นโบนัสทุกครั้งเมื่อเพื่อนของคุณลงทะเบียนและติดตั้งแอป</string>
+    <string name="second_paragraph_achievement_invite_friends">โบนัสพื้นที่เก็บข้อมูลฟรี เฉพาะคำเชิญใหม่และติดตั้งแอป MEGA บนมือถือหรือแอป MEGA เดสก์ทอปเท่านั้น</string>
+    <string name="subtitle_confirmation_invite_friends">ส่งคำเชิญแล้ว</string>
+    <string name="invite_sent_text">ได้เชิญผู้ใช้แล้ว และจะปรากฏในรายชื่อผู้ติดต่อของคุณเมื่ออีกฝ่ายกดยอมรับ</string>
+    <string name="invite_sent_text_multi">ผู้ใช้งานไดรับคำเชิญแล้วและจะปรากฎบนรายชื่อผู้ติดต่อของคุณ</string>
+    <string name="general_close">ปิด</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%1$s ทุกวัน</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%1$s ทุกสัปดาห์</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%1$s ทุกเดือน</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">คุณได้รับพื้นที่จัดเก็บเพิ่มเติม %1$s จากการติดตั้งแอปบนมือถือ</string>
+    <string name="result_paragraph_info_achievement_install_desktop">คุณได้รับพื้นที่จัดเก็บเพิ่มเติม %1$s จากการติดตั้งแอปบนเดสก์ท็อป</string>
+    <string name="result_paragraph_info_achievement_registration">คุณได้รับพื้นที่จัดเก็บเพิ่มเติม %1$s เป็นโบนัสจากการลงทะเบียน</string>
+    <string name="audio_player_not_allowed_during_call">ไม่สามารถเล่นไฟล์สื่อระหว่างอยู่ในสายได้</string>
 </resources>
