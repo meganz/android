@@ -32,6 +32,12 @@ gradlePlugin {
         }
     }
     plugins {
+        register("androidAccessibilityTest") {
+            id = "mega.android.a11y.test"
+            implementationClass = "AndroidAccessibilityTestConventionPlugin"
+        }
+    }
+    plugins {
         register("androidApplication") {
             id = "mega.android.app"
             implementationClass = "AndroidApplicationConventionPlugin"

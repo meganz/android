@@ -29,7 +29,7 @@ import org.hamcrest.Matcher
  * fail this sweep; see `megaAccessibilityValidator`
  * @return the mounted content, ready to be checked in every theme
  */
-internal fun ComposeContentTestRule.setScreenContent(
+fun ComposeContentTestRule.setScreenContent(
     reporters: ThemeReporters,
     baselineSuppressions: Matcher<AccessibilityCheckResult>? = null,
     content: @Composable () -> Unit,

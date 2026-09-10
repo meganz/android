@@ -1,45 +1,32 @@
 plugins {
-    alias(convention.plugins.mega.android.library)
-    alias(convention.plugins.mega.android.library.compose)
+    alias(convention.plugins.mega.android.a11y.test)
 }
 
 android {
     namespace = "mega.privacy.android.a11ytest"
-
-    defaultConfig {
-        testInstrumentationRunnerArguments["useTestStorageService"] = "true"
-    }
-
-    testOptions {
-        managedDevices {
-            localDevices {
-                create("ciPixel") {
-                    device = "Pixel 10"
-                    apiLevel = 36
-                    systemImageSource = "google"
-                    // Pinned so GMD never falls back to the x86_64 image on a mismatched
-                    // host; CI runs this device on Apple Silicon agents only.
-                    testedAbi = "arm64-v8a"
-                }
-            }
-        }
-    }
 }
 
 dependencies {
-    implementation(platform(androidx.compose.bom))
-    implementation(testlib.androidx.compose.ui.test.junit4.accessibility)
-    implementation(testlib.hamcrest)
+    // The harness is consumed from other modules' androidTest source sets, so everything that
+    // appears in its own public signatures has to be exposed rather than hidden.
+    api(platform(androidx.compose.bom))
+    api(testlib.androidx.compose.ui.test.junit4)
+    api(testlib.androidx.compose.ui.test.junit4.accessibility)
+    api(testlib.hamcrest)
+
+    implementation(androidx.compose.foundation)
+    implementation(androidx.compose.ui)
+    implementation(lib.mega.core.ui)
     implementation(testlib.test.storage)
     implementation(google.guava)
 
-    androidTestImplementation(platform(androidx.compose.bom))
     androidTestImplementation(androidx.compose.ui)
     androidTestImplementation(androidx.compose.foundation)
-    androidTestImplementation(androidx.compose.activity)
     androidTestImplementation(androidx.material3)
-    // Screen-level sweeps mount stateless feature-module screens directly, so the modules that
-    // own them and the modules declaring their UI-state types are compile-time dependencies.
+    // The component-family sweeps exercise the prebuilt core-ui artifact, which belongs to no
+    // feature module. Screen-level sweeps mount stateless feature-module screens directly, so
+    // the modules that own them and the modules declaring their UI-state types are compile-time
+    // dependencies until each of those screens is swept by its own module.
     androidTestImplementation(project(":feature:settings"))
     androidTestImplementation(project(":feature:transfers:transfers"))
     androidTestImplementation(project(":feature:payment:payment-snowflake-components"))
@@ -48,9 +35,5 @@ dependencies {
     androidTestImplementation(project(":resources:string-resources"))
     androidTestImplementation(lib.mega.core.ui)
     androidTestImplementation(lib.kotlinx.collections.immutable)
-    androidTestImplementation(testlib.androidx.compose.ui.test.junit4)
-    androidTestImplementation(testlib.androidx.compose.ui.test.junit4.accessibility)
     androidTestImplementation(testlib.truth)
-    debugImplementation(testlib.androidx.compose.ui.testManifest)
-    androidTestUtil(testlib.test.services)
 }

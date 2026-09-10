@@ -13,9 +13,15 @@ import org.hamcrest.Matcher
  *
  * Contrast is a function of the pixels the checks measure, so a light-only sweep is blind to
  * every dark-theme text and image contrast finding.
+ *
+ * @property isDark whether the design system renders its dark palette in this theme
  */
-internal enum class SweepTheme(val isDark: Boolean) {
+enum class SweepTheme(val isDark: Boolean) {
+
+    /** The light palette. */
     Light(isDark = false),
+
+    /** The dark palette. */
     Dark(isDark = true),
 }
 
@@ -25,7 +31,7 @@ internal enum class SweepTheme(val isDark: Boolean) {
  *
  * @param reportName prefix for the generated report file names, typically the test class name
  */
-internal class ThemeReporters(reportName: String) {
+class ThemeReporters(reportName: String) {
 
     private val reporters = SweepTheme.entries.associateWith { theme ->
         AccessibilityCheckReporter(reportName = "$reportName-${theme.name.lowercase()}")
@@ -43,6 +49,9 @@ internal class ThemeReporters(reportName: String) {
     fun entriesIn(theme: SweepTheme): List<AccessibilityCheckReportEntry> =
         reporterFor(theme).entries
 
+    /**
+     * The reporter collecting [theme]'s results.
+     */
     fun reporterFor(theme: SweepTheme): AccessibilityCheckReporter = reporters.getValue(theme)
 }
 
@@ -54,7 +63,7 @@ internal class ThemeReporters(reportName: String) {
  * the theme flag from a snapshot state instead lets one mount be recomposed into the other
  * theme and checked again, which costs a recomposition rather than a test.
  */
-internal class ThemedContent(
+class ThemedContent internal constructor(
     private val composeTestRule: ComposeContentTestRule,
     private val darkTheme: MutableState<Boolean>,
     private val reporters: ThemeReporters,

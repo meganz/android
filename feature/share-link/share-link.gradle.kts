@@ -3,6 +3,7 @@ import mega.privacy.android.build.preBuiltSdkDependency
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
+    alias(convention.plugins.mega.android.a11y.test)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
     alias(plugin.plugins.compose.screenshot)

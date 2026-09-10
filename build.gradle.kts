@@ -137,6 +137,18 @@ tasks.register("runAllUnitTestsWithCoverage") {
     dependsOn(testTasks)
 }
 
+tasks.register("runAllAccessibilityChecks") {
+    group = "Verification"
+    description = "Runs every module's accessibility checks same as CI/CD pipeline"
+    val checkTasks = rootProject.subprojects.mapNotNull { sub ->
+        // Registered by the mega.android.a11y.test convention plugin, so the aggregate covers
+        // whatever set of modules currently owns accessibility checks.
+        sub.tasks.findByName("accessibilityCheck")?.path
+    }.distinct()
+    println("Running Accessibility Check Tasks: $checkTasks")
+    dependsOn(checkTasks)
+}
+
 tasks.register("printModulesWithUnitTest") {
     doLast {
         val unitTestTaskNames = listOf(
