@@ -107,10 +107,24 @@ internal class RichSelectionGeometry {
         return RichDocPosition(index, offset.coerceIn(0, state.blockTextLength(index) ?: 0))
     }
 
-    /** Root-coordinate anchor rect for the selection menu, at a visible selection edge. */
+    /**
+     * Root-coordinate anchor rect for the selection menu: the selection's bounding box, so
+     * the platform toolbar sits above the highlight (or below it when there is no room)
+     * instead of over the selected text. Falls back to whichever edge is composed.
+     */
     fun selectionMenuRect(state: RichDocumentState): Rect? {
         val selection = state.documentSelection ?: return null
-        return edgeCursorRect(selection.end) ?: edgeCursorRect(selection.start)
+        val start = edgeCursorRect(selection.start)
+        val end = edgeCursorRect(selection.end)
+        if (start == null && end == null) return null
+        if (start == null || end == null) return start ?: end
+        val left = (selection.start.blockIndex..selection.end.blockIndex)
+            .mapNotNull { fieldBounds[it]?.left }
+            .minOrNull() ?: minOf(start.left, end.left)
+        val right = (selection.start.blockIndex..selection.end.blockIndex)
+            .mapNotNull { fieldBounds[it]?.right }
+            .maxOrNull() ?: maxOf(start.right, end.right)
+        return Rect(left, minOf(start.top, end.top), right, maxOf(start.bottom, end.bottom))
     }
 
     /** Root-coordinate cursor rect at [position], or null while its block is not composed. */

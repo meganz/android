@@ -736,6 +736,7 @@ class RichDocumentState(document: RichDocument) {
 
     /** Toolbar heading action on the focused block: body -> H1 -> H2 -> H3 -> body. */
     fun cycleFocusedHeading() {
+        val index = focusedIndex ?: return
         val block = focusedTextBlock ?: return
         recordUndo()
         block.kind = when (val kind = block.kind) {
@@ -748,6 +749,8 @@ class RichDocumentState(document: RichDocument) {
 
             else -> RichBlockKind.Heading(1)
         }
+        // The style change recreates the field node; this puts focus and caret back on it.
+        pendingFocus = RichFocusRequest(index, block.text.textFieldState.selection)
     }
 
     /**

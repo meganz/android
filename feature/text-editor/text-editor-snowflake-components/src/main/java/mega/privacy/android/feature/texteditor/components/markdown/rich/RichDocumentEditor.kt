@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
@@ -456,71 +457,77 @@ private fun RichTextBlockRow(
 
             RichBlockKind.Paragraph, is RichBlockKind.Heading -> Unit
         }
-        BasicTextField(
-            state = block.text.textFieldState,
-            textStyle = blockTextStyle(kind, colors),
-            cursorBrush = SolidColor(colors.text),
-            inputTransformation = remember(block, index) {
-                RichSpanInputTransformation(
-                    state = block.text,
-                    onSplit = { start, end -> state.requestSplit(index, start, end) },
-                    documentSelectionActive = { state.documentSelection != null },
-                    onReplaceDocumentSelection = { state.requestReplaceSelection(it) },
-                    onSmartInsert = { start, end, text ->
-                        state.requestSmartInsert(index, start, end, text)
-                    },
-                )
-            },
-            outputTransformation = remember(block, visualStyles, index) {
-                RichSpanOutputTransformation(block.text, visualStyles) {
-                    state.documentSelectionIn(index)
-                }
-            },
-            onTextLayout = { getResult -> geometry.textLayoutProviders[index] = getResult },
-            modifier = Modifier
-                .weight(1f)
-                .onGloballyPositioned {
-                    geometry.fieldBounds[index] = Rect(it.positionInRoot(), it.size.toSize())
-                }
-                // Inside a continuous quote the paragraph gap moves INSIDE the row, so the
-                // full-height bar spans it — one unbroken bar, like the preview's frame.
-                .then(
-                    if (kind is RichBlockKind.Quote &&
-                        kindAt(state.blocks, index + 1) is RichBlockKind.Quote
-                    ) {
-                        Modifier.padding(MarkdownBlockSpacing.nested)
-                    } else {
-                        Modifier
-                    },
-                )
-                .focusRequester(focusRequester)
-                .onFocusChanged {
-                    if (it.isFocused) {
-                        state.focusedIndex = index
-                        state.focusedCell = null
+        // The field is recreated when its TEXT STYLE changes (paragraph <-> heading, level
+        // cycles): a live field does not re-layout on a style-only change, leaving text and
+        // cursor at the old size. Focus survives via the pendingFocus request the retype
+        // records. Other retypes keep the stable node, per the rule above.
+        key((kind as? RichBlockKind.Heading)?.level ?: 0) {
+            BasicTextField(
+                state = block.text.textFieldState,
+                textStyle = blockTextStyle(kind, colors),
+                cursorBrush = SolidColor(colors.text),
+                inputTransformation = remember(block, index) {
+                    RichSpanInputTransformation(
+                        state = block.text,
+                        onSplit = { start, end -> state.requestSplit(index, start, end) },
+                        documentSelectionActive = { state.documentSelection != null },
+                        onReplaceDocumentSelection = { state.requestReplaceSelection(it) },
+                        onSmartInsert = { start, end, text ->
+                            state.requestSmartInsert(index, start, end, text)
+                        },
+                    )
+                },
+                outputTransformation = remember(block, visualStyles, index) {
+                    RichSpanOutputTransformation(block.text, visualStyles) {
+                        state.documentSelectionIn(index)
                     }
-                }
-                .onPreviewKeyEvent { event ->
-                    when {
-                        handleUndoRedoKey(event, state) -> true
-
-                        event.type == KeyEventType.KeyDown &&
-                                (event.key == Key.Backspace || event.key == Key.Delete) &&
-                                state.documentSelection != null -> {
-                            state.requestDeleteSelection()
-                            true
+                },
+                onTextLayout = { getResult -> geometry.textLayoutProviders[index] = getResult },
+                modifier = Modifier
+                    .weight(1f)
+                    .onGloballyPositioned {
+                        geometry.fieldBounds[index] = Rect(it.positionInRoot(), it.size.toSize())
+                    }
+                    // Inside a continuous quote the paragraph gap moves INSIDE the row, so the
+                    // full-height bar spans it — one unbroken bar, like the preview's frame.
+                    .then(
+                        if (kind is RichBlockKind.Quote &&
+                            kindAt(state.blocks, index + 1) is RichBlockKind.Quote
+                        ) {
+                            Modifier.padding(MarkdownBlockSpacing.nested)
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .focusRequester(focusRequester)
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            state.focusedIndex = index
+                            state.focusedCell = null
                         }
-
-                        event.type == KeyEventType.KeyDown &&
-                                event.key == Key.Backspace &&
-                                block.text.textFieldState.selection == TextRange.Zero ->
-                            state.mergeBlockBackward(index)
-
-                        else -> false
                     }
-                }
-                .testTag(richBlockFieldTag(index)),
-        )
+                    .onPreviewKeyEvent { event ->
+                        when {
+                            handleUndoRedoKey(event, state) -> true
+
+                            event.type == KeyEventType.KeyDown &&
+                                    (event.key == Key.Backspace || event.key == Key.Delete) &&
+                                    state.documentSelection != null -> {
+                                state.requestDeleteSelection()
+                                true
+                            }
+
+                            event.type == KeyEventType.KeyDown &&
+                                    event.key == Key.Backspace &&
+                                    block.text.textFieldState.selection == TextRange.Zero ->
+                                state.mergeBlockBackward(index)
+
+                            else -> false
+                        }
+                    }
+                    .testTag(richBlockFieldTag(index)),
+            )
+        }
     }
 }
 
