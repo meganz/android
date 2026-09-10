@@ -26,6 +26,7 @@ import androidx.media3.common.Player
  * @property currentMediaItemHandle MEGA node handle for the current media item, resolved via [mega.privacy.android.feature.mediaplayer.data.MediaHandleStore].
  * @property queueItems Snapshot of all items currently in the player's queue. Updated when the timeline changes (items added, removed, or reordered).
  * @property currentQueueIndex Index of the currently playing item within [queueItems]; mapped to `0` when no item is active.
+ * @property lastItemTransitionWasAuto True when the most recent media-item change was an automatic advance ([Player.MEDIA_ITEM_TRANSITION_REASON_AUTO]) rather than a user seek/skip or a playlist rebuild. Only meaningful on the emission where [currentMediaItemId] actually changes.
  */
 data class AudioControllerState(
     val isPlaying: Boolean = false,
@@ -45,4 +46,5 @@ data class AudioControllerState(
     val currentMediaItemHandle: Long? = null,
     val queueItems: List<AudioQueueItem> = emptyList(),
     val currentQueueIndex: Int = 0,
+    val lastItemTransitionWasAuto: Boolean = false,
 )

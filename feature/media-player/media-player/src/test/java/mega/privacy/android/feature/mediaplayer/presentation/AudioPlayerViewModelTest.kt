@@ -971,15 +971,32 @@ class AudioPlayerViewModelTest {
         }
 
     @Test
-    fun `test that sleepTimerState becomes Inactive and gateway pauses when track changes during EndOfTrack mode`() =
+    fun `test that sleepTimerState becomes Inactive and gateway pauses when the track auto-advances during EndOfTrack mode`() =
         runTest {
             gatewayPlayerState.emit(audioControllerState(currentMediaItemId = "track-1"))
             underTest.setSleepTimer(SleepTimerOption.EndOfTrack)
 
-            gatewayPlayerState.emit(audioControllerState(currentMediaItemId = "track-2"))
+            gatewayPlayerState.emit(
+                audioControllerState(currentMediaItemId = "track-2", lastItemTransitionWasAuto = true)
+            )
 
             assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.Inactive)
             verify(gateway).pause()
+        }
+
+    @Test
+    fun `test that sleepTimerState becomes Inactive without pausing when the user changes track during EndOfTrack mode`() =
+        runTest {
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemId = "track-1"))
+            underTest.setSleepTimer(SleepTimerOption.EndOfTrack)
+
+            // A skip / queue tap / notification-next arrives as a non-AUTO item transition.
+            gatewayPlayerState.emit(
+                audioControllerState(currentMediaItemId = "track-2", lastItemTransitionWasAuto = false)
+            )
+
+            assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.Inactive)
+            verify(gateway, never()).pause()
         }
 
     @Test
@@ -1163,41 +1180,75 @@ class AudioPlayerViewModelTest {
     }
 
     @Test
-    fun `test that restartFromBeginning seeks to the start of the current item`() = runTest {
-        underTest.restartFromBeginning()
-
-        verify(gateway).seekTo(0L)
-    }
-
-    @Test
-    fun `test that restartFromBeginning discards the saved playback position of the current item`() =
+    fun `test that restartFromBeginning seeks to start and discards the resumed track's saved position`() =
         runTest {
-            underTest.uiState.test {
-                awaitItem() // Loading
-                gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123456L))
-                awaitItem() // Data
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123456L))
+            underTest.resumedFromPosition.test {
+                assertThat(awaitItem()).isNull()
+                audioResumeEventQueue.emit(
+                    AudioResumeEvent(mediaHandle = 123456L, resumePositionMs = 60_000L)
+                )
+                assertThat(awaitItem()).isNotNull() // announcement armed for 123456
 
                 underTest.restartFromBeginning()
 
                 verify(gateway).seekTo(0L)
                 verify(deleteAudioPlaybackInfoUseCase).invoke(123456L)
-                cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that restartFromBeginning does not discard playback info when no item is playing`() =
+    fun `test that restartFromBeginning still restarts the resumed track after the announcement was consumed`() =
         runTest {
-            underTest.uiState.test {
-                awaitItem() // Loading
-                gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = null))
-                awaitItem() // Data
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123456L))
+            underTest.resumedFromPosition.test {
+                assertThat(awaitItem()).isNull()
+                audioResumeEventQueue.emit(
+                    AudioResumeEvent(mediaHandle = 123456L, resumePositionMs = 60_000L)
+                )
+                assertThat(awaitItem()).isNotNull()
+
+                // The screen consumes the announcement as soon as the snackbar is queued; the
+                // Restart action is tapped afterwards, while the snackbar is still visible.
+                underTest.onResumeEventConsumed()
+                assertThat(awaitItem()).isNull()
 
                 underTest.restartFromBeginning()
 
                 verify(gateway).seekTo(0L)
+                verify(deleteAudioPlaybackInfoUseCase).invoke(123456L)
+            }
+        }
+
+    @Test
+    fun `test that restartFromBeginning does nothing when no resume announcement is pending`() =
+        runTest {
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123456L))
+
+            underTest.restartFromBeginning()
+
+            verify(gateway, never()).seekTo(any())
+            verify(deleteAudioPlaybackInfoUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that restartFromBeginning does nothing when the resumed track has auto-advanced`() =
+        runTest {
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123456L))
+            underTest.resumedFromPosition.test {
+                assertThat(awaitItem()).isNull()
+                audioResumeEventQueue.emit(
+                    AudioResumeEvent(mediaHandle = 123456L, resumePositionMs = 60_000L)
+                )
+                assertThat(awaitItem()).isNotNull()
+
+                // Auto-advanced to another track while the snackbar was still showing.
+                gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 999L))
+
+                underTest.restartFromBeginning()
+
+                verify(gateway, never()).seekTo(any())
                 verify(deleteAudioPlaybackInfoUseCase, never()).invoke(any())
-                cancelAndIgnoreRemainingEvents()
             }
         }
 
@@ -1619,6 +1670,7 @@ private fun audioControllerState(
     playbackSpeed: Float = 1f,
     currentMediaItemHandle: Long? = null,
     currentQueueIndex: Int = 0,
+    lastItemTransitionWasAuto: Boolean = false,
 ): AudioControllerState = AudioControllerState(
     isPlaying = isPlaying,
     currentPositionMs = currentPositionMs,
@@ -1636,4 +1688,5 @@ private fun audioControllerState(
     playbackSpeed = playbackSpeed,
     currentMediaItemHandle = currentMediaItemHandle,
     currentQueueIndex = currentQueueIndex,
+    lastItemTransitionWasAuto = lastItemTransitionWasAuto,
 )

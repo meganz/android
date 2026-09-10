@@ -102,6 +102,13 @@ class AudioPlayerViewModel @Inject constructor(
 
     private val _resumedFromPosition = MutableStateFlow<String?>(null)
 
+    /**
+     * Node handle of the most recent resume announcement, read by [restartFromBeginning]. It is
+     * deliberately not cleared by [onResumeEventConsumed]: the screen consumes the announcement as
+     * soon as the snackbar is queued, while the Restart tap arrives seconds later.
+     */
+    private var resumedFromHandle: Long? = null
+
     /** Formatted position a silent resume started from, set while the resume snackbar is still
      * to be shown and cleared via [onResumeEventConsumed]. */
     val resumedFromPosition: StateFlow<String?> = _resumedFromPosition.asStateFlow()
@@ -294,6 +301,7 @@ class AudioPlayerViewModel @Inject constructor(
                     audioResumeEventQueue.emit(claimed)
                     return@collect
                 }
+                resumedFromHandle = claimed.mediaHandle
                 _resumedFromPosition.value =
                     durationInSecondsTextMapper(claimed.resumePositionMs.milliseconds)
             }
@@ -357,7 +365,13 @@ class AudioPlayerViewModel @Inject constructor(
             if (_sleepTimerState.value is SleepTimerState.EndOfTrack &&
                 current.currentMediaItemId != endOfTrackSourceItemId
             ) {
-                gateway.pause()
+                // End-of-track only stops playback when the source track ends on its own: an
+                // automatic advance is the timer firing, so pause. A user-driven change (skip,
+                // queue tap, notification next -> all reported as non-AUTO) means the user took
+                // control, so just retire the timer and let their chosen track play.
+                if (current.lastItemTransitionWasAuto) {
+                    gateway.pause()
+                }
                 _sleepTimerState.value = SleepTimerState.Inactive
                 endOfTrackSourceItemId = null
             }
@@ -666,7 +680,8 @@ class AudioPlayerViewModel @Inject constructor(
     }
 
     /**
-     * Restarts the current item from the beginning, undoing a silent resume.
+     * Restarts the resumed item from the beginning, undoing a silent resume. No-op when nothing
+     * has been announced yet or the resumed item is no longer the one playing.
      *
      * The saved position is discarded as well as sought past: a snapshot at the start is below
      * the minimum playback threshold and is never persisted, so seeking alone would leave the
@@ -674,9 +689,13 @@ class AudioPlayerViewModel @Inject constructor(
      * playback passes that threshold.
      */
     fun restartFromBeginning() {
-        val handle = (playerState.value as? AudioPlayerUiState.Data)?.currentPlayingHandle
+        val handle = resumedFromHandle ?: return
+        // The snackbar lingers ~4s; if the resumed track has auto-advanced since, the current
+        // item is no longer the one the announcement was about, so seeking it to 0 and discarding
+        // its saved position would hit the wrong track. Only act while they still match.
+        val currentHandle = (playerState.value as? AudioPlayerUiState.Data)?.currentPlayingHandle
+        if (currentHandle != handle) return
         gateway.seekTo(0L)
-        if (handle == null) return
         // The snackbar sits where the user dismisses the screen from, so leaving right after
         // tapping Restart is a natural gesture; on viewModelScope the delete would be cancelled
         // and the discarded position would silently resume on the next open.

@@ -3,6 +3,7 @@ package mega.privacy.android.app.mediaplayer.gateway
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -61,7 +62,8 @@ internal class AudioMediaControllerFacade @Inject constructor(
     private val _playerState = MutableStateFlow<AudioControllerState?>(null)
     override val playerState: Flow<AudioControllerState> = _playerState.filterNotNull()
 
-    private var controller: MediaController? = null
+    @VisibleForTesting
+    internal var controller: MediaController? = null
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private var positionPollingJob: Job? = null
     private var currentState = AudioControllerState()
@@ -194,7 +196,8 @@ internal class AudioMediaControllerFacade @Inject constructor(
         _playerState.value = currentState
     }
 
-    private val playerListener = object : Player.Listener {
+    @VisibleForTesting
+    internal val playerListener: Player.Listener = object : Player.Listener {
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             updateState { copy(isPlaying = isPlaying) }
@@ -235,6 +238,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
                     currentQueueIndex = ctrl.displayQueueIndex(),
                     currentPositionMs = ctrl.currentPosition.coerceAtLeast(0L),
                     durationMs = ctrl.duration.coerceAtLeast(0L),
+                    lastItemTransitionWasAuto = reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO,
                 )
             }
         }
