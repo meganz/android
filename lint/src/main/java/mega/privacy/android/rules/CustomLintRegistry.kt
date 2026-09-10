@@ -4,6 +4,7 @@ import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 import mega.privacy.android.rules.compose.ComposableFunctionVisibilityDetector
+import mega.privacy.android.rules.compose.DisabledInteractionModifierDetector
 
 /**
  * Custom lint registry
@@ -24,6 +25,7 @@ class CustomLintRegistry : IssueRegistry() {
             ComposableFunctionVisibilityDetector.ISSUE,
             ExternalLauncherPasscodeDetector.ISSUE,
             MegaApplicationGetInstanceDetector.ISSUE,
+            DisabledInteractionModifierDetector.ISSUE,
         )
 
     override val api: Int = CURRENT_API
