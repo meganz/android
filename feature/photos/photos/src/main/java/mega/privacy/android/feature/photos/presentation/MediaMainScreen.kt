@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -64,6 +65,7 @@ import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
+import mega.privacy.android.feature.photos.presentation.component.MEDIA_TIME_PERIOD_SELECTOR_EXIT_DURATION_MS
 import mega.privacy.android.feature.photos.presentation.component.MediaBottomBar
 import mega.privacy.android.feature.photos.presentation.component.MediaTimePeriodSelector
 import mega.privacy.android.feature.photos.presentation.component.MediaTopBar
@@ -525,6 +527,19 @@ fun MediaMainScreen(
     var isSearchModeForVideosOrPlaylists by rememberSaveable { mutableStateOf(false) }
 
     var isTimelinePinchActive by remember { mutableStateOf(false) }
+    var isTimePeriodSelectorVisible by remember { mutableStateOf(true) }
+    val isSelectionBottomBarRequested = selectionModeType.isAnActiveSelection()
+    var isSelectionBottomBarVisible by remember { mutableStateOf(isSelectionBottomBarRequested) }
+    LaunchedEffect(isSelectionBottomBarRequested) {
+        val waitsForSelector = isTimelineRevampEnabled &&
+                currentTabIndex == MediaScreen.Timeline.ordinal &&
+                isTimePeriodSelectorVisible &&
+                timelineRevampUiState is TimelineRevampUiState.Data
+        if (isSelectionBottomBarRequested && waitsForSelector) {
+            delay(MEDIA_TIME_PERIOD_SELECTOR_EXIT_DURATION_MS.toLong())
+        }
+        isSelectionBottomBarVisible = isSelectionBottomBarRequested
+    }
 
     // Timeline cells drag-selected before their nodes load; counted into the top bar's selection
     // count so drag-selecting placeholders reflects in the count immediately.
@@ -635,6 +650,7 @@ fun MediaMainScreen(
         },
         bottomBar = {
             MediaBottomBar(
+                isVisible = isSelectionBottomBarVisible,
                 selectionModeType = selectionModeType,
                 nodeActionUiState = nodeActionUiState,
                 albumsActions = listOf(
@@ -796,6 +812,10 @@ fun MediaMainScreen(
                                             selectedNodes.toSet(),
                                             NodeSourceType.CLOUD_DRIVE
                                         )
+                                    },
+                                    isTimePeriodSelectorVisible = isTimePeriodSelectorVisible,
+                                    onTimePeriodSelectorVisibleChanged = {
+                                        isTimePeriodSelectorVisible = it
                                     }
                                 )
                             }
@@ -875,6 +895,8 @@ private fun MediaScreen.MediaContent(
     dismissVideoPlaylistRemovedDialog: () -> Unit,
     onCurrentVideosSearchQueryRequest: () -> Unit,
     updateSelectionModeAvailableActions: (selectedNodes: List<TypedNode>, nodeSourceType: NodeSourceType) -> Unit,
+    isTimePeriodSelectorVisible: Boolean,
+    onTimePeriodSelectorVisibleChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -884,7 +906,6 @@ private fun MediaScreen.MediaContent(
         MediaScreen.Timeline -> {
             when (uiState.isTimelineRevampEnabled) {
                 true -> {
-                    var revampSelectorVisible by remember { mutableStateOf(true) }
                     Box(modifier = Modifier.fillMaxSize()) {
                         TimelineRevampScreen(
                             modifier = Modifier.fillMaxSize(),
@@ -940,7 +961,7 @@ private fun MediaScreen.MediaContent(
                             onCameraUploadsBannerDismiss = onCUBannerDismissRequest,
                             handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                             handleNotificationPermissionResult = handleNotificationPermissionResult,
-                            onSelectorVisibleChanged = { revampSelectorVisible = it },
+                            onSelectorVisibleChanged = onTimePeriodSelectorVisibleChanged,
                             contentPadding = timelineContentPadding.excludeTopPadding(),
                         )
 
@@ -950,7 +971,7 @@ private fun MediaScreen.MediaContent(
                                 .navigationBarsPadding()
                                 .align(Alignment.BottomCenter),
                             isVisible = timelineRevampUiState is TimelineRevampUiState.Data &&
-                                    revampSelectorVisible &&
+                                    isTimePeriodSelectorVisible &&
                                     selectedPhotoIds.isEmpty(),
                             selectedTimePeriod = selectedTimePeriod,
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
