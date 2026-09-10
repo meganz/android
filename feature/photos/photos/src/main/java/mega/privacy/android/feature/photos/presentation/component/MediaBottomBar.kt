@@ -20,16 +20,17 @@ internal fun MediaBottomBar(
     selectedNodes: List<TypedNode>,
     multiNodeActionHandler: MultiNodeActionHandler,
     onActionPressed: (mode: MediaSelectionModeType, action: MenuActionWithIcon) -> Unit,
+    isVisible: Boolean = true,
 ) {
     // We don’t use a when condition here because it would cause us to lose the animation for both bottom bars.
     SelectionModeBottomBar(
-        visible = selectionModeType == MediaSelectionModeType.Albums,
+        visible = isVisible && selectionModeType == MediaSelectionModeType.Albums,
         actions = albumsActions,
         onActionPressed = { onActionPressed(selectionModeType, it) }
     )
 
     SelectionModeBottomBar(
-        visible = selectionModeType == MediaSelectionModeType.Playlists,
+        visible = isVisible && selectionModeType == MediaSelectionModeType.Playlists,
         actions = playlistsActions,
         onActionPressed = { onActionPressed(selectionModeType, it) }
     )
@@ -37,7 +38,7 @@ internal fun MediaBottomBar(
     NodeSelectionModeBottomBar(
         availableActions = nodeActionUiState.availableActions,
         visibleActions = nodeActionUiState.visibleActions,
-        visible = nodeActionUiState.visibleActions.isNotEmpty() && (selectionModeType == MediaSelectionModeType.Videos || selectionModeType == MediaSelectionModeType.Timeline),
+        visible = isVisible && nodeActionUiState.visibleActions.isNotEmpty() && (selectionModeType == MediaSelectionModeType.Videos || selectionModeType == MediaSelectionModeType.Timeline),
         multiNodeActionHandler = multiNodeActionHandler,
         selectedNodes = selectedNodes,
         isSelecting = false,

@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.component
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,13 @@ import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.components.chip.SelectionChipStyle
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 
+/**
+ * How long [MediaTimePeriodSelector] takes to slide out of view. Callers that show something else
+ * anchored to the bottom of the screen wait this long before animating it in, so the two never
+ * cross each other.
+ */
+internal const val MEDIA_TIME_PERIOD_SELECTOR_EXIT_DURATION_MS = 150
+
 @Composable
 internal fun MediaTimePeriodSelector(
     isVisible: Boolean,
@@ -28,7 +36,9 @@ internal fun MediaTimePeriodSelector(
     AnimatedVisibility(
         modifier = modifier,
         visible = isVisible,
-        exit = slideOutVertically { it },
+        exit = slideOutVertically(
+            animationSpec = tween(durationMillis = MEDIA_TIME_PERIOD_SELECTOR_EXIT_DURATION_MS),
+        ) { it },
         enter = slideInVertically { it },
     ) {
         Row(
