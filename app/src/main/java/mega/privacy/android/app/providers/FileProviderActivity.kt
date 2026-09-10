@@ -1023,7 +1023,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
             )
         }
         if (viewModel.getStorageState() === StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+            showOverDiskQuotaPaywallWarning(this)
             return
         }
         val destination: File? = cacheDir

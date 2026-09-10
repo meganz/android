@@ -622,7 +622,7 @@ class FileInfoActivity : BaseActivity() {
                 }
             }
 
-            is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+            is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning(this)
 
             FileInfoOneOffViewEvent.LaunchShareContactPicker -> navigateToShare()
         }

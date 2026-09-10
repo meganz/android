@@ -799,7 +799,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         }
         if (viewModel.getStorageState() === StorageState.PayWall) {
             dismissAlertDialogIfExists(statusDialog)
-            showOverDiskQuotaPaywallWarning()
+            showOverDiskQuotaPaywallWarning(this)
             return
         }
 

@@ -57,7 +57,6 @@ import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel
 import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity.Companion.createSecondaryIntent
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -791,7 +790,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             val messagesSelected = adapter?.selectedMessages ?: arrayListOf()
 
             if (viewModel.getStorageState() == StorageState.PayWall && item.itemId != R.id.cab_menu_select_all && item.itemId != R.id.cab_menu_unselect_all) {
-                showOverDiskQuotaPaywallWarning()
+                showOverDiskQuotaPaywallWarning(this@NodeAttachmentHistoryActivity)
                 return false
             }
 
@@ -832,8 +831,8 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 clearSelections()
                 hideMultipleSelect()
                 val messageId = messagesSelected?.get(0)?.msgId
-                if (getStorageState() == StorageState.PayWall) {
-                    showOverDiskQuotaPaywallWarning()
+                if (viewModel.getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning(this@NodeAttachmentHistoryActivity)
                 } else {
                     messageId?.let { viewModel.saveChatNodeToOffline(chatId, it) }
                 }

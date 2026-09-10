@@ -624,7 +624,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun shareContactClicked() {
         Timber.d("Share contact option")
         if (viewModel.getStorageState() === StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+            showOverDiskQuotaPaywallWarning(this)
             return
         }
         if (viewModel.userEmail.isNullOrEmpty()) {
@@ -832,7 +832,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun sendFileToChat() {
         Timber.d("sendFileToChat")
         if (viewModel.getStorageState() === StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+            showOverDiskQuotaPaywallWarning(this)
             return
         }
         val email = viewModel.userEmail
@@ -1041,7 +1041,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
 
             contactInfoUiState.isStorageOverQuota -> {
-                showOverDiskQuotaPaywallWarning()
+                showOverDiskQuotaPaywallWarning(this)
                 viewModel.onConsumeStorageOverQuotaEvent()
             }
 

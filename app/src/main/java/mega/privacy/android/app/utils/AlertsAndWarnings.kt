@@ -17,7 +17,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.di.GlobalManagementEntryPoint
-import mega.privacy.android.app.di.LegacyStaticAppContext
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -33,21 +32,6 @@ object AlertsAndWarnings {
     /**
      * Shows the ODQ Paywall warning. It will not be shown if it is already being displayed or if
      * the user is upgrading to PRO (i.e. in any place of the checkout process).
-     */
-    @Deprecated(
-        "Reads the current activity from a process-wide Context holder.",
-        ReplaceWith("showOverDiskQuotaPaywallWarning(context)")
-    )
-    @JvmStatic
-    fun showOverDiskQuotaPaywallWarning() {
-        showOverDiskQuotaPaywallWarning(LegacyStaticAppContext.context)
-    }
-
-    /**
-     * Shows the ODQ Paywall warning. It will not be shown if it is already being displayed or if
-     * the user is upgrading to PRO (i.e. in any place of the checkout process).
-     *
-     * @param context Context used to resolve the currently resumed activity.
      */
     @JvmStatic
     fun showOverDiskQuotaPaywallWarning(context: Context) {

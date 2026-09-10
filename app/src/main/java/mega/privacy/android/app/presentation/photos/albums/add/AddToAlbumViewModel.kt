@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.photos.albums.add
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -18,8 +20,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
@@ -77,6 +79,8 @@ internal class AddToAlbumViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorPaginatedTimelinePhotosUseCase: MonitorPaginatedTimelinePhotosUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    @ApplicationContext private val context: Context,
     @ApplicationScope private val appScope: CoroutineScope,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -225,8 +229,8 @@ internal class AddToAlbumViewModel @Inject constructor(
     }
 
     fun setupNewAlbum(defaultAlbumName: String) {
-        if (getStorageState() == StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning(context)
             return
         }
 
@@ -289,8 +293,8 @@ internal class AddToAlbumViewModel @Inject constructor(
     }
 
     fun addPhotosToAlbum() = viewModelScope.launch {
-        if (getStorageState() == StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning(context)
             return@launch
         }
 
@@ -366,8 +370,8 @@ internal class AddToAlbumViewModel @Inject constructor(
     }
 
     fun setupNewPlaylist(defaultPlaylistName: String) {
-        if (getStorageState() == StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning(context)
             return
         }
 
@@ -426,8 +430,8 @@ internal class AddToAlbumViewModel @Inject constructor(
     }
 
     fun addVideosToPlaylist() {
-        if (getStorageState() == StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning(context)
             return
         }
 

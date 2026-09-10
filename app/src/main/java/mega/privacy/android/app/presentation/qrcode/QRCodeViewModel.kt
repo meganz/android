@@ -325,7 +325,7 @@ class QRCodeViewModel @Inject constructor(
 
             val storageState = monitorStorageStateEventUseCase.getState()
             if (storageState === StorageState.PayWall) {
-                AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                AlertsAndWarnings.showOverDiskQuotaPaywallWarning(context)
                 return@launch
             }
 

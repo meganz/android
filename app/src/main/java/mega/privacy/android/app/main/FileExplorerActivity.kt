@@ -2044,7 +2044,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             if (viewModel.storageState === StorageState.PayWall) {
                 dismissAlertDialogIfExists(statusDialog)
-                showOverDiskQuotaPaywallWarning()
+                showOverDiskQuotaPaywallWarning(this)
                 return
             }
 
@@ -2348,7 +2348,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     fun createFile(name: String?, data: String?, parentNode: MegaNode?, isURL: Boolean) {
         if (viewModel.storageState === StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+            showOverDiskQuotaPaywallWarning(this)
             return
         }
 
