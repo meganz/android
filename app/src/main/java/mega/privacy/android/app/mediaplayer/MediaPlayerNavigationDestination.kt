@@ -35,6 +35,7 @@ fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
                 handle = key.fileHandle,
                 parentHandle = key.parentHandle,
                 isFolderLink = key.isFolderLink,
+                isMediaQueueAvailable = key.isMediaQueueAvailable,
                 viewType = key.nodeSourceType,
                 searchedItems = key.searchedItems,
                 nodeHandles = key.nodeHandles,

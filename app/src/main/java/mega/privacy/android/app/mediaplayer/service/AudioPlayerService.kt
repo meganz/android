@@ -950,6 +950,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
      * result as an in-place diff so playback is not interrupted or repositioned.
      */
     private fun rebuildPlayQueueForFilterChange(params: AudioPlayQueueParams) {
+        // A single-track session has no sibling queue to filter. Rebuilding anyway would fall
+        // back to the root folder, because a no-queue launch intent carries no parent handle.
+        if (!params.isPlayQueue) return
         playQueueBuildJob?.cancel()
         retryJob?.cancel()
         absorbJob?.cancel()

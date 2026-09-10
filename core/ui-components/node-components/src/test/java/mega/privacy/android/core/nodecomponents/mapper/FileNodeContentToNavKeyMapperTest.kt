@@ -530,6 +530,46 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
+    fun `test that AudioOrVideo content maps to LegacyMediaPlayerNavKey with isMediaQueueAvailable false when the queue is disabled`() {
+        val nodeHandle = 666L
+        val parentHandle = 777L
+        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+        val nodeContentUri = NodeContentUri.RemoteContentUri("http://example.com/audio.mp3", true)
+        val fileName = "searched_audio.mp3"
+        val fileTypeInfo = AudioFileTypeInfo("audio/mpeg", "mp3", 180.seconds)
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            parentId = parentHandle,
+            name = fileName,
+            fileTypeInfo = fileTypeInfo
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.CLOUD_DRIVE))
+            .thenReturn(expectedViewType)
+
+        val result = underTest(
+            content = FileNodeContent.AudioOrVideo(uri = nodeContentUri),
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
+            isMediaQueueAvailable = false,
+        )
+
+        val expected = LegacyMediaPlayerNavKey(
+            nodeHandle = nodeHandle,
+            nodeContentUri = nodeContentUri,
+            nodeSourceType = expectedViewType,
+            sortOrder = SortOrder.ORDER_NONE,
+            isFolderLink = false,
+            fileName = fileName,
+            parentHandle = parentHandle,
+            fileHandle = nodeHandle,
+            fileTypeInfo = fileTypeInfo,
+            isMediaQueueAvailable = false,
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
     fun `test that AudioOrVideo content maps to LegacyMediaPlayerNavKey with FolderLink sets isFolderLink true`() {
         val nodeHandle = 555L
         val parentHandle = 444L

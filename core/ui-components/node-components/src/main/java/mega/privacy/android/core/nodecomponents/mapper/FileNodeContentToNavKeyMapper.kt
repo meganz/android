@@ -31,6 +31,8 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
      * @param sortOrder The sort order for media player (default: ORDER_NONE)
      * @param textEditorMode The text editor mode (default: View)
      * @param searchedItems The searched items for media player (default: null)
+     * @param isMediaQueueAvailable Whether the media player may build a play queue around the
+     * opened item; false plays it as a single track (default: true)
      * @return The corresponding NavKey or null if no navigation is found for this content
      */
     operator fun invoke(
@@ -40,6 +42,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         textEditorMode: TextEditorMode = TextEditorMode.View,
         searchedItems: List<Long>? = null,
+        isMediaQueueAvailable: Boolean = true,
         isPDFViewerEnabled: Boolean = false,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceData.nodeSourceType)
@@ -117,6 +120,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 },
                 fileHandle = fileNode.id.longValue,
                 fileTypeInfo = fileNode.type,
+                isMediaQueueAvailable = isMediaQueueAvailable,
                 searchedItems = searchedItems,
                 nodeHandles = nodeIds,
                 publicLinkUrl = publicUrl

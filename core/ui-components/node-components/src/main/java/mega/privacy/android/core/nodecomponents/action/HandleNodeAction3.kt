@@ -28,6 +28,7 @@ fun HandleNodeAction3(
     coroutineScope: CoroutineScope,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
+    isMediaQueueAvailable: Boolean = true,
 ) {
     val fileNodeContentToNavKeyMapper = remember {
         FileNodeContentToNavKeyMapper(NodeSourceTypeToViewTypeMapper())
@@ -47,6 +48,7 @@ fun HandleNodeAction3(
                 fileNode = typedFileNode,
                 nodeSourceData = nodeSourceData,
                 sortOrder = sortOrder,
+                isMediaQueueAvailable = isMediaQueueAvailable,
                 isPDFViewerEnabled = isPDFViewerEnabled,
             )?.let { navKey ->
                 onNavigate(navKey)

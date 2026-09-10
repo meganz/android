@@ -412,6 +412,7 @@ data class LegacyMediaPlayerNavKey(
     val parentHandle: Long,
     val fileHandle: Long,
     val fileTypeInfo: FileTypeInfo,
+    val isMediaQueueAvailable: Boolean = true,
     val searchedItems: List<Long>? = null,
     val nodeHandles: List<Long>? = null,
     val mediaQueueTitle: String? = null,

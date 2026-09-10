@@ -30,6 +30,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -249,6 +250,9 @@ fun SearchScreen(
             },
             onDownloadEvent = onTransfer,
             sortOrder = uiState.selectedSortOrder,
+            // Search results are not a playlist: an audio file opened from search plays as a
+            // single track instead of queueing its parent folder.
+            isMediaQueueAvailable = openedFileNode.type !is AudioFileTypeInfo,
             onNavigate = navigationHandler::navigate,
         )
     }
