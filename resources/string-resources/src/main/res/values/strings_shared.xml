@@ -4043,4 +4043,24 @@
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <!-- Audio player: snackbar shown when the user tries to control playback while a MEGA call is ongoing -->
+    <string name="audio_player_not_allowed_during_call">You can’t play media during a call</string>
+    <!-- Achievements invite-friends screen: button that opens the invite-contacts flow -->
+    <string name="invite_contacts">Invite</string>
+    <!-- Achievements invite-friends screen: first "How it works" paragraph explaining the referral bonus -->
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to sign up for a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
+    <!-- Achievements invite-friends screen: second "How it works" paragraph clarifying when the bonus applies -->
+    <string name="second_paragraph_achievement_invite_friends">Free storage bonus applicable to new invitations only and where MEGA Mobile App or MEGA Desktop App is installed.</string>
+    <!-- Achievements invite-friends screen: confirmation dialog title shown after invitations are sent -->
+    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
+    <!-- Achievements invite-friends screen: confirmation dialog message when a single user was invited -->
+    <string name="invite_sent_text">The user has been invited and will appear in your contact list once accepted.</string>
+    <!-- Achievements invite-friends screen: confirmation dialog message when multiple users were invited -->
+    <string name="invite_sent_text_multi">The users have been invited and will appear in your contact list once accepted.</string>
+    <!-- Achievements invite-friends screen: confirmation dialog button that closes the dialog -->
+    <string name="general_close">Close</string>
+    <!-- Title of the archived chats screen, reached from the chat list -->
+    <string name="chat_archived_chats_title">Archived chats</string>
+    <!-- Empty-state title shown on the archived chats screen when there are no archived chats -->
+    <string name="chat_archived_chats_empty_title">No archived chats</string>
 </resources>

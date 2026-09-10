@@ -2962,4 +2962,11 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]EB</string>
+    <string name="invite_contacts">초대</string>
+    <string name="first_paragraph_achievement_invite_friends">친구를 초대하여 무료 MEGA 계정에 가입하고 MEGA 모바일 앱을 설치하게 하세요. 가입과 앱 설치마다 당신은 무료 저장소를 보너스로 받게 됩니다.</string>
+    <string name="second_paragraph_achievement_invite_friends">무료 저장소 보너스는 새 초대에만 적용되며 MEGA 모바일 앱 또는 MEGA 데스크톱 앱이 설치되어야 합니다.</string>
+    <string name="subtitle_confirmation_invite_friends">초대장 발송됨</string>
+    <string name="invite_sent_text">이용자가 초대되었으며 수락되면 당신의 연락처 목록에 나타날 것입니다.</string>
+    <string name="invite_sent_text_multi">이용자들이 초대되었으며 수락되면 당신의 연락처 목록에 나타날 것입니다.</string>
+    <string name="general_close">닫기</string>
 </resources>

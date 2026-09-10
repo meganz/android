@@ -3240,4 +3240,20 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="invite_contacts">Convidar</string>
+    <string name="first_paragraph_achievement_invite_friends">Convide os seus amigos a cadastrar uma conta gratuita no MEGA e instalar um dos nossos aplicativos para dispositivos móveis. Cada vez que um amigo convidado se cadastrar e instalar um aplicativo, você receberá uma cota extra de armazenamento.</string>
+    <string name="second_paragraph_achievement_invite_friends">O bônus de armazenamento gratuito somente será concedido ao convidar novos usuários, os quais devem instalar o aplicativo do MEGA para dispositivos móveis ou para desktop.</string>
+    <string name="subtitle_confirmation_invite_friends">Convite enviado</string>
+    <string name="invite_sent_text">A solicitação de contato foi enviada e o usuário aparecerá na sua lista de contatos quando a aceitar.</string>
+    <string name="invite_sent_text_multi">Os usuários foram convidados e aparecerão na sua lista de contatos assim que aceitarem.</string>
+    <string name="general_close">Fechar</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%1$s todo dia</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%1$s toda semana</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%1$s todo mês</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Você obteve %1$s de armazenamento adicional por instalar o nosso aplicativo para dispositivos móveis.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Você obteve %1$s de armazenamento adicional ao instalar o nosso aplicativo para desktop.</string>
+    <string name="result_paragraph_info_achievement_registration">Você obteve %1$s de armazenamento adicional como bônus de cadastro.</string>
+    <string name="audio_player_not_allowed_during_call">Não é possível reproduzir mídia durante uma chamada</string>
+    <string name="chat_archived_chats_title">Chats arquivados</string>
+    <string name="chat_archived_chats_empty_title">Não há chats arquivados</string>
 </resources>

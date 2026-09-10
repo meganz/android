@@ -1759,15 +1759,15 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Geçersiz kod</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Bulut depolama neredeyse dolu. Pro’ya yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
+    <string name="text_almost_full_warning">Bulut depolama neredeyse dolu. Hesabınızı Pro’ya yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Bulut depolama neredeyse dolu. Şimdi yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
+    <string name="text_almost_full_warning_pro_account">Bulut depolama neredeyse dolu. Hesabınızı şimdi yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">Bulut depolama neredeyse dolu. Daha fazla depolama alanına ihtiyacınız varsa özel bir plan almak için lütfen MEGA destek ile iletişime geçin.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Bulut depolama dolu. Pro’ya yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
+    <string name="text_storage_full_warning">Bulut depolama dolu. Hesabınızı Pro’ya yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Bulut depolama dolu. Şimdi yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
+    <string name="text_storage_full_warning_pro_account">Bulut depolama dolu. Hesabınızı şimdi yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
     <string name="text_storage_full_warning_pro3_account">Bulut depolama dolu. Daha fazla depolama alanına ihtiyacınız varsa özel bir plan almak için lütfen MEGA destek ile iletişime geçin.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
@@ -1777,9 +1777,9 @@
     <!-- Button of the dialog shown when the storage is almost full to get bonus -->
     <string name="button_bonus_almost_full_warning">Bonus Al</string>
     <!-- Mail title to upgrade to a custom plan -->
-    <string name="title_mail_upgrade_plan">Özel bir plana yükseltin</string>
+    <string name="title_mail_upgrade_plan">Hesabınızı özel bir plana yükseltin</string>
     <!-- Mail subject to upgrade to a custom plan -->
-    <string name="subject_mail_upgrade_plan">Özel bir plana nasıl yükseltebileceğinizi bize sorun:</string>
+    <string name="subject_mail_upgrade_plan">Hesabınızı özel bir plana nasıl yükseltebileceğinizi bize sorun:</string>
     <!-- Title of the button in the contact info screen to start an audio call -->
     <string name="call_button">Ara</string>
     <!-- Title of the button in the contact info screen to send a message -->
@@ -2368,9 +2368,9 @@
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
     <string name="over_disk_quota_paywall_text_no_warning_dates_info">%1$s e-posta adresinize e-posta gönderdik ancak MEGA hesabınızda hâlâ %3$s yer kaplayan %2$s dosya bulunuyor ve bu durum %4$s sahibi olmanızı gerektiriyor.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
-    <string name="over_disk_quota_paywall_deletion_warning">[B]Yükseltmek için [M]%s[/M] kaldı[/B]. Bu sürenin sonunda verileriniz silinebilir.</string>
+    <string name="over_disk_quota_paywall_deletion_warning">[B]Hesabınızı yükseltmek için [M]%s[/M] kaldı[/B]. Bu sürenin sonunda verileriniz silinebilir.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
-    <string name="over_disk_quota_paywall_deletion_warning_no_data">[B]Yükseltmeniz gerekiyor[/B]. Verileriniz şu anda silinme riski altındadır.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data">[B]Hesabınızı yükseltmeniz gerekiyor[/B]. Verileriniz şu anda silinme riski altındadır.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk. -->
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]Verilerinizi kurtarmak için hemen harekete geçmelisiniz.[/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
@@ -3132,7 +3132,7 @@
     <!-- Report issue fragment instructions-->
     <string name="settings_help_report_issue_instructions">Geri bildiriminiz MEGA’yı geliştirmemize yardımcı olur. Lütfen yaşadığınız sorunu açıkça tanımlayın. Ne kadar fazla ayrıntı verirseniz çözmemiz o kadar kolay olur.</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
-    <string name="settings_help_report_issue_attach_logs_label">Günlük dosyasını gönder</string>
+    <string name="settings_help_report_issue_attach_logs_label">Log dosyasını gönder</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
     <string name="check_internet_connection_error">İnternet bağlantısı yok. Bağlantınızı kontrol edin ve tekrar deneyin.</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
@@ -3142,7 +3142,7 @@
     <!-- Success message when submit issue succeeded-->
     <string name="settings_help_report_issue_success">Raporunuzu aldık. Sorunu inceleyip size geri döneceğiz.</string>
     <!-- Message shown during log file upload-->
-    <string name="settings_help_report_issue_uploading_log_file">Günlük dosyası yükleniyor</string>
+    <string name="settings_help_report_issue_uploading_log_file">Log dosyası yükleniyor</string>
     <!-- Message shown if user tries to leave report screen without submitting their report-->
     <string name="settings_help_report_issue_discard_dialog_title">Rapor silinsin mi?</string>
     <!-- Button text for discard dialog option-->
@@ -4241,7 +4241,7 @@
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">Albüm kaydedilemiyor</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">Bu albümü bulut depolamanıza kaydetmek için yeterli depolama alanınız yok. Daha fazla depolama alanı almak için şimdi yükseltin.</string>
+    <string name="album_import_storage_exceeded_description">Bu albümü bulut depolamanıza kaydetmek için yeterli depolama alanınız yok. Daha fazla depolama alanı almak için hesabınızı şimdi yükseltin.</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">Gün</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -4623,7 +4623,7 @@
         <item quantity="other">Kamera yüklemeleri tamamlandı, %1$d dosya yüklendi</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000’e kadar katılımcı hakkına sahiptir.[/A] [B]Şimdi yükseltin.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000’e kadar katılımcı hakkına sahiptir.[/A] [B]Hesabınızı şimdi yükseltin.[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">Gizle</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -4641,7 +4641,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Değiştir</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000’e kadar katılımcı hakkına sahiptir.[/A] [B]Şimdi yükseltin.[/B]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000’e kadar katılımcı hakkına sahiptir.[/A] [B]Hesabınızı şimdi yükseltin.[/B]</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">İşletme hesabı devre dışı bırakıldı</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -4664,7 +4664,7 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">%1$s tarihinde, %2$s saatinden itibaren süresi doluyor</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">Aramaya yalnızca 100 katılımcı katılabilir. Ek katılımcılar yalnızca mesaj gönderip alabilir. Yönetici, bu kısıtlamaları kaldırmak için Pro’ya yükseltebilir.</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Aramaya yalnızca 100 katılımcı katılabilir. Ek katılımcılar yalnızca mesaj gönderip alabilir. Yönetici, bu kısıtlamaları kaldırmak için hesabını Pro’ya yükseltebilir.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">Düşük</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
@@ -4687,7 +4687,7 @@
         <item quantity="other">%1$d öğe gizlendi</item>
     </plurals>
     <!-- The title of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_title">Sınırsız arama süresi için Pro’ya yükseltin</string>
+    <string name="meetings_upgrade_pro_plan_title">Sınırsız arama süresi için hesabınızı Pro’ya yükseltin</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_body">Aramanız 60 dakika sınırına ulaştığı için sona erdi. Pro kullanıcılar sınırsız arama süresine sahip olup 1000 katılımcıya kadar davet edebilir.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->

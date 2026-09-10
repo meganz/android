@@ -3232,4 +3232,11 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="invite_contacts">Invitați</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitați-vă prietenii să se înscrie pentru un cont MEGA gratuit și să instaleze o Aplicație Mobile MEGA. Veți primi spațiu de stocare gratuit ca bonus pentru fiecare înregistrare și instalare a aplicației.</string>
+    <string name="second_paragraph_achievement_invite_friends">Bonusul pentru spațiul de stocare gratuit se aplică numai la noile invitații și în cazul în care este instalată Aplicația Mobilă MEGA sau Aplicația Desktop MEGA.</string>
+    <string name="subtitle_confirmation_invite_friends">Invitația a fost trimisă</string>
+    <string name="invite_sent_text">Utilizatorul a fost invitat și va apărea în lista de contacte de îndată ce a acceptat invitația.</string>
+    <string name="invite_sent_text_multi">Utilizatorii au fost invitați și vor apărea în lista de contacte de îndată ce au acceptat invitația.</string>
+    <string name="general_close">Închide</string>
 </resources>

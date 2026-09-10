@@ -2943,4 +2943,11 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="invite_contacts">Mời</string>
+    <string name="first_paragraph_achievement_invite_friends">Mời bạn&#160;bè của bạn tạo một tài&#160;khoản MEGA miễn&#160;phí và cài&#160;đặt App MEGA cho Di&#160;Động. Bạn sẽ nhận được thêm không&#160;gian miễn&#160;phí thưởng cho mỗi lần bạn&#160;bè đăng&#160;ký và cài đặt ứng&#160;dụng.</string>
+    <string name="second_paragraph_achievement_invite_friends">Phần thưởng không gian lưu trữ miễn phí chỉ có áp dụng cho những lời mời mới và khi App MEGA cho Di Động hoặc App MEGA cho Máy Tính được cài đặt.</string>
+    <string name="subtitle_confirmation_invite_friends">Lời mời đã gửi đi</string>
+    <string name="invite_sent_text">Đối tượng đã được mời và sẽ xuất hiện trong sổ liên lạc sau khi họ chấp nhận lời mời.</string>
+    <string name="invite_sent_text_multi">Tên của những người quý khách vừa mời sẽ xuất hiện trong sổ liên lạc sau khi họ dùng lời mời của quý khách để tạo tài khoản.</string>
+    <string name="general_close">Đóng</string>
 </resources>

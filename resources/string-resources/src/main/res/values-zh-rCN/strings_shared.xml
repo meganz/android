@@ -2972,4 +2972,11 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="invite_contacts">邀请</string>
+    <string name="first_paragraph_achievement_invite_friends">邀请您的朋友注册一个免费MEGA帐户并安装MEGA移动应用程序。每次完成注册并安装应用程序后，您都将获得免费存储空间作为奖励。</string>
+    <string name="second_paragraph_achievement_invite_friends">免费存储空间奖励仅适用于已安装MEGA手机应用程序或MEGA桌面应用程序的新邀请用户。</string>
+    <string name="subtitle_confirmation_invite_friends">邀请已发送</string>
+    <string name="invite_sent_text">该用户已被邀请，对方接受邀请后，将会出现在您的联系人列表中。</string>
+    <string name="invite_sent_text_multi">用户已被邀请，对方接受邀请后将会出现在您的联系人列表中。</string>
+    <string name="general_close">关闭</string>
 </resources>

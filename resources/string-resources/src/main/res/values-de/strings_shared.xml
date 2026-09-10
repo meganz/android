@@ -3061,12 +3061,12 @@
         <item quantity="other">[B]%1$d Sekunden[/B]</item>
     </plurals>
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] hat das Meeting aktualisiert[/B]</string>
-    <string name="subscription_quota_transfer_limited_title">Eingeschränktes Übertragungsvolumen</string>
-    <string name="subscription_quota_transfer_low_subtitle">Dein Übertragungsvolumen könnte bald aufgebraucht sein. Dadurch können deine Downloads oder Streams unterbrochen werden. Führe ein Upgrade deines Plans durch, um mehr Übertragungsvolumen zu erhalten.</string>
-    <string name="subscription_quota_transfer_low_pro_subtitle">Führe ein Upgrade deines Plans durch, um mehr Übertragungsvolumen zu erhalten.</string>
-    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Verwalte deinen Plan auf [A]mega.io[/A], um mehr Übertragungsvolumen zu erhalten</string>
+    <string name="subscription_quota_transfer_limited_title">Begrenztes Transfervolumen</string>
+    <string name="subscription_quota_transfer_low_subtitle">Ihr Transfervolumen ist möglicherweise bald aufgebraucht. Dadurch kann es zu Unterbrechungen bei Ihren Downloads oder Streams kommen. Upgraden Sie Ihr Paket, um mehr Transfervolumen zu erhalten.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">Upgraden Sie Ihr Paket, um mehr Transfervolumen zu erhalten.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Verwalten Sie Ihr Paket auf [A]mega.io[/A], um mehr Transfervolumen zu erhalten</string>
     <string name="audio_player_resumed_snackbar_message">Fortgesetzt ab %1$s</string>
-    <string name="new_text_file_rich_text_formatting_label">Rich-Text-Formatierung</string>
+    <string name="new_text_file_rich_text_formatting_label">Formatierter Text</string>
     <string name="meetings_list_recurring_meeting_label">Wiederkehrendes Meeting</string>
     <string name="meetings_list_upcoming_meeting_label">Anstehendes Meeting</string>
     <string name="meetings_list_header_today">Heute</string>
@@ -3093,4 +3093,18 @@
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%1$s jeden Tag</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%1$s jede Woche</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%1$s jeden Monat</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Sie haben %1$s Extraspeicherplatz für die Installation unserer Mobil-App erhalten.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Sie haben %1$s Extraspeicherplatz für die Installation unserer Desktop-App erhalten.</string>
+    <string name="result_paragraph_info_achievement_registration">Sie haben %1$s Extraspeicherplatz als Registrierungsbonus erhalten.</string>
+    <string name="audio_player_not_allowed_during_call">Während eines Anrufs können keine Medien wiedergegeben werden</string>
+    <string name="subtitle_confirmation_invite_friends">Einladung gesendet</string>
+    <string name="invite_sent_text">Der Benutzer wurde eingeladen und erscheint nach Annahme der Einladung in Ihrer Kontaktliste.</string>
+    <string name="general_close">Schließen</string>
+    <string name="invite_contacts">Einladen</string>
+    <string name="second_paragraph_achievement_invite_friends">Der kostenlose Bonusspeicherplatz wird nur bei neuen Einladungen und bei Installation einer MEGA-Mobil-App oder der MEGA-Desktop-App gewährt.</string>
+    <string name="first_paragraph_achievement_invite_friends">Laden Sie Ihre Freunde ein, einen kostenlosen MEGA-Account zu registrieren und eine MEGA-Mobil-App zu installieren. Für jede Anmeldung und App-Installation erhalten Sie als Bonus kostenlosen Speicherplatz.</string>
+    <string name="invite_sent_text_multi">Die Benutzer wurden eingeladen und werden in Ihrer Kontaktliste auftauchen, sobald sie die Einladung annehmen.</string>
 </resources>

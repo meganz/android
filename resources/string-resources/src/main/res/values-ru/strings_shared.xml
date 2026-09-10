@@ -3374,4 +3374,11 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;ТБ</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;ПБ</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;ЭБ</string>
+    <string name="invite_contacts">Пригласить</string>
+    <string name="first_paragraph_achievement_invite_friends">Приглашайте друзей бесплатно зарегистрироваться в MEGA и установить мобильное приложение. За каждую регистрацию и установку вы получите бонусное место на диске.</string>
+    <string name="second_paragraph_achievement_invite_friends">Бонус с бесплатным хранилищем применяется только за новые приглашения и установку мобильного или настольного приложения MEGA.</string>
+    <string name="subtitle_confirmation_invite_friends">Приглашение отправлено</string>
+    <string name="invite_sent_text">Пользователь приглашён. Он появится в ваших контактах, когда примет приглашение.</string>
+    <string name="invite_sent_text_multi">Пользователи приглашены. Они появятся в вашем списке контактов, если согласятся.</string>
+    <string name="general_close">Закрыть</string>
 </resources>

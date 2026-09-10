@@ -3621,4 +3621,11 @@
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;بيتابايت</string>
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;تيرابايت</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;إكسابايت</string>
+    <string name="invite_contacts">دعوة</string>
+    <string name="second_paragraph_achievement_invite_friends">تنطبق مكافأة التخزين المجانية على الدعوات الجديدة فقط وحين يتم تثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile أو تطبيق ميغا للحاسب المكتبي MEGA Desktop App.</string>
+    <string name="subtitle_confirmation_invite_friends">تم إرسال الدعوة</string>
+    <string name="invite_sent_text">تمت دعوة المستخدم وسيظهر في قائمة جهات الاتصال الخاصة بك بمجرد قبول الدعوة.</string>
+    <string name="general_close">إغلاق</string>
+    <string name="first_paragraph_achievement_invite_friends">قم بدعوة أصدقائك للتسجيل للحصول على حساب ميغا MEGA مجاني وتثبيت تطبيق ميغا MEGA للهاتف المحمول. ستحصل على مساحة تخزين مجانية كمكافأة لكل تسجيل وتثبيت تطبيق.</string>
+    <string name="invite_sent_text_multi">لقد تمت دعوة المستخدمين وسوف تجدهم في جهات الاتصال عند موافقتهم.</string>
 </resources>

@@ -570,9 +570,9 @@
     <!-- Title for the inline error banner when storage is full -->
     <string name="account_storage_over_quota_inline_error_banner_title">Depolama alanınız dolu</string>
     <!-- Error Message indicating the user needs to upgrade now to get more storage -->
-    <string name="account_storage_over_quota_inline_error_banner_message">Veri yüklemeye devam etmek için daha fazla depolama alanı elde etmek üzere şimdi yükseltin.</string>
+    <string name="account_storage_over_quota_inline_error_banner_message">Veri yüklemeye devam etmek için daha fazla depolama alanı elde etmek üzere hesabınızı şimdi yükseltin.</string>
     <!-- Warning Message indicating the user needs to upgrade to get more storage -->
-    <string name="account_storage_over_quota_inline_warning_banner_message">Veri yüklemeye devam etmek için, daha fazla depolama alanı elde etmek üzere yükseltin.</string>
+    <string name="account_storage_over_quota_inline_warning_banner_message">Veri yüklemeye devam etmek için, daha fazla depolama alanı elde etmek üzere hesabınızı yükseltin.</string>
     <!-- Label for the upgrade action link -->
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Hemen yükselt</string>
     <!-- Hidden nodes sharing albums -->
@@ -638,7 +638,7 @@
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">Yeni dosya yüklemek için yeterli alan yok</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">Depolama kotanızı aştınız. Yeni dosyalar yüklemek için daha yüksek bir plana yükseltin veya biraz alan açın. [A]Daha fazlasını öğrenin[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">Depolama kotanızı aştınız. Yeni dosyalar yüklemek için hesabınızı daha yüksek bir plana yükseltin veya biraz alan açın. [A]Daha fazlasını öğrenin[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Yükselt</string>
     <!-- Photos search welcome title -->
@@ -704,7 +704,7 @@
     <!-- Title of the ads free introduction screen -->
     <string name="payment_ads_free_intro_title">Reklamsız MEGA ister misiniz?</string>
     <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Bol miktarda depolama alanı ve daha fazlasına sahip bir Pro plana yükseltin. Pro planlarımız aylık sadece %1$s fiyattan başlıyor.</string>
+    <string name="payment_ads_free_intro_description">Hesabınızı bol miktarda depolama alanı ve daha fazlasına sahip bir Pro plana yükseltin. Pro planlarımız aylık sadece %1$s fiyattan başlıyor.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Cömert depolama</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -2159,7 +2159,7 @@
     <string name="album_import_snackbar_success_message">%1$s, Bulut depolamaya kaydedildi</string>
     <string name="album_import_snackbar_error_message">%1$s, Bulut depolamaya kaydedilemedi. Daha sonra tekrar deneyin. Sorun devam ederse bağlantıyı sizinle paylaşan kişiyle iletişime geçin.</string>
     <string name="album_import_storage_exceeded_dialog_title">Albüm kaydedilemiyor</string>
-    <string name="album_import_storage_exceeded_dialog_description">Bu albümü bulut depolamanıza kaydetmek için yeterli depolama alanınız yok. Daha fazla depolama alanı almak için şimdi yükseltin.</string>
+    <string name="album_import_storage_exceeded_dialog_description">Bu albümü bulut depolamanıza kaydetmek için yeterli depolama alanınız yok. Daha fazla depolama alanı almak için hesabınızı şimdi yükseltin.</string>
     <string name="photos_loading_indicator_text">Yükleniyor</string>
     <string name="photos_network_error_message">İnternet bağlantısı yok</string>
     <string name="photos_save_to_cloud_drive_button_text">Bulut depolamaya kaydet</string>
@@ -2340,7 +2340,7 @@
     <string name="general_transfer_error_temporary_unavaible">Kaynak geçici olarak kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
     <string name="video_player_more_options_playlist_option">Oynatma listesi</string>
     <string name="video_player_more_options_lock_option">Video oynatıcıyı kilitle</string>
-    <string name="rewarded_ad_dialog_upgrade_button">Pro’ya yükseltin</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Pro’ya yükselt</string>
     <string name="video_section_add_to_playlist_success">“%1$s” listesine 1 öğe eklendi</string>
     <plurals name="video_section_add_to_playlists_success">
         <item quantity="one">“%1$d” oynatma listesine 1 öğe eklendi</item>
@@ -2348,7 +2348,7 @@
     </plurals>
     <string name="rewarded_ad_dialog_title">Reklamdan sonra devam edin</string>
     <string name="rewarded_ad_dialog_watch_ad_button">Reklamı izle</string>
-    <string name="rewarded_ad_dialog_upgrade_subtitle">Veya reklamsız, anında erişim için bir Pro plana yükseltin</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Veya reklamsız, anında erişim için hesabınızı bir Pro plana yükseltin</string>
     <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
     <string name="rewarded_ad_dialog_perk_unlimited_downloads">Sınırsız indirme, reklam görmeyin</string>
     <string name="rewarded_ad_dialog_perk_storage">20 TB’a kadar şifrelenmiş depolama</string>
@@ -2566,7 +2566,7 @@
     <string name="park_account_screen_acknowledge">Yeni ve boş bir hesap başlattığımı ve şifremi hatırlayamadığım veya dışa aktarılmış bir Kurtarma anahtarı bulamadığım sürece, mevcut hesabımdaki tüm verileri kaybedeceğimi kabul ediyorum.</string>
     <string name="park_account_screen_start_button">Yeni bir hesap başlat</string>
     <string name="park_account_success_message">Eski hesabınız park edildi. Artık yeni hesabınıza giriş yapabilirsiniz.</string>
-    <string name="meetings_add_participants_user_limit_warning">Bu arama 100 katılımcı ile sınırlıdır. Bu sayıyı aşan kişiler yalnızca sohbet edebilir. Düzenleyici, bu sınırı kaldırmak için Pro\’ya yükseltebilir.</string>
+    <string name="meetings_add_participants_user_limit_warning">Bu arama 100 katılımcı ile sınırlıdır. Bu sayıyı aşan kişiler yalnızca sohbet edebilir. Düzenleyici, bu sınırı kaldırmak için hesabını Pro\’ya yükseltebilir.</string>
     <string name="email_confirmation_resend_button_countdown">%1$s içinde tekrar gönder</string>
     <string name="document_scanner_prepare_title">Belge tarayıcısı ayarlanıyor</string>
     <string name="document_scanner_prepare_message">Bu işlem yalnızca bir kez gerçekleşecek. İndirme devam ederken cihazınızı kullanmaya devam edebilirsiniz.</string>
@@ -3115,4 +3115,14 @@
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="audio_player_not_allowed_during_call">Arama sırasında medya oynatamazsınız</string>
+    <string name="invite_contacts">Davet et</string>
+    <string name="first_paragraph_achievement_invite_friends">Arkadaşlarınızı ücretsiz bir MEGA hesabı oluşturmaya ve MEGA Mobil Uygulaması’nı yüklemeye davet edin. Her kaydolma ve uygulama yüklemesi için bonus olarak ücretsiz depolama alanı kazanın.</string>
+    <string name="second_paragraph_achievement_invite_friends">Ücretsiz depolama bonusu yalnızca yeni davetiyeler için ve MEGA Mobil Uygulamasının veya MEGA Masaüstü Uygulamasının yüklü olduğu durumlarda geçerlidir.</string>
+    <string name="subtitle_confirmation_invite_friends">Davetiye gönderildi</string>
+    <string name="invite_sent_text">Kullanıcı davet edildi ve kabul edildikten sonra kişi listenizde görünecek.</string>
+    <string name="invite_sent_text_multi">Kullanıcılar davet edildi ve kabul edildikten sonra kişi listenizde görünecek.</string>
+    <string name="general_close">Kapat</string>
+    <string name="chat_archived_chats_title">Arşivlenmiş sohbetler</string>
+    <string name="chat_archived_chats_empty_title">Arşivlenmiş sohbet yok</string>
 </resources>
