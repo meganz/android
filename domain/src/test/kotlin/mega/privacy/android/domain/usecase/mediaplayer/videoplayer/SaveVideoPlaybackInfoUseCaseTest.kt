@@ -131,15 +131,46 @@ class SaveVideoPlaybackInfoUseCaseTest {
     }
 
     @Test
-    fun `test that invoke does nothing when the position is below the minimum playback threshold`() =
+    fun `test that invoke discards the stored position when the position is below the minimum playback threshold`() =
+        runTest {
+            val info = playbackInfo(currentPosition = 10_000)
+
+            underTest(info)
+
+            verify(mediaPlayerRepository).deletePlaybackInformation(mediaId)
+            verify(persistVideoPlaybackInfoUseCase).invoke(info)
+            verify(mediaPlayerRepository, never()).updatePlaybackInformation(any())
+        }
+
+    @Test
+    fun `test that invoke leaves the Continue Where Left Off index alone when the position is discarded`() =
         runTest {
             underTest(playbackInfo(currentPosition = 10_000))
 
-            verifyNoInteractions(
-                mediaPlayerRepository,
-                removeRecentlyUsedItemUseCase,
-                persistVideoPlaybackInfoUseCase,
-            )
+            verifyNoInteractions(removeRecentlyUsedItemUseCase)
+        }
+
+    @Test
+    fun `test that invoke discards the position of a short item at its start instead of marking it watched through`() =
+        runTest {
+            // 12 seconds long, stopped at 10: only 2 seconds remain, so it is inside the
+            // near-completion window while still below the minimum playback threshold.
+            underTest(playbackInfo(totalDuration = 12_000, currentPosition = 10_000))
+
+            verify(mediaPlayerRepository).deletePlaybackInformation(mediaId)
+            verifyNoInteractions(removeRecentlyUsedItemUseCase)
+        }
+
+    @Test
+    fun `test that invoke still deletes the database row when discarding from the DataStore fails`() =
+        runTest {
+            val info = playbackInfo(currentPosition = 10_000)
+            whenever(mediaPlayerRepository.deletePlaybackInformation(mediaId))
+                .thenThrow(RuntimeException("boom"))
+
+            runCatching { underTest(info) }
+
+            verify(persistVideoPlaybackInfoUseCase).invoke(info)
         }
 
     @Test

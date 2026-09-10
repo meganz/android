@@ -16,6 +16,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
@@ -62,12 +63,36 @@ class PersistAudioPlaybackInfoUseCaseTest {
     }
 
     @Test
-    fun `test that invoke does nothing when the position is not more than 15 seconds`() =
+    fun `test that invoke discards the stored position when the position is not more than 15 seconds`() =
         runTest {
             underTest(playbackInfo(currentPosition = TimeUnit.SECONDS.toMillis(15)))
 
+            verify(mediaPlayerRepository).deleteMediaPlaybackInfo(mediaHandle)
             verify(mediaPlayerRepository, never()).updateAndPersistPlaybackInfo(any())
-            verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(any())
+        }
+
+    @Test
+    fun `test that invoke leaves the recently used item alone when the position is discarded`() =
+        runTest {
+            underTest(playbackInfo(currentPosition = TimeUnit.SECONDS.toMillis(15)))
+
+            verifyNoInteractions(removeRecentlyUsedItemUseCase)
+        }
+
+    @Test
+    fun `test that invoke discards the position of a short item at its start instead of marking it finished`() =
+        runTest {
+            // 40 seconds long, stopped at 10: inside the finished window, but the item has not
+            // been played past the minimum playback threshold.
+            underTest(
+                playbackInfo(
+                    totalDuration = TimeUnit.SECONDS.toMillis(40),
+                    currentPosition = TimeUnit.SECONDS.toMillis(10),
+                )
+            )
+
+            verify(mediaPlayerRepository).deleteMediaPlaybackInfo(mediaHandle)
+            verifyNoInteractions(removeRecentlyUsedItemUseCase)
         }
 
     @Test

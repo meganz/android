@@ -13,8 +13,11 @@ import javax.inject.Inject
  * Snapshots with an unknown duration are ignored: they are taken before the player is
  * prepared (e.g. right after a resume seek), and writing them would overwrite a good record's
  * real duration with 0 — breaking the next resume, which requires a known duration.
- * Snapshots at or below [CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS] are ignored so briefly opened
- * items are never surfaced back as resumable. Within the last
+ * Snapshots at or below [CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS] mean the listener has moved back to
+ * the start, so the stored position is dropped rather than left pointing somewhere they have moved
+ * away from. The Continue Where Left Off carousel is deliberately left alone in that case: the
+ * item was never played far enough to count as finished, and removing it here would add a way for
+ * an item to leave the carousel that does not exist today. Within the last
  * [AUDIO_RESUME_FINISHED_THRESHOLD_MS] of the duration the item counts as finished: its
  * playback info is deleted and it is dropped from the Continue Where Left Off index.
  * Everything else is written straight to storage so the position survives a process kill,
@@ -32,20 +35,33 @@ class PersistAudioPlaybackInfoUseCase @Inject constructor(
     suspend operator fun invoke(info: MediaPlaybackInfo) {
         if (info.mediaHandle == -1L) return
         if (info.totalDuration <= 0) return
-        if (info.currentPosition <= CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS) return
-        if (info.totalDuration - info.currentPosition <= AUDIO_RESUME_FINISHED_THRESHOLD_MS) {
-            // Both cleanups run even when one fails. The last save of a session happens as the
-            // player is torn down, with no further tick to retry, so a skipped step would strand
-            // the item in the carousel with no playback record behind it.
-            val deleted = runCatching { mediaPlayerRepository.deleteMediaPlaybackInfo(info.mediaHandle) }
-            val removed = runCatching { removeRecentlyUsedItemUseCase(info.mediaHandle) }
-            deleted.exceptionOrNull()?.let { failure ->
-                removed.exceptionOrNull()?.let(failure::addSuppressed)
-                throw failure
-            }
-            removed.getOrThrow()
-        } else {
-            mediaPlayerRepository.updateAndPersistPlaybackInfo(info)
+
+        when {
+            // Checked before the finished case on purpose: an item shorter than the two
+            // thresholds combined sits inside the finished window while still at its start,
+            // and treating that as played through would drop it from the carousel.
+            info.currentPosition <= CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS ->
+                mediaPlayerRepository.deleteMediaPlaybackInfo(info.mediaHandle)
+
+            info.totalDuration - info.currentPosition <= AUDIO_RESUME_FINISHED_THRESHOLD_MS ->
+                markFinished(info.mediaHandle)
+
+            else -> mediaPlayerRepository.updateAndPersistPlaybackInfo(info)
         }
+    }
+
+    /**
+     * Both cleanups run even when one fails. The last save of a session happens as the player is
+     * torn down, with no further tick to retry, so a skipped step would strand the item in the
+     * carousel with no playback record behind it.
+     */
+    private suspend fun markFinished(mediaHandle: Long) {
+        val deleted = runCatching { mediaPlayerRepository.deleteMediaPlaybackInfo(mediaHandle) }
+        val removed = runCatching { removeRecentlyUsedItemUseCase(mediaHandle) }
+        deleted.exceptionOrNull()?.let { failure ->
+            removed.exceptionOrNull()?.let(failure::addSuppressed)
+            throw failure
+        }
+        removed.getOrThrow()
     }
 }

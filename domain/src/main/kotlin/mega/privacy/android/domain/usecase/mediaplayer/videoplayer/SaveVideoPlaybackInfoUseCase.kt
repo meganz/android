@@ -36,20 +36,46 @@ class SaveVideoPlaybackInfoUseCase @Inject constructor(
     suspend operator fun invoke(info: MediaPlaybackInfo) {
         if (info.mediaHandle == INVALID_MEDIA_HANDLE) return
         if (info.totalDuration <= 0) return
-        if (info.currentPosition <= CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS) return
 
-        if (info.totalDuration - info.currentPosition < CWLO_NEAR_COMPLETION_THRESHOLD_MS) {
-            markWatchedThrough(info)
-        } else {
-            mediaPlayerRepository.updatePlaybackInformation(
-                PlaybackInformation(
-                    mediaId = info.mediaHandle,
-                    totalDuration = info.totalDuration,
-                    currentPosition = info.currentPosition,
-                )
-            )
-            persistVideoPlaybackInfoUseCase(info)
+        when {
+            // Checked before the near-completion case on purpose: an item shorter than the two
+            // thresholds combined sits inside the near-completion window while still at its
+            // start, and treating that as watched through would drop it from the carousel.
+            info.currentPosition <= CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS -> discardPosition(info)
+
+            info.totalDuration - info.currentPosition < CWLO_NEAR_COMPLETION_THRESHOLD_MS ->
+                markWatchedThrough(info)
+
+            else -> keepPosition(info)
         }
+    }
+
+    private suspend fun keepPosition(info: MediaPlaybackInfo) {
+        mediaPlayerRepository.updatePlaybackInformation(
+            PlaybackInformation(
+                mediaId = info.mediaHandle,
+                totalDuration = info.totalDuration,
+                currentPosition = info.currentPosition,
+            )
+        )
+        persistVideoPlaybackInfoUseCase(info)
+    }
+
+    /**
+     * The user has moved back to the start, so the stored position no longer describes where they
+     * were and is dropped from both stores.
+     *
+     * The Continue Where Left Off carousel is deliberately left alone: the item was never played
+     * far enough to count as finished, and removing it here would add a way for an item to leave
+     * the carousel that does not exist today.
+     */
+    private suspend fun discardPosition(info: MediaPlaybackInfo) {
+        val discarded = runCatching {
+            mediaPlayerRepository.deletePlaybackInformation(info.mediaHandle)
+        }
+        // Below the minimum playback threshold this deletes the database row rather than writing.
+        val persisted = runCatching { persistVideoPlaybackInfoUseCase(info) }
+        rethrowFirstFailure(discarded.exceptionOrNull(), persisted.exceptionOrNull())
     }
 
     /**
@@ -63,16 +89,17 @@ class SaveVideoPlaybackInfoUseCase @Inject constructor(
         }
         val removed = runCatching { removeRecentlyUsedItemUseCase(info.mediaHandle) }
         val persisted = runCatching { persistVideoPlaybackInfoUseCase(info) }
-
-        val failure = deleted.exceptionOrNull()
-            ?: removed.exceptionOrNull()
-            ?: persisted.exceptionOrNull()
-            ?: return
-        listOfNotNull(
+        rethrowFirstFailure(
             deleted.exceptionOrNull(),
             removed.exceptionOrNull(),
             persisted.exceptionOrNull(),
-        ).filterNot { it === failure }.forEach(failure::addSuppressed)
+        )
+    }
+
+    private fun rethrowFirstFailure(vararg failures: Throwable?) {
+        val raised = failures.filterNotNull()
+        val failure = raised.firstOrNull() ?: return
+        raised.filterNot { it === failure }.forEach(failure::addSuppressed)
         throw failure
     }
 }
