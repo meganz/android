@@ -166,9 +166,11 @@ class VideoPlaylistsTabViewModelTest {
                 .test {
                     val initial = awaitItem()
                     assertThat(initial.videoPlaylistEntities).isNotEmpty()
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistsUseCase)
 
                     nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    advanceUntilIdle()
                     verify(getVideoPlaylistsUseCase).invoke()
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -193,9 +195,36 @@ class VideoPlaylistsTabViewModelTest {
                 .test {
                     val initial = awaitItem()
                     assertThat(initial.videoPlaylistEntities).isNotEmpty()
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistsUseCase)
 
                     nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    advanceUntilIdle()
+                    verifyNoInteractions(getVideoPlaylistsUseCase)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getVideoPlaylistsUseCase is not invoked when monitorVideoPlaylistSetsUpdateUseCase emits no updated sets`() =
+        runTest {
+            stubInitialValues()
+            val videoPlaylistSetsUpdateFlow = MutableStateFlow(listOf(1L))
+
+            monitorVideoPlaylistSetsUpdateUseCase.stub {
+                on { invoke() }.thenReturn(videoPlaylistSetsUpdateFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.videoPlaylistEntities).isNotEmpty()
+                    advanceUntilIdle()
+                    clearInvocations(getVideoPlaylistsUseCase)
+
+                    videoPlaylistSetsUpdateFlow.emit(emptyList())
+                    advanceUntilIdle()
                     verifyNoInteractions(getVideoPlaylistsUseCase)
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -216,9 +245,11 @@ class VideoPlaylistsTabViewModelTest {
                 .test {
                     val initial = awaitItem()
                     assertThat(initial.videoPlaylistEntities).isNotEmpty()
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistsUseCase)
 
                     videoPlaylistSetsUpdateFlow.emit(listOf(1L))
+                    advanceUntilIdle()
                     verify(getVideoPlaylistsUseCase).invoke()
                     cancelAndIgnoreRemainingEvents()
                 }

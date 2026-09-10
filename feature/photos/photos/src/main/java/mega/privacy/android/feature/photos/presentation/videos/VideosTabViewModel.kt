@@ -9,12 +9,17 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -30,6 +35,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -46,8 +52,9 @@ import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class VideosTabViewModel @Inject constructor(
     private val getAllVideosUseCase: GetAllVideosUseCase,
@@ -62,6 +69,7 @@ class VideosTabViewModel @Inject constructor(
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
 ) : ViewModel() {
     private val queryFlow = MutableStateFlow<String?>(null)
     private val selectedVideoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
@@ -107,11 +115,24 @@ class VideosTabViewModel @Inject constructor(
             }
         }.mapLatest { }
             .catch { Timber.e(it) },
-        monitorOfflineNodeUpdatesUseCase().mapLatest { }
+        monitorOfflineNodeUpdatesUseCase()
+            .map { offlineNodes ->
+                offlineNodes
+                    .filter { getFileTypeInfoByNameUseCase(it.name) is VideoFileTypeInfo }
+                    .toSet()
+            }
+            .distinctUntilChanged()
+            .drop(1)
+            .mapLatest { }
             .catch { Timber.e(it) },
-        monitorSortCloudOrderUseCase().mapLatest { }
+        monitorSortCloudOrderUseCase()
+            .filterNotNull()
+            .distinctUntilChanged()
+            .drop(1)
+            .mapLatest { }
             .catch { Timber.d(it) }
-    ).onStart { emit(Unit) }
+    ).debounce(REFRESH_DEBOUNCE_MS.milliseconds)
+        .onStart { emit(Unit) }
 
     private fun getVideoListFlow(): Flow<Pair<List<TypedVideoNode>, String?>> =
         combinedTriggerFlow().flatMapLatest {
@@ -261,5 +282,9 @@ class VideosTabViewModel @Inject constructor(
     internal fun clearSelection() {
         areAllSelected = false
         selectedVideoIdsFlow.update { emptyList() }
+    }
+
+    private companion object {
+        private const val REFRESH_DEBOUNCE_MS = 300L
     }
 }

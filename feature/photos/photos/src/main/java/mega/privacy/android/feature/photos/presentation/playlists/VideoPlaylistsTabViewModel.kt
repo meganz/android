@@ -6,12 +6,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
@@ -42,8 +47,9 @@ import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPla
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class VideoPlaylistsTabViewModel @Inject constructor(
     private val getVideoPlaylistsUseCase: GetVideoPlaylistsUseCase,
@@ -84,11 +90,18 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             }
         }.mapLatest { }
             .catch { Timber.e(it) },
-        monitorVideoPlaylistSetsUpdateUseCase().mapLatest { }
+        monitorVideoPlaylistSetsUpdateUseCase()
+            .filter { updatedSets -> updatedSets.isNotEmpty() }
+            .mapLatest { }
             .catch { Timber.e(it) },
-        monitorSortCloudOrderUseCase().mapLatest { }
+        monitorSortCloudOrderUseCase()
+            .filterNotNull()
+            .distinctUntilChanged()
+            .drop(1)
+            .mapLatest { }
             .catch { Timber.e(it) }
-    ).onStart { emit(Unit) }
+    ).debounce(REFRESH_DEBOUNCE_MS.milliseconds)
+        .onStart { emit(Unit) }
 
     private fun getVideoPlaylistsFlow(): Flow<Pair<List<VideoPlaylist>, String?>> =
         combinedTriggerFlow().flatMapLatest {
@@ -341,5 +354,9 @@ class VideoPlaylistsTabViewModel @Inject constructor(
                 createVideoPlaylistSuccessEvent = consumed()
             )
         }
+    }
+
+    private companion object {
+        private const val REFRESH_DEBOUNCE_MS = 300L
     }
 }

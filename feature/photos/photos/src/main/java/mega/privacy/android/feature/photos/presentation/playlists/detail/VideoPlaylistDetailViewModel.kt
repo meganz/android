@@ -11,12 +11,17 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
@@ -57,8 +62,9 @@ import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel(assistedFactory = VideoPlaylistDetailViewModel.Factory::class)
 class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private val videoPlaylistDetailUiEntityMapper: VideoPlaylistDetailUiEntityMapper,
@@ -116,9 +122,14 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
                 isMatchRefreshCondition(nodeUpdate)
             }.mapLatest { }
             .catch { Timber.e(it) },
-        monitorSortCloudOrderUseCase().mapLatest { }
+        monitorSortCloudOrderUseCase()
+            .filterNotNull()
+            .distinctUntilChanged()
+            .drop(1)
+            .mapLatest { }
             .catch { Timber.d(it) }
-    ).onStart { emit(Unit) }
+    ).debounce(REFRESH_DEBOUNCE_MS.milliseconds)
+        .onStart { emit(Unit) }
 
     private fun getVideoPlaylist() =
         combinedTriggerFlow().mapLatest {
@@ -399,4 +410,8 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
         val playlistHandle: Long,
         val type: PlaylistType,
     )
+
+    private companion object {
+        private const val REFRESH_DEBOUNCE_MS = 300L
+    }
 }

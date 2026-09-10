@@ -195,9 +195,11 @@ class VideoPlaylistDetailViewModelTest {
                     val initial = awaitItem()
                     assertThat(initial.playlistDetail).isNotNull()
                     assertThat(initial.playlistDetail?.uiEntity).isEqualTo(expectedPlaylistUiEntity)
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistByIdUseCase)
 
                     playlistsUpdatesFlow.emit(listOf(testId.longValue))
+                    advanceUntilIdle()
                     verify(getVideoPlaylistByIdUseCase).invoke(testId, testType)
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -216,9 +218,11 @@ class VideoPlaylistDetailViewModelTest {
                 .filterIsInstance<VideoPlaylistDetailUiState.Data>()
                 .test {
                     skipItems(1)
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistByIdUseCase)
 
                     playlistsUpdatesFlow.emit(listOf(100L))
+                    advanceUntilIdle()
                     verifyNoInteractions(getVideoPlaylistByIdUseCase)
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -246,9 +250,11 @@ class VideoPlaylistDetailViewModelTest {
                     assertThat(initial.playlistDetail?.uiEntity).isEqualTo(expectedPlaylistUiEntity)
                     assertThat(initial.playlistDetail?.videos).isNotEmpty()
                     assertThat(initial.playlistDetail?.videos).hasSize(4)
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistByIdUseCase)
 
                     nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    advanceUntilIdle()
                     verify(getVideoPlaylistByIdUseCase).invoke(any(), any())
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -272,9 +278,11 @@ class VideoPlaylistDetailViewModelTest {
                 .filterIsInstance<VideoPlaylistDetailUiState.Data>()
                 .test {
                     skipItems(1)
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistByIdUseCase)
 
                     nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    advanceUntilIdle()
                     verifyNoInteractions(getVideoPlaylistByIdUseCase)
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -298,9 +306,11 @@ class VideoPlaylistDetailViewModelTest {
                 .filterIsInstance<VideoPlaylistDetailUiState.Data>()
                 .test {
                     skipItems(1)
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistByIdUseCase)
 
                     nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    advanceUntilIdle()
                     verifyNoInteractions(getVideoPlaylistByIdUseCase)
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -315,9 +325,11 @@ class VideoPlaylistDetailViewModelTest {
                 .test {
                     val initial = awaitItem()
                     assertThat(initial.playlistDetail).isNotNull()
+                    advanceUntilIdle()
                     clearInvocations(getVideoPlaylistByIdUseCase)
 
                     sortOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
+                    advanceUntilIdle()
                     awaitItem()
                     verify(getVideoPlaylistByIdUseCase).invoke(any(), any())
                     cancelAndIgnoreRemainingEvents()

@@ -4,9 +4,11 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
@@ -22,6 +24,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -48,6 +51,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -71,6 +75,7 @@ class VideosTabViewModelTest {
     private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
+    private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val nodeSortConfigurationUiMapper = NodeSortConfigurationUiMapper()
     private val expectedId = NodeId(1L)
     private val expectedVideo = VideoUiEntity(
@@ -102,7 +107,8 @@ class VideosTabViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             nodeSourceTypeToViewTypeMapper = NodeSourceTypeToViewTypeMapper(),
-            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
         )
     }
 
@@ -119,6 +125,7 @@ class VideosTabViewModelTest {
             getNodeContentUriByHandleUseCase,
             monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase,
+            getFileTypeInfoByNameUseCase,
         )
 
     }
@@ -194,9 +201,11 @@ class VideosTabViewModelTest {
                 .test {
                     val initial = awaitItem()
                     assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
                     clearInvocations(getAllVideosUseCase)
 
                     nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    advanceUntilIdle()
                     verify(getAllVideosUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull())
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -221,9 +230,11 @@ class VideosTabViewModelTest {
                 .test {
                     val initial = awaitItem()
                     assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
                     clearInvocations(getAllVideosUseCase)
 
                     nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    advanceUntilIdle()
                     verifyNoInteractions(getAllVideosUseCase)
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -232,10 +243,12 @@ class VideosTabViewModelTest {
     @Test
     fun `test that getAllVideosUseCase is invoked when monitorOfflineNodeUpdatesUseCase is triggered`() =
         runTest {
-            val testOffline = mock<Offline> {
-                on { id }.thenReturn(1)
-            }
+            val testOffline = createOffline(name = "offline video.mp4")
             stubInitialValues()
+            getFileTypeInfoByNameUseCase.stub {
+                on { invoke(eq(testOffline.name), any()) } doReturn
+                        VideoFileTypeInfo("video", "mp4", 1.minutes)
+            }
             val offlineNodeUpdateFlow = MutableStateFlow(emptyList<Offline>())
 
             monitorOfflineNodeUpdatesUseCase.stub {
@@ -247,16 +260,171 @@ class VideosTabViewModelTest {
                 .test {
                     val initial = awaitItem()
                     assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
                     clearInvocations(getAllVideosUseCase)
 
                     offlineNodeUpdateFlow.emit(listOf(testOffline))
+                    advanceUntilIdle()
                     verify(getAllVideosUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull())
                     cancelAndIgnoreRemainingEvents()
                 }
         }
 
     @Test
-    fun `test that getAllVideosUseCase is invoked when monitorSortCloudOrderUseCase is triggered`() =
+    fun `test that getAllVideosUseCase is not invoked when monitorOfflineNodeUpdatesUseCase is triggered by non-video nodes`() =
+        runTest {
+            val testOffline = createOffline(name = "offline document.txt")
+            stubInitialValues()
+            getFileTypeInfoByNameUseCase.stub {
+                on { invoke(eq(testOffline.name), any()) } doReturn
+                        TextFileTypeInfo("document", "txt")
+            }
+            val offlineNodeUpdateFlow = MutableStateFlow(emptyList<Offline>())
+
+            monitorOfflineNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(offlineNodeUpdateFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
+                    clearInvocations(getAllVideosUseCase)
+
+                    offlineNodeUpdateFlow.emit(listOf(testOffline))
+                    advanceUntilIdle()
+                    verifyNoInteractions(getAllVideosUseCase)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getAllVideosUseCase is not invoked when an offline update leaves the offline videos unchanged`() =
+        runTest {
+            val offlineVideo = createOffline(name = "offline video.mp4", handle = "1")
+            val offlineDocument = createOffline(name = "offline document.txt", handle = "2")
+            stubInitialValues()
+            getFileTypeInfoByNameUseCase.stub {
+                on { invoke(eq(offlineVideo.name), any()) } doReturn
+                        VideoFileTypeInfo("video", "mp4", 1.minutes)
+                on { invoke(eq(offlineDocument.name), any()) } doReturn
+                        TextFileTypeInfo("document", "txt")
+            }
+            val offlineNodeUpdateFlow = MutableStateFlow(listOf(offlineVideo))
+
+            monitorOfflineNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(offlineNodeUpdateFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
+                    clearInvocations(getAllVideosUseCase)
+
+                    offlineNodeUpdateFlow.emit(listOf(offlineVideo, offlineDocument))
+                    advanceUntilIdle()
+                    verifyNoInteractions(getAllVideosUseCase)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getAllVideosUseCase is invoked when an offline video row changes its last modified time`() =
+        runTest {
+            val offlineVideo = createOffline(name = "offline video.mp4", lastModifiedTime = 0)
+            val downloadedVideo = offlineVideo.copy(lastModifiedTime = 1_000L)
+            stubInitialValues()
+            getFileTypeInfoByNameUseCase.stub {
+                on { invoke(eq(offlineVideo.name), any()) } doReturn
+                        VideoFileTypeInfo("video", "mp4", 1.minutes)
+            }
+            val offlineNodeUpdateFlow = MutableStateFlow(listOf(offlineVideo))
+
+            monitorOfflineNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(offlineNodeUpdateFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
+                    clearInvocations(getAllVideosUseCase)
+
+                    offlineNodeUpdateFlow.emit(listOf(downloadedVideo))
+                    advanceUntilIdle()
+                    verify(getAllVideosUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull())
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getAllVideosUseCase is invoked once when a burst of node updates is emitted`() =
+        runTest {
+            val testNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(1L))
+                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 1.minutes))
+            }
+            stubInitialValues()
+            val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
+
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(nodeUpdateFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
+                    clearInvocations(getAllVideosUseCase)
+
+                    repeat(5) {
+                        nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    }
+                    advanceUntilIdle()
+
+                    verify(getAllVideosUseCase, times(1))
+                        .invoke(anyOrNull(), anyOrNull(), anyOrNull())
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getAllVideosUseCase is invoked when the sort order changes`() =
+        runTest {
+            stubInitialValues()
+            val sortCloudOrderFlow =
+                MutableStateFlow<SortOrder?>(SortOrder.ORDER_MODIFICATION_DESC)
+
+            monitorSortCloudOrderUseCase.stub {
+                on { invoke() }.thenReturn(sortCloudOrderFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
+                    clearInvocations(getAllVideosUseCase)
+
+                    sortCloudOrderFlow.emit(SortOrder.ORDER_FAV_ASC)
+                    advanceUntilIdle()
+                    verify(getAllVideosUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull())
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getAllVideosUseCase is invoked only once when the sort order monitor replays its current value`() =
         runTest {
             stubInitialValues()
             val sortCloudOrderFlow = MutableStateFlow<SortOrder?>(null)
@@ -268,12 +436,14 @@ class VideosTabViewModelTest {
             underTest.uiState
                 .filterIsInstance<VideosTabUiState.Data>()
                 .test {
-                    val initial = awaitItem()
-                    assertThat(initial.allVideoEntities).isNotEmpty()
-                    clearInvocations(getAllVideosUseCase)
+                    awaitItem()
 
-                    sortCloudOrderFlow.emit(SortOrder.ORDER_FAV_ASC)
-                    verify(getAllVideosUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull())
+                    sortCloudOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
+                    sortCloudOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
+                    advanceUntilIdle()
+
+                    verify(getAllVideosUseCase, times(1))
+                        .invoke(anyOrNull(), anyOrNull(), anyOrNull())
                     cancelAndIgnoreRemainingEvents()
                 }
         }
@@ -578,6 +748,22 @@ class VideosTabViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
     }
+
+    private fun createOffline(
+        name: String,
+        handle: String = "1",
+        lastModifiedTime: Long = 0,
+    ) = Offline(
+        id = 1,
+        handle = handle,
+        path = "path",
+        name = name,
+        parentId = -1,
+        type = Offline.FILE,
+        origin = Offline.OTHER,
+        handleIncoming = "",
+        lastModifiedTime = lastModifiedTime,
+    )
 
     private suspend fun stubInitialValues(
         nodesAndEntities: Map<TypedVideoNode, VideoUiEntity> = mapOf(
