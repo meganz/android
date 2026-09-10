@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.domain.entity.billing.RecommendedSubscriptionOffer
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,28 +37,41 @@ import javax.inject.Singleton
  * which is what keeps the banner quick; the promoted plan does not depend on the account plan
  * anyway, only on which plans the campaign discounts.
  *
+ * No offer is promoted while the device is offline: the offer cannot be bought without a
+ * connection, and without this gate the replay cache would keep showing an offer resolved earlier
+ * in the session. The lookup runs again as soon as connectivity is back, so the offer returns on
+ * its own.
+ *
  * A failed lookup is emitted as a failed [Result] instead of terminating the flow, so a transient
  * billing error still leaves the offer monitored; consumers with nowhere to surface an error treat
  * it as "no offer".
  *
  * @property monitorAccountDetailUseCase                [MonitorAccountDetailUseCase]
+ * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
  * @property getRecommendedSubscriptionWithOfferUseCase [GetRecommendedSubscriptionWithOfferUseCase]
  * @property scope                                      the application scope the offer is shared in
  */
 @Singleton
 class MonitorSubscriptionOfferUseCase @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getRecommendedSubscriptionWithOfferUseCase: GetRecommendedSubscriptionWithOfferUseCase,
     @ApplicationScope private val scope: CoroutineScope,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val offer: Flow<Result<RecommendedSubscriptionOffer?>> by lazy {
-        monitorAccountDetailUseCase()
-            .map { it.levelDetail?.accountType }
-            .distinctUntilChanged()
-            .mapLatest {
-                runCatching { getRecommendedSubscriptionWithOfferUseCase() }
-                    .onFailure { if (it is CancellationException) throw it }
+        combine(
+            monitorAccountDetailUseCase().map { it.levelDetail?.accountType },
+            monitorConnectivityUseCase(),
+            ::Pair,
+        ).distinctUntilChanged()
+            .mapLatest { (_, isConnected) ->
+                if (isConnected) {
+                    runCatching { getRecommendedSubscriptionWithOfferUseCase() }
+                        .onFailure { if (it is CancellationException) throw it }
+                } else {
+                    Result.success(null)
+                }
             }
             .shareIn(
                 scope = scope,

@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.billing.RecommendedSubscriptionOffer
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -20,6 +21,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 
@@ -29,20 +31,29 @@ class MonitorSubscriptionOfferUseCaseTest {
     private lateinit var underTest: MonitorSubscriptionOfferUseCase
 
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val getRecommendedSubscriptionWithOfferUseCase =
         mock<GetRecommendedSubscriptionWithOfferUseCase>()
 
     private val accountDetail = MutableStateFlow(AccountDetail())
+    private val isConnected = MutableStateFlow(true)
 
     @BeforeEach
     fun resetMocks() {
-        reset(monitorAccountDetailUseCase, getRecommendedSubscriptionWithOfferUseCase)
+        reset(
+            monitorAccountDetailUseCase,
+            monitorConnectivityUseCase,
+            getRecommendedSubscriptionWithOfferUseCase,
+        )
         accountDetail.value = accountDetail(AccountType.FREE)
+        isConnected.value = true
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetail)
+        whenever(monitorConnectivityUseCase()).thenReturn(isConnected)
     }
 
     private fun createUseCase(scope: CoroutineScope) = MonitorSubscriptionOfferUseCase(
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+        monitorConnectivityUseCase = monitorConnectivityUseCase,
         getRecommendedSubscriptionWithOfferUseCase = getRecommendedSubscriptionWithOfferUseCase,
         scope = scope,
     )
@@ -52,6 +63,56 @@ class MonitorSubscriptionOfferUseCaseTest {
             on { this.accountType } doReturn accountType
         },
     )
+
+    @Test
+    fun `test that invoke emits null when there is no internet connection`() = runTest {
+        whenever(getRecommendedSubscriptionWithOfferUseCase())
+            .thenReturn(mock<RecommendedSubscriptionOffer>())
+        isConnected.value = false
+        underTest = createUseCase(backgroundScope)
+
+        underTest().test {
+            val actual = awaitItem()
+            assertThat(actual.isSuccess).isTrue()
+            assertThat(actual.getOrNull()).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verifyNoInteractions(getRecommendedSubscriptionWithOfferUseCase)
+    }
+
+    @Test
+    fun `test that invoke drops the offer when the connection is lost`() = runTest {
+        val offer = mock<RecommendedSubscriptionOffer>()
+        whenever(getRecommendedSubscriptionWithOfferUseCase()).thenReturn(offer)
+        underTest = createUseCase(backgroundScope)
+
+        underTest().test {
+            assertThat(awaitItem().getOrNull()).isEqualTo(offer)
+
+            isConnected.value = false
+
+            assertThat(awaitItem().getOrNull()).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that invoke looks the offer up again when the connection is back`() = runTest {
+        val offer = mock<RecommendedSubscriptionOffer>()
+        whenever(getRecommendedSubscriptionWithOfferUseCase()).thenReturn(offer)
+        isConnected.value = false
+        underTest = createUseCase(backgroundScope)
+
+        underTest().test {
+            assertThat(awaitItem().getOrNull()).isNull()
+
+            isConnected.value = true
+
+            assertThat(awaitItem().getOrNull()).isEqualTo(offer)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(getRecommendedSubscriptionWithOfferUseCase).invoke()
+    }
 
     @Test
     fun `test that invoke emits the recommended offer`() = runTest {
