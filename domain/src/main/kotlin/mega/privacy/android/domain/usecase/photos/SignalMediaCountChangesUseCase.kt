@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -33,7 +32,7 @@ class SignalMediaCountChangesUseCase @Inject constructor(
         }
 
     private fun FileNode.isMediaNode(): Boolean =
-        (type is ImageFileTypeInfo && type !is SvgFileTypeInfo) || type is VideoFileTypeInfo
+        type is ImageFileTypeInfo || type is VideoFileTypeInfo
 
     private companion object {
         val SECTION_AFFECTING_CHANGES = setOf(

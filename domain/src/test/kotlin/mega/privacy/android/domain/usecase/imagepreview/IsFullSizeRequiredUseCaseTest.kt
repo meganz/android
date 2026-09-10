@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -127,6 +128,50 @@ class IsFullSizeRequiredUseCaseTest {
             whenever(node.type).thenReturn(mock<StaticImageFileTypeInfo>())
             whenever(node.isTakenDown).thenReturn(false)
             whenever(node.size).thenReturn(SIZE_50_MB + SIZE_1_MB)
+            val actual = underTest(node, fullSize)
+            assertThat(actual).isEqualTo(false)
+        }
+
+    @Test
+    fun `test that when node is svg larger than 50 MB it returns true`() =
+        runTest {
+            whenever(node.type).thenReturn(mock<SvgFileTypeInfo>())
+            whenever(node.isTakenDown).thenReturn(false)
+            whenever(node.size).thenReturn(SIZE_50_MB + SIZE_1_MB)
+            val actual = underTest(node, fullSize)
+            assertThat(actual).isEqualTo(true)
+        }
+
+    @Test
+    fun `test that when node is svg smaller than 1MB it returns true regardless of connection`() =
+        runTest {
+            val fullSize = false
+            whenever(node.type).thenReturn(mock<SvgFileTypeInfo>())
+            whenever(node.isTakenDown).thenReturn(false)
+            whenever(node.size).thenReturn(1L)
+            whenever(settingsRepository.isMobileDataAllowed()).thenReturn(false)
+            whenever(networkRepository.isMeteredConnection()).thenReturn(true)
+            val actual = underTest(node, fullSize)
+            assertThat(actual).isEqualTo(true)
+        }
+
+    @Test
+    fun `test that when node is svg and taken down it returns false`() = runTest {
+        whenever(node.type).thenReturn(mock<SvgFileTypeInfo>())
+        whenever(node.isTakenDown).thenReturn(true)
+        val actual = underTest(node, fullSize)
+        assertThat(actual).isEqualTo(false)
+    }
+
+    @Test
+    fun `test that when node is svg, fullSize is false, isMobileDataAllowed is false then if isMeteredConnection is true it returns false`() =
+        runTest {
+            val fullSize = false
+            whenever(node.type).thenReturn(mock<SvgFileTypeInfo>())
+            whenever(node.isTakenDown).thenReturn(false)
+            whenever(node.size).thenReturn(SIZE_50_MB + SIZE_1_MB)
+            whenever(settingsRepository.isMobileDataAllowed()).thenReturn(false)
+            whenever(networkRepository.isMeteredConnection()).thenReturn(true)
             val actual = underTest(node, fullSize)
             assertThat(actual).isEqualTo(false)
         }

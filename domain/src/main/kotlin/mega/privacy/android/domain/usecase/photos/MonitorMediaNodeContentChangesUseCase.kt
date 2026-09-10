@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -12,7 +11,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import javax.inject.Inject
 
 /**
- * Emits the ids of media nodes (image or video, excluding SVG) whose render-affecting content changed —
+ * Emits the ids of media nodes (image or video) whose render-affecting content changed —
  * favourite or sensitivity — while leaving the timeline sections unchanged. The timeline uses this to
  * patch the affected thumbnails in place (e.g. toggle the favourite icon or the sensitive blur) instead
  * of reloading sections.
@@ -38,7 +37,7 @@ class MonitorMediaNodeContentChangesUseCase @Inject constructor(
             .filter { it.isNotEmpty() }
 
     private fun FileNode.isMediaNode(): Boolean =
-        (type is ImageFileTypeInfo && type !is SvgFileTypeInfo) || type is VideoFileTypeInfo
+        type is ImageFileTypeInfo || type is VideoFileTypeInfo
 
     private companion object {
         val CONTENT_CHANGES = setOf(NodeChanges.Favourite, NodeChanges.Sensitive)

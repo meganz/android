@@ -1,9 +1,7 @@
 package mega.privacy.android.domain.usecase.photos
 
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.SvgFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -31,8 +29,7 @@ class ListMediaNodesByOffsetUseCase @Inject constructor(
      * @param order the [SortOrder] to apply to the results
      * @param maxElements the maximum number of nodes to return for the page (0 = no limit)
      * @param offset the zero-based index, within the section, of the first node to return
-     * @return the page of media nodes as a list of [TypedFileNode], keeping only images and videos
-     * (SVGs are excluded)
+     * @return the page of media nodes as a list of [TypedFileNode]
      */
     suspend operator fun invoke(
         filter: MediaTimelineFilter,
@@ -41,16 +38,11 @@ class ListMediaNodesByOffsetUseCase @Inject constructor(
         maxElements: Int,
         offset: Long,
     ): List<TypedFileNode> =
-        photosRepository
-            .listMediaNodesByPage(
-                filter = filter,
-                section = section,
-                order = order,
-                maxElements = maxElements,
-                offset = offset,
-            )
-            .filter { it.isValidMediaNode() }
-
-    private fun TypedFileNode.isValidMediaNode(): Boolean =
-        (type is ImageFileTypeInfo && type !is SvgFileTypeInfo) || type is VideoFileTypeInfo
+        photosRepository.listMediaNodesByPage(
+            filter = filter,
+            section = section,
+            order = order,
+            maxElements = maxElements,
+            offset = offset,
+        )
 }

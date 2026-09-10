@@ -70,14 +70,14 @@ class MonitorMediaNodeContentChangesUseCaseTest {
     }
 
     @Test
-    fun `test that a content change on an SVG node does not emit`() = runTest {
+    fun `test that a content change on an SVG node emits`() = runTest {
         val svg = mock<FileNode> {
             on { id } doReturn NodeId(9L)
             on { type } doReturn SvgFileTypeInfo(mimeType = "image/svg+xml", extension = "svg")
         }
         stubUpdates(NodeUpdate(mapOf(svg to listOf(NodeChanges.Favourite))))
 
-        assertThat(underTest().toList()).isEmpty()
+        assertThat(underTest().toList()).containsExactly(setOf(9L))
     }
 
     @Test

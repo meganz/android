@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.runningFold
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Favourites
@@ -123,7 +122,7 @@ class MonitorMediaSystemAlbumsUseCase @Inject constructor(
         }
 
     private fun FileNode.isMediaNode(): Boolean =
-        (type is ImageFileTypeInfo && type !is SvgFileTypeInfo) || type is VideoFileTypeInfo
+        type is ImageFileTypeInfo || type is VideoFileTypeInfo
 
     private fun monitorSensitivity(): Flow<Sensitivity> = combine(
         monitorShowHiddenItemsUseCase(),

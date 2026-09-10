@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.imagepreview
 
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -29,11 +30,14 @@ class IsFullSizeRequiredUseCase @Inject constructor(
     ): Boolean = when {
         node.isTakenDown || node.type is VideoFileTypeInfo -> false
         node.size < SIZE_1_MB -> true
-        node.size in SIZE_1_MB..SIZE_50_MB -> fullSize || settingsRepository.isMobileDataAllowed() || !(networkRepository.isMeteredConnection()
-            ?: false)
-
+        node.type is SvgFileTypeInfo -> isDownloadAllowedOnCurrentConnection(fullSize)
+        node.size in SIZE_1_MB..SIZE_50_MB -> isDownloadAllowedOnCurrentConnection(fullSize)
         else -> false
     }
+
+    private suspend fun isDownloadAllowedOnCurrentConnection(fullSize: Boolean): Boolean =
+        fullSize || settingsRepository.isMobileDataAllowed() ||
+                !(networkRepository.isMeteredConnection() ?: false)
 
     companion object {
         private const val SIZE_1_MB = 1024 * 1024 * 1L

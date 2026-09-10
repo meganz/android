@@ -71,13 +71,13 @@ class SignalMediaCountChangesUseCaseTest {
     }
 
     @Test
-    fun `test that a section-affecting change on an SVG node does not emit`() = runTest {
+    fun `test that a section-affecting change on an SVG node emits`() = runTest {
         val svgNode = mock<FileNode> {
             on { type } doReturn SvgFileTypeInfo(mimeType = "image/svg+xml", extension = "svg")
         }
         stubUpdates(NodeUpdate(mapOf(svgNode to listOf(NodeChanges.New))))
 
-        assertThat(underTest().toList()).isEmpty()
+        assertThat(underTest().toList()).hasSize(1)
     }
 
     @Test

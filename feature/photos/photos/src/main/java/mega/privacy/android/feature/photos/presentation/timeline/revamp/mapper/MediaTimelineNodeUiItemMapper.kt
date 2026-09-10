@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper
 
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.photos.model.MediaType
@@ -21,7 +20,7 @@ class MediaTimelineNodeUiItemMapper @Inject constructor(
 ) {
 
     operator fun invoke(node: TypedFileNode): PhotosNodeContentItemV2 {
-        val mediaType = if (node.type is ImageFileTypeInfo) MediaType.Image else MediaType.Video
+        val mediaType = if (node.type is VideoFileTypeInfo) MediaType.Video else MediaType.Image
         val duration = (node.type as? VideoFileTypeInfo)
             ?.let { durationInSecondsTextMapper(it.duration) }
             .orEmpty()

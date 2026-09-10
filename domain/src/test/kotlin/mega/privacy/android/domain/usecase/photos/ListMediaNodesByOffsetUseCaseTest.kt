@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
@@ -82,15 +83,14 @@ class ListMediaNodesByOffsetUseCaseTest {
     }
 
     @Test
-    fun `test that invoke keeps images and videos but filters out svg`() = runTest {
+    fun `test that invoke keeps images and videos`() = runTest {
         val image = nodeOf(StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg"))
-        val svg = nodeOf(SvgFileTypeInfo(mimeType = "image/svg+xml", extension = "svg"))
         val video = nodeOf(
             VideoFileTypeInfo(mimeType = "video/mp4", extension = "mp4", duration = Duration.ZERO)
         )
         whenever(
             photosRepository.listMediaNodesByPage(any(), any(), any(), any(), any())
-        ) doReturn listOf(image, svg, video)
+        ) doReturn listOf(image, video)
 
         val actual = underTest(
             filter = filter,
@@ -102,6 +102,53 @@ class ListMediaNodesByOffsetUseCaseTest {
 
         assertThat(actual).containsExactly(image, video).inOrder()
     }
+
+    @Test
+    fun `test that invoke keeps svg so the page stays index aligned with the section count`() =
+        runTest {
+            val image = nodeOf(StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg"))
+            val svg = nodeOf(SvgFileTypeInfo(mimeType = "image/svg+xml", extension = "svg"))
+            val video = nodeOf(
+                VideoFileTypeInfo(
+                    mimeType = "video/mp4",
+                    extension = "mp4",
+                    duration = Duration.ZERO
+                )
+            )
+            whenever(
+                photosRepository.listMediaNodesByPage(any(), any(), any(), any(), any())
+            ) doReturn listOf(image, svg, video)
+
+            val actual = underTest(
+                filter = filter,
+                section = section,
+                order = SortOrder.ORDER_MODIFICATION_DESC,
+                maxElements = 60,
+                offset = 0L,
+            )
+
+            assertThat(actual).containsExactly(image, svg, video).inOrder()
+        }
+
+    @Test
+    fun `test that invoke does not drop a type that resolves to neither image nor video`() =
+        runTest {
+            val image = nodeOf(StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg"))
+            val unresolved = nodeOf(UnknownFileTypeInfo(mimeType = "", extension = "dwg"))
+            whenever(
+                photosRepository.listMediaNodesByPage(any(), any(), any(), any(), any())
+            ) doReturn listOf(image, unresolved)
+
+            val actual = underTest(
+                filter = filter,
+                section = section,
+                order = SortOrder.ORDER_MODIFICATION_DESC,
+                maxElements = 60,
+                offset = 0L,
+            )
+
+            assertThat(actual).containsExactly(image, unresolved).inOrder()
+        }
 
     private fun nodeOf(fileType: FileTypeInfo) = mock<TypedFileNode> {
         on { type } doReturn fileType
