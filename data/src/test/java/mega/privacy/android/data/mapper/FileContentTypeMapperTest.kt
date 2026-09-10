@@ -32,6 +32,20 @@ class FileContentTypeMapperTest {
     }
 
     @Test
+    fun `test that a jxl codestream header is detected as image`() {
+        assertThat(underTest(bytesOf(0xFF, 0x0A, 0x00, 0x01))).isEqualTo("image/jxl")
+    }
+
+    @Test
+    fun `test that a jxl container header is detected as image`() {
+        val header = bytesOf(
+            0x00, 0x00, 0x00, 0x0C, 0x4A, 0x58, 0x4C, 0x20,
+            0x0D, 0x0A, 0x87, 0x0A,
+        )
+        assertThat(underTest(header)).isEqualTo("image/jxl")
+    }
+
+    @Test
     fun `test that a pdf header is detected`() {
         assertThat(underTest(bytesOf(0x25, 0x50, 0x44, 0x46, 0x2D))).isEqualTo("application/pdf")
     }

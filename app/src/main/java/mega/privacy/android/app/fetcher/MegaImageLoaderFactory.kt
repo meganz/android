@@ -10,7 +10,9 @@ import coil3.gif.GifDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
 import coil3.video.VideoFrameDecoder
+import com.awxkee.jxlcoder.coil.AnimatedJxlDecoder
 import okhttp3.OkHttpClient
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -39,6 +41,7 @@ internal class MegaImageLoaderFactory @Inject constructor(
                 )
                 add(VideoFrameDecoder.Factory())
                 add(SvgDecoder.Factory())
+                add(AnimatedJxlDecoder.Factory(exceptionLogger = { Timber.e(it) }))
                 add(thumbnailFactory)
                 add(avatarFactory)
                 add(mediaThumbnailFactory)

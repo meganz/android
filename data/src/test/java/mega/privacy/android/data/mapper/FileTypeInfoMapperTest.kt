@@ -118,6 +118,21 @@ class FileTypeInfoMapperTest @Inject constructor() {
     }
 
     @Test
+    fun `test that a jxl file is mapped to a static image`() {
+        val expectedExtension = "jxl"
+        val expectedMimeType = "image/jxl"
+        val name = "withExtension.$expectedExtension"
+
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
+            StaticImageFileTypeInfo(
+                mimeType = expectedMimeType,
+                extension = expectedExtension
+            )
+        )
+    }
+
+    @Test
     fun `test that a file with audio type is mapped correctly`() {
         val expectedExtension = "mp3"
         val expectedMimeType = "audio/"

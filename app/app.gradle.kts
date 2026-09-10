@@ -342,6 +342,7 @@ dependencies {
     implementation(lib.coil3.svg)
     implementation(lib.coil3.video)
     implementation(lib.coil3.network)
+    implementation(lib.jxl.coder.coil)
     implementation(androidx.paging.compose)
     implementation(lib.kotlinx.collections.immutable)
     implementation(lib.mega.core.ui)

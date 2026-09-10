@@ -31,6 +31,7 @@ fun getMimeType(extension: String, defaultMapper: (String) -> String?) =
 
 private fun getCustomTypes(extension: String) = when (extension) {
     "url" -> "web/url"
+    "jxl" -> "image/jxl"
     "3fr" -> "image/3fr"
     "iiq" -> "image/iiq"
     "k25" -> "image/k25"

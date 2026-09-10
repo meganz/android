@@ -5,6 +5,7 @@ coil3 = "3.5.0"
 concurrent-futures-ktx = "1.3.0"
 coroutines = "1.11.0"
 javax = "1"
+jxl-coder-coil = "2.6.1"
 kotlin = "2.4.0"
 kotlin-ktx = "1.19.0"
 logging-logback = "3.0.0"
@@ -44,6 +45,7 @@ coil3-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil3" }
 coil3-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil3" }
 coil3-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil3" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
+jxl-coder-coil = { module = "io.github.awxkee:jxl-coder-coil", version.ref = "jxl-coder-coil" }
 concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrent-futures-ktx" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

@@ -31,6 +31,7 @@ class FileTypeNameMapperTest {
     @Test
     fun `test that a non-curated extension falls back to its category name`() {
         assertThat(underTest("bmp")).isEqualTo(nameOf(sharedR.string.file_type_name_image))
+        assertThat(underTest("jxl")).isEqualTo(nameOf(sharedR.string.file_type_name_image))
         assertThat(underTest("flac")).isEqualTo(nameOf(sharedR.string.file_type_name_audio))
         assertThat(underTest("webm")).isEqualTo(nameOf(sharedR.string.file_type_name_video))
         assertThat(underTest("tar")).isEqualTo(nameOf(sharedR.string.file_type_name_compressed))

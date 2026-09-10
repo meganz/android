@@ -30,6 +30,22 @@ internal class FileContentTypeMapper @Inject constructor() {
             0x2A
         ) -> "image/tiff"
 
+        bytes.matchAt(0, 0xFF, 0x0A) || bytes.matchAt(
+            0,
+            0x00,
+            0x00,
+            0x00,
+            0x0C,
+            0x4A,
+            0x58,
+            0x4C,
+            0x20,
+            0x0D,
+            0x0A,
+            0x87,
+            0x0A
+        ) -> "image/jxl"
+
         bytes.matchAt(0, 0x25, 0x50, 0x44, 0x46) -> "application/pdf"
         bytes.matchAt(0, 0x1A, 0x45, 0xDF, 0xA3) -> matroskaMimeType(bytes)
         bytes.matchAt(0, 0x46, 0x4C, 0x56) -> "video/x-flv"

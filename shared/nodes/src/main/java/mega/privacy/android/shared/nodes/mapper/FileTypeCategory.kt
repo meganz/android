@@ -84,6 +84,7 @@ private val categoryByExtension: Map<String, FileTypeCategory> =
             FileTypeCategory.Illustrator to listOf("ai", "aia", "aip", "ait", "art", "irs"),
             FileTypeCategory.Image to listOf(
                 "jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png", "heic", "webp",
+                "jxl",
             ),
             FileTypeCategory.InDesign to listOf("indd"),
             FileTypeCategory.Pdf to listOf("pdf"),

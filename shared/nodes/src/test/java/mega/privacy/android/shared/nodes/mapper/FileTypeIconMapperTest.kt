@@ -70,7 +70,7 @@ class FileTypeIconMapperTest {
     }
 
     @ParameterizedTest(name = "extension {0}")
-    @ValueSource(strings = ["heic", "webp"])
+    @ValueSource(strings = ["heic", "webp", "jxl"])
     fun `test that modern image extensions return the image icon`(extension: String) {
         Truth.assertThat(underTest(extension, IconType.Solid))
             .isEqualTo(R.drawable.ic_image_medium_solid)
