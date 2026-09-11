@@ -1,5 +1,24 @@
 pluginManagement {
     includeBuild("build-logic")
+
+    // Optional per-developer composite build of the megagradle plugins. Point megagradle.dir at a
+    // local megagradle checkout in local.properties (never committed) to build its plugins from
+    // source instead of resolving them from Artifactory.
+    val localMegagradleDir = java.util.Properties().apply {
+        val localProperties = java.io.File(settingsDir, "local.properties")
+        if (localProperties.exists()) localProperties.inputStream().use { load(it) }
+    }.getProperty("megagradle.dir")?.trim()?.takeIf { it.isNotEmpty() }?.let { path ->
+        java.io.File(path).takeIf { it.isAbsolute } ?: java.io.File(settingsDir, path)
+    }?.canonicalFile
+
+    if (localMegagradleDir != null) {
+        require(localMegagradleDir.isDirectory) {
+            "megagradle.dir in local.properties points at $localMegagradleDir, which does not exist"
+        }
+        println("megagradle: using local composite build at $localMegagradleDir")
+        includeBuild(localMegagradleDir)
+    }
+
     repositories {
         google()
         mavenCentral()
@@ -11,6 +30,9 @@ pluginManagement {
     }
     resolutionStrategy {
         eachPlugin {
+            // The local composite build supplies these plugins by id, so it must not be redirected
+            // to the published module.
+            if (localMegagradleDir != null) return@eachPlugin
             when (requested.id.id) {
                 "mega.android.release",
                 "mega.android.cicd",
