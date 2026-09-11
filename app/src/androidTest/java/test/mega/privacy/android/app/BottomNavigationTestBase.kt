@@ -7,6 +7,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.BySelector
+import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
@@ -221,6 +222,37 @@ abstract class BottomNavigationTestBase {
 
     // endregion
 
+    // region Menu helpers
+
+    /** The MegaTopAppBar / MegaSearchTopAppBar back affordance rendered by AppBarNavigationType.Back. */
+    protected val backArrow: BySelector get() = By.desc("Navigation Icon")
+
+    /** Opens the pinned Menu section from the navigation bar. */
+    protected fun openMenu() {
+        clickAndAwait(By.res(MENU_NAV_ITEM_TAG), By.res(MENU_TOOLBAR_TAG), "menu-nav-item")
+    }
+
+    /** A Menu account row titled [label], as opposed to the same label elsewhere on screen. */
+    protected fun menuAccountRow(label: String): BySelector =
+        By.res(MENU_ACCOUNT_ITEM_TAG).hasDescendant(By.text(label))
+
+    /**
+     * Scrolls the Menu's account list until [selector] is present. The list is a LazyColumn, so
+     * rows below the visible area are not composed and cannot be matched by UiAutomator until
+     * they are scrolled into view.
+     */
+    protected fun scrollMenuUntil(selector: BySelector, name: String) {
+        repeat(MAX_MENU_SCROLL_ATTEMPTS) {
+            if (device.hasObject(selector)) return
+            val list = device.findObject(By.scrollable(true)) ?: return@repeat
+            list.setGestureMargin(list.visibleBounds.height() / 4)
+            list.scroll(Direction.DOWN, MENU_SCROLL_PERCENT)
+        }
+        awaitObject(selector, LOAD_TIMEOUT, name)
+    }
+
+    // endregion
+
     // region UiAutomator helpers
 
     protected fun click(tag: String, name: String) {
@@ -391,6 +423,8 @@ abstract class BottomNavigationTestBase {
         const val NAVIGATION_CLICK_ATTEMPTS = 3
         const val TOGGLE_ATTEMPTS = 3
         const val MAX_SCROLL_SWIPES = 5
+        const val MAX_MENU_SCROLL_ATTEMPTS = 20
+        const val MENU_SCROLL_PERCENT = 0.3f
 
         private val NODE_PATTERN = Regex("<node[^>]*>")
 
@@ -408,8 +442,16 @@ abstract class BottomNavigationTestBase {
         const val CUSTOMISE_SAVE_BUTTON_TAG = "customise_navigation_screen:button_save"
         const val CUSTOMISE_RESET_BUTTON_TAG = "customise_navigation_screen:button_reset"
 
-        /** Mirrors CHAT_LIST_SCREEN_TAG of the Compose chat list. */
+        /** Mirror MenuHomeScreenUiTestTags. */
+        const val MENU_TOOLBAR_TAG = "menu_home_screen:toolbar"
+        const val MENU_ACCOUNT_ITEM_TAG = "menu_home_screen:account_item"
+
+        /** Mirror the ChatListScreen test tags of the Compose chat list. */
         const val CHAT_LIST_SCREEN_TAG = "chat_list_screen:screen"
+        const val CHAT_LIST_SEARCH_BAR_TAG = "chat_list_screen:search_bar"
+
+        /** Mirrors OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG of the Compose offline screen. */
+        const val OFFLINE_SEARCH_TOP_APP_BAR_TAG = "offline_screen:search_top_app_bar"
 
         /** Navigation item ids as persisted in NavigationItemsPreference. */
         const val HOME_ID = "home"
