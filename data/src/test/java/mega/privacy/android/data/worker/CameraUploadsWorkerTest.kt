@@ -92,6 +92,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.AddCameraUploadsCopyInProgressTransferUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
@@ -121,6 +122,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsWifiNotSatisfiedUseCa
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCrossDeviceFolderConflictsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorIsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
+import mega.privacy.android.domain.usecase.camerauploads.RemoveCameraUploadsCopyInProgressTransferUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
@@ -250,6 +252,10 @@ internal class CameraUploadsWorkerTest {
     private val crashReporter: CrashReporter = mock()
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val handleCUTransferEventsUseCase: HandleCUTransferEventsUseCase = mock()
+    private val addCameraUploadsCopyInProgressTransferUseCase: AddCameraUploadsCopyInProgressTransferUseCase =
+        mock()
+    private val removeCameraUploadsCopyInProgressTransferUseCase: RemoveCameraUploadsCopyInProgressTransferUseCase =
+        mock()
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
@@ -352,6 +358,8 @@ internal class CameraUploadsWorkerTest {
                 crashReporter = crashReporter,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 handleCUTransferEventsUseCase = handleCUTransferEventsUseCase,
+                addCameraUploadsCopyInProgressTransferUseCase = addCameraUploadsCopyInProgressTransferUseCase,
+                removeCameraUploadsCopyInProgressTransferUseCase = removeCameraUploadsCopyInProgressTransferUseCase,
                 checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
                 getUploadFileSizeDifferenceUseCase = getUploadFileSizeDifferenceUseCase,
                 getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
@@ -823,7 +831,90 @@ internal class CameraUploadsWorkerTest {
             underTest.doWork()
             verify(underTest).setProgress(afterToCopyEventData)
             verify(underTest).setProgress(afterCopiedEventData)
+            verify(addCameraUploadsCopyInProgressTransferUseCase).invoke(record)
+            verify(removeCameraUploadsCopyInProgressTransferUseCase).invoke(record)
         }
+
+    @Test
+    fun `test that the ToCopy event is still processed when tracking the copy in progress transfer fails`() =
+        runTest {
+            val record = setupCopyEventsScenario()
+            whenever(addCameraUploadsCopyInProgressTransferUseCase(record))
+                .thenThrow(RuntimeException("add failed"))
+
+            underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to PROGRESS,
+                    TOTAL_UPLOADED to 0,
+                    TOTAL_TO_UPLOAD to 1,
+                    TOTAL_UPLOADED_BYTES to 0L,
+                    TOTAL_UPLOAD_BYTES to COPY_FILE_SIZE,
+                    CURRENT_PROGRESS to 0f,
+                    ARE_UPLOADS_PAUSED to false,
+                )
+            )
+            verify(removeCameraUploadsCopyInProgressTransferUseCase).invoke(record)
+        }
+
+    @Test
+    fun `test that the Copied event is still processed when untracking the copy in progress transfer fails`() =
+        runTest {
+            val record = setupCopyEventsScenario()
+            whenever(removeCameraUploadsCopyInProgressTransferUseCase(record))
+                .thenThrow(RuntimeException("remove failed"))
+
+            underTest.doWork()
+
+            verify(addCameraUploadsCopyInProgressTransferUseCase).invoke(record)
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to PROGRESS,
+                    TOTAL_UPLOADED to 1,
+                    TOTAL_TO_UPLOAD to 1,
+                    TOTAL_UPLOADED_BYTES to COPY_FILE_SIZE,
+                    TOTAL_UPLOAD_BYTES to COPY_FILE_SIZE,
+                    CURRENT_PROGRESS to 1f,
+                    ARE_UPLOADS_PAUSED to false,
+                )
+            )
+        }
+
+    /**
+     * Prepares a single record that is processed through the copy path, emitting a ToCopy
+     * event followed by a Copied event
+     *
+     * @return the record being copied
+     */
+    private suspend fun setupCopyEventsScenario(): CameraUploadsRecord {
+        setupDefaultCheckConditionMocks()
+        val record = mock<CameraUploadsRecord> {
+            on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+            on { fileSize }.thenReturn(COPY_FILE_SIZE)
+        }
+        val list = listOf(record)
+        setupDefaultProcessingFilesConditionMocks(list)
+        whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+        val flow = flow {
+            emit(CameraUploadsTransferProgress.ToCopy(record = record, nodeId = mock()))
+            emit(CameraUploadsTransferProgress.Copied(record = record, nodeId = mock()))
+        }
+        whenever(
+            uploadCameraUploadsRecordsUseCase(
+                list,
+                NodeId(primaryNodeHandle),
+                NodeId(secondaryNodeHandle),
+                tempPath
+            )
+        ).thenReturn(flow)
+        val currentTime = 10000L
+        whenever(timeSystemRepository.getCurrentTimeInMillis()).thenReturn(
+            currentTime,
+            currentTime + 1000
+        )
+        return record
+    }
 
     @Test
     fun `test that the compression progress is emitted properly when an event Compressing Progress and Compressing Successful is received`() =
@@ -2053,4 +2144,7 @@ internal class CameraUploadsWorkerTest {
             assertThat(result).isEqualTo(ListenableWorker.Result.retry())
         }
 
+    private companion object {
+        const val COPY_FILE_SIZE = 2L * 1024 * 1024
+    }
 }

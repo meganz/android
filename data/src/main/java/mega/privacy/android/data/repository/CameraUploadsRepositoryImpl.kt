@@ -30,6 +30,7 @@ import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsCopyInProgressTransferMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
@@ -90,6 +91,7 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper,
     private val inProgressTransferMapper: InProgressTransferMapper,
+    private val cameraUploadsCopyInProgressTransferMapper: CameraUploadsCopyInProgressTransferMapper,
 ) : CameraUploadsRepository {
 
     /**
@@ -650,6 +652,19 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 inProgressTransfers.filterKeys { it !in uniqueIds }
             }
         }
+
+    override suspend fun addCameraUploadsCopyInProgressTransfer(record: CameraUploadsRecord) =
+        withContext(ioDispatcher) {
+            val copyTransfer = cameraUploadsCopyInProgressTransferMapper(record)
+            cameraUploadsInProgressTransfersFlow.update { inProgressTransfers ->
+                inProgressTransfers + (copyTransfer.uniqueId to copyTransfer)
+            }
+        }
+
+    override suspend fun removeCameraUploadsCopyInProgressTransfer(record: CameraUploadsRecord) =
+        removeCameraUploadsInProgressTransfers(
+            setOf(cameraUploadsCopyInProgressTransferMapper(record).uniqueId)
+        )
 
     override val monitorCameraUploadsEnabled: Flow<Boolean?> =
         cameraUploadsSettingsPreferenceGateway

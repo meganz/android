@@ -600,6 +600,23 @@ interface CameraUploadsRepository {
     suspend fun removeCameraUploadsInProgressTransfers(uniqueIds: Set<Long>)
 
     /**
+     * Add a camera uploads record being copied from an existing node to the in progress transfers
+     *
+     * Node copies do not create SDK transfers, so they must be tracked explicitly to be listed
+     * along with the Camera Uploads transfers
+     *
+     * @param record the [CameraUploadsRecord] being copied
+     */
+    suspend fun addCameraUploadsCopyInProgressTransfer(record: CameraUploadsRecord)
+
+    /**
+     * Remove a camera uploads record previously added with [addCameraUploadsCopyInProgressTransfer]
+     *
+     * @param record the [CameraUploadsRecord] whose copy has finished
+     */
+    suspend fun removeCameraUploadsCopyInProgressTransfer(record: CameraUploadsRecord)
+
+    /**
      * Monitor the Camera Uploads enabled status
      */
     val monitorCameraUploadsEnabled: Flow<Boolean?>

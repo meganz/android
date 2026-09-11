@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsCopyInProgressTransferMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
@@ -38,6 +39,7 @@ import mega.privacy.android.data.mapper.transfer.InProgressTransferMapper
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
@@ -100,6 +102,8 @@ class CameraUploadsRepositoryImplTest {
         mock()
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper = mock()
     private val inProgressTransferMapper: InProgressTransferMapper = mock()
+    private val cameraUploadsCopyInProgressTransferMapper: CameraUploadsCopyInProgressTransferMapper =
+        mock()
 
     private var monitorCameraUploadsEnabled = MutableStateFlow(false)
 
@@ -129,7 +133,8 @@ class CameraUploadsRepositoryImplTest {
             context = mock(),
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
             cameraUploadsStatusInfoMapper = cameraUploadsStatusInfoMapper,
-            inProgressTransferMapper = inProgressTransferMapper
+            inProgressTransferMapper = inProgressTransferMapper,
+            cameraUploadsCopyInProgressTransferMapper = cameraUploadsCopyInProgressTransferMapper,
         )
     }
 
@@ -786,6 +791,27 @@ class CameraUploadsRepositoryImplTest {
                 underTest.updateCameraUploadsInProgressTransfers(listOf(transfer, notCUTransfer))
 
                 assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
+            }
+        }
+
+    @Test
+    fun `test that in progress transfers flow is updated correctly when addCameraUploadsCopyInProgressTransfer and removeCameraUploadsCopyInProgressTransfer are called`() =
+        runTest {
+            val uniqueId = -5L
+            val record = mock<CameraUploadsRecord>()
+            val copyTransfer = mock<InProgressTransfer.Upload> {
+                on { it.uniqueId }.thenReturn(uniqueId)
+            }
+            whenever(cameraUploadsCopyInProgressTransferMapper(record)).thenReturn(copyTransfer)
+            setUp()
+            underTest.monitorCameraUploadsInProgressTransfers().test {
+                assertThat(awaitItem()).isEmpty()
+                underTest.addCameraUploadsCopyInProgressTransfer(record)
+
+                assertThat(awaitItem()).containsExactly(uniqueId, copyTransfer)
+                underTest.removeCameraUploadsCopyInProgressTransfer(record)
+
+                assertThat(awaitItem()).isEmpty()
             }
         }
 

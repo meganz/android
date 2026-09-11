@@ -96,6 +96,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.AddCameraUploadsCopyInProgressTransferUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
@@ -125,6 +126,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsWifiNotSatisfiedUseCa
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCrossDeviceFolderConflictsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorIsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
+import mega.privacy.android.domain.usecase.camerauploads.RemoveCameraUploadsCopyInProgressTransferUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
@@ -214,6 +216,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val crashReporter: CrashReporter,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val handleCUTransferEventsUseCase: HandleCUTransferEventsUseCase,
+    private val addCameraUploadsCopyInProgressTransferUseCase: AddCameraUploadsCopyInProgressTransferUseCase,
+    private val removeCameraUploadsCopyInProgressTransferUseCase: RemoveCameraUploadsCopyInProgressTransferUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorCrossDeviceFolderConflictsUseCase: MonitorCrossDeviceFolderConflictsUseCase,
@@ -1202,6 +1206,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun processToCopyEvent(
         progressEvent: CameraUploadsTransferProgress.ToCopy,
     ) {
+        runCatching { addCameraUploadsCopyInProgressTransferUseCase(progressEvent.record) }
+            .onFailure { Timber.e(it, "Failed to track Camera Uploads copy as in progress transfer") }
         val bytesDifference = getUploadFileSizeDifferenceUseCase(progressEvent.record)
         updateToUploadCount(
             bytesDifference = bytesDifference,
@@ -1219,6 +1225,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun processCopiedEvent(
         progressEvent: CameraUploadsTransferProgress.Copied,
     ) {
+        runCatching { removeCameraUploadsCopyInProgressTransferUseCase(progressEvent.record) }
+            .onFailure { Timber.e(it, "Failed to untrack Camera Uploads copy in progress transfer") }
         updateUploadedCountAfterCopy(
             folderType = progressEvent.record.folderType,
             fileSize = progressEvent.record.fileSize,
