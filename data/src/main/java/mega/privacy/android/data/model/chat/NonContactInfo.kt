@@ -10,7 +10,7 @@ package mega.privacy.android.data.model.chat
  * @property email     Non-contact email.
  */
 data class NonContactInfo(
-    val handle: String,
+    val handle: Long,
     val fullName: String?,
     val firstName: String?,
     val lastName: String?,

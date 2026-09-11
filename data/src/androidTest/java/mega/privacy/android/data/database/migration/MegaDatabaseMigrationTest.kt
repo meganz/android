@@ -1,12 +1,15 @@
 package mega.privacy.android.data.database.migration
 
+import android.database.sqlite.SQLiteException
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
+import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -124,12 +127,44 @@ class MegaDatabaseMigrationTest {
         val db =
             helper.runMigrationsAndValidate(testDatabaseName, 125, true, *MegaDatabase.MIGRATIONS)
 
-        db.query("SELECT * FROM non_contacts").use {
-            assert(it.count == 0)
+        db.query("SELECT * FROM $TABLE_NON_CONTACTS").use {
+            assertThat(it.count).isEqualTo(0)
         }
     }
 
+    @Test
+    @Throws(IOException::class)
+    fun migrate125To126() {
+        helper.createDatabase(testDatabaseName, 125).apply {
+            // refer onCreate LegacyDatabaseMigration before the table was owned by Room
+            execSQL(
+                "CREATE TABLE IF NOT EXISTS $TABLE_NON_CONTACTS_LEGACY(" +
+                        "$KEY_ID INTEGER PRIMARY KEY, " +
+                        "noncontacthandle TEXT, " +
+                        "noncontactfullname TEXT, " +
+                        "noncontactfirstname TEXT, " +
+                        "noncontactlastname TEXT, " +
+                        "noncontactemail TEXT)"
+            )
+            execSQL(
+                "INSERT INTO $TABLE_NON_CONTACTS_LEGACY (noncontacthandle, noncontactemail) " +
+                        "VALUES ('encrypted_handle', 'encrypted_email')"
+            )
+            close()
+        }
+
+        val db =
+            helper.runMigrationsAndValidate(testDatabaseName, 126, true, *MegaDatabase.MIGRATIONS)
+
+        val exception = assertThrows(SQLiteException::class.java) {
+            db.query("SELECT * FROM $TABLE_NON_CONTACTS_LEGACY").close()
+        }
+        assertThat(exception).hasMessageThat().contains("no such table: $TABLE_NON_CONTACTS_LEGACY")
+    }
+
     companion object {
+        const val TABLE_NON_CONTACTS = "non_contacts"
+        const val TABLE_NON_CONTACTS_LEGACY = "noncontacts"
         const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
         const val KEY_TRANSFER_FILENAME = "transferfilename"
         const val KEY_TRANSFER_TYPE = "transfertype"

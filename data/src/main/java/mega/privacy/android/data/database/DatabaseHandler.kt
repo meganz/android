@@ -71,9 +71,29 @@ interface DatabaseHandler {
      */
     var attributes: MegaAttributes?
 
-    fun setNonContactFirstName(name: String?, handle: String?): Int
-    fun setNonContactLastName(lastName: String?, handle: String?): Int
-    fun setNonContactEmail(email: String?, handle: String?): Int
+    /**
+     * Persists the first name of a non contact, blocking until the write completes.
+     *
+     * @param name   First name to cache, may be null.
+     * @param handle Non contact handle.
+     */
+    fun setNonContactFirstName(name: String?, handle: Long)
+
+    /**
+     * Persists the last name of a non contact, blocking until the write completes.
+     *
+     * @param lastName Last name to cache, may be null.
+     * @param handle   Non contact handle.
+     */
+    fun setNonContactLastName(lastName: String?, handle: Long)
+
+    /**
+     * Persists the email of a non contact, blocking until the write completes.
+     *
+     * @param email  Email to cache, may be null.
+     * @param handle Non contact handle.
+     */
+    fun setNonContactEmail(email: String?, handle: Long)
 
     @Deprecated("Should be removed when OfflineUtils is removed")
     fun exists(handle: Long): Boolean
@@ -100,11 +120,16 @@ interface DatabaseHandler {
     fun clearPreferences()
     fun clearAttributes()
     fun clearContacts()
-    fun clearNonContacts()
     fun clearChatItems()
 
     fun setAutoPlayEnabled(enabled: String)
-    fun findNonContactByHandle(handle: String): NonContactInfo?
+    /**
+     * Finds a cached non contact by handle.
+     *
+     * @param handle Non contact handle.
+     * @return The cached non contact, or null when nothing is cached for that handle.
+     */
+    fun findNonContactByHandle(handle: Long): NonContactInfo?
     fun findContactByHandle(handleParam: Long): Contact?
     fun findContactByEmail(mail: String?): Contact?
 }

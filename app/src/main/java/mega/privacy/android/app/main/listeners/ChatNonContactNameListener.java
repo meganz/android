@@ -75,21 +75,21 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                 firstName = request.getText();
                 receivedFirstName = true;
                 if (!isTextEmpty(firstName)) {
-                    dbH.setNonContactFirstName(firstName, request.getUserHandle() + "");
+                    dbH.setNonContactFirstName(firstName, request.getUserHandle());
                 }
             } else if (request.getType() == MegaChatRequest.TYPE_GET_LASTNAME) {
                 Timber.d("Last name received");
                 lastName = request.getText();
                 receivedLastName = true;
                 if (!isTextEmpty(lastName)) {
-                    dbH.setNonContactLastName(lastName, request.getUserHandle() + "");
+                    dbH.setNonContactLastName(lastName, request.getUserHandle());
                 }
             } else if (request.getType() == MegaChatRequest.TYPE_GET_EMAIL) {
                 Timber.d("Email received");
                 mail = request.getText();
                 receivedEmail = true;
                 if (!isTextEmpty(mail)) {
-                    dbH.setNonContactEmail(mail, request.getUserHandle() + "");
+                    dbH.setNonContactEmail(mail, request.getUserHandle());
                 }
             }
         } else {

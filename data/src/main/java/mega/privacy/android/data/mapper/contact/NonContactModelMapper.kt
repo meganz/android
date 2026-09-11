@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 internal class NonContactModelMapper @Inject constructor() {
     operator fun invoke(entity: NonContactEntity) = NonContactInfo(
-        handle = entity.handle.toString(),
+        handle = entity.handle,
         fullName = entity.fullName,
         firstName = entity.firstName,
         lastName = entity.lastName,

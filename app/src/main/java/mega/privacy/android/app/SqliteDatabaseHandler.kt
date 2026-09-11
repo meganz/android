@@ -587,87 +587,36 @@ class SqliteDatabaseHandler @Inject constructor(
             setAttributes(writableDatabase, attr)
         }
 
-    override fun setNonContactFirstName(name: String?, handle: String?): Int {
-        Timber.d("setContactName: %s %s", name, handle)
-        val values = ContentValues().apply {
-            put(KEY_NONCONTACT_FIRSTNAME, encrypt(name))
+    override fun setNonContactFirstName(name: String?, handle: Long) {
+        persistNonContact("first name") {
+            megaLocalRoomGateway.setNonContactFirstName(handle, name)
         }
-        val rows = writableDatabase.update(
-            TABLE_NON_CONTACTS,
-            SQLiteDatabase.CONFLICT_REPLACE,
-            values,
-            "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            emptyArray()
-        )
-        if (rows == 0) {
-            values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
-            writableDatabase.insert(TABLE_NON_CONTACTS, SQLiteDatabase.CONFLICT_NONE, values)
-        }
-        return rows
     }
 
-    override fun setNonContactLastName(lastName: String?, handle: String?): Int {
-        val values = ContentValues().apply {
-            put(KEY_NONCONTACT_LASTNAME, encrypt(lastName))
+    override fun setNonContactLastName(lastName: String?, handle: Long) {
+        persistNonContact("last name") {
+            megaLocalRoomGateway.setNonContactLastName(handle, lastName)
         }
-        val rows = writableDatabase.update(
-            TABLE_NON_CONTACTS,
-            SQLiteDatabase.CONFLICT_REPLACE,
-            values,
-            "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            emptyArray()
-        )
-        if (rows == 0) {
-            values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
-            writableDatabase.insert(TABLE_NON_CONTACTS, SQLiteDatabase.CONFLICT_NONE, values)
-        }
-        return rows
     }
 
-    override fun setNonContactEmail(email: String?, handle: String?): Int {
-        val values = ContentValues().apply {
-            put(KEY_NONCONTACT_EMAIL, encrypt(email))
+    override fun setNonContactEmail(email: String?, handle: Long) {
+        persistNonContact("email") {
+            megaLocalRoomGateway.setNonContactEmail(handle, email)
         }
-        val rows = writableDatabase.update(
-            TABLE_NON_CONTACTS,
-            SQLiteDatabase.CONFLICT_REPLACE,
-            values,
-            "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            emptyArray()
-        )
-        if (rows == 0) {
-            values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
-            writableDatabase.insert(TABLE_NON_CONTACTS, SQLiteDatabase.CONFLICT_NONE, values)
-        }
-        return rows
     }
 
-    override fun findNonContactByHandle(handle: String): NonContactInfo? {
-        Timber.d("findNONContactByHandle: %s", handle)
-        val selectQuery =
-            "SELECT * FROM $TABLE_NON_CONTACTS WHERE $KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'"
-        Timber.d("QUERY: %s", selectQuery)
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val fullName = decrypt(cursor.getString(2))
-                    val firstName = decrypt(cursor.getString(3))
-                    val lastName = decrypt(cursor.getString(4))
-                    val email = decrypt(cursor.getString(5))
-                    return NonContactInfo(
-                        handle,
-                        fullName,
-                        firstName,
-                        lastName,
-                        email
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
+    /**
+     * Callers such as GroupChatInfoActivity read the value straight back through
+     * [findNonContactByHandle], so the write has to complete before returning. A failure only
+     * costs a cache entry the SDK can re-fetch, so it must not reach the caller.
+     */
+    private fun persistNonContact(field: String, write: suspend () -> Unit) {
+        runCatching { runBlocking { write() } }
+            .onFailure { Timber.e(it, "Failed to persist the non-contact %s", field) }
     }
+
+    override fun findNonContactByHandle(handle: Long): NonContactInfo? =
+        runBlocking { megaLocalRoomGateway.getNonContactByHandle(handle) }
 
     override fun findContactByHandle(handleParam: Long): Contact? =
         runBlocking { megaLocalRoomGateway.getContactByHandle(handleParam) }
@@ -1307,11 +1256,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun clearNonContacts() {
-        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_NON_CONTACTS")
-        legacyDatabaseMigration.onCreate(writableDatabase)
-    }
-
     override fun clearChatItems() {
         writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_ITEMS")
         legacyDatabaseMigration.onCreate(writableDatabase)
@@ -1360,7 +1304,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val TABLE_CREDENTIALS = "credentials"
         const val TABLE_ATTRIBUTES = "attributes"
         const val TABLE_CHAT_ITEMS = "chat"
-        const val TABLE_NON_CONTACTS = "noncontacts"
         const val TABLE_CHAT_SETTINGS = "chatsettings"
         const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
         const val TABLE_EPHEMERAL = "ephemeral"
@@ -1447,11 +1390,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_CHAT_ITEM_SOUND_NOTIFICATIONS = "chatitemnotificationsound"
         const val KEY_CHAT_ITEM_WRITTEN_TEXT = "chatitemwrittentext"
         const val KEY_CHAT_ITEM_EDITED_MSG_ID = "chatitemeditedmsgid"
-        const val KEY_NONCONTACT_HANDLE = "noncontacthandle"
-        const val KEY_NONCONTACT_FULLNAME = "noncontactfullname"
-        const val KEY_NONCONTACT_FIRSTNAME = "noncontactfirstname"
-        const val KEY_NONCONTACT_LASTNAME = "noncontactlastname"
-        const val KEY_NONCONTACT_EMAIL = "noncontactemail"
         const val KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications"
         const val KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound"
         const val KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled"

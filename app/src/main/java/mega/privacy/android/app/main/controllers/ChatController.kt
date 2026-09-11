@@ -542,7 +542,7 @@ class ChatController @Inject constructor(
      * @return The participant's name.
      */
     private fun getNonContactFirstName(userHandle: Long): String? {
-        val nonContact = dbH.findNonContactByHandle(userHandle.toString() + "")
+        val nonContact = dbH.findNonContactByHandle(userHandle)
         if (nonContact == null) {
             return ""
         }
@@ -569,7 +569,7 @@ class ChatController @Inject constructor(
      * @return The participant's full name.
      */
     private fun getNonContactFullName(userHandle: Long): String? {
-        val nonContact = dbH.findNonContactByHandle(userHandle.toString() + "")
+        val nonContact = dbH.findNonContactByHandle(userHandle)
         if (nonContact == null) {
             return ""
         }
@@ -590,7 +590,7 @@ class ChatController @Inject constructor(
      * @return The participant's email.
      */
     private fun getNonContactEmail(userHandle: Long): String? {
-        val nonContact = dbH.findNonContactByHandle(userHandle.toString() + "")
+        val nonContact = dbH.findNonContactByHandle(userHandle)
         return if (nonContact != null) nonContact.email else ""
     }
 
@@ -720,17 +720,17 @@ class ChatController @Inject constructor(
     fun setNonContactAttributesInDB(peerHandle: Long) {
         val firstName = megaChatApi.getUserFirstnameFromCache(peerHandle)
         if (!isTextEmpty(firstName)) {
-            dbH.setNonContactFirstName(firstName, peerHandle.toString() + "")
+            dbH.setNonContactFirstName(firstName, peerHandle)
         }
 
         val lastName = megaChatApi.getUserLastnameFromCache(peerHandle)
         if (!isTextEmpty(lastName)) {
-            dbH.setNonContactLastName(lastName, peerHandle.toString() + "")
+            dbH.setNonContactLastName(lastName, peerHandle)
         }
 
         val email = megaChatApi.getUserEmailFromCache(peerHandle)
         if (!isTextEmpty(email)) {
-            dbH.setNonContactEmail(email, peerHandle.toString() + "")
+            dbH.setNonContactEmail(email, peerHandle)
         }
     }
 

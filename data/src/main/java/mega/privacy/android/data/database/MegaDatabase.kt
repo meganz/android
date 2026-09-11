@@ -488,6 +488,14 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_125_126 = object : Migration(125, 126) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // The legacy table only cached names and emails the SDK re-fetches on demand,
+                // so its rows are dropped instead of being decrypted into the new one.
+                db.execSQL("DROP TABLE IF EXISTS `${MegaDatabaseConstant.TABLE_NON_CONTACTS_LEGACY}`")
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
@@ -504,6 +512,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_119_120,
             MIGRATION_120_121,
             MIGRATION_124_125,
+            MIGRATION_125_126,
         )
     }
 }

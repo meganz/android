@@ -158,16 +158,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     "${SqliteDatabaseHandler.KEY_CHAT_ITEM_EDITED_MSG_ID} TEXT)"
         db.execSQL(CREATE_CHAT_ITEM_TABLE)
 
-        val CREATE_NONCONTACT_TABLE =
-            "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_NON_CONTACTS}(" +
-                    "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY, " +
-                    "${SqliteDatabaseHandler.KEY_NONCONTACT_HANDLE} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_NONCONTACT_FULLNAME} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_NONCONTACT_FIRSTNAME} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_NONCONTACT_LASTNAME} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_NONCONTACT_EMAIL} TEXT)"
-        db.execSQL(CREATE_NONCONTACT_TABLE)
-
         val CREATE_CHAT_TABLE =
             "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_CHAT_SETTINGS}(" +
                     "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY, " +
@@ -452,10 +442,10 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                         "${SqliteDatabaseHandler.KEY_CHAT_ITEM_SOUND_NOTIFICATIONS} TEXT)"
             db.execSQL(CREATE_CHAT_ITEM_TABLE)
             val CREATE_NONCONTACT_TABLE =
-                "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_NON_CONTACTS}(" +
+                "CREATE TABLE IF NOT EXISTS ${MegaDatabaseConstant.TABLE_NON_CONTACTS_LEGACY}(" +
                         "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY, " +
-                        "${SqliteDatabaseHandler.KEY_NONCONTACT_HANDLE} TEXT, " +
-                        "${SqliteDatabaseHandler.KEY_NONCONTACT_FULLNAME} TEXT)"
+                        "$KEY_NONCONTACT_HANDLE TEXT, " +
+                        "$KEY_NONCONTACT_FULLNAME TEXT)"
             db.execSQL(CREATE_NONCONTACT_TABLE)
             val CREATE_CHAT_TABLE =
                 "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_CHAT_SETTINGS}(" +
@@ -484,17 +474,17 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             )
         }
         if (oldVersion <= 25) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_NON_CONTACTS} ADD COLUMN ${SqliteDatabaseHandler.KEY_NONCONTACT_FIRSTNAME} TEXT;")
+            db.execSQL("ALTER TABLE ${MegaDatabaseConstant.TABLE_NON_CONTACTS_LEGACY} ADD COLUMN $KEY_NONCONTACT_FIRSTNAME TEXT;")
             db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_NON_CONTACTS} SET ${SqliteDatabaseHandler.KEY_NONCONTACT_FIRSTNAME} = '${
+                "UPDATE ${MegaDatabaseConstant.TABLE_NON_CONTACTS_LEGACY} SET $KEY_NONCONTACT_FIRSTNAME = '${
                     SqliteDatabaseHandler.encrypt(
                         ""
                     )
                 }';"
             )
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_NON_CONTACTS} ADD COLUMN ${SqliteDatabaseHandler.KEY_NONCONTACT_LASTNAME} TEXT;")
+            db.execSQL("ALTER TABLE ${MegaDatabaseConstant.TABLE_NON_CONTACTS_LEGACY} ADD COLUMN $KEY_NONCONTACT_LASTNAME TEXT;")
             db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_NON_CONTACTS} SET ${SqliteDatabaseHandler.KEY_NONCONTACT_LASTNAME} = '${
+                "UPDATE ${MegaDatabaseConstant.TABLE_NON_CONTACTS_LEGACY} SET $KEY_NONCONTACT_LASTNAME = '${
                     SqliteDatabaseHandler.encrypt(
                         ""
                     )
@@ -512,9 +502,9 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             )
         }
         if (oldVersion <= 27) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_NON_CONTACTS} ADD COLUMN ${SqliteDatabaseHandler.KEY_NONCONTACT_EMAIL} TEXT;")
+            db.execSQL("ALTER TABLE ${MegaDatabaseConstant.TABLE_NON_CONTACTS_LEGACY} ADD COLUMN $KEY_NONCONTACT_EMAIL TEXT;")
             db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_NON_CONTACTS} SET ${SqliteDatabaseHandler.KEY_NONCONTACT_EMAIL} = '${
+                "UPDATE ${MegaDatabaseConstant.TABLE_NON_CONTACTS_LEGACY} SET $KEY_NONCONTACT_EMAIL = '${
                     SqliteDatabaseHandler.encrypt(
                         ""
                     )
@@ -2082,5 +2072,13 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             Timber.e(e, "Exception opening or managing DB cursor")
         }
         return chatSettings
+    }
+
+    private companion object {
+        const val KEY_NONCONTACT_HANDLE = "noncontacthandle"
+        const val KEY_NONCONTACT_FULLNAME = "noncontactfullname"
+        const val KEY_NONCONTACT_FIRSTNAME = "noncontactfirstname"
+        const val KEY_NONCONTACT_LASTNAME = "noncontactlastname"
+        const val KEY_NONCONTACT_EMAIL = "noncontactemail"
     }
 }

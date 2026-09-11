@@ -4,6 +4,7 @@ import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -29,6 +30,7 @@ import javax.inject.Inject
  */
 internal class MegaLocalStorageFacade @Inject constructor(
     private val dbHandler: Lazy<DatabaseHandler>,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @DatabaseDispatcher private val databaseDispatcher: CoroutineDispatcher,
 ) : MegaLocalStorageGateway {
 
@@ -90,27 +92,16 @@ internal class MegaLocalStorageFacade @Inject constructor(
     }
 
     override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =
-        withContext(databaseDispatcher) {
-            dbHandler.get().findNonContactByHandle(userHandle.toString())
-        }
+        megaLocalRoomGateway.getNonContactByHandle(userHandle)
 
-    override suspend fun setNonContactEmail(userHandle: Long, email: String) {
-        withContext(databaseDispatcher) {
-            dbHandler.get().setNonContactEmail(email, userHandle.toString())
-        }
-    }
+    override suspend fun setNonContactEmail(userHandle: Long, email: String) =
+        megaLocalRoomGateway.setNonContactEmail(userHandle, email)
 
-    override suspend fun setNonContactFirstName(userHandle: Long, firstName: String?) {
-        withContext(databaseDispatcher) {
-            dbHandler.get().setNonContactFirstName(firstName, userHandle.toString())
-        }
-    }
+    override suspend fun setNonContactFirstName(userHandle: Long, firstName: String?) =
+        megaLocalRoomGateway.setNonContactFirstName(userHandle, firstName)
 
-    override suspend fun setNonContactLastName(userHandle: Long, lastName: String?) {
-        withContext(databaseDispatcher) {
-            dbHandler.get().setNonContactLastName(lastName, userHandle.toString())
-        }
-    }
+    override suspend fun setNonContactLastName(userHandle: Long, lastName: String?) =
+        megaLocalRoomGateway.setNonContactLastName(userHandle, lastName)
 
     override suspend fun getContactByEmail(email: String?) = withContext(databaseDispatcher) {
         dbHandler.get().findContactByEmail(email)
@@ -206,9 +197,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().clearContacts()
     }
 
-    override suspend fun clearNonContacts() = withContext(databaseDispatcher) {
-        dbHandler.get().clearNonContacts()
-    }
+    override suspend fun clearNonContacts() = megaLocalRoomGateway.deleteAllNonContacts()
 
     override suspend fun clearChatItems() = withContext(databaseDispatcher) {
         dbHandler.get().clearChatItems()

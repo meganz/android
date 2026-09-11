@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 125
+    const val DATABASE_VERSION = 126
 
     /**
      * Database Name
@@ -24,6 +24,11 @@ object MegaDatabaseConstant {
      * Table Non Contacts
      */
     const val TABLE_NON_CONTACTS = "non_contacts"
+
+    /**
+     * Table Non Contacts legacy, not used anymore, keep the constant for database migration purposes only
+     */
+    const val TABLE_NON_CONTACTS_LEGACY = "noncontacts"
 
     /**
      * Table Completed Transfers

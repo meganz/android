@@ -62,7 +62,7 @@ class GetUserEmailListener(
         if (request.type == MegaRequest.TYPE_GET_USER_EMAIL) {
             if (e.errorCode == MegaError.API_OK) {
                 Timber.d("Email recovered")
-                databaseHandler.setNonContactEmail(request.email, request.nodeHandle.toString())
+                databaseHandler.setNonContactEmail(request.email, request.nodeHandle)
                 callback?.onUserEmailUpdate(request.email, request.nodeHandle, position)
             } else {
                 Timber.e("Error getting user email: ${e.errorString}")

@@ -683,7 +683,7 @@ class ChatRepositoryImplTest {
         runTest {
             val handle = 123L
             val nonContact = NonContactInfo(
-                handle.toString(),
+                handle,
                 "fullName",
                 "firstName",
                 "lastName",
@@ -787,7 +787,7 @@ class ChatRepositoryImplTest {
         runTest {
             val handle = 123L
             val nonContact = NonContactInfo(
-                handle.toString(),
+                handle,
                 "fullName",
                 "firstName",
                 "lastName",
