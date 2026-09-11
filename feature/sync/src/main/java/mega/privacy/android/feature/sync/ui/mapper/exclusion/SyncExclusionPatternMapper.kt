@@ -1,5 +1,8 @@
 package mega.privacy.android.feature.sync.ui.mapper.exclusion
 
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionClass
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionTarget
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionDisplay
 import javax.inject.Inject
@@ -14,13 +17,34 @@ import javax.inject.Inject
 internal class SyncExclusionPatternMapper @Inject constructor() {
 
     /**
-     * How [pattern] is shown. The chip shape is tried first, so the caller cannot render one rule
-     * as both a chip and a row. A pattern no condition describes without dropping characters comes
-     * back as [SyncExclusionCondition.MatchingWildcard] carrying the whole pattern.
+     * How [rule] is shown. Only a plain exclusion of every node type can become a chip, because a
+     * chip carries an extension and nothing else: on a re-include or a narrower target it would
+     * state the opposite of, or more than, what the rule does.
      */
-    operator fun invoke(pattern: String): SyncExclusionDisplay {
-        extensionOrNull(pattern)?.let { return SyncExclusionDisplay.Extension(it) }
+    operator fun invoke(rule: SyncExclusionRule): SyncExclusionDisplay =
+        if (rule.exclusionClass == SyncExclusionClass.Exclude &&
+            rule.target == SyncExclusionTarget.All
+        ) {
+            invoke(rule.pattern)
+        } else {
+            condition(rule.pattern)
+        }
 
+    /**
+     * How [pattern] is shown when no rule holds it yet, such as a value still being typed. Prefer
+     * the [SyncExclusionRule] overload for a stored rule, which also weighs the fields a chip
+     * cannot carry.
+     */
+    operator fun invoke(pattern: String): SyncExclusionDisplay =
+        extensionOrNull(pattern)
+            ?.let { SyncExclusionDisplay.Extension(it) }
+            ?: condition(pattern)
+
+    /**
+     * A pattern no condition describes without dropping characters comes back as
+     * [SyncExclusionCondition.MatchingWildcard] carrying the whole pattern.
+     */
+    private fun condition(pattern: String): SyncExclusionDisplay.Condition {
         val leadingStar = pattern.startsWith(ANY)
         val trailingStar = pattern.length > 1 && pattern.endsWith(ANY)
         val value = pattern.substring(

@@ -2,6 +2,10 @@ package mega.privacy.android.feature.sync.ui.mapper.exclusion
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionClass
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionMatchType
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionTarget
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionDisplay
 import org.junit.jupiter.api.Test
@@ -232,6 +236,46 @@ internal class SyncExclusionPatternMapperTest {
         assertThat(underTest(pattern))
             .isEqualTo(SyncExclusionDisplay.Extension(extension.removePrefix(".")))
     }
+
+    @Test
+    fun `test that a plain exclusion of every node type can be a chip`() {
+        assertThat(underTest(rule("*.tmp")))
+            .isEqualTo(SyncExclusionDisplay.Extension("tmp"))
+    }
+
+    @Test
+    fun `test that a re-include is never a chip`() {
+        val result = underTest(rule("*.tmp", exclusionClass = SyncExclusionClass.Include))
+
+        assertThat(result).isEqualTo(condition(SyncExclusionCondition.EndingWith, ".tmp"))
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @EnumSource(
+        value = SyncExclusionTarget::class,
+        names = ["Directories", "Files", "Symlinks"],
+    )
+    fun `test that a narrower target is never a chip`(target: SyncExclusionTarget) {
+        val result = underTest(rule("*.tmp", target = target))
+
+        assertThat(result).isEqualTo(condition(SyncExclusionCondition.EndingWith, ".tmp"))
+    }
+
+    @Test
+    fun `test that a rule whose pattern is no extension reads the same either way`() {
+        assertThat(underTest(rule("draft*"))).isEqualTo(underTest("draft*"))
+    }
+
+    private fun rule(
+        pattern: String,
+        exclusionClass: SyncExclusionClass = SyncExclusionClass.Exclude,
+        target: SyncExclusionTarget = SyncExclusionTarget.All,
+    ) = SyncExclusionRule(
+        pattern = pattern,
+        exclusionClass = exclusionClass,
+        target = target,
+        matchType = SyncExclusionMatchType.SubtreeName,
+    )
 
     private fun condition(
         condition: SyncExclusionCondition,
