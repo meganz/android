@@ -61,6 +61,8 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.contract.state.isMainNavBarRoot
+import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.shared.nodes.components.NodeGridViewItem
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeListViewItem
@@ -252,16 +254,23 @@ internal fun OfflineScreen(
         },
         topBar = {
             val isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty()
-            val defaultTitle = uiState.title.takeIf { uiState.nodeId != -1 }
+            val isSectionRoot = uiState.nodeId == -1
+            val defaultTitle = uiState.title.takeIf { !isSectionRoot }
                 ?: stringResource(sharedR.string.offline_screen_title)
+            val defaultNavigationType =
+                if (isSectionRoot && isMainNavBarRoot(OfflineNavKey::class)) {
+                    AppBarNavigationType.None
+                } else {
+                    AppBarNavigationType.Back {
+                        Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                        onBack()
+                    }
+                }
             if (!isInSelectionMode && (uiState.offlineNodes.isNotEmpty() || !uiState.searchQuery.isNullOrEmpty())) {
                 MegaSearchTopAppBar(
                     modifier = Modifier
                         .testTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG),
-                    navigationType = AppBarNavigationType.Back {
-                        Analytics.tracker.trackEvent(BackButtonPressedEvent)
-                        onBack()
-                    },
+                    navigationType = defaultNavigationType,
                     trailingIcons = {
                         TransfersToolbarWidget(
                             onClick = onNavigateToTransfers,
@@ -296,10 +305,7 @@ internal fun OfflineScreen(
                     navigationType = if (isInSelectionMode) {
                         AppBarNavigationType.Close(deselectAll)
                     } else {
-                        AppBarNavigationType.Back {
-                            Analytics.tracker.trackEvent(BackButtonPressedEvent)
-                            onBack()
-                        }
+                        defaultNavigationType
                     },
                     actions = buildList {
                         if (isInSelectionMode && !uiState.areAllNodesSelected) {

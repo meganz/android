@@ -40,6 +40,8 @@ import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.rememberChatListSelectionState
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.state.isMainNavBarRoot
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.shared.chats.components.ChatsViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -265,7 +267,11 @@ internal fun ChatListScreenContent(
                 MegaSearchTopAppBar(
                     modifier = Modifier.testTag(CHAT_LIST_SEARCH_BAR_TAG),
                     title = stringResource(sharedR.string.general_chats_label),
-                    navigationType = AppBarNavigationType.Back(onBackClick),
+                    navigationType = if (isMainNavBarRoot(ChatListNavKey::class)) {
+                        AppBarNavigationType.None
+                    } else {
+                        AppBarNavigationType.Back(onBackClick)
+                    },
                     query = searchQuery,
                     isSearchingMode = searchMode,
                     onQueryChanged = onQueryChange,

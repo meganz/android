@@ -25,6 +25,8 @@ import mega.privacy.android.feature.clouddrive.presentation.favourites.model.Fav
 import mega.privacy.android.feature.clouddrive.presentation.favourites.view.FavouritesContent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.state.isMainNavBarRoot
+import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -88,9 +90,13 @@ fun FavouritesScreen(
             } else {
                 MegaTopAppBar(
                     title = "Favourites",
-                    navigationType = AppBarNavigationType.Back {
-                        Analytics.tracker.trackEvent(BackButtonPressedEvent)
-                        navigationHandler.back()
+                    navigationType = if (isMainNavBarRoot(FavouritesNavKey::class)) {
+                        AppBarNavigationType.None
+                    } else {
+                        AppBarNavigationType.Back {
+                            Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                            navigationHandler.back()
+                        }
                     },
                     trailingIcons = {
                         TransfersToolbarWidget {

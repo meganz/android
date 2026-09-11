@@ -21,3 +21,12 @@ val LocalTopLevelNavKeyClass = compositionLocalOf<KClass<out NavKey>?> { null }
 @Composable
 fun isPushedMainNavScreen(rootNavKeyClass: KClass<out NavKey>): Boolean =
     LocalTopLevelNavKeyClass.current?.let { it != rootNavKeyClass } == true
+
+/**
+ * Returns whether the main nav item screen rooted at [rootNavKeyClass] is the current top-level
+ * (navigation bar) destination, in which case its top bar shows no back affordance. Always false
+ * outside the main navigation display, where the screen is only ever pushed.
+ */
+@Composable
+fun isMainNavBarRoot(rootNavKeyClass: KClass<out NavKey>): Boolean =
+    LocalTopLevelNavKeyClass.current == rootNavKeyClass

@@ -59,6 +59,8 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.state.isMainNavBarRoot
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransferDragAndDropToChangePriorityEvent
@@ -448,7 +450,11 @@ internal fun TransfersTopBar(
     onActionPressed: (MenuAction) -> Unit,
 ) {
     MegaTopAppBar(
-        navigationType = AppBarNavigationType.Back(onBackPress),
+        navigationType = if (isMainNavBarRoot(TransfersNavKey::class)) {
+            AppBarNavigationType.None
+        } else {
+            AppBarNavigationType.Back(onBackPress)
+        },
         title = stringResource(id = sharedR.string.general_section_transfers),
         actions = actions,
         onActionPressed = onActionPressed,

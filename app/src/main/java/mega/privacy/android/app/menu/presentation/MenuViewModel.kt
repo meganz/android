@@ -3,6 +3,7 @@ package mega.privacy.android.app.menu.presentation
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -70,6 +71,7 @@ import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.Subscript
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.reflect.KClass
 
 @HiltViewModel
 class MenuViewModel @Inject constructor(
@@ -183,12 +185,12 @@ class MenuViewModel @Inject constructor(
                 monitorAccountDetailUseCase().map { it.levelDetail?.accountType }
                     .catch { emit(null) }
                     .distinctUntilChanged(),
-                monitorHiddenSectionRows(),
-            ) { isAchievementsEnabled, accountType, hiddenSectionRows ->
+                monitorNavigationBarSections(),
+            ) { isAchievementsEnabled, accountType, navigationBarSections ->
                 buildAccountItems(
                     isAchievementsEnabled = isAchievementsEnabled,
                     accountType = accountType ?: AccountType.FREE,
-                    hiddenSectionRows = hiddenSectionRows,
+                    navigationBarSections = navigationBarSections,
                 )
             }.collect { myAccountItems ->
                 _uiState.update {
@@ -199,37 +201,40 @@ class MenuViewModel @Inject constructor(
     }
 
     /**
-     * Emits a Menu row for every enabled main navigation section that is hidden from the user's
-     * bottom navigation bar and has no static Menu row, derived from the nav items themselves.
-     * Emits an empty list when the customisable bottom navigation feature is disabled.
+     * Emits how the enabled main navigation sections split against the user's bottom navigation
+     * bar, derived from the nav items themselves: a Menu row for every section hidden from the
+     * bar that has no static Menu row, and the destination classes of the sections resident in
+     * the bar, whose static Menu rows are redundant. Emits empty sections when the customisable
+     * bottom navigation feature is disabled, leaving the static rows untouched.
      */
-    private fun monitorHiddenSectionRows(): Flow<List<NavDrawerItem.Account>> = flow {
+    private fun monitorNavigationBarSections(): Flow<NavigationBarSections> = flow {
         if (getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation)) {
             emitAll(
                 combine(
                     getEnabledFlaggedItemsUseCase(mainNavItems),
                     monitorNavigationItemsPreferenceUseCase(),
-                ) { enabledItems, preference -> hiddenSectionRows(enabledItems, preference) }
+                ) { enabledItems, preference -> navigationBarSections(enabledItems, preference) }
             )
         } else {
-            emit(emptyList())
+            emit(NavigationBarSections(emptyList(), emptySet()))
         }
     }.catch {
         Timber.e(it, "Error monitoring sections hidden from the navigation bar")
-        emit(emptyList())
+        emit(NavigationBarSections(emptyList(), emptySet()))
     }
 
-    private fun hiddenSectionRows(
+    private fun navigationBarSections(
         enabledItems: Set<MainNavItem>,
         preference: NavigationItemsPreference?,
-    ): List<NavDrawerItem.Account> {
-        val barItemIds = mainNavigationBarReconciler(
+    ): NavigationBarSections {
+        val barItems = mainNavigationBarReconciler(
             enabledItems = enabledItems,
             preference = preference,
             isCustomisationEnabled = true,
-        ).items.map { it.id }.toSet()
+        ).items
+        val barItemIds = barItems.map { it.id }.toSet()
         val staticRowDestinations = menuItems.values.map { it.destination::class }.toSet()
-        return enabledItems
+        val hiddenSectionRows = enabledItems
             .filterNot { it.preferredSlot is PreferredSlot.Last }
             .filterNot { it.id in barItemIds }
             .filterNot { it.destination::class in staticRowDestinations }
@@ -244,22 +249,31 @@ class MenuViewModel @Inject constructor(
                     analyticsEventIdentifier = item.drawerAnalyticsEventIdentifier,
                 )
             }
+        return NavigationBarSections(
+            hiddenSectionRows = hiddenSectionRows,
+            barDestinationClasses = barItems.map { it.destination::class }.toSet(),
+        )
     }
 
     /**
      * Builds the ordered account section: the static rows interleaved with the dynamically-derived
-     * hidden-section rows. Order is expressed as a `(primary, secondary)` pair rather than a single
-     * numeric key so the hidden rows always sort within the anchor's slot and can never overrun the
-     * following static row, regardless of how many there are. The anchor's key is read from the
-     * menu items map, so this stays correct even if the static keys are renumbered.
+     * hidden-section rows, minus the static rows whose section currently sits in the navigation
+     * bar. Order is expressed as a `(primary, secondary)` pair rather than a single numeric key so
+     * the hidden rows always sort within the anchor's slot and can never overrun the following
+     * static row, regardless of how many there are. The anchor's key is read from the menu items
+     * map, so this stays correct even if the static keys are renumbered.
      */
     private fun buildAccountItems(
         isAchievementsEnabled: Boolean,
         accountType: AccountType,
-        hiddenSectionRows: List<NavDrawerItem.Account>,
+        navigationBarSections: NavigationBarSections,
     ): ImmutableList<NavDrawerItem.Account> {
         val staticRows = filterMyAccountItems(isAchievementsEnabled, accountType)
+            .filterNot { (_, item) ->
+                item.destination::class in navigationBarSections.barDestinationClasses
+            }
             .map { (key, item) -> Triple(key, 0, item) }
+        val hiddenSectionRows = navigationBarSections.hiddenSectionRows
         val hiddenRows = if (hiddenSectionRows.isEmpty()) {
             emptyList()
         } else {
@@ -522,3 +536,14 @@ class MenuViewModel @Inject constructor(
         }
     }
 }
+
+/**
+ * How the enabled main navigation sections split against the user's bottom navigation bar.
+ *
+ * @property hiddenSectionRows Menu rows for the sections hidden from the bar without a static row
+ * @property barDestinationClasses destination classes of the sections resident in the bar
+ */
+private data class NavigationBarSections(
+    val hiddenSectionRows: List<NavDrawerItem.Account>,
+    val barDestinationClasses: Set<KClass<out NavKey>>,
+)

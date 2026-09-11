@@ -6,12 +6,14 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
@@ -27,6 +29,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.feature.transfers.components.widget.TransfersToolbarWidgetStatus
+import mega.privacy.android.navigation.contract.state.LocalTopLevelNavKeyClass
+import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.shared.nodes.components.GRID_VIEW_TOGGLE_TAG
 import mega.privacy.android.shared.nodes.components.SORT_ORDER_TAG
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -43,11 +47,16 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
+import kotlin.reflect.KClass
 
 @Config(sdk = [Build.VERSION_CODES.Q])
 @RunWith(AndroidJUnit4::class)
 class OfflineScreenTest {
     private val analyticsTracker: AnalyticsTracker = mock()
+
+    private companion object {
+        const val NAVIGATION_ICON_CONTENT_DESCRIPTION = "Navigation Icon"
+    }
 
     @get:Rule
     var composeRule = createAndroidComposeRule<ComponentActivity>()
@@ -836,6 +845,43 @@ class OfflineScreenTest {
         composeRule.onNodeWithTag(OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that no back button is shown at the section root when offline is the navigation bar destination`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            nodeId = -1,
+        )
+        setupComposeContent(uiState = uiState, topLevelNavKeyClass = OfflineNavKey::class)
+
+        composeRule.onNodeWithContentDescription(NAVIGATION_ICON_CONTENT_DESCRIPTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that a back button is shown in a sub-folder when offline is the navigation bar destination`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            nodeId = 5,
+            title = "Folder",
+        )
+        setupComposeContent(uiState = uiState, topLevelNavKeyClass = OfflineNavKey::class)
+
+        composeRule.onNodeWithContentDescription(NAVIGATION_ICON_CONTENT_DESCRIPTION)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that a back button is shown at the section root when hosted outside the main navigation display`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            nodeId = -1,
+        )
+        setupComposeContent(uiState = uiState, topLevelNavKeyClass = null)
+
+        composeRule.onNodeWithContentDescription(NAVIGATION_ICON_CONTENT_DESCRIPTION)
+            .assertIsDisplayed()
+    }
+
     private fun setupComposeContent(
         uiState: OfflineUiState,
         onItemClicked: (OfflineNodeUiItem) -> Unit = {},
@@ -855,11 +901,13 @@ class OfflineScreenTest {
         openFileInformation: (String) -> Unit = {},
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         onChangeViewType: () -> Unit = {},
+        topLevelNavKeyClass: KClass<out NavKey>? = null,
     ) {
         composeRule.setContent {
             CompositionLocalProvider(
                 LocalActivity provides null,
-                LocalViewModelStoreOwner provides viewModelStoreOwner
+                LocalViewModelStoreOwner provides viewModelStoreOwner,
+                LocalTopLevelNavKeyClass provides topLevelNavKeyClass,
             ) {
                 AndroidThemeForPreviews {
                     OfflineScreen(

@@ -49,7 +49,9 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.state.isMainNavBarRoot
 import mega.privacy.android.navigation.destination.SearchNavKey
+import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
@@ -166,8 +168,12 @@ internal fun SharesScreen(
             } else {
                 MegaTopAppBar(
                     modifier = Modifier.testTag(SHARES_MAIN_APP_BAR_TAG),
-                    navigationType = AppBarNavigationType.Back {
-                        navigationHandler.back()
+                    navigationType = if (isMainNavBarRoot(SharesNavKey::class)) {
+                        AppBarNavigationType.None
+                    } else {
+                        AppBarNavigationType.Back {
+                            navigationHandler.back()
+                        }
                     },
                     title = stringResource(sharedR.string.video_section_videos_location_option_shared_items),
                     trailingIcons = {

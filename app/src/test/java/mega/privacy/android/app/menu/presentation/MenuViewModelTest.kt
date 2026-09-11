@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -25,6 +26,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationBarReconciler
 import mega.privacy.android.app.menu.navigation.AchievementsItem
+import mega.privacy.android.app.menu.navigation.ChatItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.DeviceCentreItem
 import mega.privacy.android.app.menu.navigation.MenuItemPlaceholder
@@ -81,6 +83,7 @@ import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.shared.resources.R as SharedR
@@ -2482,6 +2485,159 @@ class MenuViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that the static chat row is removed when the chat section is in the navigation bar`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(true)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flowOf(
+                        NavigationItemsPreference(
+                            orderedVisibleItemIds =
+                                listOf("chat", "home", "drive", "media", "favourites")
+                        )
+                    )
+                )
+            }
+            val mainNavItems = createMainNavItems() + createMainNavItem(
+                id = "chat",
+                destination = ChatListNavKey(),
+                preferredSlot = PreferredSlot.None,
+                label = R.string.selectAll,
+            )
+            val chatItem = createChatItem()
+            val menuItems = mapOf(30 to chatItem, 60 to DeviceCentreItem)
+
+            initUnderTest(menuItems = menuItems, mainNavItems = mainNavItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems.map { it.destination })
+                    .containsExactly(DeviceCentreItem.destination)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that only the static offline row is removed when the offline section is in the navigation bar`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(true)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flowOf(
+                        NavigationItemsPreference(
+                            orderedVisibleItemIds =
+                                listOf("offline", "home", "drive", "media", "favourites")
+                        )
+                    )
+                )
+            }
+            val mainNavItems = createMainNavItems() + setOf(
+                createMainNavItem(
+                    id = "offline",
+                    destination = OfflineNavKey(),
+                    preferredSlot = PreferredSlot.None,
+                    label = R.string.selectAll,
+                ),
+                createMainNavItem(
+                    id = "shares",
+                    destination = SharesNavKey,
+                    preferredSlot = PreferredSlot.None,
+                    label = R.string.selectTextMode,
+                ),
+            )
+            val menuItems = mapOf(50 to SharedItemsItem, 80 to OfflineFilesItem)
+
+            initUnderTest(menuItems = menuItems, mainNavItems = mainNavItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems.map { it.destination })
+                    .containsExactly(SharedItemsItem.destination)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that static rows are kept when the customisation flag is disabled and the preference holds their sections`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(false)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flowOf(
+                        NavigationItemsPreference(orderedVisibleItemIds = listOf("offline", "drive"))
+                    )
+                )
+            }
+            val mainNavItems = createMainNavItems() + createMainNavItem(
+                id = "offline",
+                destination = OfflineNavKey(),
+                preferredSlot = PreferredSlot.None,
+                label = R.string.selectAll,
+            )
+            val menuItems = mapOf(50 to SharedItemsItem, 80 to OfflineFilesItem)
+
+            initUnderTest(menuItems = menuItems, mainNavItems = mainNavItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems.map { it.destination })
+                    .containsExactly(SharedItemsItem.destination, OfflineFilesItem.destination)
+                    .inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that all static rows are kept when the customisation flag is on with the default bar`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(true)
+            val mainNavItems = createMainNavItems() + setOf(
+                createMainNavItem(
+                    id = "offline",
+                    destination = OfflineNavKey(),
+                    preferredSlot = PreferredSlot.None,
+                    label = R.string.selectAll,
+                ),
+                createMainNavItem(
+                    id = "shares",
+                    destination = SharesNavKey,
+                    preferredSlot = PreferredSlot.None,
+                    label = R.string.selectTextMode,
+                ),
+            )
+            val menuItems = mapOf(
+                50 to SharedItemsItem,
+                56 to MenuItemPlaceholder,
+                80 to OfflineFilesItem,
+            )
+
+            initUnderTest(menuItems = menuItems, mainNavItems = mainNavItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems.map { it.destination }).containsExactly(
+                    SharedItemsItem.destination,
+                    FavouritesTestNavKey,
+                    OfflineFilesItem.destination,
+                ).inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    private fun createChatItem() = ChatItem(
+        getNumUnreadChatsUseCase = mock { on { invoke() } doReturn emptyFlow() },
+        monitorActiveCallUseCase = mock { on { invoke() } doReturn emptyFlow() },
+    )
 
     private fun createMainNavItems(): Set<MainNavItem> = setOf(
         createMainNavItem(
