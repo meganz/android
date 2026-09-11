@@ -35,15 +35,22 @@ data class AccessibilityCheckReportEntry(
 )
 
 /**
- * Records every accessibility check result delivered by an [AccessibilityValidator] — including
- * suppressed design-owned findings — and serializes each batch to a JSON report file.
+ * Records the accessibility check results delivered by an [AccessibilityValidator] — including
+ * suppressed findings — and serializes each batch to a JSON report file.
+ *
+ * [mode] decides how much of that is recorded: a gate run drops the design-owned findings it is
+ * not answering for, so its reports carry developer-actionable results only. It also decides
+ * what a validator built around this reporter throws on and whether it captures screenshots, so
+ * that the two can never disagree.
  *
  * @param reportName prefix for the generated report file names, typically the test class name
  * @param reportWriter destination for the JSON reports
+ * @property mode the accessibility policy this run applies
  */
 class AccessibilityCheckReporter(
     private val reportName: String = "a11y-check-results",
     private val reportWriter: AccessibilityReportWriter = TestStorageReportWriter(),
+    val mode: AccessibilityRunMode = AccessibilityRunMode.current,
 ) : AccessibilityValidator.CheckResultsListener {
 
     private val recordedEntries = CopyOnWriteArrayList<AccessibilityCheckReportEntry>()
@@ -55,7 +62,9 @@ class AccessibilityCheckReporter(
     val entries: List<AccessibilityCheckReportEntry> get() = recordedEntries.toList()
 
     override fun onResults(callback: CheckResultsCallback) {
-        val batch = callback.accessibilityViewCheckResults.map { it.toReportEntry() }
+        val batch = callback.accessibilityViewCheckResults
+            .map { it.toReportEntry() }
+            .filter { mode.recordsDesignFindings || it.checkName !in designOwnedCheckNames }
         recordedEntries += batch
         val report = JSONObject().apply {
             put("screenshotPath", callback.screenshotPath ?: JSONObject.NULL)

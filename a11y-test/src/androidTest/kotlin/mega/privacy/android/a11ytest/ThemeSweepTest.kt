@@ -1,11 +1,19 @@
 package mega.privacy.android.a11ytest
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
+import com.google.android.apps.common.testing.accessibility.framework.checks.SpeakableTextPresentCheck
 import com.google.android.apps.common.testing.accessibility.framework.checks.TextContrastCheck
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.a11ytest.sweep.setSweepContent
@@ -23,7 +31,9 @@ class ThemeSweepTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporters = ThemeReporters("ThemeSweepTest")
+    // Pinned rather than left to the run's mode: this test asserts what a run covering both
+    // themes measures, so it has to keep asserting it in a light-only gate run.
+    private val reporters = ThemeReporters("ThemeSweepTest", AccessibilityRunMode.GateAndReport)
 
     @Test
     fun test_that_checkInEachTheme_records_the_contrast_violation_belonging_to_each_theme() {
@@ -42,6 +52,30 @@ class ThemeSweepTest {
         assertThat(lightRatios).isNotEmpty()
         assertThat(darkRatios).isNotEmpty()
         assertThat(darkRatios).containsNoneIn(lightRatios)
+    }
+
+    @Test
+    fun test_that_checkInEachTheme_skips_the_dark_pass_in_gate_mode() {
+        val gateReporters = ThemeReporters("ThemeSweepTest-gate", AccessibilityRunMode.Gate)
+        // A gate-category finding, so gate mode records it, baselined so it does not fail this
+        // test. It is theme-independent, so a dark pass would record it a second time.
+        val sweep = composeTestRule.setSweepContent(
+            reporters = gateReporters,
+            baselineSuppressions = matchesCheck(SpeakableTextPresentCheck::class.java),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color.Blue)
+                    .clickable {},
+            )
+        }
+
+        sweep.checkInEachTheme()
+
+        assertThat(gateReporters.entriesIn(SweepTheme.Light).map { it.checkName })
+            .contains(SpeakableTextPresentCheck::class.java.simpleName)
+        assertThat(gateReporters.entriesIn(SweepTheme.Dark)).isEmpty()
     }
 }
 

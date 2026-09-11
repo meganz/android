@@ -18,6 +18,8 @@ dependencies {
     implementation(androidx.compose.ui)
     implementation(lib.mega.core.ui)
     implementation(testlib.test.storage)
+    // The run mode is read from the instrumentation runner arguments.
+    implementation(testlib.test.monitor)
     implementation(google.guava)
 
     androidTestImplementation(androidx.compose.ui)

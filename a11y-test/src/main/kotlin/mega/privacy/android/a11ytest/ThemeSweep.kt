@@ -9,7 +9,8 @@ import com.google.android.apps.common.testing.accessibility.framework.Accessibil
 import org.hamcrest.Matcher
 
 /**
- * The themes every accessibility sweep is run in.
+ * The themes an accessibility sweep can be run in; which of them a given run covers is
+ * [AccessibilityRunMode.themes].
  *
  * Contrast is a function of the pixels the checks measure, so a light-only sweep is blind to
  * every dark-theme text and image contrast finding.
@@ -29,12 +30,22 @@ enum class SweepTheme(val isDark: Boolean) {
  * One [AccessibilityCheckReporter] per [SweepTheme], so the JSON reports a run leaves behind
  * name the theme each finding was measured in and design can act on them without guessing.
  *
+ * A reporter is held for every theme whether or not [mode] sweeps it, so a test can ask for a
+ * theme's findings without first asking whether this run measured them.
+ *
  * @param reportName prefix for the generated report file names, typically the test class name
+ * @property mode the accessibility policy this run applies
  */
-class ThemeReporters(reportName: String) {
+class ThemeReporters(
+    reportName: String,
+    val mode: AccessibilityRunMode = AccessibilityRunMode.current,
+) {
 
     private val reporters = SweepTheme.entries.associateWith { theme ->
-        AccessibilityCheckReporter(reportName = "$reportName-${theme.name.lowercase()}")
+        AccessibilityCheckReporter(
+            reportName = "$reportName-${theme.name.lowercase()}",
+            mode = mode,
+        )
     }
 
     /**
@@ -71,8 +82,10 @@ class ThemedContent internal constructor(
 ) {
 
     /**
-     * Runs [check] against the mounted content once per [SweepTheme], recomposing into each
-     * theme first and recording that theme's results into its own reporter.
+     * Runs [check] against the mounted content once per theme the run's
+     * [AccessibilityRunMode.themes] covers, recomposing into each theme first and recording that
+     * theme's results into its own reporter. A gate run covers light theme alone, so it checks
+     * the mount once.
      *
      * @param check triggers the accessibility checks; defaults to checking the whole root, and
      * is overridden by sweeps whose content renders in its own window.
@@ -82,7 +95,7 @@ class ThemedContent internal constructor(
             onRoot().tryPerformAccessibilityChecks()
         },
     ) {
-        SweepTheme.entries.forEach { theme ->
+        reporters.mode.themes.forEach { theme ->
             recomposeInto(theme)
             composeTestRule.enableAccessibilityChecks(
                 megaAccessibilityValidator(

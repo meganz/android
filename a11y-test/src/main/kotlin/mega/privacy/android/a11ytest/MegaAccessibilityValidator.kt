@@ -1,6 +1,7 @@
 package mega.privacy.android.a11ytest
 
 import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResult
+import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResult.AccessibilityCheckResultType
 import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
 import com.google.android.apps.common.testing.accessibility.framework.checks.ImageContrastCheck
 import com.google.android.apps.common.testing.accessibility.framework.checks.TextContrastCheck
@@ -18,11 +19,14 @@ import org.hamcrest.Matcher
  * suppressed ones included — is forwarded to [reporter] and serialized to a JSON report that
  * can be collected from the host after the run.
  *
+ * [reporter]'s [AccessibilityCheckReporter.mode] decides which half of that policy a run
+ * actually applies, so a validator can never throw on findings its reporter is not recording.
+ *
  * Enable it on a Compose test rule via
  * `composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))` and trigger
  * checks with `onRoot().tryPerformAccessibilityChecks()`.
  *
- * @param reporter receives every check result for reporting; keep a reference to it to assert
+ * @param reporter receives every check result its mode records; keep a reference to it to assert
  * on recorded findings.
  * @param baselineSuppressions optional matcher for known pre-existing findings in components
  * that cannot be fixed in this repository (e.g. the prebuilt core-ui artifact). Matched results
@@ -35,16 +39,26 @@ fun megaAccessibilityValidator(
     reporter: AccessibilityCheckReporter = AccessibilityCheckReporter(),
     baselineSuppressions: Matcher<AccessibilityCheckResult>? = null,
 ): AccessibilityValidator = AccessibilityValidator()
-    .setThrowExceptionForErrors(true)
-    .setCaptureScreenshots(true)
+    // A null type never throws, which is how the report run reaches the end of every sweep.
+    .setThrowExceptionFor(
+        AccessibilityCheckResultType.ERROR.takeIf { reporter.mode.failsOnGateFindings }
+    )
+    .setCaptureScreenshots(reporter.mode.capturesScreenshots)
     .setSuppressingResultMatcher(
         anyOf(
-            listOfNotNull(
-                matchesCheck(TextContrastCheck::class.java),
-                matchesCheck(ImageContrastCheck::class.java),
-                matchesCheck(TextSizeCheck::class.java),
-                baselineSuppressions,
-            )
+            designOwnedChecks.map { matchesCheck(it) } + listOfNotNull(baselineSuppressions)
         )
     )
     .addCheckListener(reporter)
+
+/**
+ * The checks whose findings design owns: all of them measure rendered pixels or type scale, and
+ * none of them is something a feature developer can resolve in a merge request.
+ */
+internal val designOwnedChecks = listOf(
+    TextContrastCheck::class.java,
+    ImageContrastCheck::class.java,
+    TextSizeCheck::class.java,
+)
+
+internal val designOwnedCheckNames = designOwnedChecks.map { it.simpleName }.toSet()

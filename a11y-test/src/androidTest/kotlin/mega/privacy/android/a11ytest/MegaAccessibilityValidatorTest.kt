@@ -22,6 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.apps.common.testing.accessibility.framework.checks.SpeakableTextPresentCheck
 import com.google.android.apps.common.testing.accessibility.framework.checks.TextContrastCheck
 import com.google.android.apps.common.testing.accessibility.framework.integrations.AccessibilityViewCheckException
 import com.google.common.truth.Truth.assertThat
@@ -37,7 +38,9 @@ class MegaAccessibilityValidatorTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter = AccessibilityCheckReporter(reportName = "MegaAccessibilityValidatorTest")
+    // Pinned rather than left to the run's mode: these tests assert the policy of a specific
+    // mode, so they have to keep asserting it in a run that selected another one.
+    private val reporter = reporterFor(AccessibilityRunMode.GateAndReport)
 
     @Before
     fun setUp() {
@@ -148,4 +151,64 @@ class MegaAccessibilityValidatorTest {
         val gateFindings = reporter.entries.filter { it.resultType == "ERROR" }
         assertThat(gateFindings).isEmpty()
     }
+
+    @Test
+    fun test_that_gate_mode_records_no_design_findings_when_text_contrast_is_low() {
+        val gateReporter = enableChecksIn(AccessibilityRunMode.Gate)
+        composeTestRule.setContent {
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(Color(0xFFFAFBFC)),
+                contentAlignment = Alignment.Center,
+            ) {
+                BasicText(
+                    text = "Low contrast text",
+                    style = TextStyle(color = Color(0xFFB0B1B2)),
+                )
+            }
+        }
+
+        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+
+        assertThat(gateReporter.entries.map { it.checkName })
+            .containsNoneIn(designOwnedCheckNames)
+    }
+
+    @Test
+    fun test_that_report_mode_records_but_does_not_throw_when_a_clickable_element_has_no_label() {
+        val reportReporter = enableChecksIn(AccessibilityRunMode.Report)
+        composeTestRule.setContent {
+            Box(
+                modifier = Modifier
+                    .size(200.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(Color.Blue)
+                        .clickable {},
+                )
+            }
+        }
+
+        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+
+        val unlabelledFindings = reportReporter.entries.filter {
+            it.checkName == SpeakableTextPresentCheck::class.java.simpleName &&
+                it.resultType == "ERROR"
+        }
+        assertThat(unlabelledFindings).isNotEmpty()
+    }
+
+    private fun enableChecksIn(mode: AccessibilityRunMode): AccessibilityCheckReporter =
+        reporterFor(mode).also {
+            composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(it))
+        }
 }
+
+private fun reporterFor(mode: AccessibilityRunMode) = AccessibilityCheckReporter(
+    reportName = "MegaAccessibilityValidatorTest-${mode.name}",
+    mode = mode,
+)

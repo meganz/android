@@ -18,9 +18,22 @@ internal const val ACCESSIBILITY_DEVICE_NAME = "ciPixel"
  */
 internal const val ACCESSIBILITY_CHECK_TASK_NAME = "accessibilityCheck"
 
+/**
+ * The Gradle property CI sets to pick between the per-merge-request gate run and the weekly
+ * design report run, and the runner argument it is forwarded to. `AccessibilityRunMode` in
+ * `:a11y-test` reads the argument and holds the accepted values; leaving the property unset runs
+ * both policies at once.
+ */
+internal const val ACCESSIBILITY_RUN_MODE_PROPERTY = "megaAccessibilityRunMode"
+
 internal fun Project.configureAccessibilityTest(commonExtension: CommonExtension) {
+    val runMode = providers.gradleProperty(ACCESSIBILITY_RUN_MODE_PROPERTY)
+
     commonExtension.apply {
         defaultConfig.testInstrumentationRunnerArguments["useTestStorageService"] = "true"
+        runMode.orNull?.let {
+            defaultConfig.testInstrumentationRunnerArguments[ACCESSIBILITY_RUN_MODE_PROPERTY] = it
+        }
 
         testOptions.managedDevices.localDevices.create(ACCESSIBILITY_DEVICE_NAME) {
             device = "Pixel 10"
