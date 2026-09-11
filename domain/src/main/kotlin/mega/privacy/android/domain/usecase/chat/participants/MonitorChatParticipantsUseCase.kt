@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
@@ -71,39 +71,23 @@ class MonitorChatParticipantsUseCase @Inject constructor(
         ).toMutableList()
 
     private suspend fun MutableList<ChatParticipant>.requestParticipantsInfo(): MutableList<ChatParticipant> {
-        filter { !it.isMe }
-        forEach { participant ->
-            apply {
-                val currentItemIndex = indexOfFirst { it.handle == participant.handle }
-                val currentItem = get(currentItemIndex)
-                withContext(defaultDispatcher) {
-                    set(
-                        currentItemIndex,
-                        currentItem.copy(
-                            status = chatParticipantsRepository.getStatus(
-                                currentItem
-                            ),
-                            areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(
-                                currentItem
-                            ),
-                            defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
-                                currentItem
-                            ),
-                            data = currentItem.data.copy(
-                                alias = chatParticipantsRepository.getAlias(
-                                    currentItem
-                                ),
-                                avatarUri = chatParticipantsRepository.getAvatarUri(currentItem)
-                                    ?.toString()
-                            )
-                        )
-                    )
-                }
-            }
-        }
+        // Each participant costs five round trips to the SDK, one of which fetches the avatar
+        // file, so a chat with hundreds of members takes seconds when they are requested in turn.
+        mapAsync { participant -> participant.withRequestedInfo() }
+            .forEachIndexed { index, participant -> set(index, participant) }
 
         return this
     }
+
+    private suspend fun ChatParticipant.withRequestedInfo(): ChatParticipant = copy(
+        status = chatParticipantsRepository.getStatus(this),
+        areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(this),
+        defaultAvatarColor = chatParticipantsRepository.getAvatarColor(this),
+        data = data.copy(
+            alias = chatParticipantsRepository.getAlias(this),
+            avatarUri = chatParticipantsRepository.getAvatarUri(this)?.toString(),
+        ),
+    )
 
     private fun MutableList<ChatParticipant>.monitorChatPresenceLastGreenUpdates(): Flow<MutableList<ChatParticipant>> =
         contactsRepository.monitorChatPresenceLastGreenUpdates()
