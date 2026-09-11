@@ -316,7 +316,7 @@ enum class ApiFeatures(
         experimentName = "btnav",
         description = "Enable customisable bottom navigation",
         singleCheckPerRun = true,
-        defaultValue = false,
+        defaultValue = true,
     ),
 
     /**

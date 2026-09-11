@@ -16,8 +16,10 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
+import mega.privacy.android.app.flags.RemoteFeatureFlagSeeder
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.test.gateway.FakeMegaChatApiGateway
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.preference.SetCustomiseNavigationTooltipShownUseCase
@@ -65,6 +67,9 @@ class ScheduleMeetingTest {
     lateinit var fakeMegaChat: FakeMegaChatApiGateway
 
     @Inject
+    lateinit var flagSeeder: RemoteFeatureFlagSeeder
+
+    @Inject
     lateinit var saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase
 
     @Inject
@@ -92,6 +97,8 @@ class ScheduleMeetingTest {
             targetContext.packageName,
             android.Manifest.permission.POST_NOTIFICATIONS,
         )
+
+        flagSeeder.seed(ApiFeatures.CustomisableBottomNavigation, enabled = false)
 
         TestAppBoot.runCoreInitializers()
 
@@ -143,8 +150,8 @@ class ScheduleMeetingTest {
 
     /**
      * Opens the chat list on the Meetings tab through the production intent seam. With
-     * `CustomisableBottomNavigation` off — its shipped default — the destination hands over to the
-     * legacy chat list, which is the surface carrying the "Schedule meeting" empty-state action.
+     * `CustomisableBottomNavigation` seeded off, the destination hands over to the legacy chat
+     * list, which is the surface carrying the "Schedule meeting" empty-state action.
      */
     private fun openMeetingsTab() {
         val intent = MegaActivity.getIntentWithExtraDestinations(
