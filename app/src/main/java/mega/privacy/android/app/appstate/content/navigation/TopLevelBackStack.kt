@@ -1,11 +1,13 @@
 package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.runtime.setValue
 import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.serialization.NavBackStackSerializer
 import androidx.navigation3.runtime.serialization.NavKeySerializer
@@ -22,6 +24,7 @@ import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 import kotlinx.serialization.serializer
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.state.LocalTopLevelNavKeyClass
 
 @Serializable(with = TopLevelBackStackSerializer::class)
 class TopLevelBackStack<T : NavKey, U : T>(val startKey: U) {
@@ -46,6 +49,14 @@ class TopLevelBackStack<T : NavKey, U : T>(val startKey: U) {
             backStack.addAll(startStack.filterNot { it in currentStack } + currentStack)
         }
     }
+
+    /**
+     * The top-level key whose stack displays [key]. Keys of the start stack are shown beneath
+     * the selected top level's stack, so they belong to [startKey] unless they are also part of
+     * the selected stack.
+     */
+    fun topLevelKeyOf(key: T): U =
+        if (topLevelBackStacks[topLevelKey]?.contains(key) == true) topLevelKey else startKey
 
     fun switchTopLevel(key: U) {
         switchOrCreateStack(key)
@@ -115,6 +126,22 @@ fun rememberTopLevelBackStack(startKey: MainNavItemNavKey): TopLevelBackStack<Na
     )
 }
 
+/**
+ * Provides [LocalTopLevelNavKeyClass] to each entry with the top-level key hosting it, captured
+ * when the entry is built. Providing it around the whole display would change the value for an
+ * entry that is animating out after another top level was selected.
+ */
+fun <T : NavKey> ((T) -> NavEntry<T>).providingTopLevelNavKeyClass(
+    backStack: TopLevelBackStack<T, *>,
+): (T) -> NavEntry<T> = { key ->
+    val entry = this(key)
+    val topLevelNavKeyClass = backStack.topLevelKeyOf(key)::class
+    NavEntry(navEntry = entry) {
+        CompositionLocalProvider(LocalTopLevelNavKeyClass provides topLevelNavKeyClass) {
+            entry.Content()
+        }
+    }
+}
 
 class TopLevelBackStackSerializer<T : NavKey, U : T>(
     private val elementSerializer: KSerializer<T>,
