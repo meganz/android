@@ -3,6 +3,7 @@ package mega.privacy.android.app.consent
 import android.app.Activity
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,10 +22,11 @@ import javax.inject.Inject
 /**
  * Ad consent flow wrapper - Converts the requestConsentInfoUpdate callback to a flow.
  *
- * @property consentInformation
+ * @property consentInformation Resolved lazily because UserMessagingPlatform initialisation is slow and
+ * this wrapper is created during application start on the main thread.
  */
 class AdConsentWrapper @Inject constructor(
-    private val consentInformation: ConsentInformation,
+    private val consentInformation: Lazy<ConsentInformation>,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val appDialogEventQueue: AppDialogsEventQueue,
     private val setGoogleConsentLoadedUseCase: SetGoogleConsentLoadedUseCase,
@@ -39,7 +41,7 @@ class AdConsentWrapper @Inject constructor(
         }
         val params = ConsentRequestParameters.Builder().build()
 
-        consentInformation.requestConsentInfoUpdate(
+        consentInformation.get().requestConsentInfoUpdate(
             activity,
             params,
             { trySend(true) },
@@ -58,7 +60,7 @@ class AdConsentWrapper @Inject constructor(
         coroutineScope.launch {
             runCatching {
                 if (getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)) {
-                    if (consentInformation.canRequestAds()) {
+                    if (consentInformation.get().canRequestAds()) {
                         setGoogleConsentLoadedUseCase(true)
                     } else {
                         appDialogEventQueue.emit(AppDialogEvent(AdConsentDialogNavKey))
