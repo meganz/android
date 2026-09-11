@@ -48,7 +48,7 @@ import mega.privacy.android.feature.pdfviewer.presentation.components.ExternalFi
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfPageIndicator
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfSearchResultsBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerContent
-import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerErrorDialog
+import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerErrorContent
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerPasswordDialog
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerSearchTopBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerTopBar
@@ -68,7 +68,6 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onError Callback when an error occurs
  * @param onSubmitPassword Callback to submit password for encrypted PDF
  * @param onDismissPasswordDialog Callback to dismiss the password dialog
- * @param onDismissErrorDialog Callback when the non-password error dialog is dismissed
  * @param onPasswordInputChanged Callback when the user edits the password input field
  * @param onRetry Callback to retry loading
  * @param onUploadToCloudDrive Callback to upload file to cloud drive
@@ -95,7 +94,6 @@ internal fun PdfViewerScreen(
     onError: (PdfViewerError) -> Unit,
     onSubmitPassword: (String) -> Unit,
     onDismissPasswordDialog: () -> Unit,
-    onDismissErrorDialog: () -> Unit,
     onPasswordInputChanged: () -> Unit,
     onRetry: () -> Unit,
     onUploadToCloudDrive: () -> Unit,
@@ -188,15 +186,17 @@ internal fun PdfViewerScreen(
         }
     }
 
-    // Show loading until the initial page is resolved and remote content downloaded.
-    val showLoading = currentPage == null ||
-            (uiState.source?.isRemote == true && uiState.pdfBytes == null)
+    // The page and bytes check means the data needed to render has not arrived yet. It stays true
+    // when the load fails, so isLoading is what stops the spinner and lets the error state below show.
+    val showLoading = uiState.isLoading &&
+            (currentPage == null || (uiState.source?.isRemote == true && uiState.pdfBytes == null))
 
-    val showFloatingToolbar = !showLoading
+    val isDocumentReady = !uiState.isLoading && uiState.error == null
+
+    val showFloatingToolbar = isDocumentReady
             && !uiState.isExternalFile
             && !searchState.isSearchActive
             && !uiState.isPasswordError
-            && uiState.error == null
             && bottomBarActions.isNotEmpty()
             && uiState.currentNode != null
 
@@ -251,7 +251,7 @@ internal fun PdfViewerScreen(
                             onSearch = onActivateSearch,
                             onOpenNodeOptions = onMoreClicked,
                             showMoreAction = !uiState.isExternalFile,
-                            showActions = !showLoading,
+                            showActions = isDocumentReady,
                             onShare = guardedShare,
                             modifier = Modifier.fillMaxWidth(),
                         )
@@ -306,11 +306,7 @@ internal fun PdfViewerScreen(
                         }
 
                         uiState.error != null && !uiState.isPasswordError -> {
-                            PdfViewerErrorDialog(
-                                error = uiState.error,
-                                isOnline = uiState.isOnline,
-                                onDismiss = onDismissErrorDialog,
-                            )
+                            PdfViewerErrorContent(onRetry = onRetry)
                         }
 
                         // Note: when isPasswordError=true, no branch matches intentionally.

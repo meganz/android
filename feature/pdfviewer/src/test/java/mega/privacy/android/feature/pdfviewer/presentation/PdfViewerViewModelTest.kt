@@ -372,21 +372,6 @@ class PdfViewerViewModelTest {
     }
 
     @Test
-    fun `test that clearError sets error to null`() = runTest {
-        underTest = initViewModel()
-
-        underTest.state.test {
-            awaitItem() // consume initial state
-
-            underTest.onLoadError(PdfViewerError.FileNotFound)
-            assertThat(awaitItem().error).isEqualTo(PdfViewerError.FileNotFound)
-
-            underTest.clearError()
-            assertThat(awaitItem().error).isNull()
-        }
-    }
-
-    @Test
     fun `test that activateSearch sets isSearchActive to true`() = runTest {
         underTest = initViewModel()
 

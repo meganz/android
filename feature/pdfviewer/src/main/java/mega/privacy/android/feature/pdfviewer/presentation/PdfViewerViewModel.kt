@@ -228,6 +228,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                     }
                 }
             }.onFailure { error ->
+                if (error is CancellationException) throw error
                 Timber.e(error, "Exception loading PDF bytes from URL")
                 _state.update {
                     it.copy(
@@ -537,10 +538,6 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         ) {
             loadPdfBytes(args.contentUri)
         }
-    }
-
-    fun clearError() {
-        _state.update { it.copy(error = null) }
     }
 
     fun resetDismissEvent() {

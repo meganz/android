@@ -2675,6 +2675,12 @@
     <string name="pdf_viewer_error_no_network">No network connection. Please reconnect to open the file.</string>
     <!-- PDF viewer error when streaming or downloading the PDF fails -->
     <string name="pdf_viewer_error_streaming">An error occurred while trying to open the file</string>
+    <!-- Title of the error shown in place of the file content when a preview cannot be loaded -->
+    <string name="file_preview_error_title">Can’t preview this file</string>
+    <!-- Description of the error shown in place of the file content when a preview cannot be loaded -->
+    <string name="file_preview_error_description">Something went wrong loading this preview.</string>
+    <!-- Label for a button that retries the action that just failed -->
+    <string name="general_try_again">Try again</string>
     <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_audio">[B]No[/B] [A]audios[/A] [B]found[/B]</string>
     <!-- Title for the open link dialog and bottom sheet action -->

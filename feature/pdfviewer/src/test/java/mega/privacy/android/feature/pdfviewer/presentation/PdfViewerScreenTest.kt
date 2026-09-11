@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -24,7 +25,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_PAGE_INDICATOR_TAG
-import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_ERROR_DIALOG_TAG
+import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_ERROR_CONTENT_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_PASSWORD_DIALOG_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfShareAction
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
@@ -61,7 +62,6 @@ class PdfViewerScreenTest {
     private val onError = mock<(PdfViewerError) -> Unit>()
     private val onSubmitPassword = mock<(String) -> Unit>()
     private val onDismissPasswordDialog = mock<() -> Unit>()
-    private val onDismissErrorDialog = mock<() -> Unit>()
     private val onPasswordInputChanged = mock<() -> Unit>()
     private val onRetry = mock<() -> Unit>()
     private val onUploadToCloudDrive = mock<() -> Unit>()
@@ -81,7 +81,6 @@ class PdfViewerScreenTest {
             onError,
             onSubmitPassword,
             onDismissPasswordDialog,
-            onDismissErrorDialog,
             onPasswordInputChanged,
             onRetry,
             onUploadToCloudDrive,
@@ -115,7 +114,6 @@ class PdfViewerScreenTest {
                 onError = onError,
                 onSubmitPassword = onSubmitPassword,
                 onDismissPasswordDialog = onDismissPasswordDialog,
-                onDismissErrorDialog = onDismissErrorDialog,
                 onPasswordInputChanged = onPasswordInputChanged,
                 onRetry = onRetry,
                 onUploadToCloudDrive = onUploadToCloudDrive,
@@ -145,8 +143,11 @@ class PdfViewerScreenTest {
         totalPages: Int = 0,
         isExternalFile: Boolean = false,
         currentNode: TypedNode? = null,
+        isLoading: Boolean = false,
+        pdfBytes: PdfBytes? = null,
     ) = PdfViewerState(
-        isLoading = false,
+        isLoading = isLoading,
+        pdfBytes = pdfBytes,
         source = source,
         title = title,
         error = error,
@@ -215,7 +216,7 @@ class PdfViewerScreenTest {
     }
 
     @Test
-    fun `test that error dialog is displayed when non-password error`() {
+    fun `test that error content is displayed when non-password error`() {
         setContent(
             defaultState(
                 error = PdfViewerError.FileNotFound,
@@ -223,18 +224,74 @@ class PdfViewerScreenTest {
         )
 
         composeTestRule
-            .onNodeWithTag(PDF_VIEWER_ERROR_DIALOG_TAG, useUnmergedTree = true)
+            .onNodeWithTag(PDF_VIEWER_ERROR_CONTENT_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that onDismissErrorDialog is invoked when ok button is clicked on error dialog`() {
+    fun `test that error content is displayed when remote content fails to load`() {
+        setContent(
+            defaultState(
+                source = PdfViewerSource.CloudNode(
+                    nodeHandle = 12345L,
+                    contentUri = "https://stream.example/test.pdf",
+                    isLocalContent = false,
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                ),
+                error = PdfViewerError.StreamingError(null),
+            )
+        )
+
+        composeTestRule
+            .onNodeWithTag(PDF_VIEWER_ERROR_CONTENT_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the loading indicator is shown while the remote content is loading`() {
+        setContent(
+            defaultState(
+                source = PdfViewerSource.CloudNode(
+                    nodeHandle = 12345L,
+                    contentUri = "https://stream.example/test.pdf",
+                    isLocalContent = false,
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                ),
+            ).copy(isLoading = true)
+        )
+
+        val loadingLabel =
+            composeTestRule.activity.getString(sharedR.string.transfers_fake_preview_text)
+        composeTestRule.onNodeWithContentDescription(loadingLabel).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the loading indicator is not shown when the load is not in flight`() {
+        setContent(
+            // Remote with no bytes yet, so the in-flight load is the only thing left deciding.
+            defaultState(
+                source = PdfViewerSource.CloudNode(
+                    nodeHandle = 12345L,
+                    contentUri = "https://stream.example/test.pdf",
+                    isLocalContent = false,
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                ),
+            )
+        )
+
+        val loadingLabel =
+            composeTestRule.activity.getString(sharedR.string.transfers_fake_preview_text)
+        composeTestRule.onNodeWithContentDescription(loadingLabel).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that onRetry is invoked when try again button is clicked on error content`() {
         setContent(defaultState(error = PdfViewerError.FileNotFound))
 
-        val okLabel = composeTestRule.activity.getString(sharedR.string.general_ok_only)
-        composeTestRule.onNodeWithText(okLabel).performClick()
+        val retryLabel = composeTestRule.activity.getString(sharedR.string.general_try_again)
+        composeTestRule.onNodeWithText(retryLabel).performClick()
 
-        verify(onDismissErrorDialog).invoke()
+        verify(onRetry).invoke()
     }
 
     @Test
@@ -469,6 +526,21 @@ class PdfViewerScreenTest {
         composeTestRule.onNodeWithTag(getLinkAction.testTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(shareAction.testTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(trashAction.testTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed while the document is still rendering`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(
+                currentNode = node,
+                isLoading = true,
+                pdfBytes = PdfBytes(ByteArray(1)),
+            ),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
     }
 
     @Test
