@@ -77,6 +77,20 @@ class RichSpanInputTransformation(
         }
         state.spans = RichSpanAdjuster.adjust(state.spans, edits, state.typingStyles)
         state.editCount++
+        // An IME Enter arriving as a multi-change edit (commit word + newline) slips past the
+        // single-change intercept above. Only newlines INSERTED BY THIS EDIT are handed to
+        // the split path (paragraphs can hold legitimate soft-break newlines from the file).
+        if (onSplit != null) {
+            for (i in 0 until changes.changeCount) {
+                val range = changes.getRange(i)
+                val inserted = asCharSequence().subSequence(range.min, range.max)
+                val newline = inserted.indexOf('\n')
+                if (newline >= 0) {
+                    onSplit.invoke(range.min + newline, range.min + newline + 1)
+                    break
+                }
+            }
+        }
     }
 }
 

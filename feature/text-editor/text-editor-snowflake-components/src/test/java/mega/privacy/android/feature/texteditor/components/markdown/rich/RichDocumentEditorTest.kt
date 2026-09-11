@@ -138,6 +138,34 @@ class RichDocumentEditorTest {
     }
 
     @Test
+    fun `test that toolbar list toggle on a heading keeps the field focused`() {
+        setEditor(RichDocument(listOf(RichBlock.Heading(2, RichText("title")))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).requestFocus()
+        composeRule.waitForIdle()
+
+        state.toggleFocusedListItem(ordered = false)
+        composeRule.waitForIdle()
+
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Item(ordered = false, indent = 0, checked = null))
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsFocused()
+    }
+
+    @Test
+    fun `test that heading cycle keeps the field focused across the node recreation`() {
+        setEditor(RichDocument(listOf(RichBlock.Paragraph(RichText("title")))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).requestFocus()
+        composeRule.waitForIdle()
+
+        state.cycleFocusedHeading()
+        composeRule.waitForIdle()
+
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Heading(1))
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsFocused()
+    }
+
+    @Test
     fun `test that blocks are directly editable without any reveal tap`() {
         setEditor(
             RichDocument(

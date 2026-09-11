@@ -734,9 +734,18 @@ class RichDocumentState(document: RichDocument) {
         }
     }
 
+    /**
+     * A kind change can recreate the field node (text style changes re-key it); this puts
+     * focus and the caret back where they were.
+     */
+    private fun restoreFocusAfterRetype() {
+        val index = focusedIndex ?: return
+        val block = focusedTextBlock ?: return
+        pendingFocus = RichFocusRequest(index, block.text.textFieldState.selection)
+    }
+
     /** Toolbar heading action on the focused block: body -> H1 -> H2 -> H3 -> body. */
     fun cycleFocusedHeading() {
-        val index = focusedIndex ?: return
         val block = focusedTextBlock ?: return
         recordUndo()
         block.kind = when (val kind = block.kind) {
@@ -749,8 +758,7 @@ class RichDocumentState(document: RichDocument) {
 
             else -> RichBlockKind.Heading(1)
         }
-        // The style change recreates the field node; this puts focus and caret back on it.
-        pendingFocus = RichFocusRequest(index, block.text.textFieldState.selection)
+        restoreFocusAfterRetype()
     }
 
     /**
@@ -769,6 +777,7 @@ class RichDocumentState(document: RichDocument) {
             kind is RichBlockKind.Item -> kind.copy(ordered = ordered, checked = null)
             else -> RichBlockKind.Item(ordered = ordered, indent = 0, checked = null)
         }
+        restoreFocusAfterRetype()
     }
 
     /** Toolbar checklist action: toggles the focused block's task box (unchecked when added). */
@@ -781,6 +790,7 @@ class RichDocumentState(document: RichDocument) {
             kind is RichBlockKind.Item -> kind.copy(checked = false)
             else -> RichBlockKind.Item(ordered = false, indent = 0, checked = false)
         }
+        restoreFocusAfterRetype()
     }
 
     /** Toolbar quote action: toggles the focused block between quote and paragraph. */
@@ -791,6 +801,7 @@ class RichDocumentState(document: RichDocument) {
             is RichBlockKind.Quote -> RichBlockKind.Paragraph
             else -> RichBlockKind.Quote(1)
         }
+        restoreFocusAfterRetype()
     }
 
     /** One structure level less, or null when [kind] has no structure to shed. */

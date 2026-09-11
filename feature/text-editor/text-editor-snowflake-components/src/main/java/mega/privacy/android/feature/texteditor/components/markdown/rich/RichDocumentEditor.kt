@@ -398,8 +398,11 @@ private fun RichDocumentBlocks(
                     ) {
                         val lastText = state.blocks.indexOfLast { it is RichTextBlockEditState }
                         if (lastText >= 0) {
-                            runCatching { focusRequesters[lastText]?.requestFocus() }
-                                .onFailure { Timber.w(it, "Tail focus request failed") }
+                            // Through pendingFocus so the caret predictably lands at the END
+                            // of the last block, not wherever it last was.
+                            val length = state.blockTextLength(lastText) ?: 0
+                            state.pendingFocus =
+                                RichFocusRequest(lastText, TextRange(length))
                         }
                     }
                     .testTag(RICH_DOCUMENT_TAIL_TAP_TAG),
