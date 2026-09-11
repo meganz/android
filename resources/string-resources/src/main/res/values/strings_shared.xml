@@ -1026,6 +1026,41 @@
     <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
+
+    <!-- Sync exclusions Add form: line under the tabs before a type is picked, telling the user what the screen is for. -->
+    <string name="sync_exclusions_add_description_initial">Choose what to leave out of this sync</string>
+    <!-- Sync exclusions Add form: line under the tabs once the Files type is picked, describing what the rule will do. -->
+    <string name="sync_exclusions_add_description_files">Files that match this name aren’t synced</string>
+    <!-- Sync exclusions Add form: line under the tabs once the Folders type is picked, describing what the rule will do. -->
+    <string name="sync_exclusions_add_description_folders">Folders that match this name aren’t synced</string>
+    <!-- Sync exclusions Add form: line under the tabs once the Files and folders type is picked, describing what the rule will do. -->
+    <string name="sync_exclusions_add_description_files_and_folders">Files and folders that match this name aren’t synced</string>
+    <!-- Sync exclusions Add form: the node type a rule applies to. Labels the chip that opens the picker and titles the picker itself. -->
+    <string name="sync_exclusions_add_type">Type</string>
+    <!-- Sync exclusions Add form: how a name is matched. Labels the chip that opens the picker and titles the picker itself. -->
+    <string name="sync_exclusions_add_condition">Condition</string>
+    <!-- Sync exclusions Add form: Type picker entry, a rule applying to files only. -->
+    <string name="sync_exclusions_add_type_files">Files</string>
+    <!-- Sync exclusions Add form: Type picker entry, a rule applying to folders only. -->
+    <string name="sync_exclusions_add_type_folders">Folders</string>
+    <!-- Sync exclusions Add form: Type picker entry, a rule applying to both files and folders. -->
+    <string name="sync_exclusions_add_type_files_and_folders">Files and folders</string>
+    <!-- Sync exclusions Add form: Type picker entry, switching the form over to entering file extensions. -->
+    <string name="sync_exclusions_add_type_extensions">Extensions</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names that start with the typed text. -->
+    <string name="sync_exclusions_add_condition_beginning_with">Beginning with</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names that contain the typed text anywhere. -->
+    <string name="sync_exclusions_add_condition_containing">Containing</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names that end with the typed text. -->
+    <string name="sync_exclusions_add_condition_ending_with">Ending with</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names identical to the typed text. -->
+    <string name="sync_exclusions_add_condition_matching_exactly">Matching exactly</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names against a pattern containing wildcard characters. -->
+    <string name="sync_exclusions_add_condition_matching_wildcard">Matching wildcard</string>
+    <!-- Sync exclusions Add form: helper line under the name field explaining the two wildcard characters. Keep the asterisk and the question mark exactly as they are, they are typed by the user. -->
+    <string name="sync_exclusions_add_name_wildcard_helper">Use “*” for any characters and “?” for one character</string>
+    <!-- Sync exclusions Add form: error under the name field when an existing rule already excludes the typed name. -->
+    <string name="sync_exclusions_add_name_duplicate_error">You’ve already excluded this name</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">This could be due to the following reasons:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
