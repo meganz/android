@@ -38,6 +38,7 @@ import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorato
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.TopLevelBackStackNavigationHandler
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
+import mega.privacy.android.app.appstate.content.navigation.providingTopLevelNavKeyClass
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
@@ -46,7 +47,6 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.shared.LocalSharedViewModelStoreOwner
 import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.navigation.contract.state.LocalSelectionModeController
-import mega.privacy.android.navigation.contract.state.LocalTopLevelNavKeyClass
 import mega.privacy.android.navigation.contract.state.SelectionModeController
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.CustomiseNavigationNavKey
@@ -155,7 +155,6 @@ fun HomeScreens(
                             CompositionLocalProvider(
                                 LocalSelectionModeController provides selectionModeController,
                                 LocalSharedViewModelStoreOwner provides homeScreensOwner,
-                                LocalTopLevelNavKeyClass provides homeScreenStacks.topLevelKey::class,
                             ) {
                                 NavDisplay(
                                     modifier = Modifier
@@ -183,7 +182,7 @@ fun HomeScreens(
                                                 transferHandler
                                             )
                                         }
-                                    },
+                                    }.providingTopLevelNavKeyClass(homeScreenStacks),
                                     transitionSpec = { fadeTransition },
                                     popTransitionSpec = { fadeTransition },
                                     predictivePopTransitionSpec = { fadeTransition }

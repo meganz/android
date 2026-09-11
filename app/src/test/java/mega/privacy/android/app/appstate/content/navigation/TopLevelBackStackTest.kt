@@ -396,4 +396,51 @@ class TopLevelBackStackTest {
         assertThat(underTest.topLevelBackStacks[TopLevelKey1]).containsExactly(TopLevelKey1, Destination2)
         assertThat(underTest.topLevelBackStacks[TopLevelKey2]).containsExactly(TopLevelKey2)
     }
+
+    @Test
+    fun `test that topLevelKeyOf returns startKey for the start key while another top level is selected`() {
+        underTest.switchTopLevel(TopLevelKey1)
+
+        assertThat(underTest.topLevelKeyOf(StartKey)).isEqualTo(StartKey)
+    }
+
+    @Test
+    fun `test that topLevelKeyOf returns the selected top level key for its own key`() {
+        underTest.switchTopLevel(TopLevelKey1)
+
+        assertThat(underTest.topLevelKeyOf(TopLevelKey1)).isEqualTo(TopLevelKey1)
+    }
+
+    @Test
+    fun `test that topLevelKeyOf returns the selected top level key for a destination pushed on its stack`() {
+        underTest.switchTopLevel(TopLevelKey1)
+        underTest.add(Destination1)
+
+        assertThat(underTest.topLevelKeyOf(Destination1)).isEqualTo(TopLevelKey1)
+    }
+
+    @Test
+    fun `test that topLevelKeyOf returns startKey for a destination pushed on the start stack while another top level is selected`() {
+        underTest.add(Destination1)
+        underTest.switchTopLevel(TopLevelKey1)
+
+        assertThat(underTest.topLevelKeyOf(Destination1)).isEqualTo(StartKey)
+    }
+
+    @Test
+    fun `test that topLevelKeyOf returns the hosting top level key for a top level key pushed on another stack`() {
+        underTest.switchTopLevel(TopLevelKey1)
+        underTest.add(TopLevelKey2)
+
+        assertThat(underTest.topLevelKeyOf(TopLevelKey2)).isEqualTo(TopLevelKey1)
+    }
+
+    @Test
+    fun `test that topLevelKeyOf returns the key itself when a pushed top level key becomes selected`() {
+        underTest.switchTopLevel(TopLevelKey1)
+        underTest.add(TopLevelKey2)
+        underTest.switchTopLevel(TopLevelKey2)
+
+        assertThat(underTest.topLevelKeyOf(TopLevelKey2)).isEqualTo(TopLevelKey2)
+    }
 }
