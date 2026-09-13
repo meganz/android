@@ -7,6 +7,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.test.weblate.WeblateSnackbarScreenshot
 import mega.privacy.android.icon.pack.R as iconPackR
+import java.util.TimeZone
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -93,6 +94,13 @@ class ShareLinkSnackbarScreenshotTest {
     }
 
     private companion object {
+        // The screen formats modificationTime as a wall-clock date in the JVM's default timezone,
+        // so without pinning it the goldens only match on the machine that recorded them.
+        // ExpiryDateTest pins the zone the same way.
+        init {
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+        }
+
         // hasNewLinks stays false so the screen's copy-on-open effect does not reach for the
         // clipboard during a render.
         val singleNode = ShareLinkUiState.Data(
