@@ -1,11 +1,17 @@
 package mega.privacy.android.app.mediaplayer.service
 
 import android.app.ActivityManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.Bundle
 import androidx.annotation.OptIn
+import androidx.annotation.VisibleForTesting
+import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -35,6 +41,8 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -46,6 +54,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueue
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
@@ -56,6 +65,7 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
@@ -90,8 +100,6 @@ import mega.privacy.android.feature.mediaplayer.data.mapper.ExoPlayerRepeatModeM
 import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerScreenNavKey
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Audio player service using [MediaSessionService] (Media3-recommended approach).
@@ -548,13 +556,19 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
             } else {
                 forceSaveCurrentPlaybackInfo()
-                // Remove the foreground lock so the notification can be swiped away when
-                // the player is paused. MediaSessionService will re-enter foreground
-                // automatically if playback resumes.
-                ServiceCompat.stopForeground(
-                    this@AudioPlayerService,
-                    ServiceCompat.STOP_FOREGROUND_DETACH
-                )
+                // Remove the foreground lock so the notification can be swiped away when the
+                // player is paused. Only on a real pause: isPlaying also drops while audio focus
+                // is suppressed (a phone call) or the player rebuffers, with playWhenReady still
+                // true. Media3 keeps the service in the foreground for those and only re-promotes
+                // on playback-state / playWhenReady changes, so detaching here would leave a
+                // player that resumes after the call running as a background service, which the
+                // system stops shortly after.
+                if (player?.playWhenReady == false) {
+                    ServiceCompat.stopForeground(
+                        this@AudioPlayerService,
+                        ServiceCompat.STOP_FOREGROUND_DETACH
+                    )
+                }
             }
         }
 
@@ -568,7 +582,6 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT,
                 Player.DISCONTINUITY_REASON_AUTO_TRANSITION,
                 Player.DISCONTINUITY_REASON_SKIP,
-                Player.DISCONTINUITY_REASON_REMOVE,
                     -> if (oldPosition.mediaItemIndex == newPosition.mediaItemIndex) {
                     // A seek, or a repeat-one loop. A loop restarts near zero, which the persist
                     // use case discards as below the minimum playback threshold: the user is
@@ -578,6 +591,11 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 } else {
                     saveLeftItemPlaybackInfo(oldPosition)
                 }
+
+                // Media3 only reports REMOVE when the playing item itself left the timeline, so
+                // the item being left is always the old one even when the successor inherits its
+                // index (e.g. both at 0). Comparing indices here would misfile that as a seek.
+                Player.DISCONTINUITY_REASON_REMOVE -> saveLeftItemPlaybackInfo(oldPosition)
 
                 else -> {}
             }
@@ -731,24 +749,34 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             }
         }
         super.onStartCommand(intent, flags, startId)
-        val safeIntent = intent ?: return START_STICKY
+        // A null intent is the system re-creating a sticky service after its process died. The
+        // queue and position live only in memory, so the restarted service has nothing to play:
+        // stop it instead of leaving an idle player (and its activation analytics) behind.
+        val safeIntent = intent ?: run {
+            stopUnstartedService(startId)
+            return START_NOT_STICKY
+        }
         // stopPlayerAndSelf() releases the session before onDestroy() runs; a start intent
         // landing in that teardown window would drive playback on a service with no session
         // (onGetSession returns null, no controller can connect, no notification) and leave the
         // startForegroundService contract unmet -> FGS timeout crash. Reject it; the service is
         // about to die and a fresh launch will recreate it.
         if (mediaSession == null) {
-            // stopSelf, not a bare return: a startForegroundService() call carries a promote-to-
-            // foreground obligation, and simply returning would leave the (re-started) service
-            // owing a startForeground() it can never make -> FGS timeout crash. Stopping this
-            // startId discharges the obligation via the "service stopped in time" exemption.
-            stopSelf(startId)
+            stopUnstartedService(startId)
             return START_NOT_STICKY
         }
+        // Every start intent arrives through startForegroundService() and must be answered by
+        // startForeground(), which Media3 only issues once playback actually starts. An intent
+        // that does not start anything on a player with nothing loaded can never meet that
+        // contract, so discharge it explicitly (see stopUnstartedService).
         if (!safeIntent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
-            return START_STICKY
+            if (player?.mediaItemCount == 0) stopUnstartedService(startId)
+            return START_NOT_STICKY
         }
-        val params = AudioPlayQueueParams.from(safeIntent) ?: return START_STICKY
+        val params = AudioPlayQueueParams.from(safeIntent) ?: run {
+            if (player?.mediaItemCount == 0) stopUnstartedService(startId)
+            return START_NOT_STICKY
+        }
         // Accumulate the needStopHttpServer flag from intents across play queue rebuilds.
         needStopStreamingServer = needStopStreamingServer || params.needStopHttpServer
         // Relaunching into the queue the player already holds must not rebuild it: a rebuild
@@ -759,7 +787,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         ) {
             lastPlayQueueParams = params
             MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
-            return START_STICKY
+            return START_NOT_STICKY
         }
         lastPlayQueueParams = params
         rebuildPlayQueue(params)
@@ -777,7 +805,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 }
             }
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     private fun buildCurrentPlaybackInfo(exoPlayer: ExoPlayer): MediaPlaybackInfo {
@@ -888,6 +916,12 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         // timeline that seek could target a stale index (IllegalSeekPositionException).
         absorbJob?.cancel()
         playbackRetryCount = 0
+        // A fresh launch is a deliberate play request, like pressing play while over quota
+        // (handlePlayRequestedWhileOverQuota): the stream is requested again and the SDK raises
+        // the warning again if the quota window is still open. Skipping prepare() here instead
+        // would leave the just-started service idle and in the background, so the
+        // startForegroundService() contract behind this launch would never be met.
+        isTransferOverQuota = false
         playQueueBuildJob = lifecycleScope.launch {
             // Starting new playback invalidates any terminal error the screen never showed.
             audioPlayerErrorEventQueue.clear()
@@ -938,6 +972,11 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                             .getOrDefault(true),
                     )
                 )
+                // Nothing will ever start on this player, so Media3 never calls startForeground()
+                // and the startForegroundService() behind this launch would time out. The screen
+                // has no active session to lose, so it keeps showing the error above.
+                startPlaceholderForeground()
+                stopPlayerAndSelf()
             }
         }
     }
@@ -1154,6 +1193,51 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         stopSelf()
     }
 
+    /**
+     * Stops a service that was started with startForegroundService() but will never start
+     * playback. Stopping alone is not enough: the system treats a service that is brought down
+     * while still owing its startForeground() as a contract violation and crashes the process
+     * with ForegroundServiceDidNotStartInTimeException, exactly as if it had timed out. Entering
+     * the foreground with a placeholder notification first settles the request; the notification
+     * is removed again in the same call.
+     */
+    private fun stopUnstartedService(startId: Int) {
+        startPlaceholderForeground()
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        stopSelf(startId)
+    }
+
+    /**
+     * Answers a pending startForegroundService() request on a player that Media3 will not promote
+     * itself (nothing is going to play). Uses the audio player channel with a bare notification;
+     * callers stop the service, or remove the notification, straight after.
+     */
+    private fun startPlaceholderForeground() {
+        runCatching {
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(
+                NotificationChannel(
+                    NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID,
+                    getString(R.string.audio_player_notification_channel_name),
+                    NotificationManager.IMPORTANCE_LOW,
+                )
+            )
+            val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID)
+                .setSmallIcon(R.drawable.ic_mega_logo)
+                .build()
+            ServiceCompat.startForeground(
+                this,
+                PLACEHOLDER_NOTIFICATION_ID,
+                notification,
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                } else {
+                    0
+                },
+            )
+        }.onFailure { Timber.e(it, "Failed to enter the foreground for an unstarted audio service") }
+    }
+
     override fun onDestroy() {
         isRunning = false
         forceSaveCurrentPlaybackInfo()
@@ -1190,9 +1274,12 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
          */
         @Volatile
         var isRunning = false
-            private set
+            @VisibleForTesting internal set
 
         private const val MAX_PLAYBACK_RETRIES = 6
+
+        /** Distinct from Media3's own notification id so the two never overwrite each other. */
+        private const val PLACEHOLDER_NOTIFICATION_ID = 1002
         private val PLAYBACK_RETRY_BACKOFF = 500.milliseconds
 
         private const val HTTP_TIMEOUT_MS = 5_000
@@ -1244,20 +1331,23 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
          * guard.
          */
         fun start(context: Context, intent: Intent) {
+            val wasRunning = isRunning
             isRunning = true
-            ContextCompat.startForegroundService(context, intent)
+            try {
+                ContextCompat.startForegroundService(context, intent)
+            } catch (e: Exception) {
+                // Nothing was started: leave the flag as it was, or every later stop / pause /
+                // resume command would be sent to a service that does not exist.
+                isRunning = wasRunning
+                throw e
+            }
         }
 
         fun stopAudioPlayer(context: Context) {
-            // The stop command is delivered via startService: without this guard it would
-            // first start a service that is not running just to stop it (spurious onCreate,
-            // analytics event, player construction).
-            if (!isRunning) return
-            context.startService(
-                Intent(context, AudioPlayerService::class.java).apply {
-                    action = ACTION_STOP
-                }
-            )
+            // Delivered via startService like the other commands: the isRunning guard inside
+            // sendCommand keeps it from starting a service that is not running just to stop it
+            // (spurious onCreate, analytics event, player construction).
+            sendCommand(context, ACTION_STOP)
         }
 
         /**
@@ -1280,7 +1370,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         private fun sendCommand(context: Context, action: String) {
             if (!isRunning) return
             // startService can throw when the app is backgrounded without an active foreground
-            // service; a lost pause/resume for a player that is not audibly playing is harmless.
+            // service; a lost command for a player that is not audibly playing is harmless.
             runCatching {
                 context.startService(
                     Intent(context, AudioPlayerService::class.java).apply {
