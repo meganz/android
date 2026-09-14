@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.signin.external.data.mapper.login
 
 import com.google.common.truth.Truth.assertThat
+import dagger.Lazy
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -10,7 +11,7 @@ import java.util.Base64
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GoogleIdTokenMapperTest {
 
-    private val underTest = GoogleIdTokenMapper(json = Json { ignoreUnknownKeys = true })
+    private val underTest = GoogleIdTokenMapper(json = Lazy { Json { ignoreUnknownKeys = true } })
 
     private fun buildToken(payloadJson: String): String {
         val payload = Base64.getUrlEncoder().withoutPadding()

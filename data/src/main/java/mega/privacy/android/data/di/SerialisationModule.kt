@@ -9,6 +9,7 @@ import kotlinx.serialization.modules.plus
 import mega.privacy.android.data.database.entity.chat.serialisation.messageInfoSerialisationModule
 import mega.privacy.android.domain.entity.chat.messages.serialisation.typedMessageSerialisationModule
 import mega.privacy.android.domain.entity.node.serialisation.nodeSerialisationModule
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -26,6 +27,7 @@ internal abstract class SerialisationModule {
          * @return the kotlin serialisation Json class
          */
         @Provides
+        @Singleton
         fun provideJson(): Json {
             return Json {
                 ignoreUnknownKeys = true

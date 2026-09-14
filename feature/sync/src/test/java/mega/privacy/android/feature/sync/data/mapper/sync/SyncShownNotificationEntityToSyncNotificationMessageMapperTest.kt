@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.data.mapper.sync
 
 import com.google.common.truth.Truth.assertThat
+import dagger.Lazy
 import kotlinx.serialization.json.Json
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.feature.sync.data.mapper.notification.GenericErrorToNotificationMessageMapper
@@ -29,7 +30,7 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
     private val underTest = SyncShownNotificationEntityToSyncNotificationMessageMapper(
         genericErrorToNotificationMessageMapper,
         stalledIssuesToNotificationMessageMapper,
-        json
+        Lazy { json }
     )
 
     @AfterEach

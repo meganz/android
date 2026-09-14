@@ -606,13 +606,15 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     /**
-     * Callers such as GroupChatInfoActivity read the value straight back through
-     * [findNonContactByHandle], so the write has to complete before returning. A failure only
-     * costs a cache entry the SDK can re-fetch, so it must not reach the caller.
+     * A cache write must not block the caller: GroupChatInfoActivity writes once per participant.
+     * Readers fall through to the MEGAchat cache the value came from, so a pending write is
+     * invisible to them.
      */
     private fun persistNonContact(field: String, write: suspend () -> Unit) {
-        runCatching { runBlocking { write() } }
-            .onFailure { Timber.e(it, "Failed to persist the non-contact %s", field) }
+        applicationScope.launch {
+            runCatching { write() }
+                .onFailure { Timber.e(it, "Failed to persist the non-contact %s", field) }
+        }
     }
 
     override fun findNonContactByHandle(handle: Long): NonContactInfo? =

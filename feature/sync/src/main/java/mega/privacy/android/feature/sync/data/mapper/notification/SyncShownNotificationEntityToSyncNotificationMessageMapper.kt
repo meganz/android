@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.data.mapper.notification
 
+import dagger.Lazy
 import kotlinx.serialization.json.Json
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
@@ -10,12 +11,12 @@ import javax.inject.Inject
 internal class SyncShownNotificationEntityToSyncNotificationMessageMapper @Inject constructor(
     private val genericErrorToNotificationMessageMapper: GenericErrorToNotificationMessageMapper,
     private val stalledIssueToNotificationMessageMapper: StalledIssuesToNotificationMessageMapper,
-    private val json: Json,
+    private val json: Lazy<Json>,
 ) {
 
     operator fun invoke(dbEntity: SyncShownNotificationEntity): SyncNotificationMessage {
         val notificationDetails = dbEntity.otherIdentifiers?.let {
-            json.decodeFromString<NotificationDetails>(it)
+            json.get().decodeFromString<NotificationDetails>(it)
         }
 
         return when (dbEntity.notificationType) {
@@ -53,11 +54,11 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapper @Injec
             SyncNotificationType.STALLED_ISSUE,
             SyncNotificationType.ERROR,
                 -> {
-                json.encodeToString(domainModel.notificationDetails)
+                json.get().encodeToString(domainModel.notificationDetails)
             }
 
             SyncNotificationType.CROSS_DEVICE_CONFLICT -> {
-                json.encodeToString(domainModel.notificationDetails)
+                json.get().encodeToString(domainModel.notificationDetails)
             }
 
             else -> null

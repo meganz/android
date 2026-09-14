@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.signin.external.data.mapper.login
 
+import dagger.Lazy
 import java.util.Base64
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -14,7 +15,7 @@ import javax.inject.Inject
  * No signature verification — Play Services already verified the token.
  */
 internal class GoogleIdTokenMapper @Inject constructor(
-    private val json: Json,
+    private val json: Lazy<Json>,
 ) {
 
     @Serializable
@@ -37,7 +38,7 @@ internal class GoogleIdTokenMapper @Inject constructor(
         require(parts.size == 3) { "Malformed JWT: expected 3 parts, got ${parts.size}" }
 
         val payloadJson = String(Base64.getUrlDecoder().decode(parts[1]))
-        val payload = json.decodeFromString<Payload>(payloadJson)
+        val payload = json.get().decodeFromString<Payload>(payloadJson)
 
         val email = requireNotNull(payload.email?.takeIf { it.isNotEmpty() }) {
             "Missing required field: email"
