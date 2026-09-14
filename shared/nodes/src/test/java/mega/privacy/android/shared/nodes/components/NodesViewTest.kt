@@ -1,11 +1,16 @@
 package mega.privacy.android.shared.nodes.components
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -101,5 +106,50 @@ class NodesViewTest {
         setContent(NodeSelectionState())
 
         rows().assertCountEquals(0)
+    }
+
+    private fun setHighlightedContent(
+        isListView: Boolean,
+        listState: LazyListState,
+        gridState: LazyGridState,
+    ) {
+        val manyItems = (1L..60L).map { previewFolderNodeUiItem(id = it) }
+            .mapIndexed { index, item -> if (index == 50) item.copy(isHighlighted = true) else item }
+        composeTestRule.setContent {
+            NodesView(
+                modifier = Modifier.fillMaxSize(),
+                items = manyItems,
+                onMenuClicked = {},
+                onItemClicked = {},
+                onLongClicked = {},
+                sortConfiguration = NodeSortConfiguration.default,
+                isListView = isListView,
+                onSortOrderClick = {},
+                onChangeViewTypeClicked = {},
+                nodeSelectionState = NodeSelectionState(),
+                listState = listState,
+                gridState = gridState,
+            )
+        }
+    }
+
+    @Test
+    fun `test that NodesView scrolls the list to the highlighted item`() {
+        val listState = LazyListState()
+        setHighlightedContent(isListView = true, listState = listState, gridState = LazyGridState())
+
+        composeTestRule.waitForIdle()
+
+        assertThat(listState.firstVisibleItemIndex).isGreaterThan(0)
+    }
+
+    @Test
+    fun `test that NodesView scrolls the grid to the highlighted item`() {
+        val gridState = LazyGridState()
+        setHighlightedContent(isListView = false, listState = LazyListState(), gridState = gridState)
+
+        composeTestRule.waitForIdle()
+
+        assertThat(gridState.firstVisibleItemIndex).isGreaterThan(0)
     }
 }

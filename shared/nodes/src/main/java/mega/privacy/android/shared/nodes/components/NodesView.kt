@@ -220,12 +220,20 @@ fun <T : TypedNode> NodesView(
             .takeIf { items.indices.contains(it) }
     }
 
-    LaunchedEffect(highlightedIndex) {
+    LaunchedEffect(highlightedIndex, isListView) {
         highlightedIndex?.let {
-            listState.animateScrollToItem(
-                index = highlightedIndex.plus(2).coerceAtMost(items.lastIndex),
-                scrollOffset = -(listState.layoutInfo.viewportSize.height / 2)
-            )
+            val index = highlightedIndex.plus(2).coerceAtMost(items.lastIndex)
+            if (isListView) {
+                listState.animateScrollToItem(
+                    index = index,
+                    scrollOffset = -(listState.layoutInfo.viewportSize.height / 2)
+                )
+            } else {
+                gridState.animateScrollToItem(
+                    index = index,
+                    scrollOffset = -(gridState.layoutInfo.viewportSize.height / 2)
+                )
+            }
         }
     }
 

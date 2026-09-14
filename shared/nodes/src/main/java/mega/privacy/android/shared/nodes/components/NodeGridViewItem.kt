@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -39,7 +40,7 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.model.HighlightedText
-import mega.android.core.ui.modifiers.itemContainerStyle
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -102,12 +103,17 @@ fun NodeGridViewItem(
         modifier = modifier
             .fillMaxWidth()
             .selectionSemantics(isInSelectionMode, isSelected)
-            .itemContainerStyle(
-                enabled = enabled && !isSensitive,
-                selected = isSelected,
-                highlighted = isHighlighted
-            )
             .clip(DSTokens.shapes.extraSmall)
+            .conditional(!enabled || isSensitive) {
+                Modifier.alpha(0.5f)
+            }
+            .conditional(isSelected || isHighlighted) {
+                Modifier.background(
+                    color =
+                        if (isSelected) DSTokens.colors.background.surface1
+                        else DSTokens.colors.background.surface3 // Custom logic for grid to avoid blending with thumb background color
+                )
+            }
             .combinedClickable(
                 onClick = { onClick() },
                 onLongClick = onLongClick,
