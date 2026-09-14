@@ -23,12 +23,15 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
+import mega.privacy.android.feature.mediaplayer.presentation.model.PlayingFromSection
 import timber.log.Timber
 
 /**
@@ -46,7 +49,15 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val monitorAudioContinuousPlaybackEnabledUseCase: MonitorAudioContinuousPlaybackEnabledUseCase,
     private val setAudioContinuousPlaybackEnabledUseCase: SetAudioContinuousPlaybackEnabledUseCase,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
 ) : ViewModel() {
+
+    /** Where the queue is playing from: a named folder, or a root section the UI localizes. */
+    private data class PlayingFrom(
+        val name: String? = null,
+        val section: PlayingFromSection? = null,
+    )
 
     /**
      * Triggered when starting a queue item was refused because a MEGA call is ongoing; carried
@@ -60,29 +71,28 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
     }
 
     val uiState: StateFlow<AudioPlayerQueueUiState> by lazy(LazyThreadSafetyMode.NONE) {
-        val playingFromNameFlow = gateway.playerState
+        val playingFromFlow = gateway.playerState
             .map { it.currentMediaItemHandle }
             .distinctUntilChanged()
             .flatMapLatest { handle ->
                 if (handle == null) {
-                    flowOf<String?>(null)
+                    flowOf(PlayingFrom())
                 } else {
                     flow {
-                        emit(null)
+                        emit(PlayingFrom())
                         emit(
-                            runCatching {
-                                val node = getNodeByHandleUseCase(handle) ?: return@runCatching null
-                                getNodeByHandleUseCase(node.parentId.longValue)?.name
-                            }.onFailure {
-                                Timber.w(it, "Failed to fetch parent name for handle=$handle")
-                            }.getOrNull()
+                            runCatching { resolvePlayingFrom(handle) }
+                                .onFailure {
+                                    Timber.w(it, "Failed to fetch parent name for handle=$handle")
+                                }
+                                .getOrDefault(PlayingFrom())
                         )
                     }
                 }
             }
             .catch {
                 Timber.e(it, "Failed to fetch playing-from name")
-                emit(null)
+                emit(PlayingFrom())
             }
 
         val continuousPlaybackFlow = monitorAudioContinuousPlaybackEnabledUseCase()
@@ -94,11 +104,11 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
         combine(
             gateway.playerState
                 .catch { Timber.e(it, "Failed to collect player state in queue ViewModel") },
-            playingFromNameFlow,
+            playingFromFlow,
             continuousPlaybackFlow,
             controlBlockedByCallChannel.receiveAsFlow()
                 .onStart { emit(consumed) },
-        ) { state, playingFromName, continuousPlaybackEnabled, controlBlockedByCall ->
+        ) { state, playingFrom, continuousPlaybackEnabled, controlBlockedByCall ->
             val enrichedItems = state.queueItems.mapIndexed { index, item ->
                 if (index == state.currentQueueIndex) {
                     item.copy(
@@ -120,7 +130,8 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
                 },
                 isContinuousPlayback = continuousPlaybackEnabled,
                 isShuffleEnabled = state.shuffleEnabled,
-                playingFromName = playingFromName,
+                playingFromName = playingFrom.name,
+                playingFromSection = playingFrom.section,
                 controlBlockedByCall = controlBlockedByCall,
             )
         }.asUiStateFlow(
@@ -128,6 +139,28 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
             AudioPlayerQueueUiState.Loading,
         )
     }
+
+    private suspend fun resolvePlayingFrom(handle: Long): PlayingFrom {
+        val node = getNodeByHandleUseCase(handle) ?: return PlayingFrom()
+        val parentHandle = node.parentId.longValue
+        rootSectionOf(parentHandle)?.let { return PlayingFrom(section = it) }
+        return PlayingFrom(name = getNodeByHandleUseCase(parentHandle)?.name)
+    }
+
+    /**
+     * The SDK's root nodes carry internal names, so a track sitting directly in Cloud Drive or
+     * the Rubbish bin is reported as its section and localized by the UI.
+     */
+    private suspend fun rootSectionOf(parentHandle: Long): PlayingFromSection? = when (parentHandle) {
+        rootHandle { getRootNodeUseCase()?.id?.longValue } -> PlayingFromSection.CloudDrive
+        rootHandle { getRubbishNodeUseCase()?.id?.longValue } -> PlayingFromSection.RubbishBin
+        else -> null
+    }
+
+    private suspend fun rootHandle(fetch: suspend () -> Long?): Long? =
+        runCatching { fetch() }
+            .onFailure { Timber.w(it, "Failed to resolve a root node handle") }
+            .getOrNull()
 
     /** Seeks to the queue item at player [index] ([mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem.playerIndex])
      * and begins playback from its start. Refused while a MEGA call is ongoing, since starting

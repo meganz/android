@@ -25,7 +25,10 @@ sealed interface AudioPlayerQueueUiState {
      * @property currentArtworkUri Artwork URI of the currently playing item.
      * @property currentThumbnailData Thumbnail data for the currently playing node.
      * @property isContinuousPlayback Whether playback moves on to the next queue item automatically.
-     * @property playingFromName Name of the folder or source the queue is playing from.
+     * @property playingFromName Name of the folder the queue is playing from; null when the
+     * source is a root section (see [playingFromSection]) or unknown.
+     * @property playingFromSection Root section the queue is playing from, so the UI can show its
+     * localized name instead of the SDK's root-node name; null for an ordinary folder.
      * @property controlBlockedByCall Triggered when starting a queue item was refused because a
      * MEGA call is ongoing.
      */
@@ -39,6 +42,16 @@ sealed interface AudioPlayerQueueUiState {
         val isContinuousPlayback: Boolean,
         val isShuffleEnabled: Boolean = false,
         val playingFromName: String?,
+        val playingFromSection: PlayingFromSection? = null,
         val controlBlockedByCall: StateEvent = consumed,
     ) : AudioPlayerQueueUiState
+}
+
+/**
+ * Root sections whose display name must come from string resources, not the SDK node name.
+ * Backups is not listed: its root only holds device folders, so no track can sit directly in it.
+ */
+enum class PlayingFromSection {
+    CloudDrive,
+    RubbishBin,
 }

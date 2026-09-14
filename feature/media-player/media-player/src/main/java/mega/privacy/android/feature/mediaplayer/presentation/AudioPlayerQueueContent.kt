@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.mediaplayer.components.MediaPlayerLoadingIndicator
 import mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
+import mega.privacy.android.feature.mediaplayer.presentation.model.PlayingFromSection
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
@@ -211,6 +212,7 @@ private fun QueueContent(
 
             QueueRowModel.PlayingFrom -> PlayingFromHeader(
                 playingFromName = uiState.playingFromName,
+                playingFromSection = uiState.playingFromSection,
             )
 
             is QueueRowModel.Track -> QueueItemRow(
@@ -326,11 +328,17 @@ private fun CurrentlyPlayingRow(
 @Composable
 private fun PlayingFromHeader(
     playingFromName: String?,
+    playingFromSection: PlayingFromSection?,
     modifier: Modifier = Modifier,
 ) {
-    if (playingFromName.isNullOrBlank()) return
+    val sourceName = when (playingFromSection) {
+        PlayingFromSection.CloudDrive -> stringResource(sharedR.string.general_section_cloud_drive)
+        PlayingFromSection.RubbishBin -> stringResource(sharedR.string.general_section_rubbish_bin)
+        null -> playingFromName
+    }
+    if (sourceName.isNullOrBlank()) return
     MegaSpannedText(
-        value = stringResource(sharedR.string.audio_player_playing_from_label, playingFromName),
+        value = stringResource(sharedR.string.audio_player_playing_from_label, sourceName),
         baseStyle = MaterialTheme.typography.titleMedium,
         styles = mapOf(SpanIndicator('A') to MegaSpanStyle(color = TextColor.Primary)),
         color = TextColor.Secondary,
@@ -385,7 +393,7 @@ private fun QueueItemRow(
                     Spacer(modifier = Modifier.width(4.dp))
                 }
                 MegaText(
-                    text = item.title ?: item.mediaId,
+                    text = item.title.orEmpty(),
                     style = MaterialTheme.typography.titleMedium,
                     textColor = TextColor.Primary,
                     maxLines = 1,

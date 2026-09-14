@@ -12,6 +12,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioContinuousPlaybackEnabledUseCase
@@ -20,6 +22,7 @@ import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControlle
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
 import mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
+import mega.privacy.android.feature.mediaplayer.presentation.model.PlayingFromSection
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,6 +51,8 @@ class AudioPlayerQueueViewModelTest {
         mock<MonitorAudioContinuousPlaybackEnabledUseCase>()
     private val setAudioContinuousPlaybackEnabledUseCase =
         mock<SetAudioContinuousPlaybackEnabledUseCase>()
+    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -68,6 +73,8 @@ class AudioPlayerQueueViewModelTest {
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             monitorAudioContinuousPlaybackEnabledUseCase = monitorAudioContinuousPlaybackEnabledUseCase,
             setAudioContinuousPlaybackEnabledUseCase = setAudioContinuousPlaybackEnabledUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getRubbishNodeUseCase = getRubbishNodeUseCase,
         )
     }
 
@@ -79,8 +86,68 @@ class AudioPlayerQueueViewModelTest {
             isParticipatingInChatCallUseCase,
             monitorAudioContinuousPlaybackEnabledUseCase,
             setAudioContinuousPlaybackEnabledUseCase,
+            getRootNodeUseCase,
+            getRubbishNodeUseCase,
         )
     }
+
+    private suspend fun ReceiveTurbine<AudioPlayerQueueUiState>.emitTrackWithParent(
+        parentHandle: Long,
+    ) {
+        val currentNode = mock<FileNode> { on { parentId }.thenReturn(NodeId(parentHandle)) }
+        whenever(getNodeByHandleUseCase(42L)).thenReturn(currentNode)
+        awaitItem() // Loading state
+        playerStateFlow.emit(
+            AudioControllerState(currentMediaItemId = "item-1", currentMediaItemHandle = 42L)
+        )
+        awaitDataState() // state update before the source is resolved
+    }
+
+    @Test
+    fun `test that uiState reports the Cloud Drive section when the track sits in the root node`() =
+        runTest {
+            val rootNode = mock<FileNode> { on { id }.thenReturn(NodeId(1L)) }
+            whenever(getRootNodeUseCase()).thenReturn(rootNode)
+
+            underTest.uiState.test {
+                emitTrackWithParent(parentHandle = 1L)
+
+                val state = awaitDataState()
+                assertThat(state.playingFromSection).isEqualTo(PlayingFromSection.CloudDrive)
+                assertThat(state.playingFromName).isNull()
+            }
+        }
+
+    @Test
+    fun `test that uiState reports the Rubbish bin section when the track sits in the rubbish root`() =
+        runTest {
+            val rubbishNode = mock<FileNode> { on { id }.thenReturn(NodeId(2L)) }
+            whenever(getRubbishNodeUseCase()).thenReturn(rubbishNode)
+
+            underTest.uiState.test {
+                emitTrackWithParent(parentHandle = 2L)
+
+                val state = awaitDataState()
+                assertThat(state.playingFromSection).isEqualTo(PlayingFromSection.RubbishBin)
+                assertThat(state.playingFromName).isNull()
+            }
+        }
+
+    @Test
+    fun `test that uiState falls back to the parent folder name when a root node lookup throws`() =
+        runTest {
+            val parentNode = mock<FileNode> { on { name }.thenReturn("My Playlist") }
+            whenever(getNodeByHandleUseCase(99L)).thenReturn(parentNode)
+            whenever(getRootNodeUseCase()).thenThrow(RuntimeException("sdk unavailable"))
+
+            underTest.uiState.test {
+                emitTrackWithParent(parentHandle = 99L)
+
+                val state = awaitDataState()
+                assertThat(state.playingFromName).isEqualTo("My Playlist")
+                assertThat(state.playingFromSection).isNull()
+            }
+        }
 
     private suspend fun ReceiveTurbine<AudioPlayerQueueUiState>.awaitDataState(): AudioPlayerQueueUiState.Data =
         awaitItem() as AudioPlayerQueueUiState.Data
@@ -242,6 +309,7 @@ class AudioPlayerQueueViewModelTest {
             awaitDataState() // state update with null playingFromName (immediate from flatMapLatest)
             val state = awaitDataState() // playingFromName resolved
             assertThat(state.playingFromName).isEqualTo("My Music")
+            assertThat(state.playingFromSection).isNull()
         }
     }
 
