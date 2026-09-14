@@ -5,9 +5,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.EntryPointAccessors
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.domain.entity.StorageState
+import nz.mega.sdk.MegaApiAndroid
 
 /**
  * Abstract In-App review handler for determine the base conditions and some special moment
@@ -65,9 +67,9 @@ abstract class RatingHandler(val context: Context) {
     fun showRatingBaseOnContacts() {
         if (!meetBaseCondition()) return
 
-        val app = context.applicationContext as? MegaApplication ?: return
+        val megaApi = megaApiOrNull() ?: return
         val condition = run {
-            val contact = app.megaApi.contacts
+            val contact = megaApi.contacts
             if (contact.isNullOrEmpty()) {
                 false
             } else {
@@ -98,9 +100,9 @@ abstract class RatingHandler(val context: Context) {
     fun showRatingBaseOnSharing() {
         if (!meetBaseCondition()) return
 
-        val app = context.applicationContext as? MegaApplication ?: return
+        val megaApi = megaApiOrNull() ?: return
         val condition = run {
-            val totalNum = app.megaApi.publicLinks.size + app.megaApi.outShares.size
+            val totalNum = megaApi.publicLinks.size + megaApi.outShares.size
             totalNum >= SHARED_NUM_LIMIT
         }
 
@@ -119,9 +121,7 @@ abstract class RatingHandler(val context: Context) {
             return false
         }
 
-        // Conditions are unmet when not running inside MegaApplication (e.g. Hilt tests)
-        val app = context.applicationContext as? MegaApplication ?: return false
-        val megaApi = app.megaApi
+        val megaApi = megaApiOrNull() ?: return false
 
         // Exclude ODQ & OBQ accounts
         if (megaApi.bandwidthOverquotaDelay > 0
@@ -132,6 +132,14 @@ abstract class RatingHandler(val context: Context) {
 
         return megaApi.numNodes >= FILES_NUM_LIMIT
     }
+
+    /**
+     * Resolve the account [MegaApiAndroid] via Hilt, or null when the app is not a Hilt application
+     * (e.g. non-Hilt test/tooling contexts) so rating conditions are simply skipped rather than crashing.
+     */
+    private fun megaApiOrNull(): MegaApiAndroid? = runCatching {
+        EntryPointAccessors.fromApplication(context, MegaApiEntryPoint::class.java).megaApi()
+    }.getOrNull()
 
     /**
      * Determine if it already showed the rating dialog before

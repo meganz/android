@@ -26,6 +26,7 @@ class CustomLintRegistry : IssueRegistry() {
             ExternalLauncherPasscodeDetector.ISSUE,
             MegaApplicationGetInstanceDetector.ISSUE,
             DisabledInteractionModifierDetector.ISSUE,
+            MegaApplicationCastDetector.ISSUE,
         )
 
     override val api: Int = CURRENT_API

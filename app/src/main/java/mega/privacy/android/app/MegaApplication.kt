@@ -20,61 +20,31 @@ import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
-import mega.privacy.android.app.globalmanagement.CallChangesObserver
-import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.SmsVerificationState
 import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
 import mega.privacy.android.data.gateway.LogFlushGateway
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
-import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatCall
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Mega application
  *
- * @property megaApi
- * @property megaApiFolder
- * @property megaChatApi
  * @property _dbH
  * @property myAccountInfo
- * @property updateCrashAndPerformanceReportersUseCase
  * @property activityLifecycleHandler
  * @property pushNotificationSettingManagement
  * @property chatManagement
- * @property callChangesObserver
  * @property applicationScope
  */
 @HiltAndroidApp
 class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.Provider {
-    @MegaApi
-    @Inject
-    lateinit var _megaApi: Lazy<MegaApiAndroid>
-
-    val megaApi: MegaApiAndroid
-        @JvmName("getMegaApi")
-        get() = _megaApi.get()
-
-    @MegaApiFolder
-    @Inject
-    lateinit var _megaApiFolder: Lazy<MegaApiAndroid>
-
-    val megaApiFolder: MegaApiAndroid
-        @JvmName("getMegaApiFolder")
-        get() = _megaApiFolder.get()
-
     @Inject
     lateinit var _megaChatApi: Lazy<MegaChatApiAndroid>
 
-    val megaChatApi: MegaChatApiAndroid
-        @JvmName("megaChatApi")
+    private val megaChatApi: MegaChatApiAndroid
         get() = _megaChatApi.get()
 
     @Inject
@@ -93,12 +63,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
 
     val myAccountInfo: MyAccountInfo
         get() = _myAccountInfo.get()
-
-    @Inject
-    lateinit var updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase
-
-    @Inject
-    lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCase
 
     @ApplicationScope
     @Inject
@@ -120,18 +84,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     val chatManagement: ChatManagement
         @JvmName("chatManagement")
         get() = _chatManagement.get()
-
-    @Inject
-    lateinit var _callChangesObserver: Lazy<CallChangesObserver>
-
-    val callChangesObserver: CallChangesObserver
-        get() = _callChangesObserver.get()
-
-    @Inject
-    lateinit var _chatApiListenerCoordinator: Lazy<ChatApiListenerCoordinator>
-
-    private val chatApiListenerCoordinator: ChatApiListenerCoordinator
-        get() = _chatApiListenerCoordinator.get()
 
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser
@@ -221,46 +173,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
             }
         }
     }
-
-    /**
-     * Check current enabled cookies and set the corresponding flags to true/false
-     */
-    fun checkEnabledCookies() {
-        applicationScope.launch {
-            runCatching {
-                val enabledCookies = getCookieSettingsUseCase()
-                updateCrashAndPerformanceReportersUseCase(enabledCookies)
-            }.onFailure {
-                Timber.e("Failed to get cookie settings: $it")
-            }
-        }
-    }
-
-    /**
-     * Get mega chat api
-     *
-     */
-    fun getMegaChatApi(): MegaChatApiAndroid {
-        chatApiListenerCoordinator.register()
-        return megaChatApi
-    }
-
-    /**
-     * Send signal presence activity
-     *
-     */
-    fun sendSignalPresenceActivity() {
-        Timber.d("sendSignalPresenceActivity")
-        megaChatApi.run { signalPresenceActivity() }
-    }
-
-    /**
-     * Method for showing an incoming group or one-to-one call notification.
-     *
-     * @param incomingCall The incoming call
-     */
-    fun showOneCallNotification(incomingCall: MegaChatCall) =
-        callChangesObserver.showOneCallNotification(incomingCall)
 
     /**
      * Reset my account info
