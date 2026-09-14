@@ -4,15 +4,13 @@ import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileCompressionGateway
-import mega.privacy.android.data.gateway.LogbackLogConfigurationGateway
+import mega.privacy.android.data.gateway.LogConfigurationGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.logging.LineNumberDebugTree
 import mega.privacy.android.data.logging.LogFileTree
-import mega.privacy.android.domain.qualifier.ChatLogger
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LogFileDirectory
 import mega.privacy.android.domain.qualifier.LogZipFileDirectory
-import mega.privacy.android.domain.qualifier.SdkLogger
 import mega.privacy.android.domain.repository.LoggingRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -32,9 +30,8 @@ import javax.inject.Inject
 internal class TimberLoggingRepository @Inject constructor(
     private val megaSdkLogger: MegaLoggerInterface,
     private val megaChatLogger: MegaChatLoggerInterface,
-    @SdkLogger private val sdkLogFileTree: Lazy<LogFileTree>,
-    @ChatLogger private val chatLogFileTree: Lazy<LogFileTree>,
-    private val loggingConfig: LogbackLogConfigurationGateway,
+    private val logFileTree: Lazy<LogFileTree>,
+    private val loggingConfig: LogConfigurationGateway,
     private val fileCompressionGateway: FileCompressionGateway,
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -57,13 +54,9 @@ internal class TimberLoggingRepository @Inject constructor(
         withContext(ioDispatcher) {
             // Fix race condition when multiple LoggerFactory.getLogger call
             loggingConfig.resetLoggingConfiguration()
-            val sdkTree = sdkLogFileTree.get()
-            if (!Timber.forest().contains(sdkTree)) {
-                Timber.plant(sdkTree)
-            }
-            val chatTree = chatLogFileTree.get()
-            if (!Timber.forest().contains(chatTree)) {
-                Timber.plant(chatTree)
+            val tree = logFileTree.get()
+            if (!Timber.forest().contains(tree)) {
+                Timber.plant(tree)
             }
         }
     }

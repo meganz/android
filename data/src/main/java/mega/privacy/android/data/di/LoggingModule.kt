@@ -7,16 +7,16 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.data.gateway.FileLogWriter
+import mega.privacy.android.data.gateway.LogConfigurationGateway
 import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.gateway.LogWriterGateway
+import mega.privacy.android.data.gateway.LogbackLogConfigurationGateway
 import mega.privacy.android.data.gateway.LogbackLogFlushGateway
 import mega.privacy.android.data.gateway.TimberChatLogger
 import mega.privacy.android.data.gateway.TimberMegaLogger
 import mega.privacy.android.data.logging.LogFileTree
 import mega.privacy.android.data.repository.TimberLoggingRepository
-import mega.privacy.android.domain.qualifier.ChatLogger
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.qualifier.SdkLogger
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.usecase.CreateLogEntry
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -43,34 +43,28 @@ internal abstract class LoggingModule {
     @Binds
     abstract fun bindLogFlushGateway(implementation: LogbackLogFlushGateway): LogFlushGateway
 
+    @Singleton
+    @Binds
+    abstract fun bindLogConfigurationGateway(implementation: LogbackLogConfigurationGateway): LogConfigurationGateway
+
     companion object {
-        @Singleton
-        @SdkLogger
-        @Provides
-        fun provideSdkFileLogger(): LogWriterGateway =
-            FileLogWriter { LoggerFactory.getLogger(TimberMegaLogger::class.java) }
+        /**
+         * SLF4J logger that SDK, Chat SDK and client app logs are all written through. Must
+         * match the `<logger>` declared in `assets/logback.xml`, which routes it to the one
+         * rolling file appender.
+         */
+        const val FILE_LOGGER_NAME = "mega.privacy.android.data.logging.LogFile"
 
         @Singleton
-        @ChatLogger
         @Provides
-        fun provideChatFileLogger(): LogWriterGateway =
-            FileLogWriter { LoggerFactory.getLogger(TimberChatLogger::class.java) }
+        fun provideFileLogWriter(): LogWriterGateway =
+            FileLogWriter { LoggerFactory.getLogger(FILE_LOGGER_NAME) }
 
         @Singleton
-        @SdkLogger
         @Provides
-        fun provideSdkLogFileTree(
-            @SdkLogger createLogEntry: CreateLogEntry,
-            @SdkLogger writer: LogWriterGateway,
-            @IoDispatcher dispatcher: CoroutineDispatcher,
-        ): LogFileTree = LogFileTree(dispatcher, createLogEntry, writer)
-
-        @Singleton
-        @ChatLogger
-        @Provides
-        fun provideChatLogFileTree(
-            @ChatLogger createLogEntry: CreateLogEntry,
-            @ChatLogger writer: LogWriterGateway,
+        fun provideLogFileTree(
+            createLogEntry: CreateLogEntry,
+            writer: LogWriterGateway,
             @IoDispatcher dispatcher: CoroutineDispatcher,
         ): LogFileTree = LogFileTree(dispatcher, createLogEntry, writer)
     }

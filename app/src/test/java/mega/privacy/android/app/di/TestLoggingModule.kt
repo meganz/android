@@ -5,8 +5,6 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.domain.di.LoggingModule as DomainLoggingModule
-import mega.privacy.android.domain.qualifier.ChatLogger
-import mega.privacy.android.domain.qualifier.SdkLogger
 import mega.privacy.android.domain.usecase.CreateLogEntry
 import mega.privacy.android.domain.usecase.CreateTraceString
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
@@ -21,12 +19,7 @@ import org.mockito.kotlin.mock
 object TestLoggingModule {
 
     @Provides
-    @SdkLogger
-    fun bindCreateSdkLogEntry(): CreateLogEntry = mock()
-
-    @Provides
-    @ChatLogger
-    fun bindCreateChatLogEntry(): CreateLogEntry = mock()
+    fun bindCreateLogEntry(): CreateLogEntry = mock()
 
     @Provides
     fun bindCreateTraceString(): CreateTraceString = mock()

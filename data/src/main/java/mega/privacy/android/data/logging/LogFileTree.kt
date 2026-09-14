@@ -69,7 +69,7 @@ internal class LogFileTree(
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         // Skip the caller stack capture for high-volume SDK/Chat logs (they
-        // already carry their own [sdk]/[chat_sdk] tag). For client-app logs,
+        // already carry their own [sdk]/[chat] tag). For client-app logs,
         // keep the original behaviour so the log file still shows the
         // "file#method:line" prefix that aids debugging.
         val trace = if (tag == TimberChatLogger.TAG || tag == TimberMegaLogger.TAG) {
