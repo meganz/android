@@ -219,7 +219,8 @@ class MiniAudioPlayerController(
                 if (v2MediaController != null) {
                     val intent = MegaActivity.getIntentWithExtraDestinations(
                         context,
-                        listOf(AudioPlayerScreenNavKey(AudioPlayerScreenNavKey.RESUME_LAUNCH_ID))
+                        listOf(AudioPlayerScreenNavKey(AudioPlayerScreenNavKey.RESUME_LAUNCH_ID)),
+                        dropIfAlreadyShown = true,
                     ).apply {
                         addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     }

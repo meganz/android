@@ -78,6 +78,7 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
+import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
@@ -173,8 +174,14 @@ class MegaActivity : FragmentActivity() {
             navKeys.forEach {
                 Timber.d("NavKey from intent: $it")
             }
-            navigationEventQueue.emit(navKeys)
+            val navOptions = if (intent.getBooleanExtra(EXTRA_NAV_DROP_IF_SHOWN, false)) {
+                navOptions { dropIfAlreadyShown = true }
+            } else {
+                null
+            }
+            navigationEventQueue.emit(navKeys, navOptions = navOptions)
             intent.removeExtra(EXTRA_NAV_KEYS)
+            intent.removeExtra(EXTRA_NAV_DROP_IF_SHOWN)
         }
     }
 
@@ -514,13 +521,15 @@ class MegaActivity : FragmentActivity() {
          * @param context
          * @param navKey
          * @param requestCode
+         * @param dropIfAlreadyShown see [getIntentWithExtraDestinations]
          */
         fun <T> getPendingIntentWithExtraDestination(
             context: Context,
             navKey: T,
             requestCode: Int = navKey.hashCode(), //unique request code per nav key
+            dropIfAlreadyShown: Boolean = false,
         ) where T : NavKey, T : Parcelable = getPendingIntentWithExtraDestinations(
-            context, listOf(navKey), requestCode
+            context, listOf(navKey), requestCode, dropIfAlreadyShown
         )
 
         /**
@@ -528,15 +537,17 @@ class MegaActivity : FragmentActivity() {
          * @param context
          * @param navKeys
          * @param requestCode
+         * @param dropIfAlreadyShown see [getIntentWithExtraDestinations]
          */
         fun <T> getPendingIntentWithExtraDestinations(
             context: Context,
             navKeys: List<T>,
             requestCode: Int = navKeys.hashCode(), //unique request code per nav keys
+            dropIfAlreadyShown: Boolean = false,
         ): PendingIntent where T : NavKey, T : Parcelable = PendingIntent.getActivity(
             context,
             requestCode,
-            getIntentWithExtraDestinations(context, navKeys),
+            getIntentWithExtraDestinations(context, navKeys, dropIfAlreadyShown),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -546,12 +557,20 @@ class MegaActivity : FragmentActivity() {
          * @param T
          * @param context
          * @param navKeys
+         * @param dropIfAlreadyShown when true the destinations are navigated to with
+         * [NavOptions.dropIfAlreadyShown], so the navigation is skipped while an entry of the
+         * same type is already on the back stack. The back stack only deduplicates equal keys,
+         * and a key that opens a screen already shown with different arguments (e.g. the audio
+         * player's resume key over the key a file tap created) would otherwise stack a second
+         * copy of that screen, ViewModel included, on top of the first.
          */
         fun <T> getIntentWithExtraDestinations(
             context: Context,
             navKeys: List<T>,
+            dropIfAlreadyShown: Boolean = false,
         ) where T : NavKey, T : Parcelable = getIntent(context).apply {
             putParcelableArrayListExtra(EXTRA_NAV_KEYS, ArrayList(navKeys))
+            if (dropIfAlreadyShown) putExtra(EXTRA_NAV_DROP_IF_SHOWN, true)
         }
 
         private fun Intent.getDestinations(): List<NavKey>? =
@@ -563,6 +582,7 @@ class MegaActivity : FragmentActivity() {
             }
 
         private const val EXTRA_NAV_KEYS = "navKeys"
+        private const val EXTRA_NAV_DROP_IF_SHOWN = "navDropIfShown"
         internal const val ACTION_DEEP_LINKS = "deepLinks"
     }
 }

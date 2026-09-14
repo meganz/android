@@ -386,9 +386,13 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     private fun initializeSession() {
+        // The player screen opened by a file tap carries a different launch id, so without the
+        // drop option tapping the notification would stack a second player (and a second
+        // ViewModel, losing e.g. the sleep timer) on top of the one already showing.
         val pendingIntent = MegaActivity.getPendingIntentWithExtraDestination(
             this,
-            AudioPlayerScreenNavKey(AudioPlayerScreenNavKey.RESUME_LAUNCH_ID)
+            AudioPlayerScreenNavKey(AudioPlayerScreenNavKey.RESUME_LAUNCH_ID),
+            dropIfAlreadyShown = true,
         )
         val currentPlayer = player ?: return
         mediaSession = MediaSession.Builder(this, currentPlayer)
