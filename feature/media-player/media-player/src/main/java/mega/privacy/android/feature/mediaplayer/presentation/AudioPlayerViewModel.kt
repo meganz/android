@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
@@ -85,6 +86,7 @@ class AudioPlayerViewModel @Inject constructor(
     private val audioResumeEventQueue: AudioResumeEventQueue,
     private val audioPlayerErrorEventQueue: AudioPlayerErrorEventQueue,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -336,7 +338,10 @@ class AudioPlayerViewModel @Inject constructor(
             if (current.shuffleEnabled) {
                 Analytics.tracker.trackEvent(AudioPlayerShuffleEnabledEvent)
             }
-            viewModelScope.launch { setAudioShuffleEnabledUseCase(current.shuffleEnabled) }
+            viewModelScope.launch {
+                runCatching { setAudioShuffleEnabledUseCase(current.shuffleEnabled) }
+                    .onFailure { Timber.e(it, "Failed to persist shuffle preference") }
+            }
         }
 
         if (prev.repeatMode != current.repeatMode) {
@@ -682,12 +687,20 @@ class AudioPlayerViewModel @Inject constructor(
             }
 
             else -> {
-                var remaining = option.duration
-                _sleepTimerState.value = SleepTimerState.CountingDown(remaining, option)
+                // Anchored on a wall-clock deadline rather than decremented per tick: each
+                // delay() wakes slightly late, and over an hour those overshoots would add up
+                // to the timer firing noticeably after the time the user picked.
+                val deadlineMillis =
+                    getCurrentTimeInMillisUseCase() + option.duration.inWholeMilliseconds
+                _sleepTimerState.value = SleepTimerState.CountingDown(option.duration, option)
                 sleepTimerJob = viewModelScope.launch {
+                    var remaining = option.duration
                     while (remaining > Duration.ZERO) {
-                        delay(SLEEP_TIMER_TICK)
-                        remaining = maxOf(Duration.ZERO, remaining - SLEEP_TIMER_TICK)
+                        delay(minOf(SLEEP_TIMER_TICK, remaining))
+                        // Upper bound guards against the wall clock jumping backwards, which
+                        // would otherwise stretch the timer past the duration the user picked.
+                        remaining = (deadlineMillis - getCurrentTimeInMillisUseCase())
+                            .coerceIn(0L, option.duration.inWholeMilliseconds).milliseconds
                         _sleepTimerState.value = SleepTimerState.CountingDown(remaining, option)
                     }
                     gateway.pause()

@@ -10,6 +10,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
@@ -45,7 +47,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.inOrder
@@ -54,12 +56,14 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.IOException
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(CoroutineMainDispatcherExtension::class)
 class AudioPlayerViewModelTest {
 
     private lateinit var underTest: AudioPlayerViewModel
@@ -75,6 +79,12 @@ class AudioPlayerViewModelTest {
     private val setAudioShuffleEnabledUseCase = mock<SetAudioShuffleEnabledUseCase>()
     private val setAudioRepeatModeUseCase = mock<SetAudioRepeatModeUseCase>()
     private val deleteAudioPlaybackInfoUseCase = mock<DeleteAudioPlaybackInfoUseCase>()
+    private val getCurrentTimeInMillisUseCase = mock<GetCurrentTimeInMillisUseCase>()
+
+    // The ViewModel's wall clock follows the scheduler's virtual time (so armed timers always run
+    // down and runTest can finish) plus this offset, which sleep-timer tests bump to simulate a
+    // tick that wakes up late.
+    private var fakeClockOffsetMillis = 0L
 
     // Real instance: a stateless mapper, so the tests exercise the real repeat-mode cycle.
     private val repeatToggleModeByExoPlayerMapper = RepeatToggleModeByExoPlayerMapper()
@@ -104,6 +114,10 @@ class AudioPlayerViewModelTest {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdates)
         audioResumeEventQueue = AudioResumeEventQueue()
         audioPlayerErrorEventQueue = AudioPlayerErrorEventQueue()
+        fakeClockOffsetMillis = 0L
+        whenever(getCurrentTimeInMillisUseCase()).thenAnswer {
+            mainDispatcherExtension.testDispatcher.scheduler.currentTime + fakeClockOffsetMillis
+        }
         underTest = AudioPlayerViewModel(
             gateway = gateway,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
@@ -116,8 +130,17 @@ class AudioPlayerViewModelTest {
             audioResumeEventQueue = audioResumeEventQueue,
             audioPlayerErrorEventQueue = audioPlayerErrorEventQueue,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
+            getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
         )
+    }
+
+    /**
+     * Advances virtual time by [elapsed] and lets the scheduler run the tick due at that moment
+     * (advanceTimeBy is exclusive of its end time, hence the extra millisecond).
+     */
+    private fun TestScope.advanceClock(elapsed: Duration) {
+        advanceTimeBy(elapsed + 1.milliseconds)
     }
 
     @AfterEach
@@ -131,6 +154,7 @@ class AudioPlayerViewModelTest {
             setAudioShuffleEnabledUseCase,
             setAudioRepeatModeUseCase,
             deleteAudioPlaybackInfoUseCase,
+            getCurrentTimeInMillisUseCase,
         )
     }
 
@@ -907,6 +931,26 @@ class AudioPlayerViewModelTest {
         }
 
     @Test
+    fun `test that a failing shuffle persistence does not crash and uiState keeps updating`() =
+        runTest {
+            whenever(setAudioShuffleEnabledUseCase(true)).doSuspendableAnswer {
+                throw IOException("disk full")
+            }
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(audioControllerState(shuffleEnabled = false))
+                awaitItem() // Data, shuffle off
+
+                gatewayPlayerState.emit(audioControllerState(shuffleEnabled = true))
+
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.shuffleEnabled).isTrue()
+                verify(setAudioShuffleEnabledUseCase).invoke(true)
+            }
+        }
+
+    @Test
     fun `test that sleepTimerState is Inactive initially`() = runTest {
         assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.Inactive)
     }
@@ -1000,7 +1044,7 @@ class AudioPlayerViewModelTest {
             assertThat(awaitItem()).isEqualTo(SleepTimerState.Inactive)
             underTest.setSleepTimer(SleepTimerOption.Minutes5)
             awaitItem() // initial CountingDown(300_000)
-            advanceTimeBy(1_001L.milliseconds)
+            advanceClock(1.seconds)
             val afterOneTick = awaitItem() as SleepTimerState.CountingDown
             assertThat(afterOneTick.remaining).isEqualTo(299.seconds)
             cancelAndIgnoreRemainingEvents()
@@ -1008,10 +1052,48 @@ class AudioPlayerViewModelTest {
     }
 
     @Test
+    fun `test that setSleepTimer follows the wall clock when a tick wakes up late`() = runTest {
+        underTest.sleepTimerState.test {
+            assertThat(awaitItem()).isEqualTo(SleepTimerState.Inactive)
+            underTest.setSleepTimer(SleepTimerOption.Minutes5)
+            awaitItem() // initial CountingDown(300_000)
+
+            // The 1 s tick wakes up 3 s late: the wall clock reads 4 s past the start, so the
+            // remaining time must reflect those 4 s, not the single tick that was scheduled.
+            fakeClockOffsetMillis += 3_000L
+            advanceClock(1.seconds)
+
+            val afterLateTick = awaitItem() as SleepTimerState.CountingDown
+            assertThat(afterLateTick.remaining).isEqualTo(296.seconds)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that setSleepTimer never reports more than the chosen duration when the clock jumps back`() =
+        runTest {
+            underTest.sleepTimerState.test {
+                assertThat(awaitItem()).isEqualTo(SleepTimerState.Inactive)
+                underTest.setSleepTimer(SleepTimerOption.Minutes5)
+                awaitItem() // initial CountingDown(300_000)
+
+                // The wall clock is set back by a minute before the first tick fires. The clamped
+                // value equals the initial one, so the StateFlow emits nothing new.
+                fakeClockOffsetMillis -= 60_000L
+                advanceClock(1.seconds)
+
+                expectNoEvents()
+                val afterJump = underTest.sleepTimerState.value as SleepTimerState.CountingDown
+                assertThat(afterJump.remaining).isEqualTo(5.minutes)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that setSleepTimer pauses gateway and emits Inactive when countdown expires`() =
         runTest {
             underTest.setSleepTimer(SleepTimerOption.Minutes5)
-            advanceTimeBy((5 * 60 * 1_000L + 1_000L).milliseconds)
+            advanceClock(5.minutes)
             assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.Inactive)
             verify(gateway).pause()
         }
@@ -1762,6 +1844,12 @@ class AudioPlayerViewModelTest {
     }
 
     companion object {
+        // Registered as a field (not @ExtendWith) so the tests can read the dispatcher's virtual
+        // time and feed it to the ViewModel as its wall clock.
+        @JvmField
+        @RegisterExtension
+        val mainDispatcherExtension = CoroutineMainDispatcherExtension()
+
         // Intent extra keys — must match values in AudioPlayerViewModel
         private const val INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType"
         private const val INTENT_EXTRA_KEY_REBUILD_PLAYLIST = "REBUILD_PLAYLIST"
