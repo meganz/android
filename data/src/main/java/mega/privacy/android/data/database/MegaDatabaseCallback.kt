@@ -27,7 +27,13 @@ class MegaDatabaseCallback(
 
     override fun onOpen(db: SupportSQLiteDatabase) {
         Timber.d("onOpen")
-        delegate.onOpen(db)
+        try {
+            delegate.onOpen(db)
+        } catch (e: IllegalStateException) {
+            Timber.e(e, "Room could not verify the database on open, restoring identity")
+            restoreIdentity(db, e)
+            delegate.onOpen(db)
+        }
     }
 
     override fun onConfigure(db: SupportSQLiteDatabase) {
@@ -52,6 +58,25 @@ class MegaDatabaseCallback(
             } else {
                 throw e
             }
+        }
+    }
+
+    /**
+     * Room's create path only adds what is missing (`CREATE TABLE IF NOT EXISTS`), rewrites the
+     * identity hash and then validates the whole schema, so it restores the identity without
+     * touching any intact table. If validation still fails the transaction is rolled back and
+     * the original error is rethrown, leaving the data exactly as it was.
+     */
+    private fun restoreIdentity(db: SupportSQLiteDatabase, cause: IllegalStateException) {
+        db.beginTransaction()
+        try {
+            delegate.onCreate(db)
+            db.setTransactionSuccessful()
+        } catch (e: IllegalStateException) {
+            Timber.e(e, "Schema is still invalid after restoring identity")
+            throw cause
+        } finally {
+            db.endTransaction()
         }
     }
 }
