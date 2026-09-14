@@ -497,12 +497,15 @@ class AudioPlayerViewModel @Inject constructor(
         hasStartedPlayback = true
         hadActiveSession = false
         _sessionEnded.value = false
+        val rebuildPlaylist = intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)
+        // Before setCurrentIntent: that re-maps the intent extras onto whatever Data is showing,
+        // and the previous session's Data must not be republished on its way out.
+        if (rebuildPlaylist) resetStaleSessionState()
         setCurrentIntent(intent)
         val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_VALUE.toLong())
         if (handle != INVALID_VALUE.toLong()) {
             prefetchPlayerMode(handle)
         }
-        val rebuildPlaylist = intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)
         if (rebuildPlaylist) {
             // This ViewModel outlives the player screen, so an error consumed while the screen
             // was closed would otherwise pop up over the brand-new playback session. Reopening
@@ -511,10 +514,28 @@ class AudioPlayerViewModel @Inject constructor(
             _playbackError.value = null
             // Same reason for a resume announcement latched while no screen was attached: left
             // in place it would be shown over the new session, and its Restart action would
-            // reset — and delete the saved position of — the wrong track.
+            // reset — and delete the saved position of — the wrong track. The queue is drained
+            // too: an event parked for a track that never became current would otherwise be
+            // announced, with a stale position, the next time that track plays.
             _resumedFromPosition.value = null
+            audioResumeEventQueue.consume()
             gateway.startService(intent)
         }
+    }
+
+    /**
+     * Drops the last session's screen state when that session is over. The controller reports
+     * an empty player on its first emission after a fresh service start, which [mapToUiState]
+     * deliberately ignores, so without this the new screen would compose with the previous
+     * track's data and enabled controls until the new queue arrives. A session that is still
+     * live is left alone: the gateway re-emits its real state on reconnect.
+     */
+    private fun resetStaleSessionState() {
+        val lastState = currentControllerState ?: return
+        if (!lastState.isSessionEnded && lastState.mediaItemCount > 0) return
+        currentControllerState = null
+        lastMediaItemId = null
+        playerState.value = AudioPlayerUiState.Loading
     }
 
     fun togglePlayPause() {

@@ -1693,6 +1693,64 @@ class AudioPlayerViewModelTest {
     }
 
     @Test
+    fun `test that startPlayback resets uiState to Loading when the previous session has ended`() =
+        runTest {
+            val intent = mock<Intent>().apply {
+                whenever(getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)).thenReturn(true)
+                whenever(getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, -1)).thenReturn(-1)
+            }
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(audioControllerState(isPlaying = true, title = "Old"))
+                awaitItem() // Data for the previous track
+                gatewayPlayerState.emit(
+                    audioControllerState(mediaItemCount = 1, isIdle = true, isSessionEnded = true)
+                )
+                skipItems(1) // Data updated with the ended flags
+
+                underTest.startPlayback(intent)
+
+                assertThat(awaitItem()).isEqualTo(AudioPlayerUiState.Loading)
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that startPlayback keeps the current uiState when the previous session is still live`() =
+        runTest {
+            val intent = mock<Intent>().apply {
+                whenever(getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)).thenReturn(true)
+                whenever(getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, -1)).thenReturn(-1)
+            }
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(audioControllerState(isPlaying = true, title = "Live"))
+                awaitItem() // Data for the still-playing track
+
+                underTest.startPlayback(intent)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(underTest.uiState.value).isInstanceOf(AudioPlayerUiState.Data::class.java)
+        }
+
+    @Test
+    fun `test that startPlayback drains a pending resume event when rebuilding the playlist`() =
+        runTest {
+            audioResumeEventQueue.emit(AudioResumeEvent(mediaHandle = 999L, resumePositionMs = 5_000L))
+            val intent = mock<Intent>().apply {
+                whenever(getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)).thenReturn(true)
+                whenever(getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, -1)).thenReturn(-1)
+            }
+
+            underTest.startPlayback(intent)
+
+            assertThat(audioResumeEventQueue.consume()).isNull()
+        }
+
+    @Test
     fun `test that hasActiveSession reflects whether the queue holds items`() = runTest {
         underTest.hasActiveSession.test {
             gatewayPlayerState.emit(audioControllerState(mediaItemCount = 0, isIdle = true))

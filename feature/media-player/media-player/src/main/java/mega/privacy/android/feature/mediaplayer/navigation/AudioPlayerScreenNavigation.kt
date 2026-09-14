@@ -18,7 +18,6 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.parcelize.Parcelize
@@ -43,7 +42,6 @@ import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUi
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.resources.R as sharedR
-import timber.log.Timber
 
 /**
  * Navigation key for the revamped audio player Compose screen.
@@ -88,15 +86,7 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
                     // controller a short window to prove a session is still running (the service
                     // may have survived the UI process); otherwise leave the now-empty screen.
                     val hasSession = withTimeoutOrNull(ACTIVE_SESSION_TIMEOUT) {
-                        viewModel.hasActiveSession
-                            // A controller failure here would otherwise escape the effect and
-                            // crash the activity; treating it as "no session" leaves the screen
-                            // the same way a timeout does.
-                            .catch {
-                                Timber.e(it, "Failed to check for an active audio session")
-                                emit(false)
-                            }
-                            .first { it }
+                        viewModel.hasActiveSession.first { it }
                     }
                     if (hasSession == null) navigationHandler.back()
                 }
