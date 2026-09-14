@@ -14,14 +14,14 @@ Packages under `src/main/java/mega/privacy/android/shared/nodes/`:
 - `components/` — Compose UI for node display: `NodesView`, `NodeListView`/`NodeListViewItem`, `NodeGridView`/`NodeGridViewItem`, `NodeViewWithHeader`, `NodeHeaderItem`, `NodeThumbnailView`, `NodeSelectionModeAppBar`, `NodeSkeletons`, `NodeLabelCircle`, `SortBottomSheet`. `components/previewdata/` holds `@Preview` data providers and `NodeUiItemFactory`.
 - `mapper/` — domain→UI mappers (see Key Components).
 - `model/` — UI state and item models plus `NodeHeaderItemViewModel`/`NodeHeaderItemUiState`.
-- `selection/` — multi-selection state holders (`NodeSelectionState`, `SelectableTypedNode`).
+- `selection/` — multi-selection state holder (`NodeSelectionState`).
 - `dialog/` — shared dialogs: new file (`dialog/newfile/`), new folder (`dialog/newfolder/`), `TakeDownDialog`, `DiscardScanWarningDialog`. The new-file/new-folder dialogs include their own ViewModel + UiState.
 - `sheet/` — bottom sheets such as `PublicLinkAuthAlertBottomSheet`.
 - `extension/` — `NodeIconExt` (node icon resolution helpers).
 
 ## Key Components
 - **Mappers**: `NodeUiItemMapper` and `NodeViewItemMapper` (convert `TypedNode` → UI item; built for thousands of items), `NodeSubtitleMapper`, `FileTypeIconMapper` (`@Singleton`, extension→icon), `NodeSortConfigurationUiMapper`, `NodeSourceTypeToSearchTargetMapper`.
-- **Models**: `NodeViewItem` (current pattern) and `NodeUiItem` (deprecated, migrate to `NodeViewItem`), `TypedNodeItem`, `SelectableNodeItem`, `NodeSubtitleText`, `NodeSortOption`, `SortOptionItem`, `NodeSourceTypeInt`.
+- **Models**: `NodeViewItem` (current pattern) and `NodeUiItem` (deprecated, migrate to `NodeViewItem`), `TypedNodeItem`, `NodeSubtitleText`, `NodeSortOption`, `SortOptionItem`, `NodeSourceTypeInt`.
 - **State/ViewModels**: `NodeHeaderItemViewModel` (Hilt assisted-factory, exposes `StateFlow` via `asUiStateFlow`) with `NodeHeaderItemUiState`; `NodeSelectionState` (`@Stable` rememberSaveable selection holder).
 - **UI helpers**: `NodesView` / `NodeListView` / `NodeGridView` composables and `NodeThumbnailView`, used by feature modules to render node collections.
 

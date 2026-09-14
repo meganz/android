@@ -112,7 +112,7 @@ fun NodeListViewItem(
     onItemClicked: () -> Unit,
 ) {
     GenericListItem(
-        modifier = modifier,
+        modifier = modifier.selectionSemantics(isInSelectionMode, isSelected),
         selected = isSelected,
         highlighted = isHighlighted,
         enabled = enabled && !isSensitive,

@@ -23,7 +23,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeUiItem
-import mega.privacy.android.shared.nodes.model.SelectableNodeItem
 import mega.privacy.android.shared.nodes.model.TypedNodeItem
 import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
@@ -230,17 +229,12 @@ fun <T : TypedNode> NodesView(
         }
     }
 
-    val nodeUiItems = remember(items, nodeSelectionState.selectedNodeIds) {
-        items.map {
-            SelectableNodeItem(it, nodeSelectionState.selectedNodeIds.contains(it.id))
-        }
-    }
-
     if (isListView) {
         NodeListView(
             modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUiItemList = nodeUiItems,
+            items = items,
+            nodeSelectionState = nodeSelectionState,
             isNextPageLoading = isNextPageLoading,
             onMenuClick = onMenuClicked,
             onItemClicked = {
@@ -268,7 +262,8 @@ fun <T : TypedNode> NodesView(
         NodeGridView(
             modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUiItems = nodeUiItems,
+            items = items,
+            nodeSelectionState = nodeSelectionState,
             isNextPageLoading = isNextPageLoading,
             onMenuClicked = onMenuClicked,
             onItemClicked = {

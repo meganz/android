@@ -16,13 +16,14 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVertic
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
-import mega.privacy.android.shared.nodes.selection.SelectableTypedNode
+import mega.privacy.android.shared.nodes.model.TypedNodeItem
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 
 /**
- * Composable for showing a grid of [NodeUiItem] with optional header for sort and view type
+ * Composable for showing a grid of [TypedNodeItem] with optional header for sort and view type
  *
- * @param nodeUiItems List of [NodeUiItem]
+ * @param items List of [TypedNodeItem]
+ * @param nodeSelectionState selection state, read per item so a selection change only recomposes visible items
  * @param onMenuClicked three dots click
  * @param onItemClicked on item click
  * @param onLongClicked on long item click
@@ -41,7 +42,8 @@ import mega.privacy.android.shared.nodes.selection.SelectableTypedNode
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun <T : TypedNode> NodeGridView(
-    nodeUiItems: List<SelectableTypedNode<T>>,
+    items: List<TypedNodeItem<T>>,
+    nodeSelectionState: NodeSelectionState,
     onMenuClicked: (T) -> Unit,
     onItemClicked: (T) -> Unit,
     onLongClicked: (T) -> Unit,
@@ -64,7 +66,7 @@ internal fun <T : TypedNode> NodeGridView(
     FastScrollLazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
-        totalItems = nodeUiItems.size,
+        totalItems = items.size,
         modifier = modifier
             .padding(horizontal = DSTokens.spacings.s3)
             .semantics { testTagsAsResourceId = true },
@@ -99,12 +101,12 @@ internal fun <T : TypedNode> NodeGridView(
             }
         }
         items(
-            count = nodeUiItems.size,
+            count = items.size,
             key = {
-                nodeUiItems[it].id.longValue
+                items[it].id.longValue
             },
         ) {
-            val nodeUiItem = nodeUiItems[it]
+            val nodeUiItem = items[it]
             NodeGridViewItem(
                 name = nodeUiItem.title.text,
                 iconRes = nodeUiItem.iconRes,
@@ -112,7 +114,7 @@ internal fun <T : TypedNode> NodeGridView(
                 isTakenDown = nodeUiItem.isTakenDown,
                 modifier = Modifier,
                 duration = nodeUiItem.duration,
-                isSelected = nodeUiItem.isSelected,
+                isSelected = nodeSelectionState.selectedNodeIds.contains(nodeUiItem.id),
                 isInSelectionMode = inSelectionMode,
                 isFolderNode = nodeUiItem.isFolderNode,
                 isVideoNode = nodeUiItem.isVideoNode,

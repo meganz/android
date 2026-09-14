@@ -101,6 +101,7 @@ fun NodeGridViewItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .selectionSemantics(isInSelectionMode, isSelected)
             .itemContainerStyle(
                 enabled = enabled && !isSensitive,
                 selected = isSelected,
