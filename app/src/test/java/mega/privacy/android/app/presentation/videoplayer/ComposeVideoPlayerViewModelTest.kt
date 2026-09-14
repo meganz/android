@@ -66,6 +66,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
@@ -3223,6 +3224,54 @@ class ComposeVideoPlayerViewModelTest {
         verify(saveVideoPlaybackInfoUseCase).invoke(expected)
         verify(savePlaybackTimesUseCase).invoke()
     }
+
+    @Test
+    fun `test that a pause at the start of an item never played past the threshold does not save`() =
+        runTest {
+            stubPlaybackSnapshot(currentPosition = 0L)
+            initViewModel()
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = false)
+            advanceUntilIdle()
+
+            verify(saveVideoPlaybackInfoUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that a pause at the start of another item does not save after the previous item was played past the threshold`() =
+        runTest {
+            stubPlaybackSnapshot(
+                handle = 123456L,
+                currentPosition = CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS + 1_000L,
+            )
+            initViewModel()
+            underTest.onPlaybackPositionJumped()
+            advanceUntilIdle()
+            clearInvocations(saveVideoPlaybackInfoUseCase)
+
+            stubPlaybackSnapshot(handle = 654321L, currentPosition = 0L)
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = false)
+            advanceUntilIdle()
+
+            verify(saveVideoPlaybackInfoUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that a pause below the threshold is saved when the same item was played past it`() =
+        runTest {
+            stubPlaybackSnapshot(currentPosition = CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS + 1_000L)
+            initViewModel()
+            underTest.onPlaybackPositionJumped()
+            advanceUntilIdle()
+            clearInvocations(saveVideoPlaybackInfoUseCase)
+
+            val returnedToStart =
+                stubPlaybackSnapshot(currentPosition = CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS - 10_000L)
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+
+            verify(saveVideoPlaybackInfoUseCase).invoke(returnedToStart)
+        }
 
     companion object {
         @JvmField

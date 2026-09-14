@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.PLAYBACK_INFO_SAVE_INTERVAL_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
@@ -71,6 +72,19 @@ class TrackAndSaveAudioPlaybackInfoUseCaseTest {
         verify(persistAudioPlaybackInfoUseCase).invoke(playbackInfo)
         verify(persistAudioPlaybackInfoUseCase).invoke(advanced)
     }
+
+    @Test
+    fun `test that invoke does not persist the playback info when the position is not past the minimum threshold`() =
+        runTest {
+            whenever(getTickerUseCase.invoke(any())).thenReturn(flowOf(Unit, Unit))
+            val atStart = playbackInfo.copy(currentPosition = 0L)
+            val atThreshold = playbackInfo.copy(currentPosition = CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS)
+            val snapshots = ArrayDeque(listOf(atStart, atThreshold))
+
+            underTest { snapshots.removeFirst() }
+
+            verify(persistAudioPlaybackInfoUseCase, never()).invoke(any())
+        }
 
     @Test
     fun `test that invoke does not persist the playback info when the snapshot is unchanged`() =

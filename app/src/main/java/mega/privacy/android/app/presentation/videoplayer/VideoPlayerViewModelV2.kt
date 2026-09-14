@@ -59,6 +59,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueue
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
+import mega.privacy.android.app.mediaplayer.PlayedPastThresholdTracker
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.isStreamingOverQuotaError
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -333,6 +334,8 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
      * its own dispatcher would make this a data race.
      */
     private var lastTrackedPlaybackInfo: MediaPlaybackInfo? = null
+
+    private val playedPastThresholdTracker = PlayedPastThresholdTracker()
 
     private val snackbarMessage = SingleLiveEvent<Int>()
     private var searchQuery: String = ""
@@ -1317,7 +1320,10 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         currentPosition = mediaPlayerGateway.getCurrentPlayingPosition(),
         mediaType = MediaType.Video,
     ).also {
-        if (it.mediaHandle != MediaPlaybackInfo.INVALID_MEDIA_HANDLE) lastTrackedPlaybackInfo = it
+        if (it.mediaHandle != MediaPlaybackInfo.INVALID_MEDIA_HANDLE) {
+            lastTrackedPlaybackInfo = it
+            playedPastThresholdTracker.track(it)
+        }
     }
 
     /**
@@ -1345,7 +1351,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     }
 
     private fun saveVideoPlaybackInfo(info: MediaPlaybackInfo) {
-        if (info == lastSavedPlaybackInfo) return
+        if (playedPastThresholdTracker.isStartOfUnplayedItem(info) || info == lastSavedPlaybackInfo) return
         lastSavedPlaybackInfo = info
         applicationScope.launch {
             runCatching { saveVideoPlaybackInfoUseCase(info) }

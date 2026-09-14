@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.PLAYBACK_INFO_SAVE_INTERVAL_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.logging.Log
@@ -13,6 +15,11 @@ import javax.inject.Inject
  * [PLAYBACK_INFO_SAVE_INTERVAL_MS], so the saved position survives a process kill,
  * crash, or device restart. Each snapshot goes through [PersistAudioPlaybackInfoUseCase],
  * which also decides when the item counts as played through.
+ *
+ * Snapshots at or below [CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS] are not forwarded: at that point a
+ * periodic snapshot is the natural start of an item, not a return to it, so discarding a stored
+ * position on a below-threshold position is left to the immediate saves (pause, seek, track
+ * change), which know whether the item was played past the threshold in this session.
  *
  * The ticker keeps firing while playback is paused, where every snapshot is identical, so
  * a snapshot equal to the last successfully persisted one is skipped instead of rewriting the
@@ -36,6 +43,9 @@ class TrackAndSaveAudioPlaybackInfoUseCase @Inject constructor(
         var lastPersisted: MediaPlaybackInfo? = null
         getTickerUseCase(PLAYBACK_INFO_SAVE_INTERVAL_MS)
             .map { getCurrentPlaybackInfo() }
+            // Below the threshold the periodic snapshot is the natural start of an item, not a
+            // return to it; only the immediate saves may discard a stored position there.
+            .filter { it.currentPosition > CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS }
             .collect { info ->
                 if (info == lastPersisted) return@collect
                 runCatching { persistAudioPlaybackInfoUseCase(info) }

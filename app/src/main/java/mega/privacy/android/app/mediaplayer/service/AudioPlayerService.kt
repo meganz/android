@@ -60,6 +60,7 @@ import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueu
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.mediaplayer.AudioPlayQueueBuilder
 import mega.privacy.android.app.mediaplayer.AudioPlayQueueFilterDiff
+import mega.privacy.android.app.mediaplayer.PlayedPastThresholdTracker
 import mega.privacy.android.app.mediaplayer.isStreamingOverQuotaError
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
@@ -216,6 +217,8 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     // Latest snapshot with a resolved handle, kept because forced saves on track change fire
     // after the player has already moved to the next item and its duration is no longer readable.
     private var lastPlaybackInfo: MediaPlaybackInfo? = null
+
+    private val playedPastThresholdTracker = PlayedPastThresholdTracker()
     private var isTransferOverQuota = false
     private var playbackRetryCount = 0
     private var retryJob: Job? = null
@@ -824,7 +827,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     private fun cachePlaybackInfo(info: MediaPlaybackInfo) {
-        if (info.mediaHandle != -1L) lastPlaybackInfo = info
+        if (info.mediaHandle == -1L) return
+        lastPlaybackInfo = info
+        playedPastThresholdTracker.track(info)
     }
 
     private fun snapshotAndCachePlaybackInfo(): MediaPlaybackInfo? =
@@ -840,6 +845,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     private fun persistPlaybackInfo(info: MediaPlaybackInfo) {
+        if (playedPastThresholdTracker.isStartOfUnplayedItem(info)) return
         applicationScope.launch {
             runCatching { persistAudioPlaybackInfoUseCase(info) }
                 .onFailure { Timber.e(it, "Failed to save audio playback info") }

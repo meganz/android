@@ -50,6 +50,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.mediaplayer.PlayedPastThresholdTracker
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
@@ -285,6 +286,8 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
      * its own dispatcher would make this a data race.
      */
     private var lastTrackedPlaybackInfo: MediaPlaybackInfo? = null
+
+    private val playedPastThresholdTracker = PlayedPastThresholdTracker()
 
     private val snackbarMessage = SingleLiveEvent<Int>()
     private var searchQuery: String = ""
@@ -1149,7 +1152,10 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         currentPosition = mediaPlayerManager.getCurrentPlayingPosition(),
         mediaType = MediaType.Video,
     ).also {
-        if (it.mediaHandle != MediaPlaybackInfo.INVALID_MEDIA_HANDLE) lastTrackedPlaybackInfo = it
+        if (it.mediaHandle != MediaPlaybackInfo.INVALID_MEDIA_HANDLE) {
+            lastTrackedPlaybackInfo = it
+            playedPastThresholdTracker.track(it)
+        }
     }
 
     /**
@@ -1177,7 +1183,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     }
 
     private fun saveVideoPlaybackInfo(info: MediaPlaybackInfo) {
-        if (info == lastSavedPlaybackInfo) return
+        if (playedPastThresholdTracker.isStartOfUnplayedItem(info) || info == lastSavedPlaybackInfo) return
         lastSavedPlaybackInfo = info
         applicationScope.launch {
             runCatching { saveVideoPlaybackInfoUseCase(info) }

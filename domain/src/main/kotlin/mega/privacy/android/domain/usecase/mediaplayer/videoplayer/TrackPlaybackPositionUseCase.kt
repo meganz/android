@@ -20,7 +20,10 @@ import javax.inject.Inject
  *
  * A snapshot taken before the player is prepared carries no handle and no duration, and a
  * duration of zero would read as "watched through" further down: such snapshots are dropped
- * rather than acted on. Nothing is tracked until the position is past the resumable threshold.
+ * rather than acted on. Nothing is tracked until the position is past the resumable threshold:
+ * a periodic snapshot at or below it is the natural start of an item, not a return to it, so
+ * discarding a stored position there is left to the immediate saves, which know whether the item
+ * was played past the threshold in this session.
  *
  * The ticker keeps firing while playback is paused, where every snapshot is identical, so a
  * snapshot equal to the last successfully saved one is skipped instead of rewriting the same
