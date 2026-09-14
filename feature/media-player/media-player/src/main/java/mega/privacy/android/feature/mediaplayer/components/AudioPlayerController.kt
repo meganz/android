@@ -72,7 +72,7 @@ internal fun AudioPlayerController(
             MusicPlaybackControls(
                 isPlaying = isPlaying,
                 isLoading = isLoading,
-                previousEnabled = controlsEnabled,
+                controlsEnabled = controlsEnabled,
                 nextEnabled = nextEnabled,
                 shuffleEnabled = shuffleEnabled,
                 repeatMode = repeatMode,

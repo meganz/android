@@ -76,6 +76,7 @@ internal fun PodcastPlaybackControls(
         PlayPauseButton(
             isPlaying = isPlaying,
             isLoading = isLoading,
+            enabled = controlsEnabled,
             onClick = onPlayPauseClicked,
         )
 

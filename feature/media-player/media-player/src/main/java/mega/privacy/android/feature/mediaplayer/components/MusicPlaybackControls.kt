@@ -19,7 +19,7 @@ import mega.privacy.android.icon.pack.IconPack
 internal fun MusicPlaybackControls(
     isPlaying: Boolean,
     isLoading: Boolean,
-    previousEnabled: Boolean,
+    controlsEnabled: Boolean,
     nextEnabled: Boolean,
     shuffleEnabled: Boolean,
     repeatMode: Int,
@@ -52,11 +52,11 @@ internal fun MusicPlaybackControls(
 
         IconButton(
             onClick = onPreviousClicked,
-            enabled = previousEnabled,
+            enabled = controlsEnabled,
         ) {
             MegaIcon(
                 imageVector = IconPack.Medium.Regular.Solid.SkipBack,
-                tint = if (previousEnabled) IconColor.Primary else IconColor.Disabled,
+                tint = if (controlsEnabled) IconColor.Primary else IconColor.Disabled,
                 contentDescription = "Previous",
                 modifier = Modifier.size(32.dp),
             )
@@ -65,6 +65,7 @@ internal fun MusicPlaybackControls(
         PlayPauseButton(
             isPlaying = isPlaying,
             isLoading = isLoading,
+            enabled = controlsEnabled,
             onClick = onPlayPauseClicked,
         )
 
@@ -91,16 +92,21 @@ internal fun MusicPlaybackControls(
     }
 }
 
+/**
+ * Play/pause toggle. [isLoading] only swaps the icon for a throbber; whether the button reacts
+ * to taps is [enabled], so a mid-playback rebuffer never takes the pause affordance away.
+ */
 @Composable
 internal fun PlayPauseButton(
     isPlaying: Boolean,
     isLoading: Boolean,
+    enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = onClick,
-        enabled = !isLoading,
+        enabled = enabled,
         modifier = modifier.size(64.dp),
     ) {
         if (isLoading) {

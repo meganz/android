@@ -152,6 +152,13 @@ class AudioPlayerScreenTest {
     }
 
     @Test
+    fun `test that play pause button stays enabled when uiState is Data with isLoading true`() {
+        setContent(uiState = defaultData(isLoading = true))
+
+        composeTestRule.onNodeWithContentDescription("Loading").assertIsEnabled()
+    }
+
+    @Test
     fun `test that previous button is disabled when uiState is Loading`() {
         setContent(uiState = AudioPlayerUiState.Loading, isPodcastMode = false)
 
