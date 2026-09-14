@@ -1061,6 +1061,14 @@
     <string name="sync_exclusions_add_name_wildcard_helper">Use “*” for any characters and “?” for one character</string>
     <!-- Sync exclusions Add form: error under the name field when an existing rule already excludes the typed name. -->
     <string name="sync_exclusions_add_name_duplicate_error">You’ve already excluded this name</string>
+    <!-- Sync exclusions Add form: description line shown once Extensions is chosen as the type, explaining what the rule will do. -->
+    <string name="sync_exclusions_add_description_extensions">Files with these extensions aren’t synced</string>
+    <!-- Sync exclusions Add form: helper line under the extensions field, telling the user how to enter more than one extension. Use the comma your language normally uses; the field accepts the ASCII comma and the fullwidth, ideographic and Arabic ones. -->
+    <string name="sync_exclusions_add_extension_helper">Separate extensions with a comma</string>
+    <!-- Sync exclusions Add form: error under the extensions field when a typed extension contains a character an extension cannot hold. -->
+    <string name="sync_exclusions_add_extension_invalid_error">Extensions can’t contain spaces, dots, or slashes</string>
+    <!-- Sync exclusions Add form: error under the extensions field when an existing rule already excludes one of the typed extensions. %1$s is that extension, without a leading dot, for example mp3. -->
+    <string name="sync_exclusions_add_extension_duplicate_error">You’ve already excluded %1$s</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">This could be due to the following reasons:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
