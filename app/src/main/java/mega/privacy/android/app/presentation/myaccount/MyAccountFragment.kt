@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
@@ -198,7 +197,7 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
         findNavController().navigate(R.id.action_my_account_to_export_recovery_key)
 
     override fun onClickContacts() =
-        startActivity(ContactsActivity.getListIntent(requireContext()))
+        megaNavigator.openContactList(requireContext())
 
     override fun onClickAchievements() = viewModel.navigateToAchievements()
 

@@ -53,7 +53,6 @@ import mega.privacy.android.app.presentation.chat.list.dialog.MuteTarget
 import mega.privacy.android.app.presentation.chat.list.dialog.OpenLinkDialog
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.meeting.ChatInfoActivity
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
@@ -72,6 +71,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -116,6 +116,7 @@ internal fun ChatTabsScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val context = LocalContext.current
+    val megaNavigator = rememberMegaNavigator()
     val resources = LocalResources.current
     val activity = LocalActivity.current as FragmentActivity
     val pushNotificationSettingManagement = remember(context) {
@@ -476,8 +477,9 @@ internal fun ChatTabsScreen(
                     )
                 } else {
                     Analytics.tracker.trackEvent(InviteFriendsPressedEvent)
-                    context.startActivity(
-                        Intent(context, InviteContactActivity::class.java)
+                    megaNavigator.openInviteContactActivity(
+                        context = context,
+                        isFromAchievement = false,
                     )
                 }
             }

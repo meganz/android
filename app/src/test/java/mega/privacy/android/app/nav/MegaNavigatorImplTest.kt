@@ -27,6 +27,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
@@ -314,6 +315,21 @@ class MegaNavigatorImplTest {
 
             verify(context).startActivity(any())
         }
+
+    @Test
+    fun `test that openContactList emits the gated ContactsNavKey`() = runTest {
+        whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+        underTest.openContactList(context = context)
+
+        verify(navigationQueue).emit(
+            argThat<List<NavKey>> { navKeys ->
+                navKeys.size == 1 && navKeys[0] == ContactsNavKey
+            },
+            eq(NavPriority.Default),
+            isNull(),
+        )
+    }
 
     @Test
     fun `test that openChatAfterSharing opens the chat room for a single chat`() = runTest {

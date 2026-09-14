@@ -108,6 +108,7 @@ import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
@@ -376,6 +377,12 @@ internal class MegaNavigatorImpl @Inject constructor(
             }
             context.startActivity(intent)
         }
+    }
+
+    override fun openContactList(context: Context) {
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = ContactsNavKey
+        )
     }
 
     override fun openTransfers(context: Context) {

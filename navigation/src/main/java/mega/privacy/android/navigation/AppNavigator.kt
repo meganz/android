@@ -200,6 +200,13 @@ interface AppNavigator {
     fun openInviteContactActivity(context: Context, isFromAchievement: Boolean)
 
     /**
+     * Navigate to the contacts list, routed through the `ContactComposeFeature`-gated
+     * [mega.privacy.android.navigation.destination.ContactsNavKey] destination so the flag
+     * decides between the Compose contacts list and the legacy ContactsActivity.
+     */
+    fun openContactList(context: Context)
+
+    /**
      * Navigate to the transfers section.
      */
     fun openTransfers(context: Context)
