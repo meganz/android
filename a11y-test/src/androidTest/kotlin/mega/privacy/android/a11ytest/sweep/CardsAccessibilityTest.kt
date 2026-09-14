@@ -7,9 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
-import com.google.android.apps.common.testing.accessibility.framework.checks.TouchTargetSizeCheck
-import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.R as CoreUiR
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.card.PlanFeature
@@ -49,15 +46,8 @@ class CardsAccessibilityTest {
     }
 
     @Test
-    fun test_that_plans_card_passes_accessibility_checks_when_the_feature_row_touch_target_baseline_is_suppressed() {
-        // The plans card renders each plan feature as a list item that stays clickable even though
-        // the card wires no click to it, and those rows are only 40dp tall, below the 48dp touch
-        // target minimum. This cannot be fixed in this repository, so TouchTargetSizeCheck is
-        // baselined for this test only.
-        val sweep = composeTestRule.setSweepContent(
-            reporters = reporters,
-            baselineSuppressions = matchesCheck(TouchTargetSizeCheck::class.java),
-        ) {
+    fun test_that_plans_card_passes_accessibility_checks() {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             PlansCard(
                 modifier = Modifier.fillMaxWidth(),
                 title = "Pro I",
@@ -85,12 +75,5 @@ class CardsAccessibilityTest {
         }
 
         sweep.checkInEachTheme()
-
-        val suppressedBaseline = reporters.entries.filter {
-            it.checkName == "TouchTargetSizeCheck" &&
-                it.resultType == "SUPPRESSED" &&
-                it.metadata.containsKey(TouchTargetSizeCheck.KEY_HEIGHT)
-        }
-        assertThat(suppressedBaseline).isNotEmpty()
     }
 }
