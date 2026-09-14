@@ -20,6 +20,67 @@ class AudioPlayQueueFilterDiffTest {
     }
 
     @Test
+    fun `test that resolve returns NoChange when the rebuilt queue matches the timeline`() {
+        val action = AudioPlayQueueFilterDiff.resolve(
+            oldTimelineHandles = listOf(1L, null, 3L),
+            oldCurrentIndex = 0,
+            newHandles = listOf(1L, null, 3L),
+        )
+
+        assertThat(action).isEqualTo(Action.NoChange)
+    }
+
+    @Test
+    fun `test that resolve keeps a moved current item ahead of its nearest surviving successor`() {
+        val action = AudioPlayQueueFilterDiff.resolve(
+            oldTimelineHandles = listOf(1L, 2L, 3L, 4L),
+            oldCurrentIndex = 1,
+            newHandles = listOf(4L, 1L, 3L),
+            keepDetachedCurrent = true,
+        )
+
+        // 3 is the first later item that survived; it sits at index 2 of the rebuilt queue, so
+        // two rebuilt items go ahead of the still-playing item 2.
+        assertThat(action).isEqualTo(Action.KeepCurrentDetached(insertBeforeCount = 2))
+    }
+
+    @Test
+    fun `test that resolve keeps a moved current item at the queue start when no later item survived`() {
+        val action = AudioPlayQueueFilterDiff.resolve(
+            oldTimelineHandles = listOf(1L, 2L, 3L),
+            oldCurrentIndex = 2,
+            newHandles = listOf(1L, 2L),
+            keepDetachedCurrent = true,
+        )
+
+        assertThat(action).isEqualTo(Action.KeepCurrentDetached(insertBeforeCount = 0))
+    }
+
+    @Test
+    fun `test that resolve resets instead of detaching when the current item handle is unknown`() {
+        val action = AudioPlayQueueFilterDiff.resolve(
+            oldTimelineHandles = listOf(1L, null, 3L),
+            oldCurrentIndex = 1,
+            newHandles = listOf(3L, 1L),
+            keepDetachedCurrent = true,
+        )
+
+        assertThat(action).isEqualTo(Action.ResetToSurvivor(startIndex = 0))
+    }
+
+    @Test
+    fun `test that resolve resets onto the survivor when keepDetachedCurrent is false and the current item is gone`() {
+        val action = AudioPlayQueueFilterDiff.resolve(
+            oldTimelineHandles = listOf(1L, 2L, 3L, 4L),
+            oldCurrentIndex = 1,
+            newHandles = listOf(4L, 1L, 3L),
+            keepDetachedCurrent = false,
+        )
+
+        assertThat(action).isEqualTo(Action.ResetToSurvivor(startIndex = 2))
+    }
+
+    @Test
     fun `test that resolve keeps the current item at its new index when it survives the filter`() {
         val action = AudioPlayQueueFilterDiff.resolve(
             oldTimelineHandles = listOf(1L, 2L, 3L),

@@ -72,6 +72,7 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -89,6 +90,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.PersistAudioP
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAndSaveAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodeAccessibilityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStreamOverQuotaEventUseCase
@@ -176,6 +178,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     lateinit var checkNodeAccessibilityUseCase: CheckNodeAccessibilityUseCase
 
     @Inject
+    lateinit var monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase
+
+    @Inject
     lateinit var isConnectedToInternetUseCase: IsConnectedToInternetUseCase
 
     @Inject
@@ -207,6 +212,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var isBackgroundPlayEnabled = true
     private var needStopStreamingServer = false
     private var playQueueBuildJob: Job? = null
+    private var queueMoveRebuildJob: Job? = null
     private var trackPlaybackInfoJob: Job? = null
     private var lastPlayQueueParams: AudioPlayQueueParams? = null
 
@@ -249,6 +255,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         initializeSession()
         observePreferences()
         observeHiddenNodeSettingChanges()
+        observeQueueNodeMoves()
         observeTransferOverQuota()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
@@ -465,7 +472,42 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 .drop(1) // Skip the initial emission — play queue already built on first load.
                 .catch { Timber.e(it, "Failed to monitor hidden node settings") }
                 .collect {
-                    lastPlayQueueParams?.let { params -> rebuildPlayQueueForFilterChange(params) }
+                    lastPlayQueueParams?.let { params ->
+                        rebuildPlayQueueInPlace(params, keepDetachedCurrent = false)
+                    }
+                }
+        }
+    }
+
+    /**
+     * Rebuilds the queue when one of its items is moved to another folder, so the queue follows
+     * the folder's real contents. Only items already in the timeline are watched (the global
+     * node-update stream is far too chatty to react to otherwise), and a burst of moves is
+     * collapsed into a single rebuild. The playing item keeps playing even when it is the one
+     * that left the folder.
+     */
+    private fun observeQueueNodeMoves() {
+        lifecycleScope.launch {
+            monitorNodeUpdatesUseCase()
+                .catch { Timber.e(it, "Failed to monitor node updates for the play queue") }
+                .collect { update ->
+                    val movedHandles = update.changes
+                        .filterValues { NodeChanges.Parent in it }
+                        .keys.map { it.id.longValue }
+                    if (movedHandles.isEmpty()) return@collect
+                    val currentPlayer = player ?: return@collect
+                    val queueHandles = timelineHandles(currentPlayer)
+                    if (movedHandles.none { it in queueHandles }) return@collect
+                    queueMoveRebuildJob?.cancel()
+                    queueMoveRebuildJob = launch {
+                        delay(QUEUE_MOVE_REBUILD_DEBOUNCE)
+                        // Cleared before the rebuild so the cancel inside it cannot target the
+                        // coroutine that is running it.
+                        queueMoveRebuildJob = null
+                        lastPlayQueueParams?.let { params ->
+                            rebuildPlayQueueInPlace(params, keepDetachedCurrent = true)
+                        }
+                    }
                 }
         }
     }
@@ -919,6 +961,8 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     private fun rebuildPlayQueue(params: AudioPlayQueueParams) {
         playQueueBuildJob?.cancel()
+        // A move detected against the previous queue must not rebuild the new one.
+        queueMoveRebuildJob?.cancel()
         // A new session gets a fresh retry budget, and an in-flight backoff from the previous
         // session must not fire a stray prepare() into it.
         retryJob?.cancel()
@@ -992,17 +1036,24 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     /**
-     * Rebuilds the play queue after the hidden-nodes filter inputs change.
+     * Rebuilds the play queue in place after the hidden-nodes filter inputs change or a queue
+     * item is moved to another folder.
      *
      * Unlike [rebuildPlayQueue] this is anchored on the item that is currently playing rather
      * than the originally launched one, skips the fast single-item emission, and applies the
      * result as an in-place diff so playback is not interrupted or repositioned.
+     *
+     * @param keepDetachedCurrent see [AudioPlayQueueFilterDiff.resolve]
      */
-    private fun rebuildPlayQueueForFilterChange(params: AudioPlayQueueParams) {
-        // A single-track session has no sibling queue to filter. Rebuilding anyway would fall
+    private fun rebuildPlayQueueInPlace(
+        params: AudioPlayQueueParams,
+        keepDetachedCurrent: Boolean,
+    ) {
+        // A single-track session has no sibling queue to rebuild. Rebuilding anyway would fall
         // back to the root folder, because a no-queue launch intent carries no parent handle.
         if (!params.isPlayQueue) return
         playQueueBuildJob?.cancel()
+        queueMoveRebuildJob?.cancel()
         retryJob?.cancel()
         absorbJob?.cancel()
         playbackRetryCount = 0
@@ -1011,64 +1062,70 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 ?.let { mediaHandleStore.getHandle(it) }
             val anchoredParams = currentHandle?.let { params.copy(handle = it) } ?: params
             audioPlayQueueBuilder.buildFullQueue(anchoredParams)
-                .catch { Timber.e(it, "Failed to rebuild audio play queue after filter change") }
+                .catch { Timber.e(it, "Failed to rebuild audio play queue in place") }
                 .collect { mediaSources ->
                     needStopStreamingServer =
                         needStopStreamingServer || mediaSources.serverStarted
-                    applyFilterRebuild(mediaSources)
+                    applyInPlaceRebuild(mediaSources, keepDetachedCurrent)
                 }
         }
     }
 
     /**
-     * Applies a filter-change rebuild as a diff around the currently playing item.
+     * Applies an in-place rebuild as a diff around the currently playing item.
      *
-     * The branch selection lives in [AudioPlayQueueFilterDiff]: keep the playing item's
-     * MediaItem instance and rebuild around it (playback and position untouched), reset onto
-     * the nearest surviving successor preserving playWhenReady, or — when nothing survived the
-     * filter — stop the player entirely, since keeping hidden content playing would defeat the
-     * privacy setting.
+     * The branch selection lives in [AudioPlayQueueFilterDiff]: leave the timeline alone when
+     * nothing changed, keep the playing item's MediaItem instance and rebuild around it
+     * (playback and position untouched) whether or not it is still part of the rebuilt queue,
+     * reset onto the nearest surviving successor preserving playWhenReady, or — when nothing
+     * survived the filter — stop the player entirely, since keeping hidden content playing
+     * would defeat the privacy setting.
      */
-    private fun applyFilterRebuild(mediaSources: MediaPlaySources) {
+    private fun applyInPlaceRebuild(mediaSources: MediaPlaySources, keepDetachedCurrent: Boolean) {
         val currentPlayer = player ?: return
         val newItems = mediaSources.mediaItems
 
         val beforeIds = timelineMediaIds(currentPlayer)
         val currentIndex = currentPlayer.currentMediaItemIndex
         val action = AudioPlayQueueFilterDiff.resolve(
-            oldTimelineHandles = List(currentPlayer.mediaItemCount) { index ->
-                mediaHandleStore.getHandle(currentPlayer.getMediaItemAt(index).mediaId)
-            },
+            oldTimelineHandles = timelineHandles(currentPlayer),
             oldCurrentIndex = currentIndex,
             newHandles = newItems.map { mediaHandleStore.getHandle(it.mediaId) },
+            keepDetachedCurrent = keepDetachedCurrent,
         )
 
         when (action) {
+            AudioPlayQueueFilterDiff.Action.NoChange -> {
+                // The rebuilt items were registered in the handle store when they were built;
+                // none of them enters the timeline, so their mappings are dropped here.
+                mediaHandleStore.remove(newItems.map { it.mediaId })
+                return
+            }
+
             AudioPlayQueueFilterDiff.Action.StopPlayback -> {
                 stopPlayerAndSelf()
                 return
             }
 
             is AudioPlayQueueFilterDiff.Action.KeepCurrent -> {
-                val newIndexOfCurrent = action.newIndexOfCurrent
-                if (currentIndex + 1 < currentPlayer.mediaItemCount) {
-                    currentPlayer.removeMediaItems(currentIndex + 1, currentPlayer.mediaItemCount)
-                }
-                if (currentIndex > 0) {
-                    currentPlayer.removeMediaItems(0, currentIndex)
-                }
-                if (newIndexOfCurrent > 0) {
-                    currentPlayer.addMediaItems(0, newItems.subList(0, newIndexOfCurrent))
-                }
-                if (newIndexOfCurrent + 1 < newItems.size) {
-                    currentPlayer.addMediaItems(
-                        newIndexOfCurrent + 1,
-                        newItems.subList(newIndexOfCurrent + 1, newItems.size),
-                    )
-                }
+                replaceAroundCurrent(
+                    currentPlayer = currentPlayer,
+                    currentIndex = currentIndex,
+                    before = newItems.subList(0, action.newIndexOfCurrent),
+                    after = newItems.subList(action.newIndexOfCurrent + 1, newItems.size),
+                )
                 // The rebuilt duplicate of the playing item never enters the timeline (the old
                 // instance is kept), so its freshly registered mapping must be dropped explicitly.
-                mediaHandleStore.remove(listOf(newItems[newIndexOfCurrent].mediaId))
+                mediaHandleStore.remove(listOf(newItems[action.newIndexOfCurrent].mediaId))
+            }
+
+            is AudioPlayQueueFilterDiff.Action.KeepCurrentDetached -> {
+                replaceAroundCurrent(
+                    currentPlayer = currentPlayer,
+                    currentIndex = currentIndex,
+                    before = newItems.subList(0, action.insertBeforeCount),
+                    after = newItems.subList(action.insertBeforeCount, newItems.size),
+                )
             }
 
             is AudioPlayQueueFilterDiff.Action.ResetToSurvivor -> {
@@ -1079,11 +1136,40 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         mediaHandleStore.remove(beforeIds - timelineMediaIds(currentPlayer))
     }
 
+    /**
+     * Swaps every timeline item except the playing one for [before] + [after], keeping the
+     * playing item's MediaItem instance so playback and position are untouched.
+     */
+    private fun replaceAroundCurrent(
+        currentPlayer: Player,
+        currentIndex: Int,
+        before: List<MediaItem>,
+        after: List<MediaItem>,
+    ) {
+        if (currentIndex + 1 < currentPlayer.mediaItemCount) {
+            currentPlayer.removeMediaItems(currentIndex + 1, currentPlayer.mediaItemCount)
+        }
+        if (currentIndex > 0) {
+            currentPlayer.removeMediaItems(0, currentIndex)
+        }
+        if (before.isNotEmpty()) {
+            currentPlayer.addMediaItems(0, before)
+        }
+        if (after.isNotEmpty()) {
+            currentPlayer.addMediaItems(before.size + 1, after)
+        }
+    }
+
     private fun timelineMediaIds(currentPlayer: Player): Set<String> = buildSet {
         for (i in 0 until currentPlayer.mediaItemCount) {
             add(currentPlayer.getMediaItemAt(i).mediaId)
         }
     }
+
+    private fun timelineHandles(currentPlayer: Player): List<Long?> =
+        List(currentPlayer.mediaItemCount) { index ->
+            mediaHandleStore.getHandle(currentPlayer.getMediaItemAt(index).mediaId)
+        }
 
     private fun applyMediaSources(mediaSources: MediaPlaySources, resumePositionMs: Long?) {
         val currentPlayer = player ?: return
@@ -1181,6 +1267,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         // unbind, and a queue build / retry backoff / absorb seek completing in that window
         // would re-start playback on a service the user just stopped.
         playQueueBuildJob?.cancel()
+        queueMoveRebuildJob?.cancel()
         retryJob?.cancel()
         absorbJob?.cancel()
         forceSaveCurrentPlaybackInfo()
@@ -1253,6 +1340,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         forceSaveCurrentPlaybackInfo()
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         playQueueBuildJob?.cancel()
+        queueMoveRebuildJob?.cancel()
         trackPlaybackInfoJob?.cancel()
         if (needStopStreamingServer) {
             // applicationScope, not lifecycleScope: super.onDestroy() cancels the lifecycle
@@ -1291,6 +1379,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         /** Distinct from Media3's own notification id so the two never overwrite each other. */
         private const val PLACEHOLDER_NOTIFICATION_ID = 1002
         private val PLAYBACK_RETRY_BACKOFF = 500.milliseconds
+
+        // A multi-select move lands as one node update per item; wait for the burst to settle
+        // so the queue is rebuilt once instead of once per moved file.
+        private val QUEUE_MOVE_REBUILD_DEBOUNCE = 500.milliseconds
 
         private const val HTTP_TIMEOUT_MS = 5_000
         private const val LOAD_ERROR_RETRY_COUNT = 2
