@@ -2939,4 +2939,8 @@
     <string name="general_close">Tutup</string>
     <string name="first_paragraph_achievement_invite_friends">Undang teman anda untuk mendaftar akun MEGA gratis dan menginstal Aplikasi Seluler MEGA. Anda akan menerima penyimpanan gratis sebagai bonus untuk setiap pendaftaran dan instalasi aplikasi.</string>
     <string name="invite_sent_text_multi">Pengguna telah diundang dan akan muncul dalam daftar kontak anda setelah undangan anda diterima.</string>
+    <string name="sync_exclusions_add_type">Tipe</string>
+    <string name="sync_exclusions_add_type_files">File</string>
+    <string name="sync_exclusions_add_type_folders">Folder</string>
+    <string name="general_try_again">Coba lagi</string>
 </resources>

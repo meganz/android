@@ -3120,4 +3120,7 @@
     <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s extra opslagruimte ontvangen voor het installeren van onze desktop-applicatie.</string>
     <string name="result_paragraph_info_achievement_registration">U heeft%1$s extra opslagruimte ontvangen als aanmeldingsbonus.</string>
     <string name="audio_player_not_allowed_during_call">U kunt geen media afspelen tijdens een gesprek</string>
+    <string name="sync_exclusions_add_type">Type</string>
+    <string name="sync_exclusions_add_type_files">Bestanden</string>
+    <string name="sync_exclusions_add_type_folders">Mappen</string>
 </resources>

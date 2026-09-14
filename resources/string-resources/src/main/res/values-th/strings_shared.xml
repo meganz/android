@@ -2978,4 +2978,7 @@
     <string name="result_paragraph_info_achievement_install_desktop">คุณได้รับพื้นที่จัดเก็บเพิ่มเติม %1$s จากการติดตั้งแอปบนเดสก์ท็อป</string>
     <string name="result_paragraph_info_achievement_registration">คุณได้รับพื้นที่จัดเก็บเพิ่มเติม %1$s เป็นโบนัสจากการลงทะเบียน</string>
     <string name="audio_player_not_allowed_during_call">ไม่สามารถเล่นไฟล์สื่อระหว่างอยู่ในสายได้</string>
+    <string name="sync_exclusions_add_type">ประเภท</string>
+    <string name="sync_exclusions_add_type_files">ไฟล์</string>
+    <string name="sync_exclusions_add_type_folders">โฟลเดอร์</string>
 </resources>

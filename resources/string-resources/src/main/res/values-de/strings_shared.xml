@@ -3107,4 +3107,8 @@
     <string name="second_paragraph_achievement_invite_friends">Der kostenlose Bonusspeicherplatz wird nur bei neuen Einladungen und bei Installation einer MEGA-Mobil-App oder der MEGA-Desktop-App gewährt.</string>
     <string name="first_paragraph_achievement_invite_friends">Laden Sie Ihre Freunde ein, einen kostenlosen MEGA-Account zu registrieren und eine MEGA-Mobil-App zu installieren. Für jede Anmeldung und App-Installation erhalten Sie als Bonus kostenlosen Speicherplatz.</string>
     <string name="invite_sent_text_multi">Die Benutzer wurden eingeladen und werden in Ihrer Kontaktliste auftauchen, sobald sie die Einladung annehmen.</string>
+    <string name="sync_exclusions_add_type">Typ</string>
+    <string name="sync_exclusions_add_type_files">Dateien</string>
+    <string name="sync_exclusions_add_type_folders">Ordner</string>
+    <string name="general_try_again">Wiederholen</string>
 </resources>

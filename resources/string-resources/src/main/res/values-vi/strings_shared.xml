@@ -2950,4 +2950,9 @@
     <string name="invite_sent_text">Đối tượng đã được mời và sẽ xuất hiện trong sổ liên lạc sau khi họ chấp nhận lời mời.</string>
     <string name="invite_sent_text_multi">Tên của những người quý khách vừa mời sẽ xuất hiện trong sổ liên lạc sau khi họ dùng lời mời của quý khách để tạo tài khoản.</string>
     <string name="general_close">Đóng</string>
+    <string name="sync_exclusions_add_type">Dạng</string>
+    <string name="sync_exclusions_add_type_files">Tệp&#160;tin</string>
+    <string name="sync_exclusions_add_type_folders">Thư mục</string>
+    <string name="sync_exclusions_add_type_files_and_folders">Tệp&#160;tin và thư&#160;mục</string>
+    <string name="general_try_again">Thử lại</string>
 </resources>
