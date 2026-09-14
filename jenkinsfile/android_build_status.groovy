@@ -220,9 +220,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Preparation"
-                }
-                gitlabCommitStatus(name: 'Preparation') {
-                    script {
+                    common.withStageStatus('CI: Preparation') {
                         sh("rm -fv ${CONSOLE_LOG_FILE}")
                         sh("set")
                         sh("rm -fv unit_test_result*.zip")
@@ -245,8 +243,8 @@ pipeline {
                     }
                     steps {
 
-                        gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
-                            script {
+                        script {
+                            common.withStageStatus('CI: Build APK (GMS+QA)') {
                                 STAGE_START_MS['build_apk_ms'] = System.currentTimeMillis()
                                 STAGE_NODE_NAMES['build_apk'] = env.NODE_NAME
                                 util.useArtifactory() {
@@ -297,9 +295,7 @@ pipeline {
                         script {
                             STAGE_START_MS['unit_test_ms'] = System.currentTimeMillis()
                             STAGE_NODE_NAMES['unit_test'] = env.NODE_NAME
-                        }
-                        gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
-                            script {
+                            common.withStageStatus('CI: Unit Test and Code Coverage') {
                                 util.useArtifactory() {
                                     def moduleList = common.getUnitTestModuleList()
                                     def failedModules = []
@@ -353,8 +349,8 @@ pipeline {
                         expression { !shouldSkipBuild() && !isCodeReviewOnly() && !isWeblateCheckOnly() }
                     }
                     steps {
-                        gitlabCommitStatus(name: 'Lint Check') {
-                            script {
+                        script {
+                            common.withStageStatus('CI: Lint Check') {
                                 STAGE_START_MS['lint_ms'] = System.currentTimeMillis()
                                 STAGE_NODE_NAMES['lint'] = env.NODE_NAME
                                 util.useArtifactory() {
@@ -401,8 +397,8 @@ pipeline {
                         expression { isWeblateCheckOnly() || (!shouldSkipBuild() && !isCodeReviewOnly()) }
                     }
                     steps {
-                        gitlabCommitStatus(name: 'Weblate Strings Check') {
-                            script {
+                        script {
+                            common.withStageStatus('CI: Weblate Strings Check') {
                                 STAGE_START_MS['weblate_gate_ms'] = System.currentTimeMillis()
                                 STAGE_NODE_NAMES['weblate_gate'] = env.NODE_NAME
 
@@ -460,45 +456,47 @@ pipeline {
                         expression { shouldRunCodeReview() }
                     }
                     steps {
-                        gitlabCommitStatus(name: 'Code Review') {
-                            script {
-                                STAGE_START_MS['code_review_ms'] = System.currentTimeMillis()
-                                STAGE_NODE_NAMES['code_review'] = env.NODE_NAME
+                        script {
+                            STAGE_START_MS['code_review_ms'] = System.currentTimeMillis()
+                            STAGE_NODE_NAMES['code_review'] = env.NODE_NAME
 
-                                def skillFile = common.checkoutProcessSkill('android-code-review')
-                                def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: 'develop'
+                            // The review is advisory: its errors are reported to the MR and shown as a
+                            // failed GitLab stage, but they must never fail the build itself.
+                            try {
+                                common.withStageStatus('CI: Code Review') {
+                                    def skillFile = common.checkoutProcessSkill('android-code-review')
+                                    def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: 'develop'
 
-                                util.useGitLab() {
-                                    withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
-                                        try {
+                                    util.useGitLab() {
+                                        withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
                                             sh "${GRADLE_CI} codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
                                             def summary = "Code Review Report"
                                             if (fileExists(CODE_REVIEW_SUMMARY_FILE)) {
                                                 summary = readFile(CODE_REVIEW_SUMMARY_FILE).trim()
                                             }
                                             common.sendFileToMRComment(CODE_REVIEW_OUTPUT_FILE, summary)
-                                        } catch (Exception e) {
-                                            String errorMessage = e.message ?: 'Unknown error'
-                                            try {
-                                                if (fileExists(CODE_REVIEW_ERROR_REPORT_FILE)) {
-                                                    errorMessage = readFile(CODE_REVIEW_ERROR_REPORT_FILE).trim()
-                                                }
-                                            } catch (ignored) {
-                                            }
-
-                                            common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                                            String mrNumber = common.getMrNumber()
-                                            String folder = "android-build/MR-${mrNumber}"
-                                            String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
-
-                                            String failMsg = ":x: **Code Review Failed** (Build: ${env.BUILD_NUMBER})<br/>" +
-                                                    "Error: ${errorMessage}<br/>" +
-                                                    "Please check the [build log](${jenkinsLog}) for details."
-
-                                            common.sendToMR(failMsg)
                                         }
                                     }
                                 }
+                            } catch (Exception e) {
+                                String errorMessage = e.message ?: 'Unknown error'
+                                try {
+                                    if (fileExists(CODE_REVIEW_ERROR_REPORT_FILE)) {
+                                        errorMessage = readFile(CODE_REVIEW_ERROR_REPORT_FILE).trim()
+                                    }
+                                } catch (ignored) {
+                                }
+
+                                common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                                String mrNumber = common.getMrNumber()
+                                String folder = "android-build/MR-${mrNumber}"
+                                String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
+
+                                String failMsg = ":x: **Code Review Failed** (Build: ${env.BUILD_NUMBER})<br/>" +
+                                        "Error: ${errorMessage}<br/>" +
+                                        "Please check the [build log](${jenkinsLog}) for details."
+
+                                common.sendToMR(failMsg)
                             }
                         }
                     }

@@ -63,6 +63,13 @@ pipeline {
         APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
     }
     post {
+        always {
+            script {
+                if (common != null) {
+                    common.finishStages(currentBuild.currentResult)
+                }
+            }
+        }
         failure {
             script {
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
@@ -198,6 +205,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Clone weblate'
+                    common.beginStage(BUILD_STEP)
 
                     withCredentials([
                             gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default'),
@@ -218,6 +226,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
+                    common.beginStage(BUILD_STEP)
 
                     // send command acknowledgement to MR
                     common.sendToMR(":runner: Android CD Release pipeline has started!!!" +
@@ -242,6 +251,7 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
                         BUILD_STEP = 'Fetch native symbols'
+                        common.beginStage(BUILD_STEP)
 
                         common.downloadAndExtractNativeSymbols()
                     }
@@ -255,6 +265,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Apply Google Map API Key'
+                    common.beginStage(BUILD_STEP)
                 }
 
                 withCredentials([
@@ -274,6 +285,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS APK'
+                    common.beginStage(BUILD_STEP)
                     sh './gradlew --no-daemon clean app:assembleGmsRelease'
                 }
             }
@@ -285,6 +297,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Sign GMS APK'
+                    common.beginStage(BUILD_STEP)
                 }
                 withCredentials([
                         file(credentialsId: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE', variable: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE'),
@@ -315,6 +328,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
+                    common.beginStage(BUILD_STEP)
                     sh """
                     cd $WORKSPACE
                     ./gradlew --no-daemon app:uploadCrashlyticsSymbolFileGmsRelease
@@ -329,6 +343,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS AAB'
+                    common.beginStage(BUILD_STEP)
                     sh './gradlew --no-daemon clean app:bundleGmsRelease'
                 }
             }
@@ -340,6 +355,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Sign GMS AAB'
+                    common.beginStage(BUILD_STEP)
                 }
                 withCredentials([
                         string(credentialsId: 'ANDROID_PRD_GMS_AAB_PASSWORD', variable: 'ANDROID_PRD_GMS_AAB_PASSWORD'),
@@ -368,6 +384,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Archive files'
+                    common.beginStage(BUILD_STEP)
                     println("Uploading files to Artifactory repo....")
 
                     withCredentials([
@@ -418,6 +435,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Deploy to Google Play Alpha'
+                    common.beginStage(BUILD_STEP)
                 }
                 script {
                     withCredentials([
@@ -450,6 +468,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Create Jira Version'
+                    common.beginStage(BUILD_STEP)
 
                     def parameters = parseCreateJiraVersionParameters(env.gitlabTriggerPhrase)
                     def releaseVersion = parameters[0]
@@ -471,6 +490,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Send Code Freeze Reminder'
+                    common.beginStage(BUILD_STEP)
 
                     def parameters = parseSendCodeFreezeReminderParameters(env.gitlabTriggerPhrase)
                     def currentVersion = parameters[0]
@@ -492,6 +512,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Update Analytics Dependency'
+                    common.beginStage(BUILD_STEP)
                     withCredentials([
                             string(credentialsId: 'ANALYTICS_GIT_URL', variable: 'ANALYTICS_GIT_URL'),
                             gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default'),
@@ -510,6 +531,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Post Release'
+                    common.beginStage(BUILD_STEP)
 
                     def parameters = parsePostReleaseParameters(env.gitlabTriggerPhrase)
                     def releaseVersion = parameters[0]

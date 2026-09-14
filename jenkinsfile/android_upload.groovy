@@ -91,6 +91,13 @@ pipeline {
         APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
     }
     post {
+        always {
+            script {
+                if (common != null) {
+                    common.finishStages(currentBuild.currentResult)
+                }
+            }
+        }
         failure {
             script {
                 common = load('jenkinsfile/common.groovy')
@@ -174,6 +181,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
+                    common.beginStage(BUILD_STEP)
 
                     sh("rm -frv $ARCHIVE_FOLDER")
                     sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
@@ -190,6 +198,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Apply Google Map API Key'
+                    common.beginStage(BUILD_STEP)
                 }
 
                 withCredentials([
@@ -211,6 +220,7 @@ pipeline {
                 script {
                     util.useArtifactory() {
                         BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
+                        common.beginStage(BUILD_STEP)
 
                         common.downloadAndExtractNativeSymbols()
                         sh """
@@ -229,6 +239,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build APK (GMS)'
+                    common.beginStage(BUILD_STEP)
                     sh './gradlew --no-daemon app:assembleGmsRelease'
                 }
             }
@@ -240,6 +251,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Sign APK(GMS)'
+                    common.beginStage(BUILD_STEP)
                 }
                 withCredentials([
                         file(credentialsId: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE', variable: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE'),
@@ -267,6 +279,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Upload APK(GMS) to Firebase'
+                    common.beginStage(BUILD_STEP)
                 }
                 withCredentials([
                         file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
@@ -293,6 +306,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build QA APK(GMS)'
+                    common.beginStage(BUILD_STEP)
                     withEnv([
                             "APK_VERSION_NAME_TAG_FOR_CD=_QA"
                     ]) {
@@ -309,6 +323,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Upload QA APK(GMS) to Firebase'
+                    common.beginStage(BUILD_STEP)
                 }
                 withCredentials([
                         file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
@@ -334,6 +349,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Run Instrumented Tests on Managed Device'
+                    common.beginStage(BUILD_STEP)
 
                     // The SDK dir is owned by the provisioning user and is read-only for the
                     // Jenkins user, so the pipeline must not try to install anything itself.
@@ -382,6 +398,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Upload Code Coverage"
+                    common.beginStage(BUILD_STEP)
 
                     util.useArtifactory() {
                         sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"

@@ -5,6 +5,7 @@
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurperClassic
+import groovy.transform.Field
 
 /**
  * Check if this build is triggered by a GitLab Merge Request.
@@ -96,6 +97,128 @@ void sendFileToMRComment(String filePath, String summary) {
             '''
         }
     }
+}
+
+/**
+ * Post a GitLab commit status for the commit this build checked out.
+ *
+ * The gitlab-plugin `gitlabCommitStatus` step is a silent no-op for builds without a GitLab
+ * webhook cause (the multibranch MR job), because it cannot resolve the project from the build
+ * alone. Going through the REST API with the same token as `sendToMR` works regardless of how
+ * the job was triggered. A status update must never fail the build, so errors are only logged.
+ *
+ * The description names the Jenkins build, so when two builds report on the same commit the
+ * GitLab job detail still shows which build each status came from.
+ *
+ * @param name status name; GitLab shows it as a job in the MR pipeline widget
+ * @param state one of pending, running, success, failed, canceled
+ */
+void postCommitStatus(String name, String state) {
+    if (env.GIT_COMMIT == null || env.GIT_COMMIT.isEmpty()) {
+        println("[commit-status] skipped '${name}' -> ${state}: GIT_COMMIT is not set")
+        return
+    }
+    try {
+        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+            // withEnv rather than env.X: parallel stages post concurrently and env is build-wide
+            withEnv([
+                    "COMMIT_STATUS_NAME=${name}",
+                    "COMMIT_STATUS_STATE=${state}",
+                    "COMMIT_STATUS_DESCRIPTION=Jenkins ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    "COMMIT_STATUS_URL=${env.GITLAB_BASE_URL}/api/v4/projects/199/statuses/${env.GIT_COMMIT}"
+            ]) {
+                sh '''
+                    HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --request POST --header PRIVATE-TOKEN:$TOKEN \
+                        --data-urlencode "name=${COMMIT_STATUS_NAME}" \
+                        --data-urlencode "state=${COMMIT_STATUS_STATE}" \
+                        --data-urlencode "description=${COMMIT_STATUS_DESCRIPTION}" \
+                        --data-urlencode "target_url=${BUILD_URL}" \
+                        "${COMMIT_STATUS_URL}")
+                    echo "[commit-status] ${COMMIT_STATUS_NAME} -> ${COMMIT_STATUS_STATE}: HTTP ${HTTP_CODE}"
+                '''
+            }
+        }
+    } catch (Exception e) {
+        println("[commit-status] failed '${name}' -> ${state}: ${e}")
+    }
+}
+
+/**
+ * Run [body] as a stage GitLab can follow: running first, then success, failed, or canceled
+ * (build aborted, or a failFast sibling failed). For stages that run in parallel, where a shared
+ * "current stage" would be ambiguous; sequential pipelines use [beginStage] instead.
+ */
+void withStageStatus(String name, Closure body) {
+    postCommitStatus(name, 'running')
+    try {
+        body.call()
+    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+        postCommitStatus(name, 'canceled')
+        throw e
+    } catch (Exception e) {
+        postCommitStatus(name, 'failed')
+        throw e
+    }
+    postCommitStatus(name, 'success')
+}
+
+/**
+ * Stage of a sequential pipeline currently reported to GitLab as running; see [beginStage].
+ */
+@Field String currentStage = null
+
+/**
+ * The MR command that triggered this CD build (e.g. `deliver_qa`, `deliver_appStore`), or
+ * `push` for a plain push trigger. Parameters after the command are dropped.
+ */
+String triggerCommand() {
+    String phrase = env.gitlabTriggerPhrase?.trim()
+    return phrase ? phrase.tokenize().first() : 'push'
+}
+
+/**
+ * Report [name] as running to GitLab, closing the previous [beginStage] stage as success first.
+ * Sequential pipelines call this where they set BUILD_STEP; their `post` block then calls
+ * [finishStages] to close the last stage with the build result.
+ *
+ * The status is named `<command>: <name>`. GitLab keys statuses by name within a commit, so the
+ * prefix keeps concurrent CD commands on the same MR (e.g. `deliver_qa` and `device_test`) and
+ * the CI stages apart; two runs of the *same* command on the same commit still share names, and
+ * the later terminal state wins.
+ *
+ * @param name stage name, typically BUILD_STEP
+ */
+void beginStage(String name) {
+    if (currentStage != null) {
+        postCommitStatus(currentStage, 'success')
+    }
+    currentStage = "${triggerCommand()}: ${name}"
+    postCommitStatus(currentStage, 'running')
+}
+
+/**
+ * Close the stage left open by [beginStage] with the final build result.
+ *
+ * @param buildResult currentBuild.currentResult: SUCCESS, UNSTABLE, FAILURE, ABORTED or NOT_BUILT
+ */
+void finishStages(String buildResult) {
+    if (currentStage == null) {
+        return
+    }
+    String state
+    switch (buildResult) {
+        case 'SUCCESS':
+            state = 'success'
+            break
+        case 'ABORTED':
+        case 'NOT_BUILT':
+            state = 'canceled'
+            break
+        default:
+            state = 'failed'
+    }
+    postCommitStatus(currentStage, state)
+    currentStage = null
 }
 
 /**
