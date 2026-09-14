@@ -2,11 +2,15 @@ package mega.privacy.android.app.mediaplayer.gateway
 
 import android.content.Context
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import app.cash.turbine.test
+import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -22,6 +26,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import java.util.stream.Stream
 
@@ -38,6 +43,9 @@ internal class AudioMediaControllerFacadeTest {
         on { currentMediaItemIndex } doReturn 0
         on { currentPosition } doReturn 0L
         on { duration } doReturn 0L
+        on { mediaMetadata } doReturn MediaMetadata.EMPTY
+        on { playbackParameters } doReturn PlaybackParameters.DEFAULT
+        on { playbackState } doReturn Player.STATE_IDLE
     }
 
     private lateinit var underTest: AudioMediaControllerFacade
@@ -114,6 +122,52 @@ internal class AudioMediaControllerFacadeTest {
         underTest.skipToPrevious()
 
         verify(controller).seekToPrevious()
+    }
+
+    @Test
+    fun `test that a stale connection failure does not drop the idle suppression of a reconnect`() =
+        runTest {
+            val staleFuture = mock<ListenableFuture<MediaController>>()
+            val liveFuture = mock<ListenableFuture<MediaController>>()
+            underTest.reconnectController()
+            underTest.controllerFuture = liveFuture
+
+            // releaseFuture() on the previous connection delivers its cancellation first.
+            underTest.onControllerConnectionFailed(staleFuture, CancellationException())
+            underTest.onControllerConnected(liveFuture, controller)
+
+            underTest.playerState.test {
+                assertThat(awaitItem().isIdle).isFalse()
+            }
+            underTest.release()
+        }
+
+    @Test
+    fun `test that a connection failure of the live future ends the reconnect`() = runTest {
+        val liveFuture = mock<ListenableFuture<MediaController>>()
+        underTest.reconnectController()
+        underTest.controllerFuture = liveFuture
+
+        underTest.onControllerConnectionFailed(liveFuture, RuntimeException("rejected"))
+        underTest.onControllerConnected(liveFuture, controller)
+
+        underTest.playerState.test {
+            assertThat(awaitItem().isIdle).isTrue()
+        }
+        underTest.release()
+    }
+
+    @Test
+    fun `test that a stale connection result is released instead of installed`() {
+        val staleFuture = mock<ListenableFuture<MediaController>>()
+        val staleController = mock<MediaController>()
+        underTest.controllerFuture = mock<ListenableFuture<MediaController>>()
+
+        underTest.onControllerConnected(staleFuture, staleController)
+
+        verify(staleController).release()
+        verify(staleController, never()).addListener(underTest.playerListener)
+        assertThat(underTest.controller).isSameInstanceAs(controller)
     }
 
     private fun transitionReasons(): Stream<Arguments> = Stream.of(

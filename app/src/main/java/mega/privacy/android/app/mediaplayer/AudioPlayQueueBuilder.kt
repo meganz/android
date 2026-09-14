@@ -198,7 +198,7 @@ class AudioPlayQueueBuilder @Inject constructor(
             isPaidAccount = isPaidAccount,
             isBusinessExpired = isBusinessExpired,
         ) ?: return
-        val (rawMediaItems, firstPlayIndex) = fullQueue
+        val (rawMediaItems, currentIndex) = fullQueue
 
         if (rawMediaItems.isEmpty()) {
             // Filtering emptied a queue this source did build. Only the full-queue rebuild path
@@ -221,15 +221,31 @@ class AudioPlayQueueBuilder @Inject constructor(
         // across both emissions. applyMediaSources checks mediaId equality to decide whether
         // to expand the queue with addMediaItems (no interruption) or reset with setMediaItems
         // (causes re-buffer). A mismatched UUID would always trigger the reset path.
-        val mediaItems = if (firstMediaItem != null && firstPlayIndex in rawMediaItems.indices) {
-            rawMediaItems.toMutableList().also { it[firstPlayIndex] = firstMediaItem }
-        } else {
-            rawMediaItems
+        val mediaItems: List<MediaItem>
+        val newIndexForCurrentItem: Int
+        when {
+            firstMediaItem == null -> {
+                mediaItems = rawMediaItems
+                newIndexForCurrentItem = currentIndex ?: 0
+            }
+
+            currentIndex != null -> {
+                mediaItems = rawMediaItems.toMutableList().also { it[currentIndex] = firstMediaItem }
+                newIndexForCurrentItem = currentIndex
+            }
+
+            else -> {
+                // The tapped track is already playing but is not among the siblings this source
+                // returned (filtered out, or its stream URL failed to resolve). Keep it at the
+                // head of the queue rather than overwriting the first sibling with it.
+                mediaItems = listOf(firstMediaItem) + rawMediaItems
+                newIndexForCurrentItem = 0
+            }
         }
         emit(
             MediaPlaySources(
                 mediaItems = mediaItems,
-                newIndexForCurrentItem = firstPlayIndex,
+                newIndexForCurrentItem = newIndexForCurrentItem,
                 nameToDisplay = null,
                 serverStarted = serverStarted,
             )
@@ -239,7 +255,9 @@ class AudioPlayQueueBuilder @Inject constructor(
     /**
      * Resolves the full sibling queue for [params], or null when this source cannot build one
      * (single-item sources like chat/file links, missing inputs, or a fetch failure). A non-null
-     * empty list means the source did build a queue and filtering removed every item.
+     * empty list means the source did build a queue and filtering removed every item. The index
+     * is that of [AudioPlayQueueParams.handle] within the built list, or null when the requested
+     * track is not part of it.
      */
     private suspend fun buildFullPlayQueue(
         params: AudioPlayQueueParams,
@@ -247,7 +265,7 @@ class AudioPlayQueueBuilder @Inject constructor(
         showHiddenItems: Boolean,
         isPaidAccount: Boolean,
         isBusinessExpired: Boolean,
-    ): Pair<List<MediaItem>, Int>? = when (type) {
+    ): Pair<List<MediaItem>, Int?>? = when (type) {
         OFFLINE_ADAPTER -> buildFromOfflineNodes(params.offlineParentId, params.handle)
 
         AUDIO_BROWSE_ADAPTER -> buildFromTypedNodes(
@@ -309,10 +327,10 @@ class AudioPlayQueueBuilder @Inject constructor(
     private suspend fun buildFromOfflineNodes(
         parentId: Int,
         firstPlayHandle: Long,
-    ): Pair<List<MediaItem>, Int>? = runCatching {
+    ): Pair<List<MediaItem>, Int?>? = runCatching {
         val list = getOfflineNodesByParentIdUseCase(parentId)
         val mediaItems = mutableListOf<MediaItem>()
-        var firstPlayIndex = 0
+        var firstPlayIndex: Int? = null
 
         list.filter { it.fileTypeInfo is AudioFileTypeInfo && it.fileTypeInfo?.isSupported == true }
             .forEach { item ->
@@ -342,7 +360,7 @@ class AudioPlayQueueBuilder @Inject constructor(
         showHiddenItems: Boolean,
         isPaidAccount: Boolean,
         isBusinessExpired: Boolean,
-    ): Pair<List<MediaItem>, Int>? {
+    ): Pair<List<MediaItem>, Int?>? {
         val parentHandle = params.parentHandle
         val order = params.sortOrder
 
@@ -390,7 +408,7 @@ class AudioPlayQueueBuilder @Inject constructor(
 
     private suspend fun buildFromFolderLink(
         params: AudioPlayQueueParams,
-    ): Pair<List<MediaItem>, Int>? {
+    ): Pair<List<MediaItem>, Int?>? {
         val parentHandle = params.parentHandle
         val parent = if (parentHandle == INVALID_HANDLE) {
             getRootNodeFromMegaApiFolderUseCase()
@@ -416,13 +434,13 @@ class AudioPlayQueueBuilder @Inject constructor(
     private fun buildFromZipFiles(
         zipPath: String?,
         firstPlayHandle: Long,
-    ): Pair<List<MediaItem>, Int>? {
+    ): Pair<List<MediaItem>, Int?>? {
         zipPath ?: return null
         val files = File(zipPath).parentFile?.listFiles()
             ?: return null
 
         val mediaItems = mutableListOf<MediaItem>()
-        var firstPlayIndex = 0
+        var firstPlayIndex: Int? = null
 
         files.filter { it.isFile && isAudioFile(it.name) }
             .forEachIndexed { index, file ->
@@ -447,9 +465,9 @@ class AudioPlayQueueBuilder @Inject constructor(
         showHiddenItems: Boolean,
         isPaidAccount: Boolean,
         isBusinessExpired: Boolean,
-    ): Pair<List<MediaItem>, Int> {
+    ): Pair<List<MediaItem>, Int?> {
         val mediaItems = mutableListOf<MediaItem>()
-        var firstPlayIndex = 0
+        var firstPlayIndex: Int? = null
 
         filterNonSensitiveNodes(nodes, showHiddenItems, isPaidAccount, isBusinessExpired)
             .filterTakeDownNodes()

@@ -430,6 +430,77 @@ class AudioPlayQueueBuilderTest {
         }
 
     @Test
+    fun `test that the full queue substitutes the first-emit item at the tapped track position`() =
+        runTest {
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                whenever(Uri.parse(any())).thenReturn(mock())
+                val node1 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(1L)) }
+                val node2 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(2L)) }
+                val node3 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(3L)) }
+                whenever(getAudioNodesUseCase(any())).thenReturn(listOf(node1, node2, node3))
+                whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn("http://server/track")
+                val firstMediaItem = mock<MediaItem>()
+                whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull()))
+                    .thenReturn(firstMediaItem)
+                whenever(audioNodeToMediaItemMapper(any<TypedAudioNode>(), any<Uri>()))
+                    .thenReturn(mock())
+                val params = buildParams(
+                    adapterType = AUDIO_BROWSE_ADAPTER,
+                    handle = 2L,
+                    isPlayQueue = true,
+                )
+
+                underTest(params).test {
+                    awaitItem() // fast single-item emission
+
+                    val full = awaitItem()
+
+                    assertThat(full.mediaItems).hasSize(3)
+                    assertThat(full.mediaItems[1]).isSameInstanceAs(firstMediaItem)
+                    assertThat(full.newIndexForCurrentItem).isEqualTo(1)
+                    awaitComplete()
+                }
+            }
+        }
+
+    @Test
+    fun `test that the full queue keeps every sibling when the tapped track is not among them`() =
+        runTest {
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                whenever(Uri.parse(any())).thenReturn(mock())
+                val node1 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(1L)) }
+                val node2 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(2L)) }
+                whenever(getAudioNodesUseCase(any())).thenReturn(listOf(node1, node2))
+                whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn("http://server/track")
+                val firstMediaItem = mock<MediaItem>()
+                val sibling1 = mock<MediaItem>()
+                val sibling2 = mock<MediaItem>()
+                whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull()))
+                    .thenReturn(firstMediaItem)
+                whenever(audioNodeToMediaItemMapper(any<TypedAudioNode>(), any<Uri>()))
+                    .thenReturn(sibling1, sibling2)
+                // The tapped handle is not in the sibling list (e.g. filtered out after launch).
+                val params = buildParams(
+                    adapterType = AUDIO_BROWSE_ADAPTER,
+                    handle = 99L,
+                    isPlayQueue = true,
+                )
+
+                underTest(params).test {
+                    awaitItem() // fast single-item emission
+
+                    val full = awaitItem()
+
+                    assertThat(full.mediaItems)
+                        .containsExactly(firstMediaItem, sibling1, sibling2)
+                        .inOrder()
+                    assertThat(full.newIndexForCurrentItem).isEqualTo(0)
+                    awaitComplete()
+                }
+            }
+        }
+
+    @Test
     fun `test that buildFullQueue emits an empty result when filtering removes every node`() =
         runTest {
             val levelDetail = mock<AccountLevelDetail> {

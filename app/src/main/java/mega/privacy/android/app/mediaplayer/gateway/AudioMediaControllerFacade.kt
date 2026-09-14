@@ -64,7 +64,9 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
     @VisibleForTesting
     internal var controller: MediaController? = null
-    private var controllerFuture: ListenableFuture<MediaController>? = null
+
+    @VisibleForTesting
+    internal var controllerFuture: ListenableFuture<MediaController>? = null
     private var positionPollingJob: Job? = null
     private var currentState = AudioControllerState()
     private var isReconnecting = false
@@ -87,9 +89,11 @@ internal class AudioMediaControllerFacade @Inject constructor(
                 .setListener(object : MediaController.Listener {
                     override fun onDisconnected(controller: MediaController) {
                         // Skip idle emission and future cleanup when we initiated the disconnect
-                        // ourselves via reconnectController(). In that case the new future is
-                        // already stored in controllerFuture and must not be released here.
+                        // ourselves via reconnectController(), or when the disconnect belongs to
+                        // a controller that has already been superseded. In both cases the live
+                        // future is already stored in controllerFuture and must not be released.
                         if (isReconnecting) return
+                        if (controller !== this@AudioMediaControllerFacade.controller) return
                         updateState { copy(isIdle = true, isSessionEnded = true) }
                         stopPositionPolling()
                         controller.removeListener(playerListener)
@@ -110,30 +114,54 @@ internal class AudioMediaControllerFacade @Inject constructor(
                         future,
                         object : FutureCallback<MediaController> {
                             override fun onSuccess(result: MediaController) {
-                                // Guard against delivery after release() was already called.
-                                if (controllerFuture == null) {
-                                    result.release()
-                                    return
-                                }
-                                val suppressIdle = isReconnecting
-                                isReconnecting = false
-                                controller = result
-                                result.addListener(playerListener)
-                                syncAndEmit(result, suppressIdle = suppressIdle)
-                                startPositionPolling()
+                                onControllerConnected(future, result)
                             }
 
                             override fun onFailure(t: Throwable) {
-                                isReconnecting = false
-                                Timber.e(
-                                    t,
-                                    "Failed to connect MediaController to AudioPlayerService"
-                                )
+                                onControllerConnectionFailed(future, t)
                             }
                         },
                         ContextCompat.getMainExecutor(context),
                     )
                 }
+    }
+
+    /**
+     * Installs [result] as the live controller, unless [future] is no longer the connection we
+     * are waiting for: release() cleared it, or reconnectController() replaced it. A stale
+     * result is released on the spot so it cannot leak or clobber the live controller.
+     */
+    @VisibleForTesting
+    internal fun onControllerConnected(
+        future: ListenableFuture<MediaController>,
+        result: MediaController,
+    ) {
+        if (future !== controllerFuture) {
+            result.release()
+            return
+        }
+        val suppressIdle = isReconnecting
+        isReconnecting = false
+        controller = result
+        result.addListener(playerListener)
+        syncAndEmit(result, suppressIdle = suppressIdle)
+        startPositionPolling()
+    }
+
+    /**
+     * Records a failed connection attempt for the live [future] only. releaseFuture() on the
+     * previous future during a reconnect fails it with a cancellation that is delivered before
+     * the new connection completes; letting it clear [isReconnecting] would drop the idle
+     * suppression the reconnect relies on.
+     */
+    @VisibleForTesting
+    internal fun onControllerConnectionFailed(
+        future: ListenableFuture<MediaController>,
+        t: Throwable,
+    ) {
+        if (future !== controllerFuture) return
+        isReconnecting = false
+        Timber.e(t, "Failed to connect MediaController to AudioPlayerService")
     }
 
     private fun syncAndEmit(c: MediaController, suppressIdle: Boolean = false) {
@@ -351,7 +379,8 @@ internal class AudioMediaControllerFacade @Inject constructor(
         reconnectController()
     }
 
-    private fun reconnectController() {
+    @VisibleForTesting
+    internal fun reconnectController() {
         isReconnecting = true
         stopPositionPolling()
         controller?.removeListener(playerListener)
