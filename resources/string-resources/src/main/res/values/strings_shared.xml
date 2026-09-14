@@ -3830,7 +3830,7 @@
     <!-- Snackbar shown when an action needs the internet but the device is offline, so it was not attempted. For example, creating a share link or saving a link expiry date. -->
     <string name="check_internet_connection_error">No internet connection. Check your connection and try again</string>
     <!-- Media timeline sort option for the bottom sheet to sort by "Date added" -->
-    <string name="media_timeline_sort_option_date_added">Date added</string>
+    <string name="media_timeline_sort_option_date_added">Date modified</string>
     <!-- Media timeline sort option for the bottom sheet to sort by "Date captured" -->
     <string name="media_timeline_sort_option_date_taken">Date taken</string>
     <!-- Title of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
@@ -4063,4 +4063,82 @@
     <string name="chat_archived_chats_title">Archived chats</string>
     <!-- Empty-state title shown on the archived chats screen when there are no archived chats -->
     <string name="chat_archived_chats_empty_title">No archived chats</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files and folders whose name begins with that pattern. -->
+    <string name="sync_exclusions_rule_files_and_folders_beginning_with">Files and folders beginning with</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files and folders whose name contains that pattern. -->
+    <string name="sync_exclusions_rule_files_and_folders_containing">Files and folders containing</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files and folders whose name ends with that pattern. -->
+    <string name="sync_exclusions_rule_files_and_folders_ending_with">Files and folders ending with</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files and folders whose name is exactly that pattern. -->
+    <string name="sync_exclusions_rule_files_and_folders_matching_exactly">Files and folders matching exactly</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files and folders whose name matches that pattern. -->
+    <string name="sync_exclusions_rule_files_and_folders_matching_wildcard">Files and folders matching this pattern</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes folders whose name begins with that pattern. -->
+    <string name="sync_exclusions_rule_folders_beginning_with">Folders beginning with</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes folders whose name contains that pattern. -->
+    <string name="sync_exclusions_rule_folders_containing">Folders containing</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes folders whose name ends with that pattern. -->
+    <string name="sync_exclusions_rule_folders_ending_with">Folders ending with</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes folders whose name is exactly that pattern. -->
+    <string name="sync_exclusions_rule_folders_matching_exactly">Folders matching exactly</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes folders whose name matches that pattern. -->
+    <string name="sync_exclusions_rule_folders_matching_wildcard">Folders matching this pattern</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files whose name begins with that pattern. -->
+    <string name="sync_exclusions_rule_files_beginning_with">Files beginning with</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files whose name contains that pattern. -->
+    <string name="sync_exclusions_rule_files_containing">Files containing</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files whose name ends with that pattern. -->
+    <string name="sync_exclusions_rule_files_ending_with">Files ending with</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files whose name is exactly that pattern. -->
+    <string name="sync_exclusions_rule_files_matching_exactly">Files matching exactly</string>
+    <!-- Sync exclusions row: label under the pattern it describes. Excludes files whose name matches that pattern. -->
+    <string name="sync_exclusions_rule_files_matching_wildcard">Files matching this pattern</string>
+    <!-- Sync exclusions Add form: line under the tabs before a type is picked, telling the user what the screen is for. -->
+    <string name="sync_exclusions_add_description_initial">Choose what to leave out of this sync</string>
+    <!-- Sync exclusions Add form: line under the tabs once the Files type is picked, describing what the rule will do. -->
+    <string name="sync_exclusions_add_description_files">Files that match this name aren’t synced</string>
+    <!-- Sync exclusions Add form: line under the tabs once the Folders type is picked, describing what the rule will do. -->
+    <string name="sync_exclusions_add_description_folders">Folders that match this name aren’t synced</string>
+    <!-- Sync exclusions Add form: line under the tabs once the Files and folders type is picked, describing what the rule will do. -->
+    <string name="sync_exclusions_add_description_files_and_folders">Files and folders that match this name aren’t synced</string>
+    <!-- Sync exclusions Add form: the node type a rule applies to. Labels the chip that opens the picker and titles the picker itself. -->
+    <string name="sync_exclusions_add_type">Type</string>
+    <!-- Sync exclusions Add form: how a name is matched. Labels the chip that opens the picker and titles the picker itself. -->
+    <string name="sync_exclusions_add_condition">Condition</string>
+    <!-- Sync exclusions Add form: Type picker entry, a rule applying to files only. -->
+    <string name="sync_exclusions_add_type_files">Files</string>
+    <!-- Sync exclusions Add form: Type picker entry, a rule applying to folders only. -->
+    <string name="sync_exclusions_add_type_folders">Folders</string>
+    <!-- Sync exclusions Add form: Type picker entry, a rule applying to both files and folders. -->
+    <string name="sync_exclusions_add_type_files_and_folders">Files and folders</string>
+    <!-- Sync exclusions Add form: Type picker entry, switching the form over to entering file extensions. -->
+    <string name="sync_exclusions_add_type_extensions">Extensions</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names that start with the typed text. -->
+    <string name="sync_exclusions_add_condition_beginning_with">Beginning with</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names that contain the typed text anywhere. -->
+    <string name="sync_exclusions_add_condition_containing">Containing</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names that end with the typed text. -->
+    <string name="sync_exclusions_add_condition_ending_with">Ending with</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names identical to the typed text. -->
+    <string name="sync_exclusions_add_condition_matching_exactly">Matching exactly</string>
+    <!-- Sync exclusions Add form: Condition picker entry, matching names against a pattern containing wildcard characters. -->
+    <string name="sync_exclusions_add_condition_matching_wildcard">Matching pattern</string>
+    <!-- Sync exclusions Add form: helper line under the name field explaining the two wildcard characters. Keep the asterisk and the question mark exactly as they are, they are typed by the user. -->
+    <string name="sync_exclusions_add_name_wildcard_helper">Use “*” for any characters and “?” for one character</string>
+    <!-- Sync exclusions Add form: error under the name field when an existing rule already excludes the typed name. -->
+    <string name="sync_exclusions_add_name_duplicate_error">You’ve already excluded this name</string>
+    <!-- Title of the error shown in place of the file content when a preview cannot be loaded -->
+    <string name="file_preview_error_title">Can’t preview this file</string>
+    <!-- Description of the error shown in place of the file content when a preview cannot be loaded -->
+    <string name="file_preview_error_description">Something went wrong loading this preview</string>
+    <!-- Label for a button that retries the action that just failed -->
+    <string name="general_try_again">Try again</string>
+    <!-- Sync exclusions Add form: description line shown once Extensions is chosen as the type, explaining what the rule will do. -->
+    <string name="sync_exclusions_add_description_extensions">Files with these extensions aren’t synced</string>
+    <!-- Sync exclusions Add form: helper line under the extensions field, telling the user how to enter more than one extension. Use the comma your language normally uses; the field accepts the ASCII comma and the fullwidth, ideographic and Arabic ones. -->
+    <string name="sync_exclusions_add_extension_helper">Separate extensions with a comma</string>
+    <!-- Sync exclusions Add form: error under the extensions field when a typed extension contains a character an extension cannot hold. -->
+    <string name="sync_exclusions_add_extension_invalid_error">Extensions can’t contain spaces, dots, or slashes</string>
+    <!-- Sync exclusions Add form: error under the extensions field when an existing rule already excludes one of the typed extensions. %1$s is that extension, without a leading dot, for example mp3. -->
+    <string name="sync_exclusions_add_extension_duplicate_error">You’ve already excluded %1$s</string>
 </resources>

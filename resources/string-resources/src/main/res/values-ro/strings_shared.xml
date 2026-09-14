@@ -3239,4 +3239,7 @@
     <string name="invite_sent_text">Utilizatorul a fost invitat și va apărea în lista de contacte de îndată ce a acceptat invitația.</string>
     <string name="invite_sent_text_multi">Utilizatorii au fost invitați și vor apărea în lista de contacte de îndată ce au acceptat invitația.</string>
     <string name="general_close">Închide</string>
+    <string name="sync_exclusions_add_type">Tip</string>
+    <string name="sync_exclusions_add_type_files">Fișiere</string>
+    <string name="sync_exclusions_add_type_folders">Foldere</string>
 </resources>

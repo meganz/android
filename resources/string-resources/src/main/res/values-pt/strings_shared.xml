@@ -961,7 +961,7 @@
     <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
     <string name="sign_up_password_hint_upper_lower_case">Letras maiúsculas e minúsculas</string>
     <!--Sign Up page password hint to suggest a password with at least one number or special character-->
-    <string name="sign_up_password_hint_number_or_special_character">Pelo menos um número ou caracter especial</string>
+    <string name="sign_up_password_hint_number_or_special_character">Pelo menos um número ou caractere especial</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Já tem uma conta no MEGA? [A]Faça login[/A]</string>
     <!-- Text shown in the fake preview screen -->
@@ -3114,7 +3114,7 @@
     </plurals>
     <string name="password_too_weak_error_message">Use uma senha mais segura.</string>
     <string name="check_internet_connection_error">Não há conexão à Internet. Verifique a sua conexão e tente novamente</string>
-    <string name="media_timeline_sort_option_date_added">Data de inclusão</string>
+    <string name="media_timeline_sort_option_date_added">Data da alteração</string>
     <plurals name="remove_link_dialog_title">
         <item quantity="one">Remover o link?</item>
         <item quantity="many">Remover os links?</item>
@@ -3256,4 +3256,43 @@
     <string name="audio_player_not_allowed_during_call">Não é possível reproduzir mídia durante uma chamada</string>
     <string name="chat_archived_chats_title">Chats arquivados</string>
     <string name="chat_archived_chats_empty_title">Não há chats arquivados</string>
+    <string name="sync_exclusions_add_type">Tipo</string>
+    <string name="sync_exclusions_add_type_files">Arquivos</string>
+    <string name="sync_exclusions_add_type_folders">Pastas</string>
+    <string name="sync_exclusions_rule_files_and_folders_beginning_with">Arquivos e pastas que comecem com</string>
+    <string name="sync_exclusions_rule_files_and_folders_containing">Arquivos e pastas que contenham</string>
+    <string name="sync_exclusions_rule_files_and_folders_ending_with">Arquivos e pastas que terminem com</string>
+    <string name="sync_exclusions_rule_files_and_folders_matching_exactly">Arquivos e pastas que correspondam exatamente a</string>
+    <string name="sync_exclusions_rule_files_and_folders_matching_wildcard">Arquivos e pastas que correspondam a este padrão</string>
+    <string name="sync_exclusions_rule_folders_beginning_with">Pastas que comecem com</string>
+    <string name="sync_exclusions_rule_folders_containing">Pastas com</string>
+    <string name="sync_exclusions_rule_folders_ending_with">Pastas que terminem em</string>
+    <string name="sync_exclusions_rule_folders_matching_exactly">Pastas que correspondam exatamente a</string>
+    <string name="sync_exclusions_rule_folders_matching_wildcard">Pastas que correspondam a este padrão</string>
+    <string name="sync_exclusions_rule_files_beginning_with">Arquivos que comecem com</string>
+    <string name="sync_exclusions_rule_files_containing">Arquivos com</string>
+    <string name="sync_exclusions_rule_files_ending_with">Arquivos que terminem em</string>
+    <string name="sync_exclusions_rule_files_matching_exactly">Arquivos que correspondam exatamente a</string>
+    <string name="sync_exclusions_rule_files_matching_wildcard">Arquivos que correspondam a este padrão</string>
+    <string name="sync_exclusions_add_description_initial">Escolha o que excluir desta sincronização</string>
+    <string name="sync_exclusions_add_description_files">Os arquivos que correspondam a este nome não serão sincronizados</string>
+    <string name="sync_exclusions_add_description_folders">As pastas que correspondam a este nome não serão sincronizadas</string>
+    <string name="sync_exclusions_add_description_files_and_folders">Os arquivos e as pastas que correspondam a este nome não serão sincronizados</string>
+    <string name="sync_exclusions_add_condition">Critério</string>
+    <string name="sync_exclusions_add_type_files_and_folders">Arquivos e pastas</string>
+    <string name="sync_exclusions_add_type_extensions">Extensões</string>
+    <string name="sync_exclusions_add_condition_beginning_with">Começando com</string>
+    <string name="sync_exclusions_add_condition_containing">Incluindo</string>
+    <string name="sync_exclusions_add_condition_ending_with">Terminando em</string>
+    <string name="sync_exclusions_add_condition_matching_exactly">Correspondendo exatamente a</string>
+    <string name="sync_exclusions_add_condition_matching_wildcard">Correspondendo com este padrão</string>
+    <string name="sync_exclusions_add_name_wildcard_helper">Use “*” para vários caracteres e “?” para um caractere</string>
+    <string name="sync_exclusions_add_name_duplicate_error">Você já excluiu este nome</string>
+    <string name="file_preview_error_title">Não foi possível visualizar este arquivo</string>
+    <string name="file_preview_error_description">Houve um problema ao carregar esta visualização</string>
+    <string name="general_try_again">Tentar novamente</string>
+    <string name="sync_exclusions_add_description_extensions">Os arquivos com estas extensões não serão sincronizados</string>
+    <string name="sync_exclusions_add_extension_helper">Separe as extensões usando vírgulas</string>
+    <string name="sync_exclusions_add_extension_invalid_error">As extensões não podem conter espaços, pontos ou barras</string>
+    <string name="sync_exclusions_add_extension_duplicate_error">Você já excluiu %1$s</string>
 </resources>

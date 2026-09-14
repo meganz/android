@@ -3218,4 +3218,9 @@
     <string name="general_close">Cerrar</string>
     <string name="first_paragraph_achievement_invite_friends">Invita a tus amigos a registrar una cuenta gratuita de MEGA e instalar nuestra aplicación móvil. Por cada registro e instalación de la aplicación, recibirás un bono adicional de almacenamiento.</string>
     <string name="invite_sent_text_multi">Los usuarios han sido invitados y aparecerán en tu lista de contactos en cuanto acepten la invitación.</string>
+    <string name="sync_exclusions_rule_files_and_folders_beginning_with">Archivos y carpetas que empiezan con</string>
+    <string name="sync_exclusions_add_type">Tipo</string>
+    <string name="sync_exclusions_add_type_files">Archivos</string>
+    <string name="sync_exclusions_add_type_folders">Carpetas</string>
+    <string name="general_try_again">Inténtalo de nuevo</string>
 </resources>

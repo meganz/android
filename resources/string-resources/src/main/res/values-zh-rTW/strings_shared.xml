@@ -2979,4 +2979,7 @@
     <string name="invite_sent_text">用戶已被邀請，一旦對方接受邀請，將會出現在您的聯絡人列表。</string>
     <string name="invite_sent_text_multi">用戶已被邀請。一旦他們接受邀請，將會出現在您的聯絡人列表。</string>
     <string name="general_close">關閉</string>
+    <string name="sync_exclusions_add_type">類型</string>
+    <string name="sync_exclusions_add_type_files">檔案</string>
+    <string name="sync_exclusions_add_type_folders">資料夾</string>
 </resources>
