@@ -282,6 +282,92 @@ internal class PhotosSearchViewModelTest {
     }
 
     @Test
+    fun `test that search returns photos when query matches a tag`() = runTest {
+        stubPhotosSource(createPhoto(name = "IMG_0001.jpg", tags = listOf("vacation", "beach")))
+
+        initViewModel()
+        photosSearchViewModel.search("vacation")
+        photosSearchViewModel.state.test {
+            val state = awaitItem()
+            assertThat(state.photos).hasSize(1)
+            assertThat(state.contentState).isEqualTo(MediaContentState.SearchResults)
+        }
+    }
+
+    @Test
+    fun `test that search returns photos when query matches description ignoring case`() =
+        runTest {
+            stubPhotosSource(createPhoto(name = "IMG_0001.jpg", description = "Summer vacation"))
+
+            initViewModel()
+            photosSearchViewModel.search("VACATION")
+            photosSearchViewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.photos).hasSize(1)
+                assertThat(state.contentState).isEqualTo(MediaContentState.SearchResults)
+            }
+        }
+
+    @Test
+    fun `test that search returns no photos when query matches neither name, tags nor description`() =
+        runTest {
+            stubPhotosSource(
+                createPhoto(
+                    name = "IMG_0001.jpg",
+                    tags = listOf("beach"),
+                    description = "Family trip",
+                )
+            )
+
+            initViewModel()
+            photosSearchViewModel.search("vacation")
+            photosSearchViewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.photos).isEmpty()
+                assertThat(state.contentState).isEqualTo(MediaContentState.NoResults)
+            }
+        }
+
+    private fun stubPhotosSource(vararg photos: Photo) {
+        val photoResults = photos.map { PhotoResult(photo = it, isMarkedSensitive = false) }
+        wheneverBlocking { retrievePhotosRecentQueriesUseCase() }.thenReturn(emptyList())
+        whenever(monitorTimelinePhotosUseCase(any())).thenReturn(
+            flowOf(
+                TimelinePhotosResult(
+                    allPhotos = photoResults,
+                    nonSensitivePhotos = photoResults,
+                )
+            )
+        )
+    }
+
+    private fun createPhoto(
+        name: String,
+        tags: List<String>? = null,
+        description: String? = null,
+    ) = Photo.Image(
+        id = 1L,
+        albumPhotoId = null,
+        parentId = 0L,
+        name = name,
+        isFavourite = false,
+        creationTime = LocalDateTime.now(),
+        modificationTime = LocalDateTime.now(),
+        thumbnailFilePath = null,
+        previewFilePath = null,
+        fileTypeInfo = StaticImageFileTypeInfo(
+            mimeType = "image/jpeg",
+            extension = "jpg",
+        ),
+        size = 1024L,
+        isTakenDown = false,
+        isSensitive = false,
+        isSensitiveInherited = false,
+        description = description,
+        tags = tags,
+    )
+
+    @Test
     fun `test that contentState updates to RecentQueries when query is cleared after having recentQueries`() =
         runTest {
             val recentQueries = listOf("previous_search")

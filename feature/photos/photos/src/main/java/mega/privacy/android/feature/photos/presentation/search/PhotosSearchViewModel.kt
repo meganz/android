@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Photo
@@ -168,6 +167,8 @@ class PhotosSearchViewModel @Inject constructor(
         } else {
             _state.value.photosSource.filter {
                 it.name.contains(query, ignoreCase = true)
+                        || it.tags?.contains(query) == true
+                        || it.description?.contains(query, ignoreCase = true) == true
             }.let { photos ->
                 if (showHiddenItems || accountType?.isPaid == false || isBusinessAccountExpired) {
                     photos
