@@ -6,7 +6,7 @@ import mega.privacy.android.app.presentation.documentscanner.legacy.LegacyScanDo
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.navkey.LegacyScanDocumentNavKey
+import mega.privacy.android.navigation.destination.LegacyScanDocumentNavKey
 
 /**
  * Feature destination that launches the legacy ML Kit document scanner.

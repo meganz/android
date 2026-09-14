@@ -12,9 +12,9 @@ import mega.privacy.android.feature.documentscanner.presentation.ScannerRouterVi
 import mega.privacy.android.feature.documentscanner.presentation.component.ScannerDownloadConfirmationDialog
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
-import mega.privacy.android.navigation.contract.navkey.LegacyScanDocumentNavKey
-import mega.privacy.android.navigation.contract.navkey.ScanReviewNavKey
+import mega.privacy.android.navigation.destination.ContinuousScanNavKey
+import mega.privacy.android.navigation.destination.LegacyScanDocumentNavKey
+import mega.privacy.android.navigation.destination.ScanReviewNavKey
 import timber.log.Timber
 
 /**

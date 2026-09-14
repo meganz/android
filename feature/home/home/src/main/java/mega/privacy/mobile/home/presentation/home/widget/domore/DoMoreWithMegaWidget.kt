@@ -41,9 +41,9 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
-import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.CameraBackupPermissionsNavKey
+import mega.privacy.android.navigation.destination.ContinuousScanNavKey
 import mega.privacy.android.navigation.destination.CreateAlbumDialogNavKey
 import mega.privacy.android.navigation.destination.CreateAlbumDialogResult
 import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey

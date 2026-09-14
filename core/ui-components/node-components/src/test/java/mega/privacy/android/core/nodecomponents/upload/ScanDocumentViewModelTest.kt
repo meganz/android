@@ -11,8 +11,8 @@ import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.ContinuousScanNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

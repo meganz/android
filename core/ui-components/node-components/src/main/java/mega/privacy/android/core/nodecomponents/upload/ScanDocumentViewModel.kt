@@ -13,8 +13,8 @@ import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchD
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.domain.usecase.documentscanner.isCustomScannerEnabled
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.ContinuousScanNavKey
 import timber.log.Timber
 import javax.inject.Inject
 

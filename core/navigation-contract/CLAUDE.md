@@ -12,7 +12,7 @@ Navigation is built on **Jetpack Navigation 3** (`androidx.navigation3.runtime` 
 ## Architecture & Layout
 All code lives under `mega.privacy.android.navigation.contract`:
 - **(root)** — top-level contracts: `FeatureDestination`, `MainNavItem`, `NavDrawerItem`, `NavigationHandler`, `NavigationResultsHandler`, `NavigationUiController`, `TransferHandler`, `NavOptions`, `PreferredSlot`.
-- **navkey/** — marker `NavKey` interfaces describing destination requirements: `NoSessionNavKey` (`Optional`/`Mandatory`), `NoNodeNavKey`, `MainNavItemNavKey`, `ContinuousScanNavKey`, `Suppressable`.
+- **navkey/** — marker `NavKey` interfaces describing destination requirements: `NoSessionNavKey` (`Optional`/`Mandatory`), `NoNodeNavKey`, `MainNavItemNavKey`, `Suppressable`. Interfaces only — concrete `@Serializable` destinations belong in `:navigation`.
 - **dialog/** — `AppDialogDestinations`, `DialogNavKey`.
 - **home/** — Home screen widget contract: `HomeWidget`, `HomeWidgetProvider`, `HomeWidgetOrder`.
 - **metadata/** — `buildMetadata { }` DSL and `NavEntryMetadataScope` for declarative `NavEntry` metadata.

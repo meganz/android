@@ -26,3 +26,36 @@ data class DiscardScanWarningDialogNavKey(
     val hasMultipleScans: Boolean,
     val startNavKey: UploadScannedDocumentNavKey,
 ) : DialogNavKey
+
+/**
+ * Navigation key for the continuous document scanner screen.
+ */
+@Serializable
+data object ContinuousScanNavKey : NavKey
+
+/**
+ * Navigation key for the document scanner page-review screen.
+ */
+@Serializable
+data object ScanReviewNavKey : NavKey
+
+/**
+ * Navigation key for re-capturing an existing scanned page. Opens the scan camera
+ * in retake mode; the next capture replaces the page with [pageId] in place.
+ *
+ * @property pageId Id of the page being retaken.
+ */
+@Serializable
+data class RetakeScanNavKey(val pageId: String) : NavKey
+
+/**
+ * Navigation key that launches the legacy ML Kit document scanner.
+ *
+ * The legacy scanner is started imperatively via an `ActivityResultLauncher`
+ * rather than being a composable destination, so the continuous-scanner router
+ * cannot open it directly. This key lets the router (and any entry point) fall
+ * back to the legacy scanner uniformly: a single app-shell handler owns the
+ * launcher and services this key.
+ */
+@Serializable
+data object LegacyScanDocumentNavKey : NavKey

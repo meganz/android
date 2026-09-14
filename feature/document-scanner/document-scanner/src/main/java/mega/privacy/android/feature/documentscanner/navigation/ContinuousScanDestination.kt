@@ -8,10 +8,10 @@ import mega.privacy.android.feature.documentscanner.presentation.screen.ScannerR
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
-import mega.privacy.android.navigation.contract.navkey.RetakeScanNavKey
-import mega.privacy.android.navigation.contract.navkey.ScanReviewNavKey
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.ContinuousScanNavKey
+import mega.privacy.android.navigation.destination.RetakeScanNavKey
+import mega.privacy.android.navigation.destination.ScanReviewNavKey
 
 /**
  * Feature destination for the continuous document scanner.
