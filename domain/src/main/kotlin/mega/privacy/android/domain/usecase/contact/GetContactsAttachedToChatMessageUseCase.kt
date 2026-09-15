@@ -3,7 +3,9 @@ package mega.privacy.android.domain.usecase.contact
 import mega.privacy.android.domain.entity.contacts.AttachedContact
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import javax.inject.Inject
 
 /**
@@ -18,6 +20,7 @@ class GetContactsAttachedToChatMessageUseCase @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
+    private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase,
 ) {
 
     /**
@@ -30,7 +33,7 @@ class GetContactsAttachedToChatMessageUseCase @Inject constructor(
     suspend operator fun invoke(chatId: Long, messageId: Long): List<AttachedContact> {
         val message = chatRepository.getMessage(chatId, messageId) ?: return emptyList()
         val myHandle = getMyUserHandleUseCase()
-        return (0 until message.usersCount.toInt()).map { index ->
+        return (0 until message.usersCount.toInt()).mapAsync { index ->
             val handle = message.userHandles.getOrNull(index) ?: -1L
             val email = message.userEmails.getOrNull(index).orEmpty()
             val name = message.userNames.getOrNull(index).orEmpty()
@@ -44,6 +47,7 @@ class GetContactsAttachedToChatMessageUseCase @Inject constructor(
                 isMe = handle == myHandle,
                 isContact = isContact,
                 isVerified = isVerified,
+                avatarColor = getUserAvatarColorUseCase(handle),
             )
         }
     }

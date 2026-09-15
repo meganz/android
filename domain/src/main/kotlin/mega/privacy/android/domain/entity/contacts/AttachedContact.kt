@@ -9,6 +9,7 @@ package mega.privacy.android.domain.entity.contacts
  * @property isMe True when the attached contact is the current user.
  * @property isContact True when the attached user is a visible contact of the current user.
  * @property isVerified True when the contact's credentials are verified.
+ * @property avatarColor Color used as the background of the contact's default avatar.
  */
 data class AttachedContact(
     val handle: Long,
@@ -17,4 +18,5 @@ data class AttachedContact(
     val isMe: Boolean,
     val isContact: Boolean,
     val isVerified: Boolean,
+    val avatarColor: Int,
 )

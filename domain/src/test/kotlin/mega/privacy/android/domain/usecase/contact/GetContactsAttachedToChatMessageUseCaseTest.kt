@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,6 +25,7 @@ class GetContactsAttachedToChatMessageUseCaseTest {
     private val getUserUseCase: GetUserUseCase = mock()
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock()
+    private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase = mock()
 
     private val chatId = 123L
     private val messageId = 456L
@@ -35,6 +37,7 @@ class GetContactsAttachedToChatMessageUseCaseTest {
             getUserUseCase = getUserUseCase,
             getMyUserHandleUseCase = getMyUserHandleUseCase,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
+            getUserAvatarColorUseCase = getUserAvatarColorUseCase,
         )
     }
 
@@ -45,6 +48,7 @@ class GetContactsAttachedToChatMessageUseCaseTest {
             getUserUseCase,
             getMyUserHandleUseCase,
             areCredentialsVerifiedUseCase,
+            getUserAvatarColorUseCase,
         )
     }
 
@@ -70,6 +74,8 @@ class GetContactsAttachedToChatMessageUseCaseTest {
             whenever(getMyUserHandleUseCase()).thenReturn(99L)
             whenever(getUserUseCase(UserId(1L))).thenReturn(null)
             whenever(getUserUseCase(UserId(2L))).thenReturn(null)
+            whenever(getUserAvatarColorUseCase(1L)).thenReturn(0xFF111111.toInt())
+            whenever(getUserAvatarColorUseCase(2L)).thenReturn(0xFF222222.toInt())
 
             val result = underTest(chatId, messageId)
 
@@ -77,7 +83,27 @@ class GetContactsAttachedToChatMessageUseCaseTest {
             assertThat(result.map { it.email })
                 .containsExactly("a@test.com", "b@test.com").inOrder()
             assertThat(result.map { it.name }).containsExactly("Alice", "Bob").inOrder()
+            assertThat(result.map { it.avatarColor })
+                .containsExactly(0xFF111111.toInt(), 0xFF222222.toInt()).inOrder()
         }
+
+    @Test
+    fun `test that avatarColor is resolved from the avatar color use case`() = runTest {
+        val message = mock<ChatMessage> {
+            on { usersCount }.thenReturn(1L)
+            on { userHandles }.thenReturn(listOf(7L))
+            on { userEmails }.thenReturn(listOf("a@test.com"))
+            on { userNames }.thenReturn(listOf("Alice"))
+        }
+        whenever(chatRepository.getMessage(chatId, messageId)).thenReturn(message)
+        whenever(getMyUserHandleUseCase()).thenReturn(99L)
+        whenever(getUserUseCase(UserId(7L))).thenReturn(null)
+        whenever(getUserAvatarColorUseCase(7L)).thenReturn(0xFFABCDEF.toInt())
+
+        val result = underTest(chatId, messageId).single()
+
+        assertThat(result.avatarColor).isEqualTo(0xFFABCDEF.toInt())
+    }
 
     @Test
     fun `test that isMe is true when the attached user matches my handle`() = runTest {
@@ -90,6 +116,7 @@ class GetContactsAttachedToChatMessageUseCaseTest {
         whenever(chatRepository.getMessage(chatId, messageId)).thenReturn(message)
         whenever(getMyUserHandleUseCase()).thenReturn(99L)
         whenever(getUserUseCase(UserId(99L))).thenReturn(null)
+        whenever(getUserAvatarColorUseCase(99L)).thenReturn(0xFF000000.toInt())
 
         val result = underTest(chatId, messageId)
 
@@ -112,6 +139,7 @@ class GetContactsAttachedToChatMessageUseCaseTest {
             whenever(getMyUserHandleUseCase()).thenReturn(99L)
             whenever(getUserUseCase(UserId(1L))).thenReturn(user)
             whenever(areCredentialsVerifiedUseCase("a@test.com")).thenReturn(true)
+            whenever(getUserAvatarColorUseCase(1L)).thenReturn(0xFF000000.toInt())
 
             val result = underTest(chatId, messageId).single()
 
@@ -135,6 +163,7 @@ class GetContactsAttachedToChatMessageUseCaseTest {
             whenever(getMyUserHandleUseCase()).thenReturn(99L)
             whenever(getUserUseCase(UserId(1L))).thenReturn(user)
             whenever(areCredentialsVerifiedUseCase("a@test.com")).thenReturn(false)
+            whenever(getUserAvatarColorUseCase(1L)).thenReturn(0xFF000000.toInt())
 
             val result = underTest(chatId, messageId).single()
 
@@ -156,6 +185,7 @@ class GetContactsAttachedToChatMessageUseCaseTest {
         whenever(chatRepository.getMessage(chatId, messageId)).thenReturn(message)
         whenever(getMyUserHandleUseCase()).thenReturn(99L)
         whenever(getUserUseCase(UserId(1L))).thenReturn(user)
+        whenever(getUserAvatarColorUseCase(1L)).thenReturn(0xFF000000.toInt())
 
         val result = underTest(chatId, messageId).single()
 
