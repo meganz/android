@@ -22,7 +22,7 @@ Packages under `src/main/java/mega/privacy/android/shared/nodes/`:
 ## Key Components
 - **Mappers**: `NodeUiItemMapper` and `NodeViewItemMapper` (convert `TypedNode` → UI item; built for thousands of items), `NodeSubtitleMapper`, `FileTypeIconMapper` (`@Singleton`, extension→icon), `NodeSortConfigurationUiMapper`, `NodeSourceTypeToSearchTargetMapper`.
 - **Models**: `NodeViewItem` (current pattern) and `NodeUiItem` (deprecated, migrate to `NodeViewItem`), `TypedNodeItem`, `NodeSubtitleText`, `NodeSortOption`, `SortOptionItem`, `NodeSourceTypeInt`.
-- **State/ViewModels**: `NodeHeaderItemViewModel` (Hilt assisted-factory, exposes `StateFlow` via `asUiStateFlow`) with `NodeHeaderItemUiState`; `NodeSelectionState` (`@Stable` rememberSaveable selection holder).
+- **State/ViewModels**: `NodeHeaderItemViewModel` (Hilt assisted-factory, exposes `StateFlow` via `asUiStateFlow`) with `NodeHeaderItemUiState`; `NodeSelectionState` (`@Stable` selection holder, retained per navigation entry via `retain`).
 - **UI helpers**: `NodesView` / `NodeListView` / `NodeGridView` composables and `NodeThumbnailView`, used by feature modules to render node collections.
 
 ## Module Dependencies
