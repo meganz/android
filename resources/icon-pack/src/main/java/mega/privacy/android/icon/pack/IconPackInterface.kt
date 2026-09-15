@@ -290,6 +290,16 @@ interface IconPackInterface {
                 val ZapAuto: ImageVector
                 val ZapOff: ImageVector
                 val ZoomIn: ImageVector
+                val TextBold: ImageVector
+                val TextItalic: ImageVector
+                val TextUnderline: ImageVector
+                val TextStrikethrough: ImageVector
+                val TextQuote: ImageVector
+                val Checklist: ImageVector
+                val ListSmall: ImageVector
+                val ListNumbers: ImageVector
+                val Code: ImageVector
+                val Url: ImageVector
             }
 
             /**

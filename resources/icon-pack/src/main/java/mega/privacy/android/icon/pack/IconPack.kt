@@ -38,6 +38,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCameraImage
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCheckCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCheckImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCheckStackImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineChecklistImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineChevronDownImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineChevronLeftImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineChevronRightImageVector
@@ -52,6 +53,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudDownlo
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudOffImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudUploadImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCodeImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineContractImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCopy01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCopyrightImageVector
@@ -106,6 +108,8 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineKey02ImageV
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLink01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLink02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLinkOff01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineListNumbersImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineListSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLoaderGradImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLoaderThrobberImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLockImageVector
@@ -159,10 +163,16 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSubtitles02
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSunImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSync01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTagSimpleImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextBoldImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextItalicImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextQuoteImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextStrikethroughImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextUnderlineImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTransferArrowsUpDownAltCircleCutoutImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTransferArrowsUpDownAltImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTransferArrowsUpDownAltTriangleCutoutImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTrashImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUrlImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserMinusImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserPlusImageVector
@@ -325,6 +335,9 @@ public object IconPack : IconPackInterface {
                 override val CheckStack: ImageVector by
                         lazy { createMediumThinOutlineCheckStackImageVector() }
 
+                override val Checklist: ImageVector by
+                        lazy { createMediumThinOutlineChecklistImageVector() }
+
                 override val ChevronDown: ImageVector by
                         lazy { createMediumThinOutlineChevronDownImageVector() }
 
@@ -366,6 +379,8 @@ public object IconPack : IconPackInterface {
 
                 override val CloudUpload: ImageVector by
                         lazy { createMediumThinOutlineCloudUploadImageVector() }
+
+                override val Code: ImageVector by lazy { createMediumThinOutlineCodeImageVector() }
 
                 override val Contract: ImageVector by
                         lazy { createMediumThinOutlineContractImageVector() }
@@ -523,6 +538,12 @@ public object IconPack : IconPackInterface {
                 override val LinkOff01: ImageVector by
                         lazy { createMediumThinOutlineLinkOff01ImageVector() }
 
+                override val ListNumbers: ImageVector by
+                        lazy { createMediumThinOutlineListNumbersImageVector() }
+
+                override val ListSmall: ImageVector by
+                        lazy { createMediumThinOutlineListSmallImageVector() }
+
                 override val LoaderGrad: ImageVector by
                         lazy { createMediumThinOutlineLoaderGradImageVector() }
 
@@ -673,6 +694,21 @@ public object IconPack : IconPackInterface {
                 override val TagSimple: ImageVector by
                         lazy { createMediumThinOutlineTagSimpleImageVector() }
 
+                override val TextBold: ImageVector by
+                        lazy { createMediumThinOutlineTextBoldImageVector() }
+
+                override val TextItalic: ImageVector by
+                        lazy { createMediumThinOutlineTextItalicImageVector() }
+
+                override val TextQuote: ImageVector by
+                        lazy { createMediumThinOutlineTextQuoteImageVector() }
+
+                override val TextStrikethrough: ImageVector by
+                        lazy { createMediumThinOutlineTextStrikethroughImageVector() }
+
+                override val TextUnderline: ImageVector by
+                        lazy { createMediumThinOutlineTextUnderlineImageVector() }
+
                 override val TransferArrowsUpDownAlt: ImageVector by
                         lazy { createMediumThinOutlineTransferArrowsUpDownAltImageVector() }
 
@@ -684,6 +720,8 @@ public object IconPack : IconPackInterface {
 
                 override val Trash: ImageVector by
                         lazy { createMediumThinOutlineTrashImageVector() }
+
+                override val Url: ImageVector by lazy { createMediumThinOutlineUrlImageVector() }
 
                 override val User: ImageVector by lazy { createMediumThinOutlineUserImageVector() }
 
