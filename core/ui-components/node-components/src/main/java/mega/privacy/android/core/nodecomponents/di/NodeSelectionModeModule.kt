@@ -258,6 +258,11 @@ abstract class NodeSelectionModeModule {
             moveSelectionModeMenuItem: MoveSelectionMenuItem,
             copySelectionModeMenuAction: CopySelectionMenuItem,
             addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
+            addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
+            addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             downloadSelectionMenuItem,
             getLinkSelectionMenuItem,
@@ -269,7 +274,12 @@ abstract class NodeSelectionModeModule {
             unhideSelectionMenuItem,
             moveSelectionModeMenuItem,
             copySelectionModeMenuAction,
-            addToAlbumSelectionMenuItem
+            addToAlbumSelectionMenuItem,
+            addToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem,
+            addLabelSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
 
         @Provides
