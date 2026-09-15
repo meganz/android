@@ -20,6 +20,30 @@ class AudioPlayQueueFilterDiffTest {
     }
 
     @Test
+    fun `test that resolve keeps a moved current item alone when the rebuilt queue is empty`() {
+        val action = AudioPlayQueueFilterDiff.resolve(
+            oldTimelineHandles = listOf(1L),
+            oldCurrentIndex = 0,
+            newHandles = emptyList(),
+            keepDetachedCurrent = true,
+        )
+
+        assertThat(action).isEqualTo(Action.KeepCurrentDetached(insertBeforeCount = 0))
+    }
+
+    @Test
+    fun `test that resolve stops when the rebuilt queue is empty and the current handle is unknown`() {
+        val action = AudioPlayQueueFilterDiff.resolve(
+            oldTimelineHandles = listOf(null),
+            oldCurrentIndex = 0,
+            newHandles = emptyList(),
+            keepDetachedCurrent = true,
+        )
+
+        assertThat(action).isEqualTo(Action.StopPlayback)
+    }
+
+    @Test
     fun `test that resolve returns NoChange when the rebuilt queue matches the timeline`() {
         val action = AudioPlayQueueFilterDiff.resolve(
             oldTimelineHandles = listOf(1L, null, 3L),

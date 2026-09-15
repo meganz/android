@@ -15,7 +15,9 @@ internal object AudioPlayQueueFilterDiff {
         /** The rebuilt queue matches the timeline item for item: leave the player alone. */
         data object NoChange : Action
 
-        /** Nothing survived the filter: playback must stop entirely. */
+        /**
+         * Nothing survived and the playing item cannot be kept: playback must stop entirely.
+         */
         data object StopPlayback : Action
 
         /**
@@ -61,9 +63,18 @@ internal object AudioPlayQueueFilterDiff {
         newHandles: List<Long?>,
         keepDetachedCurrent: Boolean = false,
     ): Action {
-        if (newHandles.isEmpty()) return Action.StopPlayback
-        if (newHandles == oldTimelineHandles) return Action.NoChange
         val currentHandle = oldTimelineHandles.getOrNull(oldCurrentIndex)
+        if (newHandles.isEmpty()) {
+            // The playing item was the folder's only (or last) track and has just been moved out
+            // of it: the rebuilt queue is empty, but the item itself is still playable and must
+            // keep playing on its own rather than tear the session down.
+            return if (keepDetachedCurrent && currentHandle != null) {
+                Action.KeepCurrentDetached(insertBeforeCount = 0)
+            } else {
+                Action.StopPlayback
+            }
+        }
+        if (newHandles == oldTimelineHandles) return Action.NoChange
         val newIndexOfCurrent = if (currentHandle == null) {
             -1
         } else {

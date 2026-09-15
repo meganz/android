@@ -213,6 +213,13 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var needStopStreamingServer = false
     private var playQueueBuildJob: Job? = null
     private var queueMoveRebuildJob: Job? = null
+
+    /**
+     * Whether the playing item was deleted by any update in the current debounce burst. Kept
+     * across the burst because each update restarts [queueMoveRebuildJob]; an unrelated move
+     * arriving after the deletion must not make the rebuild keep a deleted item playing.
+     */
+    private var pendingCurrentRemoved = false
     private var trackPlaybackInfoJob: Job? = null
     private var lastPlayQueueParams: AudioPlayQueueParams? = null
 
@@ -480,32 +487,49 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     /**
-     * Rebuilds the queue when one of its items is moved to another folder, so the queue follows
-     * the folder's real contents. Only items already in the timeline are watched (the global
-     * node-update stream is far too chatty to react to otherwise), and a burst of moves is
-     * collapsed into a single rebuild. The playing item keeps playing even when it is the one
-     * that left the folder.
+     * Rebuilds the queue when one of its items is moved to another folder or deleted, so the
+     * queue follows the folder's real contents. Only items already in the timeline are watched
+     * (the global node-update stream is far too chatty to react to otherwise), and a burst of
+     * changes is collapsed into a single rebuild.
+     *
+     * The playing item keeps playing when it is the one that was moved, but not when it was
+     * deleted: its stream is gone, so the queue resets onto the nearest survivor instead. The
+     * player screen skips past a deleted playing item on its own as well; by the time the
+     * debounced rebuild runs the successor is playing and survives the rebuild untouched.
+     *
+     * Known limitation: only nodes already in the timeline are watched, so a file moved into the
+     * source folder joins the queue at the next full rebuild, not immediately.
      */
     private fun observeQueueNodeMoves() {
         lifecycleScope.launch {
             monitorNodeUpdatesUseCase()
                 .catch { Timber.e(it, "Failed to monitor node updates for the play queue") }
                 .collect { update ->
-                    val movedHandles = update.changes
-                        .filterValues { NodeChanges.Parent in it }
-                        .keys.map { it.id.longValue }
-                    if (movedHandles.isEmpty()) return@collect
+                    // Cheap filter first: the global stream fires for every node change in the
+                    // account, and walking the timeline for each of them would not be free on
+                    // the main thread.
+                    val relevantChanges = update.changes
+                        .filterValues { NodeChanges.Parent in it || NodeChanges.Remove in it }
+                    if (relevantChanges.isEmpty()) return@collect
                     val currentPlayer = player ?: return@collect
                     val queueHandles = timelineHandles(currentPlayer)
-                    if (movedHandles.none { it in queueHandles }) return@collect
+                    val queueHandleSet = queueHandles.toHashSet()
+                    val queueChanges = relevantChanges.filterKeys { it.id.longValue in queueHandleSet }
+                    if (queueChanges.isEmpty()) return@collect
+                    val currentHandle = queueHandles.getOrNull(currentPlayer.currentMediaItemIndex)
+                    pendingCurrentRemoved = pendingCurrentRemoved || queueChanges.any { (node, changes) ->
+                        NodeChanges.Remove in changes && node.id.longValue == currentHandle
+                    }
                     queueMoveRebuildJob?.cancel()
                     queueMoveRebuildJob = launch {
                         delay(QUEUE_MOVE_REBUILD_DEBOUNCE)
                         // Cleared before the rebuild so the cancel inside it cannot target the
                         // coroutine that is running it.
                         queueMoveRebuildJob = null
+                        val currentRemoved = pendingCurrentRemoved
+                        pendingCurrentRemoved = false
                         lastPlayQueueParams?.let { params ->
-                            rebuildPlayQueueInPlace(params, keepDetachedCurrent = true)
+                            rebuildPlayQueueInPlace(params, keepDetachedCurrent = !currentRemoved)
                         }
                     }
                 }
@@ -686,6 +710,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 enterOverQuotaPausedState()
                 return
             }
+            // A play press during a pending backoff prepares again and can fail again; without
+            // this both chains would fire their delayed prepare().
+            retryJob?.cancel()
             // When over quota, playback is stopped instead of re-prepared — retries can never
             // succeed, and pressing play re-checks the quota and re-raises the warning
             // (see handlePlayRequestedWhileOverQuota).
@@ -918,6 +945,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         if (currentPlayer.playbackState == Player.STATE_IDLE || currentPlayer.mediaItemCount == 0) {
             return false
         }
+        // Cancel a still-running absorb before either branch: two quick same-playlist taps would
+        // otherwise leave two coroutines racing the resume-position seek, and the stale one
+        // could land last — including over a same-track relaunch that never seeks itself.
+        absorbJob?.cancel()
         val currentHandle = currentPlayer.currentMediaItem?.mediaId
             ?.let { mediaHandleStore.getHandle(it) }
         if (currentHandle == handle) {
@@ -931,13 +962,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             currentPlayer.play()
             return true
         }
-        val targetIndex = (0 until currentPlayer.mediaItemCount).firstOrNull { index ->
-            mediaHandleStore.getHandle(currentPlayer.getMediaItemAt(index).mediaId) == handle
-        } ?: return false
-        // Cancel a still-running absorb before relaunching: two quick same-playlist taps would
-        // otherwise leave two coroutines racing the resume-position seek, and the stale one could
-        // land last.
-        absorbJob?.cancel()
+        if (indexOfHandle(currentPlayer, handle) == null) return false
         absorbJob = lifecycleScope.launch {
             // Switching items invalidates an announcement the player screen never showed,
             // exactly like the rebuild path does.
@@ -948,6 +973,17 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                     Timber.e(it, "Failed to resolve audio resume position")
                 }
                 .getOrNull()
+            // Resolved after the suspension: an in-place rebuild (filter change, folder move)
+            // that lands while the position is being looked up shifts or drops timeline
+            // indices, and seeking to the index computed before it would throw
+            // IllegalSeekPositionException or start the wrong track.
+            // Still resume playback when the target vanished (removed or filtered out meanwhile):
+            // the tap was a play request, and a silent return would leave a paused player
+            // without the startForeground() its startForegroundService() requires.
+            val targetIndex = indexOfHandle(currentPlayer, handle) ?: run {
+                currentPlayer.play()
+                return@launch
+            }
             if (resumePositionMs != null) {
                 currentPlayer.seekTo(targetIndex, resumePositionMs)
                 audioResumeEventQueue.emit(AudioResumeEvent(handle, resumePositionMs))
@@ -958,6 +994,11 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         }
         return true
     }
+
+    private fun indexOfHandle(currentPlayer: Player, handle: Long): Int? =
+        (0 until currentPlayer.mediaItemCount).firstOrNull { index ->
+            mediaHandleStore.getHandle(currentPlayer.getMediaItemAt(index).mediaId) == handle
+        }
 
     private fun rebuildPlayQueue(params: AudioPlayQueueParams) {
         playQueueBuildJob?.cancel()
@@ -1017,20 +1058,23 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                     applyMediaSources(mediaSources, resumePositionMs)
                     anySourcesApplied = anySourcesApplied || mediaSources.mediaItems.isNotEmpty()
                 }
-            // Nothing was produced and nothing is loaded from before: the screen would stay on
-            // its loading state forever, so surface the failure instead.
-            if (!anySourcesApplied && player?.mediaItemCount == 0) {
+            pruneHandleStore()
+            // Nothing was produced: the screen would stay on its loading state forever, so
+            // surface the failure. Unless the player is audibly playing an earlier queue, stop
+            // the service as well: nothing else will call startForeground() for the
+            // startForegroundService() behind this launch, and a paused player has already left
+            // the foreground, so the request would time out and kill the process.
+            if (!anySourcesApplied) {
                 audioPlayerErrorEventQueue.emit(
                     AudioPlayerError.QueueBuildFailed(
                         isNetworkAvailable = runCatching { isConnectedToInternetUseCase() }
                             .getOrDefault(true),
                     )
                 )
-                // Nothing will ever start on this player, so Media3 never calls startForeground()
-                // and the startForegroundService() behind this launch would time out. The screen
-                // has no active session to lose, so it keeps showing the error above.
-                startPlaceholderForeground()
-                stopPlayerAndSelf()
+                if (player?.isPlaying != true) {
+                    startPlaceholderForeground()
+                    stopPlayerAndSelf()
+                }
             }
         }
     }
@@ -1052,6 +1096,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         // A single-track session has no sibling queue to rebuild. Rebuilding anyway would fall
         // back to the root folder, because a no-queue launch intent carries no parent handle.
         if (!params.isPlayQueue) return
+        // Nothing loaded yet: the launch build is still running and reads the filter inputs when
+        // it builds, so it already produces the right queue. Cancelling it here would leave a
+        // queue that is prepared but never played.
+        if (player?.mediaItemCount == 0) return
         playQueueBuildJob?.cancel()
         queueMoveRebuildJob?.cancel()
         retryJob?.cancel()
@@ -1068,7 +1116,20 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                         needStopStreamingServer || mediaSources.serverStarted
                     applyInPlaceRebuild(mediaSources, keepDetachedCurrent)
                 }
+            pruneHandleStore()
         }
+    }
+
+    /**
+     * Drops every handle mapping that no timeline item uses. The mapper registers a mapping for
+     * each item it builds, so a build cancelled by a newer one, or an emission superseded before
+     * it was applied, leaves mappings behind that nothing will ever look up. Only called once a
+     * build has run to completion: at that point no other build is in flight (starting one
+     * cancels the previous job), so the timeline is the complete set of live mappings.
+     */
+    private fun pruneHandleStore() {
+        val currentPlayer = player ?: return
+        mediaHandleStore.retainAll(timelineMediaIds(currentPlayer))
     }
 
     /**
@@ -1130,7 +1191,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
             is AudioPlayQueueFilterDiff.Action.ResetToSurvivor -> {
                 currentPlayer.setMediaItems(newItems, action.startIndex, 0L)
-                currentPlayer.prepare()
+                // Over quota the player was deliberately stopped; preparing the survivor would
+                // request the stream again and re-raise the warning the stop just handled. The
+                // queue is kept so the next play press resumes onto it (onPlayWhenReadyChanged).
+                if (!isTransferOverQuota) currentPlayer.prepare()
             }
         }
         mediaHandleStore.remove(beforeIds - timelineMediaIds(currentPlayer))

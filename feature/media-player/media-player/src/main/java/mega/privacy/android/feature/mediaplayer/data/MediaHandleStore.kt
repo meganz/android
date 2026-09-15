@@ -31,6 +31,19 @@ class MediaHandleStore @Inject constructor() {
         mediaIds.forEach { store.remove(it) }
     }
 
+    /**
+     * Keeps only the mappings for [mediaIds]. The inverse of [remove]: used once the caller knows
+     * the complete set of media IDs still in use, so mappings that no live item references are
+     * dropped without enumerating them.
+     *
+     * This assumes the caller owns every mapping in the store. That holds today because the audio
+     * player is the only writer (`AudioNodeToMediaItemMapper`) and reader; if another player ever
+     * shares this singleton, prune with [remove] against a caller-tracked set instead.
+     */
+    fun retainAll(mediaIds: Collection<String>) {
+        store.keys.retainAll(mediaIds.toSet())
+    }
+
     fun clear() {
         store.clear()
     }
