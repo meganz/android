@@ -33,6 +33,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.analytics.Analytics
 import mega.android.core.ui.extensions.LaunchedOncePerAppEffect
+import mega.privacy.android.navigation.contract.retain.rememberRetainedValuesStoreNavEntryDecorator
 import mega.privacy.mobile.analytics.event.CustomNavigationActiveEvent
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
@@ -165,6 +166,7 @@ fun HomeScreens(
                                     entryDecorators = listOf(
                                         rememberSaveableStateHolderNavEntryDecorator(),
                                         rememberViewModelStoreNavEntryDecorator(),
+                                        rememberRetainedValuesStoreNavEntryDecorator(),
                                         rememberAnalyticNavEntryDecorator()
                                     ),
                                     entryProvider = entryProvider({

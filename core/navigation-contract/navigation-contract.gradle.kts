@@ -19,6 +19,7 @@ dependencies {
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)
     implementation(androidx.navigation3.ui)
+    implementation(androidx.compose.runtime.retain)
     implementation(androidx.hilt.navigation)
     implementation(androidx.material3)
 

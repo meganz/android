@@ -4,8 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentSetOf
@@ -73,41 +72,23 @@ class NodeSelectionState(
     internal fun startSelecting() {
         selectAllAwaitingMoreItems = true
     }
-
-    companion object {
-        val Saver: Saver<NodeSelectionState, List<Long>> = Saver(
-            save = { state ->
-                buildList {
-                    add(if (state.selectAllAwaitingMoreItems) 1L else 0L)
-                    addAll(state.selectedNodeIds.map { it.longValue })
-                }
-            },
-            restore = { longs ->
-                NodeSelectionState(
-                    initialSelectedIds = longs.drop(1).map { NodeId(it) }.toSet(),
-                    selectAllInProgress = longs.firstOrNull() == 1L
-                )
-            }
-        )
-    }
 }
 
 /**
- * Remember a [NodeSelectionState] that survives configuration changes.
+ * Returns a [NodeSelectionState] that is retained across configuration changes and while the
+ * hosting navigation entry stays on the back stack. It is not written to saved instance state,
+ * so a process death starts with an empty selection.
  *
  * @param initialSelectedIds
  * @param initialIsSelecting
- *
  */
 @Composable
 fun rememberNodeSelectionState(
     initialSelectedIds: Set<NodeId> = emptySet(),
     initialIsSelecting: Boolean = false,
-): NodeSelectionState {
-    return rememberSaveable(saver = NodeSelectionState.Saver) {
-        NodeSelectionState(
-            initialSelectedIds = initialSelectedIds,
-            selectAllInProgress = initialIsSelecting
-        )
-    }
+): NodeSelectionState = retain {
+    NodeSelectionState(
+        initialSelectedIds = initialSelectedIds,
+        selectAllInProgress = initialIsSelecting,
+    )
 }

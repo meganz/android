@@ -63,6 +63,7 @@ compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 compose-ui-viewbinding = { group = "androidx.compose.ui", name = "ui-viewbinding" }
+compose-runtime-retain = { group = "androidx.compose.runtime", name = "runtime-retain" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 datastore-preferences-proto = { module = "androidx.datastore:datastore-preferences-proto", version.ref = "datastore" }
 documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }

@@ -28,6 +28,7 @@ import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStra
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.QueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
+import mega.privacy.android.navigation.contract.retain.rememberRetainedValuesStoreNavEntryDecorator
 import mega.privacy.android.navigation.contract.shared.rememberSharedViewModelStoreNavEntryDecorator
 import mega.privacy.android.navigation.contract.suppression.OverlaySuppressionState
 import mega.privacy.android.navigation.contract.suppression.rememberOverlaySuppressionNavEntryDecorator
@@ -57,6 +58,7 @@ internal fun MegaNavDisplay(
     entryDecorators: List<NavEntryDecorator<NavKey>> = listOf(
         rememberSaveableStateHolderNavEntryDecorator(),
         rememberSharedViewModelStoreNavEntryDecorator(),
+        rememberRetainedValuesStoreNavEntryDecorator(),
         rememberAnalyticNavEntryDecorator(),
     ),
 ) {

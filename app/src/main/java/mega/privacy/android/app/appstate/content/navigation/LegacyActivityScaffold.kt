@@ -29,6 +29,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.retain.rememberRetainedValuesStoreNavEntryDecorator
 import mega.privacy.android.navigation.contract.shared.rememberSharedViewModelStoreNavEntryDecorator
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import kotlin.reflect.KClass
@@ -66,8 +67,8 @@ fun LegacyActivityScaffold(
     container: @Composable (content: @Composable () -> Unit) -> Unit,
     initialKey: NavKey,
     navigationResultManager: NavigationResultManager,
-    featureDestinations: Set<FeatureDestination> = emptySet(),
     appDialogDestinations: Set<AppDialogDestinations>,
+    featureDestinations: Set<FeatureDestination> = emptySet(),
     onEmptyBackStack: () -> Unit = {},
     excludeOwnDestination: KClass<out FeatureDestination>? = null,
     overlayContent: @Composable (handler: NavigationHandler) -> Unit = {},
@@ -126,6 +127,7 @@ fun LegacyActivityScaffold(
                 entryDecorators = listOf(
                     rememberSaveableStateHolderNavEntryDecorator(),
                     rememberSharedViewModelStoreNavEntryDecorator(),
+                    rememberRetainedValuesStoreNavEntryDecorator(),
                 ),
                 transitionSpec = transitionSpec,
                 popTransitionSpec = popTransitionSpec,

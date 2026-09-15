@@ -61,6 +61,7 @@ dependencies {
     implementation(androidx.lifecycle.viewmodel)
     implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.bundles.compose.bom)
+    implementation(androidx.compose.runtime.retain)
     implementation(lib.compose.state.events)
     implementation(lib.kotlin.serialisation)
     implementation(google.guava)
