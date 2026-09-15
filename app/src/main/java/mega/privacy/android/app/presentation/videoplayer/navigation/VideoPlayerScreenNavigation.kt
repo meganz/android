@@ -119,7 +119,11 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             )
         }
 
-        AndroidTheme(isDark = true) {
+        // The forced dark theme must not touch the window: with the legacy status bar colour on,
+        // AndroidTheme repaints the system bars and the DecorView with pageBackground on every
+        // recomposition, undoing the activity's edge-to-edge setup and showing grey bars over the
+        // video on Android 14 and below.
+        AndroidTheme(isDark = true, useLegacyStatusBarColor = false) {
             VideoPlayerScreen(
                 viewModel = viewModel,
                 player = player,
