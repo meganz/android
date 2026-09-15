@@ -1303,6 +1303,8 @@
     <string name="context_remove_link_menu">Remove link</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="general_remove">Remove</string>
+    <!-- Content description of the delete action in a screen top bar, drawn as a bin icon -->
+    <string name="general_delete">Delete</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Remove share</string>
     <!-- Item menu option upon right click on one or multiple files. -->

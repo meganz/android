@@ -88,6 +88,17 @@ sealed interface CommonMenuAction : MenuActionWithIcon {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser)
     }
 
+    data object Delete : CommonMenuAction {
+        override val testTag: String = "app_bar:delete"
+
+        @Composable
+        override fun getDescription() = stringResource(R.string.general_delete)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
+    }
+
     companion object {
         const val DEFAULT_MAX_VISIBLE_ITEMS = 4
     }
