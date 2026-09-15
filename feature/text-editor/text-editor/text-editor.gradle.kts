@@ -3,6 +3,7 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
 }
 
 android {
@@ -10,6 +11,8 @@ android {
         abortOnError = true
     }
     namespace = "mega.privacy.android.feature.texteditor"
+
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -36,4 +39,10 @@ dependencies {
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
+
+    // screenshot tests
+    screenshotTestImplementation(project(":core-test"))
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 }

@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldState
@@ -50,6 +49,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -63,12 +63,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.snackbar.MegaSnackbar
+import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -407,22 +408,15 @@ fun TextEditorScreen(
 
                     hasError -> {
                         val messageRes = uiState.errorMessageRes
-                        val errorMessage = when {
-                            uiState.isNoInternetError ->
-                                stringResource(sharedR.string.error_no_internet_message)
-
-                            uiState.isOverQuotaError ->
-                                stringResource(sharedR.string.subscription_quota_transfer_over_title)
-
-                            messageRes != null -> stringResource(messageRes)
-                            else -> stringResource(sharedR.string.general_request_failed_message)
-                        }
                         TextEditorErrorContent(
-                            message = errorMessage,
-                            onDismiss = {
-                                viewModel.consumeErrorEvent()
-                                onBack()
+                            description = when {
+                                uiState.isNoInternetError ->
+                                    stringResource(sharedR.string.error_no_internet_message)
+
+                                messageRes != null -> stringResource(messageRes)
+                                else -> stringResource(sharedR.string.file_preview_error_description)
                             },
+                            onRetry = if (uiState.isErrorRetryable) viewModel::retryLoad else null,
                         )
                     }
 
@@ -706,27 +700,28 @@ internal fun isBarsHidden(
 
 
 @Composable
-private fun TextEditorErrorContent(
-    message: String,
-    onDismiss: () -> Unit,
+internal fun TextEditorErrorContent(
+    description: String,
+    onRetry: (() -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            MegaText(text = message, modifier = Modifier.padding(16.dp))
-            PrimaryFilledButton(
-                modifier = Modifier.wrapContentWidth(),
-                text = stringResource(sharedR.string.general_ok),
-                onClick = onDismiss,
-            )
-        }
-    }
+    EmptyStateView(
+        imagePainter = painterResource(id = IconPackR.drawable.glass_error_circle),
+        title = stringResource(sharedR.string.file_preview_error_title),
+        modifier = modifier.testTag(TEXT_EDITOR_ERROR_CONTENT_TAG),
+        description = SpannableText(description),
+        primaryAction = if (onRetry != null) {
+            @Composable {
+                SecondaryFilledButton(
+                    modifier = Modifier.testTag(TEXT_EDITOR_ERROR_RETRY_BUTTON_TAG),
+                    text = stringResource(sharedR.string.general_try_again),
+                    onClick = onRetry,
+                )
+            }
+        } else {
+            null
+        },
+    )
 }
 
 @Composable
@@ -952,3 +947,6 @@ private val InlineToggleStyles = setOf(
     RichSpanStyle.Strikethrough,
     RichSpanStyle.Code,
 )
+
+internal const val TEXT_EDITOR_ERROR_CONTENT_TAG = "text_editor:error_content"
+internal const val TEXT_EDITOR_ERROR_RETRY_BUTTON_TAG = "text_editor:error_retry_button"

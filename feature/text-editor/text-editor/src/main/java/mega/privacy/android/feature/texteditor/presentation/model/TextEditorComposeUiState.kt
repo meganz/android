@@ -15,9 +15,9 @@ import mega.privacy.android.domain.extension.isMarkdownFile
  * @param contentVersion Monotonically increasing counter; the UI re-reads chunk data when it changes.
  * @param isFullyLoaded True when gradual loading has finished and all content is in memory.
  * @param errorEvent One-shot event fired when the content could not be loaded; the UI replaces the document with the error screen. Load failures only -- a failure of an action performed on an already loaded document leaves the document on screen and reports itself through a snackbar instead.
- * @param errorMessageRes Optional localized message for a failure the UI can name; null falls back to the generic error copy. Cleared when the error is consumed.
+ * @param errorMessageRes Optional localized message for a failure the UI can name; null falls back to the generic error copy. Cleared when the load is retried.
  * @param isNoInternetError True when the current error event was caused by no internet connectivity; UI shows the no-internet message instead of [errorMessageRes].
- * @param isOverQuotaError True when the current error event was caused by bandwidth over quota; UI shows the transfer-quota message instead of [errorMessageRes].
+ * @param isErrorRetryable False when reloading can only reproduce the current error event (expired, disabled or terminated link); the UI drops the retry action.
  * @param showDiscardDialog True when the discard-changes confirmation dialog should be shown (Edit/Create, unsaved changes).
  * @param exitAfterCreateDiscardEvent One-shot event when Create mode user confirms discard; UI should pop without save.
  * @param isRestoringContent True while content is being reverted/updated in background (e.g. discard); show loading overlay.
@@ -31,7 +31,7 @@ data class TextEditorComposeUiState(
     val errorEvent: StateEvent = consumed,
     @StringRes val errorMessageRes: Int? = null,
     val isNoInternetError: Boolean = false,
-    val isOverQuotaError: Boolean = false,
+    val isErrorRetryable: Boolean = true,
     val mode: TextEditorMode = TextEditorMode.View,
     val showLineNumbers: Boolean = false,
     val showDiscardDialog: Boolean = false,

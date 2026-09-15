@@ -38,7 +38,6 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartDownloadNode
 import mega.privacy.android.domain.exception.PublicNodeException
-import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -67,7 +66,6 @@ import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLin
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatAction
 import mega.privacy.android.feature.texteditor.components.markdown.rich.MarkdownToRichDocumentConverter
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentState
@@ -128,13 +126,18 @@ private fun Throwable.presentableMessageRes(): Int? = when (this) {
     else -> null
 }
 
-/**
- * True when the failure is bandwidth over quota, which the UI names rather than reporting as a
- * generic failure. The cause is checked as well, for the failures that reach the collector wrapped
- * in another exception.
- */
-private val Throwable.isTransferOverQuota: Boolean
-    get() = this is QuotaExceededMegaException || cause is QuotaExceededMegaException
+/** False for the failures a reload can only reproduce; GenericError stays retryable. */
+private val Throwable.isRetryableFailure: Boolean
+    get() = when (this) {
+        is PublicNodeException.Expired,
+        is PublicNodeException.LinkRemoved,
+        is PublicNodeException.AccountTerminated,
+        is PublicNodeException.DecryptionKeyRequired,
+        is PublicNodeException.InvalidDecryptionKey,
+            -> false
+
+        else -> true
+    }
 
 /**
  * ViewModel for the Compose text editor screen.
@@ -179,7 +182,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val richToModelConverter: MarkdownToRichDocumentConverter,
     private val richToMarkdownConverter: RichDocumentToMarkdownConverter,
-    private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -250,6 +252,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     /** Active content-load job; cancelled if connectivity drops during a network load. */
     private var loadJob: Job? = null
 
+    /** Mid-load connectivity monitor; held so a retry cancels the previous collector instead of stacking one. */
+    private var connectivityJob: Job? = null
+
     /** Active download request; while it runs, a repeated download request is dropped. */
     private var downloadJob: Job? = null
 
@@ -274,201 +279,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
         monitorNodeRename()
         if (args.mode != TextEditorMode.Create) {
-            loadJob = viewModelScope.launch {
-                // No localPath means the editor must reach the network (Cloud Drive open,
-                // chat-attached file, or public file link). Short-circuit with a no-internet
-                // prompt to avoid kicking off a download that would hang forever.
-                if (args.localPath.isNullOrBlank() && !isConnectedToInternetUseCase()) {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorEvent = triggered,
-                            isNoInternetError = true,
-                        )
-                    }
-                    return@launch
-                }
-                _uiState.update { it.copy(isFullyLoaded = false) }
-                // Resolved before content streams so the Markdown preview routing never
-                // flips mid-stream.
-                resolveMarkdownFlags()
-                val chatId = args.chatId
-                val messageId = args.messageId
-                val publicUrl = args.publicUrl
-                var resolvedNode: TypedFileNode? = null
-                if (chatId != null && messageId != null) {
-                    val chatFileResult = runCatching {
-                        getChatFileUseCase(chatId, messageId)
-                    }
-                    val chatFile = chatFileResult.getOrNull()
-                    if (chatFile != null) {
-                        resolvedNodeHandle = chatFile.id.longValue
-                        resolvedNode = chatFile
-                        _uiState.update {
-                            it.copy(fileName = chatFile.name)
-                        }
-                    } else {
-                        val exception = chatFileResult.exceptionOrNull()
-                        Timber.e(exception, "Text editor: chat file not found for chatId=$chatId, messageId=$messageId")
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                errorEvent = triggered,
-                                errorMessageRes = exception?.presentableMessageRes(),
-                            )
-                        }
-                        return@launch
-                    }
-                } else if (!publicUrl.isNullOrBlank()) {
-                    val publicNodeResult = runCatching {
-                        getPublicNodeUseCase(publicUrl)
-                    }
-                    val publicNode = publicNodeResult.getOrNull()
-                    if (publicNode != null) {
-                        resolvedNodeHandle = publicNode.id.longValue
-                        resolvedNode = publicNode
-                        resolvedPublicNode = publicNode
-                        _uiState.update {
-                            it.copy(fileName = publicNode.name)
-                        }
-                    } else {
-                        val exception = publicNodeResult.exceptionOrNull()
-                        Timber.e(exception, "Text editor: failed to resolve public node from file link")
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                errorEvent = triggered,
-                                errorMessageRes = exception?.presentableMessageRes(),
-                            )
-                        }
-                        return@launch
-                    }
-                } else if (args.isFolderLink) {
-                    // Folder link nodes live in the folder API session, not the main account, so
-                    // they must be resolved as public child nodes; resolving by handle through the
-                    // main API would fail and the file would never load.
-                    val folderNodeResult = runCatching {
-                        getPublicChildNodeFromIdUseCase(NodeId(resolvedNodeHandle)) as? TypedFileNode
-                    }
-                    val folderNode = folderNodeResult.getOrNull()
-                    if (folderNode != null) {
-                        resolvedNodeHandle = folderNode.id.longValue
-                        resolvedNode = folderNode
-                        resolvedPublicNode = folderNode
-                        _uiState.update {
-                            it.copy(fileName = folderNode.name)
-                        }
-                    } else {
-                        val exception = folderNodeResult.exceptionOrNull()
-                        Timber.e(exception, "Text editor: failed to resolve folder link node")
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                errorEvent = triggered,
-                                errorMessageRes = exception?.presentableMessageRes(),
-                            )
-                        }
-                        return@launch
-                    }
-                }
-                // The file name drives the Markdown preview routing (isMarkdown). Openers that
-                // pass only a node handle would otherwise flash the raw source until the name
-                // arrives with the bottom-bar actions, so resolve it before any content shows.
-                if (_uiState.value.fileName.isBlank() &&
-                    resolvedNodeHandle != INVALID_NODE_HANDLE
-                ) {
-                    runCatching { getNodeByIdUseCase(NodeId(resolvedNodeHandle))?.name }
-                        .getOrNull()
-                        ?.let { name -> _uiState.update { it.copy(fileName = name) } }
-                }
-                val contentFlow = when {
-                    !publicUrl.isNullOrBlank() -> getTextContentForFileLinkUseCase(
-                        urlFileLink = publicUrl,
-                        chunkSizeLines = CHUNK_SIZE_LINES,
-                    )
-
-                    args.isFolderLink && resolvedNode != null -> getTextContentForFolderLinkUseCase(
-                        node = resolvedNode,
-                        chunkSizeLines = CHUNK_SIZE_LINES,
-                    )
-
-                    resolvedNode != null -> getTextContentForTextEditorUseCase(
-                        resolvedNode = resolvedNode,
-                        localPath = args.localPath,
-                        chunkSizeLines = CHUNK_SIZE_LINES,
-                    )
-
-                    else -> getTextContentForTextEditorUseCase(
-                        nodeHandle = resolvedNodeHandle,
-                        localPath = args.localPath,
-                        chunkSizeLines = CHUNK_SIZE_LINES,
-                    )
-                }
-                contentFlow
-                    .catch { e ->
-                        Timber.e(e, "Text editor: failed to load content gradually")
-                        // Link loaders only do an HTTP read with no download fallback, so a quota
-                        // failure arrives as a plain IO error, not as a quota exception.
-                        val streamingOnlyLoad =
-                            !args.publicUrl.isNullOrBlank() || args.isFolderLink
-                        val isOverQuota = e.isTransferOverQuota ||
-                                (streamingOnlyLoad && isInTransferOverQuota())
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                errorEvent = triggered,
-                                errorMessageRes = e.presentableMessageRes(),
-                                isOverQuotaError = isOverQuota,
-                            )
-                        }
-                    }
-                    .collect { chunk ->
-                        fullContentLines.addAll(chunk)
-                        if (args.mode != TextEditorMode.Edit) {
-                            buildChunkBoundaries()
-                        }
-                        // In Edit mode keep isLoading=true until buildChunksFromLines() is
-                        // called below; showing the edit UI with empty chunks would cause a
-                        // blank screen while the rest of the file is still streaming in.
-                        if (_uiState.value.isLoading && args.mode != TextEditorMode.Edit) {
-                            _uiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    errorEvent = consumed,
-                                    totalLineCount = fullContentLines.size,
-                                )
-                            }
-                        } else {
-                            _uiState.update { it.copy(totalLineCount = fullContentLines.size) }
-                        }
-                    }
-                val linesSnapshot = fullContentLines.toList()
-                lastSavedContent = withContext(defaultDispatcher) {
-                    linesSnapshot.joinToString("\n")
-                }
-                if (args.mode == TextEditorMode.Edit) {
-                    buildChunksFromLines()
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorEvent = consumed,
-                            totalLineCount = fullContentLines.size,
-                            contentVersion = it.contentVersion + 1,
-                            isSingleChunkDocument = chunkTexts.size <= 1,
-                        )
-                    }
-                }
-                rebuildStartLineCache()
-                _uiState.update { it.copy(isFullyLoaded = true) }
-                restoreScrollPosition()
-                saveRecentlyUsed()
-                fetchBottomBarActions(resolvedNode)
-            }
-            // Local files load without the network, so a connectivity drop must not
-            // interrupt them; only network-backed loads need the mid-load monitor.
-            if (args.localPath.isNullOrBlank()) {
-                monitorConnectivityDuringLoad()
-            }
+            startLoad()
         } else {
             viewModelScope.launch { resolveMarkdownFlags() }
             lastSavedContent = ""
@@ -477,6 +288,202 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             _uiState.update {
                 it.copy(isLoading = false, totalLineCount = 0)
             }
+        }
+    }
+
+    private fun startLoad() {
+        loadJob = viewModelScope.launch {
+            // No localPath means the editor must reach the network (Cloud Drive open,
+            // chat-attached file, or public file link). Short-circuit with a no-internet
+            // prompt to avoid kicking off a download that would hang forever.
+            if (args.localPath.isNullOrBlank() && !isConnectedToInternetUseCase()) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorEvent = triggered,
+                        isNoInternetError = true,
+                        isErrorRetryable = true,
+                    )
+                }
+                return@launch
+            }
+            _uiState.update { it.copy(isFullyLoaded = false) }
+            // Resolved before content streams so the Markdown preview routing never
+            // flips mid-stream.
+            resolveMarkdownFlags()
+            val chatId = args.chatId
+            val messageId = args.messageId
+            val publicUrl = args.publicUrl
+            var resolvedNode: TypedFileNode? = null
+            if (chatId != null && messageId != null) {
+                val chatFileResult = runCatching {
+                    getChatFileUseCase(chatId, messageId)
+                }
+                val chatFile = chatFileResult.getOrNull()
+                if (chatFile != null) {
+                    resolvedNodeHandle = chatFile.id.longValue
+                    resolvedNode = chatFile
+                    _uiState.update {
+                        it.copy(fileName = chatFile.name)
+                    }
+                } else {
+                    val exception = chatFileResult.exceptionOrNull()
+                    Timber.e(exception, "Text editor: chat file not found for chatId=$chatId, messageId=$messageId")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorEvent = triggered,
+                            errorMessageRes = exception?.presentableMessageRes(),
+                            isErrorRetryable = exception?.isRetryableFailure ?: true,
+                        )
+                    }
+                    return@launch
+                }
+            } else if (!publicUrl.isNullOrBlank()) {
+                val publicNodeResult = runCatching {
+                    getPublicNodeUseCase(publicUrl)
+                }
+                val publicNode = publicNodeResult.getOrNull()
+                if (publicNode != null) {
+                    resolvedNodeHandle = publicNode.id.longValue
+                    resolvedNode = publicNode
+                    resolvedPublicNode = publicNode
+                    _uiState.update {
+                        it.copy(fileName = publicNode.name)
+                    }
+                } else {
+                    val exception = publicNodeResult.exceptionOrNull()
+                    Timber.e(exception, "Text editor: failed to resolve public node from file link")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorEvent = triggered,
+                            errorMessageRes = exception?.presentableMessageRes(),
+                            isErrorRetryable = exception?.isRetryableFailure ?: true,
+                        )
+                    }
+                    return@launch
+                }
+            } else if (args.isFolderLink) {
+                // Folder link nodes live in the folder API session, not the main account, so
+                // they must be resolved as public child nodes; resolving by handle through the
+                // main API would fail and the file would never load.
+                val folderNodeResult = runCatching {
+                    getPublicChildNodeFromIdUseCase(NodeId(resolvedNodeHandle)) as? TypedFileNode
+                }
+                val folderNode = folderNodeResult.getOrNull()
+                if (folderNode != null) {
+                    resolvedNodeHandle = folderNode.id.longValue
+                    resolvedNode = folderNode
+                    resolvedPublicNode = folderNode
+                    _uiState.update {
+                        it.copy(fileName = folderNode.name)
+                    }
+                } else {
+                    val exception = folderNodeResult.exceptionOrNull()
+                    Timber.e(exception, "Text editor: failed to resolve folder link node")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorEvent = triggered,
+                            errorMessageRes = exception?.presentableMessageRes(),
+                            isErrorRetryable = exception?.isRetryableFailure ?: true,
+                        )
+                    }
+                    return@launch
+                }
+            }
+            // The file name drives the Markdown preview routing (isMarkdown). Openers that
+            // pass only a node handle would otherwise flash the raw source until the name
+            // arrives with the bottom-bar actions, so resolve it before any content shows.
+            if (_uiState.value.fileName.isBlank() &&
+                resolvedNodeHandle != INVALID_NODE_HANDLE
+            ) {
+                runCatching { getNodeByIdUseCase(NodeId(resolvedNodeHandle))?.name }
+                    .getOrNull()
+                    ?.let { name -> _uiState.update { it.copy(fileName = name) } }
+            }
+            val contentFlow = when {
+                !publicUrl.isNullOrBlank() -> getTextContentForFileLinkUseCase(
+                    urlFileLink = publicUrl,
+                    chunkSizeLines = CHUNK_SIZE_LINES,
+                )
+
+                args.isFolderLink && resolvedNode != null -> getTextContentForFolderLinkUseCase(
+                    node = resolvedNode,
+                    chunkSizeLines = CHUNK_SIZE_LINES,
+                )
+
+                resolvedNode != null -> getTextContentForTextEditorUseCase(
+                    resolvedNode = resolvedNode,
+                    localPath = args.localPath,
+                    chunkSizeLines = CHUNK_SIZE_LINES,
+                )
+
+                else -> getTextContentForTextEditorUseCase(
+                    nodeHandle = resolvedNodeHandle,
+                    localPath = args.localPath,
+                    chunkSizeLines = CHUNK_SIZE_LINES,
+                )
+            }
+            contentFlow
+                .catch { e ->
+                    Timber.e(e, "Text editor: failed to load content gradually")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorEvent = triggered,
+                            errorMessageRes = e.presentableMessageRes(),
+                            isErrorRetryable = e.isRetryableFailure,
+                        )
+                    }
+                }
+                .collect { chunk ->
+                    fullContentLines.addAll(chunk)
+                    if (args.mode != TextEditorMode.Edit) {
+                        buildChunkBoundaries()
+                    }
+                    // In Edit mode keep isLoading=true until buildChunksFromLines() is
+                    // called below; showing the edit UI with empty chunks would cause a
+                    // blank screen while the rest of the file is still streaming in.
+                    if (_uiState.value.isLoading && args.mode != TextEditorMode.Edit) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorEvent = consumed,
+                                totalLineCount = fullContentLines.size,
+                            )
+                        }
+                    } else {
+                        _uiState.update { it.copy(totalLineCount = fullContentLines.size) }
+                    }
+                }
+            val linesSnapshot = fullContentLines.toList()
+            lastSavedContent = withContext(defaultDispatcher) {
+                linesSnapshot.joinToString("\n")
+            }
+            if (args.mode == TextEditorMode.Edit) {
+                buildChunksFromLines()
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorEvent = consumed,
+                        totalLineCount = fullContentLines.size,
+                        contentVersion = it.contentVersion + 1,
+                        isSingleChunkDocument = chunkTexts.size <= 1,
+                    )
+                }
+            }
+            rebuildStartLineCache()
+            _uiState.update { it.copy(isFullyLoaded = true) }
+            restoreScrollPosition()
+            saveRecentlyUsed()
+            fetchBottomBarActions(resolvedNode)
+        }
+        // Local files load without the network, so a connectivity drop must not
+        // interrupt them; only network-backed loads need the mid-load monitor.
+        if (args.localPath.isNullOrBlank()) {
+            monitorConnectivityDuringLoad()
         }
     }
 
@@ -1059,26 +1066,38 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 },
                 onFailure = { e ->
                     Timber.e(e, "Text editor: failed to save content")
-                    _uiState.update {
-                        it.copy(
-                            errorEvent = triggered,
-                            errorMessageRes = e.presentableMessageRes(),
-                        )
-                    }
+                    // The edited document must stay on screen rather than be replaced by the
+                    // error screen, so the unsaved changes survive for the user to save again.
+                    snackbarEventQueue.queueMessage(
+                        e.presentableMessageRes()
+                            ?: sharedR.string.general_request_failed_message
+                    )
                 },
             )
         }
     }
 
-    fun consumeErrorEvent() {
+    /**
+     * Reloads the document after a failure. The accumulated chunks are dropped first: a stream
+     * can fail part way through, and the reload appends rather than replaces.
+     */
+    fun retryLoad() {
+        if (args.mode == TextEditorMode.Create) return
+        loadJob?.cancel()
+        fullContentLines.clear()
+        clearEditState()
+        chunkBoundaries = emptyList()
         _uiState.update {
             it.copy(
+                isLoading = true,
+                isFullyLoaded = false,
                 errorEvent = consumed,
                 errorMessageRes = null,
                 isNoInternetError = false,
-                isOverQuotaError = false,
+                isErrorRetryable = true,
             )
         }
+        startLoad()
     }
 
     fun consumeTransferEvent() {
@@ -1523,18 +1542,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     /**
-     * Whether the account is inside a bandwidth over quota window.
-     *
-     * The load reads the file by streaming it first, and a quota failure there is only ever a
-     * failed HTTP read -- the local server closes the stream rather than reporting a reason -- so
-     * the quota is queried directly instead of inferred from the failure.
-     */
-    private suspend fun isInTransferOverQuota(): Boolean =
-        runCatching { isInTransferOverQuotaUseCase() }
-            .onFailure { Timber.e(it, "Text editor: failed to read the transfer quota state") }
-            .getOrDefault(false)
-
-    /**
      * Cancels the content load and surfaces a no-internet error if connectivity drops
      * while the editor is still loading. Only started for network-backed loads (no
      * local path). The initial offline case is handled by the synchronous
@@ -1547,7 +1554,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private fun monitorConnectivityDuringLoad() {
         // Skip checking if a local path existed
         if (!args.localPath.isNullOrBlank()) return
-        viewModelScope.launch {
+        connectivityJob?.cancel()
+        connectivityJob = viewModelScope.launch {
             monitorConnectivityUseCase()
                 .distinctUntilChanged()
                 .drop(1)
@@ -1561,7 +1569,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             errorEvent = triggered,
                             errorMessageRes = null,
                             isNoInternetError = true,
-                            isOverQuotaError = false,
+                            isErrorRetryable = true,
                         )
                     }
                 }
