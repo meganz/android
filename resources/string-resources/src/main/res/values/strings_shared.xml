@@ -4149,6 +4149,14 @@
     <string name="sync_exclusions_add_extension_invalid_error">Extensions can’t contain spaces, dots, or slashes</string>
     <!-- Sync exclusions Add form: error under the extensions field when an existing rule already excludes one of the typed extensions. %1$s is that extension, without a leading dot, for example mp3. -->
     <string name="sync_exclusions_add_extension_duplicate_error">You’ve already excluded %1$s</string>
+    <!-- Sync exclusions Add screen: title of the full screen where a new exclusion rule is created. -->
+    <string name="sync_exclusions_add_title">Add exclusion</string>
+    <!-- Sync exclusions Add screen: label of the tab where a rule is described by the name it matches. -->
+    <string name="sync_exclusions_add_tab_by_name">By name</string>
+    <!-- Sync exclusions Add screen: label of the tab where a rule is described by how large a file is. -->
+    <string name="sync_exclusions_add_tab_by_size">By size</string>
+    <!-- Sync exclusions Add screen: button that saves the rule being created and closes the screen. -->
+    <string name="sync_exclusions_add_confirm">Add exclusion</string>
     <!-- Title of the personal QR code screen -->
     <string name="contacts_qr_screen_title">QR code</string>
     <!-- Button that generates the user's personal QR code -->

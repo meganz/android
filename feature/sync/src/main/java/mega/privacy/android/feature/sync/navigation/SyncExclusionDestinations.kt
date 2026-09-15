@@ -7,6 +7,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
+import mega.privacy.android.feature.sync.ui.exclusion.AddSyncExclusionRuleRoute
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Full-screen destination for authoring a new sync exclusion rule.
@@ -59,12 +61,19 @@ data class EditSyncExclusionRuleNavKey(
 ) : NavKey
 
 /**
- * Registers the exclusion rule destinations. Both render an empty screen until the Add and Edit
- * screens land in SAT-2428, SAT-2431 and SAT-2434.
+ * Registers the exclusion rule destinations.
+ *
+ * The Add destination builds a rule but does not yet write it, and the Edit destination is still
+ * empty. Nothing navigates to either, so no surface can reach a rule that would be dropped.
  */
-fun EntryProviderScope<NavKey>.syncExclusionScreens() {
+fun EntryProviderScope<NavKey>.syncExclusionScreens(
+    navigationHandler: NavigationHandler,
+) {
     entry<AddSyncExclusionRuleNavKey> {
-        Box(modifier = Modifier.fillMaxSize())
+        AddSyncExclusionRuleRoute(
+            onConfirm = { navigationHandler.back() },
+            onDismiss = { navigationHandler.back() },
+        )
     }
 
     entry<EditSyncExclusionRuleNavKey> {
