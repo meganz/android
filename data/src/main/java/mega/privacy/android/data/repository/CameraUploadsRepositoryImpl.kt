@@ -666,6 +666,10 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
             setOf(cameraUploadsCopyInProgressTransferMapper(record).uniqueId)
         )
 
+    override suspend fun clearCameraUploadsInProgressTransfers() = withContext(ioDispatcher) {
+        cameraUploadsInProgressTransfersFlow.value = emptyMap()
+    }
+
     override val monitorCameraUploadsEnabled: Flow<Boolean?> =
         cameraUploadsSettingsPreferenceGateway
             .monitorCameraUploadsEnabled

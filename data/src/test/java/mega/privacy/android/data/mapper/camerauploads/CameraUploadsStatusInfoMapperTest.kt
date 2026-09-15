@@ -210,6 +210,18 @@ class CameraUploadsStatusInfoMapperTest {
             CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP)
         ),
         Arguments.of(
+            workDataOf(),
+            WorkInfo.State.CANCELLED,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP)
+        ),
+        Arguments.of(
+            progressData,
+            WorkInfo.State.CANCELLED,
+            WorkInfo.STOP_REASON_CANCELLED_BY_APP,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP)
+        ),
+        Arguments.of(
             workDataOf(STATUS_INFO to NO_WIFI_CONNECTION),
             WorkInfo.State.RUNNING,
             WorkInfo.STOP_REASON_NOT_STOPPED,

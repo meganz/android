@@ -97,6 +97,7 @@ import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFolders
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckOrCreateCameraUploadsNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
@@ -256,6 +257,8 @@ internal class CameraUploadsWorkerTest {
         mock()
     private val removeCameraUploadsCopyInProgressTransferUseCase: RemoveCameraUploadsCopyInProgressTransferUseCase =
         mock()
+    private val clearCameraUploadsInProgressTransfersUseCase: ClearCameraUploadsInProgressTransfersUseCase =
+        mock()
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
@@ -360,6 +363,7 @@ internal class CameraUploadsWorkerTest {
                 handleCUTransferEventsUseCase = handleCUTransferEventsUseCase,
                 addCameraUploadsCopyInProgressTransferUseCase = addCameraUploadsCopyInProgressTransferUseCase,
                 removeCameraUploadsCopyInProgressTransferUseCase = removeCameraUploadsCopyInProgressTransferUseCase,
+                clearCameraUploadsInProgressTransfersUseCase = clearCameraUploadsInProgressTransfersUseCase,
                 checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
                 getUploadFileSizeDifferenceUseCase = getUploadFileSizeDifferenceUseCase,
                 getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
@@ -1814,6 +1818,7 @@ internal class CameraUploadsWorkerTest {
             underTest.doWork()
 
             verify(cancelTransferByTagUseCase).invoke(uploadTag)
+            verify(clearCameraUploadsInProgressTransfersUseCase).invoke()
         }
 
     @Test
@@ -1920,6 +1925,7 @@ internal class CameraUploadsWorkerTest {
                 deleteCameraUploadsTemporaryRootDirectoryUseCase,
                 scheduleCameraUploadUseCase
             )
+            verify(clearCameraUploadsInProgressTransfersUseCase).invoke()
         }
 
     @Test

@@ -101,6 +101,7 @@ import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFolders
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckOrCreateCameraUploadsNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
@@ -218,6 +219,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val handleCUTransferEventsUseCase: HandleCUTransferEventsUseCase,
     private val addCameraUploadsCopyInProgressTransferUseCase: AddCameraUploadsCopyInProgressTransferUseCase,
     private val removeCameraUploadsCopyInProgressTransferUseCase: RemoveCameraUploadsCopyInProgressTransferUseCase,
+    private val clearCameraUploadsInProgressTransfersUseCase: ClearCameraUploadsInProgressTransfersUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorCrossDeviceFolderConflictsUseCase: MonitorCrossDeviceFolderConflictsUseCase,
@@ -443,6 +445,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
 
     private suspend fun finalizeWork(): Result {
+        clearInProgressTransfers()
         return runCatching {
             cleanResources()
             sendFinishedStatus(finishedReason ?: CameraUploadsFinishedReason.COMPLETED)
@@ -1462,6 +1465,22 @@ class CameraUploadsWorker @AssistedInject constructor(
             retrieveFilesJob,
             uploadJob,
         ).forEach { it?.cancelAndJoin() }
+    }
+
+    /**
+     * Clear the Camera Uploads in progress transfers once the process ends, whatever the reason.
+     *
+     * Runs as [NonCancellable] because the worker coroutine is already cancelled when the app
+     * stops the work, and it stops [monitorCameraUploadsTransfers] first so that the pending events
+     * flushed on its cancellation cannot re-add entries after the map has been cleared.
+     */
+    private suspend fun clearInProgressTransfers() {
+        withContext(NonCancellable) {
+            runCatching {
+                monitorCameraUploadsTransfers?.cancelAndJoin()
+                clearCameraUploadsInProgressTransfersUseCase()
+            }.onFailure { Timber.e(it, "Failed to clear Camera Uploads in progress transfers") }
+        }
     }
 
     /**

@@ -617,6 +617,14 @@ interface CameraUploadsRepository {
     suspend fun removeCameraUploadsCopyInProgressTransfer(record: CameraUploadsRecord)
 
     /**
+     * Clear all camera uploads in progress transfers
+     *
+     * Meant to be called when the Camera Uploads process ends, so that no stale entries survive
+     * a finished or cancelled run
+     */
+    suspend fun clearCameraUploadsInProgressTransfers()
+
+    /**
      * Monitor the Camera Uploads enabled status
      */
     val monitorCameraUploadsEnabled: Flow<Boolean?>

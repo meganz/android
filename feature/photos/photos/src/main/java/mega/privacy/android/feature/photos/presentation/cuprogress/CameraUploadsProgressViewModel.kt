@@ -7,8 +7,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.CameraUploadsTransferType
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorCameraUploadsInProgressTransfersUseCase
@@ -30,6 +31,7 @@ import javax.inject.Inject
 class CameraUploadsProgressViewModel @Inject constructor(
     monitorCameraUploadsInProgressTransfersUseCase: MonitorCameraUploadsInProgressTransfersUseCase,
     monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
+    isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
 ) : ViewModel() {
@@ -46,6 +48,11 @@ class CameraUploadsProgressViewModel @Inject constructor(
         emit(CameraUploadsStatusInfo.Unknown)
     }
 
+    // The screen is only reachable while Camera Uploads is enabled, so assume enabled until the preference emits.
+    private val cuEnabledFlow = isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled
+        .catch { Timber.e(it, "Failed to monitor the Camera Uploads enabled state") }
+        .onStart { emit(true) }
+
     internal val uiState: StateFlow<CameraUploadsProgressUiState> by lazy {
         cameraUploadsProgressUiState().asUiStateFlow(
             scope = viewModelScope,
@@ -56,12 +63,16 @@ class CameraUploadsProgressViewModel @Inject constructor(
     private fun cameraUploadsProgressUiState(): Flow<CameraUploadsProgressUiState> = combine(
         flow = cuInProgressTransferFlow,
         flow2 = cuStatusInfoFlow,
-        transform = ::Pair
-    ).map { (cuInProgressTransfers, cuStatusInfo) ->
-        buildCameraUploadsProgressUiState(
-            inProgressTransfers = cuInProgressTransfers,
-            statusInfo = cuStatusInfo
-        )
+        flow3 = cuEnabledFlow,
+    ) { cuInProgressTransfers, cuStatusInfo, isCameraUploadsEnabled ->
+        if (isCameraUploadsEnabled) {
+            buildCameraUploadsProgressUiState(
+                inProgressTransfers = cuInProgressTransfers,
+                statusInfo = cuStatusInfo
+            )
+        } else {
+            CameraUploadsProgressUiState(isLoading = false)
+        }
     }
 
     private fun buildCameraUploadsProgressUiState(

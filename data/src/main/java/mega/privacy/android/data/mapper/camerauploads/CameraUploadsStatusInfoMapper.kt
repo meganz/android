@@ -57,6 +57,14 @@ class CameraUploadsStatusInfoMapper @Inject constructor() {
         stopReason: Int,
     ): CameraUploadsStatusInfo? {
         return when {
+            // WorkManager flips the state to CANCELLED before the worker is interrupted, so the
+            // stop reason is never persisted for an app-initiated cancellation. Cancellation can
+            // only ever come from the app, so it does not need the stop reason to be reported.
+            state == WorkInfo.State.CANCELLED ->
+                CameraUploadsStatusInfo.Finished(
+                    reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP
+                )
+
             state.isFinished ->
                 // In case the state is finished, only retain premature stop by the work manager system
                 // Those reason cannot be capture inside the CameraUploadsWorker itself

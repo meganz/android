@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.CameraUploadsTransferType
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorCameraUploadsInProgressTransfersUseCase
@@ -39,6 +40,7 @@ class CameraUploadsProgressViewModelTest {
         mock()
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase =
         mock()
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
     private val getThumbnailUseCase: GetThumbnailUseCase = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
 
@@ -46,14 +48,17 @@ class CameraUploadsProgressViewModelTest {
         MutableStateFlow<Map<Long, InProgressTransfer>>(emptyMap())
     private var cuStatusInfoFlow =
         MutableStateFlow<CameraUploadsStatusInfo>(CameraUploadsStatusInfo.Unknown)
+    private var cuEnabledFlow = MutableStateFlow(true)
 
     @BeforeEach
     fun setup() {
         whenever(monitorCameraUploadsInProgressTransfersUseCase()) doReturn cuInProgressTransferFlow
         whenever(monitorCameraUploadsStatusInfoUseCase()) doReturn cuStatusInfoFlow
+        whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn cuEnabledFlow
         underTest = CameraUploadsProgressViewModel(
             monitorCameraUploadsInProgressTransfersUseCase = monitorCameraUploadsInProgressTransfersUseCase,
             monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             getThumbnailUseCase = getThumbnailUseCase,
             fileTypeIconMapper = fileTypeIconMapper
         )
@@ -63,9 +68,11 @@ class CameraUploadsProgressViewModelTest {
     fun tearDown() {
         cuInProgressTransferFlow = MutableStateFlow(emptyMap())
         cuStatusInfoFlow = MutableStateFlow(CameraUploadsStatusInfo.Unknown)
+        cuEnabledFlow = MutableStateFlow(true)
         reset(
             monitorCameraUploadsInProgressTransfersUseCase,
             monitorCameraUploadsStatusInfoUseCase,
+            isCameraUploadsEnabledUseCase,
             getThumbnailUseCase,
             fileTypeIconMapper
         )
@@ -105,6 +112,30 @@ class CameraUploadsProgressViewModelTest {
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().pendingCount).isEqualTo(7)
+            }
+        }
+
+    @Test
+    fun `test that the uiState is reset to not loading with no pending count when camera uploads is disabled while uploading`() =
+        runTest {
+            cuStatusInfoFlow.value = CameraUploadsStatusInfo.UploadProgress(
+                totalToUpload = 10,
+                totalUploaded = 3,
+                totalUploadedBytes = 1L,
+                progress = Progress(1f),
+                totalUploadBytes = 1L,
+                areUploadsPaused = false,
+            )
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isLoading).isTrue()
+
+                cuEnabledFlow.value = false
+
+                val state = expectMostRecentItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.pendingCount).isEqualTo(0)
+                assertThat(state.transfers).isEmpty()
             }
         }
 

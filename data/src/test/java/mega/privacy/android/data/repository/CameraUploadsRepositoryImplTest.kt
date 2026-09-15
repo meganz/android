@@ -815,6 +815,31 @@ class CameraUploadsRepositoryImplTest {
             }
         }
 
+    @Test
+    fun `test that in progress transfers flow is emptied when clearCameraUploadsInProgressTransfers is called`() =
+        runTest {
+            val uniqueId = 5L
+            val transfer = mock<Transfer> {
+                on { it.uniqueId }.thenReturn(uniqueId)
+                on { it.transferType }.thenReturn(TransferType.CU_UPLOAD)
+                on { it.isFolderTransfer }.thenReturn(false)
+            }
+            val inProgressTransfer = mock<InProgressTransfer.Upload> {
+                on { it.uniqueId }.thenReturn(uniqueId)
+            }
+            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
+            setUp()
+            underTest.monitorCameraUploadsInProgressTransfers().test {
+                assertThat(awaitItem()).isEmpty()
+                underTest.updateCameraUploadsInProgressTransfers(listOf(transfer))
+                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
+
+                underTest.clearCameraUploadsInProgressTransfers()
+
+                assertThat(awaitItem()).isEmpty()
+            }
+        }
+
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that the correct value is returned for camera upload enablement`(isEnabled: Boolean) =
