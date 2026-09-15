@@ -444,7 +444,7 @@ internal fun CloudDriveContent(
                             )
                         },
                         onOpenLinkClicked = {
-                            navigationHandler.navigate(OpenLinkDialogNavKey)
+                            navigationHandler.navigate(OpenLinkDialogNavKey())
                         },
                         onDismissSheet = {
                             onToggleShowUploadOptionsBottomSheet(false)

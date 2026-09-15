@@ -144,7 +144,7 @@ internal fun HomeScreen(
                     ChatListNavKey(createNewChat = true)
                 )
 
-                HomeFabOption.OpenLink -> navigationHandler.navigate(OpenLinkDialogNavKey)
+                HomeFabOption.OpenLink -> navigationHandler.navigate(OpenLinkDialogNavKey())
             }
             navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)
         }

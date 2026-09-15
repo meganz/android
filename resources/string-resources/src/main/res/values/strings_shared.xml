@@ -4181,4 +4181,24 @@
     <string name="contacts_qr_own_email_dialog_body">There\’s no need to add your own email address</string>
     <!-- Body of the dialog shown when a contact invitation could not be sent due to an error -->
     <string name="contacts_qr_invite_error_dialog_body">An error occurred and the invitation has not been sent.</string>
+    <!-- Action in the chat list meetings bottom sheet that starts an unscheduled meeting immediately -->
+    <string name="chat_meeting_actions_start_now">Start meeting now</string>
+    <!-- Action in the chat list meetings bottom sheet that opens the dialog for joining a meeting by link -->
+    <string name="chat_meeting_actions_join">Join meeting</string>
+    <!-- Action in the chat list meetings bottom sheet that opens the schedule meeting screen -->
+    <string name="chat_meeting_actions_schedule">Schedule meeting</string>
+    <!-- Title of the dialog asking the user to paste the link of the meeting they were invited to -->
+    <string name="chat_join_meeting_dialog_title">You are invited to a meeting.</string>
+    <!-- Instruction shown in the dialog asking the user to paste a meeting link -->
+    <string name="chat_join_meeting_dialog_description">Tap the Meeting link sent to you or paste it here</string>
+    <!-- Placeholder of the input field where the user pastes a meeting link -->
+    <string name="chat_join_meeting_dialog_hint">Meeting link</string>
+    <!-- Message shown when the user tries to start a meeting while already in another call -->
+    <string name="chat_start_meeting_already_in_call_error">Another call in progress. Please end your current call before making another.</string>
+    <!-- Warning shown when the user denies the Bluetooth permission needed to start a meeting -->
+    <string name="chat_start_meeting_bluetooth_permission_warning">Go to Settings to allow MEGA permission to access your nearby devices using Bluetooth.</string>
+    <!-- Title of the dialog shown when a meeting cannot be started or joined because a call is already in progress -->
+    <string name="chat_meeting_blocked_by_call_dialog_title">Ongoing call</string>
+    <!-- Title of the dialog shown when the Bluetooth permission needed to start a meeting was denied -->
+    <string name="chat_start_meeting_bluetooth_permission_title">Permission required</string>
 </resources>

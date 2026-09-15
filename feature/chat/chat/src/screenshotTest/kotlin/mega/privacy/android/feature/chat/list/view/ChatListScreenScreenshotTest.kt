@@ -27,6 +27,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onMeetingActionClick = {},
                 onArchivedClick = {},
                 onSearchQueryChange = {},
             )
@@ -44,6 +45,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onMeetingActionClick = {},
                 onArchivedClick = {},
                 onSearchQueryChange = {},
             )
@@ -66,6 +68,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onMeetingActionClick = {},
                 onArchivedClick = {},
                 onSearchQueryChange = {},
             )
@@ -88,6 +91,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onMeetingActionClick = {},
                 onArchivedClick = {},
                 onSearchQueryChange = {},
             )
@@ -107,6 +111,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onMeetingFabClick = {},
                 onArchivedClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
@@ -132,6 +137,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onMeetingFabClick = {},
                 onArchivedClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
@@ -152,6 +158,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onMeetingFabClick = {},
                 onArchivedClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
@@ -174,6 +181,7 @@ class ChatListScreenScreenshotTest {
                 onBackClick = {},
                 onItemClick = {},
                 onNewChatClick = {},
+                onMeetingActionClick = {},
                 onArchivedClick = {},
                 onSearchQueryChange = {},
             )

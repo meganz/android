@@ -7,6 +7,12 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 @Serializable
 data object CreateScheduledMeetingNavKey : NavKey
 
+/**
+ * Navigation key that starts an unscheduled meeting immediately.
+ */
+@Serializable
+data object CreateMeetingNavKey : NavKey
+
 @Serializable
 data class LegacyMeetingNavKey(
     val chatId: Long,

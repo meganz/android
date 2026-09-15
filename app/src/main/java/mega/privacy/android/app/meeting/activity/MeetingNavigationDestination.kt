@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.CreateMeetingNavKey
 import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyWaitingRoomNavKey
@@ -186,6 +187,30 @@ fun EntryProviderScope<NavKey>.createScheduledMeetingScreen(
         }
         LaunchedEffect(Unit) {
             launcher.launch(Intent(context, CreateScheduledMeetingActivity::class.java))
+        }
+    }
+}
+
+/**
+ * Registers the destination that starts an unscheduled meeting immediately, launching
+ * [MeetingActivity] with [MeetingActivity.MEETING_ACTION_CREATE] and popping itself.
+ *
+ * @param removeDestination Pops this transparent entry once the meeting has been launched.
+ */
+fun EntryProviderScope<NavKey>.createMeetingScreen(
+    removeDestination: () -> Unit,
+) {
+    entry<CreateMeetingNavKey>(
+        metadata = transparentMetadata()
+    ) {
+        val context = LocalContext.current
+        LaunchedEffect(Unit) {
+            context.startActivity(
+                Intent(context, MeetingActivity::class.java).apply {
+                    action = MeetingActivity.MEETING_ACTION_CREATE
+                }
+            )
+            removeDestination()
         }
     }
 }

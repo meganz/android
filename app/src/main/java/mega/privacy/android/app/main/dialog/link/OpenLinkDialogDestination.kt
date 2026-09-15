@@ -3,7 +3,6 @@ package mega.privacy.android.app.main.dialog.link
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
-import mega.privacy.android.core.nodecomponents.dialog.openlink.OpenLinkDialog
 import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
@@ -11,6 +10,7 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
+import mega.privacy.android.shared.nodes.dialog.openlink.OpenLinkDialog
 
 data object OpenLinkDialogDestinations : AppDialogDestinations {
     override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
@@ -37,6 +37,7 @@ fun EntryProviderScope<in DialogNavKey>.openLinkDialogDestination(
         metadata = DialogSceneStrategy.dialog()
     ) { key ->
         OpenLinkDialog(
+            isJoinMeeting = key.isJoinMeeting,
             onOpenLink = { link ->
                 remove(key)
                 onDialogHandled()

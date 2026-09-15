@@ -12,6 +12,7 @@ import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
@@ -38,6 +39,8 @@ import mega.privacy.android.feature.chat.list.menu.UnarchiveChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
+import mega.privacy.android.feature.chat.list.model.MeetingAction
+import mega.privacy.android.feature.chat.list.model.MeetingActionEvent
 import mega.privacy.android.navigation.destination.NewChatNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -74,6 +77,7 @@ class ChatListViewModelTest {
     private val getContactHandleUseCase = mock<GetContactHandleUseCase>()
     private val startConversationUseCase = mock<StartConversationUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
+    private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
 
     private val chatRoomMenuItems: Map<Int, ChatRoomMenuItem> = mapOf(
         0 to ClearHistoryChatRoomMenuItem(clearChatHistoryUseCase),
@@ -112,6 +116,7 @@ class ChatListViewModelTest {
             getContactHandleUseCase = getContactHandleUseCase,
             startConversationUseCase = startConversationUseCase,
             createGroupChatRoomUseCase = createGroupChatRoomUseCase,
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             chatRoomMenuItems = chatRoomMenuItems,
         )
     }
@@ -133,6 +138,7 @@ class ChatListViewModelTest {
             clearChatHistoryUseCase,
             leaveChatUseCase,
             getContactHandleUseCase,
+            isParticipatingInChatCallUseCase,
             startConversationUseCase,
             createGroupChatRoomUseCase,
         )
@@ -547,6 +553,83 @@ class ChatListViewModelTest {
         }
         return item
     }
+
+    @Test
+    fun `test that onMeetingActionSelected emits ScheduleMeeting when schedule is picked`() =
+        runTest {
+            stubChatRooms()
+
+            underTest.meetingActionEvents.test {
+                underTest.onMeetingActionSelected(MeetingAction.Schedule)
+
+                assertThat(awaitItem()).isEqualTo(MeetingActionEvent.ScheduleMeeting)
+            }
+            verifyNoInteractions(isParticipatingInChatCallUseCase)
+        }
+
+    @Test
+    fun `test that onMeetingActionSelected emits StartMeeting when not in a call`() = runTest {
+        stubChatRooms()
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(false)
+
+        underTest.meetingActionEvents.test {
+            underTest.onMeetingActionSelected(MeetingAction.Start)
+
+            assertThat(awaitItem()).isEqualTo(MeetingActionEvent.StartMeeting)
+        }
+    }
+
+    @Test
+    fun `test that onMeetingActionSelected emits StartBlockedByOngoingCall when already in a call`() =
+        runTest {
+            stubChatRooms()
+            whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+
+            underTest.meetingActionEvents.test {
+                underTest.onMeetingActionSelected(MeetingAction.Start)
+
+                assertThat(awaitItem()).isEqualTo(MeetingActionEvent.StartBlockedByOngoingCall)
+            }
+        }
+
+    @Test
+    fun `test that onMeetingActionSelected emits JoinMeeting when not in a call`() = runTest {
+        stubChatRooms()
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(false)
+
+        underTest.meetingActionEvents.test {
+            underTest.onMeetingActionSelected(MeetingAction.Join)
+
+            assertThat(awaitItem()).isEqualTo(MeetingActionEvent.JoinMeeting)
+        }
+    }
+
+    @Test
+    fun `test that onMeetingActionSelected emits JoinBlockedByOngoingCall when already in a call`() =
+        runTest {
+            stubChatRooms()
+            whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+
+            underTest.meetingActionEvents.test {
+                underTest.onMeetingActionSelected(MeetingAction.Join)
+
+                assertThat(awaitItem()).isEqualTo(MeetingActionEvent.JoinBlockedByOngoingCall)
+            }
+        }
+
+    @Test
+    fun `test that onMeetingActionSelected emits StartMeeting when the call check fails`() =
+        runTest {
+            stubChatRooms()
+            whenever(isParticipatingInChatCallUseCase())
+                .thenThrow(RuntimeException("SDK unavailable"))
+
+            underTest.meetingActionEvents.test {
+                underTest.onMeetingActionSelected(MeetingAction.Start)
+
+                assertThat(awaitItem()).isEqualTo(MeetingActionEvent.StartMeeting)
+            }
+        }
 
     private companion object {
         private val aliceRoomItem = ChatRoomItem.IndividualChatRoomItem(

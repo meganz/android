@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
@@ -31,6 +32,8 @@ import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
+import mega.privacy.android.feature.chat.list.model.MeetingAction
+import mega.privacy.android.feature.chat.list.model.MeetingActionEvent
 import mega.privacy.android.navigation.destination.NewChatNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -47,6 +50,7 @@ internal class ChatListViewModel @Inject constructor(
     private val getContactHandleUseCase: GetContactHandleUseCase,
     private val startConversationUseCase: StartConversationUseCase,
     private val createGroupChatRoomUseCase: CreateGroupChatRoomUseCase,
+    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val chatRoomMenuItems: Map<Int, @JvmSuppressWildcards ChatRoomMenuItem>,
 ) : ViewModel() {
 
@@ -54,11 +58,18 @@ internal class ChatListViewModel @Inject constructor(
 
     private val openChatChannel = Channel<Long>(Channel.BUFFERED)
 
+    private val meetingActionChannel = Channel<MeetingActionEvent>(Channel.BUFFERED)
+
     /**
      * Emits the chat id of a chat that has just been created through the new-chat flow and should
      * be opened.
      */
     val openChatEvents: Flow<Long> = openChatChannel.receiveAsFlow()
+
+    /**
+     * Emits the resolved outcome of a meeting action picked from the meetings bottom sheet.
+     */
+    val meetingActionEvents: Flow<MeetingActionEvent> = meetingActionChannel.receiveAsFlow()
 
     /**
      * UI state for the chat list screen.
@@ -126,6 +137,43 @@ internal class ChatListViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Resolve the meeting [action] picked from the meetings bottom sheet and emit the outcome
+     * through [meetingActionEvents].
+     *
+     * Starting or joining a meeting is refused while the user is already participating in a call,
+     * matching the legacy chat list; scheduling is always allowed.
+     *
+     * @param action The action the user picked.
+     */
+    fun onMeetingActionSelected(action: MeetingAction) {
+        viewModelScope.launch {
+            val event = when (action) {
+                MeetingAction.Schedule -> MeetingActionEvent.ScheduleMeeting
+
+                MeetingAction.Start -> if (isParticipatingInACall()) {
+                    MeetingActionEvent.StartBlockedByOngoingCall
+                } else {
+                    MeetingActionEvent.StartMeeting
+                }
+
+                MeetingAction.Join -> if (isParticipatingInACall()) {
+                    MeetingActionEvent.JoinBlockedByOngoingCall
+                } else {
+                    MeetingActionEvent.JoinMeeting
+                }
+            }
+            meetingActionChannel.send(event)
+        }
+    }
+
+    private suspend fun isParticipatingInACall(): Boolean =
+        runCatching { isParticipatingInChatCallUseCase() }
+            .getOrElse { e ->
+                Timber.e(e, "Failed to check whether the user is in a call")
+                false
+            }
 
     /**
      * Resolve the ordered actions available for the selected chats in [chatIds] when the bulk

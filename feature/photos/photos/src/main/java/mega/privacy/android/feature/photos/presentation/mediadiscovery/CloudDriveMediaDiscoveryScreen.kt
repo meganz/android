@@ -252,7 +252,7 @@ fun CloudDriveMediaDiscoveryRoute(
             navigationHandler.navigate(NewTextFileDialogNavKey(parentNodeId = parentId))
         },
         onOpenLinkClicked = {
-            navigationHandler.navigate(OpenLinkDialogNavKey)
+            navigationHandler.navigate(OpenLinkDialogNavKey())
         },
         onDismissUploadSheet = { showUploadOptionsBottomSheet = false },
         onTransfersClicked = { navigationHandler.navigate(TransfersNavKey()) },

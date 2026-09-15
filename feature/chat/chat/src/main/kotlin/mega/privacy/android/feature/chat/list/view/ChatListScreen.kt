@@ -10,6 +10,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,6 +39,7 @@ import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
+import mega.privacy.android.feature.chat.list.model.MeetingAction
 import mega.privacy.android.feature.chat.list.model.rememberChatListSelectionState
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.state.isMainNavBarRoot
@@ -56,6 +58,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onBackClick Callback when back navigation is requested.
  * @param onItemClick Callback when a chat room row is clicked, with the chat id.
  * @param onNewChatClick Callback when the new-chat floating action button is clicked.
+ * @param onMeetingActionClick Callback when a meeting action is picked from the meetings sheet.
  * @param onSearchQueryChange Callback when the search query changes, with `null` when cleared.
  * @param modifier [Modifier]
  * @param resolveBulkActions Resolves the ordered actions common to the selected chats.
@@ -68,6 +71,7 @@ internal fun ChatListScreen(
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
     onNewChatClick: () -> Unit,
+    onMeetingActionClick: (MeetingAction) -> Unit,
     onArchivedClick: () -> Unit,
     onSearchQueryChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
@@ -80,6 +84,7 @@ internal fun ChatListScreen(
     var bulkActionsState by rememberSaveable(stateSaver = ChatListBulkActionsUiState.Saver) {
         mutableStateOf<ChatListBulkActionsUiState>(ChatListBulkActionsUiState.Hidden)
     }
+    var showMeetingActions by rememberSaveable { mutableStateOf(false) }
 
     val selectionMode = selectionState.isInSelectionMode
     val selectableChatIds = remember(uiState) { uiState.selectableChatIds() }
@@ -109,6 +114,7 @@ internal fun ChatListScreen(
         onBackClick = onBackClick,
         onItemClick = onItemClick,
         onNewChatClick = onNewChatClick,
+        onMeetingFabClick = { showMeetingActions = true },
         onArchivedClick = onArchivedClick,
         onSearchModeChange = { searchMode = it },
         onQueryChange = {
@@ -129,6 +135,13 @@ internal fun ChatListScreen(
             bulkActionsState = ChatListBulkActionsUiState.ShowingActions(selectionState.selectedChatIds)
         },
     )
+
+    if (showMeetingActions) {
+        MeetingActionsBottomSheet(
+            onActionClick = onMeetingActionClick,
+            onDismiss = { showMeetingActions = false },
+        )
+    }
 
     ChatListBulkActionsOverlay(
         actionsState = bulkActionsState,
@@ -212,7 +225,8 @@ private fun ChatListBulkActionsOverlay(
  * @param searchQuery Current search query text.
  * @param onBackClick Callback when back navigation is requested.
  * @param onItemClick Callback when a chat room row is clicked, with the chat id.
- * @param onNewChatClick Callback when the new-chat floating action button is clicked.
+ * @param onNewChatClick Callback when the floating action button is clicked on the Chats tab.
+ * @param onMeetingFabClick Callback when the floating action button is clicked on the Meetings tab.
  * @param onSearchModeChange Callback when the search field is opened or closed.
  * @param onQueryChange Callback when the search query text changes.
  * @param modifier [Modifier]
@@ -236,6 +250,7 @@ internal fun ChatListScreenContent(
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
     onNewChatClick: () -> Unit,
+    onMeetingFabClick: () -> Unit,
     onArchivedClick: () -> Unit,
     onSearchModeChange: (Boolean) -> Unit,
     onQueryChange: (String) -> Unit,
@@ -250,6 +265,10 @@ internal fun ChatListScreenContent(
     onCancelSelection: () -> Unit = {},
     onBulkActionsClick: () -> Unit = {},
 ) {
+    var selectedTabIndex by rememberSaveable {
+        mutableIntStateOf(if (showMeetingTab) MEETINGS_TAB_INDEX else CHATS_TAB_INDEX)
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
             .fillMaxSize()
@@ -295,13 +314,26 @@ internal fun ChatListScreenContent(
         },
         floatingActionButton = {
             if (uiState is ChatListUiState.Data && !searchMode) {
+                val isMeetingsTab = selectedTabIndex == MEETINGS_TAB_INDEX
                 MegaFab(
                     modifier = Modifier
-                        .testTag(CHAT_LIST_FAB_TAG)
+                        .testTag(if (isMeetingsTab) CHAT_LIST_MEETING_FAB_TAG else CHAT_LIST_FAB_TAG)
                         .applyScrollToHideFabBehavior(),
-                    onClick = onNewChatClick,
-                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
-                    contentDescription = stringResource(sharedR.string.new_chat_title),
+                    onClick = if (isMeetingsTab) onMeetingFabClick else onNewChatClick,
+                    painter = rememberVectorPainter(
+                        if (isMeetingsTab) {
+                            IconPack.Medium.Thin.Outline.VideoPlus
+                        } else {
+                            IconPack.Medium.Thin.Outline.Plus
+                        }
+                    ),
+                    contentDescription = stringResource(
+                        if (isMeetingsTab) {
+                            sharedR.string.chat_meeting_actions_start_now
+                        } else {
+                            sharedR.string.new_chat_title
+                        }
+                    ),
                 )
             }
         },
@@ -319,6 +351,10 @@ internal fun ChatListScreenContent(
                     .testTag(CHAT_LIST_TAB_ROW_TAG),
                 contentPadding = paddingValues.excludingBottomPadding(),
                 initialSelectedIndex = if (showMeetingTab) MEETINGS_TAB_INDEX else CHATS_TAB_INDEX,
+                onTabSelected = { index ->
+                    selectedTabIndex = index
+                    true
+                },
                 cells = {
                     addTextTabWithScrollableContent(
                         tabItem = TabItems(
@@ -390,6 +426,7 @@ internal const val CHAT_LIST_TAB_ROW_TAG = "chat_list_screen:tab_row"
 internal const val CHAT_LIST_CHATS_TAB_TAG = "chat_list_screen:chats_tab"
 internal const val CHAT_LIST_MEETINGS_TAB_TAG = "chat_list_screen:meetings_tab"
 internal const val CHAT_LIST_FAB_TAG = "chat_list_screen:new_chat_fab"
+internal const val CHAT_LIST_MEETING_FAB_TAG = "chat_list_screen:new_meeting_fab"
 internal const val CHAT_LIST_ARCHIVED_TAG = "chat_list_screen:archived_action"
 
 private val previewChats = persistentListOf(
@@ -446,6 +483,7 @@ private fun ChatListScreenPreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onMeetingActionClick = {},
             onArchivedClick = {},
             onSearchQueryChange = {},
         )
@@ -469,6 +507,7 @@ private fun ChatListScreenSearchActivePreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onMeetingFabClick = {},
             onArchivedClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
@@ -493,6 +532,7 @@ private fun ChatListScreenNoResultsPreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onMeetingFabClick = {},
             onArchivedClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
@@ -523,6 +563,7 @@ private fun ChatListScreenSelectionModePreview() {
             selectedCount = 1,
             isAllSelected = false,
             onNewChatClick = {},
+            onMeetingFabClick = {},
             onArchivedClick = {},
         )
     }
@@ -538,6 +579,7 @@ private fun ChatListScreenLoadingPreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onMeetingActionClick = {},
             onArchivedClick = {},
             onSearchQueryChange = {},
         )
