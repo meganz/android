@@ -7,14 +7,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -29,14 +29,16 @@ import mega.privacy.android.domain.usecase.file.SaveFileToDestinationUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
+import mega.privacy.android.feature.contact.qrcode.mycode.MyQrCodeViewModel.Companion.MINIMUM_LOADING_DURATION
 import mega.privacy.android.feature.contact.qrcode.mycode.mapper.MyQrCodeErrorMapper
-import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeContentState
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeMessage
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeUiState
+import mega.privacy.android.feature.contact.qrcode.mycode.model.QrCode
 import mega.privacy.android.shared.account.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.shared.account.presentation.model.AvatarContent
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel driving the personal "My QR code" flow: creating, resetting and deleting the
@@ -60,7 +62,13 @@ class MyQrCodeViewModel @Inject constructor(
     private val myQrCodeErrorMapper: MyQrCodeErrorMapper,
 ) : ViewModel() {
 
-    private val contentState = MutableStateFlow<MyQrCodeContentState>(MyQrCodeContentState.Idle)
+    private val qrCodeChannel = Channel<QrData>()
+
+    /**
+     * Mirrors the latest value sent on [qrCodeChannel]. The channel is a conduit to the UI
+     * collector, not a state holder, so restoring after a failed reset needs its own record.
+     */
+    private var lastQrData: QrData = QrData.Loading
     private val messageChannel = Channel<StateEventWithContent<MyQrCodeMessage>>(Channel.BUFFERED)
 
     /**
@@ -68,45 +76,41 @@ class MyQrCodeViewModel @Inject constructor(
      */
     val uiState: StateFlow<MyQrCodeUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            contentState,
+            qrCodeChannel.receiveAsFlow().onStart { createQRCode() },
             messageChannel.receiveAsFlow().onStart { emit(consumed()) },
-        ) { content, message ->
-            MyQrCodeUiState(
-                contentState = content,
-                message = message,
-            )
-        }.catch { Timber.e(it) }
-            .asUiStateFlow(
-                viewModelScope,
-                MyQrCodeUiState(
-                    contentState = MyQrCodeContentState.Idle,
-                    message = consumed(),
-                ),
-            )
+        ) { qrData, message ->
+            when (qrData) {
+                is QrData.Data -> MyQrCodeUiState.QRCodeAvailable(qrData.qrCode, message)
+                QrData.Empty -> MyQrCodeUiState.QRCodeUnavailable(message)
+                QrData.Loading -> MyQrCodeUiState.CreatingQRCode
+            }
+        }.asUiStateFlow(
+            viewModelScope,
+            MyQrCodeUiState.CreatingQRCode,
+        )
+    }
+
+    sealed interface QrData {
+        data object Loading : QrData
+        data object Empty : QrData
+        data class Data(val qrCode: QrCode) : QrData
     }
 
     /**
-     * Create a QR code for the current user's contact link.
+     * Creates a new qr code
      *
-     * @param showLoader whether the creating state should request a loading indicator
      */
-    fun createQRCode(showLoader: Boolean) {
+    fun createQRCode() {
         viewModelScope.launch {
-            runCatching {
-                contentState.update { MyQrCodeContentState.CreatingQRCode(showLoader) }
-                createContactLinkUseCase(renew = false)
-            }.onSuccess { contactLink ->
-                runCatching { qrCodeAvailable(contactLink) }
-                    .onSuccess { available -> contentState.update { available } }
-                    .onFailure { error ->
-                        Timber.e(error)
-                        messageChannel.trySend(triggered(MyQrCodeMessage.GeneralError))
-                        contentState.update { MyQrCodeContentState.Idle }
-                    }
-            }.onFailure { error ->
-                Timber.e(error)
-                messageChannel.trySend(triggered(MyQrCodeMessage.GeneralError))
-                contentState.update { MyQrCodeContentState.Idle }
+            emitQrData(QrData.Loading)
+            withMinimumLoadingDuration {
+                runCatching { getQrCodeData(createContactLinkUseCase(renew = false)) }
+            }.onSuccess {
+                emitQrData(QrData.Data(it))
+            }.onFailure {
+                Timber.e(it)
+                emitQrData(QrData.Empty)
+                messageChannel.send(triggered(MyQrCodeMessage.GeneralError))
             }
         }
     }
@@ -116,52 +120,65 @@ class MyQrCodeViewModel @Inject constructor(
      */
     fun resetQRCode() {
         viewModelScope.launch {
-            val backup = availableStateOrNull()
-            runCatching {
-                contentState.update { MyQrCodeContentState.CreatingQRCode(showLoader = true) }
-                resetContactLinkUseCase()
-            }.onSuccess { contactLink ->
-                runCatching { qrCodeAvailable(contactLink) }
-                    .onSuccess { available ->
-                        contentState.update { available }
-                        messageChannel.trySend(triggered(MyQrCodeMessage.ResetDone))
-                    }
-                    .onFailure { error -> emitOperationError(error, backup) }
-            }.onFailure { error -> emitOperationError(error, backup) }
+            val current = lastQrData
+            emitQrData(QrData.Loading)
+            withMinimumLoadingDuration {
+                runCatching { getQrCodeData(resetContactLinkUseCase()) }
+            }.onSuccess {
+                emitQrData(QrData.Data(it))
+                messageChannel.send(triggered(MyQrCodeMessage.ResetDone))
+            }.onFailure {
+                Timber.e(it)
+                emitQrData(current)
+                messageChannel.send(
+                    triggered(MyQrCodeMessage.OperationError(myQrCodeErrorMapper(it)))
+                )
+            }
         }
     }
+
+
+    fun deleteQRCode(contactLink: String) {
+        viewModelScope.launch {
+            runCatching {
+                deleteQRCodeUseCase(contactLink = contactLink)
+            }.onSuccess {
+                emitQrData(QrData.Empty)
+            }.onFailure {
+                Timber.e(it)
+                messageChannel.send(
+                    triggered(MyQrCodeMessage.OperationError(myQrCodeErrorMapper(it)))
+                )
+            }
+        }
+    }
+
+
 
     /**
-     * Delete the current QR code and its contact link.
+     * Runs [block], holding the caller for at least [MINIMUM_LOADING_DURATION] so that a loading
+     * state already on screen stays readable — a spinner that appears and vanishes within a frame
+     * reads as a glitch. Slower work is not delayed further. Failures are covered too, so a fast
+     * error does not flash the spinner either.
      */
-    fun deleteQRCode() {
-        viewModelScope.launch {
-            val backup = availableStateOrNull() ?: return@launch
-            runCatching {
-                deleteQRCodeUseCase(contactLink = backup.contactLink)
-            }.onSuccess {
-                contentState.update { MyQrCodeContentState.QRCodeDeleted }
-            }.onFailure { error -> emitOperationError(error, backup) }
-        }
+    private suspend fun <T> withMinimumLoadingDuration(block: suspend () -> T): T = coroutineScope {
+        val minimumElapsed = async { delay(MINIMUM_LOADING_DURATION) }
+        val result = block()
+        minimumElapsed.await()
+        result
     }
 
-    private fun emitOperationError(
-        error: Throwable,
-        backup: MyQrCodeContentState.QRCodeAvailable?,
-    ) {
-        Timber.e(error)
-        messageChannel.trySend(triggered(MyQrCodeMessage.OperationError(myQrCodeErrorMapper(error))))
-        contentState.update { backup ?: MyQrCodeContentState.Idle }
+    private suspend fun emitQrData(qrData: QrData) {
+        lastQrData = qrData
+        qrCodeChannel.send(qrData)
     }
 
     /**
      * Copy the current contact link to the clipboard.
      */
-    fun copyContactLink() {
-        availableStateOrNull()?.let { available ->
-            copyToClipBoard(label = CONTACT_LINK_CLIPBOARD_LABEL, text = available.contactLink)
-            messageChannel.trySend(triggered(MyQrCodeMessage.ContactLinkCopied))
-        }
+    fun copyContactLink(contactLink: String) {
+        copyToClipBoard(label = CONTACT_LINK_CLIPBOARD_LABEL, text = contactLink)
+        messageChannel.trySend(triggered(MyQrCodeMessage.ContactLinkCopied))
     }
 
     /**
@@ -211,12 +228,9 @@ class MyQrCodeViewModel @Inject constructor(
         messageChannel.trySend(consumed())
     }
 
-    private fun availableStateOrNull(): MyQrCodeContentState.QRCodeAvailable? =
-        contentState.value as? MyQrCodeContentState.QRCodeAvailable
-
-    private suspend fun qrCodeAvailable(contactLink: String): MyQrCodeContentState.QRCodeAvailable {
+    private suspend fun getQrCodeData(contactLink: String): QrCode {
         val avatarBgColor = getMyAvatarColorUseCase()
-        return MyQrCodeContentState.QRCodeAvailable(
+        return QrCode(
             contactLink = contactLink,
             avatarContent = buildAvatarContent(avatarBgColor),
             avatarBgColor = avatarBgColor,
@@ -238,5 +252,8 @@ class MyQrCodeViewModel @Inject constructor(
 
         // Matches the legacy QRCode screen's avatar sizing.
         private const val AVATAR_TEXT_SIZE = 38f
+
+        // Provisional floor for how long the generating state stays on screen — confirm with design.
+        private val MINIMUM_LOADING_DURATION = 600.milliseconds
     }
 }

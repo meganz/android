@@ -3,6 +3,7 @@ package mega.privacy.android.feature.contact.navigation
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.contact.group.navigation.contactGroups
+import mega.privacy.android.feature.contact.qrcode.navigation.qrCode
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -16,6 +17,7 @@ class ContactFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, transferHandler: TransferHandler) -> Unit =
         { navigationHandler, _ ->
             contactGroups(navigationHandler)
+            qrCode(navigationHandler)
         }
 }
 

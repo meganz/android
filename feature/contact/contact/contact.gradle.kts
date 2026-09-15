@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))
 
+    implementation(project(":core:qr"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.ktx)
@@ -84,4 +85,5 @@ dependencies {
     screenshotTestImplementation(platform(androidx.compose.bom))
     screenshotTestImplementation(androidx.compose.ui.tooling)
     screenshotTestImplementation(testlib.compose.screenshot)
+    screenshotTestImplementation(project(":core-test"))
 }

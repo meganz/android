@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -21,7 +22,6 @@ import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.feature.contact.qrcode.mycode.mapper.MyQrCodeErrorMapper
-import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeContentState
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeError
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeMessage
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeUiState
@@ -34,10 +34,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.io.IOException
@@ -104,80 +105,155 @@ class MyQrCodeViewModelTest {
     }
 
     @Test
-    fun `test that initial state is Idle with no message`() = runTest {
-        underTest.uiState.test {
-            val initial = awaitItem()
-            assertThat(initial.contentState).isEqualTo(MyQrCodeContentState.Idle)
-            assertThat(initial.message).isEqualTo(consumed())
-        }
+    fun `test that initial state is CreatingQRCode`() = runTest {
+        assertThat(underTest.uiState.value).isEqualTo(MyQrCodeUiState.CreatingQRCode)
     }
 
     @Test
-    fun `test that createQRCode sets QRCodeAvailable when creation succeeds`() = runTest {
+    fun `test that init does not call createContactLinkUseCase before the state is collected`() =
+        runTest {
+            underTest.uiState
+
+            verify(createContactLinkUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that init emits QRCodeAvailable when creation succeeds`() = runTest {
         stubQRCodeCreation()
 
         underTest.uiState.test {
-            underTest.createQRCode(showLoader = true)
             val state = awaitAvailableState()
-            assertThat(state.contactLink).isEqualTo(initialContactLink)
+            assertThat(state.qrCode.contactLink).isEqualTo(initialContactLink)
         }
     }
 
     @Test
-    fun `test that createQRCode sets Idle when creation fails`() = runTest {
-        whenever(createContactLinkUseCase(renew = false)).thenAnswer { throw RuntimeException() }
-
-        underTest.createQRCode(showLoader = true)
+    fun `test that init emits QRCodeUnavailable when creation fails`() = runTest {
+        stubQRCodeCreationFailure()
 
         underTest.uiState.test {
-            assertThat(awaitItem().contentState).isEqualTo(MyQrCodeContentState.Idle)
+            assertThat(awaitUnavailableState()).isInstanceOf(MyQrCodeUiState.QRCodeUnavailable::class.java)
         }
     }
 
     @Test
-    fun `test that createQRCode emits GeneralError when creation fails`() = runTest {
-        whenever(createContactLinkUseCase(renew = false)).thenAnswer { throw RuntimeException() }
+    fun `test that init emits GeneralError when creation fails`() = runTest {
+        stubQRCodeCreationFailure()
 
         underTest.uiState.test {
-            underTest.createQRCode(showLoader = true)
             assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.GeneralError)
         }
     }
 
     @Test
-    fun `test that resetQRCode sets QRCodeAvailable with the new link when reset succeeds`() =
+    fun `test that createQRCode emits QRCodeAvailable when creation succeeds after an initial failure`() =
         runTest {
-            prepareAvailableQRCode()
-            val newContactLink = "https://contact_link2"
-            whenever(resetContactLinkUseCase()).thenReturn(newContactLink)
+            stubQRCodeCreation()
+            whenever(createContactLinkUseCase(renew = false))
+                .thenAnswer { throw RuntimeException() }
+                .thenReturn(initialContactLink)
 
             underTest.uiState.test {
-                underTest.resetQRCode()
-                val state = awaitAvailableStateWithLink(newContactLink)
-                assertThat(state.contactLink).isEqualTo(newContactLink)
+                awaitUnavailableState()
+                underTest.createQRCode()
+                val state = awaitAvailableState()
+                assertThat(state.qrCode.contactLink).isEqualTo(initialContactLink)
             }
         }
 
     @Test
-    fun `test that resetQRCode restores the previous QR code when reset fails`() = runTest {
-        prepareAvailableQRCode()
+    fun `test that createQRCode emits CreatingQRCode while creation is in flight`() = runTest {
+        stubQRCodeCreation()
+        val gate = CompletableDeferred<String>()
+        whenever { createContactLinkUseCase(renew = false) } doSuspendableAnswer { gate.await() }
+
+        underTest.uiState.test {
+            assertThat(awaitState { it is MyQrCodeUiState.CreatingQRCode })
+                .isEqualTo(MyQrCodeUiState.CreatingQRCode)
+
+            gate.complete(initialContactLink)
+
+            val state = awaitAvailableState()
+            assertThat(state.qrCode.contactLink).isEqualTo(initialContactLink)
+        }
+    }
+
+    @Test
+    fun `test that createQRCode emits CreatingQRCode while re-creating after a delete`() = runTest {
+        stubQRCodeCreation()
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.deleteQRCode(initialContactLink)
+            awaitUnavailableState()
+
+            val gate = CompletableDeferred<String>()
+            whenever { createContactLinkUseCase(renew = false) } doSuspendableAnswer { gate.await() }
+            underTest.createQRCode()
+            assertThat(awaitState { it is MyQrCodeUiState.CreatingQRCode })
+                .isEqualTo(MyQrCodeUiState.CreatingQRCode)
+
+            gate.complete(initialContactLink)
+            awaitAvailableState()
+        }
+    }
+
+    @Test
+    fun `test that resetQRCode emits CreatingQRCode while the reset is in flight`() = runTest {
+        stubQRCodeCreation()
+        val newContactLink = "https://contact_link2"
+        val gate = CompletableDeferred<String>()
+        whenever { resetContactLinkUseCase() } doSuspendableAnswer { gate.await() }
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.resetQRCode()
+            assertThat(awaitState { it is MyQrCodeUiState.CreatingQRCode })
+                .isEqualTo(MyQrCodeUiState.CreatingQRCode)
+
+            gate.complete(newContactLink)
+
+            val state = awaitAvailableStateWithLink(newContactLink)
+            assertThat(state.qrCode.contactLink).isEqualTo(newContactLink)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that resetQRCode emits QRCodeAvailable with the new link when reset succeeds`() =
+        runTest {
+            stubQRCodeCreation()
+            val newContactLink = "https://contact_link2"
+            whenever(resetContactLinkUseCase()).thenReturn(newContactLink)
+
+            underTest.uiState.test {
+                awaitAvailableState()
+                underTest.resetQRCode()
+                val state = awaitAvailableStateWithLink(newContactLink)
+                assertThat(state.qrCode.contactLink).isEqualTo(newContactLink)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that resetQRCode retains the previous QR code when reset fails`() = runTest {
+        stubQRCodeCreation()
         whenever(resetContactLinkUseCase()).thenAnswer { throw RuntimeException() }
         whenever(myQrCodeErrorMapper(any())).thenReturn(MyQrCodeError.ResetFailed)
 
         underTest.uiState.test {
             awaitAvailableState()
             underTest.resetQRCode()
-            val restored = awaitFailureRestoredState()
-            assertThat(restored.contactLink).isEqualTo(initialContactLink)
+            val retained = awaitFailureRetainedState()
+            assertThat(retained.qrCode.contactLink).isEqualTo(initialContactLink)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `test that resetQRCode emits ResetDone when reset succeeds`() = runTest {
-        prepareAvailableQRCode()
-        val newContactLink = "https://contact_link2"
-        whenever(resetContactLinkUseCase()).thenReturn(newContactLink)
+        stubQRCodeCreation()
+        whenever(resetContactLinkUseCase()).thenReturn("https://contact_link2")
 
         underTest.uiState.test {
             awaitAvailableState()
@@ -188,7 +264,7 @@ class MyQrCodeViewModelTest {
 
     @Test
     fun `test that resetQRCode emits OperationError when reset fails`() = runTest {
-        prepareAvailableQRCode()
+        stubQRCodeCreation()
         whenever(resetContactLinkUseCase()).thenAnswer { throw RuntimeException() }
         whenever(myQrCodeErrorMapper(any())).thenReturn(MyQrCodeError.ResetFailed)
 
@@ -201,96 +277,82 @@ class MyQrCodeViewModelTest {
     }
 
     @Test
-    fun `test that resetQRCode sets Idle when reset fails and no QR code is available`() = runTest {
-        whenever(resetContactLinkUseCase()).thenAnswer { throw RuntimeException() }
-        whenever(myQrCodeErrorMapper(any())).thenReturn(MyQrCodeError.ResetFailed)
+    fun `test that resetQRCode stays QRCodeUnavailable when reset fails and no QR code is available`() =
+        runTest {
+            stubQRCodeCreationFailure()
+            whenever(resetContactLinkUseCase()).thenAnswer { throw RuntimeException() }
+            whenever(myQrCodeErrorMapper(any())).thenReturn(MyQrCodeError.ResetFailed)
+
+            underTest.uiState.test {
+                settleAfterCreationFailure()
+                underTest.resetQRCode()
+                val settled = awaitUnavailableStateWithMessage()
+                assertThat((settled.message as StateEventWithContentTriggered).content)
+                    .isEqualTo(MyQrCodeMessage.OperationError(MyQrCodeError.ResetFailed))
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that deleteQRCode emits QRCodeUnavailable when deletion succeeds`() = runTest {
+        stubQRCodeCreation()
 
         underTest.uiState.test {
-            assertThat(awaitItem().contentState).isEqualTo(MyQrCodeContentState.Idle)
-            underTest.resetQRCode()
-            val settled = awaitIdleStateWithMessage()
-            assertThat(settled.contentState).isEqualTo(MyQrCodeContentState.Idle)
-            assertThat((settled.message as StateEventWithContentTriggered).content)
-                .isEqualTo(MyQrCodeMessage.OperationError(MyQrCodeError.ResetFailed))
-            cancelAndIgnoreRemainingEvents()
+            awaitAvailableState()
+            underTest.deleteQRCode(initialContactLink)
+            awaitUnavailableState()
         }
+        verify(deleteQRCodeUseCase).invoke(contactLink = initialContactLink)
     }
 
     @Test
-    fun `test that deleteQRCode sets QRCodeDeleted when deletion succeeds`() = runTest {
-        prepareAvailableQRCode()
-
-        underTest.uiState.test {
-            underTest.deleteQRCode()
-            val state = awaitContentState { it is MyQrCodeContentState.QRCodeDeleted }
-            assertThat(state).isEqualTo(MyQrCodeContentState.QRCodeDeleted)
-        }
-    }
-
-    @Test
-    fun `test that deleteQRCode restores the previous QR code when deletion fails`() = runTest {
-        prepareAvailableQRCode()
+    fun `test that deleteQRCode retains the previous QR code when deletion fails`() = runTest {
+        stubQRCodeCreation()
         whenever(deleteQRCodeUseCase(any())).thenAnswer { throw RuntimeException() }
         whenever(myQrCodeErrorMapper(any())).thenReturn(MyQrCodeError.DeleteFailed)
 
         underTest.uiState.test {
             awaitAvailableState()
-            underTest.deleteQRCode()
-            val restored = awaitFailureRestoredState()
-            assertThat(restored.contactLink).isEqualTo(initialContactLink)
+            underTest.deleteQRCode(initialContactLink)
+            val retained = awaitFailureRetainedState()
+            assertThat(retained.qrCode.contactLink).isEqualTo(initialContactLink)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `test that deleteQRCode emits OperationError when deletion fails`() = runTest {
-        prepareAvailableQRCode()
+        stubQRCodeCreation()
         whenever(deleteQRCodeUseCase(any())).thenAnswer { throw RuntimeException() }
         whenever(myQrCodeErrorMapper(any())).thenReturn(MyQrCodeError.DeleteFailed)
 
         underTest.uiState.test {
             awaitAvailableState()
-            underTest.deleteQRCode()
+            underTest.deleteQRCode(initialContactLink)
             assertThat(awaitMessage())
                 .isEqualTo(MyQrCodeMessage.OperationError(MyQrCodeError.DeleteFailed))
         }
     }
 
     @Test
-    fun `test that deleteQRCode does nothing when no QR code is available`() = runTest {
+    fun `test that copyContactLink copies the link and emits ContactLinkCopied`() = runTest {
+        stubQRCodeCreation()
+
         underTest.uiState.test {
-            assertThat(awaitItem().contentState).isEqualTo(MyQrCodeContentState.Idle)
-            underTest.deleteQRCode()
-            expectNoEvents()
+            awaitAvailableState()
+            underTest.copyContactLink(initialContactLink)
+            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.ContactLinkCopied)
         }
-        verifyNoInteractions(deleteQRCodeUseCase)
-    }
-
-    @Test
-    fun `test that copyContactLink copies the link and emits ContactLinkCopied when available`() =
-        runTest {
-            prepareAvailableQRCode()
-
-            underTest.uiState.test {
-                awaitAvailableState()
-                underTest.copyContactLink()
-                val message = awaitMessage()
-                assertThat(message).isEqualTo(MyQrCodeMessage.ContactLinkCopied)
-            }
-            verify(copyToClipBoard).invoke(label = "contact link", text = initialContactLink)
-        }
-
-    @Test
-    fun `test that copyContactLink does nothing when no QR code is available`() = runTest {
-        underTest.copyContactLink()
-        verifyNoInteractions(copyToClipBoard)
+        verify(copyToClipBoard).invoke(label = "contact link", text = initialContactLink)
     }
 
     @Test
     fun `test that saveToFileSystem emits SaveError when QR file is null`() = runTest {
+        stubQRCodeCreationFailure()
         whenever(getQRCodeFileUseCase()).thenReturn(null)
 
         underTest.uiState.test {
+            settleAfterCreationFailure()
             underTest.saveToFileSystem(UriPath("/test/destination"))
             assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
         }
@@ -298,12 +360,14 @@ class MyQrCodeViewModelTest {
 
     @Test
     fun `test that saveToFileSystem emits NotEnoughSpace when space is insufficient`() = runTest {
+        stubQRCodeCreationFailure()
         val destination = UriPath("/test/destination")
         val qrFile = mock<File> { on { length() } doReturn 1000L }
         whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
         whenever(doesUriPathHaveSufficientSpaceUseCase(destination, 1000L)).thenReturn(false)
 
         underTest.uiState.test {
+            settleAfterCreationFailure()
             underTest.saveToFileSystem(destination)
             assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.NotEnoughSpace)
         }
@@ -312,6 +376,7 @@ class MyQrCodeViewModelTest {
     @Test
     fun `test that saveToFileSystem emits SaveSuccess with the display path when save succeeds`() =
         runTest {
+            stubQRCodeCreationFailure()
             val destination = UriPath("content://downloads/tree")
             val displayPath = "/storage/emulated/0/Download"
             val qrFile = mock<File> {
@@ -323,6 +388,7 @@ class MyQrCodeViewModelTest {
             whenever(getPathByDocumentContentUriUseCase(destination.value)).thenReturn(displayPath)
 
             underTest.uiState.test {
+                settleAfterCreationFailure()
                 underTest.saveToFileSystem(destination)
                 assertThat(awaitMessage())
                     .isEqualTo(MyQrCodeMessage.SaveSuccess(displayPath))
@@ -331,6 +397,7 @@ class MyQrCodeViewModelTest {
 
     @Test
     fun `test that saveToFileSystem emits GeneralError when saving throws IOException`() = runTest {
+        stubQRCodeCreationFailure()
         val destination = UriPath("/test/destination")
         val qrFile = mock<File> { on { length() } doReturn 1000L }
         whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
@@ -339,6 +406,7 @@ class MyQrCodeViewModelTest {
         whenever(saveFileToDestinationUseCase(any(), any())).thenAnswer { throw IOException("io") }
 
         underTest.uiState.test {
+            settleAfterCreationFailure()
             underTest.saveToFileSystem(destination)
             assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.GeneralError)
         }
@@ -346,14 +414,14 @@ class MyQrCodeViewModelTest {
 
     @Test
     fun `test that onMessageConsumed clears the message`() = runTest {
-        prepareAvailableQRCode()
+        stubQRCodeCreation()
 
         underTest.uiState.test {
             awaitAvailableState()
-            underTest.copyContactLink()
+            underTest.copyContactLink(initialContactLink)
             awaitMessage()
             underTest.onMessageConsumed()
-            val state = awaitItem()
+            val state = awaitConsumedMessageState()
             assertThat(state.message).isEqualTo(consumed())
         }
     }
@@ -381,64 +449,53 @@ class MyQrCodeViewModelTest {
         ).thenReturn(PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true))
     }
 
-    private suspend fun prepareAvailableQRCode() {
-        stubQRCodeCreation()
-        underTest.createQRCode(showLoader = true)
+    private suspend fun stubQRCodeCreationFailure() {
+        whenever(createContactLinkUseCase(renew = false)).thenAnswer { throw RuntimeException() }
     }
 
-    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitAvailableState(): MyQrCodeContentState.QRCodeAvailable {
-        var item = awaitItem()
-        while (item.contentState !is MyQrCodeContentState.QRCodeAvailable) {
-            item = awaitItem()
-        }
-        return item.contentState as MyQrCodeContentState.QRCodeAvailable
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.settleAfterCreationFailure() {
+        awaitMessage()
+        underTest.onMessageConsumed()
+        awaitConsumedMessageState()
     }
+
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitAvailableState(): MyQrCodeUiState.QRCodeAvailable =
+        awaitState { it is MyQrCodeUiState.QRCodeAvailable } as MyQrCodeUiState.QRCodeAvailable
 
     private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitAvailableStateWithLink(
         link: String,
-    ): MyQrCodeContentState.QRCodeAvailable {
-        var item = awaitItem()
-        while ((item.contentState as? MyQrCodeContentState.QRCodeAvailable)?.contactLink != link) {
-            item = awaitItem()
-        }
-        return item.contentState as MyQrCodeContentState.QRCodeAvailable
-    }
+    ): MyQrCodeUiState.QRCodeAvailable =
+        awaitState {
+            (it as? MyQrCodeUiState.QRCodeAvailable)?.qrCode?.contactLink == link
+        } as MyQrCodeUiState.QRCodeAvailable
 
-    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitFailureRestoredState(): MyQrCodeContentState.QRCodeAvailable {
-        var item = awaitItem()
-        while (item.contentState !is MyQrCodeContentState.QRCodeAvailable ||
-            item.message !is StateEventWithContentTriggered
-        ) {
-            item = awaitItem()
-        }
-        return item.contentState as MyQrCodeContentState.QRCodeAvailable
-    }
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitUnavailableState(): MyQrCodeUiState.QRCodeUnavailable =
+        awaitState { it is MyQrCodeUiState.QRCodeUnavailable } as MyQrCodeUiState.QRCodeUnavailable
 
-    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitIdleStateWithMessage(): MyQrCodeUiState {
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitUnavailableStateWithMessage(): MyQrCodeUiState.QRCodeUnavailable =
+        awaitState {
+            it is MyQrCodeUiState.QRCodeUnavailable && it.message is StateEventWithContentTriggered
+        } as MyQrCodeUiState.QRCodeUnavailable
+
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitFailureRetainedState(): MyQrCodeUiState.QRCodeAvailable =
+        awaitState {
+            it is MyQrCodeUiState.QRCodeAvailable && it.message is StateEventWithContentTriggered
+        } as MyQrCodeUiState.QRCodeAvailable
+
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitConsumedMessageState(): MyQrCodeUiState =
+        awaitState { it.message !is StateEventWithContentTriggered }
+
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitMessage(): MyQrCodeMessage =
+        (awaitState { it.message is StateEventWithContentTriggered }
+            .message as StateEventWithContentTriggered).content
+
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitState(
+        predicate: (MyQrCodeUiState) -> Boolean,
+    ): MyQrCodeUiState {
         var item = awaitItem()
-        while (item.contentState != MyQrCodeContentState.Idle ||
-            item.message !is StateEventWithContentTriggered
-        ) {
+        while (!predicate(item)) {
             item = awaitItem()
         }
         return item
-    }
-
-    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitContentState(
-        predicate: (MyQrCodeContentState) -> Boolean,
-    ): MyQrCodeContentState {
-        var item = awaitItem()
-        while (!predicate(item.contentState)) {
-            item = awaitItem()
-        }
-        return item.contentState
-    }
-
-    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitMessage(): MyQrCodeMessage {
-        var item = awaitItem()
-        while (item.message !is StateEventWithContentTriggered) {
-            item = awaitItem()
-        }
-        return (item.message as StateEventWithContentTriggered).content
     }
 }
