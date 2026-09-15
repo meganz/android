@@ -12,7 +12,6 @@ import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_OFFLINE
@@ -130,10 +129,6 @@ class SqliteDatabaseHandler @Inject constructor(
                     val wifi = decrypt(cursor.getString(getColumnIndex(cursor, KEY_CAM_SYNC_WIFI)))
                     val fileUpload =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_CAM_SYNC_FILE_UPLOAD)))
-                    val pinLockEnabled =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_PASSCODE_LOCK_ENABLED)))
-                    val pinLockCode =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_PASSCODE_LOCK_CODE)))
                     val askAlways =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_ASK_ALWAYS)))
                     val downloadLocation = decrypt(
@@ -144,46 +139,16 @@ class SqliteDatabaseHandler @Inject constructor(
                             )
                         )
                     )
-                    val camSyncTimeStamp =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_CAM_SYNC_TIMESTAMP)))
-                    val lastFolderUpload =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_UPLOAD_FOLDER)))
-                    val lastFolderCloud = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_LAST_CLOUD_FOLDER_HANDLE
-                            )
-                        )
-                    )
                     val secondaryFolderEnabled =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SEC_FOLDER_ENABLED)))
                     val secondaryPath =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SEC_FOLDER_LOCAL_PATH)))
                     val secondaryHandle =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SEC_FOLDER_HANDLE)))
-                    val secSyncTimeStamp =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_SEC_SYNC_TIMESTAMP)))
                     val keepFileNames =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_KEEP_FILE_NAMES)))
-                    val storageAdvancedDevices = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_STORAGE_ADVANCED_DEVICES
-                            )
-                        )
-                    )
                     val preferredViewList =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_PREFERRED_VIEW_LIST)))
-                    val preferredViewListCamera = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_PREFERRED_VIEW_LIST_CAMERA
-                            )
-                        )
-                    )
                     val uriExternalSDCard =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_URI_EXTERNAL_SD_CARD)))
                     val cameraFolderExternalSDCard = decrypt(
@@ -194,14 +159,10 @@ class SqliteDatabaseHandler @Inject constructor(
                             )
                         )
                     )
-                    val pinLockType =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_PASSCODE_LOCK_TYPE)))
                     val preferredSortCloud =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_PREFERRED_SORT_CLOUD)))
                     val preferredSortOthers =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_PREFERRED_SORT_OTHERS)))
-                    val firstTimeChat =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_FIRST_LOGIN_CHAT)))
                     val isAutoPlayEnabled =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_AUTO_PLAY)))
                     val uploadVideoQuality =
@@ -216,26 +177,8 @@ class SqliteDatabaseHandler @Inject constructor(
                     )
                     val chargingOnSize =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_CHARGING_ON_SIZE)))
-                    val camVideoSyncTimeStamp = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_CAM_VIDEO_SYNC_TIMESTAMP
-                            )
-                        )
-                    )
-                    val secVideoSyncTimeStamp = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_SEC_VIDEO_SYNC_TIMESTAMP
-                            )
-                        )
-                    )
                     val removeGPS =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_REMOVE_GPS)))
-                    val closeInviteBanner =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_SHOW_INVITE_BANNER)))
                     val preferredSortCameraUpload = decrypt(
                         cursor.getString(
                             getColumnIndex(
@@ -244,51 +187,6 @@ class SqliteDatabaseHandler @Inject constructor(
                             )
                         )
                     )
-                    val sdCardUri =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_SD_CARD_URI)))
-                    val askForDisplayOver =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_ASK_FOR_DISPLAY_OVER)))
-                    val askForSetDownloadLocation = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_ASK_SET_DOWNLOAD_LOCATION
-                            )
-                        )
-                    )
-                    val mediaSDCardUri = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_URI_MEDIA_EXTERNAL_SD_CARD
-                            )
-                        )
-                    )
-                    val isMediaOnSDCard = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD
-                            )
-                        )
-                    )
-                    val passcodeLockRequireTime = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_PASSCODE_LOCK_REQUIRE_TIME
-                            )
-                        )
-                    )
-                    val fingerprintLock =
-                        if (cursor.getColumnIndex(KEY_FINGERPRINT_LOCK) != Constants.INVALID_VALUE) decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    KEY_FINGERPRINT_LOCK
-                                )
-                            )
-                        ) else "false"
                     prefs = MegaPreferences(
                         firstTime,
                         wifi,
@@ -296,43 +194,23 @@ class SqliteDatabaseHandler @Inject constructor(
                         camSyncHandle,
                         camSyncLocalPath,
                         fileUpload,
-                        camSyncTimeStamp,
-                        pinLockEnabled,
-                        pinLockCode,
                         askAlways,
                         downloadLocation,
-                        lastFolderUpload,
-                        lastFolderCloud,
                         secondaryFolderEnabled,
                         secondaryPath,
                         secondaryHandle,
-                        secSyncTimeStamp,
                         keepFileNames,
-                        storageAdvancedDevices,
                         preferredViewList,
-                        preferredViewListCamera,
                         uriExternalSDCard,
                         cameraFolderExternalSDCard,
-                        pinLockType,
                         preferredSortCloud,
                         preferredSortOthers,
-                        firstTimeChat,
                         uploadVideoQuality,
                         conversionOnCharging,
                         chargingOnSize,
-                        camVideoSyncTimeStamp,
-                        secVideoSyncTimeStamp,
                         isAutoPlayEnabled,
                         removeGPS,
-                        closeInviteBanner,
-                        preferredSortCameraUpload,
-                        sdCardUri,
-                        askForDisplayOver,
-                        askForSetDownloadLocation,
-                        mediaSDCardUri,
-                        isMediaOnSDCard,
-                        passcodeLockRequireTime,
-                        fingerprintLock
+                        preferredSortCameraUpload
                     )
                 }
             }
@@ -1263,12 +1141,6 @@ class SqliteDatabaseHandler @Inject constructor(
         legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
-    override var sdCardUri: String?
-        get() = getStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, "")
-        set(sdCardUri) {
-            setStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, sdCardUri)
-        }
-
     override fun setAutoPlayEnabled(enabled: String) {
         Timber.d("setAutoPlayEnabled")
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
@@ -1325,25 +1197,14 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_CAM_SYNC_WIFI = "wifi"
         const val KEY_CAM_SYNC_LOCAL_PATH = "camsynclocalpath"
         const val KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload"
-        const val KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp"
-        const val KEY_CAM_VIDEO_SYNC_TIMESTAMP = "camVideoSyncTimeStamp"
         const val KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality"
         const val KEY_CONVERSION_ON_CHARGING = "conversionOnCharging"
         const val KEY_REMOVE_GPS = "removeGPS"
         const val KEY_CHARGING_ON_SIZE = "chargingOnSize"
         const val KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords"
         const val KEY_KEEP_FILE_NAMES = "keepFileNames"
-        const val KEY_SHOW_INVITE_BANNER = "showinvitebanner"
-        const val KEY_ASK_FOR_DISPLAY_OVER = "askfordisplayover"
-        const val KEY_PASSCODE_LOCK_ENABLED = "pinlockenabled"
-        const val KEY_PASSCODE_LOCK_TYPE = "pinlocktype"
-        const val KEY_PASSCODE_LOCK_CODE = "pinlockcode"
-        const val KEY_PASSCODE_LOCK_REQUIRE_TIME = "passcodelockrequiretime"
-        const val KEY_FINGERPRINT_LOCK = "fingerprintlock"
         const val KEY_STORAGE_ASK_ALWAYS = "storageaskalways"
         const val KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation"
-        const val KEY_LAST_UPLOAD_FOLDER = "lastuploadfolder"
-        const val KEY_LAST_CLOUD_FOLDER_HANDLE = "lastcloudfolder"
         const val KEY_ATTR_ONLINE = "online"
         const val KEY_ATTR_INTENTS = "intents"
         const val KEY_ATTR_ASK_SIZE_DOWNLOAD = "asksizedownload"
@@ -1356,17 +1217,10 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_OFF_INCOMING = "incoming"
         const val KEY_OFF_HANDLE_INCOMING = "incomingHandle"
         const val KEY_OFF_LAST_MODIFIED_TIME = "lastModifiedTime"
-        const val KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp"
-        const val KEY_SEC_VIDEO_SYNC_TIMESTAMP = "secondaryVideoSyncTimeStamp"
-        const val KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices"
         const val KEY_ASK_SET_DOWNLOAD_LOCATION = "askSetDefaultDownloadLocation"
         const val KEY_PREFERRED_VIEW_LIST = "preferredviewlist"
-        const val KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera"
         const val KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard"
-        const val KEY_URI_MEDIA_EXTERNAL_SD_CARD = "urimediaexternalsdcard"
-        const val KEY_SD_CARD_URI = "sdcarduri"
         const val KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = "camerafolderexternalsdcard"
-        const val KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD = "mediafolderexternalsdcard"
         const val KEY_CONTACT_HANDLE = "handle"
         const val KEY_CONTACT_MAIL = "mail"
         const val KEY_CONTACT_NAME = "name"
@@ -1408,7 +1262,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_TRANSFER_ERROR = "transfererror"
         const val KEY_TRANSFER_ORIGINAL_PATH = "transferoriginalpath"
         const val KEY_TRANSFER_PARENT_HANDLE = "transferparenthandle"
-        const val KEY_FIRST_LOGIN_CHAT = "firstloginchat"
         const val KEY_AUTO_PLAY = "autoplay"
 
         const val KEY_LAST_PUBLIC_HANDLE = "lastpublichandle"

@@ -62,7 +62,6 @@ interface DatabaseHandler {
      * @param transferQueueStatus True if the queue is paused, false otherwise.
      */
     var transferQueueStatus: Boolean
-    var sdCardUri: String?
 
     /**
      * Saves attributes in DB.

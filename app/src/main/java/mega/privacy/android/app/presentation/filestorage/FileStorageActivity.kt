@@ -556,7 +556,6 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         }
 
         val uri = intent.data
-        val isFolderInPrimaryStorage: Boolean
 
         when (requestCode) {
             REQUEST_SAVE_RK -> {
@@ -570,8 +569,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                     uri ?: return,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                isFolderInPrimaryStorage = setPathAndCheckIfIsPrimary(uri)
-                isFolderInSDCard = !isFolderInPrimaryStorage
+                isFolderInSDCard = !setPathAndCheckIfIsPrimary(uri)
                 viewModel.folderPicked(uri.toString())
             }
 
@@ -580,12 +578,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                     uri ?: return,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
-                isFolderInPrimaryStorage = setPathAndCheckIfIsPrimary(uri)
-
-                if (!isFolderInPrimaryStorage) {
-                    dbH.sdCardUri = uri.toString()
-                }
-
+                setPathAndCheckIfIsPrimary(uri)
                 viewModel.folderPicked(uri.toString())
             }
         }

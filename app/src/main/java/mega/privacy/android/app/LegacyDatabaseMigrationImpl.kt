@@ -4,8 +4,6 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.mapper.StorageStateIntMapper
@@ -40,61 +38,36 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
 
         val CREATE_PREFERENCES_TABLE =
             "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_PREFERENCES} (" +
-                    "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY," +                    //0
-                    "${SqliteDatabaseHandler.KEY_FIRST_LOGIN} BOOLEAN, " +                      //1
-                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_ENABLED} BOOLEAN, " +                 //2
-                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_HANDLE} TEXT, " +                     //3
-                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_LOCAL_PATH} TEXT, " +                 //4
-                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_WIFI} BOOLEAN, " +                    //5
-                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_FILE_UPLOAD} TEXT, " +                //6
-                    "${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_ENABLED} TEXT, " +               //7
-                    "${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_CODE} TEXT, " +                  //8
-                    "${SqliteDatabaseHandler.KEY_STORAGE_ASK_ALWAYS} TEXT, " +                  //9
-                    "${SqliteDatabaseHandler.KEY_STORAGE_DOWNLOAD_LOCATION} TEXT, " +           //10
-                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_TIMESTAMP} TEXT, " +                  //11
-                    "${SqliteDatabaseHandler.KEY_LAST_UPLOAD_FOLDER} TEXT, " +                  //12
-                    "${SqliteDatabaseHandler.KEY_LAST_CLOUD_FOLDER_HANDLE} TEXT, " +            //13
-                    "${SqliteDatabaseHandler.KEY_SEC_FOLDER_ENABLED} TEXT, " +                  //14
-                    "${SqliteDatabaseHandler.KEY_SEC_FOLDER_LOCAL_PATH} TEXT, " +               //15
-                    "${SqliteDatabaseHandler.KEY_SEC_FOLDER_HANDLE} TEXT, " +                   //16
-                    "${SqliteDatabaseHandler.KEY_SEC_SYNC_TIMESTAMP} TEXT, " +                  //17
-                    "${SqliteDatabaseHandler.KEY_KEEP_FILE_NAMES} BOOLEAN, " +                  //18
-                    "${SqliteDatabaseHandler.KEY_STORAGE_ADVANCED_DEVICES} BOOLEAN, " +         //19
-                    "${SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST} BOOLEAN, " +              //20
-                    "${SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST_CAMERA} BOOLEAN, " +       //21
-                    "${SqliteDatabaseHandler.KEY_URI_EXTERNAL_SD_CARD} TEXT, " +                //22
-                    "${SqliteDatabaseHandler.KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD} BOOLEAN, " +   //23
-                    "${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_TYPE} TEXT, " +                  //24
-                    "${SqliteDatabaseHandler.KEY_PREFERRED_SORT_CLOUD} TEXT, " +                //25
-                    "${SqliteDatabaseHandler.KEY_PREFERRED_SORT_OTHERS} TEXT," +                //26
-                    "${SqliteDatabaseHandler.KEY_FIRST_LOGIN_CHAT} BOOLEAN, " +                 //27
-                    "${SqliteDatabaseHandler.KEY_AUTO_PLAY} BOOLEAN," +                         //28
+                    "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY," +
+                    "${SqliteDatabaseHandler.KEY_FIRST_LOGIN} BOOLEAN, " +
+                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_ENABLED} BOOLEAN, " +
+                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_HANDLE} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_LOCAL_PATH} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_WIFI} BOOLEAN, " +
+                    "${SqliteDatabaseHandler.KEY_CAM_SYNC_FILE_UPLOAD} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_STORAGE_ASK_ALWAYS} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_STORAGE_DOWNLOAD_LOCATION} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_SEC_FOLDER_ENABLED} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_SEC_FOLDER_LOCAL_PATH} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_SEC_FOLDER_HANDLE} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_KEEP_FILE_NAMES} BOOLEAN, " +
+                    "${SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST} BOOLEAN, " +
+                    "${SqliteDatabaseHandler.KEY_URI_EXTERNAL_SD_CARD} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD} BOOLEAN, " +
+                    "${SqliteDatabaseHandler.KEY_PREFERRED_SORT_CLOUD} TEXT, " +
+                    "${SqliteDatabaseHandler.KEY_PREFERRED_SORT_OTHERS} TEXT," +
+                    "${SqliteDatabaseHandler.KEY_AUTO_PLAY} BOOLEAN," +
                     "${SqliteDatabaseHandler.KEY_UPLOAD_VIDEO_QUALITY} TEXT DEFAULT '${
                         SqliteDatabaseHandler.encrypt(
                             VideoQuality.ORIGINAL.value.toString()
                         )
-                    }'," +  //29
-                    "${SqliteDatabaseHandler.KEY_CONVERSION_ON_CHARGING} BOOLEAN," +            //30
-                    "${SqliteDatabaseHandler.KEY_CHARGING_ON_SIZE} TEXT," +                     //31
-                    "${SqliteDatabaseHandler.KEY_SHOULD_CLEAR_CAMSYNC_RECORDS} TEXT," +         //32
-                    "${SqliteDatabaseHandler.KEY_CAM_VIDEO_SYNC_TIMESTAMP} TEXT," +             //33
-                    "${SqliteDatabaseHandler.KEY_SEC_VIDEO_SYNC_TIMESTAMP} TEXT," +             //34
-                    "${SqliteDatabaseHandler.KEY_REMOVE_GPS} TEXT," +                           //35
-                    "${SqliteDatabaseHandler.KEY_SHOW_INVITE_BANNER} TEXT," +                   //36
-                    "${SqliteDatabaseHandler.KEY_PREFERRED_SORT_CAMERA_UPLOAD} TEXT," +         //37
-                    "${SqliteDatabaseHandler.KEY_SD_CARD_URI} TEXT," +                          //38
-                    "${SqliteDatabaseHandler.KEY_ASK_FOR_DISPLAY_OVER} TEXT," +                 //39
-                    "${SqliteDatabaseHandler.KEY_ASK_SET_DOWNLOAD_LOCATION} BOOLEAN," +         //40
-                    "${SqliteDatabaseHandler.KEY_URI_MEDIA_EXTERNAL_SD_CARD} TEXT," +           //41
-                    "${SqliteDatabaseHandler.KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD} BOOLEAN," +     //42
-                    "${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_REQUIRE_TIME} TEXT DEFAULT '${
-                        SqliteDatabaseHandler.encrypt(
-                            Constants.REQUIRE_PASSCODE_INVALID.toString()
-                        )
-                    }', " + //43
-                    "${SqliteDatabaseHandler.KEY_FINGERPRINT_LOCK} BOOLEAN DEFAULT '" + SqliteDatabaseHandler.encrypt(
-                "false"
-            ) + "'" + //44
+                    }'," +
+                    "${SqliteDatabaseHandler.KEY_CONVERSION_ON_CHARGING} BOOLEAN," +
+                    "${SqliteDatabaseHandler.KEY_CHARGING_ON_SIZE} TEXT," +
+                    "${SqliteDatabaseHandler.KEY_SHOULD_CLEAR_CAMSYNC_RECORDS} TEXT," +
+                    "${SqliteDatabaseHandler.KEY_REMOVE_GPS} TEXT," +
+                    "${SqliteDatabaseHandler.KEY_PREFERRED_SORT_CAMERA_UPLOAD} TEXT," +
+                    "${SqliteDatabaseHandler.KEY_ASK_SET_DOWNLOAD_LOCATION} BOOLEAN" +
                     ")"
         db.execSQL(CREATE_PREFERENCES_TABLE)
 
@@ -212,27 +185,10 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             db.execSQL("ALTER TABLE ${MegaDatabaseConstant.TABLE_OFFLINE} ADD COLUMN ${SqliteDatabaseHandler.KEY_OFF_HANDLE_INCOMING} INTEGER;")
             db.execSQL("UPDATE ${MegaDatabaseConstant.TABLE_OFFLINE} SET ${SqliteDatabaseHandler.KEY_OFF_INCOMING} = '0';")
         }
-        if (oldVersion <= 8) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_LAST_UPLOAD_FOLDER} TEXT;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_LAST_UPLOAD_FOLDER} = '" + SqliteDatabaseHandler.encrypt(
-                    ""
-                ) + "';"
-            )
-        }
-        if (oldVersion <= 9) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_LAST_CLOUD_FOLDER_HANDLE} TEXT;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_LAST_CLOUD_FOLDER_HANDLE} = '" + SqliteDatabaseHandler.encrypt(
-                    ""
-                ) + "';"
-            )
-        }
         if (oldVersion <= 12) {
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_SEC_FOLDER_ENABLED} TEXT;")
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_SEC_FOLDER_LOCAL_PATH} TEXT;")
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_SEC_FOLDER_HANDLE} TEXT;")
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_SEC_SYNC_TIMESTAMP} TEXT;")
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_KEEP_FILE_NAMES} TEXT;")
             db.execSQL(
                 "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_SEC_FOLDER_ENABLED} = '${
@@ -256,24 +212,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 }';"
             )
             db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_SEC_SYNC_TIMESTAMP} = '${
-                    SqliteDatabaseHandler.encrypt(
-                        "0"
-                    )
-                }';"
-            )
-            db.execSQL(
                 "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_KEEP_FILE_NAMES} = '${
-                    SqliteDatabaseHandler.encrypt(
-                        "false"
-                    )
-                }';"
-            )
-        }
-        if (oldVersion <= 13) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_STORAGE_ADVANCED_DEVICES} BOOLEAN;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_STORAGE_ADVANCED_DEVICES} = '${
                     SqliteDatabaseHandler.encrypt(
                         "false"
                     )
@@ -296,14 +235,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST} = '${
                     SqliteDatabaseHandler.encrypt(
                         "true"
-                    )
-                }';"
-            )
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST_CAMERA} BOOLEAN;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST_CAMERA} = '${
-                    SqliteDatabaseHandler.encrypt(
-                        "false"
                     )
                 }';"
             )
@@ -364,26 +295,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     Timber.d("Encrypted: %s", offline.name)
                     this.setOfflineFileOld(offline, db) //using the OLD method that doesn't encrypt
                 }
-            }
-        }
-        if (oldVersion <= 19) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_TYPE} TEXT;")
-            if (isPasscodeLockEnabled(db)) {
-                Timber.d("PIN enabled!")
-                db.execSQL(
-                    "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_TYPE} = '${
-                        SqliteDatabaseHandler.encrypt(Constants.PIN_4)
-                    }';"
-                )
-            } else {
-                Timber.d("PIN NOT enabled!")
-                db.execSQL(
-                    "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_TYPE} = '${
-                        SqliteDatabaseHandler.encrypt(
-                            ""
-                        )
-                    }';"
-                )
             }
         }
         if (oldVersion <= 20) {
@@ -532,16 +443,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                         "${SqliteDatabaseHandler.KEY_TRANSFER_HANDLE} TEXT)"
             db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE)
         }
-        if (oldVersion <= 30) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_FIRST_LOGIN_CHAT} BOOLEAN;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_FIRST_LOGIN_CHAT} = '${
-                    SqliteDatabaseHandler.encrypt(
-                        "true"
-                    )
-                }';"
-            )
-        }
         if (oldVersion <= 31) {
             val CREATE_EPHEMERAL =
                 "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_EPHEMERAL}(" +
@@ -618,8 +519,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_CONVERSION_ON_CHARGING} BOOLEAN;")
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_CHARGING_ON_SIZE} TEXT;")
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_SHOULD_CLEAR_CAMSYNC_RECORDS} TEXT;")
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_CAM_VIDEO_SYNC_TIMESTAMP} TEXT;")
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_SEC_VIDEO_SYNC_TIMESTAMP} TEXT;")
         }
         if (oldVersion <= 45) {
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_REMOVE_GPS} TEXT;")
@@ -637,35 +536,12 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 }';"
             )
         }
-        if (oldVersion <= 47) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_SHOW_INVITE_BANNER} TEXT;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_SHOW_INVITE_BANNER} = '${
-                    SqliteDatabaseHandler.encrypt(
-                        "true"
-                    )
-                }';"
-            )
-        }
         if (oldVersion <= 48) {
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_PREFERRED_SORT_CAMERA_UPLOAD} TEXT;")
             db.execSQL(
                 "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} " +
                         "SET ${SqliteDatabaseHandler.KEY_PREFERRED_SORT_CAMERA_UPLOAD} = " +
                         "'${SqliteDatabaseHandler.encrypt(MegaApiJava.ORDER_MODIFICATION_DESC.toString())}';"
-            )
-        }
-        if (oldVersion <= 49) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_SD_CARD_URI} TEXT;")
-        }
-        if (oldVersion <= 50) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_ASK_FOR_DISPLAY_OVER} TEXT;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_ASK_FOR_DISPLAY_OVER} = '${
-                    SqliteDatabaseHandler.encrypt(
-                        "true"
-                    )
-                }';"
             )
         }
         if (oldVersion <= 51) {
@@ -717,23 +593,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             db.execSQL("UPDATE ${SqliteDatabaseHandler.TABLE_CHAT_ITEMS} SET ${SqliteDatabaseHandler.KEY_CHAT_ITEM_EDITED_MSG_ID} = '';")
         }
         if (oldVersion <= 57) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_URI_MEDIA_EXTERNAL_SD_CARD} TEXT;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_URI_MEDIA_EXTERNAL_SD_CARD} = '${
-                    SqliteDatabaseHandler.encrypt(
-                        ""
-                    )
-                }';"
-            )
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD} BOOLEAN;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} " +
-                        "SET ${SqliteDatabaseHandler.KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD} = '${
-                            SqliteDatabaseHandler.encrypt(
-                                "false"
-                            )
-                        }';"
-            )
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_COMPLETED_TRANSFERS} ADD COLUMN ${SqliteDatabaseHandler.KEY_TRANSFER_OFFLINE} BOOLEAN;")
             db.execSQL(
                 "UPDATE ${SqliteDatabaseHandler.TABLE_COMPLETED_TRANSFERS} SET ${SqliteDatabaseHandler.KEY_TRANSFER_OFFLINE} = '${
@@ -780,15 +639,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 }';"
             )
         }
-        if (oldVersion <= 60) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_REQUIRE_TIME} TEXT;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} " +
-                        "SET ${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_REQUIRE_TIME} = '${
-                            SqliteDatabaseHandler.encrypt("" + if (isPasscodeLockEnabled(db)) PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE else Constants.REQUIRE_PASSCODE_INVALID)
-                        }';"
-            )
-        }
         if (oldVersion <= 61) {
             recreateAttributes(db, getAttributes(db))
             attributesAlreadyUpdated = true
@@ -799,16 +649,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             }
             recreatePreferences(db, getPreferencesFromDBv62(db))
             preferencesAlreadyUpdated = true
-        }
-        if (oldVersion <= 63 && !preferencesAlreadyUpdated) {
-            db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_FINGERPRINT_LOCK} BOOLEAN;")
-            db.execSQL(
-                "UPDATE ${SqliteDatabaseHandler.TABLE_PREFERENCES} SET ${SqliteDatabaseHandler.KEY_FINGERPRINT_LOCK} = '${
-                    SqliteDatabaseHandler.encrypt(
-                        "false"
-                    )
-                }';"
-            )
         }
         if (oldVersion <= 64 && !preferencesAlreadyUpdated) {
             //KEY_CAM_SYNC_CHARGING and KEY_SMALL_GRID_CAMERA have been removed in DB v65
@@ -890,25 +730,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
 
         // Temporary fix to avoid wrong values in attributes after upgrade.
         getAttributes(db)
-    }
-
-    private fun isPasscodeLockEnabled(db: SupportSQLiteDatabase): Boolean {
-        Timber.d("getPinLockEnabled")
-        val selectQuery = "SELECT * FROM ${SqliteDatabaseHandler.TABLE_PREFERENCES}"
-        var result = false
-        try {
-            db.query(selectQuery)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    //get pinLockEnabled
-                    SqliteDatabaseHandler.decrypt(cursor.getString(7))?.let { pinLockEnabled ->
-                        result = pinLockEnabled.toBooleanStrictOrNull() ?: false
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return result
     }
 
 
@@ -1400,423 +1221,33 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
         try {
             db.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
-                    val firstTime =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_FIRST_LOGIN
-                                )
-                            )
-                        )
-                    val camSyncEnabled =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_CAM_SYNC_ENABLED
-                                )
-                            )
-                        )
-                    val camSyncHandle =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_CAM_SYNC_HANDLE
-                                )
-                            )
-                        )
-                    val camSyncLocalPath =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_CAM_SYNC_LOCAL_PATH
-                                )
-                            )
-                        )
-                    val wifi = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_CAM_SYNC_WIFI
-                            )
-                        )
-                    )
-                    val fileUpload =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_CAM_SYNC_FILE_UPLOAD
-                                )
-                            )
-                        )
-                    val pinLockEnabled =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_PASSCODE_LOCK_ENABLED
-                                )
-                            )
-                        )
-                    val pinLockCode =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_PASSCODE_LOCK_CODE
-                                )
-                            )
-                        )
-                    val askAlways =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_STORAGE_ASK_ALWAYS
-                                )
-                            )
-                        )
-                    val downloadLocation = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_STORAGE_DOWNLOAD_LOCATION
-                            )
-                        )
-                    )
-                    val camSyncTimeStamp =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_CAM_SYNC_TIMESTAMP
-                                )
-                            )
-                        )
-                    val lastFolderUpload =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_LAST_UPLOAD_FOLDER
-                                )
-                            )
-                        )
-                    val lastFolderCloud = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_LAST_CLOUD_FOLDER_HANDLE
-                            )
-                        )
-                    )
-                    val secondaryFolderEnabled =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_SEC_FOLDER_ENABLED
-                                )
-                            )
-                        )
-                    val secondaryPath =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_SEC_FOLDER_LOCAL_PATH
-                                )
-                            )
-                        )
-                    val secondaryHandle =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_SEC_FOLDER_HANDLE
-                                )
-                            )
-                        )
-                    val secSyncTimeStamp =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_SEC_SYNC_TIMESTAMP
-                                )
-                            )
-                        )
-                    val keepFileNames =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_KEEP_FILE_NAMES
-                                )
-                            )
-                        )
-                    val storageAdvancedDevices = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_STORAGE_ADVANCED_DEVICES
-                            )
-                        )
-                    )
-                    val preferredViewList =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST
-                                )
-                            )
-                        )
-                    val preferredViewListCamera = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST_CAMERA
-                            )
-                        )
-                    )
-                    val uriExternalSDCard =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_URI_EXTERNAL_SD_CARD
-                                )
-                            )
-                        )
-                    val cameraFolderExternalSDCard = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD
-                            )
-                        )
-                    )
-                    val pinLockType =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_PASSCODE_LOCK_TYPE
-                                )
-                            )
-                        )
-                    val preferredSortCloud =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_PREFERRED_SORT_CLOUD
-                                )
-                            )
-                        )
-                    val preferredSortOthers =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_PREFERRED_SORT_OTHERS
-                                )
-                            )
-                        )
-                    val firstTimeChat =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_FIRST_LOGIN_CHAT
-                                )
-                            )
-                        )
-                    val isAutoPlayEnabled =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_AUTO_PLAY
-                                )
-                            )
-                        )
-                    val uploadVideoQuality =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_UPLOAD_VIDEO_QUALITY
-                                )
-                            )
-                        )
-                    val conversionOnCharging = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_CONVERSION_ON_CHARGING
-                            )
-                        )
-                    )
-                    val chargingOnSize =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_CHARGING_ON_SIZE
-                                )
-                            )
-                        )
-                    val camVideoSyncTimeStamp = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_CAM_VIDEO_SYNC_TIMESTAMP
-                            )
-                        )
-                    )
-                    val secVideoSyncTimeStamp = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_SEC_VIDEO_SYNC_TIMESTAMP
-                            )
-                        )
-                    )
-                    val removeGPS =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_REMOVE_GPS
-                                )
-                            )
-                        )
-                    val closeInviteBanner =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_SHOW_INVITE_BANNER
-                                )
-                            )
-                        )
-                    val preferredSortCameraUpload = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_PREFERRED_SORT_CAMERA_UPLOAD
-                            )
-                        )
-                    )
-                    val sdCardUri =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_SD_CARD_URI
-                                )
-                            )
-                        )
-                    val askForDisplayOver =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_ASK_FOR_DISPLAY_OVER
-                                )
-                            )
-                        )
-                    val askForSetDownloadLocation = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_ASK_SET_DOWNLOAD_LOCATION
-                            )
-                        )
-                    )
-                    val mediaSDCardUri = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_URI_MEDIA_EXTERNAL_SD_CARD
-                            )
-                        )
-                    )
-                    val isMediaOnSDCard = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD
-                            )
-                        )
-                    )
-                    val passcodeLockRequireTime = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_PASSCODE_LOCK_REQUIRE_TIME
-                            )
-                        )
-                    )
-                    val fingerprintLock =
-                        if (cursor.getColumnIndex(SqliteDatabaseHandler.KEY_FINGERPRINT_LOCK) != Constants.INVALID_VALUE) SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_FINGERPRINT_LOCK
-                                )
-                            )
-                        ) else "false"
+                    fun column(key: String): String? =
+                        SqliteDatabaseHandler.decrypt(cursor.getString(getColumnIndex(cursor, key)))
+
                     prefs = MegaPreferences(
-                        firstTime,
-                        wifi,
-                        camSyncEnabled,
-                        camSyncHandle,
-                        camSyncLocalPath,
-                        fileUpload,
-                        camSyncTimeStamp,
-                        pinLockEnabled,
-                        pinLockCode,
-                        askAlways,
-                        downloadLocation,
-                        lastFolderUpload,
-                        lastFolderCloud,
-                        secondaryFolderEnabled,
-                        secondaryPath,
-                        secondaryHandle,
-                        secSyncTimeStamp,
-                        keepFileNames,
-                        storageAdvancedDevices,
-                        preferredViewList,
-                        preferredViewListCamera,
-                        uriExternalSDCard,
-                        cameraFolderExternalSDCard,
-                        pinLockType,
-                        preferredSortCloud,
-                        preferredSortOthers,
-                        firstTimeChat,
-                        uploadVideoQuality,
-                        conversionOnCharging,
-                        chargingOnSize,
-                        camVideoSyncTimeStamp,
-                        secVideoSyncTimeStamp,
-                        isAutoPlayEnabled,
-                        removeGPS,
-                        closeInviteBanner,
-                        preferredSortCameraUpload,
-                        sdCardUri,
-                        askForDisplayOver,
-                        askForSetDownloadLocation,
-                        mediaSDCardUri,
-                        isMediaOnSDCard,
-                        passcodeLockRequireTime,
-                        fingerprintLock
+                        column(SqliteDatabaseHandler.KEY_FIRST_LOGIN),
+                        column(SqliteDatabaseHandler.KEY_CAM_SYNC_WIFI),
+                        column(SqliteDatabaseHandler.KEY_CAM_SYNC_ENABLED),
+                        column(SqliteDatabaseHandler.KEY_CAM_SYNC_HANDLE),
+                        column(SqliteDatabaseHandler.KEY_CAM_SYNC_LOCAL_PATH),
+                        column(SqliteDatabaseHandler.KEY_CAM_SYNC_FILE_UPLOAD),
+                        column(SqliteDatabaseHandler.KEY_STORAGE_ASK_ALWAYS),
+                        column(SqliteDatabaseHandler.KEY_STORAGE_DOWNLOAD_LOCATION),
+                        column(SqliteDatabaseHandler.KEY_SEC_FOLDER_ENABLED),
+                        column(SqliteDatabaseHandler.KEY_SEC_FOLDER_LOCAL_PATH),
+                        column(SqliteDatabaseHandler.KEY_SEC_FOLDER_HANDLE),
+                        column(SqliteDatabaseHandler.KEY_KEEP_FILE_NAMES),
+                        column(SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST),
+                        column(SqliteDatabaseHandler.KEY_URI_EXTERNAL_SD_CARD),
+                        column(SqliteDatabaseHandler.KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD),
+                        column(SqliteDatabaseHandler.KEY_PREFERRED_SORT_CLOUD),
+                        column(SqliteDatabaseHandler.KEY_PREFERRED_SORT_OTHERS),
+                        column(SqliteDatabaseHandler.KEY_UPLOAD_VIDEO_QUALITY),
+                        column(SqliteDatabaseHandler.KEY_CONVERSION_ON_CHARGING),
+                        column(SqliteDatabaseHandler.KEY_CHARGING_ON_SIZE),
+                        column(SqliteDatabaseHandler.KEY_AUTO_PLAY),
+                        column(SqliteDatabaseHandler.KEY_REMOVE_GPS),
+                        column(SqliteDatabaseHandler.KEY_PREFERRED_SORT_CAMERA_UPLOAD),
                     )
                 }
             }
@@ -1859,36 +1290,12 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 SqliteDatabaseHandler.encrypt(prefs.getCamSyncFileUpload())
             )
             put(
-                SqliteDatabaseHandler.KEY_PASSCODE_LOCK_ENABLED,
-                SqliteDatabaseHandler.encrypt(prefs.getPasscodeLockEnabled())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_PASSCODE_LOCK_CODE,
-                SqliteDatabaseHandler.encrypt(prefs.getPasscodeLockCode())
-            )
-            put(
                 SqliteDatabaseHandler.KEY_STORAGE_ASK_ALWAYS,
                 SqliteDatabaseHandler.encrypt(prefs.getStorageAskAlways())
             )
             put(
                 SqliteDatabaseHandler.KEY_STORAGE_DOWNLOAD_LOCATION,
                 SqliteDatabaseHandler.encrypt(prefs.getStorageDownloadLocation())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_CAM_SYNC_TIMESTAMP,
-                SqliteDatabaseHandler.encrypt(prefs.getCamSyncTimeStamp())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_CAM_VIDEO_SYNC_TIMESTAMP,
-                SqliteDatabaseHandler.encrypt(prefs.getCamVideoSyncTimeStamp())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_LAST_UPLOAD_FOLDER,
-                SqliteDatabaseHandler.encrypt(prefs.getLastFolderUpload())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_LAST_CLOUD_FOLDER_HANDLE,
-                SqliteDatabaseHandler.encrypt(prefs.getLastFolderCloud())
             )
             put(
                 SqliteDatabaseHandler.KEY_SEC_FOLDER_ENABLED,
@@ -1903,24 +1310,8 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 SqliteDatabaseHandler.encrypt(prefs.getMegaHandleSecondaryFolder())
             )
             put(
-                SqliteDatabaseHandler.KEY_SEC_SYNC_TIMESTAMP,
-                SqliteDatabaseHandler.encrypt(prefs.getSecSyncTimeStamp())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_SEC_VIDEO_SYNC_TIMESTAMP,
-                SqliteDatabaseHandler.encrypt(prefs.getSecVideoSyncTimeStamp())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_STORAGE_ADVANCED_DEVICES,
-                SqliteDatabaseHandler.encrypt(prefs.getStorageAdvancedDevices())
-            )
-            put(
                 SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST,
                 SqliteDatabaseHandler.encrypt(prefs.getPreferredViewList())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_PREFERRED_VIEW_LIST_CAMERA,
-                SqliteDatabaseHandler.encrypt(prefs.getPreferredViewListCameraUploads())
             )
             put(
                 SqliteDatabaseHandler.KEY_URI_EXTERNAL_SD_CARD,
@@ -1931,28 +1322,20 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 SqliteDatabaseHandler.encrypt(prefs.getCameraFolderExternalSDCard())
             )
             put(
-                SqliteDatabaseHandler.KEY_PASSCODE_LOCK_TYPE,
-                SqliteDatabaseHandler.encrypt(prefs.getPasscodeLockType())
-            )
-            put(
                 SqliteDatabaseHandler.KEY_PREFERRED_SORT_CLOUD,
                 SqliteDatabaseHandler.encrypt(prefs.getPreferredSortCloud())
             )
             put(
                 SqliteDatabaseHandler.KEY_PREFERRED_SORT_CAMERA_UPLOAD,
-                SqliteDatabaseHandler.encrypt(prefs.preferredSortCameraUpload)
+                SqliteDatabaseHandler.encrypt(prefs.getPreferredSortCameraUpload())
             )
             put(
                 SqliteDatabaseHandler.KEY_PREFERRED_SORT_OTHERS,
                 SqliteDatabaseHandler.encrypt(prefs.getPreferredSortOthers())
             )
             put(
-                SqliteDatabaseHandler.KEY_FIRST_LOGIN_CHAT,
-                SqliteDatabaseHandler.encrypt(prefs.getFirstTimeChat())
-            )
-            put(
                 SqliteDatabaseHandler.KEY_REMOVE_GPS,
-                SqliteDatabaseHandler.encrypt(prefs.removeGPS)
+                SqliteDatabaseHandler.encrypt(prefs.getRemoveGPS())
             )
             put(
                 SqliteDatabaseHandler.KEY_KEEP_FILE_NAMES,
@@ -1960,7 +1343,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             )
             put(
                 SqliteDatabaseHandler.KEY_AUTO_PLAY,
-                SqliteDatabaseHandler.encrypt(prefs.isAutoPlayEnabled().toString())
+                SqliteDatabaseHandler.encrypt(prefs.getIsAutoPlayEnabled())
             )
             put(
                 SqliteDatabaseHandler.KEY_UPLOAD_VIDEO_QUALITY,
@@ -1973,38 +1356,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             put(
                 SqliteDatabaseHandler.KEY_CHARGING_ON_SIZE,
                 SqliteDatabaseHandler.encrypt(prefs.getChargingOnSize())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_SHOW_INVITE_BANNER,
-                SqliteDatabaseHandler.encrypt(prefs.showInviteBanner)
-            )
-            put(
-                SqliteDatabaseHandler.KEY_SD_CARD_URI,
-                SqliteDatabaseHandler.encrypt(prefs.getSdCardUri())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_ASK_FOR_DISPLAY_OVER,
-                SqliteDatabaseHandler.encrypt(prefs.askForDisplayOver)
-            )
-            put(
-                SqliteDatabaseHandler.KEY_ASK_SET_DOWNLOAD_LOCATION,
-                SqliteDatabaseHandler.encrypt(prefs.askForSetDownloadLocation)
-            )
-            put(
-                SqliteDatabaseHandler.KEY_URI_MEDIA_EXTERNAL_SD_CARD,
-                SqliteDatabaseHandler.encrypt(prefs.mediaSDCardUri)
-            )
-            put(
-                SqliteDatabaseHandler.KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD,
-                SqliteDatabaseHandler.encrypt(prefs.isMediaOnSDCard)
-            )
-            put(
-                SqliteDatabaseHandler.KEY_PASSCODE_LOCK_REQUIRE_TIME,
-                SqliteDatabaseHandler.encrypt(prefs.passcodeLockRequireTime)
-            )
-            put(
-                SqliteDatabaseHandler.KEY_FINGERPRINT_LOCK,
-                SqliteDatabaseHandler.encrypt(prefs.fingerprintLock)
             )
         }
 

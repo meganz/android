@@ -84,10 +84,6 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
             val expectedChargingRequiredForVideoCompression = true
             val expectedVideoCompressionSizeLimit = 400
             val expectedFileUploadOption = 1001
-            val expectedPhotoTimeStamp = 1234L
-            val expectedVideoTimeStamp = 5678L
-            val expectedMediaUploadsPhotoTimeStamp = 1234L
-            val expectedMediaUploadsVideoTimeStamp = 5678L
             val expectedUploadsByWifi = true
 
             val megaPreferences = mock<MegaPreferences> {
@@ -103,10 +99,6 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
                 on { conversionOnCharging }.thenReturn(expectedChargingRequiredForVideoCompression.toString())
                 on { chargingOnSize }.thenReturn(expectedVideoCompressionSizeLimit.toString())
                 on { camSyncFileUpload }.thenReturn(expectedFileUploadOption.toString())
-                on { camSyncTimeStamp }.thenReturn(expectedPhotoTimeStamp.toString())
-                on { camVideoSyncTimeStamp }.thenReturn(expectedVideoTimeStamp.toString())
-                on { secSyncTimeStamp }.thenReturn(expectedMediaUploadsPhotoTimeStamp.toString())
-                on { secVideoSyncTimeStamp }.thenReturn(expectedMediaUploadsVideoTimeStamp.toString())
                 on { camSyncWifi }.thenReturn(expectedUploadsByWifi.toString())
             }
 
