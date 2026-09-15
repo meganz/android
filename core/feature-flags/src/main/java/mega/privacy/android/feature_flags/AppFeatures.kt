@@ -105,14 +105,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Feature flag to control the migration of NodeLabelBottomSheetDialogFragment to Kotlin.
-     */
-    NodeLabelBottomSheetDialogFragmentConversion(
-        "Convert the NodeLabelBottomSheetDialogFragment to Kotlin",
-        true
-    ),
-
-    /**
      * Feature flag to control the migration of FileExplorerActivity to ComposeUI and single activity.
      */
     CloudExplorer(

@@ -58,7 +58,6 @@ import mega.privacy.android.app.appstate.content.navigation.NavigationResultMana
 import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -93,6 +92,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -146,9 +146,6 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
-
-    @Inject
-    lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
 
     @Inject
     lateinit var exportNodeUseCase: ExportNodeUseCase
@@ -256,6 +253,11 @@ class ImagePreviewActivity : BaseActivity() {
                                 ShareLinkNavKey(handles = listOf(imageNode.id.longValue))
                             )
                         },
+                        onChangeLabel = { imageNode ->
+                            navigationHandler.navigate(
+                                ChangeLabelBottomSheet(nodeId = imageNode.id.longValue)
+                            )
+                        },
                     )
                 }
             }
@@ -268,6 +270,7 @@ class ImagePreviewActivity : BaseActivity() {
         onEditVideo: (ImageNode) -> Unit,
         onRemoveLink: (ImageNode) -> Unit,
         onGetLink: (ImageNode) -> Unit,
+        onChangeLabel: (ImageNode) -> Unit,
     ) {
         val themeMode by monitorThemeModeUseCase()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -300,7 +303,7 @@ class ImagePreviewActivity : BaseActivity() {
                 onClickSlideshow = ::playSlideshow,
                 onClickInfo = ::checkInfo,
                 onClickFavourite = ::favouriteNode,
-                onClickLabel = ::handleLabel,
+                onClickLabel = onChangeLabel,
                 onClickOpenWith = ::handleOpenWith,
                 onClickSaveToDevice = ::saveNodeToDevice,
                 onClickImport = ::importNode,
@@ -447,13 +450,6 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun favouriteNode(imageNode: ImageNode) {
         viewModel.favouriteNode(imageNode)
-    }
-
-    private fun handleLabel(imageNode: ImageNode) {
-        lifecycleScope.launch {
-            nodeLabelBottomSheetDialogFragmentFactory.newInstance(imageNode.id.longValue)
-                .show(supportFragmentManager, TAG)
-        }
     }
 
     private fun handleOpenWith(imageNode: ImageNode) {
@@ -798,8 +794,6 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     companion object {
-        private const val TAG = "ImagePreviewActivity"
-
         fun createIntent(
             context: Context,
             imageSource: ImagePreviewFetcherSource,
