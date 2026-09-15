@@ -2,7 +2,6 @@ package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.di.LegacyStaticAppContext
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
@@ -31,7 +30,6 @@ internal class StaticContextInitialiser @Inject constructor(
     override val name = "StaticContextInitialiser"
 
     override operator fun invoke() {
-        LegacyStaticAppContext.context = context
         AvatarUtil.applicationContext = context
         CacheFolderManager.applicationContext = context
         CallUtil.applicationContext = context

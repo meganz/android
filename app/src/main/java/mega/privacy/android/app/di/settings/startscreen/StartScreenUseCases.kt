@@ -4,10 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.di.LegacyStaticAppContext
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenOptionMapper
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.mapStartScreenOption
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -59,13 +57,6 @@ class TempStartScreenUseCaseStaticModule {
         useCase
 }
 
-/**
- * This method is to inject MonitorStartScreenPreference into static classes by Hilt
- */
-fun getMonitorStartScreenPreference(): MonitorStartScreenPreference =
-    EntryPointAccessors.fromApplication(
-        LegacyStaticAppContext.context,
-        MonitorStartScreenPreferenceEntryPoint::class.java).monitorStartScreenPreference
 
 /**
  * This interface is needed to inject DatabaseHandler by Hilt
