@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.drop
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
@@ -154,7 +155,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
             Image(
                 modifier = Modifier
                     .padding(top = 12.dp)
-                    .clickable(enabled = !isFocused) { focusRequester.requestFocus() }
+                    .conditional(!isFocused) { clickable { focusRequester.requestFocus() } }
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_EDIT_FILENAME_IMAGE)
                     .alpha(if (isFocused) 0f else 1f),
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),

@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -92,7 +93,7 @@ internal fun StalledIssueCard(
             }
             MegaIcon(
                 modifier = Modifier
-                    .clickable(shouldShowMoreIcon) { moreClicked() }
+                    .conditional(shouldShowMoreIcon) { clickable { moreClicked() } }
                     .testTag(TEST_TAG_STALLED_ISSUE_CARD_BUTTON_MORE)
                     .alpha(if (shouldShowMoreIcon) 1f else 0f),
                 painter = painterResource(R.drawable.ic_universal_more),

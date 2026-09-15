@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +29,7 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.model.HighlightedText
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -123,19 +125,21 @@ internal fun AlbumsTabScreen(
                     AlbumGridItem(
                         modifier = Modifier
                             .testTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:${index}")
-                            .combinedClickable(
-                                enabled = isEnabled,
-                                onClick = {
-                                    if (uiState.isInSelectionMode) {
+                            .semantics(mergeDescendants = true) {}
+                            .conditional(isEnabled) {
+                                combinedClickable(
+                                    onClick = {
+                                        if (uiState.isInSelectionMode) {
+                                            userAlbum?.let(onAlbumSelectionToggle)
+                                        } else {
+                                            onNavigate(album.mediaAlbum.toAlbumContentNavKey())
+                                        }
+                                    },
+                                    onLongClick = {
                                         userAlbum?.let(onAlbumSelectionToggle)
-                                    } else {
-                                        onNavigate(album.mediaAlbum.toAlbumContentNavKey())
                                     }
-                                },
-                                onLongClick = {
-                                    userAlbum?.let(onAlbumSelectionToggle)
-                                }
-                            ),
+                                )
+                            },
                         coverImage = album.cover,
                         title = HighlightedText(album.title.text),
                         placeholder = placeholder,

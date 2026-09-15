@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
@@ -144,7 +145,7 @@ internal fun VideoItemView(
                 ),
                 contentDescription = VIDEO_ITEM_MENU_ICON_CONTENT_DESCRIPTION,
                 modifier = Modifier
-                    .clickable(enabled = !isSelected, onClick = onMenuClick)
+                    .conditional(!isSelected) { clickable(onClick = onMenuClick) }
                     .padding(top = 25.dp)
                     .testTag(VIDEO_ITEM_MENU_ICON_TEST_TAG),
             )

@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.list.MegaReorderableLazyColumn
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollForLazyColumn
+import mega.android.core.ui.modifiers.conditional
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
 import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
@@ -144,8 +146,9 @@ internal fun ActiveTransfersView(
                         },
                         modifier = Modifier
                             .animateItem()
-                            .clickable(enabled = selectMode) {
-                                onActiveTransferSelected(item)
+                            .semantics(mergeDescendants = true) {}
+                            .conditional(selectMode) {
+                                clickable { onActiveTransferSelected(item) }
                             }
                     )
                 }

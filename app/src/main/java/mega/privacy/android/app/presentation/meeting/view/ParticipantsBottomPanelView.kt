@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.launch
+import mega.android.core.ui.modifiers.conditional
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
@@ -363,8 +365,9 @@ fun BottomPanelView(
                                         modifier = Modifier
                                             .wrapContentSize(Alignment.CenterEnd)
                                             .testTag(TEST_TAG_MUTE_ALL_ITEM_VIEW)
-                                            .clickable(enabled = !areAllParticipantsMuted()) {
-                                                onMuteAllParticipantsClick()
+                                            .semantics(mergeDescendants = true) {}
+                                            .conditional(!areAllParticipantsMuted()) {
+                                                clickable { onMuteAllParticipantsClick() }
                                             },
                                     ) {
                                         Row(modifier = Modifier.align(Alignment.Center)) {

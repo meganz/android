@@ -167,6 +167,12 @@ internal fun PsaStateView(
     }
 }
 
+/**
+ * The full-screen box behind the PSA is a scrim: the disabled `clickable` is there to swallow every
+ * tap so nothing underneath the PSA can be reached until it is dismissed, which is also why the
+ * back gesture is consumed.
+ */
+@Suppress("DisabledInteractionModifier")
 @Composable
 private fun NestedPsaView(
     containerModifier: Modifier,

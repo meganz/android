@@ -24,6 +24,11 @@ import mega.android.core.ui.theme.values.TextColor
  * the label, adds dividers and a surface background, and its multi-button overload is private,
  * so it cannot express this row of three stacked actions.
  *
+ * The disabled `clickable` is deliberate: the card this footer sits in is itself clickable to
+ * expand and collapse, so a tap on a greyed-out action has to be absorbed here rather than
+ * collapsing the card, and keeping it also leaves the action announced to accessibility services
+ * as disabled rather than dropping out of the tree.
+ *
  * @param icon      Button icon
  * @param text      Button label
  * @param onClick   Action to perform on tap
@@ -32,6 +37,7 @@ import mega.android.core.ui.theme.values.TextColor
  * @param textColor Label colour
  * @param enabled   Whether the action is enabled
  */
+@Suppress("DisabledInteractionModifier")
 @Composable
 internal fun SyncCardActionButton(
     @DrawableRes icon: Int,

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import mega.android.core.ui.modifiers.conditional
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -100,7 +101,7 @@ internal fun VideoPlaylistItemView(
                 contentDescription = "3 dots",
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .clickable(enabled = !isSelected, onClick = onMenuClick),
+                    .conditional(!isSelected) { clickable(onClick = onMenuClick) },
                 alignment = Alignment.CenterEnd,
             )
         }
