@@ -8,7 +8,9 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -32,7 +35,11 @@ import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
 import mega.privacy.android.feature.mediaplayer.presentation.model.PlayingFromSection
+import mega.privacy.mobile.analytics.event.AudioPlayerContinuousPlaybackDisabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerContinuousPlaybackEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerQueueReorderedEvent
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel for the audio player play-queue screen.
@@ -58,6 +65,16 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
         val name: String? = null,
         val section: PlayingFromSection? = null,
     )
+
+    /** Debounces the reorder analytics event across the burst of moves one drag produces. */
+    private var reorderEventJob: Job? = null
+
+    /**
+     * Whether a reorder is waiting on [reorderEventJob]. Tracked separately because the
+     * ViewModel scope is already cancelled by the time [onCleared] runs, so the job itself can no
+     * longer say whether it had fired.
+     */
+    private var pendingReorderEvent = false
 
     /**
      * Triggered when starting a queue item was refused because a MEGA call is ongoing; carried
@@ -185,6 +202,13 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
      * Only the preference is written: the player service observes it and applies the result.
      */
     fun setContinuousPlayback(enabled: Boolean) {
+        Analytics.tracker.trackEvent(
+            if (enabled) {
+                AudioPlayerContinuousPlaybackEnabledEvent
+            } else {
+                AudioPlayerContinuousPlaybackDisabledEvent
+            }
+        )
         viewModelScope.launch {
             runCatching { setAudioContinuousPlaybackEnabledUseCase(enabled) }
                 .onFailure { Timber.e(it, "Failed to save continuous playback preference") }
@@ -194,13 +218,32 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
     /** Moves the queue item at [fromIndex] to [toIndex], keeping playback of the current item uninterrupted. */
     fun moveQueueItem(fromIndex: Int, toIndex: Int) {
         gateway.moveMediaItem(fromIndex, toIndex)
+        // The list commits a move for every row the dragged item passes, so one drag gesture
+        // arrives here as a burst of calls; report it as a single reorder once the burst stops.
+        reorderEventJob?.cancel()
+        pendingReorderEvent = true
+        reorderEventJob = viewModelScope.launch {
+            delay(REORDER_EVENT_DEBOUNCE)
+            pendingReorderEvent = false
+            Analytics.tracker.trackEvent(AudioPlayerQueueReorderedEvent)
+        }
     }
 
     override fun onCleared() {
+        // Closing the queue right after a drag would otherwise cancel the debounce and lose the
+        // reorder; report it now rather than drop it.
+        if (pendingReorderEvent) {
+            pendingReorderEvent = false
+            Analytics.tracker.trackEvent(AudioPlayerQueueReorderedEvent)
+        }
         // The gateway binding is unscoped, so this ViewModel owns its own MediaController
         // connection; without releasing it here every opened queue leaks a service binding
         // whose listener keeps position polling alive for as long as playback continues.
         gateway.release()
         super.onCleared()
+    }
+
+    companion object {
+        private val REORDER_EVENT_DEBOUNCE = 500.milliseconds
     }
 }

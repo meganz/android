@@ -76,7 +76,10 @@ private const val WIDEST_SPEED_LABEL = "0.00x"
  * quick access to 1×, 1.25×, 1.5×, 1.75×, and 2×.
  *
  * @param currentSpeed The currently active playback speed.
- * @param onSpeedSelected Invoked with the new speed when the user commits a selection.
+ * @param onPresetSpeedSelected Invoked with the new speed when the user taps one of the preset
+ * buttons.
+ * @param onSliderSpeedSelected Invoked with the new (tick-snapped) speed when the user releases
+ * the slider. Kept apart from the presets so callers can tell the two interactions apart.
  * @param onDismiss Invoked when the sheet should be dismissed.
  * @param isDark Forces dark or light theme when non-null; falls back to the system theme when null.
  */
@@ -84,7 +87,8 @@ private const val WIDEST_SPEED_LABEL = "0.00x"
 @Composable
 fun PlaybackSpeedBottomSheet(
     currentSpeed: Float,
-    onSpeedSelected: (Float) -> Unit,
+    onPresetSpeedSelected: (Float) -> Unit,
+    onSliderSpeedSelected: (Float) -> Unit,
     onDismiss: () -> Unit,
     isDark: Boolean? = null,
 ) {
@@ -123,7 +127,7 @@ fun PlaybackSpeedBottomSheet(
 
                 SpeedRuler(
                     currentSpeed = currentSpeed,
-                    onSpeedChanged = onSpeedSelected,
+                    onSpeedChanged = onSliderSpeedSelected,
                     onSpeedDragging = { displaySpeed = it },
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -139,7 +143,7 @@ fun PlaybackSpeedBottomSheet(
                         PresetSpeedButton(
                             speed = speed,
                             isSelected = abs(currentSpeed - speed) < 0.001f,
-                            onClick = { onSpeedSelected(speed) },
+                            onClick = { onPresetSpeedSelected(speed) },
                         )
                     }
                 }
@@ -368,7 +372,8 @@ private fun PreviewPlaybackSpeedBottomSheet() {
     PlaybackSpeedBottomSheet(
         currentSpeed = 1.65f,
         isDark = true,
-        onSpeedSelected = {},
+        onPresetSpeedSelected = {},
+        onSliderSpeedSelected = {},
         onDismiss = {},
     )
 }
@@ -379,7 +384,8 @@ private fun PreviewPlaybackSpeedBottomSheetNormal() {
     PlaybackSpeedBottomSheet(
         currentSpeed = 1f,
         isDark = true,
-        onSpeedSelected = {},
+        onPresetSpeedSelected = {},
+        onSliderSpeedSelected = {},
         onDismiss = {},
     )
 }

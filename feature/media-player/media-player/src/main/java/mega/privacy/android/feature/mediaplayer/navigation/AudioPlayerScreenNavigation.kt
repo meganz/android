@@ -39,6 +39,7 @@ import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerViewMode
 import mega.privacy.android.feature.mediaplayer.presentation.SleepTimerBottomSheet
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
+import mega.privacy.android.feature.mediaplayer.presentation.model.PlaybackSpeedSource
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.resources.R as sharedR
@@ -191,6 +192,7 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             onSleepTimerClicked = { showSleepTimerSheet = true },
             sleepTimerState = sleepTimerState,
             queueContent = { queueModifier -> AudioPlayerQueue(modifier = queueModifier) },
+            onQueueButtonPressed = viewModel::onQueueButtonPressed,
         )
 
         if (showSleepTimerSheet) {
@@ -213,8 +215,12 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             PlaybackSpeedBottomSheet(
                 currentSpeed = currentSpeed,
                 isDark = true, // audio player UI is always dark-themed
-                onSpeedSelected = { speed ->
-                    viewModel.setPlaybackSpeed(speed)
+                onPresetSpeedSelected = { speed ->
+                    viewModel.setPlaybackSpeed(speed, PlaybackSpeedSource.Preset)
+                    showSpeedSheet = false
+                },
+                onSliderSpeedSelected = { speed ->
+                    viewModel.setPlaybackSpeed(speed, PlaybackSpeedSource.Slider)
                     showSpeedSheet = false
                 },
                 onDismiss = { showSpeedSheet = false },

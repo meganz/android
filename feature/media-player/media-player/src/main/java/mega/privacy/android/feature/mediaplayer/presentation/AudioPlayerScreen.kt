@@ -83,6 +83,8 @@ internal const val AUDIO_PLAYER_CONTENT_TAG = "audio_player:content"
  * @param onRepeatClicked Called when the repeat button is tapped (music mode only).
  * @param onPlaylistClicked Called when the playlist button is tapped, only when no [queueContent]
  * is supplied to render the queue in place.
+ * @param onQueueButtonPressed Called when the playlist button is tapped to open the queue (in
+ * either mode); used for analytics only.
  * @param onBackPressed Called when the back button in the top bar is tapped.
  * @param onMoreActionsClicked Called when the more actions button in the top bar is tapped.
  * @param onToggleMode Called when the user taps the mode button to switch between podcast/music.
@@ -119,6 +121,7 @@ fun AudioPlayerScreen(
     sleepTimerState: SleepTimerState = SleepTimerState.Inactive,
     queueContent: (@Composable (Modifier) -> Unit)? = null,
     onPlaylistClicked: () -> Unit = {},
+    onQueueButtonPressed: () -> Unit = {},
 ) {
     AndroidTheme(isDark = true, useLegacyStatusBarColor = false) {
         // Must be the first child — see AudioPlayerWindowEffect KDoc for ordering requirements.
@@ -255,9 +258,15 @@ fun AudioPlayerScreen(
                         onShuffleClicked = onShuffleClicked,
                         onRepeatClicked = onRepeatClicked,
                         onPlaylistClicked = if (queueContent != null) {
-                            { isQueueVisible = !isQueueVisible }
+                            {
+                                if (!isQueueVisible) onQueueButtonPressed()
+                                isQueueVisible = !isQueueVisible
+                            }
                         } else {
-                            onPlaylistClicked
+                            {
+                                onQueueButtonPressed()
+                                onPlaylistClicked()
+                            }
                         },
                         contentPadding = innerPadding,
                         onToggleMode = onToggleMode,

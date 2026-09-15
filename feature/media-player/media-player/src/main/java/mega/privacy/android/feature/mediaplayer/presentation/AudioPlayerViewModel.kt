@@ -48,15 +48,35 @@ import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControlle
 import mega.privacy.android.feature.mediaplayer.data.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
+import mega.privacy.android.feature.mediaplayer.presentation.model.PlaybackSpeedSource
 import mega.privacy.android.feature.mediaplayer.presentation.model.SleepTimerOption
 import mega.privacy.android.feature.mediaplayer.presentation.model.SleepTimerState
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_LINK_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import mega.privacy.mobile.analytics.event.AudioPlayerBack15SecondsEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerForward15SecondsEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopPlayingItemEnabledEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopQueueEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerMusicModeEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerPodcastModeEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerQueueButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerRestartFromBeginningEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerShuffleEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimer15MinutesEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimer30MinutesEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimer5MinutesEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimer60MinutesEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimerEndOfTrackEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimerTurnOffEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange1XEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange2XEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeBySliderEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeOneAndHalfXEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeTo_1_25XEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeTo_1_75XEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
+import kotlin.math.abs
 
 /**
  * ViewModel for the revamped audio player.
@@ -364,7 +384,7 @@ class AudioPlayerViewModel @Inject constructor(
         }
 
         if (prev.mediaItemCount > 0 && current.isIdle) {
-            cancelSleepTimer()
+            clearSleepTimer()
         }
 
         if (prev.currentMediaItemId != current.currentMediaItemId) {
@@ -573,6 +593,9 @@ class AudioPlayerViewModel @Inject constructor(
         val newMode = !_isPodcastMode.value
         userOverriddenMode = newMode
         _isPodcastMode.value = newMode
+        Analytics.tracker.trackEvent(
+            if (newMode) AudioPlayerPodcastModeEnabledEvent else AudioPlayerMusicModeEnabledEvent
+        )
     }
 
     fun seekForward15() {
@@ -582,12 +605,18 @@ class AudioPlayerViewModel @Inject constructor(
         } else {
             state.currentPositionMs + SEEK_15_SECONDS_MS
         }
-        runUnlessInCall { gateway.seekTo(target) }
+        runUnlessInCall {
+            Analytics.tracker.trackEvent(AudioPlayerForward15SecondsEvent)
+            gateway.seekTo(target)
+        }
     }
 
     fun seekBackward15() {
         val state = currentControllerState ?: return
-        runUnlessInCall { gateway.seekTo(maxOf(0L, state.currentPositionMs - SEEK_15_SECONDS_MS)) }
+        runUnlessInCall {
+            Analytics.tracker.trackEvent(AudioPlayerBack15SecondsEvent)
+            gateway.seekTo(maxOf(0L, state.currentPositionMs - SEEK_15_SECONDS_MS))
+        }
     }
 
     /**
@@ -676,6 +705,15 @@ class AudioPlayerViewModel @Inject constructor(
      * active replaces it.
      */
     fun setSleepTimer(option: SleepTimerOption) {
+        Analytics.tracker.trackEvent(
+            when (option) {
+                SleepTimerOption.Minutes5 -> AudioPlayerSleepTimer5MinutesEvent
+                SleepTimerOption.Minutes15 -> AudioPlayerSleepTimer15MinutesEvent
+                SleepTimerOption.Minutes30 -> AudioPlayerSleepTimer30MinutesEvent
+                SleepTimerOption.Minutes60 -> AudioPlayerSleepTimer60MinutesEvent
+                SleepTimerOption.EndOfTrack -> AudioPlayerSleepTimerEndOfTrackEvent
+            }
+        )
         sleepTimerJob?.cancel()
         sleepTimerJob = null
         endOfTrackSourceItemId = null
@@ -711,9 +749,15 @@ class AudioPlayerViewModel @Inject constructor(
     }
 
     /**
-     * Cancels any active sleep timer and resets the state to [SleepTimerState.Inactive].
+     * Cancels the sleep timer because the user turned it off from the sheet, and resets the state
+     * to [SleepTimerState.Inactive]. The player-driven reset is [clearSleepTimer].
      */
     fun cancelSleepTimer() {
+        Analytics.tracker.trackEvent(AudioPlayerSleepTimerTurnOffEvent)
+        clearSleepTimer()
+    }
+
+    private fun clearSleepTimer() {
         sleepTimerJob?.cancel()
         sleepTimerJob = null
         endOfTrackSourceItemId = null
@@ -741,6 +785,7 @@ class AudioPlayerViewModel @Inject constructor(
         // its saved position would hit the wrong track. Only act while they still match.
         val currentHandle = (playerState.value as? AudioPlayerUiState.Data)?.currentPlayingHandle
         if (currentHandle != handle) return
+        Analytics.tracker.trackEvent(AudioPlayerRestartFromBeginningEvent)
         gateway.seekTo(0L)
         // The snackbar sits where the user dismisses the screen from, so leaving right after
         // tapping Restart is a natural gesture; on viewModelScope the delete would be cancelled
@@ -751,8 +796,33 @@ class AudioPlayerViewModel @Inject constructor(
         }
     }
 
-    fun setPlaybackSpeed(speed: Float) {
+    /**
+     * Applies [speed] and reports how it was chosen. Preset taps report the preset's own event;
+     * a slider release reports a single event whatever tick it landed on, including a tick equal
+     * to a preset, so the two controls can be compared in analytics.
+     */
+    fun setPlaybackSpeed(speed: Float, source: PlaybackSpeedSource) {
         gateway.setPlaybackSpeed(speed)
+        when (source) {
+            PlaybackSpeedSource.Slider -> Analytics.tracker.trackEvent(AudioPlayerSpeedChangeBySliderEvent)
+            PlaybackSpeedSource.Preset -> presetSpeedEvent(speed)?.let(Analytics.tracker::trackEvent)
+        }
+    }
+
+    private fun presetSpeedEvent(speed: Float) = when {
+        speed.isCloseTo(1f) -> AudioPlayerSpeedChange1XEvent
+        speed.isCloseTo(1.25f) -> AudioPlayerSpeedChangeTo_1_25XEvent
+        speed.isCloseTo(1.5f) -> AudioPlayerSpeedChangeOneAndHalfXEvent
+        speed.isCloseTo(1.75f) -> AudioPlayerSpeedChangeTo_1_75XEvent
+        speed.isCloseTo(2f) -> AudioPlayerSpeedChange2XEvent
+        else -> null
+    }
+
+    private fun Float.isCloseTo(other: Float) = abs(this - other) < PRESET_SPEED_TOLERANCE
+
+    /** Reports the queue button tap that opens the play queue. */
+    fun onQueueButtonPressed() {
+        Analytics.tracker.trackEvent(AudioPlayerQueueButtonPressedEvent)
     }
 
     fun stopPlayer() {
@@ -765,6 +835,9 @@ class AudioPlayerViewModel @Inject constructor(
     }
 
     companion object {
+        /** Preset speeds arrive as float literals; compare with a tolerance rather than equality. */
+        private const val PRESET_SPEED_TOLERANCE = 0.001f
+
         // Tracks longer than 12 minutes are automatically detected as podcasts; shorter tracks are classified as music.
         // The 12-minute threshold is defined in the design specification.
         private const val PODCAST_MODE_DURATION_MS = 12 * 60 * 1_000L

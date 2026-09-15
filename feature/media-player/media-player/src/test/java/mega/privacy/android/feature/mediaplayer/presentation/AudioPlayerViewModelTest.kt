@@ -41,8 +41,20 @@ import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControlle
 import mega.privacy.android.feature.mediaplayer.data.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
+import mega.privacy.android.feature.mediaplayer.presentation.model.PlaybackSpeedSource
 import mega.privacy.android.feature.mediaplayer.presentation.model.SleepTimerOption
 import mega.privacy.android.feature.mediaplayer.presentation.model.SleepTimerState
+import mega.privacy.mobile.analytics.event.AudioPlayerBack15SecondsEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerForward15SecondsEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerMusicModeEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerPodcastModeEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerQueueButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerRestartFromBeginningEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimer30MinutesEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimerEndOfTrackEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSleepTimerTurnOffEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeBySliderEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeTo_1_25XEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -99,12 +111,15 @@ class AudioPlayerViewModelTest {
     // Real instance: a stateless formatter, so the tests assert the string the user actually sees.
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
+    private lateinit var analyticsTracker: AnalyticsTracker
+
     @BeforeEach
     fun setUp() {
         // Analytics must be initialised before any test that triggers handleSideEffects, because
         // Analytics.tracker throws IllegalStateException when uninitialised and that propagates
         // out of the collect lambda, killing the observePlayerState coroutine.
-        Analytics.initialise(mock<AnalyticsTracker>())
+        analyticsTracker = mock()
+        Analytics.initialise(analyticsTracker)
         // replay = 1: when gatewayPlayerState.emit() is called inside uiState.test{} the
         // observePlayerState coroutine may not have subscribed yet (lazy scheduler). The replay
         // cache ensures the value is delivered once the coroutine does subscribe.
@@ -915,7 +930,7 @@ class AudioPlayerViewModelTest {
 
     @Test
     fun `test that setPlaybackSpeed delegates to gateway`() = runTest {
-        underTest.setPlaybackSpeed(1.5f)
+        underTest.setPlaybackSpeed(1.5f, PlaybackSpeedSource.Preset)
         verify(gateway).setPlaybackSpeed(1.5f)
     }
 
@@ -1842,6 +1857,116 @@ class AudioPlayerViewModelTest {
             assertThat(awaitItem()).isTrue()
         }
     }
+
+    @Test
+    fun `test that setPlaybackSpeed tracks the preset event when a preset speed is selected`() =
+        runTest {
+            underTest.setPlaybackSpeed(1.25f, PlaybackSpeedSource.Preset)
+
+            verify(analyticsTracker).trackEvent(AudioPlayerSpeedChangeTo_1_25XEvent)
+            verify(analyticsTracker, never()).trackEvent(AudioPlayerSpeedChangeBySliderEvent)
+        }
+
+    @Test
+    fun `test that setPlaybackSpeed tracks the slider event when the slider lands on a preset value`() =
+        runTest {
+            underTest.setPlaybackSpeed(1.25f, PlaybackSpeedSource.Slider)
+
+            verify(analyticsTracker).trackEvent(AudioPlayerSpeedChangeBySliderEvent)
+            verify(analyticsTracker, never()).trackEvent(AudioPlayerSpeedChangeTo_1_25XEvent)
+        }
+
+    @Test
+    fun `test that setSleepTimer tracks the event matching the chosen option`() = runTest {
+        underTest.setSleepTimer(SleepTimerOption.Minutes30)
+        underTest.setSleepTimer(SleepTimerOption.EndOfTrack)
+
+        verify(analyticsTracker).trackEvent(AudioPlayerSleepTimer30MinutesEvent)
+        verify(analyticsTracker).trackEvent(AudioPlayerSleepTimerEndOfTrackEvent)
+    }
+
+    @Test
+    fun `test that a player-driven idle reset does not track the turn off event`() = runTest {
+        underTest.uiState.test {
+            awaitItem() // Loading
+            gatewayPlayerState.emit(audioControllerState(isPlaying = true))
+            awaitItem() // Data
+            gatewayPlayerState.emit(audioControllerState(mediaItemCount = 1, isIdle = true))
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(analyticsTracker, never()).trackEvent(AudioPlayerSleepTimerTurnOffEvent)
+    }
+
+    @Test
+    fun `test that cancelSleepTimer tracks the turn off event`() = runTest {
+        underTest.cancelSleepTimer()
+
+        verify(analyticsTracker).trackEvent(AudioPlayerSleepTimerTurnOffEvent)
+    }
+
+    @Test
+    fun `test that togglePlayerMode tracks the mode the player switches to`() = runTest {
+        underTest.togglePlayerMode() // music -> podcast
+        underTest.togglePlayerMode() // podcast -> music
+
+        verify(analyticsTracker).trackEvent(AudioPlayerPodcastModeEnabledEvent)
+        verify(analyticsTracker).trackEvent(AudioPlayerMusicModeEnabledEvent)
+    }
+
+    @Test
+    fun `test that the 15 second seeks track their events`() = runTest {
+        underTest.uiState.test {
+            awaitItem() // Loading
+            gatewayPlayerState.emit(audioControllerState(currentPositionMs = 30_000L))
+            awaitItem() // Data
+
+            underTest.seekForward15()
+            underTest.seekBackward15()
+
+            verify(analyticsTracker).trackEvent(AudioPlayerForward15SecondsEvent)
+            verify(analyticsTracker).trackEvent(AudioPlayerBack15SecondsEvent)
+        }
+    }
+
+    @Test
+    fun `test that a 15 second seek refused by an ongoing call is not tracked`() = runTest {
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+        underTest.uiState.test {
+            awaitItem() // Loading
+            gatewayPlayerState.emit(audioControllerState(currentPositionMs = 30_000L))
+            awaitItem() // Data
+
+            underTest.seekForward15()
+
+            verify(gateway, never()).seekTo(any())
+            verify(analyticsTracker, never()).trackEvent(AudioPlayerForward15SecondsEvent)
+        }
+    }
+
+    @Test
+    fun `test that onQueueButtonPressed tracks the queue button event`() = runTest {
+        underTest.onQueueButtonPressed()
+
+        verify(analyticsTracker).trackEvent(AudioPlayerQueueButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that restartFromBeginning tracks the restart event when it restarts the track`() =
+        runTest {
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123456L))
+            underTest.resumedFromPosition.test {
+                assertThat(awaitItem()).isNull()
+                audioResumeEventQueue.emit(
+                    AudioResumeEvent(mediaHandle = 123456L, resumePositionMs = 60_000L)
+                )
+                assertThat(awaitItem()).isNotNull()
+
+                underTest.restartFromBeginning()
+
+                verify(analyticsTracker).trackEvent(AudioPlayerRestartFromBeginningEvent)
+            }
+        }
 
     companion object {
         // Registered as a field (not @ExtendWith) so the tests can read the dispatcher's virtual

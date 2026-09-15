@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.mediaplayer.presentation
 
+import androidx.lifecycle.ViewModelStore
 import androidx.media3.common.Player
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
@@ -7,7 +8,10 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -23,6 +27,9 @@ import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
 import mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
 import mega.privacy.android.feature.mediaplayer.presentation.model.PlayingFromSection
+import mega.privacy.mobile.analytics.event.AudioPlayerContinuousPlaybackDisabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerContinuousPlaybackEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerQueueReorderedEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -54,8 +61,12 @@ class AudioPlayerQueueViewModelTest {
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
 
+    private lateinit var analyticsTracker: AnalyticsTracker
+
     @BeforeEach
     fun setUp() {
+        analyticsTracker = mock()
+        Analytics.initialise(analyticsTracker)
         // replay = 1 ensures the collected value is delivered even if the coroutine subscribes
         // after the emit call (due to lazy test-scheduler ordering).
         playerStateFlow = MutableSharedFlow(replay = 1)
@@ -80,6 +91,7 @@ class AudioPlayerQueueViewModelTest {
 
     @AfterEach
     fun tearDown() {
+        Analytics.initialise(null as AnalyticsTracker?)
         reset(
             gateway,
             getNodeByHandleUseCase,
@@ -474,5 +486,32 @@ class AudioPlayerQueueViewModelTest {
     fun `test that moveQueueItem calls moveMediaItem on gateway with the given indices`() = runTest {
         underTest.moveQueueItem(1, 3)
         verify(gateway).moveMediaItem(1, 3)
+    }
+
+    @Test
+    fun `test that moveQueueItem tracks one reordered event for a burst of drag steps`() = runTest {
+        underTest.moveQueueItem(1, 2)
+        underTest.moveQueueItem(2, 3)
+        advanceUntilIdle()
+
+        verify(analyticsTracker, times(1)).trackEvent(AudioPlayerQueueReorderedEvent)
+    }
+
+    @Test
+    fun `test that a pending reorder event is reported when the ViewModel is cleared`() = runTest {
+        underTest.moveQueueItem(1, 2)
+
+        ViewModelStore().apply { put("queue", underTest) }.clear()
+
+        verify(analyticsTracker, times(1)).trackEvent(AudioPlayerQueueReorderedEvent)
+    }
+
+    @Test
+    fun `test that setContinuousPlayback tracks the event matching the new value`() = runTest {
+        underTest.setContinuousPlayback(true)
+        underTest.setContinuousPlayback(false)
+
+        verify(analyticsTracker).trackEvent(AudioPlayerContinuousPlaybackEnabledEvent)
+        verify(analyticsTracker).trackEvent(AudioPlayerContinuousPlaybackDisabledEvent)
     }
 }
