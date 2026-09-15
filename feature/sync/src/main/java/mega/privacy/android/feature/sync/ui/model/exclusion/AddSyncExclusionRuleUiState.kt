@@ -25,6 +25,7 @@ internal data class AddSyncExclusionRuleUiState(
     val selectedTab: AddExclusionTab = AddExclusionTab.ByName,
     val byName: AddExclusionByNameFormState = AddExclusionByNameFormState(),
     val byExtension: AddExclusionByExtensionFormState = AddExclusionByExtensionFormState(),
+    val bySize: AddExclusionBySizeFormState = AddExclusionBySizeFormState(),
 ) {
 
     /** Whether the By name tab is showing extension entry rather than the name form. */

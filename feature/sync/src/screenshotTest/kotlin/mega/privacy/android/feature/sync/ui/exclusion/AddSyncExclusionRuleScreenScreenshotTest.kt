@@ -4,11 +4,15 @@ import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionByNameFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddSyncExclusionRuleUiState
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOption
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeBoundInput
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeCondition
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeUnit
 
 /**
  * The chrome both tabs share, pinned once per tab. The form bodies have their own tests, so only
@@ -27,13 +31,24 @@ class AddSyncExclusionRuleScreenScreenshotTest {
 
 
 
-
     @PreviewTest
     @CombinedThemePreviews
     @Composable
-    fun AddSyncExclusionRuleScreenBySizeTab() {
+    fun AddSyncExclusionRuleScreenBySizeTabNotBetween() {
         AndroidThemeForPreviews {
-            Screen(AddSyncExclusionRuleUiState(selectedTab = AddExclusionTab.BySize))
+            Screen(
+                AddSyncExclusionRuleUiState(
+                    selectedTab = AddExclusionTab.BySize,
+                    bySize = AddExclusionBySizeFormState(
+                        condition = SyncSizeCondition.NotBetween,
+                        firstBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Kilobytes),
+                        secondBound = SyncSizeBoundInput(
+                            value = "2",
+                            unit = SyncSizeUnit.Gigabytes,
+                        ),
+                    ),
+                )
+            )
         }
     }
 
@@ -46,6 +61,11 @@ class AddSyncExclusionRuleScreenScreenshotTest {
             onConditionSelected = {},
             onNameValueChanged = {},
             onExtensionValueChanged = {},
+            onSizeConditionSelected = {},
+            onFirstBoundValueChanged = {},
+            onFirstBoundUnitSelected = {},
+            onSecondBoundValueChanged = {},
+            onSecondBoundUnitSelected = {},
             onConfirm = {},
             onDismiss = {},
         )

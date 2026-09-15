@@ -5,10 +5,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddSyncExclusionRuleUiState
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOption
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeCondition
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeUnit
 import javax.inject.Inject
 
 /**
@@ -53,5 +56,31 @@ internal class AddSyncExclusionRuleViewModel @Inject constructor() : ViewModel()
 
     fun onExtensionValueChanged(value: String) {
         uiState.update { it.copy(byExtension = it.byExtension.copy(value = value)) }
+    }
+
+    fun onSizeConditionSelected(condition: SyncSizeCondition) {
+        updateSize { it.copy(condition = condition) }
+    }
+
+    fun onFirstBoundValueChanged(value: String) {
+        updateSize { it.copy(firstBound = it.firstBound.copy(value = value)) }
+    }
+
+    fun onFirstBoundUnitSelected(unit: SyncSizeUnit) {
+        updateSize { it.copy(firstBound = it.firstBound.copy(unit = unit)) }
+    }
+
+    fun onSecondBoundValueChanged(value: String) {
+        updateSize { it.copy(secondBound = it.secondBound.copy(value = value)) }
+    }
+
+    fun onSecondBoundUnitSelected(unit: SyncSizeUnit) {
+        updateSize { it.copy(secondBound = it.secondBound.copy(unit = unit)) }
+    }
+
+    private fun updateSize(
+        transform: (AddExclusionBySizeFormState) -> AddExclusionBySizeFormState,
+    ) {
+        uiState.update { it.copy(bySize = transform(it.bySize)) }
     }
 }

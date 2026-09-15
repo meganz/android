@@ -4,9 +4,12 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOption
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeCondition
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeUnit
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -32,6 +35,7 @@ internal class AddSyncExclusionRuleViewModelTest {
             assertThat(initial.byName.typeOption).isNull()
             assertThat(initial.byName.value).isEmpty()
             assertThat(initial.byExtension.value).isEmpty()
+            assertThat(initial.bySize).isEqualTo(AddExclusionBySizeFormState())
             assertThat(initial.showsExtensionForm).isFalse()
         }
     }
@@ -140,6 +144,83 @@ internal class AddSyncExclusionRuleViewModelTest {
             underTest.onTabSelected(AddExclusionTab.BySize)
 
             assertThat(awaitItem().showsExtensionForm).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that switching tabs does not carry a name draft into the size form`() = runTest {
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+        underTest.onConditionSelected(SyncExclusionCondition.EndingWith)
+        underTest.onNameValueChanged("tmp")
+
+        underTest.uiState.test {
+            assertThat(awaitItem().byName.value).isEqualTo("tmp")
+
+            underTest.onTabSelected(AddExclusionTab.BySize)
+
+            val state = awaitItem()
+            assertThat(state.bySize).isEqualTo(AddExclusionBySizeFormState())
+            assertThat(state.byName.value).isEqualTo("tmp")
+        }
+    }
+
+    @Test
+    fun `test that switching tabs does not carry a size draft into the name form`() = runTest {
+        underTest.onTabSelected(AddExclusionTab.BySize)
+        underTest.onSizeConditionSelected(SyncSizeCondition.BiggerThan)
+        underTest.onFirstBoundValueChanged("10")
+
+        underTest.uiState.test {
+            assertThat(awaitItem().bySize.firstBound.value).isEqualTo("10")
+
+            underTest.onTabSelected(AddExclusionTab.ByName)
+
+            val state = awaitItem()
+            assertThat(state.byName.value).isEmpty()
+            assertThat(state.byName.typeOption).isNull()
+            assertThat(state.bySize.firstBound.value).isEqualTo("10")
+        }
+    }
+
+    /** Each edit is awaited on its own, so a bound that moved another would surface here. */
+    @Test
+    fun `test that each size bound keeps its own unit`() = runTest {
+        underTest.onSizeConditionSelected(SyncSizeCondition.NotBetween)
+
+        underTest.uiState.test {
+            awaitItem()
+
+            underTest.onFirstBoundValueChanged("1")
+            assertThat(awaitItem().bySize.firstBound.value).isEqualTo("1")
+
+            underTest.onFirstBoundUnitSelected(SyncSizeUnit.Kilobytes)
+            assertThat(awaitItem().bySize.firstBound.unit).isEqualTo(SyncSizeUnit.Kilobytes)
+
+            underTest.onSecondBoundValueChanged("2")
+            assertThat(awaitItem().bySize.secondBound.value).isEqualTo("2")
+
+            underTest.onSecondBoundUnitSelected(SyncSizeUnit.Gigabytes)
+
+            val bySize = awaitItem().bySize
+            assertThat(bySize.firstBound.unit).isEqualTo(SyncSizeUnit.Kilobytes)
+            assertThat(bySize.secondBound.unit).isEqualTo(SyncSizeUnit.Gigabytes)
+            assertThat(bySize.firstBound.bytes).isEqualTo(1_024L)
+            assertThat(bySize.secondBound.bytes).isEqualTo(2_147_483_648L)
+        }
+    }
+
+    @Test
+    fun `test that changing one bound unit leaves the other alone`() = runTest {
+        underTest.onSizeConditionSelected(SyncSizeCondition.NotBetween)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().bySize.firstBound.unit).isEqualTo(SyncSizeUnit.Megabytes)
+
+            underTest.onSecondBoundUnitSelected(SyncSizeUnit.Bytes)
+
+            val bySize = awaitItem().bySize
+            assertThat(bySize.secondBound.unit).isEqualTo(SyncSizeUnit.Bytes)
+            assertThat(bySize.firstBound.unit).isEqualTo(SyncSizeUnit.Megabytes)
         }
     }
 

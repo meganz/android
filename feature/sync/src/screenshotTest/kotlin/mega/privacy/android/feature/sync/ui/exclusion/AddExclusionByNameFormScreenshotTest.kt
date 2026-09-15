@@ -10,7 +10,8 @@ import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOpt
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * The form body is pinned rather than the whole Add screen, whose chrome is not built yet.
+ * The form body is pinned on its own, so a change to the chrome around it cannot move these
+ * goldens. The chrome has its own test.
  */
 class AddExclusionByNameFormScreenshotTest {
 

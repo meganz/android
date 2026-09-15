@@ -43,6 +43,11 @@ internal class AddSyncExclusionRuleScreenTest {
                 onConditionSelected = {},
                 onNameValueChanged = {},
                 onExtensionValueChanged = {},
+                onSizeConditionSelected = {},
+                onFirstBoundValueChanged = {},
+                onFirstBoundUnitSelected = {},
+                onSecondBoundValueChanged = {},
+                onSecondBoundUnitSelected = {},
                 onConfirm = { confirmed++ },
                 onDismiss = { dismissed++ },
             )
@@ -82,15 +87,17 @@ internal class AddSyncExclusionRuleScreenTest {
         setContent(AddSyncExclusionRuleUiState())
 
         composeTestRule.onNodeWithTag(ADD_EXCLUSION_DESCRIPTION_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_SIZE_DESCRIPTION_TAG).assertDoesNotExist()
         composeTestRule
             .onNodeWithText(string(sharedR.string.sync_exclusions_add_tab_by_name))
             .assertIsSelected()
     }
 
     @Test
-    fun `test that the screen leaves the by name body when the size tab is selected`() {
+    fun `test that the screen shows the size form when the size tab is selected`() {
         setContent(AddSyncExclusionRuleUiState(selectedTab = AddExclusionTab.BySize))
 
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_SIZE_DESCRIPTION_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(ADD_EXCLUSION_DESCRIPTION_TAG).assertDoesNotExist()
         composeTestRule
             .onNodeWithText(string(sharedR.string.sync_exclusions_add_tab_by_size))
@@ -136,7 +143,7 @@ internal class AddSyncExclusionRuleScreenTest {
         )
 
         composeTestRule.onNodeWithTag(ADD_EXCLUSION_EXTENSION_DESCRIPTION_TAG).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(ADD_EXCLUSION_DESCRIPTION_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_SIZE_DESCRIPTION_TAG).assertIsDisplayed()
     }
 
     @Test

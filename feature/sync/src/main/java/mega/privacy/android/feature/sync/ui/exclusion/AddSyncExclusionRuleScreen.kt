@@ -21,11 +21,15 @@ import mega.android.core.ui.model.Button
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionByNameFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddSyncExclusionRuleUiState
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOption
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeBoundInput
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeCondition
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeUnit
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -42,6 +46,11 @@ internal fun AddSyncExclusionRuleScreen(
     onConditionSelected: (SyncExclusionCondition) -> Unit,
     onNameValueChanged: (String) -> Unit,
     onExtensionValueChanged: (String) -> Unit,
+    onSizeConditionSelected: (SyncSizeCondition) -> Unit,
+    onFirstBoundValueChanged: (String) -> Unit,
+    onFirstBoundUnitSelected: (SyncSizeUnit) -> Unit,
+    onSecondBoundValueChanged: (String) -> Unit,
+    onSecondBoundUnitSelected: (SyncSizeUnit) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -111,8 +120,14 @@ internal fun AddSyncExclusionRuleScreen(
                             )
                         }
 
-                        // the by-size body plugs in here
-                        AddExclusionTab.BySize -> Unit
+                        AddExclusionTab.BySize -> AddExclusionBySizeForm(
+                            state = uiState.bySize,
+                            onConditionSelected = onSizeConditionSelected,
+                            onFirstBoundValueChanged = onFirstBoundValueChanged,
+                            onFirstBoundUnitSelected = onFirstBoundUnitSelected,
+                            onSecondBoundValueChanged = onSecondBoundValueChanged,
+                            onSecondBoundUnitSelected = onSecondBoundUnitSelected,
+                        )
                     }
                 }
             }
@@ -136,7 +151,14 @@ private class AddSyncExclusionRuleUiStateProvider :
                 value = "tmp",
             ),
         ),
-        AddSyncExclusionRuleUiState(selectedTab = AddExclusionTab.BySize),
+        AddSyncExclusionRuleUiState(
+            selectedTab = AddExclusionTab.BySize,
+            bySize = AddExclusionBySizeFormState(
+                condition = SyncSizeCondition.NotBetween,
+                firstBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Kilobytes),
+                secondBound = SyncSizeBoundInput(value = "2", unit = SyncSizeUnit.Gigabytes),
+            ),
+        ),
     )
 }
 
@@ -154,6 +176,11 @@ private fun AddSyncExclusionRuleScreenPreview(
             onConditionSelected = {},
             onNameValueChanged = {},
             onExtensionValueChanged = {},
+            onSizeConditionSelected = {},
+            onFirstBoundValueChanged = {},
+            onFirstBoundUnitSelected = {},
+            onSecondBoundValueChanged = {},
+            onSecondBoundUnitSelected = {},
             onConfirm = {},
             onDismiss = {},
         )

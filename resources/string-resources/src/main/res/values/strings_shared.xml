@@ -4157,6 +4157,28 @@
     <string name="sync_exclusions_add_tab_by_size">By size</string>
     <!-- Sync exclusions Add screen: button that saves the rule being created and closes the screen. -->
     <string name="sync_exclusions_add_confirm">Add exclusion</string>
+    <!-- Sync exclusions Add form: line under the tabs on the By size tab, telling the user what the tab is for. -->
+    <string name="sync_exclusions_add_description_size">Choose what to leave out, based on file size</string>
+    <!-- Sync exclusions Add form: title of the picker listing the ways a file size can be matched. Files only, as size rules never apply to folders. -->
+    <string name="sync_exclusions_add_size_condition_title">Exclude files</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files above the size the user types. -->
+    <string name="sync_exclusions_add_size_condition_bigger_than">Bigger than</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files below the size the user types. -->
+    <string name="sync_exclusions_add_size_condition_smaller_than">Smaller than</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files outside the range between the two sizes the user types. -->
+    <string name="sync_exclusions_add_size_condition_not_between">Not between</string>
+    <!-- Sync exclusions Add form: word joining the two sizes of a range, as in “Not between 1 KB and 2 GB”. -->
+    <string name="sync_exclusions_add_size_range_conjunction">and</string>
+    <!-- Sync exclusions Add form: title of the picker listing the units a file size can be typed in. -->
+    <string name="sync_exclusions_add_size_unit_title">Unit</string>
+    <!-- Sync exclusions Add form: size unit, bytes. Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_bytes">B</string>
+    <!-- Sync exclusions Add form: size unit, kilobytes (1024 bytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_kilobytes">KB</string>
+    <!-- Sync exclusions Add form: size unit, megabytes (1024 kilobytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_megabytes">MB</string>
+    <!-- Sync exclusions Add form: size unit, gigabytes (1024 megabytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_gigabytes">GB</string>
     <!-- Title of the personal QR code screen -->
     <string name="contacts_qr_screen_title">QR code</string>
     <!-- Button that generates the user's personal QR code -->

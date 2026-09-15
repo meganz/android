@@ -39,3 +39,34 @@ internal val SyncExclusionCondition.labelRes: Int
         SyncExclusionCondition.MatchingWildcard ->
             sharedR.string.sync_exclusions_add_condition_matching_wildcard
     }
+
+/**
+ * The label shown for this condition in the size picker, and on the chip once it is chosen.
+ */
+@get:StringRes
+internal val SyncSizeCondition.labelRes: Int
+    get() = when (this) {
+        SyncSizeCondition.BiggerThan ->
+            sharedR.string.sync_exclusions_add_size_condition_bigger_than
+
+        SyncSizeCondition.SmallerThan ->
+            sharedR.string.sync_exclusions_add_size_condition_smaller_than
+
+        SyncSizeCondition.NotBetween ->
+            sharedR.string.sync_exclusions_add_size_condition_not_between
+    }
+
+/**
+ * The abbreviation shown for this unit in the unit picker, and in the field once it is chosen.
+ *
+ * The abbreviations are translated rather than taken from the enum name, which would leave every
+ * locale reading the English one.
+ */
+@get:StringRes
+internal val SyncSizeUnit.labelRes: Int
+    get() = when (this) {
+        SyncSizeUnit.Bytes -> sharedR.string.sync_exclusions_add_size_unit_bytes
+        SyncSizeUnit.Kilobytes -> sharedR.string.sync_exclusions_add_size_unit_kilobytes
+        SyncSizeUnit.Megabytes -> sharedR.string.sync_exclusions_add_size_unit_megabytes
+        SyncSizeUnit.Gigabytes -> sharedR.string.sync_exclusions_add_size_unit_gigabytes
+    }
