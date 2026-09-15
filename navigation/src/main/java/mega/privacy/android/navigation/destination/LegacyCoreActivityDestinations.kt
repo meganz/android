@@ -399,6 +399,8 @@ data class LegacyTextEditorNavKey(
     val publicUrl: String? = null,
     /** Serialized node string for public file links; used by the legacy TextEditorActivity. */
     val serializedNode: String? = null,
+    /** Folder link URL the open file belongs to; only reopens it after authentication. */
+    val folderLinkUrl: String? = null,
 ) : NoSessionNavKey.Optional
 
 @Serializable

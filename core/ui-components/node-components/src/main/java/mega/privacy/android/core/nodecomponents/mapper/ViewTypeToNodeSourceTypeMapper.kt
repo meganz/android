@@ -23,6 +23,8 @@ class ViewTypeToNodeSourceTypeMapper @Inject constructor() {
         NodeSourceTypeInt.INCOMING_SHARES_ADAPTER -> NodeSourceType.INCOMING_SHARES
         NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER -> NodeSourceType.OUTGOING_SHARES
         NodeSourceTypeInt.BACKUPS_ADAPTER -> NodeSourceType.BACKUPS
+        NodeSourceTypeInt.FOLDER_LINK_ADAPTER -> NodeSourceType.FOLDER_LINK
+        NodeSourceTypeInt.FILE_LINK_ADAPTER -> NodeSourceType.FILE_LINK
         NodeSourceTypeInt.FAVOURITES_ADAPTER -> NodeSourceType.FAVOURITES
         NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER -> NodeSourceType.DOCUMENTS
         NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER -> NodeSourceType.AUDIO

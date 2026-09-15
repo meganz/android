@@ -379,12 +379,13 @@ class FileNodeContentToNavKeyMapperTest {
             nodeSourceType = expectedViewType,
             publicUrl = publicUrl,
             serializedNode = serialized,
+            folderLinkUrl = null,
         )
         assertThat(result).isEqualTo(expected)
     }
 
     @Test
-    fun `test that TextContent maps to LegacyTextEditorNavKey with FolderLink does not set publicUrl`() {
+    fun `test that TextContent maps to LegacyTextEditorNavKey with FolderLink sets folderLinkUrl and not publicUrl`() {
         val nodeHandle = 555L
         val folderUrl = "https://mega.nz/folder/abc#key"
         val serialized = "serialized-node-data"
@@ -408,13 +409,15 @@ class FileNodeContentToNavKeyMapperTest {
 
         // A folder link's URL must NOT be forwarded as publicUrl, otherwise the text editor
         // resolves it as a public file node and throws PublicNodeException. The editor must
-        // route folder links through the FOLDER_LINK_ADAPTER path instead.
+        // route folder links through the FOLDER_LINK_ADAPTER path instead. It still travels as
+        // folderLinkUrl so the logged-out Save to MEGA prompt can reopen the folder link.
         val expected = LegacyTextEditorNavKey(
             nodeHandle = nodeHandle,
             mode = TextEditorMode.View.value,
             nodeSourceType = expectedViewType,
             publicUrl = null,
             serializedNode = serialized,
+            folderLinkUrl = folderUrl,
         )
         assertThat(result).isEqualTo(expected)
     }

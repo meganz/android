@@ -104,6 +104,8 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 // FOLDER_LINK_ADAPTER path instead; passing it here throws PublicNodeException.
                 publicUrl = (nodeSourceData as? NodeSourceData.FileLink)?.url,
                 serializedNode = fileNode.serializedData,
+                // Separate from publicUrl: only reopens the link after authentication.
+                folderLinkUrl = (nodeSourceData as? NodeSourceData.FolderLink)?.url,
             )
 
             is FileNodeContent.AudioOrVideo -> LegacyMediaPlayerNavKey(

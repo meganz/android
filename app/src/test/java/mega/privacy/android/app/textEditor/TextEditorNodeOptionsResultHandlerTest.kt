@@ -16,6 +16,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
@@ -149,5 +150,55 @@ internal class TextEditorNodeOptionsResultHandlerTest {
 
         assertThat(args.publicUrl).isEqualTo(fileUrl)
         assertThat(args.isFolderLink).isFalse()
+    }
+
+    @Test
+    fun `test that isPublicLinkEditor returns true when the node comes from a folder link`() {
+        assertThat(
+            isPublicLinkEditor(
+                LegacyTextEditorNavKey(
+                    nodeHandle = 123L,
+                    nodeSourceType = FOLDER_LINK_ADAPTER,
+                )
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that isPublicLinkEditor returns true when the node comes from a file link`() {
+        assertThat(
+            isPublicLinkEditor(
+                LegacyTextEditorNavKey(
+                    nodeHandle = 456L,
+                    nodeSourceType = FILE_LINK_ADAPTER,
+                    publicUrl = "https://mega.nz/file/abc#key",
+                )
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that isPublicLinkEditor returns false for a cloud node`() {
+        assertThat(
+            isPublicLinkEditor(
+                LegacyTextEditorNavKey(
+                    nodeHandle = 789L,
+                    nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                )
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that isPublicLinkEditor returns false for an offline file`() {
+        assertThat(
+            isPublicLinkEditor(
+                LegacyTextEditorNavKey(
+                    localPath = "/storage/offline/file.txt",
+                    fileName = "file.txt",
+                    nodeSourceType = NodeSourceTypeInt.OFFLINE_ADAPTER,
+                )
+            )
+        ).isFalse()
     }
 }

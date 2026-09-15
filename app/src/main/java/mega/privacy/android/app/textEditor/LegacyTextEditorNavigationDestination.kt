@@ -1,16 +1,22 @@
 package mega.privacy.android.app.textEditor
 
 import android.content.Intent
+import androidx.activity.compose.LocalActivity
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.drop
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -41,9 +47,14 @@ import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.navOptions
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
+import mega.privacy.android.navigation.setPendingDeepLink
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.shared.nodes.sheet.PublicLinkAuthAlertBottomSheet
+import mega.privacy.android.shared.nodes.sheet.PublicLinkType
 import nz.mega.sdk.MegaApiJava
 import java.io.File
 
@@ -115,6 +126,10 @@ internal fun shouldShowSendToChat(nodeSourceType: Int?): Boolean {
         OFFLINE_ADAPTER,
     )
 }
+
+/** True when the open node lives behind a public link, so the sheet must resolve it publicly. */
+internal fun isPublicLinkEditor(navKey: LegacyTextEditorNavKey): Boolean =
+    navKey.publicUrl != null || navKey.nodeSourceType == FOLDER_LINK_ADAPTER
 
 /**
  * Builds [TextEditorComposeViewModel.Args] from [navKey].
@@ -196,7 +211,7 @@ private fun cloudNodeArgs(
 
 /**
  * Text editor destination. Renders the Compose [TextEditorScreen].
- * Tapping More opens the Node Options Bottom Sheet (cloud node only). When the user deletes or
+ * Tapping More opens the Node Options Bottom Sheet (cloud node or public link). When the user deletes or
  * moves the node (Navigation or most Transfer results), the editor is closed; preview/Open-with
  * downloads stay on the editor and forward the transfer.
  */
@@ -248,9 +263,10 @@ private fun TextEditorComposeContent(
             factory.create(args)
         }
 
+    // Public links included: their sheet resolves the node publicly, so it works while logged out.
     val showNodeOptions = navKey.chatId == null && navKey.localPath == null
-        && navKey.publicUrl == null
         && textEditorModeFromValue(navKey.mode) != TextEditorMode.Create
+    val isPublicLink = isPublicLinkEditor(navKey)
 
     if (showNodeOptions) {
         val nodeOptionsActionViewModel =
@@ -293,6 +309,12 @@ private fun TextEditorComposeContent(
             },
         )
 
+        TextEditorSaveToMegaLoginPrompt(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            resumeUrl = navKey.publicUrl ?: navKey.folderLinkUrl,
+        )
+
         // Close the editor when the user confirms the Move to Rubbish / Delete dialog.
         // The result key is shared across the app (other screens use the same dialog and may
         // not clear it after consumption), so we (a) clear any stale value on entry and (b)
@@ -314,8 +336,7 @@ private fun TextEditorComposeContent(
     }
     val onOpenNodeOptions: (() -> Unit)? = if (showNodeOptions) {
         remember(
-            navKey.nodeHandle,
-            navKey.nodeSourceType,
+            navKey,
             navigationHandler,
             viewTypeToNodeSourceTypeMapper,
         ) {
@@ -326,6 +347,11 @@ private fun TextEditorComposeContent(
                     NodeOptionsBottomSheetNavKey(
                         nodeHandle = nodeHandle,
                         nodeSourceType = viewTypeToNodeSourceTypeMapper(sourceType),
+                        // A link node is not in the account; the sheet resolves it from these.
+                        publicLinkUrl = navKey.publicUrl,
+                        serializedData = navKey.serializedNode,
+                        // Links offer only two options, so half-screen would collapse at once.
+                        partiallyExpand = !isPublicLink,
                     ),
                     navOptions { dropIfAlreadyShown = true },
                 )
@@ -377,5 +403,51 @@ private fun TextEditorComposeContent(
         onOpenNodeOptions = onOpenNodeOptions.takeUnless { uiState.value.isLoading },
         onTransfer = { transferHandler.setTransferEvent(it) },
         onShare = onShare,
+    )
+}
+
+/**
+ * Prompts sign in / sign up when a logged-out user taps Save to MEGA, as the file link and PDF
+ * viewer screens do.
+ *
+ * @param resumeUrl link reopened after authentication so the user can tap Save again.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TextEditorSaveToMegaLoginPrompt(
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel,
+    navigationHandler: NavigationHandler,
+    resumeUrl: String?,
+) {
+    val activity = LocalActivity.current
+    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    var showLoginRequiredSheet by rememberSaveable { mutableStateOf(false) }
+
+    EventEffect(
+        event = nodeActionState.loginRequiredEvent,
+        onConsumed = nodeOptionsActionViewModel::resetLoginRequiredEvent,
+    ) {
+        showLoginRequiredSheet = true
+    }
+
+    if (!showLoginRequiredSheet) return
+
+    val stashPendingDeepLink: () -> Unit = {
+        resumeUrl?.let { activity.setPendingDeepLink(it) }
+    }
+    PublicLinkAuthAlertBottomSheet(
+        // Always File: the editor imports the open text file, never the folder that contains it.
+        type = PublicLinkType.File,
+        onSignupClicked = {
+            showLoginRequiredSheet = false
+            stashPendingDeepLink()
+            navigationHandler.navigate(CreateAccountNavKey())
+        },
+        onLoginClicked = {
+            showLoginRequiredSheet = false
+            stashPendingDeepLink()
+            navigationHandler.navigate(LoginNavKey())
+        },
+        onDismissSheet = { showLoginRequiredSheet = false },
     )
 }

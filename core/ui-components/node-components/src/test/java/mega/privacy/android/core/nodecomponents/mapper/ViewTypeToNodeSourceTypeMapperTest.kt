@@ -41,6 +41,8 @@ class ViewTypeToNodeSourceTypeMapperTest {
             Arguments.of(NodeSourceTypeInt.INCOMING_SHARES_ADAPTER, NodeSourceType.INCOMING_SHARES),
             Arguments.of(NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER, NodeSourceType.OUTGOING_SHARES),
             Arguments.of(NodeSourceTypeInt.BACKUPS_ADAPTER, NodeSourceType.BACKUPS),
+            Arguments.of(NodeSourceTypeInt.FOLDER_LINK_ADAPTER, NodeSourceType.FOLDER_LINK),
+            Arguments.of(NodeSourceTypeInt.FILE_LINK_ADAPTER, NodeSourceType.FILE_LINK),
             Arguments.of(NodeSourceTypeInt.FAVOURITES_ADAPTER, NodeSourceType.FAVOURITES),
             Arguments.of(NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER, NodeSourceType.DOCUMENTS),
             Arguments.of(NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER, NodeSourceType.AUDIO),
