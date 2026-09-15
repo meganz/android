@@ -2939,6 +2939,16 @@
     <string name="contacts_action_contact_info">Contact info</string>
     <!-- Contact list bottom sheet: destructive action that removes the contact from the user's contact list -->
     <string name="contacts_action_remove_contact">Remove contact</string>
+    <!-- Contact attachment: top bar title of the screen listing the contacts attached to a chat message -->
+    <string name="activity_title_contacts_attached">Contacts attached</string>
+    <!-- Contact attachment: action that sends a contact invitation to the attached user(s) not yet in the contact list -->
+    <string name="menu_add_contact">Add contact</string>
+    <!-- Contact attachment: action that opens or starts a chat conversation with the attached contact(s) -->
+    <string name="group_chat_start_conversation_label">Start conversation</string>
+    <!-- Contact attachment: snackbar shown when tapping an attached user that is not in the contact list -->
+    <string name="alert_user_is_not_contact">The user is not a contact</string>
+    <!-- Contact attachment: empty state shown when the message no longer has any attached contacts -->
+    <string name="contact_attachment_empty_state">No contacts attached</string>
     <!-- Contact list: placeholder displayed inside the search field on the contacts screen -->
     <string name="contacts_search_hint">Search contacts</string>
     <!-- Contact list: title of the dialog asking the user to confirm removing a contact. %1$s is the contact display name. -->

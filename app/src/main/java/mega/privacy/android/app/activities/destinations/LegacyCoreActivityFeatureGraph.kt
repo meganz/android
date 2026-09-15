@@ -26,7 +26,7 @@ import mega.privacy.android.app.presentation.contact.invite.navigation.inviteCon
 import mega.privacy.android.app.presentation.contact.navigation.addChatParticipantsDestination
 import mega.privacy.android.app.presentation.contact.navigation.addContactsDestination
 import mega.privacy.android.app.presentation.contact.navigation.addMeetingParticipantsDestination
-import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactRequestsDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsListDestination
 import mega.privacy.android.app.presentation.contact.navigation.createGroupChatLegacyDestination
@@ -167,7 +167,7 @@ class LegacyCoreActivityFeatureGraph(
                 navigationHandler::back,
                 navigationHandler::returnResult
             )
-            contactAttachmentLegacyDestination(navigationHandler::remove)
+            contactAttachmentDestination(navigationHandler = navigationHandler)
             businessExpiredAlertLegacyDestination(navigationHandler::back)
             leftMeetingDestination(navigationHandler::remove)
             fileExplorer(
