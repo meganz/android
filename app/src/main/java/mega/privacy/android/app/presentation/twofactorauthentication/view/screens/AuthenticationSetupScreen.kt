@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view.screens
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -48,8 +48,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
-import mega.privacy.android.core.sharedcomponents.qr.QRCode
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import mega.privacy.android.core.qr.rememberQrCodeBitmap
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
@@ -64,11 +65,12 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_
 import mega.privacy.android.shared.resources.R as sharedR
 
 
+private val QR_CODE_SIZE = 120.dp
+
 @Composable
 internal fun AuthenticationSetupScreen(
     uiState: TwoFactorAuthenticationUIState,
     isDarkMode: Boolean,
-    qrCodeMapper: QRCodeMapper,
     openPlayStore: () -> Unit,
     onNextClicked: () -> Unit,
     isIntentAvailable: (String) -> Boolean,
@@ -105,16 +107,21 @@ internal fun AuthenticationSetupScreen(
                 openPlayStore = openPlayStore,
             )
             Spacer(modifier = Modifier.height(20.dp))
-            QRCode(
+            Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(QR_CODE_SIZE)
                     .align(CenterHorizontally)
                     .testTag(QR_CODE_TEST_TAG),
-                text = qrText,
-                qrCodeMapper = qrCodeMapper,
-                penColor = dark_grey,
-                bgColor = MaterialTheme.colors.white_grey_700
-            )
+            ) {
+                rememberQrCodeBitmap(text = qrText, size = QR_CODE_SIZE)?.let { qrCode ->
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = BitmapPainter(qrCode),
+                        colorFilter = ColorFilter.tint(dark_grey),
+                        contentDescription = null,
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(20.dp))
             SeedsBox(
                 modifier = Modifier.testTag(
@@ -351,9 +358,6 @@ private fun PreviewSetupView() {
     AuthenticationSetupScreen(
         uiState = uiState,
         isDarkMode = false,
-        qrCodeMapper = { _, _, _, _, _ ->
-            Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
-        },
         isIntentAvailable = { true },
         onNextClicked = {},
         onOpenInClicked = {},

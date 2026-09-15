@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.twofactorauthentication
 
-import androidx.annotation.ColorInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.NUMBER_PINS
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
@@ -32,7 +30,6 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
     private val isMasterKeyExportedUseCase: IsMasterKeyExportedUseCase,
     private val getMultiFactorAuthCodeUseCase: GetMultiFactorAuthCodeUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
-    private val qrCodeMapper: QRCodeMapper,
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
     private val setMasterKeyExportedUseCase: SetMasterKeyExportedUseCase,
 ) : ViewModel() {
@@ -116,42 +113,6 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
         return getExportMasterKeyUseCase().also { key ->
             if (key.isNullOrBlank().not()) {
                 setMasterKeyExportedUseCase()
-            }
-        }
-    }
-
-    /**
-     * Generate the QR code for the 2fa
-     *
-     * @param qrCodeUrl the text value of QR code.
-     * @param width width of the target bitmap.
-     * @param height height of the target bitmap.
-     * @param penColor pen color of the QR code. Color format is ARGB.
-     * @param bgColor background color of the QR code. Color format is ARGB.
-     */
-    fun generateQRCodeBitmap(
-        qrCodeUrl: String,
-        width: Int,
-        height: Int,
-        @ColorInt penColor: Int,
-        @ColorInt bgColor: Int,
-    ) {
-        viewModelScope.launch {
-            runCatching {
-                qrCodeMapper(
-                    text = qrCodeUrl,
-                    width = width,
-                    height = height,
-                    penColor = penColor,
-                    bgColor = bgColor
-                )?.let { bitmap ->
-                    _uiState.update {
-                        it.copy(
-                            isQRCodeGenerationCompleted = true,
-                            qrBitmap = bitmap
-                        )
-                    }
-                }
             }
         }
     }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.twofactorauthentication
 
-import android.graphics.Bitmap
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +9,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.MegaException
@@ -40,7 +38,6 @@ internal class TwoFactorAuthenticationViewModelTest {
     private val isMasterKeyExportedUseCase = mock<IsMasterKeyExportedUseCase>()
     private val getMultiFactorAuthCodeUseCase = mock<GetMultiFactorAuthCodeUseCase>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
-    private val qrCodeMapper = mock<QRCodeMapper>()
     private val getExportMasterKeyUseCase = mock<GetExportMasterKeyUseCase>()
     private val setMasterKeyExportedUseCase = mock<SetMasterKeyExportedUseCase>()
 
@@ -53,7 +50,6 @@ internal class TwoFactorAuthenticationViewModelTest {
             isMasterKeyExportedUseCase,
             getMultiFactorAuthCodeUseCase,
             getCurrentUserEmail,
-            qrCodeMapper,
             getExportMasterKeyUseCase,
             setMasterKeyExportedUseCase
         )
@@ -202,37 +198,4 @@ internal class TwoFactorAuthenticationViewModelTest {
         }
     }
 
-    @Test
-    fun `test that isQRCodeGenerationCompleted should true when generating the QR code process is successful`() {
-        runTest {
-            val text = "random url"
-            val width = 300
-            val height = 300
-            val penColor = 0xFF00000
-            val bgColor = 0xFFFFFF
-            val qrBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-
-            whenever(
-                qrCodeMapper(
-                    text = text,
-                    width = width,
-                    height = height,
-                    penColor = penColor,
-                    bgColor = bgColor
-                )
-            ).thenReturn(qrBitmap)
-            underTest.generateQRCodeBitmap(
-                qrCodeUrl = text,
-                width = width,
-                height = height,
-                penColor = penColor,
-                bgColor = bgColor
-            )
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.isQRCodeGenerationCompleted).isEqualTo(true)
-                assertThat(state.qrBitmap).isEqualTo(qrBitmap)
-            }
-        }
-    }
 }

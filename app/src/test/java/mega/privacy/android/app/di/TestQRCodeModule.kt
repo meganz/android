@@ -9,7 +9,6 @@ import mega.privacy.android.app.presentation.qrcode.mapper.CombineQRCodeAndAvata
 import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import org.mockito.kotlin.mock
 
@@ -24,15 +23,11 @@ import org.mockito.kotlin.mock
 )
 @Module
 class TestQRCodeModule {
-    private val qrCodeMapper = mock<QRCodeMapper>()
     private val loadBitmapFromFileMapper = mock<LoadBitmapFromFileMapper>()
     private val saveBitmapToFileMapper = mock<SaveBitmapToFileMapper>()
     private val getCircleBitmapMapper = mock<GetCircleBitmapMapper>()
     private val combineQRCodeAndAvatarMapper = mock<CombineQRCodeAndAvatarMapper>()
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
-
-    @Provides
-    fun provideCreateQRCodeMapper() = qrCodeMapper
 
     @Provides
     fun provideLoadBitmapFromFileMapper() = loadBitmapFromFileMapper

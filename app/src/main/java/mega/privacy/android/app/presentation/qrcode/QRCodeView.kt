@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -76,8 +77,9 @@ import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.sharedcomponents.qr.QRCode
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.core.qr.rememberQrCodeBitmap
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
@@ -133,7 +135,6 @@ internal fun QRCodeView(
     onScanCancelConsumed: () -> Unit,
     onUploadEventConsumed: () -> Unit,
     navigateToQrSettings: () -> Unit,
-    qrCodeMapper: QRCodeMapper,
 ) {
     val view: View = LocalView.current
     val context = LocalContext.current
@@ -284,18 +285,23 @@ internal fun QRCodeView(
                         Box(
                             modifier = Modifier
                                 .padding(top = 60.dp)
-                                .size(280.dp)
+                                .size(QR_CODE_SIZE)
                                 .testTag(QRCODE_TAG)
                                 .onGloballyPositioned {
                                     qrCodeComposableBounds = it.boundsInWindow()
                                 },
                             contentAlignment = Alignment.Center,
                         ) {
-                            QRCode(
-                                modifier = Modifier.fillMaxSize(),
+                            rememberQrCodeBitmap(
                                 text = contactLink,
-                                qrCodeMapper = qrCodeMapper,
-                            )
+                                size = QR_CODE_SIZE,
+                            )?.let { qrCode ->
+                                MegaIcon(
+                                    modifier = Modifier.fillMaxSize(),
+                                    painter = BitmapPainter(qrCode),
+                                    tint = IconColor.Primary,
+                                )
+                            }
 
                             Avatar(
                                 modifier = Modifier.size(64.dp),
@@ -715,9 +721,7 @@ private fun PreviewQRCodeView() {
             onScanCancelConsumed = { },
             onUploadEventConsumed = { },
             navigateToQrSettings = {},
-        ) { _, _, _, _, _ ->
-            Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
-        }
+        )
     }
 }
 
@@ -759,6 +763,8 @@ private fun PreviewInviteResultDialog() {
         )
     }
 }
+
+private val QR_CODE_SIZE = 280.dp
 
 internal const val QRCODE_TAG = "qr_code_view:view_qrcode"
 internal const val LINK_TAG = "qr_code_view:button_link"

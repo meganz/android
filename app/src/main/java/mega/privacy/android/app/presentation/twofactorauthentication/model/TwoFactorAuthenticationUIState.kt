@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.model
 
-import android.graphics.Bitmap
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
@@ -15,8 +14,6 @@ import de.palm.composestateevents.consumed
  * @param seed The seed that show in the UI as 13 unique codes
  * @param twoFAPin Typed 2FA pin (0..6 digits) provided by the authentication App from the user.
  * @param userEmail The current user email required to generate the 2FA url to be copied to clipboard
- * @param isQRCodeGenerationCompleted UI state to check if generating the QR code process was completed or not
- * @param qrBitmap the qr code bitmap generated from the 2FA codes to display in the view
  * @param isPinSubmitted UI state to determine if the pins got submitted or not
  * @param authenticationState UI state for enabling the two factor authentication
  * @param isMasterKeyExported UI state to change the visibility of some related views in the activity
@@ -30,8 +27,6 @@ data class TwoFactorAuthenticationUIState(
     val seed: String? = null,
     val twoFAPin: String = "",
     val userEmail: String? = null,
-    val isQRCodeGenerationCompleted: Boolean = false,
-    val qrBitmap: Bitmap? = null,
     val isPinSubmitted: Boolean = false,
     val authenticationState: AuthenticationState? = AuthenticationState.Fixed,
     val isMasterKeyExported: Boolean = false,

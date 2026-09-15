@@ -12,7 +12,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.model.qrTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
@@ -36,12 +35,6 @@ class QRCodeComposeActivity : PasscodeActivity() {
     private val viewModel: QRCodeViewModel by viewModels()
     private var inviteContacts = false
     private var showScanQrView = false
-
-    /**
-     * QR code mapper
-     */
-    @Inject
-    lateinit var qrCodeMapper: QRCodeMapper
 
     /**
      * Get theme mode
@@ -109,7 +102,6 @@ class QRCodeComposeActivity : PasscodeActivity() {
                     onUploadFileConsumed = viewModel::resetUploadFile,
                     onScanCancelConsumed = viewModel::resetScanCancel,
                     onUploadEventConsumed = viewModel::onUploadEventConsumed,
-                    qrCodeMapper = qrCodeMapper,
                     navigateToQrSettings = { megaNavigator.openSettings(this, qrTargetPreference) },
                 )
             }

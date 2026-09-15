@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.qrcode
 
-import android.graphics.Bitmap
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -15,7 +14,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
@@ -25,18 +23,15 @@ import mega.privacy.android.app.presentation.transfers.transferoverquota.model.T
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class QRCodeViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val qrCodeMapper: QRCodeMapper = mock()
     private val startTransfersComponentViewModel = mock<StartTransfersComponentViewModel> {
         on { uiState } doReturn MutableStateFlow(StartTransferViewState())
     }
@@ -80,15 +75,9 @@ class QRCodeViewTest {
                     onScanCancelConsumed = { },
                     onUploadEventConsumed = {},
                     navigateToQrSettings = {},
-                    qrCodeMapper = qrCodeMapper,
                 )
             }
         }
-    }
-
-    private suspend fun prepareQRCodeMapper() {
-        val dummyBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-        whenever(qrCodeMapper(any(), any(), any(), any(), any())).thenReturn(dummyBitmap)
     }
 
     @Test
@@ -100,7 +89,6 @@ class QRCodeViewTest {
                 avatarBgColor = Color.Red.toArgb(),
                 avatarContent = TextAvatarContent("Jack", Color.Black.toArgb())
             )
-            prepareQRCodeMapper()
             setComposeContent(QRCodeUIState(myQRCodeState = uiState))
             composeTestRule.onNodeWithTag(QRCODE_TAG).assertIsDisplayed()
             composeTestRule.onNodeWithTag(LINK_TAG).assertIsDisplayed()

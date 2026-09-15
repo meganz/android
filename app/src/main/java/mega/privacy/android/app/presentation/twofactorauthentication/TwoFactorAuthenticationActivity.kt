@@ -26,7 +26,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationView
@@ -46,9 +45,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var qrCodeMapper: QRCodeMapper
 
     private val viewModel: TwoFactorAuthenticationViewModel by viewModels()
 
@@ -83,7 +79,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         TwoFactorAuthenticationView(
             uiState = uiState,
             isDarkMode = isDarkMode,
-            qrCodeMapper = qrCodeMapper,
             onFinishActivity = ::finish,
             isIntentAvailable = { isIntentAvailable(uiState.twoFactorAuthUrl) },
             onOpenInClicked = this::onOpenInClicked,

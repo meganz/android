@@ -20,7 +20,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.ScreenType
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
@@ -39,7 +38,6 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun TwoFactorAuthenticationView(
     uiState: TwoFactorAuthenticationUIState,
     isDarkMode: Boolean,
-    qrCodeMapper: QRCodeMapper,
     onFinishActivity: () -> Unit,
     openPlayStore: () -> Unit,
     isIntentAvailable: (String) -> Boolean,
@@ -112,7 +110,6 @@ internal fun TwoFactorAuthenticationView(
                 AuthenticationSetupScreen(
                     uiState = uiState,
                     isDarkMode = isDarkMode,
-                    qrCodeMapper = qrCodeMapper,
                     onNextClicked = {
                         currentScreen = ScreenType.AuthenticationScreen
                     },

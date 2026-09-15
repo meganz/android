@@ -8,13 +8,11 @@ import mega.privacy.android.app.presentation.qrcode.mapper.CombineQRCodeAndAvata
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultCombineQRCodeAndAvatarMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultGetCircleBitmapMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultLoadBitmapFromFileMapper
-import mega.privacy.android.core.sharedcomponents.qr.DefaultQRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultSaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapperImpl
-import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 
 /**
@@ -23,12 +21,6 @@ import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMappe
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class QRCodeMapperModule {
-
-    /**
-     * provide the instance of [QRCodeMapper]
-     */
-    @Binds
-    abstract fun bindQRCodeMapper(implementation: DefaultQRCodeMapper): QRCodeMapper
 
     /**
      * provide the instance of [LoadBitmapFromFileMapper]

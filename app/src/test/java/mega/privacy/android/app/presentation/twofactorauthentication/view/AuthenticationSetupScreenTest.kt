@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view
 
-import android.graphics.Bitmap
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -34,9 +33,6 @@ class AuthenticationSetupScreenTest {
             AuthenticationSetupScreen(
                 uiState = uiState,
                 isDarkMode = false,
-                qrCodeMapper = { _, _, _, _, _ ->
-                    Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
-                },
                 isIntentAvailable = { true },
                 onNextClicked = {},
                 onOpenInClicked = {},

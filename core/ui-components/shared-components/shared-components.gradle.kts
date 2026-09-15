@@ -37,7 +37,6 @@ dependencies {
     implementation(lib.coil.compose)
 
     // QR code generation
-    implementation(google.zxing)
 
     //test
     testImplementation(project(":core-test"))

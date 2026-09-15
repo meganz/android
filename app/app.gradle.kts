@@ -282,6 +282,7 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
     implementation(project(":core:passcode:passcode"))
     implementation(project(":core:transfers"))
+    implementation(project(":core:qr"))
     implementation(project(":feature:myaccount:myaccount"))
     implementation(project(":feature:settings"))
     implementation(project(":third-party-lib:twemoji"))
