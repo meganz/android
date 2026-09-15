@@ -22,11 +22,14 @@ sealed interface ChatListUiState {
      * badge. Independent of the active search query.
      * @property meetingsHaveUnread Whether the Meetings tab has any unread meeting, driving its tab
      * badge. Independent of the active search query.
+     * @property hasAnyContact Whether the user has at least one MEGA contact, driving the call to
+     * action offered on the empty Chats tab.
      */
     data class Data(
         val chats: ChatListTabState,
         val meetings: ChatListTabState,
         val chatsHaveUnread: Boolean,
         val meetingsHaveUnread: Boolean,
+        val hasAnyContact: Boolean,
     ) : ChatListUiState
 }

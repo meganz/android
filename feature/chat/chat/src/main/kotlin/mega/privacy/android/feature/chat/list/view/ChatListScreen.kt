@@ -58,7 +58,9 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onBackClick Callback when back navigation is requested.
  * @param onItemClick Callback when a chat room row is clicked, with the chat id.
  * @param onNewChatClick Callback when the new-chat floating action button is clicked.
- * @param onMeetingActionClick Callback when a meeting action is picked from the meetings sheet.
+ * @param onInviteFriendClick Callback when the empty Chats tab invite-a-friend action is clicked.
+ * @param onMeetingActionClick Callback when a meeting action is picked from the meetings sheet or
+ * from the empty Meetings tab.
  * @param onSearchQueryChange Callback when the search query changes, with `null` when cleared.
  * @param modifier [Modifier]
  * @param resolveBulkActions Resolves the ordered actions common to the selected chats.
@@ -71,6 +73,7 @@ internal fun ChatListScreen(
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
     onNewChatClick: () -> Unit,
+    onInviteFriendClick: () -> Unit,
     onMeetingActionClick: (MeetingAction) -> Unit,
     onArchivedClick: () -> Unit,
     onSearchQueryChange: (String?) -> Unit,
@@ -114,7 +117,9 @@ internal fun ChatListScreen(
         onBackClick = onBackClick,
         onItemClick = onItemClick,
         onNewChatClick = onNewChatClick,
+        onInviteFriendClick = onInviteFriendClick,
         onMeetingFabClick = { showMeetingActions = true },
+        onMeetingActionClick = onMeetingActionClick,
         onArchivedClick = onArchivedClick,
         onSearchModeChange = { searchMode = it },
         onQueryChange = {
@@ -226,7 +231,9 @@ private fun ChatListBulkActionsOverlay(
  * @param onBackClick Callback when back navigation is requested.
  * @param onItemClick Callback when a chat room row is clicked, with the chat id.
  * @param onNewChatClick Callback when the floating action button is clicked on the Chats tab.
+ * @param onInviteFriendClick Callback when the empty Chats tab invite-a-friend action is clicked.
  * @param onMeetingFabClick Callback when the floating action button is clicked on the Meetings tab.
+ * @param onMeetingActionClick Callback when an action on the empty Meetings tab is clicked.
  * @param onSearchModeChange Callback when the search field is opened or closed.
  * @param onQueryChange Callback when the search query text changes.
  * @param modifier [Modifier]
@@ -250,7 +257,9 @@ internal fun ChatListScreenContent(
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
     onNewChatClick: () -> Unit,
+    onInviteFriendClick: () -> Unit,
     onMeetingFabClick: () -> Unit,
+    onMeetingActionClick: (MeetingAction) -> Unit,
     onArchivedClick: () -> Unit,
     onSearchModeChange: (Boolean) -> Unit,
     onQueryChange: (String) -> Unit,
@@ -366,7 +375,11 @@ internal fun ChatListScreenContent(
                         ChatListContent(
                             state = uiState.chats,
                             isMeetingsTab = false,
+                            hasAnyContact = uiState.hasAnyContact,
                             onItemClick = onItemClick,
+                            onNewChatClick = onNewChatClick,
+                            onInviteFriendClick = onInviteFriendClick,
+                            onMeetingActionClick = onMeetingActionClick,
                             modifier = tabModifier,
                             contentPadding = PaddingValues(
                                 bottom = paddingValues.calculateBottomPadding() + FAB_BOTTOM_CLEARANCE,
@@ -387,7 +400,11 @@ internal fun ChatListScreenContent(
                         ChatListContent(
                             state = uiState.meetings,
                             isMeetingsTab = true,
+                            hasAnyContact = uiState.hasAnyContact,
                             onItemClick = onItemClick,
+                            onNewChatClick = onNewChatClick,
+                            onInviteFriendClick = onInviteFriendClick,
+                            onMeetingActionClick = onMeetingActionClick,
                             modifier = tabModifier,
                             contentPadding = PaddingValues(
                                 bottom = paddingValues.calculateBottomPadding() + FAB_BOTTOM_CLEARANCE,
@@ -478,11 +495,13 @@ private fun ChatListScreenPreview() {
                 meetings = ChatListTabState.Empty,
                 chatsHaveUnread = true,
                 meetingsHaveUnread = false,
+                hasAnyContact = true,
             ),
             showMeetingTab = false,
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onInviteFriendClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
             onSearchQueryChange = {},
@@ -500,6 +519,7 @@ private fun ChatListScreenSearchActivePreview() {
                 meetings = ChatListTabState.Empty,
                 chatsHaveUnread = true,
                 meetingsHaveUnread = false,
+                hasAnyContact = true,
             ),
             showMeetingTab = false,
             searchMode = true,
@@ -507,7 +527,9 @@ private fun ChatListScreenSearchActivePreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onInviteFriendClick = {},
             onMeetingFabClick = {},
+            onMeetingActionClick = {},
             onArchivedClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
@@ -525,6 +547,7 @@ private fun ChatListScreenNoResultsPreview() {
                 meetings = ChatListTabState.NoSearchResults,
                 chatsHaveUnread = false,
                 meetingsHaveUnread = false,
+                hasAnyContact = true,
             ),
             showMeetingTab = false,
             searchMode = true,
@@ -532,7 +555,9 @@ private fun ChatListScreenNoResultsPreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onInviteFriendClick = {},
             onMeetingFabClick = {},
+            onMeetingActionClick = {},
             onArchivedClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
@@ -550,6 +575,7 @@ private fun ChatListScreenSelectionModePreview() {
                 meetings = ChatListTabState.Empty,
                 chatsHaveUnread = false,
                 meetingsHaveUnread = false,
+                hasAnyContact = true,
             ),
             showMeetingTab = false,
             searchMode = false,
@@ -563,7 +589,9 @@ private fun ChatListScreenSelectionModePreview() {
             selectedCount = 1,
             isAllSelected = false,
             onNewChatClick = {},
+            onInviteFriendClick = {},
             onMeetingFabClick = {},
+            onMeetingActionClick = {},
             onArchivedClick = {},
         )
     }
@@ -579,6 +607,7 @@ private fun ChatListScreenLoadingPreview() {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onInviteFriendClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
             onSearchQueryChange = {},

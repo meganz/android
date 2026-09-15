@@ -15,12 +15,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
@@ -31,6 +35,7 @@ import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
+import mega.privacy.android.feature.chat.list.model.MeetingAction
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -40,7 +45,11 @@ import mega.privacy.android.shared.resources.R as sharedR
  *
  * @param state Content state of the tab.
  * @param isMeetingsTab Whether this tab shows meetings; drives the empty state content.
+ * @param hasAnyContact Whether the user has any MEGA contact; picks the empty Chats tab action.
  * @param onItemClick Callback when a row is clicked, with the chat id.
+ * @param onNewChatClick Callback when the empty Chats tab new-chat action is clicked.
+ * @param onInviteFriendClick Callback when the empty Chats tab invite-a-friend action is clicked.
+ * @param onMeetingActionClick Callback when an empty Meetings tab action is clicked.
  * @param modifier [Modifier]
  * @param contentPadding Padding for the list content.
  * @param onItemLongClick Optional callback when a row is long-pressed, with the chat id.
@@ -52,7 +61,11 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun ChatListContent(
     state: ChatListTabState,
     isMeetingsTab: Boolean,
+    hasAnyContact: Boolean,
     onItemClick: (Long) -> Unit,
+    onNewChatClick: () -> Unit,
+    onInviteFriendClick: () -> Unit,
+    onMeetingActionClick: (MeetingAction) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     onItemLongClick: ((Long) -> Unit)? = null,
@@ -63,6 +76,10 @@ internal fun ChatListContent(
     when (state) {
         ChatListTabState.Empty -> ChatListEmptyView(
             isMeetingsTab = isMeetingsTab,
+            hasAnyContact = hasAnyContact,
+            onNewChatClick = onNewChatClick,
+            onInviteFriendClick = onInviteFriendClick,
+            onMeetingActionClick = onMeetingActionClick,
             modifier = modifier,
         )
 
@@ -117,6 +134,10 @@ private fun ChatListSectionHeader(
 @Composable
 private fun ChatListEmptyView(
     isMeetingsTab: Boolean,
+    hasAnyContact: Boolean,
+    onNewChatClick: () -> Unit,
+    onInviteFriendClick: () -> Unit,
+    onMeetingActionClick: (MeetingAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -128,11 +149,13 @@ private fun ChatListEmptyView(
         contentAlignment = Alignment.Center,
     ) {
         EmptyStateView(
-            illustration = if (isMeetingsTab) {
-                iconPackR.drawable.ic_video_glass
-            } else {
-                iconPackR.drawable.ic_message_call_glass
-            },
+            imagePainter = painterResource(
+                if (isMeetingsTab) {
+                    iconPackR.drawable.ic_video_glass
+                } else {
+                    iconPackR.drawable.ic_message_call_glass
+                }
+            ),
             title = stringResource(
                 if (isMeetingsTab) {
                     sharedR.string.meeting_recent_list_empty_title
@@ -140,23 +163,57 @@ private fun ChatListEmptyView(
                     sharedR.string.chat_recent_list_empty_title
                 }
             ),
-            description = stringResource(
-                if (isMeetingsTab) {
-                    sharedR.string.meeting_recent_list_empty_subtitle
-                } else {
-                    sharedR.string.chat_recent_list_empty_subtitle
-                }
-            ),
-            descriptionSpanStyles = mapOf(
-                SpanIndicator('A') to SpanStyleWithAnnotation(
-                    MegaSpanStyle.LinkColorStyle(
-                        SpanStyle(),
-                        LinkColor.Primary,
-                    ),
-                    LEARN_MORE_URL,
+            description = SpannableText(
+                text = stringResource(
+                    if (isMeetingsTab) {
+                        sharedR.string.meeting_recent_list_empty_subtitle
+                    } else {
+                        sharedR.string.chat_recent_list_empty_subtitle
+                    }
                 ),
+                annotations = mapOf(
+                    SpanIndicator('A') to SpanStyleWithAnnotation(
+                        MegaSpanStyle.LinkColorStyle(
+                            SpanStyle(),
+                            LinkColor.Primary,
+                        ),
+                        LEARN_MORE_URL,
+                    ),
+                ),
+                onAnnotationClick = { uriHandler.openUri(LEARN_MORE_URL) },
             ),
-            onDescriptionAnnotationClick = { uriHandler.openUri(LEARN_MORE_URL) },
+            primaryAction = {
+                when {
+                    isMeetingsTab -> PrimaryFilledButton(
+                        modifier = Modifier.testTag(MEETING_LIST_EMPTY_START_TAG),
+                        text = stringResource(sharedR.string.chat_meeting_actions_start_now),
+                        onClick = { onMeetingActionClick(MeetingAction.Start) },
+                    )
+
+                    hasAnyContact -> PrimaryFilledButton(
+                        modifier = Modifier.testTag(CHAT_LIST_EMPTY_NEW_CHAT_TAG),
+                        text = stringResource(sharedR.string.new_chat_title),
+                        onClick = onNewChatClick,
+                    )
+
+                    else -> PrimaryFilledButton(
+                        modifier = Modifier.testTag(CHAT_LIST_EMPTY_INVITE_TAG),
+                        text = stringResource(sharedR.string.chat_recent_invite_friend),
+                        onClick = onInviteFriendClick,
+                    )
+                }
+            },
+            secondaryAction = if (isMeetingsTab) {
+                {
+                    SecondaryFilledButton(
+                        modifier = Modifier.testTag(MEETING_LIST_EMPTY_SCHEDULE_TAG),
+                        text = stringResource(sharedR.string.chat_meeting_actions_schedule),
+                        onClick = { onMeetingActionClick(MeetingAction.Schedule) },
+                    )
+                }
+            } else {
+                null
+            },
         )
     }
 }
@@ -188,6 +245,10 @@ internal const val CHAT_LIST_TAG = "chat_list_content:chat_list"
 internal const val MEETING_LIST_TAG = "chat_list_content:meeting_list"
 internal const val CHAT_LIST_EMPTY_TAG = "chat_list_content:chat_empty"
 internal const val MEETING_LIST_EMPTY_TAG = "chat_list_content:meeting_empty"
+internal const val CHAT_LIST_EMPTY_NEW_CHAT_TAG = "chat_list_content:chat_empty_new_chat"
+internal const val CHAT_LIST_EMPTY_INVITE_TAG = "chat_list_content:chat_empty_invite_friend"
+internal const val MEETING_LIST_EMPTY_START_TAG = "chat_list_content:meeting_empty_start"
+internal const val MEETING_LIST_EMPTY_SCHEDULE_TAG = "chat_list_content:meeting_empty_schedule"
 internal const val CHAT_LIST_NO_RESULTS_TAG = "chat_list_content:chat_no_results"
 internal const val MEETING_LIST_NO_RESULTS_TAG = "chat_list_content:meeting_no_results"
 
@@ -198,7 +259,27 @@ private fun ChatListContentEmptyPreview() {
         ChatListContent(
             state = ChatListTabState.Empty,
             isMeetingsTab = false,
+            hasAnyContact = true,
             onItemClick = {},
+            onNewChatClick = {},
+            onInviteFriendClick = {},
+            onMeetingActionClick = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ChatListContentEmptyWithoutContactsPreview() {
+    AndroidThemeForPreviews {
+        ChatListContent(
+            state = ChatListTabState.Empty,
+            isMeetingsTab = false,
+            hasAnyContact = false,
+            onItemClick = {},
+            onNewChatClick = {},
+            onInviteFriendClick = {},
+            onMeetingActionClick = {},
         )
     }
 }
@@ -210,7 +291,11 @@ private fun MeetingListContentEmptyPreview() {
         ChatListContent(
             state = ChatListTabState.Empty,
             isMeetingsTab = true,
+            hasAnyContact = true,
             onItemClick = {},
+            onNewChatClick = {},
+            onInviteFriendClick = {},
+            onMeetingActionClick = {},
         )
     }
 }
@@ -222,7 +307,11 @@ private fun ChatListContentNoResultsPreview() {
         ChatListContent(
             state = ChatListTabState.NoSearchResults,
             isMeetingsTab = false,
+            hasAnyContact = true,
             onItemClick = {},
+            onNewChatClick = {},
+            onInviteFriendClick = {},
+            onMeetingActionClick = {},
         )
     }
 }

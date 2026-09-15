@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
@@ -51,6 +52,7 @@ internal class ChatListViewModel @Inject constructor(
     private val startConversationUseCase: StartConversationUseCase,
     private val createGroupChatRoomUseCase: CreateGroupChatRoomUseCase,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
+    private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
     private val chatRoomMenuItems: Map<Int, @JvmSuppressWildcards ChatRoomMenuItem>,
 ) : ViewModel() {
 
@@ -67,7 +69,7 @@ internal class ChatListViewModel @Inject constructor(
     val openChatEvents: Flow<Long> = openChatChannel.receiveAsFlow()
 
     /**
-     * Emits the resolved outcome of a meeting action picked from the meetings bottom sheet.
+     * Emits the resolved outcome of a picked meeting action.
      */
     val meetingActionEvents: Flow<MeetingActionEvent> = meetingActionChannel.receiveAsFlow()
 
@@ -79,12 +81,14 @@ internal class ChatListViewModel @Inject constructor(
             chatRoomsFlow(ChatRoomType.NON_MEETINGS),
             chatRoomsFlow(ChatRoomType.MEETINGS),
             queryChannel.receiveAsFlow().onStart { emit(null) },
-        ) { chats, meetings, query ->
+            hasAnyContactFlow(),
+        ) { chats, meetings, query, hasAnyContact ->
             ChatListUiState.Data(
                 chats = tabState(chats, query),
                 meetings = tabState(meetings, query),
                 chatsHaveUnread = chats.anyUnread(),
                 meetingsHaveUnread = meetings.anyUnread(),
+                hasAnyContact = hasAnyContact,
             )
         }.catch { e ->
             Timber.e(e, "Failed to load chat list")
@@ -139,8 +143,8 @@ internal class ChatListViewModel @Inject constructor(
     }
 
     /**
-     * Resolve the meeting [action] picked from the meetings bottom sheet and emit the outcome
-     * through [meetingActionEvents].
+     * Resolve the meeting [action] picked from the meetings bottom sheet or the empty Meetings tab
+     * and emit the outcome through [meetingActionEvents].
      *
      * Starting or joining a meeting is refused while the user is already participating in a call,
      * matching the legacy chat list; scheduling is always allowed.
@@ -236,6 +240,12 @@ internal class ChatListViewModel @Inject constructor(
             meetingTimeMapper = { _, _ -> "" },
             headerTimeMapper = { _, _ -> null },
         )
+
+    private fun hasAnyContactFlow(): Flow<Boolean> = monitorHasAnyContactUseCase()
+        .catch { e ->
+            Timber.e(e, "Failed to monitor whether the user has any contact")
+            emit(false)
+        }
 
     private fun chatRoomsFlow(chatRoomType: ChatRoomType): Flow<ImmutableList<ChatRoomUiItem>> =
         getChatsUseCase(

@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.components.contact.state.ContactItemStatus
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRooms
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
@@ -78,6 +80,7 @@ class ChatListViewModelTest {
     private val startConversationUseCase = mock<StartConversationUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
     private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
+    private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase>()
 
     private val chatRoomMenuItems: Map<Int, ChatRoomMenuItem> = mapOf(
         0 to ClearHistoryChatRoomMenuItem(clearChatHistoryUseCase),
@@ -108,6 +111,7 @@ class ChatListViewModelTest {
 
     @BeforeEach
     fun setUp() {
+        stubHasAnyContact(hasAnyContact = false)
         underTest = ChatListViewModel(
             getChatsUseCase = getChatsUseCase,
             chatLastMessageFormatter = chatLastMessageFormatter,
@@ -117,6 +121,7 @@ class ChatListViewModelTest {
             startConversationUseCase = startConversationUseCase,
             createGroupChatRoomUseCase = createGroupChatRoomUseCase,
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
+            monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
             chatRoomMenuItems = chatRoomMenuItems,
         )
     }
@@ -141,6 +146,7 @@ class ChatListViewModelTest {
             isParticipatingInChatCallUseCase,
             startConversationUseCase,
             createGroupChatRoomUseCase,
+            monitorHasAnyContactUseCase,
         )
     }
 
@@ -474,6 +480,38 @@ class ChatListViewModelTest {
             }
         }
 
+    @Test
+    fun `test that uiState exposes hasAnyContact when the user has contacts`() = runTest {
+        stubChatRooms()
+        stubHasAnyContact(hasAnyContact = true)
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().hasAnyContact).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that uiState exposes no contacts when the user has none`() = runTest {
+        stubChatRooms()
+        stubHasAnyContact(hasAnyContact = false)
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().hasAnyContact).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that uiState exposes no contacts when monitoring contacts fails`() = runTest {
+        stubChatRooms()
+        monitorHasAnyContactUseCase.stub {
+            on { invoke() } doAnswer { flow<Boolean> { throw IllegalStateException("boom") } }
+        }
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().hasAnyContact).isFalse()
+        }
+    }
+
     private fun stubChatRooms(
         chats: List<ChatRoomItem> = listOf(chatRoomItem),
         meetings: List<ChatRoomItem> = listOf(meetingRoomItem),
@@ -497,6 +535,12 @@ class ChatListViewModelTest {
         chatRoomUiItemMapper.stub {
             on { invoke(chatRoomItem) } doReturn chatUiItem
             on { invoke(meetingRoomItem) } doReturn meetingUiItem
+        }
+    }
+
+    private fun stubHasAnyContact(hasAnyContact: Boolean) {
+        monitorHasAnyContactUseCase.stub {
+            on { invoke() } doReturn flowOf(hasAnyContact)
         }
     }
 

@@ -33,6 +33,7 @@ fun EntryProviderScope<NavKey>.chatListDestination(navigationHandler: Navigation
                 ChatListEntry(
                     navigationHandler = navigationHandler,
                     showMeetingTab = key.showMeetingTab,
+                    createNewChat = key.createNewChat,
                 )
             },
         )

@@ -69,6 +69,7 @@ class ChatListScreenTest {
             onBackClick = {},
             onItemClick = {},
             onNewChatClick = {},
+            onInviteFriendClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
             onSearchQueryChange = {},
@@ -213,6 +214,86 @@ class ChatListScreenTest {
         composeRule.onNodeWithTag(MEETING_BLOCKED_BY_CALL_DIALOG_TAG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that the new chat action is shown on the empty Chats tab when the user has contacts`() {
+        setupEmptyScreen(showMeetingTab = false, hasAnyContact = true)
+
+        composeRule.onNodeWithTag(CHAT_LIST_EMPTY_NEW_CHAT_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(CHAT_LIST_EMPTY_INVITE_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the invite action is shown on the empty Chats tab when the user has no contacts`() {
+        setupEmptyScreen(showMeetingTab = false, hasAnyContact = false)
+
+        composeRule.onNodeWithTag(CHAT_LIST_EMPTY_INVITE_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(CHAT_LIST_EMPTY_NEW_CHAT_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the empty Chats tab action starts a new chat when the user has contacts`() {
+        var newChatClicks = 0
+        setupEmptyScreen(
+            showMeetingTab = false,
+            hasAnyContact = true,
+            onNewChatClick = { newChatClicks++ },
+        )
+
+        composeRule.onNodeWithTag(CHAT_LIST_EMPTY_NEW_CHAT_TAG).performClick()
+
+        assertThat(newChatClicks).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that the empty Chats tab action invites a friend when the user has no contacts`() {
+        var inviteClicks = 0
+        setupEmptyScreen(
+            showMeetingTab = false,
+            hasAnyContact = false,
+            onInviteFriendClick = { inviteClicks++ },
+        )
+
+        composeRule.onNodeWithTag(CHAT_LIST_EMPTY_INVITE_TAG).performClick()
+
+        assertThat(inviteClicks).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that both meeting actions are shown on the empty Meetings tab`() {
+        setupEmptyScreen(showMeetingTab = true, hasAnyContact = true)
+
+        composeRule.onNodeWithTag(MEETING_LIST_EMPTY_START_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(MEETING_LIST_EMPTY_SCHEDULE_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the empty Meetings tab reports the Start action when start meeting is clicked`() {
+        val pickedActions = mutableListOf<MeetingAction>()
+        setupEmptyScreen(
+            showMeetingTab = true,
+            hasAnyContact = true,
+            onMeetingActionClick = pickedActions::add,
+        )
+
+        composeRule.onNodeWithTag(MEETING_LIST_EMPTY_START_TAG).performClick()
+
+        assertThat(pickedActions).containsExactly(MeetingAction.Start)
+    }
+
+    @Test
+    fun `test that the empty Meetings tab reports the Schedule action when schedule meeting is clicked`() {
+        val pickedActions = mutableListOf<MeetingAction>()
+        setupEmptyScreen(
+            showMeetingTab = true,
+            hasAnyContact = true,
+            onMeetingActionClick = pickedActions::add,
+        )
+
+        composeRule.onNodeWithTag(MEETING_LIST_EMPTY_SCHEDULE_TAG).performClick()
+
+        assertThat(pickedActions).containsExactly(MeetingAction.Schedule)
+    }
+
     @Composable
     private fun RestorableChatListScreen(showMeetingTab: Boolean = true) {
         CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
@@ -223,6 +304,7 @@ class ChatListScreenTest {
                     onBackClick = {},
                     onItemClick = {},
                     onNewChatClick = {},
+                    onInviteFriendClick = {},
                     onMeetingActionClick = {},
                     onArchivedClick = {},
                     onSearchQueryChange = {},
@@ -244,6 +326,39 @@ class ChatListScreenTest {
                         onBackClick = {},
                         onItemClick = {},
                         onNewChatClick = {},
+                        onInviteFriendClick = {},
+                        onMeetingActionClick = onMeetingActionClick,
+                        onArchivedClick = {},
+                        onSearchQueryChange = {},
+                    )
+                }
+            }
+        }
+    }
+
+    private fun setupEmptyScreen(
+        showMeetingTab: Boolean,
+        hasAnyContact: Boolean,
+        onNewChatClick: () -> Unit = {},
+        onInviteFriendClick: () -> Unit = {},
+        onMeetingActionClick: (MeetingAction) -> Unit = {},
+    ) {
+        composeRule.setContent {
+            CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
+                AndroidThemeForPreviews {
+                    ChatListScreen(
+                        uiState = ChatListUiState.Data(
+                            chats = ChatListTabState.Empty,
+                            meetings = ChatListTabState.Empty,
+                            chatsHaveUnread = false,
+                            meetingsHaveUnread = false,
+                            hasAnyContact = hasAnyContact,
+                        ),
+                        showMeetingTab = showMeetingTab,
+                        onBackClick = {},
+                        onItemClick = {},
+                        onNewChatClick = onNewChatClick,
+                        onInviteFriendClick = onInviteFriendClick,
                         onMeetingActionClick = onMeetingActionClick,
                         onArchivedClick = {},
                         onSearchQueryChange = {},
@@ -258,6 +373,7 @@ class ChatListScreenTest {
         meetings = ChatListTabState.Results(persistentListOf(chatRoomUiItem(2L, "Meeting"))),
         chatsHaveUnread = false,
         meetingsHaveUnread = false,
+        hasAnyContact = true,
     )
 
     private fun chatRoomUiItem(chatId: Long, title: String) = ChatRoomUiItem(
