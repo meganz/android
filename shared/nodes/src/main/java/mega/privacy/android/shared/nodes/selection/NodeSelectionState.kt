@@ -7,6 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toPersistentSet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 
@@ -28,8 +31,10 @@ class NodeSelectionState(
     initialSelectedIds: Set<NodeId> = emptySet(),
     selectAllInProgress: Boolean = false,
 ) {
-    var selectedNodeIds: Set<NodeId> by mutableStateOf(initialSelectedIds)
-        private set
+    private var selectedIds: PersistentSet<NodeId> by mutableStateOf(initialSelectedIds.toPersistentSet())
+
+    val selectedNodeIds: Set<NodeId>
+        get() = selectedIds
 
     var selectAllAwaitingMoreItems: Boolean by mutableStateOf(selectAllInProgress)
         private set
@@ -41,29 +46,26 @@ class NodeSelectionState(
         get() = selectedNodeIds.size
 
     fun toggleSelection(nodeId: NodeId) {
-        selectedNodeIds = if (nodeId in selectedNodeIds) {
-            val updated = selectedNodeIds - nodeId
-            if (updated.isEmpty()) {
-                selectAllAwaitingMoreItems = false
-            }
-            updated
+        selectedIds = if (nodeId in selectedIds) {
+            selectedIds.removing(nodeId)
         } else {
-            selectedNodeIds + nodeId
+            selectedIds.adding(nodeId)
+        }
+        if (selectedIds.isEmpty()) {
+            selectAllAwaitingMoreItems = false
         }
     }
 
-    fun selectAll(nodeIds: Set<NodeId>) {
-        selectedNodeIds = nodeIds
-        selectAllAwaitingMoreItems = false
-    }
-
-    fun selectAll(nodeIds: Set<NodeId>, nodesLoadingState: NodesLoadingState) {
-        selectedNodeIds = nodeIds
+    fun selectAll(
+        nodeIds: Set<NodeId>,
+        nodesLoadingState: NodesLoadingState = NodesLoadingState.FullyLoaded,
+    ) {
+        selectedIds = nodeIds.toPersistentSet()
         selectAllAwaitingMoreItems = !nodesLoadingState.isComplete
     }
 
     fun deselectAll() {
-        selectedNodeIds = emptySet()
+        selectedIds = persistentSetOf()
         selectAllAwaitingMoreItems = false
     }
 
