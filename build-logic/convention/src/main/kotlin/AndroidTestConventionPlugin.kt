@@ -1,6 +1,7 @@
 import mega.privacy.android.gradle.configureTestOptionsIfAndroidApplication
 import mega.privacy.android.gradle.configureTestOptionsIfAndroidLibrary
 import mega.privacy.android.gradle.enableParallelTest
+import mega.privacy.android.gradle.logManagedDeviceTestProgress
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -19,6 +20,7 @@ class AndroidTestConventionPlugin : Plugin<Project> {
             configureTestOptionsIfAndroidLibrary()
             configureTestOptionsIfAndroidApplication()
             enableParallelTest()
+            logManagedDeviceTestProgress()
         }
     }
 }

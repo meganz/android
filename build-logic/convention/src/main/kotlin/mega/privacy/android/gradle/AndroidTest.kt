@@ -4,6 +4,7 @@ package mega.privacy.android.gradle
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.UnitTestOptions
 import com.android.build.api.dsl.LibraryExtension
+import com.android.build.gradle.internal.tasks.ManagedDeviceInstrumentationTestTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
@@ -71,6 +72,38 @@ private fun Project.setTestReportPath(unitTestOptions: UnitTestOptions) {
 
             junitXml.required.set(true)
             junitXml.outputLocation.set(file("$path/junit"))
+        }
+    }
+}
+
+/**
+ * Report the instrumented test a Gradle Managed Device task is currently running.
+ *
+ * AGP prints nothing between the start of such a task and its report at the end, which leaves a
+ * full run of `:app:ciPixelGmsDebugAndroidTest` opaque for the best part of an hour. Set the
+ * `mega.androidTest.progress` Gradle property to `false` to turn this off.
+ */
+fun Project.logManagedDeviceTestProgress() {
+    if (providers.gradleProperty("mega.androidTest.progress").orNull?.toBoolean() == false) return
+
+    val testListFile = layout.buildDirectory.file("androidTestProgress/test-list.txt")
+
+    tasks.withType<ManagedDeviceInstrumentationTestTask>().configureEach {
+        // Scoped to the project: convention plugin classes reach separate projects through
+        // separate classloaders, and one shared name hands them an instance they cannot cast.
+        val progressService = project.gradle.sharedServices.registerIfAbsent(
+            "megaAndroidTestProgress${project.path}",
+            AndroidTestProgressService::class.java,
+        ) {}
+        usesService(progressService)
+        val resultsDir = getResultsDir()
+        doFirst {
+            val taskLogger = logger
+            progressService.get().start(
+                resultsDir = resultsDir.get().asFile,
+                testListFile = testListFile.get().asFile,
+                log = { line -> taskLogger.lifecycle(line) },
+            )
         }
     }
 }
