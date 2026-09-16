@@ -1,7 +1,5 @@
 /**
  * This script builds and uploads the Android APK to Firebase AppDistribution.
- * It can also run the connected device instrumented tests on a Gradle Managed Device
- * via the "device_test" MR command.
  */
 
  @Library('jenkins-android-shared-lib') _
@@ -19,39 +17,6 @@ NATIVE_SYMBOLS_FILE = "symbols.zip"
  */
 DELIVER_QA_CMD = "deliver_qa"
 UPLOAD_COVERAGE_REPORT_CMD = "upload_coverage"
-DEVICE_TEST_CMD = "device_test"
-
-/**
- * Test task of the Gradle Managed Device defined in app/app.gradle.kts (testOptions.managedDevices).
- */
-DEVICE_TEST_GRADLE_TASK = ":app:ciPixelGmsDebugAndroidTest"
-
-/**
- * System image used by the managed device. Must match the device definition
- * (apiLevel / systemImageSource / ABI) in app/app.gradle.kts.
- */
-DEVICE_TEST_SYSTEM_IMAGE = "system-images;android-36;google_apis;arm64-v8a"
-
-/**
- * Folder holding the JUnit XML results of the managed device run.
- */
-DEVICE_TEST_RESULTS_FOLDER = "app/build/outputs/androidTest-results/managedDevice/debug/flavors/gms"
-
-/**
- * Folder holding the HTML report of the managed device run.
- */
-DEVICE_TEST_REPORT_FOLDER = "app/build/reports/androidTests/managedDevice/debug/flavors/gms"
-
-/**
- * Zip of the HTML test report and the per-test logcat, uploaded to Artifactory so it can be
- * downloaded from the MR.
- */
-DEVICE_TEST_REPORT_ZIP = "device_test_report.zip"
-
-/**
- * Download link of the uploaded test report zip; empty when no report was produced.
- */
-DEVICE_TEST_REPORT_LINK = ""
 
 /**
  * common.groovy file with common methods
@@ -59,13 +24,7 @@ DEVICE_TEST_REPORT_LINK = ""
 def common
 
 pipeline {
-    // device_test needs an Apple Silicon agent: on Intel machines (labelled mac-intel) the
-    // emulator is too slow to render the app and every UI test times out.
-    agent {
-        label env.gitlabTriggerPhrase?.startsWith("device_test")
-                ? '(mac-jenkins-slave-android || mac-jenkins-slave) && !mac-intel'
-                : 'mac-jenkins-slave-android || mac-jenkins-slave'
-    }
+    agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
@@ -114,16 +73,6 @@ pipeline {
 
                         common.sendToMR(message)
                     }
-                } else if (triggerByDeviceTestCmd()) {
-                    if (common.hasGitLabMergeRequest()) {
-                        String mrNumber = common.getMrNumber()
-                        String folder = "android_upload/MR-${mrNumber}"
-                        String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
-
-                        common.sendToMR(deviceTestFailureMessage("<br/>", jenkinsLog, false))
-                        slackSend channel: '#mobile-pipelines-channel', color: 'danger',
-                                message: deviceTestFailureMessage("\n", jenkinsLog, true)
-                    }
                 } else if (triggerByPushToDevelop()) {
                     String jenkinsLog = common.uploadFileToArtifactory("android_upload", CONSOLE_LOG_FILE)
 
@@ -138,12 +87,6 @@ pipeline {
                 if (triggerByDeliverQaCmd() || triggerByUploadCoverage()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n", true)
                     common.sendToMR(firebaseUploadSuccessMessage("<br/>", true))
-                } else if (triggerByDeviceTestCmd()) {
-                    if (common.hasGitLabMergeRequest()) {
-                        common.sendToMR(deviceTestSuccessMessage("<br/>", false))
-                    }
-                    slackSend channel: '#mobile-pipelines-channel', color: 'good',
-                            message: deviceTestSuccessMessage("\n", true)
                 } else if (triggerByPushToDevelop()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n", false)
                 }
@@ -174,8 +117,7 @@ pipeline {
                 expression {
                     triggerByDeliverQaCmd() ||
                             triggerByUploadCoverage() ||
-                            triggerByPushToDevelop() ||
-                            triggerByDeviceTestCmd()
+                            triggerByPushToDevelop()
                 }
             }
             steps {
@@ -342,55 +284,6 @@ pipeline {
             }
         }
 
-        stage('Run Instrumented Tests on Managed Device') {
-            when {
-                expression { triggerByDeviceTestCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Run Instrumented Tests on Managed Device'
-                    common.beginStage(BUILD_STEP)
-
-                    // The SDK dir is owned by the provisioning user and is read-only for the
-                    // Jenkins user, so the pipeline must not try to install anything itself.
-                    // Verify the managed-device prerequisites instead, and fail with an
-                    // actionable provisioning message when this agent is missing them.
-                    sh """
-                        IMAGE_DIR="${ANDROID_HOME}/\$(echo "${DEVICE_TEST_SYSTEM_IMAGE}" | tr ';' '/')"
-                        if [ ! -d "\$IMAGE_DIR" ] || [ ! -d "${ANDROID_HOME}/emulator" ]; then
-                            echo "ERROR: agent \$(hostname) is missing the managed-device prerequisites."
-                            echo "Ask the SDK owner (the user owning ${ANDROID_HOME}) to provision it:"
-                            echo "  yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses"
-                            echo "  ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager emulator '${DEVICE_TEST_SYSTEM_IMAGE}'"
-                            exit 1
-                        fi
-                    """
-
-                    // --rerun forces test execution even when Gradle considers the task up-to-date
-                    sh "./gradlew --no-daemon ${DEVICE_TEST_GRADLE_TASK} --rerun"
-                }
-            }
-            // collect results even when tests fail, so Jenkins still shows the failure details
-            post {
-                always {
-                    junit(testResults: "${DEVICE_TEST_RESULTS_FOLDER}/**/*.xml", allowEmptyResults: true)
-                    archiveArtifacts(artifacts: "${DEVICE_TEST_REPORT_FOLDER}/**", allowEmptyArchive: true)
-                    archiveArtifacts(artifacts: "${DEVICE_TEST_RESULTS_FOLDER}/**/logcat-*.txt", allowEmptyArchive: true)
-                    script {
-                        try {
-                            if (fileExists(DEVICE_TEST_REPORT_FOLDER)) {
-                                sh "cd ${DEVICE_TEST_REPORT_FOLDER} && zip -qr ${WORKSPACE}/${DEVICE_TEST_REPORT_ZIP} ."
-                                stageDeviceTestLogcat()
-                                DEVICE_TEST_REPORT_LINK = common.uploadFileToArtifactory("android_upload", DEVICE_TEST_REPORT_ZIP)
-                            }
-                        } catch (Exception e) {
-                            println("[WARNING] Failed to upload the device test report: ${e.message}")
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Collect and Upload Code Coverage') {
             when {
                 expression { triggerByUploadCoverage() || triggerByPushToDevelop() }
@@ -470,105 +363,6 @@ private String firebaseUploadSuccessMessage(String lineBreak, boolean useComment
 }
 
 /**
- * Compose the device test failure message to be sent to the GitLab MR.
- *
- * @param lineBreak the line break used between the lines
- * @param logFile the uploaded Jenkins console log URL
- * @return failure message
- */
-private String deviceTestFailureMessage(String lineBreak, String logFile, boolean slackFormat) {
-    return ":x: Android Device Test Failed!(BuildNumber: ${env.BUILD_NUMBER}, Node: ${env.NODE_NAME}, Duration: ${buildDuration()})" +
-            "${lineBreak}Test Summary:\t${readDeviceTestSummary()}" +
-            "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
-            "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${formattedCommentAuthor()}" +
-            "${lineBreak}Commit:\t${GIT_COMMIT}" +
-            deviceTestReportLine(lineBreak, slackFormat) +
-            "${lineBreak}Build Log: ${formatLink(CONSOLE_LOG_FILE, logFile, slackFormat)}"
-}
-
-/**
- * Compose the device test success message to be sent to the GitLab MR.
- *
- * @param lineBreak the line break used between the lines
- * @return success message
- */
-private String deviceTestSuccessMessage(String lineBreak, boolean slackFormat) {
-    return ":white_check_mark: Android Device Test Passed!(BuildNumber: ${env.BUILD_NUMBER}, Node: ${env.NODE_NAME}, Duration: ${buildDuration()})" +
-            "${lineBreak}Test Summary:\t${readDeviceTestSummary()}" +
-            "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
-            "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${formattedCommentAuthor()}" +
-            "${lineBreak}Commit:\t${GIT_COMMIT}" +
-            deviceTestReportLine(lineBreak, slackFormat)
-}
-
-/**
- * Format a link for the target destination: Slack uses <url|label>, GitLab uses Markdown.
- */
-private String formatLink(String label, String url, boolean slackFormat) {
-    return slackFormat ? "<${url}|${label}>" : "[${label}](${url})"
-}
-
-/**
- * Elapsed time of the current build, e.g. "12 min 34 sec".
- */
-private String buildDuration() {
-    return currentBuild.durationString.replace(' and counting', '')
-}
-
-/**
- * Download link line for the uploaded test report zip, or empty when no report was uploaded
- * (e.g. the build failed before the tests produced one).
- */
-private String deviceTestReportLine(String lineBreak, boolean slackFormat) {
-    if (!DEVICE_TEST_REPORT_LINK) {
-        return ""
-    }
-    return "${lineBreak}Test Report: ${formatLink(DEVICE_TEST_REPORT_ZIP, DEVICE_TEST_REPORT_LINK, slackFormat)}"
-}
-
-/**
- * Read the executed/failed/skipped test counts from the managed device JUnit XML results.
- * @return summary line, e.g. "3 tests, 0 failures, 0 skipped", or "no test results found"
- */
-private String readDeviceTestSummary() {
-    return sh(
-            script: """
-                if ls ${DEVICE_TEST_RESULTS_FOLDER}/*/TEST-*.xml > /dev/null 2>&1; then
-                    grep -h '<testsuite ' ${DEVICE_TEST_RESULTS_FOLDER}/*/TEST-*.xml | \\
-                        awk -F'"' '{ for (i = 1; i < NF; i++) {
-                                if (\$i ~ /tests=\$/) t += \$(i+1);
-                                if (\$i ~ / failures=\$/) f += \$(i+1);
-                                if (\$i ~ / errors=\$/) f += \$(i+1);
-                                if (\$i ~ /skipped=\$/) s += \$(i+1);
-                        } } END { printf "%d tests, %d failures, %d skipped", t, f, s }'
-                else
-                    echo "no test results found"
-                fi
-            """,
-            returnStdout: true
-    ).trim()
-}
-
-/**
- * Add the managed device's per-test logcat files to the uploaded test report zip.
- *
- * A crash that kills the instrumentation process explains itself only in logcat; the HTML report
- * records that the run died but not why. The files are added under the device folder they were
- * produced in, so each one sits beside the HTML for the same run.
- */
-private void stageDeviceTestLogcat() {
-    sh """
-        if ls ${DEVICE_TEST_RESULTS_FOLDER}/*/logcat-*.txt > /dev/null 2>&1; then
-            cd ${DEVICE_TEST_RESULTS_FOLDER} && zip -qr ${WORKSPACE}/${DEVICE_TEST_REPORT_ZIP} . -i '*/logcat-*.txt'
-        else
-            echo "No device test logcat files to add to ${DEVICE_TEST_REPORT_ZIP}"
-        fi
-    """
-}
-
-/**
  * Check if this build is triggered by a deliver_qa command
  * @return
  */
@@ -586,16 +380,6 @@ private boolean triggerByUploadCoverage() {
     return env.gitlabActionType == "NOTE" &&
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase.startsWith(UPLOAD_COVERAGE_REPORT_CMD)
-}
-
-/**
- * Check if this build is triggered by a device_test command
- * @return
- */
-private boolean triggerByDeviceTestCmd() {
-    return env.gitlabActionType == "NOTE" &&
-            env.gitlabTriggerPhrase != null &&
-            env.gitlabTriggerPhrase.startsWith(DEVICE_TEST_CMD)
 }
 
 /**
