@@ -4,9 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,7 +22,6 @@ import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.fab.MegaFab
-import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
@@ -33,7 +30,9 @@ import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
+import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.feature.chat.list.model.ChatListBulkActionsUiState
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
@@ -50,8 +49,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 /**
  * Chat list screen with Chats and Meetings tabs and in-tab search.
  *
- * Owns the search field state, the Compose multi-selection state and the chat room actions
- * overlay, and delegates rendering to [ChatListScreenContent].
+ * Owns the search field state, the Compose multi-selection state, the chat room actions overlay
+ * and the presence and do-not-disturb dialogs, and delegates rendering to [ChatListScreenContent].
  *
  * @param uiState UI state of the screen.
  * @param showMeetingTab Whether the Meetings tab should be initially selected.
@@ -61,10 +60,15 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onInviteFriendClick Callback when the empty Chats tab invite-a-friend action is clicked.
  * @param onMeetingActionClick Callback when a meeting action is picked from the meetings sheet or
  * from the empty Meetings tab.
+ * @param onArchivedClick Callback when the archived chats action is clicked.
+ * @param onOpenLinkClick Callback when the open-link action is picked from the overflow.
  * @param onSearchQueryChange Callback when the search query changes, with `null` when cleared.
  * @param modifier [Modifier]
  * @param resolveChatRoomActions Resolves the ordered actions common to the given chats.
  * @param onChatRoomActionSelected Runs the picked action across the given chats.
+ * @param onChatStatusSelected Callback with the presence the user picked.
+ * @param doNotDisturbOptions Mute periods offered by the do-not-disturb action.
+ * @param onDoNotDisturbOptionSelected Callback with the mute period the user picked.
  */
 @Composable
 internal fun ChatListScreen(
@@ -76,10 +80,14 @@ internal fun ChatListScreen(
     onInviteFriendClick: () -> Unit,
     onMeetingActionClick: (MeetingAction) -> Unit,
     onArchivedClick: () -> Unit,
+    onOpenLinkClick: () -> Unit,
     onSearchQueryChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
     resolveChatRoomActions: suspend (Set<Long>) -> List<ChatRoomActionUiItem> = { emptyList() },
     onChatRoomActionSelected: (Set<Long>, String) -> Unit = { _, _ -> },
+    onChatStatusSelected: (UserChatStatus) -> Unit = {},
+    doNotDisturbOptions: () -> List<ChatPushNotificationMuteOption> = { emptyList() },
+    onDoNotDisturbOptionSelected: (ChatPushNotificationMuteOption) -> Unit = {},
 ) {
     var searchMode by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -88,6 +96,8 @@ internal fun ChatListScreen(
         mutableStateOf<ChatListBulkActionsUiState>(ChatListBulkActionsUiState.Hidden)
     }
     var showMeetingActions by rememberSaveable { mutableStateOf(false) }
+    var showStatusDialog by rememberSaveable { mutableStateOf(false) }
+    var showDoNotDisturbDialog by rememberSaveable { mutableStateOf(false) }
 
     val selectionMode = selectionState.isInSelectionMode
     val selectableChatIds = remember(uiState) { uiState.selectableChatIds() }
@@ -120,6 +130,7 @@ internal fun ChatListScreen(
         onMeetingFabClick = { showMeetingActions = true },
         onMeetingActionClick = onMeetingActionClick,
         onArchivedClick = onArchivedClick,
+        onOpenLinkClick = onOpenLinkClick,
         onSearchModeChange = { searchMode = it },
         onQueryChange = {
             searchQuery = it
@@ -141,12 +152,31 @@ internal fun ChatListScreen(
         onBulkActionsClick = {
             actionsState = ChatListBulkActionsUiState.ShowingActions(selectionState.selectedChatIds)
         },
+        onPresenceClick = { showStatusDialog = true },
+        onDoNotDisturbClick = { showDoNotDisturbDialog = true },
     )
 
     if (showMeetingActions) {
         MeetingActionsBottomSheet(
             onActionClick = onMeetingActionClick,
             onDismiss = { showMeetingActions = false },
+        )
+    }
+
+    if (showStatusDialog) {
+        ChatStatusDialog(
+            chatStatus = (uiState as? ChatListUiState.Data)?.chatStatus,
+            onStatusSelected = onChatStatusSelected,
+            onDismiss = { showStatusDialog = false },
+        )
+    }
+
+    if (showDoNotDisturbDialog) {
+        val options = remember { doNotDisturbOptions() }
+        ChatDoNotDisturbDialog(
+            options = options,
+            onOptionSelected = onDoNotDisturbOptionSelected,
+            onDismiss = { showDoNotDisturbDialog = false },
         )
     }
 
@@ -162,8 +192,8 @@ internal fun ChatListScreen(
 }
 
 /**
- * Stateless chat list screen rendering the search top app bar (or the selection top app bar while
- * in multi-select) and the Chats and Meetings tabs.
+ * Stateless chat list screen rendering the chat list top app bar, the search top app bar or the
+ * selection top app bar, and the Chats and Meetings tabs.
  *
  * @param uiState UI state of the screen.
  * @param showMeetingTab Whether the Meetings tab should be initially selected.
@@ -175,6 +205,8 @@ internal fun ChatListScreen(
  * @param onInviteFriendClick Callback when the empty Chats tab invite-a-friend action is clicked.
  * @param onMeetingFabClick Callback when the floating action button is clicked on the Meetings tab.
  * @param onMeetingActionClick Callback when an action on the empty Meetings tab is clicked.
+ * @param onArchivedClick Callback when the archived chats action is clicked.
+ * @param onOpenLinkClick Callback when the open-link action is picked from the overflow.
  * @param onSearchModeChange Callback when the search field is opened or closed.
  * @param onQueryChange Callback when the search query text changes.
  * @param modifier [Modifier]
@@ -189,6 +221,8 @@ internal fun ChatListScreen(
  * @param onSelectAll Callback when the select-all action is pressed.
  * @param onCancelSelection Callback when selection mode is dismissed.
  * @param onBulkActionsClick Callback when the bulk actions overflow is pressed.
+ * @param onPresenceClick Callback when the user asks to change their presence.
+ * @param onDoNotDisturbClick Callback when the do-not-disturb action is picked.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -204,6 +238,7 @@ internal fun ChatListScreenContent(
     onMeetingFabClick: () -> Unit,
     onMeetingActionClick: (MeetingAction) -> Unit,
     onArchivedClick: () -> Unit,
+    onOpenLinkClick: () -> Unit,
     onSearchModeChange: (Boolean) -> Unit,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -217,9 +252,17 @@ internal fun ChatListScreenContent(
     onSelectAll: () -> Unit = {},
     onCancelSelection: () -> Unit = {},
     onBulkActionsClick: () -> Unit = {},
+    onPresenceClick: () -> Unit = {},
+    onDoNotDisturbClick: () -> Unit = {},
 ) {
     var selectedTabIndex by rememberSaveable {
         mutableIntStateOf(if (showMeetingTab) MEETINGS_TAB_INDEX else CHATS_TAB_INDEX)
+    }
+
+    val navigationType = if (isMainNavBarRoot(ChatListNavKey::class)) {
+        AppBarNavigationType.None
+    } else {
+        AppBarNavigationType.Back(onBackClick)
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -227,41 +270,38 @@ internal fun ChatListScreenContent(
             .fillMaxSize()
             .testTag(CHAT_LIST_SCREEN_TAG),
         topBar = {
-            if (selectionMode) {
-                ChatListSelectionAppBar(
+            when {
+                selectionMode -> ChatListSelectionAppBar(
                     count = selectedCount,
                     isAllSelected = isAllSelected,
                     onSelectAllClick = onSelectAll,
                     onCancelClick = onCancelSelection,
                     onMoreClick = onBulkActionsClick,
                 )
-            } else {
-                MegaSearchTopAppBar(
+
+                searchMode -> MegaSearchTopAppBar(
                     modifier = Modifier.testTag(CHAT_LIST_SEARCH_BAR_TAG),
                     title = stringResource(sharedR.string.general_chats_label),
-                    navigationType = if (isMainNavBarRoot(ChatListNavKey::class)) {
-                        AppBarNavigationType.None
-                    } else {
-                        AppBarNavigationType.Back(onBackClick)
-                    },
+                    navigationType = navigationType,
                     query = searchQuery,
-                    isSearchingMode = searchMode,
+                    isSearchingMode = true,
                     onQueryChanged = onQueryChange,
                     onSearchingModeChanged = onSearchModeChange,
                     searchPlaceholder = stringResource(sharedR.string.search_placeholder_chat),
-                    trailingIcons = {
-                        IconButton(
-                            modifier = Modifier.testTag(CHAT_LIST_ARCHIVED_TAG),
-                            onClick = onArchivedClick,
-                        ) {
-                            MegaIcon(
-                                modifier = Modifier.size(24.dp),
-                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Archive),
-                                contentDescription = stringResource(sharedR.string.chat_archived_chats_title),
-                                tint = IconColor.Primary,
-                            )
-                        }
-                    },
+                )
+
+                else -> ChatListTopAppBar(
+                    chatStatus = (uiState as? ChatListUiState.Data)?.chatStatus,
+                    isSearchAvailable = (uiState as? ChatListUiState.Data)?.isSearchAvailable
+                        ?: false,
+                    hasArchivedChats = (uiState as? ChatListUiState.Data)?.hasArchivedChats
+                        ?: false,
+                    navigationType = navigationType,
+                    onPresenceClick = onPresenceClick,
+                    onSearchClick = { onSearchModeChange(true) },
+                    onArchivedClick = onArchivedClick,
+                    onOpenLinkClick = onOpenLinkClick,
+                    onDoNotDisturbClick = onDoNotDisturbClick,
                 )
             }
         },
@@ -390,7 +430,6 @@ internal const val CHAT_LIST_CHATS_TAB_TAG = "chat_list_screen:chats_tab"
 internal const val CHAT_LIST_MEETINGS_TAB_TAG = "chat_list_screen:meetings_tab"
 internal const val CHAT_LIST_FAB_TAG = "chat_list_screen:new_chat_fab"
 internal const val CHAT_LIST_MEETING_FAB_TAG = "chat_list_screen:new_meeting_fab"
-internal const val CHAT_LIST_ARCHIVED_TAG = "chat_list_screen:archived_action"
 
 private val previewChats = persistentListOf(
     ChatRoomUiItem(
@@ -431,18 +470,29 @@ private val previewChats = persistentListOf(
     ),
 )
 
+private fun previewState(
+    chats: ChatListTabState = ChatListTabState.Results(previewChats),
+    meetings: ChatListTabState = ChatListTabState.Empty,
+    hasAnyContact: Boolean = true,
+    hasArchivedChats: Boolean = true,
+    isSearchAvailable: Boolean = true,
+) = ChatListUiState.Data(
+    chats = chats,
+    meetings = meetings,
+    chatsHaveUnread = true,
+    meetingsHaveUnread = false,
+    hasAnyContact = hasAnyContact,
+    hasArchivedChats = hasArchivedChats,
+    isSearchAvailable = isSearchAvailable,
+    chatStatus = ChatStatus.Online,
+)
+
 @CombinedThemePreviews
 @Composable
 private fun ChatListScreenPreview() {
     AndroidThemeForPreviews {
         ChatListScreen(
-            uiState = ChatListUiState.Data(
-                chats = ChatListTabState.Results(previewChats),
-                meetings = ChatListTabState.Empty,
-                chatsHaveUnread = true,
-                meetingsHaveUnread = false,
-                hasAnyContact = true,
-            ),
+            uiState = previewState(),
             showMeetingTab = false,
             onBackClick = {},
             onItemClick = {},
@@ -450,6 +500,7 @@ private fun ChatListScreenPreview() {
             onInviteFriendClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
+            onOpenLinkClick = {},
             onSearchQueryChange = {},
         )
     }
@@ -460,13 +511,7 @@ private fun ChatListScreenPreview() {
 private fun ChatListScreenSearchActivePreview() {
     AndroidThemeForPreviews {
         ChatListScreenContent(
-            uiState = ChatListUiState.Data(
-                chats = ChatListTabState.Results(previewChats),
-                meetings = ChatListTabState.Empty,
-                chatsHaveUnread = true,
-                meetingsHaveUnread = false,
-                hasAnyContact = true,
-            ),
+            uiState = previewState(),
             showMeetingTab = false,
             searchMode = true,
             searchQuery = "Re",
@@ -477,6 +522,7 @@ private fun ChatListScreenSearchActivePreview() {
             onMeetingFabClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
+            onOpenLinkClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
         )
@@ -488,12 +534,9 @@ private fun ChatListScreenSearchActivePreview() {
 private fun ChatListScreenNoResultsPreview() {
     AndroidThemeForPreviews {
         ChatListScreenContent(
-            uiState = ChatListUiState.Data(
+            uiState = previewState(
                 chats = ChatListTabState.NoSearchResults,
                 meetings = ChatListTabState.NoSearchResults,
-                chatsHaveUnread = false,
-                meetingsHaveUnread = false,
-                hasAnyContact = true,
             ),
             showMeetingTab = false,
             searchMode = true,
@@ -505,6 +548,7 @@ private fun ChatListScreenNoResultsPreview() {
             onMeetingFabClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
+            onOpenLinkClick = {},
             onSearchModeChange = {},
             onQueryChange = {},
         )
@@ -516,13 +560,7 @@ private fun ChatListScreenNoResultsPreview() {
 private fun ChatListScreenSelectionModePreview() {
     AndroidThemeForPreviews {
         ChatListScreenContent(
-            uiState = ChatListUiState.Data(
-                chats = ChatListTabState.Results(previewChats),
-                meetings = ChatListTabState.Empty,
-                chatsHaveUnread = false,
-                meetingsHaveUnread = false,
-                hasAnyContact = true,
-            ),
+            uiState = previewState(),
             showMeetingTab = false,
             searchMode = false,
             searchQuery = "",
@@ -539,6 +577,7 @@ private fun ChatListScreenSelectionModePreview() {
             onMeetingFabClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
+            onOpenLinkClick = {},
         )
     }
 }
@@ -556,6 +595,7 @@ private fun ChatListScreenLoadingPreview() {
             onInviteFriendClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
+            onOpenLinkClick = {},
             onSearchQueryChange = {},
         )
     }

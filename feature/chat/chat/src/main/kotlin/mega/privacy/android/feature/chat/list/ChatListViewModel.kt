@@ -11,20 +11,30 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
+import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
+import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
+import mega.privacy.android.domain.usecase.chat.MuteChatPushNotificationUseCase
+import mega.privacy.android.domain.usecase.chat.SetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
+import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
@@ -36,7 +46,9 @@ import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.MeetingAction
 import mega.privacy.android.feature.chat.list.model.MeetingActionEvent
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.NewChatNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,6 +66,13 @@ internal class ChatListViewModel @Inject constructor(
     private val createGroupChatRoomUseCase: CreateGroupChatRoomUseCase,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
+    private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
+    private val hasArchivedChatsUseCase: HasArchivedChatsUseCase,
+    private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase,
+    private val setCurrentUserStatusUseCase: SetCurrentUserStatusUseCase,
+    private val getChatMuteOptionListUseCase: GetChatMuteOptionListUseCase,
+    private val muteChatPushNotificationUseCase: MuteChatPushNotificationUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
     private val chatRoomActions: ChatRoomActions,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
@@ -80,17 +99,20 @@ internal class ChatListViewModel @Inject constructor(
      */
     val uiState: StateFlow<ChatListUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            chatRoomsFlow(ChatRoomType.NON_MEETINGS),
-            chatRoomsFlow(ChatRoomType.MEETINGS),
+            chatRoomsFlow(),
             queryChannel.receiveAsFlow().onStart { emit(null) },
             hasAnyContactFlow(),
-        ) { chats, meetings, query, hasAnyContact ->
+            chatStatusFlow(),
+        ) { rooms, query, hasAnyContact, chatStatus ->
             ChatListUiState.Data(
-                chats = tabState(chats, query),
-                meetings = tabState(meetings, query),
-                chatsHaveUnread = chats.anyUnread(),
-                meetingsHaveUnread = meetings.anyUnread(),
+                chats = tabState(rooms.chats, query),
+                meetings = tabState(rooms.meetings, query),
+                chatsHaveUnread = rooms.chats.anyUnread(),
+                meetingsHaveUnread = rooms.meetings.anyUnread(),
                 hasAnyContact = hasAnyContact,
+                hasArchivedChats = rooms.hasArchived,
+                isSearchAvailable = rooms.isSearchable,
+                chatStatus = chatStatus,
             )
         }.catch { e ->
             Timber.e(e, "Failed to load chat list")
@@ -215,6 +237,49 @@ internal class ChatListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Publish [status] as the user's presence.
+     *
+     * @param status Presence the user picked.
+     */
+    fun onChatStatusSelected(status: UserChatStatus) {
+        viewModelScope.launch {
+            runCatching { setCurrentUserStatusUseCase(status) }.onFailure { e ->
+                Timber.e(e, "Failed to set the user status to $status")
+                queueMessage(sharedR.string.changing_status_error)
+            }
+        }
+    }
+
+    /**
+     * Mute options offered by the do-not-disturb toolbar action, which silences every chat at once.
+     */
+    fun doNotDisturbOptions(): List<ChatPushNotificationMuteOption> =
+        runCatching { getChatMuteOptionListUseCase(emptyChatList = true) }
+            .getOrElse { e ->
+                Timber.e(e, "Failed to resolve the do not disturb options")
+                emptyList()
+            }
+
+    /**
+     * Silence every chat for the period the user picked from the do-not-disturb toolbar action.
+     *
+     * @param option Mute period the user picked.
+     */
+    fun onDoNotDisturbOptionSelected(option: ChatPushNotificationMuteOption) {
+        viewModelScope.launch {
+            runCatching { muteChatPushNotificationUseCase(null, option) }.onFailure { e ->
+                Timber.e(e, "Failed to mute all chat notifications with $option")
+                queueMessage(sharedR.string.general_request_failed_message)
+            }
+        }
+    }
+
+    private suspend fun queueMessage(messageId: Int) {
+        runCatching { snackbarEventQueue.queueMessage(messageId) }
+            .onFailure { Timber.e(it, "Failed to queue a chat list message") }
+    }
+
     private suspend fun selectedRooms(chatIds: Set<Long>): List<ChatRoomItem> {
         if (chatIds.isEmpty()) return emptyList()
         val rooms = currentChatRooms()
@@ -248,18 +313,67 @@ internal class ChatListViewModel @Inject constructor(
             emit(false)
         }
 
-    private fun chatRoomsFlow(chatRoomType: ChatRoomType): Flow<ImmutableList<ChatRoomUiItem>> =
-        getChatsUseCase(
-            chatRoomType = chatRoomType,
-            lastMessage = chatLastMessageFormatter::invoke,
-            lastTimeMapper = chatRoomTimestampMapper::getLastTimeFormatted,
-            meetingTimeMapper = chatRoomTimestampMapper::getMeetingTimeFormatted,
-            headerTimeMapper = chatRoomTimestampMapper::getHeaderTimeFormatted,
-        ).map { items ->
-            items.map(chatRoomUiItemMapper::invoke).toImmutableList()
-        }.catch { e ->
-            Timber.e(e, "Failed to load $chatRoomType chat rooms")
+    private fun chatStatusFlow(): Flow<ChatStatus?> = getCurrentChatStatusUseCase()
+        .map<ChatStatus, ChatStatus?> { it }
+        .onStart { emit(null) }
+        .catch { e ->
+            Timber.e(e, "Failed to monitor the user chat status")
+            emit(null)
         }
+
+    private fun chatRoomsFlow(): Flow<ChatRooms> = combine(
+        formattedChatRoomsFlow(ChatRoomType.NON_MEETINGS),
+        formattedChatRoomsFlow(ChatRoomType.MEETINGS),
+        hasArchivedChatsFlow(),
+    ) { chats, meetings, hasArchived ->
+        ChatRooms(
+            chats = chats.map(chatRoomUiItemMapper::invoke).toImmutableList(),
+            meetings = meetings.map(chatRoomUiItemMapper::invoke).toImmutableList(),
+            hasArchived = hasArchived,
+            isSearchable = isSearchable(chats, meetings),
+        )
+    }
+
+    /**
+     * There is nothing to search while both tabs are empty, or while the only chat the user has is
+     * a note-to-self chat with no messages in it.
+     */
+    private fun isSearchable(
+        chats: List<ChatRoomItem>,
+        meetings: List<ChatRoomItem>,
+    ): Boolean = when {
+        chats.isEmpty() && meetings.isEmpty() -> false
+        meetings.isNotEmpty() || chats.size > 1 -> true
+        else -> chats.first().let {
+            it !is ChatRoomItem.NoteToSelfChatRoomItem || !it.isEmptyNoteToSelfChatRoom
+        }
+    }
+
+    /**
+     * Only whether any archived chat exists is needed, so the archived list is asked for that one
+     * answer on every chat list change instead of subscribing to the archived chat rooms pipeline,
+     * which keeps resolving avatars, last messages and per-peer attributes for rows nothing renders.
+     */
+    private fun hasArchivedChatsFlow(): Flow<Boolean> = monitorChatListItemUpdates()
+        .map { hasArchivedChatsUseCase() }
+        .onStart { emit(hasArchivedChatsUseCase()) }
+        .distinctUntilChanged()
+        .catch { e ->
+            Timber.e(e, "Failed to monitor whether the user has archived chats")
+            emit(false)
+        }
+
+    private fun formattedChatRoomsFlow(
+        chatRoomType: ChatRoomType,
+    ): Flow<List<ChatRoomItem>> = getChatsUseCase(
+        chatRoomType = chatRoomType,
+        lastMessage = chatLastMessageFormatter::invoke,
+        lastTimeMapper = chatRoomTimestampMapper::getLastTimeFormatted,
+        meetingTimeMapper = chatRoomTimestampMapper::getMeetingTimeFormatted,
+        headerTimeMapper = chatRoomTimestampMapper::getHeaderTimeFormatted,
+    ).catch { e ->
+        Timber.e(e, "Failed to load $chatRoomType chat rooms")
+    }
 
     private fun tabState(
         items: ImmutableList<ChatRoomUiItem>,
@@ -286,4 +400,19 @@ internal class ChatListViewModel @Inject constructor(
                 || lastMessage?.contains(query, ignoreCase = true) == true
 
     private fun List<ChatRoomUiItem>.anyUnread(): Boolean = any { it.unreadCount > 0 }
+
+    /**
+     * Chat rooms behind both tabs, independent of the active search query.
+     *
+     * @property chats Rows of the Chats tab.
+     * @property meetings Rows of the Meetings tab.
+     * @property hasArchived Whether the user has any archived chat.
+     * @property isSearchable Whether there is anything worth searching.
+     */
+    private data class ChatRooms(
+        val chats: ImmutableList<ChatRoomUiItem>,
+        val meetings: ImmutableList<ChatRoomUiItem>,
+        val hasArchived: Boolean,
+        val isSearchable: Boolean,
+    )
 }

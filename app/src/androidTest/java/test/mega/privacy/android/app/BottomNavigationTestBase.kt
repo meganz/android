@@ -446,9 +446,9 @@ abstract class BottomNavigationTestBase {
         const val MENU_TOOLBAR_TAG = "menu_home_screen:toolbar"
         const val MENU_ACCOUNT_ITEM_TAG = "menu_home_screen:account_item"
 
-        /** Mirror the ChatListScreen test tags of the Compose chat list. */
+        /** Mirror the ChatListScreen and ChatListTopAppBar test tags of the Compose chat list. */
         const val CHAT_LIST_SCREEN_TAG = "chat_list_screen:screen"
-        const val CHAT_LIST_SEARCH_BAR_TAG = "chat_list_screen:search_bar"
+        const val CHAT_LIST_TOP_BAR_TAG = "chat_list_top_app_bar:bar"
 
         /** Mirrors OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG of the Compose offline screen. */
         const val OFFLINE_SEARCH_TOP_APP_BAR_TAG = "offline_screen:search_top_app_bar"

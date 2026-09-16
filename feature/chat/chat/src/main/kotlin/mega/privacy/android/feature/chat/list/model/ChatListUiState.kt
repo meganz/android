@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.chat.list.model
 
 import androidx.compose.runtime.Stable
+import mega.privacy.android.domain.entity.chat.ChatStatus
 
 /**
  * UI state for the chat list screen.
@@ -24,6 +25,12 @@ sealed interface ChatListUiState {
      * badge. Independent of the active search query.
      * @property hasAnyContact Whether the user has at least one MEGA contact, driving the call to
      * action offered on the empty Chats tab.
+     * @property hasArchivedChats Whether the user has any archived chat, driving the archived
+     * chats toolbar action.
+     * @property isSearchAvailable Whether there is anything worth searching, driving the search
+     * toolbar action. Independent of the active search query.
+     * @property chatStatus Presence the user is currently publishing, shown as the toolbar
+     * subtitle; null while it is still being resolved.
      */
     data class Data(
         val chats: ChatListTabState,
@@ -31,5 +38,8 @@ sealed interface ChatListUiState {
         val chatsHaveUnread: Boolean,
         val meetingsHaveUnread: Boolean,
         val hasAnyContact: Boolean,
+        val hasArchivedChats: Boolean,
+        val isSearchAvailable: Boolean,
+        val chatStatus: ChatStatus?,
     ) : ChatListUiState
 }

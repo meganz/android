@@ -48,7 +48,7 @@ class BarResidentChatTest : BottomNavigationTestBase() {
         clickAndAwait(By.res(CHAT_NAV_ITEM_TAG), By.res(CHAT_LIST_SCREEN_TAG), "chat-nav-item")
 
         // The bar root's top bar renders with no back affordance.
-        awaitObject(By.res(CHAT_LIST_SEARCH_BAR_TAG), LOAD_TIMEOUT, "chat-top-bar")
+        awaitObject(By.res(CHAT_LIST_TOP_BAR_TAG), LOAD_TIMEOUT, "chat-top-bar")
         assertNotPresent(backArrow, "chat-back-arrow")
 
         // The Menu shows no Chat row while Chat is in the bar; the anchor row below Chat's slot

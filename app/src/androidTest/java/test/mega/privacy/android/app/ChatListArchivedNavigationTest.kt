@@ -180,7 +180,7 @@ class ChatListArchivedNavigationTest {
         const val ARCHIVED_TITLE = "Old Project"
 
         const val CHAT_ROOM_ITEM_TAG = "chat_room_item:row"
-        const val ARCHIVED_ACTION_TAG = "chat_list_screen:archived_action"
+        const val ARCHIVED_ACTION_TAG = "chat_list_top_app_bar:archived_action"
         const val ARCHIVED_SCREEN_TAG = "archived_chats_screen:screen"
     }
 }

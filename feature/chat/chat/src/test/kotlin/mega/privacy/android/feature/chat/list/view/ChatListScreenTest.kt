@@ -28,6 +28,10 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.contact.state.ContactItemStatus
+import mega.android.core.ui.components.menu.TAG_TOP_APP_BAR_ACTIONS_SHOW_MORE
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
+import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_ARCHIVE_TAG
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.icon.pack.IconPack
@@ -76,6 +80,7 @@ class ChatListScreenTest {
             onInviteFriendClick = {},
             onMeetingActionClick = {},
             onArchivedClick = {},
+            onOpenLinkClick = {},
             onSearchQueryChange = {},
         )
     }
@@ -311,6 +316,7 @@ class ChatListScreenTest {
                     onInviteFriendClick = {},
                     onMeetingActionClick = {},
                     onArchivedClick = {},
+                    onOpenLinkClick = {},
                     onSearchQueryChange = {},
                     resolveChatRoomActions = { listOf(archiveAction) },
                 )
@@ -321,12 +327,20 @@ class ChatListScreenTest {
     private fun setupPopulatedScreen(
         showMeetingTab: Boolean,
         onMeetingActionClick: (MeetingAction) -> Unit = {},
+        hasArchivedChats: Boolean = true,
+        isSearchAvailable: Boolean = true,
+        onChatStatusSelected: (UserChatStatus) -> Unit = {},
+        doNotDisturbOptions: () -> List<ChatPushNotificationMuteOption> = { emptyList() },
+        onOpenLinkClick: () -> Unit = {},
     ) {
         composeRule.setContent {
             CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
                 AndroidThemeForPreviews {
                     ChatListScreen(
-                        uiState = populatedState(),
+                        uiState = populatedState(
+                            hasArchivedChats = hasArchivedChats,
+                            isSearchAvailable = isSearchAvailable,
+                        ),
                         showMeetingTab = showMeetingTab,
                         onBackClick = {},
                         onItemClick = {},
@@ -334,7 +348,10 @@ class ChatListScreenTest {
                         onInviteFriendClick = {},
                         onMeetingActionClick = onMeetingActionClick,
                         onArchivedClick = {},
+                        onOpenLinkClick = onOpenLinkClick,
                         onSearchQueryChange = {},
+                        onChatStatusSelected = onChatStatusSelected,
+                        doNotDisturbOptions = doNotDisturbOptions,
                     )
                 }
             }
@@ -358,6 +375,9 @@ class ChatListScreenTest {
                             chatsHaveUnread = false,
                             meetingsHaveUnread = false,
                             hasAnyContact = hasAnyContact,
+                            hasArchivedChats = true,
+                            isSearchAvailable = true,
+                            chatStatus = ChatStatus.Online,
                         ),
                         showMeetingTab = showMeetingTab,
                         onBackClick = {},
@@ -366,6 +386,7 @@ class ChatListScreenTest {
                         onInviteFriendClick = onInviteFriendClick,
                         onMeetingActionClick = onMeetingActionClick,
                         onArchivedClick = {},
+                        onOpenLinkClick = {},
                         onSearchQueryChange = {},
                     )
                 }
@@ -373,12 +394,18 @@ class ChatListScreenTest {
         }
     }
 
-    private fun populatedState() = ChatListUiState.Data(
+    private fun populatedState(
+        hasArchivedChats: Boolean = true,
+        isSearchAvailable: Boolean = true,
+    ) = ChatListUiState.Data(
         chats = ChatListTabState.Results(persistentListOf(chatRoomUiItem(1L, "Chat"))),
         meetings = ChatListTabState.Results(persistentListOf(chatRoomUiItem(2L, "Meeting"))),
         chatsHaveUnread = false,
         meetingsHaveUnread = false,
         hasAnyContact = true,
+        hasArchivedChats = hasArchivedChats,
+        isSearchAvailable = isSearchAvailable,
+        chatStatus = ChatStatus.Online,
     )
 
     private fun chatRoomUiItem(chatId: Long, title: String) = ChatRoomUiItem(
@@ -453,6 +480,7 @@ class ChatListScreenTest {
                         onInviteFriendClick = {},
                         onMeetingActionClick = {},
                         onArchivedClick = {},
+                        onOpenLinkClick = {},
                         onSearchQueryChange = {},
                         resolveChatRoomActions = { chatIds ->
                             onActionsResolved(chatIds)
@@ -472,4 +500,87 @@ class ChatListScreenTest {
         isDestructive = false,
         confirmation = null,
     )
+
+    @Test
+    fun `test that the open link action reports the click`() {
+        var openLinkClicks = 0
+        setupPopulatedScreen(showMeetingTab = false, onOpenLinkClick = { openLinkClicks++ })
+
+        composeRule.onNodeWithTag(TAG_TOP_APP_BAR_ACTIONS_SHOW_MORE, useUnmergedTree = true)
+            .performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(CHAT_LIST_OPEN_LINK_TAG).performClick()
+        composeRule.waitForIdle()
+
+        assertThat(openLinkClicks).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that the archived action is shown when the user has archived chats`() {
+        setupPopulatedScreen(showMeetingTab = false, hasArchivedChats = true)
+
+        composeRule.onNodeWithTag(CHAT_LIST_ARCHIVED_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the archived action is hidden when the user has no archived chats`() {
+        setupPopulatedScreen(showMeetingTab = false, hasArchivedChats = false)
+
+        composeRule.onNodeWithTag(CHAT_LIST_ARCHIVED_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the search action is hidden when there is nothing to search`() {
+        setupPopulatedScreen(showMeetingTab = false, isSearchAvailable = false)
+
+        composeRule.onNodeWithTag(CHAT_LIST_SEARCH_ACTION_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the presence is shown as the toolbar subtitle`() {
+        setupPopulatedScreen(showMeetingTab = false)
+
+        composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.online_status))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that tapping the toolbar opens the presence picker`() {
+        setupPopulatedScreen(showMeetingTab = false)
+
+        composeRule.onNodeWithTag(CHAT_LIST_TOP_BAR_TAG).performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onAllNodesWithTag(CHAT_STATUS_DIALOG_TAG)[0].assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that picking a presence reports it`() {
+        val picked = mutableListOf<UserChatStatus>()
+        setupPopulatedScreen(showMeetingTab = false, onChatStatusSelected = picked::add)
+
+        composeRule.onNodeWithTag(CHAT_LIST_TOP_BAR_TAG).performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.busy_status))
+            .performClick()
+        composeRule.waitForIdle()
+
+        assertThat(picked).containsExactly(UserChatStatus.Busy)
+    }
+
+    @Test
+    fun `test that the do not disturb action opens the mute period picker`() {
+        setupPopulatedScreen(
+            showMeetingTab = false,
+            doNotDisturbOptions = { listOf(ChatPushNotificationMuteOption.Mute1Hour) },
+        )
+
+        composeRule.onNodeWithTag(TAG_TOP_APP_BAR_ACTIONS_SHOW_MORE, useUnmergedTree = true)
+            .performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(CHAT_LIST_DO_NOT_DISTURB_TAG).performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onAllNodesWithTag(CHAT_DO_NOT_DISTURB_DIALOG_TAG)[0].assertIsDisplayed()
+    }
 }

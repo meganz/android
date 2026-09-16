@@ -6,6 +6,7 @@ import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
@@ -31,6 +32,7 @@ class ChatListScreenScreenshotTest {
                 onInviteFriendClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -50,6 +52,7 @@ class ChatListScreenScreenshotTest {
                 onInviteFriendClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -67,6 +70,9 @@ class ChatListScreenScreenshotTest {
                     chatsHaveUnread = false,
                     meetingsHaveUnread = false,
                     hasAnyContact = true,
+                    hasArchivedChats = true,
+                    isSearchAvailable = true,
+                    chatStatus = ChatStatus.Online,
                 ),
                 showMeetingTab = false,
                 onBackClick = {},
@@ -75,6 +81,7 @@ class ChatListScreenScreenshotTest {
                 onInviteFriendClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -92,6 +99,9 @@ class ChatListScreenScreenshotTest {
                     chatsHaveUnread = false,
                     meetingsHaveUnread = false,
                     hasAnyContact = false,
+                    hasArchivedChats = true,
+                    isSearchAvailable = true,
+                    chatStatus = ChatStatus.Online,
                 ),
                 showMeetingTab = false,
                 onBackClick = {},
@@ -100,6 +110,7 @@ class ChatListScreenScreenshotTest {
                 onInviteFriendClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -117,6 +128,9 @@ class ChatListScreenScreenshotTest {
                     chatsHaveUnread = false,
                     meetingsHaveUnread = false,
                     hasAnyContact = true,
+                    hasArchivedChats = true,
+                    isSearchAvailable = true,
+                    chatStatus = ChatStatus.Online,
                 ),
                 showMeetingTab = true,
                 onBackClick = {},
@@ -125,6 +139,7 @@ class ChatListScreenScreenshotTest {
                 onInviteFriendClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -147,6 +162,7 @@ class ChatListScreenScreenshotTest {
                 onMeetingFabClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
             )
@@ -165,6 +181,9 @@ class ChatListScreenScreenshotTest {
                     chatsHaveUnread = false,
                     meetingsHaveUnread = false,
                     hasAnyContact = true,
+                    hasArchivedChats = true,
+                    isSearchAvailable = true,
+                    chatStatus = ChatStatus.Online,
                 ),
                 showMeetingTab = false,
                 searchMode = true,
@@ -176,6 +195,7 @@ class ChatListScreenScreenshotTest {
                 onMeetingFabClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
             )
@@ -199,6 +219,7 @@ class ChatListScreenScreenshotTest {
                 onMeetingFabClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchModeChange = {},
                 onQueryChange = {},
                 selectionMode = true,
@@ -223,6 +244,7 @@ class ChatListScreenScreenshotTest {
                 onInviteFriendClick = {},
                 onMeetingActionClick = {},
                 onArchivedClick = {},
+                onOpenLinkClick = {},
                 onSearchQueryChange = {},
             )
         }
@@ -329,5 +351,8 @@ class ChatListScreenScreenshotTest {
         chatsHaveUnread = true,
         meetingsHaveUnread = true,
         hasAnyContact = true,
+        hasArchivedChats = true,
+        isSearchAvailable = true,
+        chatStatus = ChatStatus.Online,
     )
 }

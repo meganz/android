@@ -145,9 +145,13 @@ fun ChatListEntry(
             viewModel.onMeetingActionSelected(action)
         },
         onArchivedClick = { navigationHandler.navigate(ArchivedChatsNavKey) },
+        onOpenLinkClick = { navigationHandler.navigate(OpenLinkDialogNavKey()) },
         onSearchQueryChange = viewModel::onSearchQueryChange,
         resolveChatRoomActions = viewModel::getBulkChatRoomActions,
         onChatRoomActionSelected = viewModel::onBulkChatRoomActionSelected,
+        onChatStatusSelected = viewModel::onChatStatusSelected,
+        doNotDisturbOptions = viewModel::doNotDisturbOptions,
+        onDoNotDisturbOptionSelected = viewModel::onDoNotDisturbOptionSelected,
     )
 
     blockedMessage?.let { message ->

@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -17,18 +18,27 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
+import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
+import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
+import mega.privacy.android.domain.usecase.chat.MuteChatPushNotificationUseCase
+import mega.privacy.android.domain.usecase.chat.SetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
+import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
@@ -61,6 +71,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
@@ -96,6 +107,12 @@ class ChatListViewModelTest {
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
     private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
     private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase>()
+    private val monitorChatListItemUpdates = mock<MonitorChatListItemUpdates>()
+    private val hasArchivedChatsUseCase = mock<HasArchivedChatsUseCase>()
+    private val getCurrentChatStatusUseCase = mock<GetCurrentChatStatusUseCase>()
+    private val setCurrentUserStatusUseCase = mock<SetCurrentUserStatusUseCase>()
+    private val getChatMuteOptionListUseCase = mock<GetChatMuteOptionListUseCase>()
+    private val muteChatPushNotificationUseCase = mock<MuteChatPushNotificationUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val chatRoomTitleMapper = mock<ChatRoomTitleMapper>()
 
@@ -138,6 +155,7 @@ class ChatListViewModelTest {
     fun setUp() {
         stubHasAnyContact(hasAnyContact = false)
         applicationScope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher())
+        stubChatStatus(ChatStatus.Online)
         underTest = ChatListViewModel(
             getChatsUseCase = getChatsUseCase,
             chatLastMessageFormatter = chatLastMessageFormatter,
@@ -148,6 +166,13 @@ class ChatListViewModelTest {
             createGroupChatRoomUseCase = createGroupChatRoomUseCase,
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
+            monitorChatListItemUpdates = monitorChatListItemUpdates,
+            hasArchivedChatsUseCase = hasArchivedChatsUseCase,
+            getCurrentChatStatusUseCase = getCurrentChatStatusUseCase,
+            setCurrentUserStatusUseCase = setCurrentUserStatusUseCase,
+            getChatMuteOptionListUseCase = getChatMuteOptionListUseCase,
+            muteChatPushNotificationUseCase = muteChatPushNotificationUseCase,
+            snackbarEventQueue = snackbarEventQueue,
             chatRoomActions = chatRoomActions,
             applicationScope = applicationScope,
         )
@@ -175,6 +200,12 @@ class ChatListViewModelTest {
             startConversationUseCase,
             createGroupChatRoomUseCase,
             monitorHasAnyContactUseCase,
+            monitorChatListItemUpdates,
+            hasArchivedChatsUseCase,
+            getCurrentChatStatusUseCase,
+            setCurrentUserStatusUseCase,
+            getChatMuteOptionListUseCase,
+            muteChatPushNotificationUseCase,
             snackbarEventQueue,
             chatRoomTitleMapper,
             chatRoomActionPluralMapper,
@@ -604,8 +635,16 @@ class ChatListViewModelTest {
     private fun stubChatRooms(
         chats: List<ChatRoomItem> = listOf(chatRoomItem),
         meetings: List<ChatRoomItem> = listOf(meetingRoomItem),
+        archived: List<ChatRoomItem> = emptyList(),
     ) {
+        stubHasArchivedChats(archived.isNotEmpty())
         getChatsUseCase.stub {
+            on { invoke(eq(ChatRoomType.ARCHIVED_CHATS), any(), any(), any(), any()) } doAnswer {
+                flow {
+                    emit(archived)
+                    awaitCancellation()
+                }
+            }
             on { invoke(eq(ChatRoomType.NON_MEETINGS), any(), any(), any(), any()) } doAnswer { invocation ->
                 captureMappers(invocation)
                 flow {
@@ -627,9 +666,24 @@ class ChatListViewModelTest {
         }
     }
 
+    private fun stubHasArchivedChats(hasArchivedChats: Boolean) {
+        monitorChatListItemUpdates.stub {
+            on { invoke() } doReturn emptyFlow()
+        }
+        hasArchivedChatsUseCase.stub {
+            onBlocking { invoke() } doReturn hasArchivedChats
+        }
+    }
+
     private fun stubHasAnyContact(hasAnyContact: Boolean) {
         monitorHasAnyContactUseCase.stub {
             on { invoke() } doReturn flowOf(hasAnyContact)
+        }
+    }
+
+    private fun stubChatStatus(status: ChatStatus) {
+        getCurrentChatStatusUseCase.stub {
+            on { invoke() } doReturn flowOf(status)
         }
     }
 
@@ -842,4 +896,144 @@ class ChatListViewModelTest {
             assertThat(actions.first { it.testTag == CHAT_ROOM_ACTIONS_MUTE_TAG }.label)
                 .isEqualTo(sharedR.string.general_unmute)
         }
+
+    @Test
+    fun `test that uiState reports archived chats when the user has some`() = runTest {
+        stubChatRooms(archived = listOf(ChatRoomItem.IndividualChatRoomItem(chatId = 9L, title = "Old")))
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().hasArchivedChats).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that uiState reports no archived chats when the user has none`() = runTest {
+        stubChatRooms(archived = emptyList())
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().hasArchivedChats).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that uiState offers search when the user has chats`() = runTest {
+        stubChatRooms()
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().isSearchAvailable).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that uiState hides search when there is no chat at all`() = runTest {
+        stubChatRooms(chats = emptyList(), meetings = emptyList())
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().isSearchAvailable).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that uiState hides search when the only chat is an empty note to self`() = runTest {
+        val noteToSelf = ChatRoomItem.NoteToSelfChatRoomItem(chatId = 5L, title = "Note to self")
+        stubChatRooms(chats = listOf(noteToSelf), meetings = emptyList())
+        chatRoomUiItemMapper.stub {
+            on { invoke(noteToSelf) } doReturn chatRoomUiItem(5L, "Note to self")
+        }
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().isSearchAvailable).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that uiState offers search when the only chat is a note to self with messages`() =
+        runTest {
+            val noteToSelf = ChatRoomItem.NoteToSelfChatRoomItem(
+                chatId = 5L,
+                title = "Note to self",
+                lastMessageType = ChatRoomLastMessage.Normal,
+            )
+            stubChatRooms(chats = listOf(noteToSelf), meetings = emptyList())
+            chatRoomUiItemMapper.stub {
+                on { invoke(noteToSelf) } doReturn chatRoomUiItem(5L, "Note to self")
+            }
+
+            underTest.uiState.test {
+                assertThat(awaitDataState().isSearchAvailable).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that uiState exposes the current chat status`() = runTest {
+        stubChatRooms()
+        stubChatStatus(ChatStatus.Away)
+
+        underTest.uiState.test {
+            var state = awaitDataState()
+            while (state.chatStatus == null) {
+                state = awaitDataState()
+            }
+            assertThat(state.chatStatus).isEqualTo(ChatStatus.Away)
+        }
+    }
+
+    @Test
+    fun `test that onChatStatusSelected publishes the picked presence`() = runTest {
+        stubChatRooms()
+
+        underTest.onChatStatusSelected(UserChatStatus.Busy)
+        advanceUntilIdle()
+
+        verify(setCurrentUserStatusUseCase)(UserChatStatus.Busy)
+    }
+
+    @Test
+    fun `test that onChatStatusSelected queues an error when publishing the presence fails`() =
+        runTest {
+            stubChatRooms()
+            setCurrentUserStatusUseCase.stub {
+                onBlocking { invoke(any()) } doAnswer { throw RuntimeException("boom") }
+            }
+
+            underTest.onChatStatusSelected(UserChatStatus.Busy)
+            advanceUntilIdle()
+
+            verify(snackbarEventQueue).queueMessage(sharedR.string.changing_status_error)
+        }
+
+    @Test
+    fun `test that doNotDisturbOptions returns the global mute options`() = runTest {
+        val options = listOf(ChatPushNotificationMuteOption.Mute30Minutes)
+        whenever(getChatMuteOptionListUseCase(emptyChatList = true)) doReturn options
+
+        assertThat(underTest.doNotDisturbOptions()).isEqualTo(options)
+    }
+
+    @Test
+    fun `test that onDoNotDisturbOptionSelected silences every chat for the picked period`() =
+        runTest {
+            stubChatRooms()
+
+            underTest.onDoNotDisturbOptionSelected(ChatPushNotificationMuteOption.Mute1Hour)
+            advanceUntilIdle()
+
+            verify(muteChatPushNotificationUseCase)(
+                null,
+                ChatPushNotificationMuteOption.Mute1Hour,
+            )
+        }
+
+    @Test
+    fun `test that onDoNotDisturbOptionSelected queues an error when silencing fails`() = runTest {
+        stubChatRooms()
+        muteChatPushNotificationUseCase.stub {
+            onBlocking { invoke(anyOrNull(), any()) } doAnswer { throw RuntimeException("boom") }
+        }
+
+        underTest.onDoNotDisturbOptionSelected(ChatPushNotificationMuteOption.Mute1Hour)
+        advanceUntilIdle()
+
+        verify(snackbarEventQueue).queueMessage(sharedR.string.general_request_failed_message)
+    }
 }
