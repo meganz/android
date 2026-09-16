@@ -7,6 +7,7 @@ import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
@@ -73,6 +74,7 @@ class ChatListScreenScreenshotTest {
                     hasArchivedChats = true,
                     isSearchAvailable = true,
                     chatStatus = ChatStatus.Online,
+                    meetingTooltip = MeetingTooltipItem.NONE,
                 ),
                 showMeetingTab = false,
                 onBackClick = {},
@@ -102,6 +104,7 @@ class ChatListScreenScreenshotTest {
                     hasArchivedChats = true,
                     isSearchAvailable = true,
                     chatStatus = ChatStatus.Online,
+                    meetingTooltip = MeetingTooltipItem.NONE,
                 ),
                 showMeetingTab = false,
                 onBackClick = {},
@@ -131,6 +134,7 @@ class ChatListScreenScreenshotTest {
                     hasArchivedChats = true,
                     isSearchAvailable = true,
                     chatStatus = ChatStatus.Online,
+                    meetingTooltip = MeetingTooltipItem.NONE,
                 ),
                 showMeetingTab = true,
                 onBackClick = {},
@@ -184,6 +188,7 @@ class ChatListScreenScreenshotTest {
                     hasArchivedChats = true,
                     isSearchAvailable = true,
                     chatStatus = ChatStatus.Online,
+                    meetingTooltip = MeetingTooltipItem.NONE,
                 ),
                 showMeetingTab = false,
                 searchMode = true,
@@ -354,5 +359,6 @@ class ChatListScreenScreenshotTest {
         hasArchivedChats = true,
         isSearchAvailable = true,
         chatStatus = ChatStatus.Online,
+        meetingTooltip = MeetingTooltipItem.NONE,
     )
 }

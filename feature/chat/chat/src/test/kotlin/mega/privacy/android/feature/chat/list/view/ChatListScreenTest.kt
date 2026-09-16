@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -27,10 +28,12 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.menu.TAG_TOP_APP_BAR_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_ARCHIVE_TAG
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
@@ -327,6 +330,7 @@ class ChatListScreenTest {
     private fun setupPopulatedScreen(
         showMeetingTab: Boolean,
         onMeetingActionClick: (MeetingAction) -> Unit = {},
+        onBackClick: () -> Unit = {},
         hasArchivedChats: Boolean = true,
         isSearchAvailable: Boolean = true,
         onChatStatusSelected: (UserChatStatus) -> Unit = {},
@@ -342,7 +346,7 @@ class ChatListScreenTest {
                             isSearchAvailable = isSearchAvailable,
                         ),
                         showMeetingTab = showMeetingTab,
-                        onBackClick = {},
+                        onBackClick = onBackClick,
                         onItemClick = {},
                         onNewChatClick = {},
                         onInviteFriendClick = {},
@@ -378,6 +382,7 @@ class ChatListScreenTest {
                             hasArchivedChats = true,
                             isSearchAvailable = true,
                             chatStatus = ChatStatus.Online,
+                            meetingTooltip = MeetingTooltipItem.NONE,
                         ),
                         showMeetingTab = showMeetingTab,
                         onBackClick = {},
@@ -406,6 +411,7 @@ class ChatListScreenTest {
         hasArchivedChats = hasArchivedChats,
         isSearchAvailable = isSearchAvailable,
         chatStatus = ChatStatus.Online,
+        meetingTooltip = MeetingTooltipItem.NONE,
     )
 
     private fun chatRoomUiItem(chatId: Long, title: String) = ChatRoomUiItem(
@@ -464,42 +470,34 @@ class ChatListScreenTest {
         composeRule.onNodeWithTag(CHAT_ROOM_ACTIONS_SHEET_TAG).assertIsDisplayed()
     }
 
-    private fun setupActionableScreen(
-        onActionsResolved: (Set<Long>) -> Unit = {},
-        onActionSelected: (Set<Long>, String) -> Unit = { _, _ -> },
-    ) {
-        composeRule.setContent {
-            CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
-                AndroidThemeForPreviews {
-                    ChatListScreen(
-                        uiState = populatedState(),
-                        showMeetingTab = false,
-                        onBackClick = {},
-                        onItemClick = {},
-                        onNewChatClick = {},
-                        onInviteFriendClick = {},
-                        onMeetingActionClick = {},
-                        onArchivedClick = {},
-                        onOpenLinkClick = {},
-                        onSearchQueryChange = {},
-                        resolveChatRoomActions = { chatIds ->
-                            onActionsResolved(chatIds)
-                            listOf(archiveAction)
-                        },
-                        onChatRoomActionSelected = onActionSelected,
-                    )
-                }
-            }
-        }
+    @Test
+    fun `test that system back leaves search mode without navigating away`() {
+        var backClicks = 0
+        setupPopulatedScreen(showMeetingTab = false, onBackClick = { backClicks++ })
+
+        composeRule.onNodeWithTag(CHAT_LIST_SEARCH_ACTION_TAG).performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(CHAT_LIST_SEARCH_BAR_TAG).assertIsDisplayed()
+
+        pressBack()
+
+        composeRule.onNodeWithTag(CHAT_LIST_TOP_BAR_TAG).assertIsDisplayed()
+        assertThat(backClicks).isEqualTo(0)
     }
 
-    private val archiveAction = ChatRoomActionUiItem(
-        label = sharedR.string.general_archive,
-        icon = IconPack.Medium.Thin.Outline.Archive,
-        testTag = CHAT_ROOM_ACTIONS_ARCHIVE_TAG,
-        isDestructive = false,
-        confirmation = null,
-    )
+    @Test
+    fun `test that re-selecting the active tab scrolls its list back to the top`() {
+        setupLongMeetingList()
+
+        composeRule.onNodeWithTag(MEETING_LIST_TAG).performScrollToIndex(LONG_LIST_SIZE - 1)
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText("Meeting 1").assertDoesNotExist()
+
+        composeRule.onNodeWithText(meetingsTabLabel).performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("Meeting 1").assertIsDisplayed()
+    }
 
     @Test
     fun `test that the open link action reports the click`() {
@@ -582,5 +580,88 @@ class ChatListScreenTest {
         composeRule.waitForIdle()
 
         composeRule.onAllNodesWithTag(CHAT_DO_NOT_DISTURB_DIALOG_TAG)[0].assertIsDisplayed()
+    }
+
+    private fun pressBack() {
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitForIdle()
+    }
+
+    private fun setupActionableScreen(
+        onActionsResolved: (Set<Long>) -> Unit = {},
+        onActionSelected: (Set<Long>, String) -> Unit = { _, _ -> },
+    ) {
+        composeRule.setContent {
+            CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
+                AndroidThemeForPreviews {
+                    ChatListScreen(
+                        uiState = populatedState(),
+                        showMeetingTab = false,
+                        onBackClick = {},
+                        onItemClick = {},
+                        onNewChatClick = {},
+                        onInviteFriendClick = {},
+                        onMeetingActionClick = {},
+                        onArchivedClick = {},
+                        onOpenLinkClick = {},
+                        onSearchQueryChange = {},
+                        resolveChatRoomActions = { chatIds ->
+                            onActionsResolved(chatIds)
+                            listOf(archiveAction)
+                        },
+                        onChatRoomActionSelected = onActionSelected,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun setupLongMeetingList() {
+        composeRule.setContent {
+            CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
+                AndroidThemeForPreviews {
+                    ChatListScreen(
+                        uiState = ChatListUiState.Data(
+                            chats = ChatListTabState.Empty,
+                            meetings = ChatListTabState.Results(
+                                (1..LONG_LIST_SIZE)
+                                    .map { chatRoomUiItem(it.toLong(), "Meeting $it") }
+                                    .toImmutableList(),
+                            ),
+                            chatsHaveUnread = false,
+                            meetingsHaveUnread = false,
+                            hasAnyContact = true,
+                            hasArchivedChats = true,
+                            isSearchAvailable = true,
+                            chatStatus = ChatStatus.Online,
+                            meetingTooltip = MeetingTooltipItem.NONE,
+                        ),
+                        showMeetingTab = true,
+                        onBackClick = {},
+                        onItemClick = {},
+                        onNewChatClick = {},
+                        onInviteFriendClick = {},
+                        onMeetingActionClick = {},
+                        onArchivedClick = {},
+                        onOpenLinkClick = {},
+                        onSearchQueryChange = {},
+                    )
+                }
+            }
+        }
+    }
+
+    private val archiveAction = ChatRoomActionUiItem(
+        label = sharedR.string.general_archive,
+        icon = IconPack.Medium.Thin.Outline.Archive,
+        testTag = CHAT_ROOM_ACTIONS_ARCHIVE_TAG,
+        isDestructive = false,
+        confirmation = null,
+    )
+
+    private companion object {
+        const val LONG_LIST_SIZE = 40
     }
 }

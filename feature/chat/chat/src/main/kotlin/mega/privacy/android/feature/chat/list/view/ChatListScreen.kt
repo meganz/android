@@ -15,9 +15,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.contact.state.ContactItemStatus
@@ -25,6 +28,9 @@ import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.components.tooltip.direction.TooltipDirection
+import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveBottomDirectionTooltipPopup
+import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTooltipButtonProperties
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
@@ -32,6 +38,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.feature.chat.list.model.ChatListBulkActionsUiState
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
@@ -69,6 +76,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onChatStatusSelected Callback with the presence the user picked.
  * @param doNotDisturbOptions Mute periods offered by the do-not-disturb action.
  * @param onDoNotDisturbOptionSelected Callback with the mute period the user picked.
+ * @param onMeetingTooltipShown Callback with the tooltip to offer after the current one was seen.
  */
 @Composable
 internal fun ChatListScreen(
@@ -88,6 +96,7 @@ internal fun ChatListScreen(
     onChatStatusSelected: (UserChatStatus) -> Unit = {},
     doNotDisturbOptions: () -> List<ChatPushNotificationMuteOption> = { emptyList() },
     onDoNotDisturbOptionSelected: (ChatPushNotificationMuteOption) -> Unit = {},
+    onMeetingTooltipShown: (MeetingTooltipItem) -> Unit = {},
 ) {
     var searchMode by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -114,8 +123,12 @@ internal fun ChatListScreen(
         actionsState = ChatListBulkActionsUiState.Hidden
     }
 
-    BackHandler(enabled = selectionMode) {
-        exitSelection()
+    BackHandler(enabled = selectionMode || searchMode) {
+        if (selectionMode) {
+            exitSelection()
+        } else {
+            searchMode = false
+        }
     }
 
     ChatListScreenContent(
@@ -154,6 +167,7 @@ internal fun ChatListScreen(
         },
         onPresenceClick = { showStatusDialog = true },
         onDoNotDisturbClick = { showDoNotDisturbDialog = true },
+        onMeetingTooltipShown = onMeetingTooltipShown,
     )
 
     if (showMeetingActions) {
@@ -223,6 +237,7 @@ internal fun ChatListScreen(
  * @param onBulkActionsClick Callback when the bulk actions overflow is pressed.
  * @param onPresenceClick Callback when the user asks to change their presence.
  * @param onDoNotDisturbClick Callback when the do-not-disturb action is picked.
+ * @param onMeetingTooltipShown Callback with the tooltip to offer after the current one was seen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -254,10 +269,14 @@ internal fun ChatListScreenContent(
     onBulkActionsClick: () -> Unit = {},
     onPresenceClick: () -> Unit = {},
     onDoNotDisturbClick: () -> Unit = {},
+    onMeetingTooltipShown: (MeetingTooltipItem) -> Unit = {},
 ) {
     var selectedTabIndex by rememberSaveable {
         mutableIntStateOf(if (showMeetingTab) MEETINGS_TAB_INDEX else CHATS_TAB_INDEX)
     }
+    var chatsScrollToTopToken by rememberSaveable { mutableIntStateOf(0) }
+    var meetingsScrollToTopToken by rememberSaveable { mutableIntStateOf(0) }
+    var meetingFabCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
     val navigationType = if (isMainNavBarRoot(ChatListNavKey::class)) {
         AppBarNavigationType.None
@@ -311,6 +330,7 @@ internal fun ChatListScreenContent(
                 MegaFab(
                     modifier = Modifier
                         .testTag(if (isMeetingsTab) CHAT_LIST_MEETING_FAB_TAG else CHAT_LIST_FAB_TAG)
+                        .onGloballyPositioned { meetingFabCoordinates = it }
                         .applyScrollToHideFabBehavior(),
                     onClick = if (isMeetingsTab) onMeetingFabClick else onNewChatClick,
                     painter = rememberVectorPainter(
@@ -328,6 +348,14 @@ internal fun ChatListScreenContent(
                         }
                     ),
                 )
+                if (isMeetingsTab && uiState.meetingTooltip == MeetingTooltipItem.CREATE) {
+                    CreateMeetingTooltip(
+                        anchorCoordinates = meetingFabCoordinates,
+                        onDismiss = {
+                            onMeetingTooltipShown(MeetingTooltipItem.RECURRING_OR_PENDING)
+                        },
+                    )
+                }
             }
         },
     ) { paddingValues ->
@@ -345,8 +373,17 @@ internal fun ChatListScreenContent(
                 contentPadding = paddingValues.excludingBottomPadding(),
                 initialSelectedIndex = if (showMeetingTab) MEETINGS_TAB_INDEX else CHATS_TAB_INDEX,
                 onTabSelected = { index ->
-                    selectedTabIndex = index
-                    true
+                    if (index == selectedTabIndex) {
+                        if (index == MEETINGS_TAB_INDEX) {
+                            meetingsScrollToTopToken++
+                        } else {
+                            chatsScrollToTopToken++
+                        }
+                        false
+                    } else {
+                        selectedTabIndex = index
+                        true
+                    }
                 },
                 cells = {
                     addTextTabWithScrollableContent(
@@ -373,6 +410,7 @@ internal fun ChatListScreenContent(
                             selectionMode = selectionMode,
                             selectedChatIds = selectedChatIds,
                             onSelectionToggle = onSelectionToggle,
+                            scrollToTopToken = chatsScrollToTopToken,
                         )
                     }
                     addTextTabWithScrollableContent(
@@ -399,11 +437,47 @@ internal fun ChatListScreenContent(
                             selectionMode = selectionMode,
                             selectedChatIds = selectedChatIds,
                             onSelectionToggle = onSelectionToggle,
+                            scrollToTopToken = meetingsScrollToTopToken,
                         )
                     }
                 },
             )
         }
+    }
+}
+
+/**
+ * One-time onboarding tooltip pointing at the meetings floating action button.
+ *
+ * @param anchorCoordinates Coordinates of the floating action button, or null until it has been
+ * laid out; the tooltip then waits.
+ * @param onDismiss Called when the tooltip is dismissed.
+ */
+@Composable
+private fun CreateMeetingTooltip(
+    anchorCoordinates: LayoutCoordinates?,
+    onDismiss: () -> Unit,
+) {
+    anchorCoordinates?.takeIf { it.isAttached }?.let { coordinates ->
+        InteractiveBottomDirectionTooltipPopup(
+            modifier = Modifier.testTag(CHAT_LIST_CREATE_MEETING_TOOLTIP_TAG),
+            direction = TooltipDirection.Bottom.Right,
+            properties = PopupProperties(
+                focusable = false,
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+            ),
+            title = stringResource(sharedR.string.chat_meeting_actions_schedule),
+            body = stringResource(sharedR.string.meeting_list_tooltip_fab_description),
+            primaryButton = InteractiveTooltipButtonProperties(
+                text = stringResource(sharedR.string.general_ok),
+                onClick = onDismiss,
+            ),
+            needCloseIcon = true,
+            needDivider = true,
+            anchorViewCoordinates = coordinates,
+            onDismissRequest = onDismiss,
+        )
     }
 }
 
@@ -430,6 +504,7 @@ internal const val CHAT_LIST_CHATS_TAB_TAG = "chat_list_screen:chats_tab"
 internal const val CHAT_LIST_MEETINGS_TAB_TAG = "chat_list_screen:meetings_tab"
 internal const val CHAT_LIST_FAB_TAG = "chat_list_screen:new_chat_fab"
 internal const val CHAT_LIST_MEETING_FAB_TAG = "chat_list_screen:new_meeting_fab"
+internal const val CHAT_LIST_CREATE_MEETING_TOOLTIP_TAG = "chat_list_screen:create_meeting_tooltip"
 
 private val previewChats = persistentListOf(
     ChatRoomUiItem(
@@ -485,6 +560,7 @@ private fun previewState(
     hasArchivedChats = hasArchivedChats,
     isSearchAvailable = isSearchAvailable,
     chatStatus = ChatStatus.Online,
+    meetingTooltip = MeetingTooltipItem.NONE,
 )
 
 @CombinedThemePreviews

@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -31,11 +32,13 @@ import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
+import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatPushNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.SetCurrentUserStatusUseCase
+import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
@@ -111,6 +114,8 @@ class ChatListViewModelTest {
     private val hasArchivedChatsUseCase = mock<HasArchivedChatsUseCase>()
     private val getCurrentChatStatusUseCase = mock<GetCurrentChatStatusUseCase>()
     private val setCurrentUserStatusUseCase = mock<SetCurrentUserStatusUseCase>()
+    private val getMeetingTooltipsUseCase = mock<GetMeetingTooltipsUseCase>()
+    private val setNextMeetingTooltipUseCase = mock<SetNextMeetingTooltipUseCase>()
     private val getChatMuteOptionListUseCase = mock<GetChatMuteOptionListUseCase>()
     private val muteChatPushNotificationUseCase = mock<MuteChatPushNotificationUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
@@ -156,6 +161,7 @@ class ChatListViewModelTest {
         stubHasAnyContact(hasAnyContact = false)
         applicationScope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher())
         stubChatStatus(ChatStatus.Online)
+        stubMeetingTooltip(MeetingTooltipItem.NONE)
         underTest = ChatListViewModel(
             getChatsUseCase = getChatsUseCase,
             chatLastMessageFormatter = chatLastMessageFormatter,
@@ -170,6 +176,8 @@ class ChatListViewModelTest {
             hasArchivedChatsUseCase = hasArchivedChatsUseCase,
             getCurrentChatStatusUseCase = getCurrentChatStatusUseCase,
             setCurrentUserStatusUseCase = setCurrentUserStatusUseCase,
+            getMeetingTooltipsUseCase = getMeetingTooltipsUseCase,
+            setNextMeetingTooltipUseCase = setNextMeetingTooltipUseCase,
             getChatMuteOptionListUseCase = getChatMuteOptionListUseCase,
             muteChatPushNotificationUseCase = muteChatPushNotificationUseCase,
             snackbarEventQueue = snackbarEventQueue,
@@ -204,6 +212,8 @@ class ChatListViewModelTest {
             hasArchivedChatsUseCase,
             getCurrentChatStatusUseCase,
             setCurrentUserStatusUseCase,
+            getMeetingTooltipsUseCase,
+            setNextMeetingTooltipUseCase,
             getChatMuteOptionListUseCase,
             muteChatPushNotificationUseCase,
             snackbarEventQueue,
@@ -687,6 +697,12 @@ class ChatListViewModelTest {
         }
     }
 
+    private fun stubMeetingTooltip(tooltip: MeetingTooltipItem) {
+        getMeetingTooltipsUseCase.stub {
+            onBlocking { invoke() } doReturn tooltip
+        }
+    }
+
     private fun stubSearchableChats() {
         stubChatRooms(chats = listOf(aliceRoomItem, bobRoomItem), meetings = emptyList())
         chatRoomUiItemMapper.stub {
@@ -1036,4 +1052,32 @@ class ChatListViewModelTest {
 
         verify(snackbarEventQueue).queueMessage(sharedR.string.general_request_failed_message)
     }
+
+    @Test
+    fun `test that uiState exposes the meeting tooltip still owed`() = runTest {
+        stubChatRooms()
+        stubMeetingTooltip(MeetingTooltipItem.CREATE)
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().meetingTooltip).isEqualTo(MeetingTooltipItem.CREATE)
+        }
+    }
+
+    @Test
+    fun `test that onMeetingTooltipShown stores the next tooltip and refreshes the state`() =
+        runTest {
+            stubChatRooms()
+            stubMeetingTooltip(MeetingTooltipItem.CREATE)
+
+            underTest.uiState.test {
+                assertThat(awaitDataState().meetingTooltip).isEqualTo(MeetingTooltipItem.CREATE)
+
+                stubMeetingTooltip(MeetingTooltipItem.RECURRING_OR_PENDING)
+                underTest.onMeetingTooltipShown(MeetingTooltipItem.RECURRING_OR_PENDING)
+
+                assertThat(awaitDataState().meetingTooltip)
+                    .isEqualTo(MeetingTooltipItem.RECURRING_OR_PENDING)
+            }
+            verify(setNextMeetingTooltipUseCase)(MeetingTooltipItem.RECURRING_OR_PENDING)
+        }
 }

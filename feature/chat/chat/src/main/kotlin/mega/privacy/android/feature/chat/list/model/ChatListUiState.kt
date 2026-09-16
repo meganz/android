@@ -2,6 +2,7 @@ package mega.privacy.android.feature.chat.list.model
 
 import androidx.compose.runtime.Stable
 import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 
 /**
  * UI state for the chat list screen.
@@ -31,6 +32,7 @@ sealed interface ChatListUiState {
      * toolbar action. Independent of the active search query.
      * @property chatStatus Presence the user is currently publishing, shown as the toolbar
      * subtitle; null while it is still being resolved.
+     * @property meetingTooltip Onboarding tooltip still owed to the user on the Meetings tab.
      */
     data class Data(
         val chats: ChatListTabState,
@@ -41,5 +43,6 @@ sealed interface ChatListUiState {
         val hasArchivedChats: Boolean,
         val isSearchAvailable: Boolean,
         val chatStatus: ChatStatus?,
+        val meetingTooltip: MeetingTooltipItem,
     ) : ChatListUiState
 }

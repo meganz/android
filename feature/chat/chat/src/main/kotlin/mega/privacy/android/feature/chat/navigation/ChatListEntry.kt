@@ -152,6 +152,7 @@ fun ChatListEntry(
         onChatStatusSelected = viewModel::onChatStatusSelected,
         doNotDisturbOptions = viewModel::doNotDisturbOptions,
         onDoNotDisturbOptionSelected = viewModel::onDoNotDisturbOptionSelected,
+        onMeetingTooltipShown = viewModel::onMeetingTooltipShown,
     )
 
     blockedMessage?.let { message ->

@@ -10,6 +10,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.test.weblate.WeblateSnackbarScreenshot
 import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.feature.chat.list.archived.model.ArchivedChatsUiState
 import mega.privacy.android.feature.chat.list.archived.view.ArchivedChatsScreen
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
@@ -176,6 +177,7 @@ class WeblateChatListSnackbarsScreenshotTest {
                 hasArchivedChats = true,
                 isSearchAvailable = true,
                 chatStatus = ChatStatus.Online,
+                meetingTooltip = MeetingTooltipItem.NONE,
             ),
             showMeetingTab = false,
             onBackClick = {},

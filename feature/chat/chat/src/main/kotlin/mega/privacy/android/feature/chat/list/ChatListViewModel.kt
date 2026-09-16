@@ -21,6 +21,7 @@ import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
@@ -29,9 +30,11 @@ import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
+import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatPushNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.SetCurrentUserStatusUseCase
+import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
@@ -70,6 +73,8 @@ internal class ChatListViewModel @Inject constructor(
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase,
     private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase,
     private val setCurrentUserStatusUseCase: SetCurrentUserStatusUseCase,
+    private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase,
+    private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase,
     private val getChatMuteOptionListUseCase: GetChatMuteOptionListUseCase,
     private val muteChatPushNotificationUseCase: MuteChatPushNotificationUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
@@ -78,6 +83,8 @@ internal class ChatListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val queryChannel = Channel<String?>(Channel.CONFLATED)
+
+    private val tooltipChannel = Channel<Unit>(Channel.CONFLATED)
 
     private val openChatChannel = Channel<Long>(Channel.BUFFERED)
 
@@ -103,7 +110,8 @@ internal class ChatListViewModel @Inject constructor(
             queryChannel.receiveAsFlow().onStart { emit(null) },
             hasAnyContactFlow(),
             chatStatusFlow(),
-        ) { rooms, query, hasAnyContact, chatStatus ->
+            meetingTooltipFlow(),
+        ) { rooms, query, hasAnyContact, chatStatus, tooltip ->
             ChatListUiState.Data(
                 chats = tabState(rooms.chats, query),
                 meetings = tabState(rooms.meetings, query),
@@ -113,6 +121,7 @@ internal class ChatListViewModel @Inject constructor(
                 hasArchivedChats = rooms.hasArchived,
                 isSearchAvailable = rooms.isSearchable,
                 chatStatus = chatStatus,
+                meetingTooltip = tooltip,
             )
         }.catch { e ->
             Timber.e(e, "Failed to load chat list")
@@ -275,6 +284,19 @@ internal class ChatListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Record that the tooltip currently owed has been seen, so [next] is offered instead.
+     *
+     * @param next Tooltip to show after the current one.
+     */
+    fun onMeetingTooltipShown(next: MeetingTooltipItem) {
+        viewModelScope.launch {
+            runCatching { setNextMeetingTooltipUseCase(next) }
+                .onFailure { Timber.e(it, "Failed to store the next meeting tooltip") }
+            tooltipChannel.send(Unit)
+        }
+    }
+
     private suspend fun queueMessage(messageId: Int) {
         runCatching { snackbarEventQueue.queueMessage(messageId) }
             .onFailure { Timber.e(it, "Failed to queue a chat list message") }
@@ -319,6 +341,14 @@ internal class ChatListViewModel @Inject constructor(
         .catch { e ->
             Timber.e(e, "Failed to monitor the user chat status")
             emit(null)
+        }
+
+    private fun meetingTooltipFlow(): Flow<MeetingTooltipItem> = tooltipChannel.receiveAsFlow()
+        .onStart { emit(Unit) }
+        .map { getMeetingTooltipsUseCase() }
+        .catch { e ->
+            Timber.e(e, "Failed to resolve the meeting tooltip")
+            emit(MeetingTooltipItem.NONE)
         }
 
     private fun chatRoomsFlow(): Flow<ChatRooms> = combine(
