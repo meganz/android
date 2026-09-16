@@ -1,5 +1,6 @@
 package mega.privacy.android.app
 
+import android.os.SystemClock
 import android.util.Log
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +18,7 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
 import mega.privacy.android.app.di.FakeFeatureFlagValueProvider
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
 import mega.privacy.android.data.test.stub.StubMegaNode
 import mega.privacy.android.data.test.stub.StubMegaRequest
@@ -25,8 +27,12 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.shared.resources.R as sharedR
+import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferListenerInterface
+import nz.mega.sdk.MegaUploadOptions
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -35,6 +41,7 @@ import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
+import kotlin.reflect.KFunction6
 
 /**
  * Full-app instrumented port of the AAT feature `sm04 CloudDriveInteractions`, built on the
@@ -48,15 +55,23 @@ import javax.inject.Inject
  * open a folder row, open the search screen, open the FAB options sheet) are the entry points
  * shared by every scenario.
  *
- * Ported: tc01 + tc06 (list/grid switch and scrolling, folded into one test), tc02 (search for a
- * file), tc03 (search for a folder), tc05 (Open link shows the file-link preview), tc07 (tapping a
- * text file opens its full preview) and tc10 (tapping a folder shows its sub-contents).
+ * Ported from sm04: tc01 + tc06 (list/grid switch and scrolling, folded into one test), tc02
+ * (search for a file), tc03 (search for a folder), tc05 (Open link shows the file-link preview),
+ * tc07 (tapping a text file opens its full preview) and tc10 (tapping a folder shows its
+ * sub-contents).
  *
- * Not ported:
+ * Not ported from sm04:
  * - tc04 (matching a name portion): the matching is SDK-side — the app only forwards the typed
  *   query.
  * - tc08 and tc09 (image preview, audio playback): both need fake capabilities that do not exist
  *   yet (real preview bytes, a playable local link).
+ *
+ * The two create-through-the-Plus-icon scenarios of the AAT feature `sm03
+ * UploadToCloudDriveViaPlusOption` are hosted here too, since they run through the same FAB
+ * options sheet and Cloud Drive navigation: sm03 tc04 (create a new folder) and sm03 tc05 (create
+ * a new text file). Of the rest of sm03, tc01 (upload a text file) is already covered by
+ * [CloudDriveUploadTest], while tc02 (upload a folder) and tc03 (capture a picture) need real
+ * files through the system document picker and the device camera respectively.
  */
 @HiltAndroidTest
 class CloudDriveInteractionsTest {
@@ -75,6 +90,10 @@ class CloudDriveInteractionsTest {
 
     @Inject
     lateinit var getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase
+
+    /** Typed reference because startUpload is overloaded; stubs are shared by method name. */
+    private val startUploadRef: KFunction6<MegaApiGateway, String, MegaNode, MegaCancelToken?, MegaUploadOptions, MegaTransferListenerInterface, Unit> =
+        MegaApiGateway::startUpload
 
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
 
@@ -246,6 +265,114 @@ class CloudDriveInteractionsTest {
     }
 
     /**
+     * sm03 tc04 — creating a folder through the FAB's "New folder" option asks the SDK to create
+     * it and reports the success to the user.
+     *
+     * The AAT scenario stops at that notification and leaves its "folder is found in Cloud Drive"
+     * tail commented out; the tail is not ported either, because the fake completes createFolder
+     * without adding anything to its node tree, so the created folder only exists as the command
+     * the app sent.
+     */
+    @Test
+    fun creatingFolderFromTheFabReportsItAsCreated() {
+        // The FAB is only offered once the Cloud Drive has content.
+        seedFile(handle = FILE_HANDLE, name = "sm3tc04-seed.txt")
+
+        launchCloudDrive()
+        openFabOptionsSheet()
+        clickSheetOption(NEW_FOLDER_ACTION_TAG, "new-folder-action")
+        confirmNameDialog(CREATED_FOLDER_NAME)
+
+        awaitObject(
+            By.text(str(sharedR.string.folder_created_success_message)),
+            LOAD_TIMEOUT,
+            "folder-created-snackbar",
+        )
+        assertThat(
+            fakeMegaApi.invocationsOf(MegaApiGateway::createFolder)
+                .map { it.arguments.firstOrNull() }
+        ).contains(CREATED_FOLDER_NAME)
+    }
+
+    /**
+     * sm03 tc05 — a text file created through the FAB's "New text file" option is uploaded, is
+     * then found by the Cloud Drive search, and opens in the text viewer showing its name and the
+     * affordance that puts it back into edit mode.
+     *
+     * The redesigned viewer has no edit FAB; editing is reached through the toolbar's More menu,
+     * so that is what stands in for the AAT scenario's "Edit file button".
+     */
+    @Test
+    fun creatingTextFileFromTheFabUploadsItAndOpensItInTheTextViewer() {
+        seedFile(handle = FILE_HANDLE, name = "sm3tc05-seed.txt")
+        fakeMegaApi.stubTransfer(
+            startUploadRef,
+            transfer = StubMegaTransfer(
+                type = MegaTransfer.TYPE_UPLOAD,
+                tag = 1,
+                uniqueId = 1L,
+                fileName = CREATED_FILE_NAME,
+                parentHandle = rootHandle,
+                transferredBytes = FILE_SIZE,
+                totalBytes = FILE_SIZE,
+                state = MegaTransfer.STATE_COMPLETED,
+                isFinished = true,
+            ),
+        )
+        // As in tc07, the viewer resolves the content by downloading the node; script the download
+        // to report a pre-created file holding what the editor just saved.
+        val downloadedFile = File(targetContext.cacheDir, CREATED_FILE_NAME).apply {
+            writeText(CREATED_FILE_CONTENT)
+        }
+        fakeMegaApi.stubTransfer(
+            MegaApiGateway::startDownload,
+            transfer = StubMegaTransfer(
+                type = MegaTransfer.TYPE_DOWNLOAD,
+                tag = 2,
+                uniqueId = 2L,
+                fileName = CREATED_FILE_NAME,
+                path = downloadedFile.absolutePath,
+                nodeHandle = CREATED_FILE_HANDLE,
+                transferredBytes = FILE_SIZE,
+                totalBytes = FILE_SIZE,
+                state = MegaTransfer.STATE_COMPLETED,
+                isFinished = true,
+            ),
+        )
+
+        launchCloudDrive()
+        openFabOptionsSheet()
+        clickSheetOption(NEW_TEXT_FILE_ACTION_TAG, "new-text-file-action")
+        confirmNameDialog(CREATED_FILE_NAME)
+
+        awaitObject(By.res(TEXT_EDITOR_SAVE_TAG), LOAD_TIMEOUT, "text-editor-save-action")
+        val editorInput = By.clazz("android.widget.EditText")
+        awaitObject(editorInput, LOAD_TIMEOUT, "text-editor-input")
+        device.findObject(editorInput).text = CREATED_FILE_CONTENT
+        click(By.res(TEXT_EDITOR_SAVE_TAG), "text-editor-save-action")
+
+        awaitInvocations("startUpload") {
+            fakeMegaApi.invocationsOf(startUploadRef)
+        }
+
+        // The fake does not mutate its node tree on upload, so the SDK's post-upload state is
+        // applied here, as in CloudDriveUploadTest.
+        val uploadedNode = seedFile(handle = CREATED_FILE_HANDLE, name = CREATED_FILE_NAME)
+        runBlocking {
+            fakeMegaApi.emitGlobalUpdate(GlobalUpdate.OnNodesUpdate(arrayListOf(uploadedNode)))
+        }
+
+        awaitObject(By.res(DRIVE_SYNCS_APP_BAR_TAG), LOAD_TIMEOUT, "drive-app-bar-after-save")
+        searchCloudDriveFor(CREATED_FILE_NAME)
+        click(By.res(NODE_LIST_TITLE_TAG).text(CREATED_FILE_NAME), "search-result-row")
+
+        awaitObject(By.text(CREATED_FILE_NAME), LOAD_TIMEOUT, "text-viewer-file-name")
+        click(By.res(TEXT_EDITOR_MORE_TAG), "text-viewer-more-action")
+        awaitObject(By.res(NODE_OPTIONS_SHEET_TAG), LOAD_TIMEOUT, "node-options-sheet")
+        awaitObject(By.res(EDIT_ACTION_TAG), LOAD_TIMEOUT, "edit-action")
+    }
+
+    /**
      * tc10 — a folder holding one folder and one file shows the matching child-count subtitle, and
      * tapping it lists both children.
      */
@@ -361,6 +488,23 @@ class CloudDriveInteractionsTest {
         }
     }
 
+    /**
+     * Types [name] into the name dialog opened from the FAB options sheet and confirms it. The
+     * dialog renders in its own window, where the activity's `testTagsAsResourceId` does not
+     * apply, so its input is matched by class and its confirm button by the label's clickable
+     * ancestor. The confirm button doubles as the anchor for the dialog being up — the dialog
+     * title repeats the sheet entry that opened it.
+     */
+    private fun confirmNameDialog(name: String) {
+        val confirm = By.clickable(true)
+            .hasDescendant(By.text(str(sharedR.string.general_create_label)))
+        awaitObject(confirm, LOAD_TIMEOUT, "name-dialog")
+        val input = By.clazz("android.widget.EditText")
+        awaitObject(input, LOAD_TIMEOUT, "name-dialog-input")
+        device.findObject(input).text = name
+        click(confirm, "name-dialog-confirm")
+    }
+
     // endregion
 
     // region UiAutomator helpers
@@ -401,6 +545,24 @@ class CloudDriveInteractionsTest {
         return null
     }
 
+    /**
+     * Gateway commands are dispatched from coroutine launches, so their invocations are not
+     * recorded synchronously after the UI action that triggers them. Poll [supplier] until at
+     * least one invocation matches, or fail with what was actually recorded.
+     */
+    private fun <T> awaitInvocations(name: String, supplier: () -> List<T>): List<T> {
+        val deadline = SystemClock.uptimeMillis() + LOAD_TIMEOUT
+        while (SystemClock.uptimeMillis() < deadline) {
+            val matches = supplier()
+            if (matches.isNotEmpty()) return matches
+            Thread.sleep(POLL_INTERVAL_MS)
+        }
+        throw AssertionError(
+            "Timed out after ${LOAD_TIMEOUT}ms waiting for an invocation of $name; " +
+                    "recorded ${fakeMegaApi.invocations.map { it.methodName }}",
+        )
+    }
+
     private fun awaitObject(selector: BySelector, timeout: Long, name: String) {
         if (device.wait(Until.hasObject(selector), timeout)) return
         dumpHierarchy(name)
@@ -422,6 +584,7 @@ class CloudDriveInteractionsTest {
     private companion object {
         const val LAUNCH_TIMEOUT = 60_000L
         const val LOAD_TIMEOUT = 30_000L
+        const val POLL_INTERVAL_MS = 200L
         const val MAX_SCROLL_SWIPES = 12
         const val MAX_PARENT_HOPS = 8
         const val SCROLL_PERCENT = 0.8f
@@ -431,6 +594,7 @@ class CloudDriveInteractionsTest {
         const val CHILD_FOLDER_HANDLE = 201L
         const val CHILD_FILE_HANDLE = 202L
         const val PUBLIC_FILE_HANDLE = 300L
+        const val CREATED_FILE_HANDLE = 400L
         const val FILE_SIZE = 1_024L
 
         /** Enough rows for the last one to start below the viewport on any phone screen. */
@@ -439,6 +603,10 @@ class CloudDriveInteractionsTest {
         const val FILE_CONTENT = "hello from the sm04 cloud drive port"
 
         const val PUBLIC_FILE_NAME = "sm4tc05-link.txt"
+
+        const val CREATED_FOLDER_NAME = "sm3tc04-folder"
+        const val CREATED_FILE_NAME = "sm3tc05-file.txt"
+        const val CREATED_FILE_CONTENT = "hello from the sm03 plus-option port"
 
         /** A link matching the SDK file-link regex, so the deep link resolves to the file link screen. */
         const val FILE_LINK_URL = "https://mega.nz/file/AAAAAAAA#sm4tc05decryptionkey"
@@ -470,8 +638,18 @@ class CloudDriveInteractionsTest {
         /** Mirrors the internal tags of UploadOptionsBottomSheet. */
         const val FAB_OPTIONS_SHEET_TAG = "home_fab_options_panel"
         const val OPEN_LINK_ACTION_TAG = "home_fab_options_panel:open_link_action"
+        const val NEW_FOLDER_ACTION_TAG = "home_fab_options_panel:new_folder_action"
+        const val NEW_TEXT_FILE_ACTION_TAG = "home_fab_options_panel:new_text_file_action"
 
         /** Mirrors FILE_LINK_FILE_NAME_TAG of the file link screen. */
         const val FILE_LINK_FILE_NAME_TAG = "file_link_screen:file_name"
+
+        /** Mirror the testTags of TextEditorTopBarAction. */
+        const val TEXT_EDITOR_SAVE_TAG = "text_editor_top_bar:save"
+        const val TEXT_EDITOR_MORE_TAG = "text_editor_top_bar:more"
+
+        /** Mirrors NODE_OPTIONS_LAZY_COLUMN_TEST_TAG and EditMenuAction's testTag. */
+        const val NODE_OPTIONS_SHEET_TAG = "node_options_bottom_sheet:lazy_column"
+        const val EDIT_ACTION_TAG = "menu_action:edit"
     }
 }
