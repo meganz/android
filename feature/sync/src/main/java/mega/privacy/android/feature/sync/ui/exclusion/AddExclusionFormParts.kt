@@ -119,17 +119,23 @@ internal fun ExclusionFormHelperText(
     )
 }
 
-/** The Type sheet. */
+/**
+ * The Type sheet.
+ *
+ * @param options the entries offered, which the Edit screen narrows: an existing rule carries a
+ * node type, and [SyncExclusionTypeOption.Extensions] is a mode of the Add form rather than one
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ExclusionTypeBottomSheet(
     selectedValue: SyncExclusionTypeOption?,
     onOptionSelected: (SyncExclusionTypeOption) -> Unit,
     onDismissRequest: () -> Unit,
+    options: List<SyncExclusionTypeOption> = SyncExclusionTypeOption.entries,
 ) {
     SyncSingleSelectBottomSheet(
         title = stringResource(sharedR.string.sync_exclusions_add_type),
-        options = SyncExclusionTypeOption.entries.map {
+        options = options.map {
             SyncSingleSelectOption(value = it, label = stringResource(it.labelRes))
         },
         selectedValue = selectedValue,

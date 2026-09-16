@@ -4151,6 +4151,8 @@
     <string name="sync_exclusions_add_extension_duplicate_error">You’ve already excluded %1$s</string>
     <!-- Sync exclusions Add screen: title of the full screen where a new exclusion rule is created. -->
     <string name="sync_exclusions_add_title">Add exclusion</string>
+    <!-- Sync exclusions Edit screen: title of the full screen where an existing exclusion rule is changed or deleted. -->
+    <string name="sync_exclusions_edit_title">Edit exclusion</string>
     <!-- Sync exclusions Add screen: label of the tab where a rule is described by the name it matches. -->
     <string name="sync_exclusions_add_tab_by_name">By name</string>
     <!-- Sync exclusions Add screen: label of the tab where a rule is described by how large a file is. -->

@@ -1,13 +1,11 @@
 package mega.privacy.android.feature.sync.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.ui.exclusion.AddSyncExclusionRuleRoute
+import mega.privacy.android.feature.sync.ui.exclusion.EditSyncExclusionRuleRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
@@ -63,8 +61,8 @@ data class EditSyncExclusionRuleNavKey(
 /**
  * Registers the exclusion rule destinations.
  *
- * The Add destination builds a rule but does not yet write it, and the Edit destination is still
- * empty. Nothing navigates to either, so no surface can reach a rule that would be dropped.
+ * Both destinations build a change but neither yet writes one, so saving and deleting only close
+ * the screen. Nothing navigates to either, so no surface can reach a rule that would be dropped.
  */
 fun EntryProviderScope<NavKey>.syncExclusionScreens(
     navigationHandler: NavigationHandler,
@@ -76,7 +74,12 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
         )
     }
 
-    entry<EditSyncExclusionRuleNavKey> {
-        Box(modifier = Modifier.fillMaxSize())
+    entry<EditSyncExclusionRuleNavKey> { navKey ->
+        EditSyncExclusionRuleRoute(
+            rule = navKey.rule,
+            onDelete = { navigationHandler.back() },
+            onSave = { navigationHandler.back() },
+            onDismiss = { navigationHandler.back() },
+        )
     }
 }

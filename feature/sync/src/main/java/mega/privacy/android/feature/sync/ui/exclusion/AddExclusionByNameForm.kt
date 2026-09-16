@@ -29,8 +29,10 @@ import mega.privacy.android.feature.sync.ui.views.SyncSingleSelectOption
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * The by-name body of the Add exclusion screen: the description line the pickers drive, the two
- * picker chips and the name field.
+ * The by-name body of the Add and Edit exclusion screens: the description line the pickers drive,
+ * the two picker chips and the name field.
+ *
+ * @param typeOptions the entries the Type sheet offers, which the Edit screen narrows
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -40,6 +42,7 @@ internal fun AddExclusionByNameForm(
     onConditionSelected: (SyncExclusionCondition) -> Unit,
     onValueChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
+    typeOptions: List<SyncExclusionTypeOption> = SyncExclusionTypeOption.entries,
 ) {
     var visibleSheet by rememberSaveable { mutableStateOf<AddExclusionByNamePicker?>(null) }
 
@@ -95,6 +98,7 @@ internal fun AddExclusionByNameForm(
             selectedValue = state.typeOption,
             onOptionSelected = onTypeOptionSelected,
             onDismissRequest = { visibleSheet = null },
+            options = typeOptions,
         )
 
         AddExclusionByNamePicker.Condition -> SyncSingleSelectBottomSheet(
