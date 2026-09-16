@@ -15,5 +15,5 @@ class SetPushTokenUseCase @Inject constructor(
      *
      * @param newToken The push token.
      */
-    operator fun invoke(newToken: String) = pushesRepository.setPushToken(newToken)
+    suspend operator fun invoke(newToken: String) = pushesRepository.setPushToken(newToken)
 }

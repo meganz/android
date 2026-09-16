@@ -16,6 +16,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import mega.privacy.android.data.preferences.PushesPreferencesDataStore.Companion.PUSH_TOKEN_FILE
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore.Companion.REQUEST_PHONE_NUMBER_FILE
 import mega.privacy.android.data.preferences.base.createEncrypted
 import mega.privacy.android.data.preferences.cameraUploadsSettingsPreferenceDataStoreName
@@ -35,6 +36,7 @@ import mega.privacy.android.data.preferences.viewedLinksSortPreferenceFileName
 import mega.privacy.android.data.qualifier.ContinueWhereLeftOffSortPreference
 import mega.privacy.android.data.qualifier.MediaTimelinePreferenceDataStore
 import mega.privacy.android.data.qualifier.PaymentPreference
+import mega.privacy.android.data.qualifier.PushesPreference
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
 import mega.privacy.android.data.qualifier.PinnedItemsSortPreference
 import mega.privacy.android.data.qualifier.ViewedLinksSortPreference
@@ -71,6 +73,31 @@ internal object DataStoreModule {
             ),
             scope = CoroutineScope(ioDispatcher),
             produceFile = { context.preferencesDataStoreFile(REQUEST_PHONE_NUMBER_FILE) }
+        )
+    }
+
+    /**
+     * Provides DataStore<Preferences> for [PUSH_TOKEN_FILE]
+     */
+    @Singleton
+    @Provides
+    @PushesPreference
+    fun providePushesPreferencesDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }
+            ),
+            migrations = listOf(
+                SharedPreferencesMigration(
+                    context,
+                    PUSH_TOKEN_FILE
+                )
+            ),
+            scope = CoroutineScope(ioDispatcher),
+            produceFile = { context.preferencesDataStoreFile(PUSH_TOKEN_FILE) }
         )
     }
 

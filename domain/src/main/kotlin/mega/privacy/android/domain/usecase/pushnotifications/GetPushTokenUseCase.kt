@@ -15,5 +15,5 @@ class GetPushTokenUseCase @Inject constructor(
      *
      * @return Push token.
      */
-    operator fun invoke(): String = pushesRepository.getPushToken()
+    suspend operator fun invoke(): String = pushesRepository.getPushToken()
 }

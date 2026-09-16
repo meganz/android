@@ -1,8 +1,5 @@
 package mega.privacy.android.data.repository
 
-import android.content.Context
-import androidx.core.content.edit
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -10,6 +7,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.PushesPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
@@ -27,25 +25,23 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default [PushesRepository] implementation.
  *
- * @property context           Required for getting shared preferences.
  * @property megaApi           Required for registering push notifications.
  * @property ioDispatcher      Required for launching coroutines.
  * @property megaChatApi       Required for notifying about pushes.
  * @property chatRequestMapper [ChatRequestMapper]
  * @property appEventGateway    Required for getting app events
+ * @property pushesPreferencesGateway Required for storing the push token
  */
 internal class DefaultPushesRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val megaApi: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaChatApi: MegaChatApiGateway,
     private val chatRequestMapper: ChatRequestMapper,
     private val appEventGateway: AppEventGateway,
+    private val pushesPreferencesGateway: PushesPreferencesGateway,
 ) : PushesRepository {
 
-    override fun getPushToken(): String =
-        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
-            .getString(NEW_TOKEN, "") ?: ""
+    override suspend fun getPushToken(): String = pushesPreferencesGateway.getPushToken()
 
     override suspend fun registerPushNotifications(deviceType: Int, newToken: String): String =
         withContext(ioDispatcher) {
@@ -67,12 +63,8 @@ internal class DefaultPushesRepository @Inject constructor(
             }
         }
 
-    override fun setPushToken(newToken: String) {
-        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
-            .edit {
-                putString(NEW_TOKEN, newToken)
-            }
-    }
+    override suspend fun setPushToken(newToken: String) =
+        pushesPreferencesGateway.setPushToken(newToken)
 
     override suspend fun pushReceived(beep: Boolean) =
         withContext(ioDispatcher) {
@@ -91,11 +83,7 @@ internal class DefaultPushesRepository @Inject constructor(
             }
         }
 
-    override suspend fun clearPushToken() = withContext(ioDispatcher) {
-        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit {
-            clear()
-        }
-    }
+    override suspend fun clearPushToken() = pushesPreferencesGateway.clearPushToken()
 
     override suspend fun broadcastPushNotificationSettings() = withContext(ioDispatcher) {
         appEventGateway.broadcastPushNotificationSettings()
@@ -103,9 +91,4 @@ internal class DefaultPushesRepository @Inject constructor(
 
     override fun monitorPushNotificationSettings() =
         appEventGateway.monitorPushNotificationSettings()
-
-    companion object {
-        private const val PUSH_TOKEN = "PUSH_TOKEN"
-        private const val NEW_TOKEN = "NEW_TOKEN"
-    }
 }

@@ -36,3 +36,10 @@ internal annotation class PinnedItemsSortPreference
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier
 internal annotation class PaymentPreference
+
+/**
+ * Annotation for PushesPreferencesDataStore
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+internal annotation class PushesPreference

@@ -12,7 +12,7 @@ interface PushesRepository {
      *
      * @return The push token.
      */
-    fun getPushToken(): String
+    suspend fun getPushToken(): String
 
     /**
      * Registers push notifications.
@@ -28,7 +28,7 @@ interface PushesRepository {
      *
      * @param newToken  The push token.
      */
-    fun setPushToken(newToken: String)
+    suspend fun setPushToken(newToken: String)
 
     /**
      * Notifies a push has been received.

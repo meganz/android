@@ -82,6 +82,7 @@ import mega.privacy.android.data.gateway.preferences.InAppUpdatePreferencesGatew
 import mega.privacy.android.data.gateway.preferences.MediaPlayerPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.MediaTimelinePreferencesGateway
 import mega.privacy.android.data.gateway.preferences.PaymentPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.PushesPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
@@ -101,6 +102,7 @@ import mega.privacy.android.data.preferences.MediaPlayerPreferencesDatastore
 import mega.privacy.android.data.preferences.MediaTimelinePreferencesDataStore
 import mega.privacy.android.data.preferences.PaymentDatastore
 import mega.privacy.android.data.preferences.QAAccountCacheDataStore
+import mega.privacy.android.data.preferences.PushesPreferencesDataStore
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore
 import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.StatisticsPreferencesDataStore
@@ -115,6 +117,10 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindRequestPhoneNumberPreferencesGateway(implementation: RequestPhoneNumberPreferencesDataStore): RequestPhoneNumberPreferencesGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindPushesPreferencesGateway(implementation: PushesPreferencesDataStore): PushesPreferencesGateway
 
     @Binds
     @Singleton
