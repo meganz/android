@@ -146,8 +146,8 @@ fun ChatListEntry(
         },
         onArchivedClick = { navigationHandler.navigate(ArchivedChatsNavKey) },
         onSearchQueryChange = viewModel::onSearchQueryChange,
-        resolveBulkActions = viewModel::getBulkChatRoomActions,
-        onBulkActionSelected = viewModel::onBulkChatRoomActionSelected,
+        resolveChatRoomActions = viewModel::getBulkChatRoomActions,
+        onChatRoomActionSelected = viewModel::onBulkChatRoomActionSelected,
     )
 
     blockedMessage?.let { message ->

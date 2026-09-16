@@ -30,6 +30,8 @@ internal fun ArchivedChatsEntry(
         onItemClick = { chatId ->
             navigationHandler.navigate(ShowChatMessagesNavKey(chatId))
         },
+        resolveChatRoomActions = viewModel::getChatRoomActions,
+        onChatRoomActionSelected = viewModel::onChatRoomActionSelected,
     )
 }
 

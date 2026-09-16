@@ -50,8 +50,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 /**
  * Chat list screen with Chats and Meetings tabs and in-tab search.
  *
- * Owns the search field state, the Compose multi-selection state, and the bulk-actions overlay,
- * and delegates rendering to [ChatListScreenContent].
+ * Owns the search field state, the Compose multi-selection state and the chat room actions
+ * overlay, and delegates rendering to [ChatListScreenContent].
  *
  * @param uiState UI state of the screen.
  * @param showMeetingTab Whether the Meetings tab should be initially selected.
@@ -63,8 +63,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * from the empty Meetings tab.
  * @param onSearchQueryChange Callback when the search query changes, with `null` when cleared.
  * @param modifier [Modifier]
- * @param resolveBulkActions Resolves the ordered actions common to the selected chats.
- * @param onBulkActionSelected Runs the picked action across the selected chats.
+ * @param resolveChatRoomActions Resolves the ordered actions common to the given chats.
+ * @param onChatRoomActionSelected Runs the picked action across the given chats.
  */
 @Composable
 internal fun ChatListScreen(
@@ -78,13 +78,13 @@ internal fun ChatListScreen(
     onArchivedClick: () -> Unit,
     onSearchQueryChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
-    resolveBulkActions: suspend (Set<Long>) -> List<ChatRoomActionUiItem> = { emptyList() },
-    onBulkActionSelected: (Set<Long>, String) -> Unit = { _, _ -> },
+    resolveChatRoomActions: suspend (Set<Long>) -> List<ChatRoomActionUiItem> = { emptyList() },
+    onChatRoomActionSelected: (Set<Long>, String) -> Unit = { _, _ -> },
 ) {
     var searchMode by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val selectionState = rememberChatListSelectionState()
-    var bulkActionsState by rememberSaveable(stateSaver = ChatListBulkActionsUiState.Saver) {
+    var actionsState by rememberSaveable(stateSaver = ChatListBulkActionsUiState.Saver) {
         mutableStateOf<ChatListBulkActionsUiState>(ChatListBulkActionsUiState.Hidden)
     }
     var showMeetingActions by rememberSaveable { mutableStateOf(false) }
@@ -99,14 +99,13 @@ internal fun ChatListScreen(
         }
     }
 
-    LaunchedEffect(selectionMode) {
-        if (!selectionMode) {
-            bulkActionsState = ChatListBulkActionsUiState.Hidden
-        }
+    val exitSelection = {
+        selectionState.deselectAll()
+        actionsState = ChatListBulkActionsUiState.Hidden
     }
 
     BackHandler(enabled = selectionMode) {
-        selectionState.deselectAll()
+        exitSelection()
     }
 
     ChatListScreenContent(
@@ -128,6 +127,9 @@ internal fun ChatListScreen(
         },
         modifier = modifier,
         onItemLongClick = selectionState::toggleSelection,
+        onItemMoreClick = { chatId ->
+            actionsState = ChatListBulkActionsUiState.ShowingActions(setOf(chatId))
+        },
         selectionMode = selectionMode,
         selectedChatIds = selectionState.selectedChatIds,
         selectedCount = selectionState.selectedCount,
@@ -135,9 +137,9 @@ internal fun ChatListScreen(
                 selectionState.selectedChatIds.containsAll(selectableChatIds),
         onSelectionToggle = selectionState::toggleSelection,
         onSelectAll = { selectionState.selectAll(selectableChatIds) },
-        onCancelSelection = selectionState::deselectAll,
+        onCancelSelection = exitSelection,
         onBulkActionsClick = {
-            bulkActionsState = ChatListBulkActionsUiState.ShowingActions(selectionState.selectedChatIds)
+            actionsState = ChatListBulkActionsUiState.ShowingActions(selectionState.selectedChatIds)
         },
     )
 
@@ -148,76 +150,15 @@ internal fun ChatListScreen(
         )
     }
 
-    ChatListBulkActionsOverlay(
-        actionsState = bulkActionsState,
-        resolveActions = resolveBulkActions,
-        onStateChange = { bulkActionsState = it },
+    ChatRoomActionsOverlay(
+        actionsState = actionsState,
+        resolveActions = resolveChatRoomActions,
+        onStateChange = { actionsState = it },
         onActionSelected = { chatIds, actionId ->
-            onBulkActionSelected(chatIds, actionId)
+            onChatRoomActionSelected(chatIds, actionId)
             selectionState.deselectAll()
         },
     )
-}
-
-@Composable
-private fun ChatListBulkActionsOverlay(
-    actionsState: ChatListBulkActionsUiState,
-    resolveActions: suspend (Set<Long>) -> List<ChatRoomActionUiItem>,
-    onStateChange: (ChatListBulkActionsUiState) -> Unit,
-    onActionSelected: (Set<Long>, String) -> Unit,
-) {
-    when (actionsState) {
-        ChatListBulkActionsUiState.Hidden -> Unit
-
-        is ChatListBulkActionsUiState.ShowingActions -> {
-            val chatIds = actionsState.chatIds
-            var actions by remember(chatIds) {
-                mutableStateOf<List<ChatRoomActionUiItem>?>(null)
-            }
-            LaunchedEffect(chatIds) {
-                val resolved = resolveActions(chatIds)
-                if (resolved.isEmpty()) {
-                    onStateChange(ChatListBulkActionsUiState.Hidden)
-                } else {
-                    actions = resolved
-                }
-            }
-            actions?.let { resolved ->
-                ChatRoomActionsBottomSheet(
-                    actions = resolved,
-                    onDismiss = { onStateChange(ChatListBulkActionsUiState.Hidden) },
-                    onActionClick = { action ->
-                        val confirmation = action.confirmation
-                        if (confirmation != null) {
-                            onStateChange(
-                                ChatListBulkActionsUiState.Confirming(
-                                    chatIds = chatIds,
-                                    actionId = action.testTag,
-                                    confirmation = confirmation,
-                                )
-                            )
-                        } else {
-                            onActionSelected(chatIds, action.testTag)
-                            onStateChange(ChatListBulkActionsUiState.Hidden)
-                        }
-                    },
-                )
-            }
-        }
-
-        is ChatListBulkActionsUiState.Confirming -> {
-            val chatIds = actionsState.chatIds
-            val actionId = actionsState.actionId
-            ChatRoomActionConfirmationDialog(
-                confirmation = actionsState.confirmation,
-                onConfirm = {
-                    onActionSelected(chatIds, actionId)
-                    onStateChange(ChatListBulkActionsUiState.Hidden)
-                },
-                onDismiss = { onStateChange(ChatListBulkActionsUiState.Hidden) },
-            )
-        }
-    }
 }
 
 /**
@@ -238,6 +179,8 @@ private fun ChatListBulkActionsOverlay(
  * @param onQueryChange Callback when the search query text changes.
  * @param modifier [Modifier]
  * @param onItemLongClick Optional callback when a chat room row is long-pressed, with the chat id.
+ * @param onItemMoreClick Optional callback when a row's actions affordance is pressed, with the
+ * chat id.
  * @param selectionMode Whether the list is in multi-select mode.
  * @param selectedChatIds Ids of the currently selected chats.
  * @param selectedCount Number of selected chats, shown in the selection top app bar.
@@ -265,6 +208,7 @@ internal fun ChatListScreenContent(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     onItemLongClick: ((Long) -> Unit)? = null,
+    onItemMoreClick: ((Long) -> Unit)? = null,
     selectionMode: Boolean = false,
     selectedChatIds: Set<Long> = emptySet(),
     selectedCount: Int = 0,
@@ -385,6 +329,7 @@ internal fun ChatListScreenContent(
                                 bottom = paddingValues.calculateBottomPadding() + FAB_BOTTOM_CLEARANCE,
                             ),
                             onItemLongClick = onItemLongClick,
+                            onItemMoreClick = onItemMoreClick,
                             selectionMode = selectionMode,
                             selectedChatIds = selectedChatIds,
                             onSelectionToggle = onSelectionToggle,
@@ -410,6 +355,7 @@ internal fun ChatListScreenContent(
                                 bottom = paddingValues.calculateBottomPadding() + FAB_BOTTOM_CLEARANCE,
                             ),
                             onItemLongClick = onItemLongClick,
+                            onItemMoreClick = onItemMoreClick,
                             selectionMode = selectionMode,
                             selectedChatIds = selectedChatIds,
                             onSelectionToggle = onSelectionToggle,

@@ -82,6 +82,24 @@ class ChatRoomItemViewScreenshotTest {
         }
     }
 
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ChatRoomItemWithActionsAffordance() {
+        AndroidThemeForPreviews {
+            ChatRoomItemView(
+                item = meetingRow(
+                    pendingMeeting = ChatRoomUiItem.PendingMeeting.OneOff(
+                        scheduledTime = "10:00am - 11:00am",
+                    ),
+                    showRecurringIcon = false,
+                ),
+                onItemClick = {},
+                onItemMoreClick = {},
+            )
+        }
+    }
+
     @Composable
     private fun RowWithStatus(status: ContactItemStatus, hasOngoingCall: Boolean = false) {
         AndroidThemeForPreviews {

@@ -7,6 +7,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -20,7 +24,10 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.chat.list.archived.model.ArchivedChatsUiState
+import mega.privacy.android.feature.chat.list.model.ChatListBulkActionsUiState
+import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
+import mega.privacy.android.feature.chat.list.view.ChatRoomActionsOverlay
 import mega.privacy.android.feature.chat.list.view.ChatRoomItemView
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.chats.components.ChatsViewSkeleton
@@ -33,6 +40,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onBackClick Callback when back navigation is requested.
  * @param onItemClick Callback when an archived chat row is clicked, with the chat id.
  * @param modifier [Modifier]
+ * @param resolveChatRoomActions Resolves the ordered actions available for the given chats.
+ * @param onChatRoomActionSelected Runs the picked action across the given chats.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +50,13 @@ internal fun ArchivedChatsScreen(
     onBackClick: () -> Unit,
     onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    resolveChatRoomActions: suspend (Set<Long>) -> List<ChatRoomActionUiItem> = { emptyList() },
+    onChatRoomActionSelected: (Set<Long>, String) -> Unit = { _, _ -> },
 ) {
+    var actionsState by rememberSaveable(stateSaver = ChatListBulkActionsUiState.Saver) {
+        mutableStateOf<ChatListBulkActionsUiState>(ChatListBulkActionsUiState.Hidden)
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
             .fillMaxSize()
@@ -84,11 +99,22 @@ internal fun ArchivedChatsScreen(
                     ChatRoomItemView(
                         item = item,
                         onItemClick = onItemClick,
+                        onItemMoreClick = { chatId ->
+                            actionsState =
+                                ChatListBulkActionsUiState.ShowingActions(setOf(chatId))
+                        },
                     )
                 }
             }
         }
     }
+
+    ChatRoomActionsOverlay(
+        actionsState = actionsState,
+        resolveActions = resolveChatRoomActions,
+        onStateChange = { actionsState = it },
+        onActionSelected = onChatRoomActionSelected,
+    )
 }
 
 internal const val ARCHIVED_CHATS_SCREEN_TAG = "archived_chats_screen:screen"

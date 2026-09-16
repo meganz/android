@@ -4,9 +4,10 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 
 /**
- * Mutually-exclusive overlay state driving the chat list bulk actions bottom sheet and its
- * destructive-action confirmation dialog while in selection mode. Only one overlay can be shown
- * at a time, for the set of currently selected chats.
+ * Mutually-exclusive overlay state driving the chat room actions bottom sheet and its
+ * destructive-action confirmation dialog. Only one overlay can be shown at a time, for the chats
+ * it was opened for: the whole selection in multi-select mode, or the single chat whose row
+ * actions affordance was pressed.
  */
 sealed interface ChatListBulkActionsUiState {
 

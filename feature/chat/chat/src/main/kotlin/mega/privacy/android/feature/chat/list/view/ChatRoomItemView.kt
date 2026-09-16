@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +51,8 @@ import java.io.File
  * and the row shows a selection checkbox instead of the unread badge.
  * @param isSelected Whether this row is currently selected.
  * @param onSelectionToggle Optional callback when the row's selection is toggled, with the chat id.
+ * @param onItemMoreClick Optional callback when the row's actions affordance is pressed, with the
+ * chat id; when null the row shows no actions affordance.
  */
 @Composable
 internal fun ChatRoomItemView(
@@ -60,6 +63,7 @@ internal fun ChatRoomItemView(
     selectionMode: Boolean = false,
     isSelected: Boolean = false,
     onSelectionToggle: ((Long) -> Unit)? = null,
+    onItemMoreClick: ((Long) -> Unit)? = null,
 ) {
     GenericListItem(
         modifier = modifier.testTag(CHAT_ROOM_ITEM_TAG),
@@ -158,11 +162,32 @@ internal fun ChatRoomItemView(
                     tapTargetArea = false,
                     modifier = Modifier.testTag(CHAT_ROOM_ITEM_CHECKBOX_TAG),
                 )
-            } else if (item.unreadCount > 0) {
-                NotificationBadge(
-                    count = item.unreadCount,
-                    modifier = Modifier.testTag(CHAT_ROOM_ITEM_UNREAD_TAG),
-                )
+            } else if (item.unreadCount > 0 || onItemMoreClick != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (item.unreadCount > 0) {
+                        NotificationBadge(
+                            count = item.unreadCount,
+                            modifier = Modifier.testTag(CHAT_ROOM_ITEM_UNREAD_TAG),
+                        )
+                    }
+                    onItemMoreClick?.let { onMoreClick ->
+                        IconButton(
+                            modifier = Modifier.testTag(CHAT_ROOM_ITEM_MORE_TAG),
+                            onClick = { onMoreClick(item.chatId) },
+                        ) {
+                            MegaIcon(
+                                painter = rememberVectorPainter(
+                                    IconPack.Medium.Thin.Outline.MoreVertical
+                                ),
+                                tint = IconColor.Secondary,
+                                contentDescription = stringResource(
+                                    sharedR.string.more_options
+                                ),
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
+                    }
+                }
             }
         },
         onClickListener = {
@@ -324,6 +349,7 @@ internal const val CHAT_ROOM_ITEM_MESSAGE_TAG = "chat_room_item:last_message"
 internal const val CHAT_ROOM_ITEM_TIMESTAMP_TAG = "chat_room_item:timestamp"
 internal const val CHAT_ROOM_ITEM_UNREAD_TAG = "chat_room_item:unread_badge"
 internal const val CHAT_ROOM_ITEM_CHECKBOX_TAG = "chat_room_item:selection_checkbox"
+internal const val CHAT_ROOM_ITEM_MORE_TAG = "chat_room_item:more_actions"
 
 @CombinedThemePreviews
 @Composable

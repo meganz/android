@@ -53,6 +53,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param modifier [Modifier]
  * @param contentPadding Padding for the list content.
  * @param onItemLongClick Optional callback when a row is long-pressed, with the chat id.
+ * @param onItemMoreClick Optional callback when a row's actions affordance is pressed, with the
+ * chat id.
  * @param selectionMode Whether the list is in multi-select mode.
  * @param selectedChatIds Ids of the currently selected chats.
  * @param onSelectionToggle Optional callback when a row's selection is toggled, with the chat id.
@@ -69,6 +71,7 @@ internal fun ChatListContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     onItemLongClick: ((Long) -> Unit)? = null,
+    onItemMoreClick: ((Long) -> Unit)? = null,
     selectionMode: Boolean = false,
     selectedChatIds: Set<Long> = emptySet(),
     onSelectionToggle: ((Long) -> Unit)? = null,
@@ -106,6 +109,7 @@ internal fun ChatListContent(
                         selectionMode = selectionMode,
                         isSelected = item.chatId in selectedChatIds,
                         onSelectionToggle = onSelectionToggle,
+                        onItemMoreClick = onItemMoreClick,
                     )
                 }
             }

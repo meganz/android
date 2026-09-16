@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -27,6 +28,9 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.contact.state.ContactItemStatus
+import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_ARCHIVE_TAG
+import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
@@ -308,6 +312,7 @@ class ChatListScreenTest {
                     onMeetingActionClick = {},
                     onArchivedClick = {},
                     onSearchQueryChange = {},
+                    resolveChatRoomActions = { listOf(archiveAction) },
                 )
             }
         }
@@ -391,5 +396,80 @@ class ChatListScreenTest {
         avatar = ChatRoomUiItem.ChatRoomUiAvatar.Group,
         status = ContactItemStatus.Unknown,
         hasOngoingCall = false,
+    )
+
+    @Test
+    fun `test that the row actions affordance opens the actions sheet for that chat`() {
+        val resolvedFor = mutableListOf<Set<Long>>()
+        setupActionableScreen(onActionsResolved = resolvedFor::add)
+
+        composeRule.onAllNodesWithTag(CHAT_ROOM_ITEM_MORE_TAG)[0].performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(CHAT_ROOM_ACTIONS_SHEET_TAG).assertIsDisplayed()
+        assertThat(resolvedFor).containsExactly(setOf(1L))
+    }
+
+    @Test
+    fun `test that picking a row action reports it for that chat alone`() {
+        val picked = mutableListOf<Pair<Set<Long>, String>>()
+        setupActionableScreen(onActionSelected = { ids, action -> picked += ids to action })
+
+        composeRule.onAllNodesWithTag(CHAT_ROOM_ITEM_MORE_TAG)[0].performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(CHAT_ROOM_ACTIONS_ARCHIVE_TAG).performClick()
+        composeRule.waitForIdle()
+
+        assertThat(picked).containsExactly(setOf(1L) to CHAT_ROOM_ACTIONS_ARCHIVE_TAG)
+    }
+
+    @Test
+    fun `test that the row actions sheet survives state restoration`() {
+        val restorationTester = StateRestorationTester(composeRule)
+        restorationTester.setContent { RestorableChatListScreen(showMeetingTab = false) }
+
+        composeRule.onAllNodesWithTag(CHAT_ROOM_ITEM_MORE_TAG)[0].performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(CHAT_ROOM_ACTIONS_SHEET_TAG).assertIsDisplayed()
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        composeRule.onNodeWithTag(CHAT_ROOM_ACTIONS_SHEET_TAG).assertIsDisplayed()
+    }
+
+    private fun setupActionableScreen(
+        onActionsResolved: (Set<Long>) -> Unit = {},
+        onActionSelected: (Set<Long>, String) -> Unit = { _, _ -> },
+    ) {
+        composeRule.setContent {
+            CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
+                AndroidThemeForPreviews {
+                    ChatListScreen(
+                        uiState = populatedState(),
+                        showMeetingTab = false,
+                        onBackClick = {},
+                        onItemClick = {},
+                        onNewChatClick = {},
+                        onInviteFriendClick = {},
+                        onMeetingActionClick = {},
+                        onArchivedClick = {},
+                        onSearchQueryChange = {},
+                        resolveChatRoomActions = { chatIds ->
+                            onActionsResolved(chatIds)
+                            listOf(archiveAction)
+                        },
+                        onChatRoomActionSelected = onActionSelected,
+                    )
+                }
+            }
+        }
+    }
+
+    private val archiveAction = ChatRoomActionUiItem(
+        label = sharedR.string.general_archive,
+        icon = IconPack.Medium.Thin.Outline.Archive,
+        testTag = CHAT_ROOM_ACTIONS_ARCHIVE_TAG,
+        isDestructive = false,
+        confirmation = null,
     )
 }
