@@ -85,7 +85,7 @@ class ClearHistoryChatRoomMenuItemTest {
     fun `test that onClick clears the chat history`() = runTest {
         val item = ChatRoomItem.IndividualChatRoomItem(chatId = 7L, title = "Contact")
 
-        underTest.onClick(item)
+        underTest.onClick(listOf(item))
 
         verify(clearChatHistoryUseCase)(7L)
     }

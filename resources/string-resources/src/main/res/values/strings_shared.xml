@@ -4231,4 +4231,40 @@
     <string name="chat_meeting_blocked_by_call_dialog_title">Ongoing call</string>
     <!-- Title of the dialog shown when the Bluetooth permission needed to start a meeting was denied -->
     <string name="chat_start_meeting_bluetooth_permission_title">Permission required</string>
+    <!-- Snackbar message shown after archiving a single chat from the chat list. %s is the chat title -->
+    <string name="success_archive_chat">%s was archived</string>
+    <!-- Snackbar message shown when archiving a single chat from the chat list fails. %s is the chat title -->
+    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
+    <!-- Snackbar message shown over the chat list after archiving several chats at once. %1$d is the number of chats that were archived -->
+    <plurals name="chat_list_chats_archived_message">
+        <item quantity="one">%1$d chat was archived</item>
+        <item quantity="other">%1$d chats were archived</item>
+    </plurals>
+    <!-- Snackbar message shown after restoring an archived chat to the chat list. %s is the chat title -->
+    <string name="success_unarchive_chat">%s was unarchived</string>
+    <!-- Snackbar message shown over the archived chats list after restoring several chats to the chat list at once. %1$d is the number of chats that were unarchived -->
+    <plurals name="chat_list_chats_unarchived_message">
+        <item quantity="one">%1$d chat was unarchived</item>
+        <item quantity="other">%1$d chats were unarchived</item>
+    </plurals>
+    <!-- Snackbar message shown when restoring an archived chat to the chat list fails. %s is the chat title -->
+    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
+    <!-- Snackbar message shown after the message history of a chat has been cleared -->
+    <string name="clear_history_success">Chat history has been cleared</string>
+    <!-- Snackbar message shown when clearing the message history of a chat fails -->
+    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
+    <!-- Title of the dialog where the user picks the presence other people see for them -->
+    <string name="status_label">Status</string>
+    <!-- Snackbar message shown when changing the presence other people see for the user fails -->
+    <string name="changing_status_error">Error. Your status has not been changed</string>
+    <!-- Chat list toolbar action that silences the notifications of every chat at once -->
+    <string name="title_dialog_mute_chat_notifications">Do not disturb</string>
+    <!-- Body of the one-time tooltip pointing at the button that creates a meeting, shown on the Meetings tab -->
+    <string name="meeting_list_tooltip_fab_description">You can now schedule one-off and recurring meetings.</string>
+    <!-- Chat list toolbar subtitle shown while the device has no network connection -->
+    <string name="error_server_connection_problem">No network connection</string>
+    <!-- Chat list toolbar subtitle shown while the chat connection is being re-established -->
+    <string name="invalid_connection_state">Reconnecting to chat</string>
+    <!-- Chat list toolbar subtitle shown while the chat connection is being established -->
+    <string name="chat_connecting">Connecting…</string>
 </resources>

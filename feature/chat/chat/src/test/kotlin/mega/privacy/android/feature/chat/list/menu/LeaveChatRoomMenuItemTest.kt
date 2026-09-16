@@ -88,7 +88,7 @@ class LeaveChatRoomMenuItemTest {
     fun `test that onClick leaves the chat`() = runTest {
         val item = ChatRoomItem.GroupChatRoomItem(chatId = 7L, title = "Group", isActive = true)
 
-        underTest.onClick(item)
+        underTest.onClick(listOf(item))
 
         verify(leaveChatUseCase)(7L)
     }

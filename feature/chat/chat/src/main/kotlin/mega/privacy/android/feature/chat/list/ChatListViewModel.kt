@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
@@ -27,8 +29,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
-import mega.privacy.android.feature.chat.list.menu.ChatRoomMenuItem
-import mega.privacy.android.feature.chat.list.menu.toUiItem
+import mega.privacy.android.feature.chat.list.menu.ChatRoomActions
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
@@ -53,7 +54,8 @@ internal class ChatListViewModel @Inject constructor(
     private val createGroupChatRoomUseCase: CreateGroupChatRoomUseCase,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
-    private val chatRoomMenuItems: Map<Int, @JvmSuppressWildcards ChatRoomMenuItem>,
+    private val chatRoomActions: ChatRoomActions,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     private val queryChannel = Channel<String?>(Channel.CONFLATED)
@@ -180,44 +182,43 @@ internal class ChatListViewModel @Inject constructor(
             }
 
     /**
-     * Resolve the ordered actions available for the selected chats in [chatIds] when the bulk
-     * actions bottom sheet is opened, by filtering the contributed [ChatRoomMenuItem]s to those
-     * eligible for every selected chat. A single-chat selection therefore yields exactly that
-     * chat's actions.
+     * Resolve the ordered actions available for the chats in [chatIds] when the actions bottom
+     * sheet is opened, by filtering the contributed chat room actions to those eligible for every
+     * chat. A single-chat selection therefore yields exactly that chat's actions.
      *
-     * @param chatIds Ids of the currently selected chats.
-     * @return Ordered, renderable actions common to all selected chats, or empty when none apply.
+     * @param chatIds Ids of the chats the sheet was opened for.
+     * @return Ordered, renderable actions common to all those chats, or empty when none apply.
      */
-    suspend fun getBulkChatRoomActions(chatIds: Set<Long>): List<ChatRoomActionUiItem> {
-        if (chatIds.isEmpty()) return emptyList()
-        val rooms = currentChatRooms()
-        val selectedRooms = chatIds.mapNotNull { rooms[it] }
-        if (selectedRooms.isEmpty()) return emptyList()
-        return chatRoomMenuItems.entries
-            .sortedBy { it.key }
-            .map { it.value }
-            .filter { menuItem -> selectedRooms.all { menuItem.shouldDisplay(it) } }
-            .map { it.toUiItem(selectedRooms.first()) }
-    }
+    suspend fun getBulkChatRoomActions(chatIds: Set<Long>): List<ChatRoomActionUiItem> =
+        chatRoomActions.resolve(selectedRooms(chatIds))
 
     /**
-     * Run the action identified by [actionId] on every selected chat in [chatIds].
+     * Run the action identified by [actionId] on every chat in [chatIds], reporting the outcome to
+     * the user.
+     *
+     * The action itself runs in the application scope rather than [viewModelScope]: archiving,
+     * leaving, clearing and muting change the chats for good, so leaving the screen mid-run must
+     * not abandon the batch part-way through or drop the message telling the user what happened.
+     * The selection is resolved before that hand-off, on [viewModelScope], so the chat rooms the
+     * action is committed to are read while the screen is still up, and neither this ViewModel nor
+     * the chat room subscription the read needs outlives it in the process-wide scope.
      *
      * @param chatIds Ids of the chats the action was picked for.
      * @param actionId Test-tag identity of the picked action.
      */
     fun onBulkChatRoomActionSelected(chatIds: Set<Long>, actionId: String) {
         viewModelScope.launch {
-            val rooms = currentChatRooms()
-            val menuItem =
-                chatRoomMenuItems.values.firstOrNull { it.testTag == actionId } ?: return@launch
-            chatIds.mapNotNull { rooms[it] }.forEach { room ->
-                runCatching { menuItem.onClick(room) }
-                    .onFailure {
-                        Timber.e(it, "Failed to run action $actionId on chat ${room.chatId}")
-                    }
+            val rooms = selectedRooms(chatIds)
+            applicationScope.launch {
+                chatRoomActions.run(actionId, rooms)
             }
         }
+    }
+
+    private suspend fun selectedRooms(chatIds: Set<Long>): List<ChatRoomItem> {
+        if (chatIds.isEmpty()) return emptyList()
+        val rooms = currentChatRooms()
+        return chatIds.mapNotNull { rooms[it] }
     }
 
     private suspend fun currentChatRooms(): Map<Long, ChatRoomItem> = runCatching {

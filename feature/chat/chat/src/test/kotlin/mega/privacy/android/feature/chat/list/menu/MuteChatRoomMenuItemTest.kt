@@ -12,7 +12,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MuteChatRoomMenuItemTest {
@@ -25,6 +27,7 @@ class MuteChatRoomMenuItemTest {
 
     @BeforeEach
     fun setUp() {
+        reset(muteChatNotificationForChatRoomsUseCase, unmuteChatNotificationUseCase)
         underTest = MuteChatRoomMenuItem(
             muteChatNotificationForChatRoomsUseCase,
             unmuteChatNotificationUseCase,
@@ -35,28 +38,28 @@ class MuteChatRoomMenuItemTest {
     fun `test that label is mute for an unmuted chat`() {
         val item = ChatRoomItem.IndividualChatRoomItem(chatId = 1L, title = "Contact", isMuted = false)
 
-        assertThat(underTest.label(item)).isEqualTo(sharedR.string.general_mute)
+        assertThat(underTest.label(listOf(item))).isEqualTo(sharedR.string.general_mute)
     }
 
     @Test
     fun `test that label is unmute for a muted chat`() {
         val item = ChatRoomItem.IndividualChatRoomItem(chatId = 1L, title = "Contact", isMuted = true)
 
-        assertThat(underTest.label(item)).isEqualTo(sharedR.string.general_unmute)
+        assertThat(underTest.label(listOf(item))).isEqualTo(sharedR.string.general_unmute)
     }
 
     @Test
     fun `test that icon is bell off for an unmuted chat`() {
         val item = ChatRoomItem.IndividualChatRoomItem(chatId = 1L, title = "Contact", isMuted = false)
 
-        assertThat(underTest.icon(item)).isEqualTo(IconPack.Medium.Thin.Outline.BellOff)
+        assertThat(underTest.icon(listOf(item))).isEqualTo(IconPack.Medium.Thin.Outline.BellOff)
     }
 
     @Test
     fun `test that icon is bell for a muted chat`() {
         val item = ChatRoomItem.IndividualChatRoomItem(chatId = 1L, title = "Contact", isMuted = true)
 
-        assertThat(underTest.icon(item)).isEqualTo(IconPack.Medium.Thin.Outline.Bell)
+        assertThat(underTest.icon(listOf(item))).isEqualTo(IconPack.Medium.Thin.Outline.Bell)
     }
 
     @Test
@@ -159,7 +162,7 @@ class MuteChatRoomMenuItemTest {
     fun `test that onClick mutes an unmuted chat until turned back on`() = runTest {
         val item = ChatRoomItem.IndividualChatRoomItem(chatId = 7L, title = "Contact", isMuted = false)
 
-        underTest.onClick(item)
+        underTest.onClick(listOf(item))
 
         verify(muteChatNotificationForChatRoomsUseCase)(
             chatIdList = listOf(7L),
@@ -171,8 +174,65 @@ class MuteChatRoomMenuItemTest {
     fun `test that onClick unmutes a muted chat`() = runTest {
         val item = ChatRoomItem.IndividualChatRoomItem(chatId = 7L, title = "Contact", isMuted = true)
 
-        underTest.onClick(item)
+        underTest.onClick(listOf(item))
 
         verify(unmuteChatNotificationUseCase)(7L)
     }
+
+    @Test
+    fun `test that label is mute when the selection mixes muted and unmuted chats`() {
+        assertThat(underTest.label(mixedSelection())).isEqualTo(sharedR.string.general_mute)
+    }
+
+    @Test
+    fun `test that icon is bell off when the selection mixes muted and unmuted chats`() {
+        assertThat(underTest.icon(mixedSelection()))
+            .isEqualTo(IconPack.Medium.Thin.Outline.BellOff)
+    }
+
+    @Test
+    fun `test that onClick mutes every chat when the selection mixes muted and unmuted chats`() =
+        runTest {
+            underTest.onClick(mixedSelection())
+
+            verify(muteChatNotificationForChatRoomsUseCase)(
+                chatIdList = listOf(1L, 2L),
+                muteOption = ChatPushNotificationMuteOption.MuteUntilTurnBackOn,
+            )
+            verifyNoInteractions(unmuteChatNotificationUseCase)
+        }
+
+    @Test
+    fun `test that label is unmute when every chat in the selection is muted`() {
+        val items = listOf(
+            ChatRoomItem.IndividualChatRoomItem(chatId = 1L, title = "Muted", isMuted = true),
+            ChatRoomItem.IndividualChatRoomItem(chatId = 2L, title = "Also muted", isMuted = true),
+        )
+
+        assertThat(underTest.label(items)).isEqualTo(sharedR.string.general_unmute)
+    }
+
+    @Test
+    fun `test that onClick unmutes every chat when every chat in the selection is muted`() =
+        runTest {
+            val items = listOf(
+                ChatRoomItem.IndividualChatRoomItem(chatId = 1L, title = "Muted", isMuted = true),
+                ChatRoomItem.IndividualChatRoomItem(
+                    chatId = 2L,
+                    title = "Also muted",
+                    isMuted = true,
+                ),
+            )
+
+            underTest.onClick(items)
+
+            verify(unmuteChatNotificationUseCase)(1L)
+            verify(unmuteChatNotificationUseCase)(2L)
+            verifyNoInteractions(muteChatNotificationForChatRoomsUseCase)
+        }
+
+    private fun mixedSelection() = listOf(
+        ChatRoomItem.IndividualChatRoomItem(chatId = 1L, title = "Unmuted", isMuted = false),
+        ChatRoomItem.IndividualChatRoomItem(chatId = 2L, title = "Muted", isMuted = true),
+    )
 }

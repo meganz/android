@@ -1,12 +1,18 @@
 package mega.privacy.android.feature.chat.list
 
+import androidx.lifecycle.ViewModelStore
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.components.contact.state.ContactItemStatus
@@ -27,12 +33,15 @@ import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
+import mega.privacy.android.feature.chat.list.mapper.ChatRoomActionPluralMapper
+import mega.privacy.android.feature.chat.list.mapper.ChatRoomTitleMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
 import mega.privacy.android.feature.chat.list.menu.ArchiveChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_ARCHIVE_TAG
 import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_CLEAR_HISTORY_TAG
 import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_LEAVE_TAG
 import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_MUTE_TAG
+import mega.privacy.android.feature.chat.list.menu.ChatRoomActions
 import mega.privacy.android.feature.chat.list.menu.ChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.menu.ClearHistoryChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.menu.LeaveChatRoomMenuItem
@@ -43,7 +52,9 @@ import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.MeetingAction
 import mega.privacy.android.feature.chat.list.model.MeetingActionEvent
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.NewChatNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,8 +63,10 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -65,6 +78,8 @@ import org.mockito.kotlin.whenever
 class ChatListViewModelTest {
 
     private lateinit var underTest: ChatListViewModel
+
+    private lateinit var applicationScope: CoroutineScope
 
     private val getChatsUseCase = mock<GetChatsUseCase>()
     private val chatLastMessageFormatter = mock<ChatLastMessageFormatter>()
@@ -81,6 +96,8 @@ class ChatListViewModelTest {
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
     private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
     private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
+    private val chatRoomTitleMapper = mock<ChatRoomTitleMapper>()
 
     private val chatRoomMenuItems: Map<Int, ChatRoomMenuItem> = mapOf(
         0 to ClearHistoryChatRoomMenuItem(clearChatHistoryUseCase),
@@ -88,9 +105,17 @@ class ChatListViewModelTest {
             muteChatNotificationForChatRoomsUseCase,
             unmuteChatNotificationUseCase,
         ),
-        2 to ArchiveChatRoomMenuItem(archiveChatUseCase),
-        3 to UnarchiveChatRoomMenuItem(archiveChatUseCase),
+        2 to ArchiveChatRoomMenuItem(archiveChatUseCase, chatRoomTitleMapper),
+        3 to UnarchiveChatRoomMenuItem(archiveChatUseCase, chatRoomTitleMapper),
         4 to LeaveChatRoomMenuItem(leaveChatUseCase),
+    )
+
+    private val chatRoomActionPluralMapper = mock<ChatRoomActionPluralMapper>()
+
+    private val chatRoomActions = ChatRoomActions(
+        chatRoomMenuItems = chatRoomMenuItems,
+        chatRoomActionPluralMapper = chatRoomActionPluralMapper,
+        snackbarEventQueue = snackbarEventQueue,
     )
 
     private val chatRoomItem = ChatRoomItem.IndividualChatRoomItem(
@@ -112,6 +137,7 @@ class ChatListViewModelTest {
     @BeforeEach
     fun setUp() {
         stubHasAnyContact(hasAnyContact = false)
+        applicationScope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher())
         underTest = ChatListViewModel(
             getChatsUseCase = getChatsUseCase,
             chatLastMessageFormatter = chatLastMessageFormatter,
@@ -122,12 +148,14 @@ class ChatListViewModelTest {
             createGroupChatRoomUseCase = createGroupChatRoomUseCase,
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
-            chatRoomMenuItems = chatRoomMenuItems,
+            chatRoomActions = chatRoomActions,
+            applicationScope = applicationScope,
         )
     }
 
     @AfterEach
     fun tearDown() {
+        applicationScope.cancel()
         capturedLastMessage = null
         capturedLastTimeMapper = null
         capturedMeetingTimeMapper = null
@@ -147,6 +175,9 @@ class ChatListViewModelTest {
             startConversationUseCase,
             createGroupChatRoomUseCase,
             monitorHasAnyContactUseCase,
+            snackbarEventQueue,
+            chatRoomTitleMapper,
+            chatRoomActionPluralMapper,
         )
     }
 
@@ -393,13 +424,71 @@ class ChatListViewModelTest {
             advanceUntilIdle()
 
             verify(muteChatNotificationForChatRoomsUseCase)(
-                chatIdList = listOf(1L),
+                chatIdList = listOf(1L, 2L),
                 muteOption = ChatPushNotificationMuteOption.MuteUntilTurnBackOn,
             )
-            verify(muteChatNotificationForChatRoomsUseCase)(
-                chatIdList = listOf(2L),
-                muteOption = ChatPushNotificationMuteOption.MuteUntilTurnBackOn,
+        }
+
+    @Test
+    fun `test that onBulkChatRoomActionSelected runs the action and queues its message when the ViewModel is cleared`() =
+        runTest {
+            val room = ChatRoomItem.IndividualChatRoomItem(
+                chatId = 1L,
+                title = "Chat",
+                hasPermissions = true,
             )
+            stubChatRooms(chats = listOf(room), meetings = emptyList())
+            chatRoomTitleMapper.stub { on { invoke(room) } doReturn "Chat" }
+            val archiving = CompletableDeferred<Unit>()
+            archiveChatUseCase.stub {
+                onBlocking { invoke(eq(1L), any()) } doSuspendableAnswer { archiving.await() }
+            }
+            val viewModelStore = ViewModelStore().apply { put("chatList", underTest) }
+
+            underTest.onBulkChatRoomActionSelected(setOf(1L), CHAT_ROOM_ACTIONS_ARCHIVE_TAG)
+            advanceUntilIdle()
+            viewModelStore.clear()
+            archiving.complete(Unit)
+            advanceUntilIdle()
+
+            verify(archiveChatUseCase)(1L, true)
+            verify(snackbarEventQueue).queueMessage(sharedR.string.success_archive_chat, "Chat")
+        }
+
+    @Test
+    fun `test that onBulkChatRoomActionSelected stops resolving the selection when the ViewModel is cleared`() =
+        runTest {
+            var meetingsCancelled = false
+            getChatsUseCase.stub {
+                on {
+                    invoke(eq(ChatRoomType.NON_MEETINGS), any(), any(), any(), any())
+                } doAnswer {
+                    flow {
+                        emit(listOf(chatRoomItem))
+                        awaitCancellation()
+                    }
+                }
+                on {
+                    invoke(eq(ChatRoomType.MEETINGS), any(), any(), any(), any())
+                } doAnswer {
+                    flow<List<ChatRoomItem>> {
+                        try {
+                            awaitCancellation()
+                        } finally {
+                            meetingsCancelled = true
+                        }
+                    }
+                }
+            }
+            val viewModelStore = ViewModelStore().apply { put("chatList", underTest) }
+
+            underTest.onBulkChatRoomActionSelected(setOf(1L), CHAT_ROOM_ACTIONS_ARCHIVE_TAG)
+            advanceUntilIdle()
+            viewModelStore.clear()
+            advanceUntilIdle()
+
+            assertThat(meetingsCancelled).isTrue()
+            verifyNoInteractions(archiveChatUseCase)
         }
 
     @Test
@@ -692,4 +781,65 @@ class ChatListViewModelTest {
         title = "Bob",
         lastMessage = "Dinner at 8?",
     )
+
+    @Test
+    fun `test that onBulkChatRoomActionSelected mutes every chat when the selection mixes muted and unmuted chats`() =
+        runTest {
+            stubChatRooms(
+                chats = listOf(
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 1L,
+                        title = "Unmuted",
+                        hasPermissions = true,
+                        isMuted = false,
+                    ),
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 2L,
+                        title = "Muted",
+                        hasPermissions = true,
+                        isMuted = true,
+                    ),
+                ),
+                meetings = emptyList(),
+            )
+
+            val actions = underTest.getBulkChatRoomActions(setOf(1L, 2L))
+            underTest.onBulkChatRoomActionSelected(setOf(1L, 2L), CHAT_ROOM_ACTIONS_MUTE_TAG)
+            advanceUntilIdle()
+
+            assertThat(actions.first { it.testTag == CHAT_ROOM_ACTIONS_MUTE_TAG }.label)
+                .isEqualTo(sharedR.string.general_mute)
+            verify(muteChatNotificationForChatRoomsUseCase)(
+                chatIdList = listOf(1L, 2L),
+                muteOption = ChatPushNotificationMuteOption.MuteUntilTurnBackOn,
+            )
+            verify(unmuteChatNotificationUseCase, never())(any())
+        }
+
+    @Test
+    fun `test that getBulkChatRoomActions labels the action unmute when every selected chat is muted`() =
+        runTest {
+            stubChatRooms(
+                chats = listOf(
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 1L,
+                        title = "Muted",
+                        hasPermissions = true,
+                        isMuted = true,
+                    ),
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 2L,
+                        title = "Also muted",
+                        hasPermissions = true,
+                        isMuted = true,
+                    ),
+                ),
+                meetings = emptyList(),
+            )
+
+            val actions = underTest.getBulkChatRoomActions(setOf(1L, 2L))
+
+            assertThat(actions.first { it.testTag == CHAT_ROOM_ACTIONS_MUTE_TAG }.label)
+                .isEqualTo(sharedR.string.general_unmute)
+        }
 }
