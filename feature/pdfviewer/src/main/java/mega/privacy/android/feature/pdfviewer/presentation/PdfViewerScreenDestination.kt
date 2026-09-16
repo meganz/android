@@ -85,6 +85,7 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
                         messageId = navKey.messageId,
                         shouldStopHttpServer = navKey.shouldStopHttpServer,
                         isExternalFile = navKey.isExternalFile,
+                        isFromZip = navKey.isFromZip,
                         publicLinkUrl = navKey.publicLinkUrl,
                     )
                 )
@@ -205,15 +206,15 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
                 .filterNot { it is CommonMenuAction.More },
             singleNodeActionHandler = downloadAwareActionHandler,
             // Reuse one Share action for the two surfaces that have something to share:
-            //  • file link  → share the original public-link URL (mirrors the file-link screen);
-            //  • external   → share the file itself via its content URI (mirrors legacy share).
+            //  • file link      → share the original public-link URL (mirrors the file-link screen);
+            //  • external / zip → share the file itself via its content URI (mirrors legacy share).
             // Null for in-account sources, where Share lives in the node-options sheet instead.
             onShare = when {
                 navKey.publicLinkUrl != null -> {
                     { activity?.startPdfPublicLinkShareIntent(navKey.publicLinkUrl, uiState.title) }
                 }
 
-                navKey.isExternalFile -> {
+                navKey.isExternalFile || navKey.isFromZip -> {
                     {
                         activity?.startPdfFileShareIntent(
                             contentUri = navKey.contentUri,

@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -214,6 +216,18 @@ class ZipBrowserViewModel @Inject constructor(
         _uiState.update { it.copy(showSnackBar = value) }
 
     internal fun clearOpenedFile() = _uiState.update { it.copy(openedFile = null) }
+
+    /**
+     * Handle an unzipped PDF file being opened. The host owns the navigation, so the file is
+     * exposed as an event instead of being opened here.
+     *
+     * @param file the unzipped PDF file
+     */
+    internal fun onOpenPdfFile(file: File) =
+        _uiState.update { it.copy(openPdfEvent = triggered(file)) }
+
+    internal fun onOpenPdfEventConsumed() =
+        _uiState.update { it.copy(openPdfEvent = consumed()) }
 
     internal suspend fun getFileTypeInfo(file: File) = getFileTypeInfoUseCase(file)
 

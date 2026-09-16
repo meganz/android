@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.zipbrowser.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
+import java.io.File
 
 /**
  * Zip browser ui state
@@ -13,6 +16,7 @@ import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
  * @property showAlertDialog whether should show the file cannot open alert dialog
  * @property showSnackBar whether should show the snack bar
  * @property openedFile opened file
+ * @property openPdfEvent Event to open an unzipped PDF file, routed by the host
  */
 data class ZipBrowserUiState(
     val items: List<ZipInfoUiEntity> = emptyList(),
@@ -23,4 +27,5 @@ data class ZipBrowserUiState(
     val showAlertDialog: Boolean = false,
     val showSnackBar: Boolean = false,
     val openedFile: ZipInfoUiEntity? = null,
+    val openPdfEvent: StateEventWithContent<File> = consumed(),
 )

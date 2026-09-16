@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.zipbrowser
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import de.palm.composestateevents.StateEventWithContentConsumed
+import de.palm.composestateevents.StateEventWithContentTriggered
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -134,6 +136,36 @@ class ZipBrowserViewModelTest {
             assertThat(initial.folderDepth).isEqualTo(0)
             assertThat(initial.parentFolderName).isEmpty()
             assertThat(initial.currentZipTreeNode).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onOpenPdfFile emits the file in openPdfEvent`() = runTest {
+        whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+        initUnderTest()
+        val pdfFile = File("${temporaryFolder.path}/document.pdf")
+
+        underTest.onOpenPdfFile(pdfFile)
+
+        underTest.uiState.test {
+            val event = awaitItem().openPdfEvent
+            assertThat((event as StateEventWithContentTriggered).content).isEqualTo(pdfFile)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onOpenPdfEventConsumed consumes openPdfEvent`() = runTest {
+        whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+        initUnderTest()
+        underTest.onOpenPdfFile(File("${temporaryFolder.path}/document.pdf"))
+
+        underTest.onOpenPdfEventConsumed()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().openPdfEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
             cancelAndIgnoreRemainingEvents()
         }
     }

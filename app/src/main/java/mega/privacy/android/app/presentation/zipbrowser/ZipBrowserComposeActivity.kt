@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -19,30 +20,31 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ZipImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.zipbrowser.view.ZipBrowserScreen
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.data.model.MimeTypeList
@@ -55,6 +57,9 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import java.io.File
@@ -63,7 +68,10 @@ import java.util.zip.ZipFile
 import javax.inject.Inject
 
 /**
- * The activity for the zip browser
+ * The activity for the zip browser.
+ *
+ * It hosts its own back stack with every feature destination registered, so a PDF inside the zip
+ * opens in-place on top of the zip list instead of in a separate activity.
  */
 @AndroidEntryPoint
 class ZipBrowserComposeActivity : PasscodeActivity() {
@@ -79,6 +87,24 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    /**
+     * [NavigationResultManager] injection
+     */
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    /**
+     * Feature destinations registered in this activity's navigation display
+     */
+    @Inject
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
+
+    /**
+     * App dialog destinations registered in this activity's navigation display
+     */
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
+
     private val viewModel by viewModels<ZipBrowserViewModel>()
 
     /**
@@ -91,28 +117,25 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(
                 initialValue = ThemeMode.System
             )
-            OriginalTheme(isDark = themeMode.isDarkMode()) {
-                ConstraintLayout(
-                    modifier = Modifier.systemBarsPadding().fillMaxSize()
-                ) {
-                    val (audioPlayer, audioSectionComposeView) = createRefs()
-                    MiniAudioPlayerView(
-                        modifier = Modifier
-                            .constrainAs(audioPlayer) {
-                                bottom.linkTo(parent.bottom)
-                            }
-                            .fillMaxWidth(),
-                        lifecycle = lifecycle,
-                    )
-                    ZipBrowserScreen(
-                        modifier = Modifier
-                            .constrainAs(audioSectionComposeView) {
-                                top.linkTo(parent.top)
-                                bottom.linkTo(audioPlayer.top)
-                                height = Dimension.fillToConstraints
-                            }
-                            .fillMaxWidth(),
-                        viewModel = viewModel)
+            LegacyActivityScaffold(
+                container = { content ->
+                    OriginalTheme(isDark = themeMode.isDarkMode(), content = content)
+                },
+                initialKey = InternalZipBrowserNavKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
+                onEmptyBackStack = { if (!isFinishing) finish() },
+            ) { navigationHandler, _ ->
+                entry<InternalZipBrowserNavKey> {
+                    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                    EventEffect(
+                        event = uiState.openPdfEvent,
+                        onConsumed = viewModel::onOpenPdfEventConsumed,
+                    ) { file ->
+                        navigationHandler.navigate(composePdfViewerNavKey(file))
+                    }
+                    ZipBrowserContent()
                 }
             }
         }
@@ -134,7 +157,7 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
 
                             isVideoMimeType || isAudio -> openMediaFile(zipFile)
 
-                            isPdf -> openPdfFile(zipFile)
+                            isPdf -> viewModel.onOpenPdfFile(zipFile)
 
                             isOpenableTextFile(zipFile.length()) -> {
                                 megaNavigator.openTextEditor(
@@ -153,6 +176,35 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
 
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun ZipBrowserContent() {
+        ConstraintLayout(
+            modifier = Modifier
+                .systemBarsPadding()
+                .fillMaxSize()
+        ) {
+            val (audioPlayer, audioSectionComposeView) = createRefs()
+            MiniAudioPlayerView(
+                modifier = Modifier
+                    .constrainAs(audioPlayer) {
+                        bottom.linkTo(parent.bottom)
+                    }
+                    .fillMaxWidth(),
+                lifecycle = lifecycle,
+            )
+            ZipBrowserScreen(
+                modifier = Modifier
+                    .constrainAs(audioSectionComposeView) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(audioPlayer.top)
+                        height = Dimension.fillToConstraints
+                    }
+                    .fillMaxWidth(),
+                viewModel = viewModel
+            )
         }
     }
 
@@ -207,31 +259,17 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
         get() = type.startsWith("application/pdf")
 
     /**
-     * legacy logic to open pdf type file
+     * The Compose PDF viewer destination for a file unzipped from the browsed zip. The content URI
+     * is a [FileProvider] one, as the viewer reads it through the content resolver.
+     *
      * @param file file
      */
-    private fun MimeTypeList.openPdfFile(file: File) {
-        Timber.d("Pdf file")
-        val pdfIntent =
-            Intent(this@ZipBrowserComposeActivity, PdfViewerActivity::class.java)
-        pdfIntent.apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)
-            putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
-            putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.absolutePath)
-        }
-        getExternalFilesDir(null)?.apply {
-            pdfIntent.setDataAndType(
-                FileProvider.getUriForFile(
-                    this@ZipBrowserComposeActivity,
-                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                    file
-                ), type
-            )
-            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(pdfIntent)
-        }
-    }
+    private fun composePdfViewerNavKey(file: File) = PdfViewerNavKey(
+        contentUri = zipFileProviderUri(file).toString(),
+        isLocalContent = true,
+        isFromZip = true,
+        title = file.name,
+    )
 
     /**
      * legacy logic to open other type file
@@ -240,25 +278,13 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
     private fun MimeTypeList.openOtherTypeFile(file: File) {
         Timber.d("NOT Image, video, audio or pdf")
         val viewIntent = Intent(Intent.ACTION_VIEW)
-        viewIntent.setDataAndType(
-            FileProvider.getUriForFile(
-                this@ZipBrowserComposeActivity,
-                Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                file
-            ), type
-        )
+        viewIntent.setDataAndType(zipFileProviderUri(file), type)
         viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         if (MegaApiUtils.isIntentAvailable(this@ZipBrowserComposeActivity, viewIntent)) {
             startActivity(viewIntent)
         } else {
             val intentShare = Intent(Intent.ACTION_SEND)
-            intentShare.setDataAndType(
-                FileProvider.getUriForFile(
-                    this@ZipBrowserComposeActivity,
-                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                    file
-                ), type
-            )
+            intentShare.setDataAndType(zipFileProviderUri(file), type)
             intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             if (MegaApiUtils.isIntentAvailable(this@ZipBrowserComposeActivity, intentShare)) {
                 Timber.d("Call to startActivity(intentShare)")
@@ -269,6 +295,12 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
             Toast.makeText(this@ZipBrowserComposeActivity, toastMessage, Toast.LENGTH_LONG).show()
         }
     }
+
+    private fun zipFileProviderUri(file: File) = FileProvider.getUriForFile(
+        this@ZipBrowserComposeActivity,
+        Constants.AUTHORITY_STRING_FILE_PROVIDER,
+        file
+    )
 
     companion object {
         /**
@@ -327,3 +359,6 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
         }
     }
 }
+
+@Serializable
+private data object InternalZipBrowserNavKey : NavKey

@@ -1203,6 +1203,81 @@ class PdfViewerViewModelTest {
         isExternalFile = true,
     )
 
+    private val zipFileArgs = PdfViewerViewModel.Args(
+        nodeHandle = -1L,
+        contentUri = "content://authority/inside_zip.pdf",
+        isLocalContent = true,
+        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        mimeType = "application/pdf",
+        title = "inside_zip.pdf",
+        chatId = null,
+        messageId = null,
+        shouldStopHttpServer = false,
+        isFromZip = true,
+    )
+
+    @Test
+    fun `test that source is ZipFile when isFromZip is true`() = runTest {
+        underTest = initViewModel(args = zipFileArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isFromZip).isTrue()
+            assertThat(state.source)
+                .isEqualTo(PdfViewerSource.ZipFile(contentUri = zipFileArgs.contentUri))
+        }
+    }
+
+    @Test
+    fun `test that init does not load last viewed page when isFromZip is true`() = runTest {
+        underTest = initViewModel(args = zipFileArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentPage).isEqualTo(1)
+        }
+        verify(getLastPageViewedInPdfUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onPageChanged does not persist last page when isFromZip is true`() = runTest {
+        underTest = initViewModel(args = zipFileArgs)
+        advanceUntilIdle()
+
+        underTest.onPageChanged(2, 10)
+        advanceUntilIdle()
+
+        verify(setOrUpdateLastPageViewedInPdfUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onCleared does not touch Continue Where Left Off when isFromZip is true`() =
+        runTest {
+            underTest = initViewModel(args = zipFileArgs)
+            advanceUntilIdle()
+            underTest.onLoadComplete(20)
+            underTest.onPageChanged(5, 20)
+            advanceUntilIdle()
+
+            underTest.onCleared()
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+        }
+
+    @Test
+    fun `test that currentNode stays null and node lookup is skipped when isFromZip is true`() =
+        runTest {
+            underTest = initViewModel(args = zipFileArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isNull()
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
     @Test
     fun `test that init does not load last viewed page when isExternalFile is true`() = runTest {
         underTest = initViewModel(args = externalFileArgs)

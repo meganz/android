@@ -195,6 +195,7 @@ internal fun PdfViewerScreen(
 
     val showFloatingToolbar = isDocumentReady
             && !uiState.isExternalFile
+            && !uiState.isFromZip
             && !searchState.isSearchActive
             && !uiState.isPasswordError
             && bottomBarActions.isNotEmpty()
@@ -250,7 +251,7 @@ internal fun PdfViewerScreen(
                             onBack = onBack,
                             onSearch = onActivateSearch,
                             onOpenNodeOptions = onMoreClicked,
-                            showMoreAction = !uiState.isExternalFile,
+                            showMoreAction = !uiState.isExternalFile && !uiState.isFromZip,
                             showActions = isDocumentReady,
                             onShare = guardedShare,
                             modifier = Modifier.fillMaxWidth(),

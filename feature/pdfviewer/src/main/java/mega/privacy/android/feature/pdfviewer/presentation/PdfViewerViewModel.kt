@@ -103,6 +103,10 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val _state = MutableStateFlow(PdfViewerState())
     val state: StateFlow<PdfViewerState> = _state.asStateFlow()
 
+    // External and zip files are plain local documents: there is no MEGA node to resolve, no
+    // reading position to persist and nothing to surface in Continue Where Left Off.
+    private val hasNoMegaNode = args.isExternalFile || args.isFromZip
+
     // search text (debounce + flatMapLatest) reacts to this.
     private val _rawQuery = MutableStateFlow("")
 
@@ -185,12 +189,13 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 isFromFileLink = args.nodeSourceType == NodeSourceType.FILE_LINK,
                 isOffline = args.nodeSourceType == NodeSourceType.OFFLINE,
                 isExternalFile = args.isExternalFile,
+                isFromZip = args.isFromZip,
                 source = createSourceFromArgs(),
             )
         }
 
-        if (args.isExternalFile) {
-            // External files don't save currentPage
+        if (hasNoMegaNode) {
+            // Files without a MEGA node don't save currentPage
             _state.update { it.copy(currentPage = 1) }
         } else {
             // Show loading until currentPage is resolved
@@ -465,7 +470,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         if (_state.value.searchState.hasResults) {
             fetchRectsForVisiblePages(page - 1) // page is 1-indexed; convert to 0-indexed
         }
-        if (!args.isExternalFile) {
+        if (!hasNoMegaNode) {
             viewModelScope.launch {
                 runCatching {
                     setOrUpdateLastPageViewedInPdfUseCase(
@@ -642,7 +647,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * [viewModelScope] is already cancelled by the time [onCleared] is called.
      */
     private fun persistContinueWhereLeftOffOnExit() {
-        if (args.isExternalFile) return
+        if (hasNoMegaNode) return
         val currentPage = _state.value.currentPage ?: return
         val totalPages = _state.value.totalPages
         if (totalPages <= 0) return
@@ -669,6 +674,10 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 contentUri = contentUri,
                 fileName = args.title,
             )
+        }
+
+        if (args.isFromZip) {
+            return PdfViewerSource.ZipFile(contentUri = contentUri)
         }
 
         if (args.nodeSourceType == NodeSourceType.OFFLINE) {
@@ -752,10 +761,10 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * Chat attachments received from others are not in the account, so the handle lookup returns null,
      * and they resolve via [GetChatFileUseCase] instead.
      *
-     * No-op for external files (no MEGA node).
+     * No-op for sources without a MEGA node (external and zip files).
      */
     private fun loadCurrentNode() {
-        if (args.isExternalFile || args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (hasNoMegaNode || args.nodeHandle == INVALID_NODE_HANDLE) return
         viewModelScope.launch {
             val node: TypedNode? = when (args.nodeSourceType) {
                 NodeSourceType.FILE_LINK -> loadPublicLinkNode()
@@ -784,7 +793,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * permission change on another device / web), keeping the toolbar and action list in sync.
      */
     private fun monitorNodeUpdates() {
-        if (args.isExternalFile || args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (hasNoMegaNode || args.nodeHandle == INVALID_NODE_HANDLE) return
         monitorNodeUpdatesUseCase()
             .filter { update -> update.changes.keys.any { it.id.longValue == args.nodeHandle } }
             .onEach { loadCurrentNode() }
@@ -820,7 +829,8 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     /**
      * Arguments for the PdfViewerViewModel.
      *
-     * @param nodeHandle The handle of the node to display. -1L for external files.
+     * @param nodeHandle The handle of the node to display. -1L for sources without a MEGA node
+     * (external and zip files).
      * @param contentUri The content URI string for the PDF (local file path or remote URL)
      * @param isLocalContent True if content is local, false if remote streaming
      * @param nodeSourceType The source type of the node (use FOLDER_LINK/FILE_LINK for links)
@@ -830,6 +840,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * @param messageId The message ID if opening from chat (optional)
      * @param shouldStopHttpServer True if HTTP server should be stopped when done
      * @param isExternalFile True if the PDF was opened from an external app intent (no MEGA node)
+     * @param isFromZip True if the PDF was opened from a zip file (no MEGA node)
      * @param publicLinkUrl The public file-link URL when opened from a file link
      */
     data class Args(
@@ -843,6 +854,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         val messageId: Long?,
         val shouldStopHttpServer: Boolean,
         val isExternalFile: Boolean = false,
+        val isFromZip: Boolean = false,
         val publicLinkUrl: String? = null,
     )
 
@@ -855,7 +867,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         /** Number of pages to prefetch on each side of the current page. */
         const val PREFETCH_RADIUS = 1
 
-        /** Sentinel node handle used for external files that have no MEGA node. */
+        /** Sentinel node handle used for sources that have no MEGA node. */
         const val INVALID_NODE_HANDLE = -1L
     }
 }
