@@ -7,8 +7,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.BySelector
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.StaleObjectException
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -522,27 +522,24 @@ class CloudDriveInteractionsTest {
     /**
      * Scrolls the node list until [selector] is on screen. The list is scrolled through its own
      * container — the Drive tab nests it inside a horizontally scrollable pager, so the first
-     * scrollable node on screen is not necessarily the node list.
+     * scrollable node on screen is not necessarily the node list. The container is re-resolved on
+     * every swipe: the list keeps recomposing after a view-type switch, and a UiObject2 whose node
+     * changed underneath throws StaleObjectException on its next use, so the swipe is retried with
+     * a fresh handle instead.
      */
     private fun scrollNodeListUntil(selector: BySelector, name: String) {
+        val container = By.res(NODE_LIST_CONTAINER_TAG).hasDescendant(By.res(NODE_LIST_TITLE_TAG))
         repeat(MAX_SCROLL_SWIPES) {
             if (device.hasObject(selector)) return
-            val container = nodeListContainer() ?: return@repeat
-            container.setGestureMargin(container.visibleBounds.height() / 4)
-            container.scroll(Direction.DOWN, SCROLL_PERCENT)
+            try {
+                val list = device.findObject(container) ?: return@repeat
+                list.setGestureMargin(list.visibleBounds.height() / 4)
+                list.scroll(Direction.DOWN, SCROLL_PERCENT)
+            } catch (e: StaleObjectException) {
+                Log.d("UiScroll", "node list changed under the swipe, retrying", e)
+            }
         }
         awaitObject(selector, LOAD_TIMEOUT, name)
-    }
-
-    /** The innermost scrollable ancestor of a visible node row, i.e. the node list itself. */
-    private fun nodeListContainer(): UiObject2? {
-        var node = device.findObject(By.res(NODE_LIST_TITLE_TAG)) ?: return null
-        repeat(MAX_PARENT_HOPS) {
-            val parent = node.parent ?: return null
-            if (parent.isScrollable) return parent
-            node = parent
-        }
-        return null
     }
 
     /**
@@ -586,7 +583,6 @@ class CloudDriveInteractionsTest {
         const val LOAD_TIMEOUT = 30_000L
         const val POLL_INTERVAL_MS = 200L
         const val MAX_SCROLL_SWIPES = 12
-        const val MAX_PARENT_HOPS = 8
         const val SCROLL_PERCENT = 0.8f
 
         const val FILE_HANDLE = 100L
@@ -623,6 +619,9 @@ class CloudDriveInteractionsTest {
 
         /** Mirrors CommonMenuAction.Search.testTag. */
         const val SEARCH_ACTION_TAG = "app_bar:search"
+
+        /** Mirrors the internal LAZY_COLUMN_TAG of FastScrollLazyColumn, which hosts the node list. */
+        const val NODE_LIST_CONTAINER_TAG = "fast_scroll_lazy_column:lazy_column_content"
 
         /** Mirrors the internal TITLE_TAG / SUBTITLE_TAG of NodeListViewItem rows. */
         const val NODE_LIST_TITLE_TAG = "node_list_view_item:title"
