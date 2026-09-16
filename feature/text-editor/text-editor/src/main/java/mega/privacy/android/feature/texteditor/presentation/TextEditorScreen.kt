@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -111,6 +113,9 @@ private const val BARS_HIDDEN_EPSILON_PX = 1f
 private const val ENTRANCE_ANIMATION_MS = 300
 private const val FLING_SNAP_ANIMATION_MS = 150
 private val BottomBarSlideDistance = 100.dp
+
+/** Formatting toolbar height plus its bottom margin, kept scrollable-clear at the editor's end. */
+private val RichToolbarStripHeight = 56.dp
 private val SnackbarBottomBarClearance = 112.dp
 private val SnackbarHorizontalPadding = 16.dp
 
@@ -455,24 +460,21 @@ fun TextEditorScreen(
                         LaunchedEffect(useRichText) {
                             if (useRichText) viewModel.ensureRichDocumentState()
                         }
-                        Column(
+                        Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .then(
-                                    // Nav inset consumed first, so imePadding adds only the rest.
+                                    // Nav inset stays as editor content padding so text draws
+                                    // edge to edge behind the system bar.
                                     if (useRichText) {
-                                        Modifier
-                                            .navigationBarsPadding()
-                                            .imePadding()
+                                        Modifier.imePadding()
                                     } else {
                                         Modifier
                                     },
                                 ),
                         ) {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+                                modifier = Modifier.fillMaxSize(),
                             ) {
                                 val richState = richDocumentState
                                 if (useRichText && richState != null) {
@@ -481,6 +483,7 @@ fun TextEditorScreen(
                                         autoFocusWhenEmpty =
                                             uiState.mode == TextEditorMode.Create,
                                         modifier = Modifier.fillMaxSize(),
+                                        bottomOverlayClearance = RichToolbarStripHeight,
                                     )
                                 } else if (useRichText) {
                                     // One frame while ensureRichDocumentState builds the model.
@@ -547,6 +550,19 @@ fun TextEditorScreen(
                                     RichEditToolbar(
                                         viewModel = viewModel,
                                         richState = richState,
+                                        modifier = Modifier
+                                            .align(Alignment.BottomCenter)
+                                            // Above the nav bar when the keyboard is closed; the
+                                            // container's imePadding already lifts it otherwise.
+                                            .windowInsetsPadding(
+                                                WindowInsets.navigationBars
+                                                    .exclude(WindowInsets.ime),
+                                            )
+                                            .padding(
+                                                start = 16.dp,
+                                                end = 16.dp,
+                                                bottom = 8.dp,
+                                            ),
                                     )
                                 }
                             }
@@ -851,6 +867,7 @@ private fun TextEditorViewModeTopAppBar(
 private fun RichEditToolbar(
     viewModel: TextEditorComposeViewModel,
     richState: RichDocumentState,
+    modifier: Modifier = Modifier,
 ) {
     var formats by remember { mutableStateOf(MarkdownSelectionFormats.Empty) }
     val focused = richState.focusedInlineText
@@ -888,6 +905,7 @@ private fun RichEditToolbar(
     MarkdownFormattingToolbar(
         formats = formats,
         onAction = viewModel::applyFormatAction,
+        modifier = modifier,
         // Structural actions are disabled where they cannot act on what the user sees:
         // table cells take inline styles only, and a cross-block selection would silently
         // retype just the origin block.

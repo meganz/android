@@ -2,38 +2,34 @@ package mega.privacy.android.feature.texteditor.components.markdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.FormatBold
-import androidx.compose.material.icons.filled.FormatItalic
-import androidx.compose.material.icons.filled.FormatListBulleted
-import androidx.compose.material.icons.filled.FormatListNumbered
-import androidx.compose.material.icons.filled.FormatQuote
-import androidx.compose.material.icons.filled.FormatStrikethrough
-import androidx.compose.material.icons.filled.FormatUnderlined
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.Title
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.IconPack
 
 /** Formatting actions the toolbar can emit. [Link] opens the link dialog before any text edit. */
 enum class MarkdownFormatAction {
@@ -59,11 +55,8 @@ fun markdownToolbarActionTag(action: MarkdownFormatAction): String =
     "markdown_formatting_toolbar:action_${action.name.lowercase()}"
 
 /**
- * Text formatting toolbar docked above the keyboard while editing Markdown in rich text mode.
+ * Text formatting toolbar floating above the keyboard while editing Markdown in rich text mode.
  * Toggle buttons reflect the formats covering the current cursor/selection.
- *
- * Icons are intentionally isolated here (material extended set) so a later swap to icon-pack
- * assets touches one file.
  */
 @Composable
 fun MarkdownFormattingToolbar(
@@ -72,32 +65,43 @@ fun MarkdownFormattingToolbar(
     modifier: Modifier = Modifier,
     disabledActions: Set<MarkdownFormatAction> = emptySet(),
 ) {
-    Box(
+    // Same floating pill styling as core-ui's MegaFloatingToolbar.
+    Card(
+        shape = CircleShape,
+        colors = CardDefaults.cardColors(
+            containerColor = DSTokens.colors.background.surface1,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = ToolbarElevation),
         modifier = modifier
             .fillMaxWidth()
-            .background(DSTokens.colors.background.pageBackground)
             .testTag(MARKDOWN_TOOLBAR_TAG),
     ) {
-        HorizontalDivider(
-            color = DSTokens.colors.border.subtle,
-            modifier = Modifier.align(Alignment.TopCenter),
-        )
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .height(ToolbarHeight),
         ) {
+            val scrollState = rememberScrollState()
             Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .horizontalScroll(rememberScrollState()),
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .horizontalScroll(scrollState)
+                    .padding(horizontal = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 ToolbarToggleButton(
+                    action = MarkdownFormatAction.HeadingCycle,
+                    icon = IconPack.Medium.Thin.Outline.FileText, // TODO update to dropdown
+                    contentDescription = "Heading",
+                    isActive = formats.headingLevel != null,
+                    enabled = MarkdownFormatAction.HeadingCycle !in disabledActions,
+                    onAction = onAction,
+                )
+                ToolbarToggleButton(
                     action = MarkdownFormatAction.Bold,
-                    icon = Icons.Default.FormatBold,
+                    icon = IconPack.Medium.Thin.Outline.TextBold,
                     contentDescription = "Bold",
                     isActive = formats.isBold,
                     enabled = MarkdownFormatAction.Bold !in disabledActions,
@@ -105,7 +109,7 @@ fun MarkdownFormattingToolbar(
                 )
                 ToolbarToggleButton(
                     action = MarkdownFormatAction.Italic,
-                    icon = Icons.Default.FormatItalic,
+                    icon = IconPack.Medium.Thin.Outline.TextItalic,
                     contentDescription = "Italic",
                     isActive = formats.isItalic,
                     enabled = MarkdownFormatAction.Italic !in disabledActions,
@@ -113,7 +117,7 @@ fun MarkdownFormattingToolbar(
                 )
                 ToolbarToggleButton(
                     action = MarkdownFormatAction.Underline,
-                    icon = Icons.Default.FormatUnderlined,
+                    icon = IconPack.Medium.Thin.Outline.TextUnderline,
                     contentDescription = "Underline",
                     isActive = formats.isUnderline,
                     enabled = MarkdownFormatAction.Underline !in disabledActions,
@@ -121,23 +125,23 @@ fun MarkdownFormattingToolbar(
                 )
                 ToolbarToggleButton(
                     action = MarkdownFormatAction.Strikethrough,
-                    icon = Icons.Default.FormatStrikethrough,
+                    icon = IconPack.Medium.Thin.Outline.TextStrikethrough,
                     contentDescription = "Strikethrough",
                     isActive = formats.isStrikethrough,
                     enabled = MarkdownFormatAction.Strikethrough !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
-                    action = MarkdownFormatAction.HeadingCycle,
-                    icon = Icons.Default.Title,
-                    contentDescription = "Heading",
-                    isActive = formats.headingLevel != null,
-                    enabled = MarkdownFormatAction.HeadingCycle !in disabledActions,
+                    action = MarkdownFormatAction.TaskList,
+                    icon = IconPack.Medium.Thin.Outline.Checklist,
+                    contentDescription = "Checklist",
+                    isActive = formats.isTaskList,
+                    enabled = MarkdownFormatAction.TaskList !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
                     action = MarkdownFormatAction.BulletList,
-                    icon = Icons.Default.FormatListBulleted,
+                    icon = IconPack.Medium.Thin.Outline.ListSmall,
                     contentDescription = "Bulleted list",
                     isActive = formats.isBulletList,
                     enabled = MarkdownFormatAction.BulletList !in disabledActions,
@@ -145,23 +149,15 @@ fun MarkdownFormattingToolbar(
                 )
                 ToolbarToggleButton(
                     action = MarkdownFormatAction.OrderedList,
-                    icon = Icons.Default.FormatListNumbered,
+                    icon = IconPack.Medium.Thin.Outline.ListNumbers,
                     contentDescription = "Numbered list",
                     isActive = formats.isOrderedList,
                     enabled = MarkdownFormatAction.OrderedList !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
-                    action = MarkdownFormatAction.TaskList,
-                    icon = Icons.Default.Checklist,
-                    contentDescription = "Checklist",
-                    isActive = formats.isTaskList,
-                    enabled = MarkdownFormatAction.TaskList !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
                     action = MarkdownFormatAction.Quote,
-                    icon = Icons.Default.FormatQuote,
+                    icon = IconPack.Medium.Thin.Outline.TextQuote,
                     contentDescription = "Quote",
                     isActive = formats.isQuote,
                     enabled = MarkdownFormatAction.Quote !in disabledActions,
@@ -169,7 +165,7 @@ fun MarkdownFormattingToolbar(
                 )
                 ToolbarToggleButton(
                     action = MarkdownFormatAction.InlineCode,
-                    icon = Icons.Default.Code,
+                    icon = IconPack.Medium.Thin.Outline.Code,
                     contentDescription = "Code",
                     isActive = formats.isInlineCode,
                     enabled = MarkdownFormatAction.InlineCode !in disabledActions,
@@ -177,15 +173,38 @@ fun MarkdownFormattingToolbar(
                 )
                 ToolbarToggleButton(
                     action = MarkdownFormatAction.Link,
-                    icon = Icons.Default.Link,
+                    icon = IconPack.Medium.Thin.Outline.Url,
                     contentDescription = "Link",
                     isActive = formats.isLink,
                     enabled = MarkdownFormatAction.Link !in disabledActions,
                     onAction = onAction,
                 )
             }
+            if (scrollState.canScrollBackward) {
+                ScrollEdgeShade(isStart = true, modifier = Modifier.align(Alignment.CenterStart))
+            }
+            if (scrollState.canScrollForward) {
+                ScrollEdgeShade(isStart = false, modifier = Modifier.align(Alignment.CenterEnd))
+            }
         }
     }
+}
+
+@Composable
+private fun ScrollEdgeShade(
+    isStart: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val background = DSTokens.colors.background.surface1
+    val colors = listOf(background, background.copy(alpha = 0f))
+    Box(
+        modifier = modifier
+            .width(ToolbarShadeWidth)
+            .fillMaxHeight()
+            .background(
+                Brush.horizontalGradient(if (isStart) colors else colors.reversed()),
+            ),
+    )
 }
 
 @Composable
@@ -202,17 +221,16 @@ private fun ToolbarToggleButton(
         onCheckedChange = { onAction(action) },
         enabled = enabled,
         colors = IconButtonDefaults.iconToggleButtonColors(
-            containerColor = DSTokens.colors.background.pageBackground,
+            containerColor = Color.Transparent,
             contentColor = DSTokens.colors.icon.primary,
-            checkedContainerColor = DSTokens.colors.background.surface2,
-            checkedContentColor = DSTokens.colors.icon.accent,
-            disabledContainerColor = DSTokens.colors.background.pageBackground,
+            checkedContainerColor = DSTokens.colors.background.surface3,
+            checkedContentColor = DSTokens.colors.icon.primary,
+            disabledContainerColor = Color.Transparent,
             disabledContentColor = DSTokens.colors.icon.disabled,
         ),
-        shape = IconButtonDefaults.filledShape,
+        shape = CircleShape,
         modifier = Modifier
-            .padding(horizontal = 2.dp)
-            .size(40.dp)
+            .size(36.dp)
             .testTag(markdownToolbarActionTag(action)),
     ) {
         Icon(
@@ -222,6 +240,10 @@ private fun ToolbarToggleButton(
         )
     }
 }
+
+private val ToolbarHeight = 48.dp
+private val ToolbarShadeWidth = 24.dp
+private val ToolbarElevation = 3.dp
 
 @CombinedThemePreviews
 @Composable
