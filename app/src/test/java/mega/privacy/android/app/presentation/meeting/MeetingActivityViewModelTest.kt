@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -24,6 +25,11 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.call.CallNotificationType
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
@@ -80,6 +86,8 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -365,6 +373,126 @@ class MeetingActivityViewModelTest {
         underTest.state.map { it.emailContactToShowInfo }.test {
             assertThat(awaitItem()).isEqualTo(email)
         }
+    }
+
+    @Test
+    fun `test that free plan limits state is set when a generic notification reports CallUsersLimit`() =
+        runTest {
+            stubChatCallUpdate(
+                status = ChatCallStatus.InProgress,
+                changes = listOf(ChatCallChanges.GenericNotification),
+                termCode = ChatCallTermCodeType.CallUsersLimit,
+                notificationType = CallNotificationType.SFUError,
+            )
+            initUnderTest()
+
+            underTest.state.map { it.callEndedDueToFreePlanLimits }.test {
+                assertThat(awaitItem()).isTrue()
+            }
+            verifyNoInteractions(broadcastCallEndedUseCase)
+        }
+
+    @Test
+    fun `test that too many participants state is set when a generic notification reports TooManyParticipants`() =
+        runTest {
+            stubChatCallUpdate(
+                status = ChatCallStatus.InProgress,
+                changes = listOf(ChatCallChanges.GenericNotification),
+                termCode = ChatCallTermCodeType.TooManyParticipants,
+                notificationType = CallNotificationType.SFUError,
+            )
+            initUnderTest()
+
+            underTest.state.map { it.callEndedDueToTooManyParticipants }.test {
+                assertThat(awaitItem()).isTrue()
+            }
+            verifyNoInteractions(broadcastCallEndedUseCase)
+        }
+
+    @Test
+    fun `test that free plan limits state is set when the call ends due to CallUsersLimit`() =
+        runTest {
+            stubChatCallUpdate(
+                status = ChatCallStatus.TerminatingUserParticipation,
+                changes = listOf(ChatCallChanges.Status),
+                termCode = ChatCallTermCodeType.CallUsersLimit,
+            )
+            initUnderTest()
+
+            underTest.state.map { it.callEndedDueToFreePlanLimits }.test {
+                assertThat(awaitItem()).isTrue()
+            }
+            verifyNoInteractions(broadcastCallEndedUseCase)
+        }
+
+    @Test
+    fun `test that the call ended broadcast is sent when the call ends without a limit term code`() =
+        runTest {
+            stubChatCallUpdate(
+                status = ChatCallStatus.TerminatingUserParticipation,
+                changes = listOf(ChatCallChanges.Status),
+                termCode = ChatCallTermCodeType.Hangup,
+            )
+            initUnderTest()
+
+            verify(broadcastCallEndedUseCase).invoke(chatId)
+        }
+
+    @ParameterizedTest(name = " when the notification type is {0}")
+    @EnumSource(
+        value = CallNotificationType::class,
+        names = ["SFUError"],
+        mode = EnumSource.Mode.EXCLUDE
+    )
+    fun `test that no limit state is set when a generic notification is not an SFU error`(
+        notificationType: CallNotificationType,
+    ) = runTest {
+        stubChatCallUpdate(
+            status = ChatCallStatus.InProgress,
+            changes = listOf(ChatCallChanges.GenericNotification),
+            termCode = ChatCallTermCodeType.CallUsersLimit,
+            notificationType = notificationType,
+        )
+        initUnderTest()
+
+        underTest.state.map { it.callEndedDueToFreePlanLimits }.test {
+            assertThat(awaitItem()).isFalse()
+        }
+        verifyNoInteractions(broadcastCallEndedUseCase)
+    }
+
+    @Test
+    fun `test that no limit state is set when a non generic notification change reports CallUsersLimit`() =
+        runTest {
+            stubChatCallUpdate(
+                status = ChatCallStatus.InProgress,
+                changes = listOf(ChatCallChanges.CallLimitsUpdated),
+                termCode = ChatCallTermCodeType.CallUsersLimit,
+                notificationType = CallNotificationType.SFUError,
+            )
+            initUnderTest()
+
+            underTest.state.map { it.callEndedDueToFreePlanLimits }.test {
+                assertThat(awaitItem()).isFalse()
+            }
+        }
+
+    private fun stubChatCallUpdate(
+        status: ChatCallStatus,
+        changes: List<ChatCallChanges>,
+        termCode: ChatCallTermCodeType,
+        notificationType: CallNotificationType? = null,
+    ) {
+        wheneverBlocking { monitorChatCallUpdatesUseCase() } doReturn flowOf(
+            ChatCall(
+                chatId = chatId,
+                callId = 1L,
+                status = status,
+                changes = changes,
+                notificationType = notificationType,
+                termCode = termCode,
+            )
+        )
     }
 
     companion object {

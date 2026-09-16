@@ -46,7 +46,9 @@ import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchD
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.call.CallNotificationType
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
@@ -745,52 +747,60 @@ class ChatViewModel @Inject constructor(
         monitorCallInChatJob = viewModelScope.launch {
             monitorCallInChatUseCase(chatId)
                 .catch { Timber.e(it) }
-                .collect {
-                    it?.apply {
-                        when (status) {
-                            ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification ->
-                                when (termCode) {
-                                    ChatCallTermCodeType.TooManyParticipants -> {
-                                        val infoToShow =
-                                            InfoToShow.SimpleString(stringId = R.string.call_error_too_many_participants)
-                                        _state.update { state ->
-                                            state.copy(
-                                                infoToShowEvent = triggered(
-                                                    infoToShow
-                                                )
-                                            )
-                                        }
-                                    }
-
-                                    ChatCallTermCodeType.CallDurationLimit -> {
-                                        if (it.isOwnClientCaller && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
-                                            _state.update { state ->
-                                                state.copy(
-                                                    shouldUpgradeToProPlan = true
-                                                )
-                                            }
-                                        }
-                                    }
-
-                                    ChatCallTermCodeType.CallUsersLimit -> {
-                                        if (_state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
-                                            setUsersCallLimitReminder(true)
-                                            _state.update { state ->
-                                                state.copy(
-                                                    callEndedDueToFreePlanLimits = true
-                                                )
-                                            }
-                                        }
-                                    }
-
-                                    else -> {}
-                                }
-
-                            else -> {}
-                        }
-                    }
-                    _state.update { state -> state.copy(callInThisChat = it) }
+                .collect { call ->
+                    call?.let { handleCallLimitTermCode(it) }
+                    _state.update { state -> state.copy(callInThisChat = call) }
                 }
+        }
+    }
+
+    /**
+     * A term code is meaningful either when the SFU ends our participation in the call, or when it
+     * reports the limit as an SFU error carried by a generic notification while the call is still
+     * running. Any other notification type is ignored.
+     */
+    private fun handleCallLimitTermCode(call: ChatCall) {
+        val reportsTermCode =
+            call.status == ChatCallStatus.TerminatingUserParticipation
+                    || (call.changes?.contains(ChatCallChanges.GenericNotification) == true
+                    && call.notificationType == CallNotificationType.SFUError)
+        if (!reportsTermCode) return
+
+        when (call.termCode) {
+            ChatCallTermCodeType.TooManyParticipants -> {
+                val infoToShow =
+                    InfoToShow.SimpleString(stringId = R.string.call_error_too_many_participants)
+                _state.update { state ->
+                    state.copy(
+                        infoToShowEvent = triggered(
+                            infoToShow
+                        )
+                    )
+                }
+            }
+
+            ChatCallTermCodeType.CallDurationLimit -> {
+                if (call.isOwnClientCaller && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
+                    _state.update { state ->
+                        state.copy(
+                            shouldUpgradeToProPlan = true
+                        )
+                    }
+                }
+            }
+
+            ChatCallTermCodeType.CallUsersLimit -> {
+                if (_state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
+                    setUsersCallLimitReminder(true)
+                    _state.update { state ->
+                        state.copy(
+                            callEndedDueToFreePlanLimits = true
+                        )
+                    }
+                }
+            }
+
+            else -> Unit
         }
     }
 

@@ -40,11 +40,6 @@ enum class ChatCallStatus {
     TerminatingUserParticipation,
 
     /**
-     * Call status Generic Notification
-     */
-    GenericNotification,
-
-    /**
      * Call status Destroyed
      */
     Destroyed,

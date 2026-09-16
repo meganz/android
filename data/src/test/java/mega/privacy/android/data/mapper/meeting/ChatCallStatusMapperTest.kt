@@ -39,11 +39,31 @@ class ChatCallStatusMapperTest {
             MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
             ChatCallStatus.TerminatingUserParticipation
         ),
-        Arguments.of(
-            MegaChatCall.CHANGE_TYPE_GENERIC_NOTIFICATION,
-            ChatCallStatus.GenericNotification
-        ),
         Arguments.of(MegaChatCall.CALL_STATUS_DESTROYED, ChatCallStatus.Destroyed),
         Arguments.of(-1, ChatCallStatus.Unknown)
     )
+
+    @ParameterizedTest(name = "test {0} is not mapped to a change bitmask")
+    @EnumSource(ChatCallStatus::class)
+    fun `test that a status is never mapped to a change bitmask`(status: ChatCallStatus) {
+        val validCallStatuses = listOf(
+            MegaChatCall.CALL_STATUS_INITIAL,
+            MegaChatCall.CALL_STATUS_USER_NO_PRESENT,
+            MegaChatCall.CALL_STATUS_CONNECTING,
+            MegaChatCall.CALL_STATUS_WAITING_ROOM,
+            MegaChatCall.CALL_STATUS_JOINING,
+            MegaChatCall.CALL_STATUS_IN_PROGRESS,
+            MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
+            MegaChatCall.CALL_STATUS_DESTROYED,
+            UNKNOWN_STATUS,
+        )
+
+        val actual = underTest(status)
+
+        Truth.assertThat(validCallStatuses).contains(actual)
+    }
+
+    private companion object {
+        const val UNKNOWN_STATUS = -1
+    }
 }

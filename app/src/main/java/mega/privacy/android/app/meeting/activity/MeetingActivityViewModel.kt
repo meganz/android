@@ -57,6 +57,7 @@ import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.call.AudioDevice
+import mega.privacy.android.domain.entity.call.CallNotificationType
 import mega.privacy.android.domain.entity.call.CallType
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
@@ -889,6 +890,38 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * Raises the call limit dialogs for the term codes that report one.
+     *
+     * The SFU reports a limit either by ending our participation in the call or, while the call is
+     * still running, as an SFU error carried by a generic notification with the same term code.
+     *
+     * @return true when [call] carries a limit term code, false otherwise
+     */
+    private fun handleCallLimitTermCode(call: ChatCall): Boolean = when (call.termCode) {
+        ChatCallTermCodeType.CallUsersLimit -> {
+            _state.update { state ->
+                state.copy(
+                    callEndedDueToFreePlanLimits = true
+                )
+            }
+            true
+        }
+
+        ChatCallTermCodeType.TooManyParticipants,
+        ChatCallTermCodeType.TooManyClients,
+            -> {
+            _state.update { state ->
+                state.copy(
+                    callEndedDueToTooManyParticipants = true
+                )
+            }
+            true
+        }
+
+        else -> false
+    }
+
+    /**
      * Get chat call updates
      */
     private fun startMonitoringChatCallUpdates() {
@@ -905,6 +938,13 @@ class MeetingActivityViewModel @Inject constructor(
 
                     checkIfPresenting(call)
                     call.changes?.apply {
+                        if (contains(ChatCallChanges.GenericNotification)
+                            && call.notificationType == CallNotificationType.SFUError
+                        ) {
+                            Timber.d("SFU error notification termCode: ${call.termCode}")
+                            handleCallLimitTermCode(call)
+                        }
+
                         when {
                             contains(ChatCallChanges.Status) -> {
                                 Timber.d("Chat call status: ${call.status}")
@@ -919,27 +959,11 @@ class MeetingActivityViewModel @Inject constructor(
                                         initialiseUserToShowInHandRaisedSnackbar(call)
                                     }
 
-                                    ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification -> {
+                                    ChatCallStatus.TerminatingUserParticipation -> {
                                         Timber.d("Chat call termCode: ${call.termCode}")
-                                        when (call.termCode) {
-                                            ChatCallTermCodeType.CallUsersLimit -> _state.update { state ->
-                                                state.copy(
-                                                    callEndedDueToFreePlanLimits = true
-                                                )
-                                            }
-
-                                            ChatCallTermCodeType.TooManyParticipants,
-                                            ChatCallTermCodeType.TooManyClients,
-                                                -> _state.update { state ->
-                                                state.copy(
-                                                    callEndedDueToTooManyParticipants = true
-                                                )
-                                            }
-
-                                            else -> if (call.status == ChatCallStatus.TerminatingUserParticipation) {
-                                                broadcastCallEndedUseCase(_state.value.chatId)
-                                                finishMeetingActivity()
-                                            }
+                                        if (!handleCallLimitTermCode(call)) {
+                                            broadcastCallEndedUseCase(_state.value.chatId)
+                                            finishMeetingActivity()
                                         }
                                     }
 

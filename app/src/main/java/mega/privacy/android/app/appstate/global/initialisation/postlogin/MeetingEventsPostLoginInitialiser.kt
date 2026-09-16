@@ -3,6 +3,9 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 import kotlinx.coroutines.flow.retry
 import mega.privacy.android.app.presentation.meeting.navigation.FreePlanParticipantsLimitNavKey
 import mega.privacy.android.app.presentation.meeting.navigation.UpgradeProPlanBottomSheetNavKey
+import mega.privacy.android.domain.entity.call.CallNotificationType
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -28,39 +31,39 @@ class MeetingEventsPostLoginInitialiser @Inject constructor(
                 Timber.e(it, "Error in monitoring meeting events")
                 true
             }.collect { call ->
-                when (call.status) {
-                    ChatCallStatus.TerminatingUserParticipation,
-                    ChatCallStatus.GenericNotification,
-                        -> {
-                        when (call.termCode) {
-                            ChatCallTermCodeType.CallUsersLimit -> {
-                                Timber.d("Emitting FreePlanParticipantsLimitNavKey")
-                                appDialogsEventQueue.emit(
-                                    AppDialogEvent(
-                                        FreePlanParticipantsLimitNavKey(
-                                            callEndedDueToFreePlanLimits = true
-                                        )
-                                    )
+                if (!call.reportsCallLimit()) return@collect
+
+                when (call.termCode) {
+                    ChatCallTermCodeType.CallUsersLimit -> {
+                        Timber.d("Emitting FreePlanParticipantsLimitNavKey")
+                        appDialogsEventQueue.emit(
+                            AppDialogEvent(
+                                FreePlanParticipantsLimitNavKey(
+                                    callEndedDueToFreePlanLimits = true
                                 )
-                            }
+                            )
+                        )
+                    }
 
-                            ChatCallTermCodeType.CallDurationLimit -> {
-                                if (call.isOwnClientCaller) {
-                                    Timber.d("Emitting UpgradeProPlanBottomSheetNavKey")
-                                    navigationEventQueue.emit(UpgradeProPlanBottomSheetNavKey)
-                                }
-                            }
-
-                            else -> {
-                                // No action for other term codes
-                            }
+                    ChatCallTermCodeType.CallDurationLimit -> {
+                        if (call.isOwnClientCaller) {
+                            Timber.d("Emitting UpgradeProPlanBottomSheetNavKey")
+                            navigationEventQueue.emit(UpgradeProPlanBottomSheetNavKey)
                         }
                     }
 
-                    else -> {
-                        // No action for other statuses
-                    }
+                    else -> Unit
                 }
             }
     }
 )
+
+/**
+ * A term code is meaningful either when the SFU ends our participation in the call, or when it
+ * reports the limit as an SFU error carried by a generic notification while the call is still
+ * running. Any other notification type is ignored, since acting on one can close a live call.
+ */
+private fun ChatCall.reportsCallLimit() =
+    status == ChatCallStatus.TerminatingUserParticipation
+            || (changes?.contains(ChatCallChanges.GenericNotification) == true
+            && notificationType == CallNotificationType.SFUError)

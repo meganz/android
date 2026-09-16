@@ -225,7 +225,7 @@ class CallRecordingViewModelTest {
     @EnumSource(
         value = ChatCallStatus::class,
         names = ["Initial", "UserNoPresent", "WaitingRoom", "TerminatingUserParticipation",
-            "GenericNotification", "Destroyed", "Unknown"]
+            "Destroyed", "Unknown"]
     )
     fun `test that isParticipatingInCall is set to false and broadcast recording consent is invoked`(
         status: ChatCallStatus,
@@ -314,7 +314,7 @@ class CallRecordingViewModelTest {
     @EnumSource(
         value = ChatCallStatus::class,
         names = ["Initial", "UserNoPresent", "WaitingRoom", "TerminatingUserParticipation",
-            "GenericNotification", "Destroyed", "Unknown", "Connecting", "Joining", "InProgress"]
+            "Destroyed", "Unknown", "Connecting", "Joining", "InProgress"]
     )
     fun `test that isSessionOnRecording is set to true when is recording`(
         status: ChatCallStatus,
@@ -344,7 +344,7 @@ class CallRecordingViewModelTest {
     @EnumSource(
         value = ChatCallStatus::class,
         names = ["Initial", "UserNoPresent", "WaitingRoom", "TerminatingUserParticipation",
-            "GenericNotification", "Destroyed", "Unknown", "Connecting", "Joining", "InProgress"]
+            "Destroyed", "Unknown", "Connecting", "Joining", "InProgress"]
     )
     fun `test that isSessionOnRecording is set to false when is recording`(
         status: ChatCallStatus,

@@ -18,7 +18,7 @@ import org.mockito.kotlin.whenever
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class ChatRequestMapperTest {
+class ChatCallMapperTest {
     private lateinit var underTest: ChatCallMapper
 
     private val expectedCallId = 123L
@@ -129,6 +129,19 @@ class ChatRequestMapperTest {
         val chatCall = getMockChatCall(changes = MegaChatCall.CHANGE_TYPE_STATUS)
         val actual = underTest(chatCall)
         Truth.assertThat(actual.changes).contains(ChatCallChanges.Status)
+    }
+
+    @Test
+    fun `test mapping chat call generic notification is a change and not a status`() {
+        val chatCall = getMockChatCall(
+            status = MegaChatCall.CALL_STATUS_IN_PROGRESS,
+            changes = MegaChatCall.CHANGE_TYPE_GENERIC_NOTIFICATION,
+        )
+
+        val actual = underTest(chatCall)
+
+        Truth.assertThat(actual.changes).contains(ChatCallChanges.GenericNotification)
+        Truth.assertThat(actual.status).isEqualTo(ChatCallStatus.InProgress)
     }
 
     @Test

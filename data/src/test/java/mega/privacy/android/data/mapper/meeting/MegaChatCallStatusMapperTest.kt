@@ -32,17 +32,33 @@ class MegaChatCallStatusMapperTest {
         Arguments.of(ChatCallStatus.Initial, MegaChatCall.CALL_STATUS_INITIAL),
         Arguments.of(ChatCallStatus.UserNoPresent, MegaChatCall.CALL_STATUS_USER_NO_PRESENT),
         Arguments.of(ChatCallStatus.Connecting, MegaChatCall.CALL_STATUS_CONNECTING),
+        Arguments.of(ChatCallStatus.WaitingRoom, MegaChatCall.CALL_STATUS_WAITING_ROOM),
         Arguments.of(ChatCallStatus.Joining, MegaChatCall.CALL_STATUS_JOINING),
         Arguments.of(ChatCallStatus.InProgress, MegaChatCall.CALL_STATUS_IN_PROGRESS),
         Arguments.of(
             ChatCallStatus.TerminatingUserParticipation,
             MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION
         ),
-        Arguments.of(
-            ChatCallStatus.GenericNotification,
-            MegaChatCall.CHANGE_TYPE_GENERIC_NOTIFICATION
-        ),
         Arguments.of(ChatCallStatus.Destroyed, MegaChatCall.CALL_STATUS_DESTROYED),
         Arguments.of(ChatCallStatus.Unknown, -1)
+    )
+
+    @ParameterizedTest(name = "test change bitmask {0} is mapped to Unknown")
+    @MethodSource("provideChangeTypes")
+    fun `test that a change bitmask is not mapped to a call status`(changeType: Int) {
+        val actual = underTest(changeType)
+        Truth.assertThat(actual).isEqualTo(ChatCallStatus.Unknown)
+    }
+
+    private fun provideChangeTypes(): Stream<Arguments> = Stream.of(
+        Arguments.of(MegaChatCall.CHANGE_TYPE_GENERIC_NOTIFICATION),
+        Arguments.of(MegaChatCall.CHANGE_TYPE_OUTGOING_RINGING_STOP),
+        Arguments.of(MegaChatCall.CHANGE_TYPE_OWN_PERMISSIONS),
+        Arguments.of(MegaChatCall.CHANGE_TYPE_WR_ALLOW),
+        Arguments.of(MegaChatCall.CHANGE_TYPE_WR_DENY),
+        Arguments.of(MegaChatCall.CHANGE_TYPE_WR_COMPOSITION),
+        Arguments.of(MegaChatCall.CHANGE_TYPE_CALL_WILL_END),
+        Arguments.of(MegaChatCall.CHANGE_TYPE_CALL_LIMITS_UPDATED),
+        Arguments.of(MegaChatCall.CHANGE_TYPE_CALL_RAISE_HAND),
     )
 }
