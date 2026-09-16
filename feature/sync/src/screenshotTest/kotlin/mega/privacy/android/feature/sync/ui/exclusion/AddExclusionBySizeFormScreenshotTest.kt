@@ -10,9 +10,9 @@ import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeUnit
 
 /**
- * One preview per distinct layout the form has: no bounds, one bound, and a range whose two
- * bounds carry different units. A second single-bound condition renders the same layout with a
- * different chip label, which the chip's own tests already cover.
+ * One preview per distinct layout the form has: no bounds, one bound, a range whose two bounds
+ * carry different units, and that range in error. A second single-bound condition renders the
+ * same layout with a different chip label, which the chip's own tests already cover.
  */
 class AddExclusionBySizeFormScreenshotTest {
 
@@ -53,6 +53,22 @@ class AddExclusionBySizeFormScreenshotTest {
                     condition = SyncSizeCondition.NotBetween,
                     firstBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Kilobytes),
                     secondBound = SyncSizeBoundInput(value = "2", unit = SyncSizeUnit.Gigabytes),
+                )
+            )
+        }
+    }
+
+    /** The one error state the design draws: a range typed the wrong way round. */
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun AddExclusionBySizeFormNotBetweenInvertedRange() {
+        AndroidThemeForPreviews {
+            Form(
+                AddExclusionBySizeFormState(
+                    condition = SyncSizeCondition.NotBetween,
+                    firstBound = SyncSizeBoundInput(value = "2", unit = SyncSizeUnit.Gigabytes),
+                    secondBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Kilobytes),
                 )
             )
         }

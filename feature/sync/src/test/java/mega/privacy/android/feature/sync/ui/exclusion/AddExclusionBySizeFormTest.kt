@@ -201,6 +201,59 @@ internal class AddExclusionBySizeFormTest {
     }
 
     @Test
+    fun `test that the form shows the range error when the bounds are the wrong way round`() {
+        setContent(
+            AddExclusionBySizeFormState(
+                condition = SyncSizeCondition.NotBetween,
+                firstBound = SyncSizeBoundInput(value = "2", unit = SyncSizeUnit.Gigabytes),
+                secondBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Kilobytes),
+            )
+        )
+
+        composeTestRule
+            .onNodeWithText(string(sharedR.string.sync_exclusions_add_size_range_error))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the form hides the range error when the range reads upwards`() {
+        setContent(
+            AddExclusionBySizeFormState(
+                condition = SyncSizeCondition.NotBetween,
+                firstBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Kilobytes),
+                secondBound = SyncSizeBoundInput(value = "2", unit = SyncSizeUnit.Gigabytes),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_SIZE_RANGE_ERROR_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the form does not blame the order when a bound is not a usable size`() {
+        setContent(
+            AddExclusionBySizeFormState(
+                condition = SyncSizeCondition.NotBetween,
+                firstBound = SyncSizeBoundInput(value = "5", unit = SyncSizeUnit.Gigabytes),
+                secondBound = SyncSizeBoundInput(value = "0", unit = SyncSizeUnit.Bytes),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_SIZE_RANGE_ERROR_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the form hides the range error while the second bound is still empty`() {
+        setContent(
+            AddExclusionBySizeFormState(
+                condition = SyncSizeCondition.NotBetween,
+                firstBound = SyncSizeBoundInput(value = "2", unit = SyncSizeUnit.Gigabytes),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_SIZE_RANGE_ERROR_TAG).assertDoesNotExist()
+    }
+
+    @Test
     fun `test that each bound field reports against its own bound`() {
         setContent(AddExclusionBySizeFormState(condition = SyncSizeCondition.NotBetween))
 

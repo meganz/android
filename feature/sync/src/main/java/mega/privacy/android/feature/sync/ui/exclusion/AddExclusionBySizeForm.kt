@@ -15,10 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.inputfields.HelpTextError
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -94,6 +98,20 @@ internal fun AddExclusionBySizeForm(
                 valueTestTag = ADD_EXCLUSION_SIZE_SECOND_VALUE_TAG,
                 unitTestTag = ADD_EXCLUSION_SIZE_SECOND_UNIT_TAG,
             )
+
+            if (state.showsRangeError) {
+                // the error appears while focus stays in the field that caused it, so without a
+                // live region a screen reader never announces it
+                HelpTextError(
+                    text = stringResource(
+                        sharedR.string.sync_exclusions_add_size_range_error,
+                    ),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .semantics { liveRegion = LiveRegionMode.Polite }
+                        .testTag(ADD_EXCLUSION_SIZE_RANGE_ERROR_TAG),
+                )
+            }
         }
     }
 
@@ -178,6 +196,7 @@ internal const val ADD_EXCLUSION_SIZE_FIRST_UNIT_TAG = "add_exclusion_by_size:fi
 internal const val ADD_EXCLUSION_SIZE_CONJUNCTION_TAG = "add_exclusion_by_size:conjunction"
 internal const val ADD_EXCLUSION_SIZE_SECOND_VALUE_TAG = "add_exclusion_by_size:second_value"
 internal const val ADD_EXCLUSION_SIZE_SECOND_UNIT_TAG = "add_exclusion_by_size:second_unit"
+internal const val ADD_EXCLUSION_SIZE_RANGE_ERROR_TAG = "add_exclusion_by_size:range_error"
 
 private class AddExclusionBySizeFormStateProvider :
     PreviewParameterProvider<AddExclusionBySizeFormState> {

@@ -28,6 +28,15 @@ internal data class AddSyncExclusionRuleUiState(
     val bySize: AddExclusionBySizeFormState = AddExclusionBySizeFormState(),
 ) {
 
+    /**
+     * Whether the size tab is holding a rule that cannot be added. The primary button stays
+     * enabled and refuses the tap, rather than going grey. The By name tab has no producer for
+     * its own error yet, so nothing on it blocks.
+     */
+    val showsBlockingError: Boolean
+        get() = selectedTab == AddExclusionTab.BySize &&
+                (bySize.showsRangeError || bySize.hasUnusableBound)
+
     /** Whether the By name tab is showing extension entry rather than the name form. */
     val showsExtensionForm: Boolean
         get() = selectedTab == AddExclusionTab.ByName &&

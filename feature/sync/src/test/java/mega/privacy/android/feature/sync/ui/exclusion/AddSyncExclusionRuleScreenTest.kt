@@ -16,9 +16,13 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionByNameFormState
+import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddSyncExclusionRuleUiState
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOption
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeBoundInput
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeCondition
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeUnit
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -179,6 +183,77 @@ internal class AddSyncExclusionRuleScreenTest {
         assertThat(confirmed).isEqualTo(1)
         assertThat(dismissed).isEqualTo(0)
     }
+
+    @Test
+    fun `test that the primary button stays enabled but refuses an inverted range`() {
+        setContent(
+            sizeRange(
+                first = "2" to SyncSizeUnit.Gigabytes,
+                second = "1" to SyncSizeUnit.Kilobytes,
+            )
+        )
+
+        confirmButton().assertIsEnabled().performClick()
+
+        assertThat(confirmed).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that the primary button confirms a range whose first bound is the smaller one`() {
+        setContent(
+            sizeRange(
+                first = "1" to SyncSizeUnit.Kilobytes,
+                second = "2" to SyncSizeUnit.Gigabytes,
+            )
+        )
+
+        confirmButton().performClick()
+
+        assertThat(confirmed).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that the primary button refuses a bound that is not a usable size`() {
+        setContent(
+            AddSyncExclusionRuleUiState(
+                selectedTab = AddExclusionTab.BySize,
+                bySize = AddExclusionBySizeFormState(
+                    condition = SyncSizeCondition.BiggerThan,
+                    firstBound = SyncSizeBoundInput(value = "0", unit = SyncSizeUnit.Gigabytes),
+                ),
+            )
+        )
+
+        confirmButton().assertIsEnabled().performClick()
+
+        assertThat(confirmed).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that a size draft left in error does not block the by name tab`() {
+        setContent(
+            sizeRange(
+                first = "2" to SyncSizeUnit.Gigabytes,
+                second = "1" to SyncSizeUnit.Kilobytes,
+            ).copy(selectedTab = AddExclusionTab.ByName)
+        )
+
+        confirmButton().performClick()
+
+        assertThat(confirmed).isEqualTo(1)
+    }
+
+    private fun sizeRange(
+        first: Pair<String, SyncSizeUnit>,
+        second: Pair<String, SyncSizeUnit>,
+    ) = AddSyncExclusionRuleUiState(
+        selectedTab = AddExclusionTab.BySize,
+        bySize = AddExclusionBySizeFormState(
+            condition = SyncSizeCondition.NotBetween,
+            firstBound = SyncSizeBoundInput(value = first.first, unit = first.second),
+            secondBound = SyncSizeBoundInput(value = second.first, unit = second.second),
+        ),
+    )
 }
 
 /** The description core-ui gives every top bar navigation icon, whichever type it draws. */

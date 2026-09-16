@@ -4179,6 +4179,8 @@
     <string name="sync_exclusions_add_size_unit_megabytes">MB</string>
     <!-- Sync exclusions Add form: size unit, gigabytes (1024 megabytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
     <string name="sync_exclusions_add_size_unit_gigabytes">GB</string>
+    <!-- Sync exclusions Add form: error under the two size fields of a “Not between” rule when the first size is not smaller than the second. Such a range would leave out every file. -->
+    <string name="sync_exclusions_add_size_range_error">The first size must be smaller than the second</string>
     <!-- Title of the personal QR code screen -->
     <string name="contacts_qr_screen_title">QR code</string>
     <!-- Button that generates the user's personal QR code -->

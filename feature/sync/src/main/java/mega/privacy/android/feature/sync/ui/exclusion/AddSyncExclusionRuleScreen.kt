@@ -77,7 +77,7 @@ internal fun AddSyncExclusionRuleScreen(
                     {
                         Button.PrimaryButtonM3(
                             text = stringResource(sharedR.string.sync_exclusions_add_confirm),
-                            onClick = onConfirm,
+                            onClick = { if (!uiState.showsBlockingError) onConfirm() },
                         )
                     },
                 ),
