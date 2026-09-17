@@ -4,8 +4,10 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
+import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
 import mega.privacy.android.feature.sync.ui.exclusion.AddSyncExclusionRuleRoute
 import mega.privacy.android.feature.sync.ui.exclusion.EditSyncExclusionRuleRoute
+import mega.privacy.android.feature.sync.ui.exclusion.EditSyncSizeExclusionRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
@@ -59,10 +61,29 @@ data class EditSyncExclusionRuleNavKey(
 ) : NavKey
 
 /**
+ * Full-screen destination for editing the size bounds of a sync's `.megaignore`, or clearing
+ * both of them through the trash.
+ *
+ * The bounds travel whole rather than by position, because they are not rules: the SDK applies
+ * the last `exclude-smaller` and the last `exclude-larger` line, so a file has at most one bound
+ * in each direction and neither has an index an edit could be anchored to.
+ *
+ * @param exclusion the bounds as the exclusions list showed them
+ * @param syncId id of the sync the bounds belong to, or null while they are staged during setup,
+ * before a folder pair exists.
+ */
+@Serializable
+data class EditSyncSizeExclusionNavKey(
+    val exclusion: SyncSizeExclusion,
+    val syncId: Long? = null,
+) : NavKey
+
+/**
  * Registers the exclusion rule destinations.
  *
- * Both destinations build a change but neither yet writes one, so saving and deleting only close
- * the screen. Nothing navigates to either, so no surface can reach a rule that would be dropped.
+ * Every destination builds a change but none yet writes one, so saving and deleting only close
+ * the screen. Nothing navigates to any of them, so no surface can reach a rule that would be
+ * dropped.
  */
 fun EntryProviderScope<NavKey>.syncExclusionScreens(
     navigationHandler: NavigationHandler,
@@ -77,6 +98,15 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
     entry<EditSyncExclusionRuleNavKey> { navKey ->
         EditSyncExclusionRuleRoute(
             rule = navKey.rule,
+            onDelete = { navigationHandler.back() },
+            onSave = { navigationHandler.back() },
+            onDismiss = { navigationHandler.back() },
+        )
+    }
+
+    entry<EditSyncSizeExclusionNavKey> { navKey ->
+        EditSyncSizeExclusionRoute(
+            exclusion = navKey.exclusion,
             onDelete = { navigationHandler.back() },
             onSave = { navigationHandler.back() },
             onDismiss = { navigationHandler.back() },

@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.domain.entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * The size bounds of a sync, as expressed by the `exclude-smaller` and
  * `exclude-larger` lines of a `.megaignore` file.
@@ -16,6 +18,7 @@ package mega.privacy.android.feature.sync.domain.entity
  * @property excludeSmallerThanBytes files smaller than this are excluded
  * @property excludeLargerThanBytes files larger than this are excluded
  */
+@Serializable
 data class SyncSizeExclusion(
     val excludeSmallerThanBytes: Long? = null,
     val excludeLargerThanBytes: Long? = null,

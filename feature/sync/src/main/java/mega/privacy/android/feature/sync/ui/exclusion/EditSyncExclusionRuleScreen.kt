@@ -1,35 +1,19 @@
 package mega.privacy.android.feature.sync.ui.exclusion
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
-import mega.android.core.ui.components.toolbar.AppBarNavigationType
-import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.Button
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionByNameFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.EditSyncExclusionRuleUiState
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOption
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * The Edit exclusion screen: the chrome around the by-name form, prefilled from the chosen rule.
- *
- * Deleting is the top bar's sole trailing action and asks for no confirmation, because the screen
- * hands the deletion back for the exclusions list to stage: Cancel there still undoes it.
+ * The Edit exclusion screen for a name rule: the shared chrome around the by-name form,
+ * prefilled from the chosen rule.
  *
  * @param onDelete invoked when the user takes the rule out through the trash action
  * @param onSave invoked when the user keeps the rule as the form now reads it
@@ -46,53 +30,20 @@ internal fun EditSyncExclusionRuleScreen(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    MegaScaffold(
+    EditExclusionScaffold(
+        onDelete = onDelete,
+        onSave = onSave,
+        onDismiss = onDismiss,
         modifier = modifier,
-        topBar = {
-            MegaTopAppBar(
-                modifier = Modifier.testTag(EDIT_EXCLUSION_TOP_BAR_TAG),
-                title = stringResource(sharedR.string.sync_exclusions_edit_title),
-                navigationType = AppBarNavigationType.Back(onDismiss),
-                actions = listOf(CommonMenuAction.Delete),
-                onActionPressed = { onDelete() },
-            )
-        },
-        bottomBar = {
-            InlineAnchoredButtonGroup(
-                modifier = Modifier.testTag(EDIT_EXCLUSION_BUTTON_GROUP_TAG),
-                buttonGroup = listOf(
-                    {
-                        Button.TextOnlyButtonM3(
-                            text = stringResource(sharedR.string.general_dialog_cancel_button),
-                            onClick = onDismiss,
-                        )
-                    },
-                    {
-                        Button.PrimaryButtonM3(
-                            text = stringResource(sharedR.string.general_action_save),
-                            onClick = onSave,
-                        )
-                    },
-                ),
-            )
-        },
-        content = { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                AddExclusionByNameForm(
-                    state = uiState.byName,
-                    onTypeOptionSelected = onTypeOptionSelected,
-                    onConditionSelected = onConditionSelected,
-                    onValueChanged = onValueChanged,
-                    typeOptions = EDIT_EXCLUSION_TYPE_OPTIONS,
-                )
-            }
-        },
-    )
+    ) {
+        AddExclusionByNameForm(
+            state = uiState.byName,
+            onTypeOptionSelected = onTypeOptionSelected,
+            onConditionSelected = onConditionSelected,
+            onValueChanged = onValueChanged,
+            typeOptions = EDIT_EXCLUSION_TYPE_OPTIONS,
+        )
+    }
 }
 
 /**
@@ -105,9 +56,6 @@ private val EDIT_EXCLUSION_TYPE_OPTIONS = listOf(
     SyncExclusionTypeOption.Folders,
     SyncExclusionTypeOption.FilesAndFolders,
 )
-
-internal const val EDIT_EXCLUSION_TOP_BAR_TAG = "edit_exclusion:top_bar"
-internal const val EDIT_EXCLUSION_BUTTON_GROUP_TAG = "edit_exclusion:button_group"
 
 private class EditSyncExclusionRuleUiStateProvider :
     PreviewParameterProvider<EditSyncExclusionRuleUiState> {
