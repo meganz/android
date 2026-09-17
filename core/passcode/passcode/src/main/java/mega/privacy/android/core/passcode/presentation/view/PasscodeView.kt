@@ -55,6 +55,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.passcode.biometric.hasBiometricCapability
 import mega.privacy.android.core.passcode.components.PasscodeField
 import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
@@ -79,7 +80,7 @@ import timber.log.Timber
 fun PasscodeView(
     passcodeUnlockViewModel: PasscodeUnlockViewModel = hiltViewModel(),
     logoutConfirmationDialog: @Composable (onDismissed: () -> Unit) -> Unit = {},
-    biometricAuthIsAvailable: (Context) -> Boolean = ::areBiometricsEnabled,
+    biometricAuthIsAvailable: (Context) -> Boolean = ::hasBiometricCapability,
     showBiometricAuth: (
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -335,10 +336,6 @@ private fun FailedAttemptsView(
         textColor = TextColor.InverseAccent,
     )
 }
-
-private fun areBiometricsEnabled(context: Context) = BiometricManager.from(context).canAuthenticate(
-    BiometricManager.Authenticators.BIOMETRIC_WEAK
-) == BiometricManager.BIOMETRIC_SUCCESS
 
 internal const val PASSCODE_FIELD_TAG = "passcode_dialog:passcode_field"
 internal const val PASSWORD_FIELD_TAG = "passcode_dialog:password_text_field"

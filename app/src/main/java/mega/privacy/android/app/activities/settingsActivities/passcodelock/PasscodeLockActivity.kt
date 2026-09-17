@@ -13,9 +13,7 @@ import android.view.inputmethod.EditorInfo.IME_FLAG_NO_FULLSCREEN
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
-import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.AuthenticationResult
 import androidx.biometric.BiometricPrompt.CryptoObject
@@ -47,6 +45,7 @@ import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.android.core.passcode.biometric.hasBiometricCapability
 import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.shared.resources.R as sharedR
@@ -963,7 +962,6 @@ class PasscodeLockActivity : BaseActivity() {
      * @return True if fingerprint lock should be shown, false otherwise.
      */
     private fun shouldShowFingerprintLock(): Boolean =
-        !fingerprintSkipped && fingerprintEnabled && BiometricManager.from(this)
-            .canAuthenticate(BIOMETRIC_WEAK) == BIOMETRIC_SUCCESS
+        !fingerprintSkipped && fingerprintEnabled && hasBiometricCapability(this)
 
 }
