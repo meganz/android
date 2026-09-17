@@ -74,4 +74,15 @@ sealed interface GlobalTransfer {
         val currentFolder: String?,
         val currentFileLeafName: String?,
     ) : GlobalTransfer
+
+    /**
+     * On transfer quota state
+     *
+     * @property transfer
+     * @property state one of the [nz.mega.sdk.MegaApiJava] TRANSFER_QUOTA_STATE_* values
+     */
+    data class OnTransferQuotaState(
+        override val transfer: MegaTransfer,
+        val state: Int,
+    ) : GlobalTransfer
 }

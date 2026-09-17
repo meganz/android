@@ -1,11 +1,14 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
@@ -29,7 +32,21 @@ abstract class StartAllPendingTransfersUseCase(
     private val updatePendingTransferStartedCountUseCase: UpdatePendingTransferStartedCountUseCase,
 ) {
 
-    abstract suspend fun doTransfer(pendingTransfer: PendingTransfer): Flow<TransferEvent>
+    /**
+     * Start the whole set of pending transfers collected in one go, returning the flow of events
+     * to monitor for each of them.
+     *
+     * Returning a flow per pending transfer rather than one for the whole set lets a subclass
+     * start them as a single SDK transfer and hand each pending transfer its share of that
+     * transfer's events, while another starts one transfer each.
+     *
+     * The flows are collected one per coroutine, so they should be cold: anything done to start a
+     * transfer then happens from that coroutine rather than here, one after another.
+     */
+    protected abstract suspend fun doTransfers(
+        pendingTransfers: List<PendingTransfer>,
+        scope: CoroutineScope,
+    ): Map<PendingTransfer, Flow<TransferEvent>>
 
     /**
      * Invoke
@@ -50,10 +67,10 @@ abstract class StartAllPendingTransfersUseCase(
                         PendingTransferState.SdkScanning
                     )
                     send(pendingTransfers.size)
-                    pendingTransfers.forEach { pendingTransfer ->
+                    doTransfers(pendingTransfers, this).forEach { (pendingTransfer, events) ->
                         //start all transfers in parallel to get the scanning result without the need to finish previous transfer.
                         launch {
-                            doTransfer(pendingTransfer).takeWhile { transferEvent ->
+                            events.takeWhile { transferEvent ->
                                 if (transferEvent is TransferEvent.TransferStartEvent &&
                                     transferEvent.transfer.isBackgroundTransfer().not()
                                 ) {

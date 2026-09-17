@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaDownloadItemList
 import nz.mega.sdk.MegaDateSectionList
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFileServiceReclaimOptions
@@ -823,6 +824,37 @@ interface MegaApiGateway {
         collisionResolution: Int,
         listener: MegaTransferListenerInterface?,
     )
+
+    /**
+     * Starts a batch download: every root node of a single download action in one call.
+     *
+     * The whole batch is one MegaTransfer, with the individual files reported as sub-transfers, and
+     * it is the only download that reports the predicted transfer quota state through
+     * [MegaTransferListenerInterface.onTransferQuotaState].
+     *
+     * @param items       The files and/or folders to download, each with its own destination,
+     *                    custom name, app data and start-first flag.
+     * @param cancelToken MegaCancelToken to be able to cancel the whole batch.
+     * @param collisionCheck How to detect a file that is already at the destination, one of the
+     *                    MegaTransfer.COLLISION_CHECK_* values.
+     * @param collisionResolution What to do with one that is, one of the
+     *                    MegaTransfer.COLLISION_RESOLUTION_* values.
+     * @param listener    MegaTransferListener to track this transfer.
+     */
+    fun startDownloadBatch(
+        items: MegaDownloadItemList,
+        cancelToken: MegaCancelToken?,
+        collisionCheck: Int,
+        collisionResolution: Int,
+        listener: MegaTransferListenerInterface?,
+    )
+
+    /**
+     * Creates an empty list to fill with the items of a batch download.
+     *
+     * You take the ownership of the returned value.
+     */
+    fun createDownloadItemList(): MegaDownloadItemList
 
     /**
      * Get user email

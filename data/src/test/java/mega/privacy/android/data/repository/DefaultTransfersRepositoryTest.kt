@@ -37,6 +37,7 @@ import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTarget
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.times
@@ -45,6 +46,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.DownloadBatchItem
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
@@ -58,6 +60,8 @@ import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransfer
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError
+import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
+import nz.mega.sdk.MegaDownloadItemList
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
@@ -79,6 +83,7 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -226,6 +231,112 @@ class DefaultTransfersRepositoryTest {
             )
 
         private val appData = listOf(TransferAppData.CameraUpload)
+
+        private fun batchItem(node: TypedNode) = DownloadBatchItem(
+            node = node,
+            destinationPath = "test local path",
+            fileName = "test filename",
+            appData = null,
+            isHighPriority = false,
+        )
+
+        @Test
+        fun `test that every batch item is added before the batch is started`() = runTest {
+            val nodes = List(3) { mock<TypedFileNode>() }
+            val megaNodes = nodes.map { node ->
+                mock<MegaNode>().also { whenever(megaNodeMapper(node)).thenReturn(it) }
+            }
+            val downloadItems = mock<MegaDownloadItemList> { on { size() } doReturn 3 }
+            whenever(megaApiGateway.createDownloadItemList()).thenReturn(downloadItems)
+
+            underTest.startDownloadBatch(nodes.map { batchItem(it) }).test {
+                megaNodes.forEach { megaNode ->
+                    verify(downloadItems).add(
+                        eq(megaNode), eq("test local path"), eq("test filename"),
+                        anyOrNull(), eq(false), eq(false),
+                    )
+                }
+                verify(megaApiGateway).startDownloadBatch(
+                    items = eq(downloadItems),
+                    cancelToken = anyOrNull(),
+                    collisionCheck = any(),
+                    collisionResolution = any(),
+                    listener = any(),
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+        @Test
+        fun `test that the batch is started without an item whose node cannot be resolved`() =
+            runTest {
+                val resolvable = mock<TypedFileNode>()
+                val missing = mock<TypedFileNode>()
+                val megaNode = mock<MegaNode>()
+                whenever(megaNodeMapper(resolvable)).thenReturn(megaNode)
+                whenever(megaNodeMapper(missing)).thenReturn(null)
+                val downloadItems = mock<MegaDownloadItemList> { on { size() } doReturn 1 }
+                whenever(megaApiGateway.createDownloadItemList()).thenReturn(downloadItems)
+
+                underTest.startDownloadBatch(listOf(batchItem(missing), batchItem(resolvable)))
+                    .test {
+                        verify(downloadItems).add(
+                            eq(megaNode), any(), anyOrNull(), anyOrNull(), any(), any(),
+                        )
+                        verify(megaApiGateway).startDownloadBatch(
+                            items = eq(downloadItems),
+                            cancelToken = anyOrNull(),
+                            collisionCheck = any(),
+                            collisionResolution = any(),
+                            listener = any(),
+                        )
+                        cancelAndIgnoreRemainingEvents()
+                    }
+            }
+
+        @Test
+        fun `test that the batch is not started when no node can be resolved`() = runTest {
+            whenever(megaApiGateway.createDownloadItemList()).thenReturn(mock())
+            whenever(megaNodeMapper(any())).thenReturn(null)
+
+            underTest.startDownloadBatch(listOf(batchItem(mock<TypedFileNode>()))).test {
+                assertThat(awaitError()).isInstanceOf(NodeDoesNotExistsException::class.java)
+            }
+            verify(megaApiGateway, never()).startDownloadBatch(
+                items = any(),
+                cancelToken = anyOrNull(),
+                collisionCheck = any(),
+                collisionResolution = any(),
+                listener = anyOrNull(),
+            )
+        }
+
+        @Test
+        fun `test that the predicted quota state is returned when the batch reports one`() =
+            runTest {
+                val downloadItems = mock<MegaDownloadItemList> { on { size() } doReturn 1 }
+                whenever(megaApiGateway.createDownloadItemList()).thenReturn(downloadItems)
+                whenever(megaNodeMapper(any())).thenReturn(mock())
+                whenever(
+                    megaApiGateway.startDownloadBatch(
+                        items = any(),
+                        cancelToken = anyOrNull(),
+                        collisionCheck = any(),
+                        collisionResolution = any(),
+                        listener = any(),
+                    )
+                ).thenAnswer {
+                    (it.arguments.last() as OptionalMegaTransferListenerInterface)
+                        .onTransferQuotaState(mock(), mock(), 1)
+                }
+                val expected = mock<TransferEvent.TransferQuotaStateEvent>()
+                whenever(transferEventMapper.invoke(any())).thenReturn(expected)
+
+                underTest.startDownloadBatch(listOf(batchItem(mock<TypedFileNode>()))).test {
+                    assertThat(awaitItem()).isEqualTo(expected)
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
 
         private fun mockStartDownload() = megaApiGateway.startDownload(
             node = anyOrNull(),

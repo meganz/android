@@ -10,11 +10,13 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.DownloadBatchItem
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
+import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -141,6 +143,21 @@ interface TransferRepository {
      * @param status the [TransferOverQuotaStatus] to broadcast
      */
     suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus)
+
+    /**
+     * Monitor the transfer quota state predicted for a batch download.
+     *
+     * The SDK reports it only to the listener of the batch that asked for it, so it is broadcast
+     * from there rather than reaching app wide monitors on its own.
+     */
+    fun monitorTransferQuotaState(): Flow<TransferQuotaState>
+
+    /**
+     * Broadcast a predicted transfer quota state.
+     *
+     * @param state the [TransferQuotaState] to broadcast
+     */
+    suspend fun broadcastTransferQuotaState(state: TransferQuotaState)
 
     /**
      * Monitor storage over quota
@@ -309,6 +326,18 @@ interface TransferRepository {
         appData: List<TransferAppData>?,
         shouldStartFirst: Boolean,
     ): Flow<TransferEvent>
+
+    /**
+     * Start downloading every root of a single download action as one batch, and returns a flow to
+     * expose its progress.
+     *
+     * The whole batch is one transfer: one start and one finish event for the batch, with the
+     * individual files reported as sub-transfers. It is the only download that reports
+     * [TransferEvent.TransferQuotaStateEvent], raised before any file starts.
+     *
+     * @param items The roots to download, each with its own destination and settings.
+     */
+    fun startDownloadBatch(items: List<DownloadBatchItem>): Flow<TransferEvent>
 
     /**
      * Upload a file or folder

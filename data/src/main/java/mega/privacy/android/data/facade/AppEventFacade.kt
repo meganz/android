@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAct
 import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
+import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 
@@ -32,6 +33,7 @@ internal class AppEventFacade @Inject constructor(
         MutableSharedFlow<CameraUploadsFolderDestinationUpdate>()
     private val _transferOverQuota = MutableStateFlow(false)
     private val _transferOverQuotaEvent = MutableSharedFlow<TransferOverQuotaStatus>()
+    private val _transferQuotaState = MutableSharedFlow<TransferQuotaState>()
     private val _storageOverQuota = MutableStateFlow(false)
     private val _fileAvailableOffline = MutableSharedFlow<Long>()
     private val _cookieSettings = MutableSharedFlow<Set<CookieType>>()
@@ -101,6 +103,13 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus) {
         _transferOverQuotaEvent.emit(status)
+    }
+
+    override fun monitorTransferQuotaState(): Flow<TransferQuotaState> =
+        _transferQuotaState.asSharedFlow()
+
+    override suspend fun broadcastTransferQuotaState(state: TransferQuotaState) {
+        _transferQuotaState.emit(state)
     }
 
     override fun monitorStorageOverQuota(): Flow<Boolean> = _storageOverQuota.asSharedFlow()

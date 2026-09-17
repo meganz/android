@@ -90,6 +90,19 @@ sealed interface TransferEvent {
         val currentFolder: String?,
         val currentFileLeafName: String?,
     ) : TransferEvent
+
+    /**
+     * Predicted transfer quota state, raised before any of the transfer's files starts.
+     *
+     * Only batch downloads report it, at most once, and not always, so anything waiting on it must
+     * also treat [TransferFinishEvent] as a release condition.
+     *
+     * @property state
+     */
+    data class TransferQuotaStateEvent(
+        override val transfer: Transfer,
+        val state: TransferQuotaState,
+    ) : TransferEvent
 }
 
 /**

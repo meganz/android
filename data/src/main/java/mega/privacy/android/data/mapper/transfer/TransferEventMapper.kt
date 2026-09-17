@@ -14,6 +14,7 @@ internal class TransferEventMapper @Inject constructor(
     private val exceptionMapper: MegaExceptionMapper,
     private val errorContextMapper: ErrorContextMapper,
     private val transferStageMapper: TransferStageMapper,
+    private val transferQuotaStateMapper: TransferQuotaStateMapper,
 ) {
     operator fun invoke(
         event: GlobalTransfer,
@@ -67,6 +68,11 @@ internal class TransferEventMapper @Inject constructor(
 
         is GlobalTransfer.OnTransferUpdate -> TransferEvent.TransferUpdateEvent(
             transferMapper(event.transfer)
+        )
+
+        is GlobalTransfer.OnTransferQuotaState -> TransferEvent.TransferQuotaStateEvent(
+            transfer = transferMapper(event.transfer),
+            state = transferQuotaStateMapper(event.state),
         )
     }
 }

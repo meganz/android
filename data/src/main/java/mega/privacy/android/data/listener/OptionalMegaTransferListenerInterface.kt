@@ -23,6 +23,7 @@ internal class OptionalMegaTransferListenerInterface(
         currentFolder: String?,
         currentFileLeafName: String?,
     ) -> Unit)? = null,
+    private val onTransferQuotaState: ((transfer: MegaTransfer, state: Int) -> Unit)? = null,
 ) : MegaTransferListenerInterface {
 
     override fun onTransferStart(
@@ -83,5 +84,13 @@ internal class OptionalMegaTransferListenerInterface(
             currentFolder,
             currentFileLeafName
         )
+    }
+
+    override fun onTransferQuotaState(
+        api: MegaApiJava,
+        transfer: MegaTransfer,
+        state: Int,
+    ) {
+        onTransferQuotaState?.invoke(transfer, state)
     }
 }

@@ -16,6 +16,7 @@ import mega.privacy.android.data.test.state.childrenMatching
 import mega.privacy.android.data.test.state.nodesMatching
 import mega.privacy.android.data.test.stub.StubMegaAccountDetails
 import mega.privacy.android.data.test.stub.StubMegaCancelToken
+import mega.privacy.android.data.test.stub.StubMegaDownloadItemList
 import mega.privacy.android.data.test.stub.StubMegaError
 import mega.privacy.android.data.test.stub.StubMegaPushNotificationSettings
 import mega.privacy.android.data.test.stub.StubMegaRequest
@@ -29,6 +30,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaDateSectionList
+import nz.mega.sdk.MegaDownloadItemList
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaFlag
@@ -876,6 +878,25 @@ class FakeMegaApiGateway(
             listener,
         )
     }
+
+    override fun startDownloadBatch(
+        items: MegaDownloadItemList,
+        cancelToken: MegaCancelToken?,
+        collisionCheck: Int,
+        collisionResolution: Int,
+        listener: MegaTransferListenerInterface?,
+    ) {
+        completeTransfer(
+            MegaApiGateway::startDownloadBatch,
+            listOf(items, cancelToken, collisionCheck, collisionResolution, listener),
+            listener,
+        )
+    }
+
+    override fun createDownloadItemList(): MegaDownloadItemList =
+        engine.dispatchBlocking(MegaApiGateway::createDownloadItemList, emptyList()) {
+            StubMegaDownloadItemList()
+        }
 
     override fun getUserEmail(userHandle: Long, callback: MegaRequestListenerInterface) {
         completeRequest(

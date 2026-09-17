@@ -25,6 +25,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaDownloadItemList
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaFileServiceReclaimOptions
@@ -556,6 +557,23 @@ internal class MegaApiFacade @Inject constructor(
         listener
     )
 
+    override fun startDownloadBatch(
+        items: MegaDownloadItemList,
+        cancelToken: MegaCancelToken?,
+        collisionCheck: Int,
+        collisionResolution: Int,
+        listener: MegaTransferListenerInterface?,
+    ) = megaApi.startDownloadBatch(
+        items,
+        cancelToken,
+        collisionCheck,
+        collisionResolution,
+        listener
+    )
+
+    override fun createDownloadItemList(): MegaDownloadItemList =
+        MegaDownloadItemList.createInstance()
+
     override fun getUserEmail(userHandle: Long, callback: MegaRequestListenerInterface) =
         megaApi.getUserEmail(userHandle, callback)
 
@@ -630,12 +648,18 @@ internal class MegaApiFacade @Inject constructor(
         highPriority: Boolean,
         listener: MegaTransferListenerInterface,
     ) {
-        megaApi.startDownload(
-            node,
-            fullFile.absolutePath,
-            fullFile.name,
-            AppDataTypeConstants.BackgroundTransfer.sdkTypeValue,
-            highPriority,
+        val items = MegaDownloadItemList.createInstance().apply {
+            add(
+                node,
+                fullFile.absolutePath,
+                fullFile.name,
+                AppDataTypeConstants.BackgroundTransfer.sdkTypeValue,
+                highPriority,
+                false,
+            )
+        }
+        megaApi.startDownloadBatch(
+            items,
             null,
             MegaTransfer.COLLISION_CHECK_FINGERPRINT,
             MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N,

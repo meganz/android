@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.mapper.account.AccountBlockedTypeMapper
 import mega.privacy.android.data.mapper.meeting.IntegerListMapper
+import mega.privacy.android.data.mapper.transfer.TransferQuotaStateMapper
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.AccountConfirmationEvent
 import mega.privacy.android.domain.entity.BusinessStatusEvent
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.RequestStatusProgressEvent
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.StorageSumChangedEvent
 import mega.privacy.android.domain.entity.StreamOverQuotaEvent
+import mega.privacy.android.domain.entity.TransferQuotaStateEvent
 import mega.privacy.android.domain.entity.TransfersResumedEvent
 import mega.privacy.android.domain.entity.UnknownEvent
 import nz.mega.sdk.MegaEvent
@@ -30,6 +32,7 @@ internal class EventMapper @Inject constructor(
     private val storageStateMapper: StorageStateMapper,
     private val accountBlockedTypeMapper: AccountBlockedTypeMapper,
     private val integerListMapper: IntegerListMapper,
+    private val transferQuotaStateMapper: TransferQuotaStateMapper,
 ) {
     /**
      * Map [MegaEvent] to [Event].
@@ -136,6 +139,13 @@ internal class EventMapper @Inject constructor(
             StreamOverQuotaEvent(
                 handle = megaEvent.handle,
                 timeLeft = megaEvent.number.seconds,
+            )
+        }
+
+        MegaEvent.EVENT_TRANSFER_QUOTA_STATE -> {
+            TransferQuotaStateEvent(
+                handle = megaEvent.handle,
+                state = transferQuotaStateMapper(megaEvent.number),
             )
         }
 

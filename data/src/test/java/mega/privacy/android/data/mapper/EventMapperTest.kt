@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.mapper.account.AccountBlockedTypeMapper
 import mega.privacy.android.data.mapper.meeting.IntegerListMapper
+import mega.privacy.android.data.mapper.transfer.TransferQuotaStateMapper
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.AccountConfirmationEvent
 import mega.privacy.android.domain.entity.BusinessStatusEvent
@@ -17,8 +18,11 @@ import mega.privacy.android.domain.entity.NodesCurrentEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.StorageSumChangedEvent
+import mega.privacy.android.domain.entity.TransferQuotaStateEvent
 import mega.privacy.android.domain.entity.TransfersResumedEvent
+import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 import mega.privacy.android.domain.entity.UnknownEvent
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaIntegerList
 import org.junit.jupiter.api.BeforeAll
@@ -55,6 +59,7 @@ class EventMapperTest {
             storageStateMapper = storageStateMapper,
             accountBlockedTypeMapper = AccountBlockedTypeMapper(),
             integerListMapper = integerListMapper,
+            transferQuotaStateMapper = TransferQuotaStateMapper(),
         )
     }
 
@@ -99,6 +104,20 @@ class EventMapperTest {
         megaEvent.stub {
             on { type }.thenReturn(MegaEvent.EVENT_STORAGE)
         }
+    }
+
+    @Test
+    fun `test that EVENT_TRANSFER_QUOTA_STATE returns the predicted state`() {
+        megaEvent.stub {
+            on { type }.thenReturn(MegaEvent.EVENT_TRANSFER_QUOTA_STATE)
+            on { number }.thenReturn(MegaApiJava.TRANSFER_QUOTA_STATE_ORANGE.toLong())
+        }
+
+        val actual = underTest(megaEvent)
+
+        assertThat(actual).isInstanceOf(TransferQuotaStateEvent::class.java)
+        assertThat((actual as TransferQuotaStateEvent).state)
+            .isEqualTo(TransferQuotaState.Orange)
     }
 
     @Test

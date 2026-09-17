@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity
 
 import mega.privacy.android.domain.entity.account.AccountBlockedType
+import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 import kotlin.time.Duration
 
 /**
@@ -106,6 +107,19 @@ data class LastPurgeEvent(
 data class StreamOverQuotaEvent(
     override val handle: Long,
     val timeLeft: Duration,
+) : Event
+
+/**
+ * Sub type of [Event] for the predicted transfer quota state (EVENT_TRANSFER_QUOTA_STATE).
+ *
+ * A streaming read has no transfer to report on, so the SDK predicts the state through this global
+ * event. Downloads report the same prediction per transfer instead.
+ *
+ * @property state the predicted transfer quota state.
+ */
+data class TransferQuotaStateEvent(
+    override val handle: Long,
+    val state: TransferQuotaState,
 ) : Event
 
 data class UnknownEvent(

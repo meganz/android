@@ -57,11 +57,13 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.DownloadBatchItem
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
+import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -280,6 +282,11 @@ internal class DefaultTransfersRepository @Inject constructor(
                 )
             )
         },
+        onTransferQuotaState = { transfer, state ->
+            channel.trySend(
+                transferEventMapper(GlobalTransfer.OnTransferQuotaState(transfer, state))
+            )
+        },
     )
 
     override fun startDownload(
@@ -302,6 +309,41 @@ internal class DefaultTransfersRepository @Inject constructor(
             collisionCheck = COLLISION_CHECK_FINGERPRINT,
             collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
             listener = listener,
+        )
+        awaitClose()
+    }
+        .flowOn(ioDispatcher)
+        .cancellable()
+
+    override fun startDownloadBatch(items: List<DownloadBatchItem>) = callbackFlow {
+        val downloadItems = megaApiGateway.createDownloadItemList()
+        items.forEach { item ->
+            val megaNode = runCatching { megaNodeMapper(item.node) }.getOrNull()
+            if (megaNode == null) {
+                // One node that has gone since it was picked does not take the rest of the
+                // download with it, matching the SDK, which ignores an item it cannot use and
+                // only fails the call when none of them is usable.
+                Timber.e("Skipping batch item ${item.node.id.longValue}: node not found")
+                return@forEach
+            }
+            val rawAppData = transferAppDataStringMapper(item.appData)
+            downloadItems.add(
+                megaNode,
+                item.destinationPath,
+                item.fileName ?: megaNode.name,
+                rawAppData,
+                item.isHighPriority,
+                false,
+            )
+        }
+        if (downloadItems.size() == 0) throw NodeDoesNotExistsException()
+
+        megaApiGateway.startDownloadBatch(
+            items = downloadItems,
+            cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            collisionCheck = COLLISION_CHECK_FINGERPRINT,
+            collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
+            listener = transferListener(channel),
         )
         awaitClose()
     }
@@ -407,6 +449,13 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus) {
         appEventGateway.broadcastTransferOverQuotaEvent(status)
+    }
+
+    override fun monitorTransferQuotaState(): Flow<TransferQuotaState> =
+        appEventGateway.monitorTransferQuotaState()
+
+    override suspend fun broadcastTransferQuotaState(state: TransferQuotaState) {
+        appEventGateway.broadcastTransferQuotaState(state)
     }
 
     override fun monitorStorageOverQuota(): Flow<Boolean> =

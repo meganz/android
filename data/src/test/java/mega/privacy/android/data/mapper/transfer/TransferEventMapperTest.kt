@@ -5,13 +5,16 @@ import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -32,6 +35,7 @@ internal class TransferEventMapperTest {
     private val mockTransfer = mock<Transfer>()
     private val megaTransfer = mock<MegaTransfer>()
     private val transferStageMapper = mock<TransferStageMapper>()
+    private val transferQuotaStateMapper = mock<TransferQuotaStateMapper>()
 
     val megaError = mock<MegaError> {
         on { errorCode }.thenReturn(MegaError.API_OK)
@@ -53,13 +57,13 @@ internal class TransferEventMapperTest {
     fun setup() {
         underTest = TransferEventMapper(
             transferMapper, exceptionMapper, errorContextMapper,
-            transferStageMapper
+            transferStageMapper, transferQuotaStateMapper
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(exceptionMapper, transferMapper, transferStageMapper)
+        reset(exceptionMapper, transferMapper, transferStageMapper, transferQuotaStateMapper)
     }
 
     @ParameterizedTest(name = "invoked with {0} and returns {1}")
@@ -89,6 +93,23 @@ internal class TransferEventMapperTest {
 
     }
 
+
+    @Test
+    fun `test that transfer event mapper maps the transfer quota state`() {
+        whenever(transferMapper(megaTransfer)).thenReturn(mockTransfer)
+        whenever(transferQuotaStateMapper(any())).thenReturn(TransferQuotaState.Orange)
+
+        val actual = underTest(
+            GlobalTransfer.OnTransferQuotaState(
+                megaTransfer,
+                MegaApiJava.TRANSFER_QUOTA_STATE_ORANGE,
+            )
+        )
+
+        Truth.assertThat(actual).isEqualTo(
+            TransferEvent.TransferQuotaStateEvent(mockTransfer, TransferQuotaState.Orange)
+        )
+    }
 
     @ParameterizedTest(name = "invoked with {0} and returns {1}")
     @MethodSource("provideExceptionParameters")

@@ -73,6 +73,12 @@ class FakeMegaApiGatewayTransferTest {
             currentFolder: String?,
             currentFileLeafName: String?,
         ) = Unit
+
+        override fun onTransferQuotaState(
+            api: MegaApiJava,
+            transfer: MegaTransfer,
+            state: Int,
+        ) = Unit
     }
 
     @Suppress("DEPRECATION")
@@ -256,6 +262,12 @@ class FakeMegaApiGatewayTransferTest {
                 fileCount: Long,
                 currentFolder: String?,
                 currentFileLeafName: String?,
+            ) = Unit
+
+            override fun onTransferQuotaState(
+                api: MegaApiJava,
+                transfer: MegaTransfer,
+                state: Int,
             ) = Unit
         }
         underTest.stubTransferScript(

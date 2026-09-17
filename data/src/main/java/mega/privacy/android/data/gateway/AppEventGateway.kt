@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAct
 import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
+import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 
 internal interface AppEventGateway {
 
@@ -79,6 +80,20 @@ internal interface AppEventGateway {
      * @param status the [TransferOverQuotaStatus] to broadcast
      */
     suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus)
+
+    /**
+     * Monitor the transfer quota state predicted for a batch download.
+     *
+     * The SDK reports it only to the listener of the batch that asked, so it is broadcast from
+     * there rather than reaching app wide monitors on its own.
+     */
+    fun monitorTransferQuotaState(): Flow<TransferQuotaState>
+
+    /**
+     * Broadcast a predicted transfer quota state
+     * @param state the [TransferQuotaState] to broadcast
+     */
+    suspend fun broadcastTransferQuotaState(state: TransferQuotaState)
 
     /**
      * Broadcast storage over quota

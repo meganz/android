@@ -1,6 +1,9 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.pitag.PitagTarget
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -25,7 +28,15 @@ class StartAllPendingUploadsUseCase @Inject constructor(
     updatePendingTransferStateUseCase,
     updatePendingTransferStartedCountUseCase
 ) {
-    override suspend fun doTransfer(pendingTransfer: PendingTransfer): Flow<TransferEvent> =
+    override suspend fun doTransfers(
+        pendingTransfers: List<PendingTransfer>,
+        scope: CoroutineScope,
+    ): Map<PendingTransfer, Flow<TransferEvent>> =
+        pendingTransfers.associateWith { pendingTransfer ->
+            flow { emitAll(doTransfer(pendingTransfer)) }
+        }
+
+    private suspend fun doTransfer(pendingTransfer: PendingTransfer): Flow<TransferEvent> =
         uploadFileUseCase(
             uriPath = pendingTransfer.uriPath,
             fileName = pendingTransfer.fileName,

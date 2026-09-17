@@ -119,6 +119,10 @@ class OptionalMegaListenerInterface(
 
     }
 
+    override fun onTransferQuotaState(api: MegaApiJava, transfer: MegaTransfer, state: Int) {
+
+    }
+
     override fun onSyncDeleted(api: MegaApiJava, sync: MegaSync) {
         onSyncDeleted?.invoke(sync)
     }
