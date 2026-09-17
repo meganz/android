@@ -1,5 +1,6 @@
 package mega.privacy.android.app.appstate.global.quota
 
+import mega.privacy.android.domain.entity.transfer.TransferQuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 
 /**
@@ -24,5 +25,15 @@ enum class TransferOverQuotaSource {
         get() = when (this) {
             Download -> QuotaWarningTrigger.Download
             Streaming -> QuotaWarningTrigger.Streaming
+        }
+
+    /**
+     * The matching [TransferQuotaWarningTrigger], which carries the daily allowance the running low
+     * warning draws from.
+     */
+    val warningTrigger: TransferQuotaWarningTrigger
+        get() = when (this) {
+            Download -> TransferQuotaWarningTrigger.Download
+            Streaming -> TransferQuotaWarningTrigger.Streaming
         }
 }
