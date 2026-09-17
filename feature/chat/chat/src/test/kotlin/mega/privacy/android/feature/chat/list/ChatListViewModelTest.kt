@@ -496,6 +496,7 @@ class ChatListViewModelTest {
                 meetings = emptyList(),
             )
 
+            underTest.getBulkChatRoomActions(setOf(1L, 2L))
             underTest.onBulkChatRoomActionSelected(setOf(1L, 2L), CHAT_ROOM_ACTIONS_MUTE_TAG)
             advanceUntilIdle()
 
@@ -520,6 +521,7 @@ class ChatListViewModelTest {
                 onBlocking { invoke(eq(1L), any()) } doSuspendableAnswer { archiving.await() }
             }
             val viewModelStore = ViewModelStore().apply { put("chatList", underTest) }
+            underTest.getBulkChatRoomActions(setOf(1L))
 
             underTest.onBulkChatRoomActionSelected(setOf(1L), CHAT_ROOM_ACTIONS_ARCHIVE_TAG)
             advanceUntilIdle()
@@ -532,38 +534,107 @@ class ChatListViewModelTest {
         }
 
     @Test
-    fun `test that onBulkChatRoomActionSelected stops resolving the selection when the ViewModel is cleared`() =
+    fun `test that onBulkChatRoomActionSelected does not read the chat rooms a second time`() =
         runTest {
-            var meetingsCancelled = false
-            getChatsUseCase.stub {
-                on {
-                    invoke(eq(ChatRoomType.NON_MEETINGS), any(), any(), any(), any())
-                } doAnswer {
-                    flow {
-                        emit(listOf(chatRoomItem))
-                        awaitCancellation()
-                    }
-                }
-                on {
-                    invoke(eq(ChatRoomType.MEETINGS), any(), any(), any(), any())
-                } doAnswer {
-                    flow<List<ChatRoomItem>> {
-                        try {
-                            awaitCancellation()
-                        } finally {
-                            meetingsCancelled = true
-                        }
-                    }
-                }
-            }
-            val viewModelStore = ViewModelStore().apply { put("chatList", underTest) }
+            stubChatRooms(
+                chats = listOf(
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 1L,
+                        title = "Chat",
+                        hasPermissions = true,
+                    )
+                ),
+                meetings = emptyList(),
+            )
+            underTest.getBulkChatRoomActions(setOf(1L))
+            reset(getChatsUseCase)
 
             underTest.onBulkChatRoomActionSelected(setOf(1L), CHAT_ROOM_ACTIONS_ARCHIVE_TAG)
             advanceUntilIdle()
-            viewModelStore.clear()
+
+            verifyNoInteractions(getChatsUseCase)
+            verify(archiveChatUseCase)(1L, true)
+        }
+
+    @Test
+    fun `test that onBulkChatRoomActionSelected does not run the action on a chat the sheet never offered it for`() =
+        runTest {
+            val loaded = ChatRoomItem.IndividualChatRoomItem(
+                chatId = 1L,
+                title = "Chat",
+                hasPermissions = true,
+            )
+            val stillLoading = ChatRoomItem.IndividualChatRoomItem(
+                chatId = 2L,
+                title = "Chat 2",
+                hasPermissions = false,
+            )
+            stubChatRooms(chats = listOf(loaded), meetings = emptyList())
+            underTest.getBulkChatRoomActions(setOf(1L, 2L))
+            stubChatRooms(chats = listOf(loaded, stillLoading), meetings = emptyList())
+
+            underTest.onBulkChatRoomActionSelected(setOf(1L, 2L), CHAT_ROOM_ACTIONS_CLEAR_HISTORY_TAG)
             advanceUntilIdle()
 
-            assertThat(meetingsCancelled).isTrue()
+            verify(clearChatHistoryUseCase)(1L)
+            verify(clearChatHistoryUseCase, never())(2L)
+        }
+
+    @Test
+    fun `test that onBulkChatRoomActionSelected applies the mute direction the sheet offered when the chats stop being muted`() =
+        runTest {
+            val muted = listOf(
+                ChatRoomItem.IndividualChatRoomItem(
+                    chatId = 1L,
+                    title = "Chat",
+                    hasPermissions = true,
+                    isMuted = true,
+                ),
+                ChatRoomItem.IndividualChatRoomItem(
+                    chatId = 2L,
+                    title = "Chat 2",
+                    hasPermissions = true,
+                    isMuted = true,
+                ),
+            )
+            stubChatRooms(chats = muted, meetings = emptyList())
+            underTest.getBulkChatRoomActions(setOf(1L, 2L))
+            stubChatRooms(
+                chats = muted.map { (it as ChatRoomItem.IndividualChatRoomItem).copy(isMuted = false) },
+                meetings = emptyList(),
+            )
+
+            underTest.onBulkChatRoomActionSelected(setOf(1L, 2L), CHAT_ROOM_ACTIONS_MUTE_TAG)
+            advanceUntilIdle()
+
+            verify(unmuteChatNotificationUseCase)(1L)
+            verify(unmuteChatNotificationUseCase)(2L)
+            verifyNoInteractions(muteChatNotificationForChatRoomsUseCase)
+        }
+
+    @Test
+    fun `test that onBulkChatRoomActionSelected ignores an action picked for a selection the sheet was not opened for`() =
+        runTest {
+            stubChatRooms(
+                chats = listOf(
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 1L,
+                        title = "Chat",
+                        hasPermissions = true,
+                    ),
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 2L,
+                        title = "Chat 2",
+                        hasPermissions = true,
+                    ),
+                ),
+                meetings = emptyList(),
+            )
+            underTest.getBulkChatRoomActions(setOf(1L))
+
+            underTest.onBulkChatRoomActionSelected(setOf(2L), CHAT_ROOM_ACTIONS_ARCHIVE_TAG)
+            advanceUntilIdle()
+
             verifyNoInteractions(archiveChatUseCase)
         }
 

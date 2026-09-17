@@ -457,7 +457,7 @@ class ChatListScreenTest {
     }
 
     @Test
-    fun `test that the row actions sheet survives state restoration`() {
+    fun `test that the row actions sheet is not restored from saved state`() {
         val restorationTester = StateRestorationTester(composeRule)
         restorationTester.setContent { RestorableChatListScreen(showMeetingTab = false) }
 
@@ -467,7 +467,7 @@ class ChatListScreenTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        composeRule.onNodeWithTag(CHAT_ROOM_ACTIONS_SHEET_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(CHAT_ROOM_ACTIONS_SHEET_TAG).assertDoesNotExist()
     }
 
     @Test

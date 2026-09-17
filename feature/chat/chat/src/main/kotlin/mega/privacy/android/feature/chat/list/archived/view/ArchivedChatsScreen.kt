@@ -9,7 +9,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +53,7 @@ internal fun ArchivedChatsScreen(
     resolveChatRoomActions: suspend (Set<Long>) -> List<ChatRoomActionUiItem> = { emptyList() },
     onChatRoomActionSelected: (Set<Long>, String) -> Unit = { _, _ -> },
 ) {
-    var actionsState by rememberSaveable(stateSaver = ChatListBulkActionsUiState.Saver) {
+    var actionsState by retain {
         mutableStateOf<ChatListBulkActionsUiState>(ChatListBulkActionsUiState.Hidden)
     }
 

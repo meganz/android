@@ -3,6 +3,7 @@ package mega.privacy.android.feature.chat.list.archived
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import org.mockito.kotlin.verifyNoInteractions
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -223,10 +224,25 @@ class ArchivedChatsViewModelTest {
     @Test
     fun `test that onChatRoomActionSelected unarchives the picked chat`() = runTest {
         stubArchivedChats()
+        underTest.getChatRoomActions(setOf(1L))
 
         underTest.onChatRoomActionSelected(setOf(1L), CHAT_ROOM_ACTIONS_UNARCHIVE_TAG)
         advanceUntilIdle()
 
         verify(archiveChatUseCase)(1L, false)
     }
+
+    @Test
+    fun `test that onChatRoomActionSelected ignores an action picked for a selection the sheet was not opened for`() =
+        runTest {
+            stubArchivedChats(
+                archived = listOf(archivedRoomItem, archivedRoomItem.copy(chatId = 2L)),
+            )
+            underTest.getChatRoomActions(setOf(1L))
+
+            underTest.onChatRoomActionSelected(setOf(2L), CHAT_ROOM_ACTIONS_UNARCHIVE_TAG)
+            advanceUntilIdle()
+
+            verifyNoInteractions(archiveChatUseCase)
+        }
 }

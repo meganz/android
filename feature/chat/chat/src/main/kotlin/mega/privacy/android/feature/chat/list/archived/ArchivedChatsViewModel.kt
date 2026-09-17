@@ -19,6 +19,7 @@ import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
 import mega.privacy.android.feature.chat.list.menu.ChatRoomActions
+import mega.privacy.android.feature.chat.list.menu.OfferedChatRoomActions
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.runCatchingCancellable
 import timber.log.Timber
@@ -60,6 +61,8 @@ internal class ArchivedChatsViewModel @Inject constructor(
         }.asUiStateFlow(viewModelScope, ArchivedChatsUiState.Loading)
     }
 
+    private var offeredActions: OfferedChatRoomActions? = null
+
     /**
      * Resolve the ordered actions available for the archived chats in [chatIds], so an archived
      * chat can be restored to the chat list from here.
@@ -67,19 +70,30 @@ internal class ArchivedChatsViewModel @Inject constructor(
      * @param chatIds Ids of the chats the actions sheet was opened for.
      * @return Ordered, renderable actions common to all those chats, or empty when none apply.
      */
-    suspend fun getChatRoomActions(chatIds: Set<Long>): List<ChatRoomActionUiItem> =
-        chatRoomActions.resolve(selectedRooms(chatIds))
+    suspend fun getChatRoomActions(chatIds: Set<Long>): List<ChatRoomActionUiItem> {
+        val rooms = selectedRooms(chatIds)
+        val actions = chatRoomActions.resolve(rooms)
+        offeredActions = OfferedChatRoomActions.of(chatIds, rooms, actions)
+        return actions
+    }
 
     /**
-     * Run the action identified by [actionId] on every archived chat in [chatIds], reporting the
-     * outcome to the user.
+     * Run the action identified by [actionId] on the archived chats [getChatRoomActions] resolved
+     * for [chatIds], reporting the outcome to the user.
+     *
+     * Acting on that one read keeps the action to the chats whose eligibility put it in the sheet,
+     * rather than to a second read that may no longer agree with the first.
      *
      * @param chatIds Ids of the chats the action was picked for.
      * @param actionId Test-tag identity of the picked action.
      */
     fun onChatRoomActionSelected(chatIds: Set<Long>, actionId: String) {
+        val rooms = offeredActions?.roomsFor(chatIds, actionId) ?: run {
+            Timber.w("Ignoring action $actionId, which was not offered for the selected chats")
+            return
+        }
         viewModelScope.launch {
-            chatRoomActions.run(actionId, selectedRooms(chatIds))
+            chatRoomActions.run(actionId, rooms)
         }
     }
 

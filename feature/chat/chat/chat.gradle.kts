@@ -35,6 +35,7 @@ dependencies {
     implementation(lib.kotlinx.collections.immutable)
     implementation(androidx.material3.window)
     implementation(androidx.bundles.compose.bom)
+    implementation(androidx.compose.runtime.retain)
     implementation(androidx.material3)
     implementation(androidx.hilt.navigation)
     implementation(lib.kotlin.serialisation)

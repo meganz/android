@@ -17,9 +17,10 @@ import timber.log.Timber
  * ([onClick]) and user feedback ([successMessage], [failureMessage]).
  *
  * Rendering and behaviour are both resolved against the whole set of chat rooms the sheet was
- * opened for, never a representative one, so an action that presents differently per chat — a mute
- * toggle, say — shows one label and applies exactly what that label promises to every chat in the
- * selection. New actions are added by contributing another implementation into the
+ * opened for, never a representative one, and against the one read of them the sheet was rendered
+ * from, so an action that presents differently per chat — a mute toggle, say — shows one label and
+ * applies exactly what that label promises to every chat in the selection, whatever those chats
+ * have done since. New actions are added by contributing another implementation into the
  * `Map<Int, ChatRoomMenuItem>` multibinding, whose unique key fixes the action's position — no
  * central dispatch to change.
  */

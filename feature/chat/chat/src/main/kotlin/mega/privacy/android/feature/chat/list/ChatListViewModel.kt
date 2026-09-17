@@ -43,6 +43,7 @@ import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
 import mega.privacy.android.feature.chat.list.menu.ChatRoomActions
+import mega.privacy.android.feature.chat.list.menu.OfferedChatRoomActions
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
@@ -90,6 +91,8 @@ internal class ChatListViewModel @Inject constructor(
     private val openChatChannel = Channel<Long>(Channel.BUFFERED)
 
     private val meetingActionChannel = Channel<MeetingActionEvent>(Channel.BUFFERED)
+
+    private var offeredActions: OfferedChatRoomActions? = null
 
     /**
      * Emits the chat id of a chat that has just been created through the new-chat flow and should
@@ -218,32 +221,45 @@ internal class ChatListViewModel @Inject constructor(
      * sheet is opened, by filtering the contributed chat room actions to those eligible for every
      * chat. A single-chat selection therefore yields exactly that chat's actions.
      *
+     * The chat rooms read here are kept as the offer the sheet was rendered from, so
+     * [onBulkChatRoomActionSelected] applies the picked action to those same chat rooms rather
+     * than to a second, possibly disagreeing, read.
+     *
      * @param chatIds Ids of the chats the sheet was opened for.
      * @return Ordered, renderable actions common to all those chats, or empty when none apply.
      */
-    suspend fun getBulkChatRoomActions(chatIds: Set<Long>): List<ChatRoomActionUiItem> =
-        chatRoomActions.resolve(selectedRooms(chatIds))
+    suspend fun getBulkChatRoomActions(chatIds: Set<Long>): List<ChatRoomActionUiItem> {
+        val rooms = selectedRooms(chatIds)
+        val actions = chatRoomActions.resolve(rooms)
+        offeredActions = OfferedChatRoomActions.of(chatIds, rooms, actions)
+        return actions
+    }
 
     /**
-     * Run the action identified by [actionId] on every chat in [chatIds], reporting the outcome to
-     * the user.
+     * Run the action identified by [actionId] on the chat rooms [getBulkChatRoomActions] resolved
+     * for [chatIds], reporting the outcome to the user.
+     *
+     * Acting on that one read is what makes the action honest: it reaches exactly the chats whose
+     * eligibility put it in the sheet, and an action that presents differently per chat applies
+     * the direction its label promised, however the chats have changed since. A second read could
+     * disagree with the first on both counts.
      *
      * The action itself runs in the application scope rather than [viewModelScope]: archiving,
      * leaving, clearing and muting change the chats for good, so leaving the screen mid-run must
      * not abandon the batch part-way through or drop the message telling the user what happened.
-     * The selection is resolved before that hand-off, on [viewModelScope], so the chat rooms the
-     * action is committed to are read while the screen is still up, and neither this ViewModel nor
-     * the chat room subscription the read needs outlives it in the process-wide scope.
+     * Reading the chat rooms stays out of that process-wide scope, so neither this ViewModel nor
+     * the chat room subscription the read needs outlives the screen.
      *
      * @param chatIds Ids of the chats the action was picked for.
      * @param actionId Test-tag identity of the picked action.
      */
     fun onBulkChatRoomActionSelected(chatIds: Set<Long>, actionId: String) {
-        viewModelScope.launch {
-            val rooms = selectedRooms(chatIds)
-            applicationScope.launch {
-                chatRoomActions.run(actionId, rooms)
-            }
+        val rooms = offeredActions?.roomsFor(chatIds, actionId) ?: run {
+            Timber.w("Ignoring action $actionId, which was not offered for the selected chats")
+            return
+        }
+        applicationScope.launch {
+            chatRoomActions.run(actionId, rooms)
         }
     }
 
@@ -431,6 +447,7 @@ internal class ChatListViewModel @Inject constructor(
                 || lastMessage?.contains(query, ignoreCase = true) == true
 
     private fun List<ChatRoomUiItem>.anyUnread(): Boolean = any { it.unreadCount > 0 }
+
 
     /**
      * Chat rooms behind both tabs, independent of the active search query.

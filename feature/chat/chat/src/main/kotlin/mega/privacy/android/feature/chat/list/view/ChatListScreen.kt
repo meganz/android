@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -101,7 +102,7 @@ internal fun ChatListScreen(
     var searchMode by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val selectionState = rememberChatListSelectionState()
-    var actionsState by rememberSaveable(stateSaver = ChatListBulkActionsUiState.Saver) {
+    var actionsState by retain {
         mutableStateOf<ChatListBulkActionsUiState>(ChatListBulkActionsUiState.Hidden)
     }
     var showMeetingActions by rememberSaveable { mutableStateOf(false) }
