@@ -225,8 +225,13 @@ private fun PasscodeContent(
                         .semantics(
                             mergeDescendants = true,
                             properties = {
-                                setText {
-                                    onPasscodeEntered(it.text)
+                                // Accessibility services deliver the whole passcode in one action
+                                // rather than a character at a time, so the field's own length gate
+                                // never runs and has to be applied here.
+                                setText { text ->
+                                    val passcode = text.text
+                                    if (passcode.length != passcodeType.digits) return@setText false
+                                    onPasscodeEntered(passcode)
                                     true
                                 }
                             }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.CryptoObject
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasImeAction
@@ -12,7 +13,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -37,6 +40,7 @@ import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -254,6 +258,60 @@ internal class PasscodeViewTest {
     }
 
     @Test
+    fun `test that setText unlocks with the passcode when it is the expected length`() {
+        displayPasscodeViewWithState(pinState(digits = 4))
+
+        performSetText("1234")
+
+        verify(passcodeUnlockViewModel).unlockWithPasscode("1234")
+    }
+
+    @Test
+    fun `test that setText does not unlock when the passcode is shorter than the expected length`() {
+        displayPasscodeViewWithState(pinState(digits = 4))
+
+        performSetText("12")
+
+        verify(passcodeUnlockViewModel, never()).unlockWithPasscode(any())
+    }
+
+    @Test
+    fun `test that setText does not unlock when the passcode is longer than the expected length`() {
+        displayPasscodeViewWithState(pinState(digits = 4))
+
+        performSetText("12345")
+
+        verify(passcodeUnlockViewModel, never()).unlockWithPasscode(any())
+    }
+
+    @Test
+    fun `test that setText unlocks with the passcode when it is the expected length for a six digit passcode`() {
+        displayPasscodeViewWithState(pinState(digits = 6))
+
+        performSetText("123456")
+
+        verify(passcodeUnlockViewModel).unlockWithPasscode("123456")
+    }
+
+    @Test
+    fun `test that setText does not unlock when the passcode is shorter than the expected length for a six digit passcode`() {
+        displayPasscodeViewWithState(pinState(digits = 6))
+
+        performSetText("1234")
+
+        verify(passcodeUnlockViewModel, never()).unlockWithPasscode(any())
+    }
+
+    @Test
+    fun `test that setText does not unlock when the passcode is longer than the expected length for a six digit passcode`() {
+        displayPasscodeViewWithState(pinState(digits = 6))
+
+        performSetText("1234567")
+
+        verify(passcodeUnlockViewModel, never()).unlockWithPasscode(any())
+    }
+
+    @Test
     fun `test that biometric auth is launched if available and enabled`() {
         whenever(biometricAuthIsAvailable.invoke(any())).thenReturn(true)
 
@@ -414,6 +472,18 @@ internal class PasscodeViewTest {
         composeTestRule.onNodeWithTag(LOGOUT_BUTTON_TAG).performClick()
 
         assertThat(analyticsRule.events).contains(PasscodeLogoutButtonPressedEvent)
+    }
+
+    private fun pinState(digits: Int) = PasscodeUnlockState.Data(
+        passcodeType = PasscodeUIType.Pin(false, digits),
+        failedAttempts = 0,
+        logoutWarning = false,
+        themeMode = ThemeMode.System
+    )
+
+    private fun performSetText(passcode: String) {
+        composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
+            .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString(passcode)) }
     }
 
     private fun displayPasscodeViewWithState(uiState: PasscodeUnlockState) {
