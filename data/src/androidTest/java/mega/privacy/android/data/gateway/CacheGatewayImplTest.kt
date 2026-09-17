@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.environment.ScreenLockState
 import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
@@ -303,6 +304,7 @@ class CacheGatewayImplTest {
         override val monitorDevicePowerConnectionState: Flow<String?> get() = unsupported()
         override fun isInPowerSaveMode(): Boolean = unsupported()
         override val monitorPowerSaveState: Flow<Boolean> get() = unsupported()
+        override fun monitorScreenLockState(): Flow<ScreenLockState> = unsupported()
         override val monitorThermalState: Flow<Int> get() = unsupported()
         override fun getAvailableProcessors(): Int = unsupported()
         override fun getTimezone(): String = unsupported()
