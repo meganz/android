@@ -568,13 +568,17 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
             MarkdownFormatAction.InlineCode -> toggleFocusedStyle(rich, RichSpanStyle.Code)
 
-            MarkdownFormatAction.HeadingCycle -> rich.cycleFocusedHeading()
             MarkdownFormatAction.BulletList -> rich.toggleFocusedListItem(ordered = false)
             MarkdownFormatAction.OrderedList -> rich.toggleFocusedListItem(ordered = true)
             MarkdownFormatAction.TaskList -> rich.toggleFocusedTaskItem()
             MarkdownFormatAction.Quote -> rich.toggleFocusedQuote()
             MarkdownFormatAction.Link -> requestRichLinkDialog(rich)
         }
+    }
+
+    /** Text style menu selection in rich text mode: null retypes the block back to body. */
+    fun setTextStyle(level: Int?) {
+        richDocumentState.value?.setFocusedHeading(level)
     }
 
     private fun toggleFocusedStyle(rich: RichDocumentState, style: RichSpanStyle) {

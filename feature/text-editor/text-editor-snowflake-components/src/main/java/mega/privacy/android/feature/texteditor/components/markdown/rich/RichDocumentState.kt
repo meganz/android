@@ -744,20 +744,13 @@ class RichDocumentState(document: RichDocument) {
         pendingFocus = RichFocusRequest(index, block.text.textFieldState.selection)
     }
 
-    /** Toolbar heading action on the focused block: body -> H1 -> H2 -> H3 -> body. */
-    fun cycleFocusedHeading() {
+    /** Toolbar text style selection on the focused block: null retypes back to a paragraph. */
+    fun setFocusedHeading(level: Int?) {
         val block = focusedTextBlock ?: return
+        val target = if (level == null) RichBlockKind.Paragraph else RichBlockKind.Heading(level)
+        if (block.kind == target) return
         recordUndo()
-        block.kind = when (val kind = block.kind) {
-            is RichBlockKind.Heading ->
-                if (kind.level < MaxCycledHeadingLevel) {
-                    RichBlockKind.Heading(kind.level + 1)
-                } else {
-                    RichBlockKind.Paragraph
-                }
-
-            else -> RichBlockKind.Heading(1)
-        }
+        block.kind = target
         restoreFocusAfterRetype()
     }
 
@@ -863,9 +856,6 @@ class RichDocumentState(document: RichDocument) {
     )
 
     private companion object {
-        /** The heading toolbar cycles H1..H3; deeper levels are kept but not produced. */
-        const val MaxCycledHeadingLevel = 3
-
         /** Undo checkpoints kept; bounds memory for the largest rich-capable documents. */
         const val UndoCapacity = 50
     }

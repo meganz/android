@@ -27,7 +27,6 @@ dependencies {
     // Compose
     implementation(androidx.bundles.compose.bom)
     implementation(androidx.material3)
-    implementation(androidx.compose.icons.extended)
     implementation(lib.kotlinx.collections.immutable)
     implementation(lib.logging.timber)
 

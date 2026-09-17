@@ -540,8 +540,11 @@ internal class TextEditorComposeViewModelTest {
             rich.focusedIndex = 0
             val block = rich.blocks[0] as RichTextBlockEditState
 
-            underTest.applyFormatAction(MarkdownFormatAction.HeadingCycle)
+            underTest.setTextStyle(1)
             assertThat(block.kind).isEqualTo(RichBlockKind.Heading(1))
+
+            underTest.setTextStyle(null)
+            assertThat(block.kind).isEqualTo(RichBlockKind.Paragraph)
 
             underTest.applyFormatAction(MarkdownFormatAction.BulletList)
             assertThat(block.kind)

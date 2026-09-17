@@ -19,6 +19,7 @@ class MarkdownFormattingToolbarScreenshotTest {
             MarkdownFormattingToolbar(
                 formats = MarkdownSelectionFormats.Empty,
                 onAction = {},
+                onTextStyleSelected = {},
             )
         }
     }
@@ -37,6 +38,7 @@ class MarkdownFormattingToolbarScreenshotTest {
                     isBulletList = true,
                 ),
                 onAction = {},
+                onTextStyleSelected = {},
             )
         }
     }

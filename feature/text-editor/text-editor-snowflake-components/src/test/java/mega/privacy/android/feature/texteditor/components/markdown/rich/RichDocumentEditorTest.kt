@@ -152,12 +152,12 @@ class RichDocumentEditorTest {
     }
 
     @Test
-    fun `test that heading cycle keeps the field focused across the node recreation`() {
+    fun `test that heading selection keeps the field focused across the node recreation`() {
         setEditor(RichDocument(listOf(RichBlock.Paragraph(RichText("title")))))
         composeRule.onNodeWithTag(richBlockFieldTag(0)).requestFocus()
         composeRule.waitForIdle()
 
-        state.cycleFocusedHeading()
+        state.setFocusedHeading(1)
         composeRule.waitForIdle()
 
         assertThat((state.blocks[0] as RichTextBlockEditState).kind)

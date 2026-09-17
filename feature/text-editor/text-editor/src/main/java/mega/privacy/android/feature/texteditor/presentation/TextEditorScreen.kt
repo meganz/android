@@ -902,20 +902,18 @@ private fun RichEditToolbar(
             }
         }.collect { formats = it }
     }
+    // Structural actions are disabled where they cannot act on what the user sees:
+    // table cells take inline styles only, and a cross-block selection would silently
+    // retype just the origin block.
+    val structuralDisabled = richState.focusedCell != null ||
+            richState.documentSelection != null
     MarkdownFormattingToolbar(
         formats = formats,
         onAction = viewModel::applyFormatAction,
+        onTextStyleSelected = viewModel::setTextStyle,
         modifier = modifier,
-        // Structural actions are disabled where they cannot act on what the user sees:
-        // table cells take inline styles only, and a cross-block selection would silently
-        // retype just the origin block.
-        disabledActions = if (richState.focusedCell != null ||
-            richState.documentSelection != null
-        ) {
-            StructuralFormatActions
-        } else {
-            emptySet()
-        },
+        textStyleEnabled = !structuralDisabled,
+        disabledActions = if (structuralDisabled) StructuralFormatActions else emptySet(),
     )
 }
 
@@ -951,7 +949,6 @@ private fun richSelectionFormats(
 }
 
 private val StructuralFormatActions = setOf(
-    MarkdownFormatAction.HeadingCycle,
     MarkdownFormatAction.BulletList,
     MarkdownFormatAction.OrderedList,
     MarkdownFormatAction.TaskList,

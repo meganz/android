@@ -226,23 +226,29 @@ internal class RichDocumentStateTest {
     }
 
     @Test
-    fun `test that cycleFocusedHeading cycles body through H1 to H3 and back`() {
+    fun `test that setFocusedHeading retypes the block to the selected level and back to body`() {
         val state = stateOf(RichBlock.Paragraph(RichText("text")))
         state.focusedIndex = 0
         val block = state.blocks[0] as RichTextBlockEditState
 
-        val seen = mutableListOf<RichBlockKind>()
-        repeat(4) {
-            state.cycleFocusedHeading()
-            seen += block.kind
-        }
+        state.setFocusedHeading(2)
+        assertThat(block.kind).isEqualTo(RichBlockKind.Heading(2))
 
-        assertThat(seen).containsExactly(
-            RichBlockKind.Heading(1),
-            RichBlockKind.Heading(2),
-            RichBlockKind.Heading(3),
-            RichBlockKind.Paragraph,
-        ).inOrder()
+        state.setFocusedHeading(3)
+        assertThat(block.kind).isEqualTo(RichBlockKind.Heading(3))
+
+        state.setFocusedHeading(null)
+        assertThat(block.kind).isEqualTo(RichBlockKind.Paragraph)
+    }
+
+    @Test
+    fun `test that setFocusedHeading does not record an undo step when the level is unchanged`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("text")))
+        state.focusedIndex = 0
+
+        state.setFocusedHeading(null)
+
+        assertThat(state.undo()).isFalse()
     }
 
     @Test
@@ -332,7 +338,7 @@ internal class RichDocumentStateTest {
     fun `test that structural toggles do nothing when no block is focused`() {
         val state = stateOf(RichBlock.Paragraph(RichText("text")))
 
-        state.cycleFocusedHeading()
+        state.setFocusedHeading(1)
         state.toggleFocusedListItem(ordered = false)
         state.toggleFocusedQuote()
 
