@@ -20,6 +20,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
+import mega.privacy.android.core.transfers.extension.isUnderway
+import mega.privacy.android.core.transfers.extension.sortedByUnderwayThenPriority
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
@@ -97,7 +99,7 @@ class TransfersViewModel @Inject constructor(
     private fun monitorActiveTransfers() {
         viewModelScope.launch {
             monitorInProgressTransfersUseCase().collectLatest { activeTransfersMap ->
-                val sortedTransfers = activeTransfersMap.values.sortedBy { it.priority }
+                val sortedTransfers = activeTransfersMap.values.sortedByUnderwayThenPriority()
                 setTransfers(
                     if (reordering) {
                         sortedTransfers.matchOrderWithNewAtEnd(uiState.value.activeTransfers) { it.tag }
@@ -374,13 +376,17 @@ class TransfersViewModel @Inject constructor(
      * @param toIndex the index that the transfer should be moved to
      */
     fun onActiveTransfersReorderPreview(fromIndex: Int, toIndex: Int) {
-        if (fromIndex !in uiState.value.activeTransfers.indices || toIndex !in uiState.value.activeTransfers.indices) {
-            Timber.e(IndexOutOfBoundsException("Reordering indices are not correct: $fromIndex to $toIndex should be in ${uiState.value.activeTransfers.indices}"))
+        val activeTransfers = uiState.value.activeTransfers
+        if (fromIndex !in activeTransfers.indices || toIndex !in activeTransfers.indices) {
+            Timber.e(IndexOutOfBoundsException("Reordering indices are not correct: $fromIndex to $toIndex should be in ${activeTransfers.indices}"))
             return
         }
+        // A row is grouped by its state, so a drop in the other group is undone by the next update.
+        val destinationIndex = toIndex.coerceIn(activeTransfers.groupRange(fromIndex))
+        if (destinationIndex == fromIndex) return
         reordering = true
         setTransfers(
-            uiState.value.activeTransfers.toMutableList().moveElement(fromIndex, toIndex)
+            activeTransfers.toMutableList().moveElement(fromIndex, destinationIndex)
         )
     }
 
@@ -390,20 +396,24 @@ class TransfersViewModel @Inject constructor(
      */
     fun onActiveTransfersReorderConfirmed(transfer: InProgressTransfer) {
         reordering = false
-        uiState.value.activeTransfers.indexOfFirst { it.tag == transfer.tag }.takeIf { it >= 0 }
+        val activeTransfers = uiState.value.activeTransfers
+        activeTransfers.indexOfFirst { it.tag == transfer.tag }.takeIf { it >= 0 }
             ?.let { destinationIndex ->
                 viewModelScope.launch {
                     runCatching {
                         if (destinationIndex == 0) {
                             moveTransferToFirstByTagUseCase(transfer.tag)
-                        } else if (destinationIndex >= uiState.value.activeTransfers.lastIndex) {
+                        } else if (destinationIndex >= activeTransfers.lastIndex) {
                             moveTransferToLastByTagUseCase(transfer.tag)
                         } else {
-                            uiState.value.activeTransfers.getOrNull(destinationIndex + 1)?.tag?.let { prevTag ->
+                            val prevTag = activeTransfers.prevTagFor(destinationIndex)
+                            if (prevTag != null) {
                                 moveTransferBeforeByTagUseCase(
                                     tag = transfer.tag,
                                     prevTag = prevTag
                                 )
+                            } else {
+                                moveTransferToLastByTagUseCase(transfer.tag)
                             }
                         }
                     }.onFailure {
@@ -675,8 +685,10 @@ class TransfersViewModel @Inject constructor(
             }
 
             viewModelScope.launch {
-                setTransfers(monitorInProgressTransfersUseCase().lastOrNull()?.values?.sortedBy { it.priority }
-                    ?: emptyList())
+                setTransfers(
+                    monitorInProgressTransfersUseCase().lastOrNull()?.values
+                        ?.sortedByUnderwayThenPriority() ?: emptyList()
+                )
             }
         }
 
@@ -710,4 +722,31 @@ class TransfersViewModel @Inject constructor(
     companion object {
         internal const val MAX_COMPLETED_TRANSFER_FOR_STATE = 100
     }
+}
+
+/**
+ * Range of the contiguous rows sharing the group of the transfer at [index]. A drag keeps the ui
+ * order until it is confirmed, so a transfer arriving meanwhile can sit outside of its group.
+ */
+private fun List<InProgressTransfer>.groupRange(index: Int): IntRange {
+    val underway = this[index].isUnderway
+    var first = index
+    while (first > 0 && this[first - 1].isUnderway == underway) first--
+    var last = index
+    while (last < lastIndex && this[last + 1].isUnderway == underway) last++
+    return first..last
+}
+
+/**
+ * Tag of the transfer the one at [index] has to be moved before for the SDK priorities to match the
+ * displayed order. The row below is the anchor, unless [index] closes its group: the priorities of
+ * the queued rows below it interleave with the group, so the row above is used instead and the
+ * anchor is taken from the priority order.
+ */
+private fun List<InProgressTransfer>.prevTagFor(index: Int): Int? {
+    val group = groupRange(index)
+    getOrNull(index + 1)?.takeIf { index + 1 in group }?.let { return it.tag }
+    val previous = getOrNull(index - 1)?.takeIf { index - 1 in group } ?: return null
+    val byPriority = sortedBy { it.priority }.filterNot { it.tag == this[index].tag }
+    return byPriority.getOrNull(byPriority.indexOfFirst { it.tag == previous.tag } + 1)?.tag
 }
