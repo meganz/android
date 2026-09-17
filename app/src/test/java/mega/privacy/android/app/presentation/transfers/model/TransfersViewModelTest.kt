@@ -191,6 +191,19 @@ class TransfersViewModelTest {
         wheneverBlocking { correctActiveTransfersUseCase(any()) }.thenReturn(Unit)
     }
 
+    private fun stubInProgressTransfer(tag: Int, priority: Int, state: TransferState) =
+        mock<InProgressTransfer.Download> {
+            on { this.tag } doReturn tag
+            on { this.uniqueId } doReturn tag.toLong()
+            on { this.priority } doReturn priority.toBigInteger()
+            on { this.state } doReturn state
+        }
+
+    private fun stubInProgressTransfers(vararg transfers: InProgressTransfer) {
+        val map = transfers.associateBy { it.uniqueId }
+        whenever(monitorInProgressTransfersUseCase()).thenReturn(map.asHotFlow())
+    }
+
     private fun initTestClass() {
         underTest = TransfersViewModel(
             ioDispatcher = UnconfinedTestDispatcher(),
@@ -595,6 +608,155 @@ class TransfersViewModelTest {
             verifyNoInteractions(
                 moveTransferBeforeByTagUseCase,
                 moveTransferToFirstByTagUseCase,
+            )
+        }
+
+    @Test
+    fun `test that active transfers in ui state place underway transfers before queued ones`() =
+        runTest {
+            val queuedFirst = stubInProgressTransfer(tag = 1, priority = 1, state = TransferState.STATE_QUEUED)
+            val activeSecond = stubInProgressTransfer(tag = 2, priority = 2, state = TransferState.STATE_ACTIVE)
+            val queuedThird = stubInProgressTransfer(tag = 3, priority = 3, state = TransferState.STATE_QUEUED)
+            val activeFourth = stubInProgressTransfer(tag = 4, priority = 4, state = TransferState.STATE_ACTIVE)
+            stubInProgressTransfers(queuedFirst, activeSecond, queuedThird, activeFourth)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().activeTransfers).containsExactly(
+                    activeSecond, activeFourth, queuedFirst, queuedThird,
+                ).inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that active transfers in ui state keep a paused transfer with the underway ones`() =
+        runTest {
+            val queued = stubInProgressTransfer(tag = 1, priority = 1, state = TransferState.STATE_QUEUED)
+            val paused = stubInProgressTransfer(tag = 2, priority = 2, state = TransferState.STATE_PAUSED)
+            val active = stubInProgressTransfer(tag = 3, priority = 3, state = TransferState.STATE_ACTIVE)
+            stubInProgressTransfers(queued, paused, active)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().activeTransfers)
+                    .containsExactly(paused, active, queued).inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that active transfers in ui state are ordered by priority when all transfers are paused`() =
+        runTest {
+            val third = stubInProgressTransfer(tag = 1, priority = 3, state = TransferState.STATE_PAUSED)
+            val first = stubInProgressTransfer(tag = 2, priority = 1, state = TransferState.STATE_PAUSED)
+            val second = stubInProgressTransfer(tag = 3, priority = 2, state = TransferState.STATE_PAUSED)
+            stubInProgressTransfers(third, first, second)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().activeTransfers)
+                    .containsExactly(first, second, third).inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onActiveTransfersReorderPreview clamps the move to the group of the moved transfer`() =
+        runTest {
+            val firstActive = stubInProgressTransfer(tag = 1, priority = 1, state = TransferState.STATE_ACTIVE)
+            val secondActive = stubInProgressTransfer(tag = 2, priority = 2, state = TransferState.STATE_ACTIVE)
+            val firstQueued = stubInProgressTransfer(tag = 3, priority = 3, state = TransferState.STATE_QUEUED)
+            val secondQueued = stubInProgressTransfer(tag = 4, priority = 4, state = TransferState.STATE_QUEUED)
+            stubInProgressTransfers(firstActive, secondActive, firstQueued, secondQueued)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onActiveTransfersReorderPreview(3, 0)
+                assertThat(awaitItem().activeTransfers).containsExactly(
+                    firstActive, secondActive, secondQueued, firstQueued,
+                ).inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that moveTransferBeforeByTagUseCase is invoked with the next transfer of the group when preview reorder is confirmed`() =
+        runTest {
+            val firstActive = stubInProgressTransfer(tag = 1, priority = 1, state = TransferState.STATE_ACTIVE)
+            val secondActive = stubInProgressTransfer(tag = 2, priority = 2, state = TransferState.STATE_ACTIVE)
+            val thirdActive = stubInProgressTransfer(tag = 3, priority = 3, state = TransferState.STATE_ACTIVE)
+            val queued = stubInProgressTransfer(tag = 4, priority = 4, state = TransferState.STATE_QUEUED)
+            stubInProgressTransfers(firstActive, secondActive, thirdActive, queued)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onActiveTransfersReorderPreview(2, 1)
+                underTest.onActiveTransfersReorderConfirmed(thirdActive)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(moveTransferBeforeByTagUseCase).invoke(thirdActive.tag, secondActive.tag)
+            verifyNoInteractions(
+                moveTransferToFirstByTagUseCase,
+                moveTransferToLastByTagUseCase,
+            )
+        }
+
+    @Test
+    fun `test that moveTransferBeforeByTagUseCase is invoked with the transfer following the previous one in priority order when preview reorder to the end of the group is confirmed`() =
+        runTest {
+            val firstActive = stubInProgressTransfer(tag = 1, priority = 1, state = TransferState.STATE_ACTIVE)
+            val secondActive = stubInProgressTransfer(tag = 2, priority = 2, state = TransferState.STATE_ACTIVE)
+            val firstQueued = stubInProgressTransfer(tag = 3, priority = 3, state = TransferState.STATE_QUEUED)
+            val secondQueued = stubInProgressTransfer(tag = 4, priority = 4, state = TransferState.STATE_QUEUED)
+            stubInProgressTransfers(firstActive, secondActive, firstQueued, secondQueued)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onActiveTransfersReorderPreview(0, 1)
+                underTest.onActiveTransfersReorderConfirmed(firstActive)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(moveTransferBeforeByTagUseCase).invoke(firstActive.tag, firstQueued.tag)
+            verifyNoInteractions(
+                moveTransferToFirstByTagUseCase,
+                moveTransferToLastByTagUseCase,
+            )
+        }
+
+    @Test
+    fun `test that moveTransferBeforeByTagUseCase is invoked when preview reorder to the first queued position is confirmed`() =
+        runTest {
+            val active = stubInProgressTransfer(tag = 1, priority = 1, state = TransferState.STATE_ACTIVE)
+            val firstQueued = stubInProgressTransfer(tag = 2, priority = 2, state = TransferState.STATE_QUEUED)
+            val secondQueued = stubInProgressTransfer(tag = 3, priority = 3, state = TransferState.STATE_QUEUED)
+            val thirdQueued = stubInProgressTransfer(tag = 4, priority = 4, state = TransferState.STATE_QUEUED)
+            stubInProgressTransfers(active, firstQueued, secondQueued, thirdQueued)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onActiveTransfersReorderPreview(3, 1)
+                underTest.onActiveTransfersReorderConfirmed(thirdQueued)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(moveTransferBeforeByTagUseCase).invoke(thirdQueued.tag, firstQueued.tag)
+            verifyNoInteractions(
+                moveTransferToFirstByTagUseCase,
+                moveTransferToLastByTagUseCase,
             )
         }
 
