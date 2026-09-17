@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomActionPluralMapper
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionMessage
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
+import mega.privacy.android.feature.chat.runCatchingCancellable
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import timber.log.Timber
 import javax.inject.Inject

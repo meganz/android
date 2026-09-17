@@ -4,15 +4,18 @@ import androidx.lifecycle.ViewModelStore
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -62,6 +65,7 @@ import mega.privacy.android.feature.chat.list.menu.MuteChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.menu.UnarchiveChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
+import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.MeetingAction
 import mega.privacy.android.feature.chat.list.model.MeetingActionEvent
@@ -441,6 +445,37 @@ class ChatListViewModelTest {
 
         assertThat(underTest.getBulkChatRoomActions(setOf(999L))).isEmpty()
     }
+
+    @Test
+    fun `test that getBulkChatRoomActions rethrows cancellation instead of resolving against an empty selection when the coroutine reading the chat rooms is cancelled`() =
+        runTest {
+            stubHasArchivedChats(hasArchivedChats = false)
+            lateinit var running: Job
+            var actions: List<ChatRoomActionUiItem>? = null
+            var thrown: Throwable? = null
+            getChatsUseCase.stub {
+                on {
+                    invoke(eq(ChatRoomType.NON_MEETINGS), any(), any(), any(), any())
+                } doAnswer {
+                    flow {
+                        running.cancel()
+                        throw CancellationException("cancelled")
+                    }
+                }
+                on {
+                    invoke(eq(ChatRoomType.MEETINGS), any(), any(), any(), any())
+                } doAnswer { flow { awaitCancellation() } }
+            }
+
+            running = launch {
+                thrown = runCatching { actions = underTest.getBulkChatRoomActions(setOf(1L)) }
+                    .exceptionOrNull()
+            }
+            advanceUntilIdle()
+
+            assertThat(thrown).isInstanceOf(CancellationException::class.java)
+            assertThat(actions).isNull()
+        }
 
     @Test
     fun `test that onBulkChatRoomActionSelected runs the picked action on every selected chat`() =

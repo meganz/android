@@ -1,7 +1,12 @@
 package mega.privacy.android.feature.chat.navigation
 
 import android.net.Uri
+import androidx.navigation3.runtime.NavKey
 import com.google.common.truth.Truth.assertThat
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.RegexPatternType
@@ -38,10 +43,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -163,6 +170,34 @@ class ChatsDeepLinkHandlerTest {
                 verify(snackbarEventQueue).queueMessage(sharedR.string.general_invalid_link)
             }
         }
+
+        @Test
+        fun `test that getNavKeys rethrows cancellation instead of reporting an invalid link when the coroutine resolving the link is cancelled`() =
+            runTest {
+                val uri = mock<Uri> {
+                    on { this.toString() } doReturn uriString
+                }
+                whenever(rootNodeExistsUseCase()) doReturn true
+                lateinit var running: Job
+                var navKeys: List<NavKey>? = null
+                var thrown: Throwable? = null
+                getChatLinkContentUseCase.stub {
+                    onBlocking { invoke(uriString) } doAnswer {
+                        running.cancel()
+                        throw CancellationException("cancelled")
+                    }
+                }
+
+                running = launch {
+                    thrown = runCatching { navKeys = underTest.getNavKeys(uri, CHAT_LINK, true) }
+                        .exceptionOrNull()
+                }
+                advanceUntilIdle()
+
+                assertThat(thrown).isInstanceOf(CancellationException::class.java)
+                assertThat(navKeys).isNull()
+                verifyNoInteractions(snackbarEventQueue)
+            }
 
         @Test
         fun `test that error is shown when MeetingLink has invalid chatHandle`() = runTest {

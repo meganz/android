@@ -3,9 +3,12 @@ package mega.privacy.android.feature.chat.list.archived
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -24,6 +27,7 @@ import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_UNARCHIVE_T
 import mega.privacy.android.feature.chat.list.menu.ChatRoomActions
 import mega.privacy.android.feature.chat.list.menu.ChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.menu.UnarchiveChatRoomMenuItem
+import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.jupiter.api.AfterEach
@@ -31,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -187,6 +192,33 @@ class ArchivedChatsViewModelTest {
 
         assertThat(underTest.getChatRoomActions(setOf(999L))).isEmpty()
     }
+
+    @Test
+    fun `test that getChatRoomActions rethrows cancellation instead of resolving against an empty selection when the coroutine reading the chat rooms is cancelled`() =
+        runTest {
+            lateinit var running: Job
+            var actions: List<ChatRoomActionUiItem>? = null
+            var thrown: Throwable? = null
+            getChatsUseCase.stub {
+                on {
+                    invoke(eq(ChatRoomType.ARCHIVED_CHATS), any(), any(), any(), any())
+                } doAnswer {
+                    flow {
+                        running.cancel()
+                        throw CancellationException("cancelled")
+                    }
+                }
+            }
+
+            running = launch {
+                thrown = runCatching { actions = underTest.getChatRoomActions(setOf(1L)) }
+                    .exceptionOrNull()
+            }
+            advanceUntilIdle()
+
+            assertThat(thrown).isInstanceOf(CancellationException::class.java)
+            assertThat(actions).isNull()
+        }
 
     @Test
     fun `test that onChatRoomActionSelected unarchives the picked chat`() = runTest {

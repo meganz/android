@@ -20,6 +20,7 @@ import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
 import mega.privacy.android.feature.chat.list.menu.ChatRoomActions
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
+import mega.privacy.android.feature.chat.runCatchingCancellable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -88,7 +89,7 @@ internal class ArchivedChatsViewModel @Inject constructor(
         return chatIds.mapNotNull { rooms[it] }
     }
 
-    private suspend fun currentChatRooms(): Map<Long, ChatRoomItem> = runCatching {
+    private suspend fun currentChatRooms(): Map<Long, ChatRoomItem> = runCatchingCancellable {
         domainChatRoomsFlow().first().associateBy(ChatRoomItem::chatId)
     }.getOrElse { e ->
         Timber.e(e, "Failed to load archived chat rooms for actions")

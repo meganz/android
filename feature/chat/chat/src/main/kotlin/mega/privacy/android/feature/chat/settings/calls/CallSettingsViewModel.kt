@@ -11,7 +11,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
 import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
+import mega.privacy.android.feature.chat.runCatchingCancellable
 import mega.privacy.android.feature.chat.settings.calls.model.CallSettingsUiState
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -31,14 +33,14 @@ class CallSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            runCatching {
+            runCatchingCancellable {
                 monitorCallSoundEnabledUseCase()
                     .collectLatest { callSoundState ->
                         _uiState.update {
                             it.copy(isSoundNotificationActive = callSoundState == CallsSoundEnabledState.Enabled)
                         }
                     }
-            }
+            }.onFailure { Timber.e(it, "Failed to monitor the call sound setting") }
         }
     }
 

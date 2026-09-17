@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingConsentUiState
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.feature.chat.runCatchingCancellable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -81,7 +82,7 @@ class CallRecordingConsentDialogViewModel @Inject constructor(
      */
     fun decline(chatId: Long) {
         viewModelScope.launch {
-            runCatching { hangChatCallByChatIdUseCase(chatId) }
+            runCatchingCancellable { hangChatCallByChatIdUseCase(chatId) }
                 .onFailure { Timber.d(it) }
             broadcastCallRecordingConsentEventUseCase(CallRecordingConsentStatus.Denied(chatId))
         }

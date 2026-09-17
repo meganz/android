@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.feature.chat.runCatchingCancellable
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.time.Duration
 import javax.inject.Inject
@@ -232,7 +233,7 @@ internal class ChatLastMessageFormatter @Inject constructor(
 
     private suspend fun callEndedPreview(item: ChatListItem): String {
         val message = getChatMessageUseCase(item.chatId, item.lastMessageId) ?: return item.lastMessage
-        val chatRoom = runCatching { getChatRoomUseCase(item.chatId) }.getOrNull()
+        val chatRoom = runCatchingCancellable { getChatRoomUseCase(item.chatId) }.getOrNull()
         val isGroup = chatRoom?.isGroup ?: item.isGroup
         val isMeeting = chatRoom?.isMeeting == true
         val body = when (message.termCode) {
@@ -372,7 +373,7 @@ internal class ChatLastMessageFormatter @Inject constructor(
     }
 
     private suspend fun isMeeting(chatId: Long): Boolean =
-        runCatching { getChatRoomUseCase(chatId)?.isMeeting }.getOrNull() == true
+        runCatchingCancellable { getChatRoomUseCase(chatId)?.isMeeting }.getOrNull() == true
 
     private fun stripFormatMarkers(text: String): String =
         text.replace("[A]", "").replace("[/A]", "")
@@ -427,7 +428,7 @@ internal class ChatLastMessageFormatter @Inject constructor(
         if (handle == myHandle()) {
             myFullName() ?: context.getString(sharedR.string.chat_last_message_sender_me)
         } else {
-            runCatching { getMessageSenderNameUseCase(handle, chatId) }
+            runCatchingCancellable { getMessageSenderNameUseCase(handle, chatId) }
                 .getOrNull()?.takeIf { it.isNotBlank() }
                 ?: context.getString(sharedR.string.chat_last_message_sender_unknown)
         }
@@ -436,18 +437,18 @@ internal class ChatLastMessageFormatter @Inject constructor(
         if (item.lastMessageSender == myHandle()) {
             myFullName() ?: context.getString(sharedR.string.chat_last_message_sender_me)
         } else {
-            runCatching { getMessageSenderNameUseCase(item.lastMessageSender, item.chatId) }
+            runCatchingCancellable { getMessageSenderNameUseCase(item.lastMessageSender, item.chatId) }
                 .getOrNull()?.takeIf { it.isNotBlank() }
                 ?: context.getString(sharedR.string.chat_last_message_sender_unknown)
         }
 
     private suspend fun myHandle(): Long? = identityMutex.withLock {
-        cachedMyHandle ?: runCatching { getMyUserHandleUseCase() }.getOrNull()
+        cachedMyHandle ?: runCatchingCancellable { getMyUserHandleUseCase() }.getOrNull()
             ?.also { cachedMyHandle = it }
     }
 
     private suspend fun myFullName(): String? = identityMutex.withLock {
-        cachedMyFullName ?: runCatching { getMyFullNameUseCase() }.getOrNull()
+        cachedMyFullName ?: runCatchingCancellable { getMyFullNameUseCase() }.getOrNull()
             ?.takeIf { it.isNotBlank() }
             ?.also { cachedMyFullName = it }
     }

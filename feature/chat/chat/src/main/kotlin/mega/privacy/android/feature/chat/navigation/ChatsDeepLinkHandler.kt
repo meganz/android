@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
+import mega.privacy.android.feature.chat.runCatchingCancellable
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
@@ -59,7 +60,7 @@ class ChatsDeepLinkHandler @Inject constructor(
         isLoggedIn: Boolean,
     ): List<NavKey>? = when (regexPatternType) {
         CHAT_LINK -> if (isLoggedIn
-            && runCatching { rootNodeExistsUseCase() }.getOrDefault(false).not()
+            && runCatchingCancellable { rootNodeExistsUseCase() }.getOrDefault(false).not()
         ) {
             listOf(
                 DeepLinksAfterFetchNodesDialogNavKey(
@@ -68,7 +69,7 @@ class ChatsDeepLinkHandler @Inject constructor(
                 )
             )
         } else {
-            runCatching {
+            runCatchingCancellable {
                 getChatLinkContentUseCase(uri.toString())
             }.fold(
                 onSuccess = { chatLinkContent ->
@@ -133,7 +134,8 @@ class ChatsDeepLinkHandler @Inject constructor(
                         }
 
                         is MeetingEndedException -> {
-                            val chatRoom = runCatching { getChatRoomUseCase(e.chatId) }.getOrNull()
+                            val chatRoom =
+                                runCatchingCancellable { getChatRoomUseCase(e.chatId) }.getOrNull()
                             listOf(
                                 MeetingHasEndedDialogNavKey(chatRoom?.let { e.chatId })
                             )

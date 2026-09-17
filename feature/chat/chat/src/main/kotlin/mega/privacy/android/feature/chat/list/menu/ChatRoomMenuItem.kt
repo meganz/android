@@ -2,14 +2,12 @@ package mega.privacy.android.feature.chat.list.menu
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionMessage
 import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomMenuItemConfirmation
+import mega.privacy.android.feature.chat.runCatchingCancellable
 import timber.log.Timber
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * A single, self-contained chat room action offered in the chat list item actions bottom sheet.
@@ -104,18 +102,6 @@ internal suspend fun List<ChatRoomItem>.failuresOf(
         .onFailure { Timber.e(it, "Chat room action failed for chat ${item.chatId}") }
         .isFailure
 }
-
-/**
- * Runs [block] and captures its failures, except when the calling coroutine has itself been
- * cancelled: that cancellation is rethrown so it keeps propagating instead of being reported to
- * the user as an ordinary failure.
- *
- * A [CancellationException] raised while the caller is still active — a timeout inside the call,
- * say — is an ordinary failure, and is captured like any other, so one chat timing out neither
- * abandons the rest of a bulk action nor leaves the user without an outcome.
- */
-internal suspend inline fun <T> runCatchingCancellable(block: () -> T): Result<T> =
-    runCatching(block).onFailure { currentCoroutineContext().ensureActive() }
 
 internal fun ChatRoomMenuItem.toUiItem(items: List<ChatRoomItem>): ChatRoomActionUiItem =
     ChatRoomActionUiItem(

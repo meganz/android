@@ -4,6 +4,10 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.formatter.emoji.EmojiShortcodeConverter
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -28,6 +32,7 @@ import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.shared.resources.R as sharedR
+import org.mockito.kotlin.stub
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -155,6 +160,36 @@ class ChatLastMessageFormatterTest {
             whenever(emojiShortcodeConverter.convert("Hello :smile:")) doReturn "Hello 😄"
 
             assertThat(underTest(CHAT_ID)).isEqualTo(":smile:: Hello 😄")
+        }
+
+    @Test
+    fun `test that invoke rethrows cancellation instead of falling back to an unknown sender when the coroutine formatting the message is cancelled`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "Hello there",
+                lastMessageType = ChatRoomLastMessage.Normal,
+                lastMessageSender = SENDER_HANDLE,
+                isGroup = true,
+            )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            lateinit var running: Job
+            var preview: String? = null
+            var thrown: Throwable? = null
+            getMessageSenderNameUseCase.stub {
+                onBlocking { invoke(SENDER_HANDLE, CHAT_ID) } doAnswer {
+                    running.cancel()
+                    throw CancellationException("cancelled")
+                }
+            }
+
+            running = launch {
+                thrown = runCatching { preview = underTest(CHAT_ID) }.exceptionOrNull()
+            }
+            advanceUntilIdle()
+
+            assertThat(thrown).isInstanceOf(CancellationException::class.java)
+            assertThat(preview).isNull()
         }
 
     @Test

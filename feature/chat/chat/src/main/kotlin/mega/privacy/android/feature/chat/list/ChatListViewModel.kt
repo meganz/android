@@ -49,6 +49,7 @@ import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.MeetingAction
 import mega.privacy.android.feature.chat.list.model.MeetingActionEvent
+import mega.privacy.android.feature.chat.runCatchingCancellable
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.NewChatNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -151,7 +152,7 @@ internal class ChatListViewModel @Inject constructor(
      */
     fun onNewChatResult(result: NewChatNavKey.NewChatResult) {
         viewModelScope.launch {
-            runCatching {
+            runCatchingCancellable {
                 val groupSettings = result.groupSettings
                 if (groupSettings == null) {
                     val handle = result.emails.firstOrNull()
@@ -206,7 +207,7 @@ internal class ChatListViewModel @Inject constructor(
     }
 
     private suspend fun isParticipatingInACall(): Boolean =
-        runCatching { isParticipatingInChatCallUseCase() }
+        runCatchingCancellable { isParticipatingInChatCallUseCase() }
             .getOrElse { e ->
                 Timber.e(e, "Failed to check whether the user is in a call")
                 false
@@ -253,7 +254,7 @@ internal class ChatListViewModel @Inject constructor(
      */
     fun onChatStatusSelected(status: UserChatStatus) {
         viewModelScope.launch {
-            runCatching { setCurrentUserStatusUseCase(status) }.onFailure { e ->
+            runCatchingCancellable { setCurrentUserStatusUseCase(status) }.onFailure { e ->
                 Timber.e(e, "Failed to set the user status to $status")
                 queueMessage(sharedR.string.changing_status_error)
             }
@@ -277,7 +278,7 @@ internal class ChatListViewModel @Inject constructor(
      */
     fun onDoNotDisturbOptionSelected(option: ChatPushNotificationMuteOption) {
         viewModelScope.launch {
-            runCatching { muteChatPushNotificationUseCase(null, option) }.onFailure { e ->
+            runCatchingCancellable { muteChatPushNotificationUseCase(null, option) }.onFailure { e ->
                 Timber.e(e, "Failed to mute all chat notifications with $option")
                 queueMessage(sharedR.string.general_request_failed_message)
             }
@@ -298,7 +299,7 @@ internal class ChatListViewModel @Inject constructor(
     }
 
     private suspend fun queueMessage(messageId: Int) {
-        runCatching { snackbarEventQueue.queueMessage(messageId) }
+        runCatchingCancellable { snackbarEventQueue.queueMessage(messageId) }
             .onFailure { Timber.e(it, "Failed to queue a chat list message") }
     }
 
@@ -308,7 +309,7 @@ internal class ChatListViewModel @Inject constructor(
         return chatIds.mapNotNull { rooms[it] }
     }
 
-    private suspend fun currentChatRooms(): Map<Long, ChatRoomItem> = runCatching {
+    private suspend fun currentChatRooms(): Map<Long, ChatRoomItem> = runCatchingCancellable {
         combine(
             domainChatRoomsFlow(ChatRoomType.NON_MEETINGS),
             domainChatRoomsFlow(ChatRoomType.MEETINGS),
