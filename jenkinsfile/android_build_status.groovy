@@ -56,6 +56,8 @@ CODE_REVIEW_ERROR_REPORT_FILE = "code_review_error_report.txt"
 WEBLATE_GATE_REPORT_FILE = "weblate_gate_report.txt"
 WEBLATE_CHECK_CMD = "weblate_check"
 
+SIGNATURE_GATE_REPORT_FILE = "commit_signature_gate_report.txt"
+
 /**
  * common.groovy file with common methods
  */
@@ -449,6 +451,46 @@ pipeline {
                         }
                     }
                 } //stage('Weblate Strings Check')
+
+                stage('Commit Signature Check') {
+                    agent { label LIGHT_NODE_LABELS }
+                    when {
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() && !isWeblateCheckOnly() }
+                    }
+                    steps {
+                        script {
+                            common.withStageStatus('CI: Commit Signature Check') {
+                                def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET ?: env.gitlabTargetBranch ?: 'develop'
+                                util.useGitLab() {
+                                    def gateStatus = sh(
+                                            script: "SIGNATURE_GATE_FETCH=1 bash tools/git/commit_signature_gate.sh 'origin/${targetBranch}' > ${SIGNATURE_GATE_REPORT_FILE} 2>&1",
+                                            returnStatus: true
+                                    )
+                                    String gateReport = fileExists(SIGNATURE_GATE_REPORT_FILE) ? readFile(SIGNATURE_GATE_REPORT_FILE).trim() : 'no report produced'
+                                    echo "Commit signature gate exit ${gateStatus}:\n${gateReport}"
+                                    if (gateStatus == 1) {
+                                        // <pre> keeps the remediation commands on their own lines and copy-pasteable.
+                                        common.sendToMR(":x: **Commit Signature Check failed**<br/><pre>${gateReport}</pre>")
+                                        util.failPipeline("Commit signature check failed:\n${gateReport}")
+                                    } else if (gateStatus != 0) {
+                                        // fail-open: verification problems must not block unrelated MRs
+                                        common.sendToMR(":warning: **Commit Signature Check could not verify this MR** — please check manually.<br/>${gateReport.replaceAll('\n', '<br/>')}")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        failure {
+                            script {
+                                BUILD_STEP = "Commit Signature Check"
+                            }
+                        }
+                        cleanup {
+                            cleanWs(cleanWhenFailure: true)
+                        }
+                    }
+                } //stage('Commit Signature Check')
 
                 stage('Code Review') {
                     agent { label LIGHT_NODE_LABELS }
