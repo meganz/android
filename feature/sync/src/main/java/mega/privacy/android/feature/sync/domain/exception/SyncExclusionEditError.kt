@@ -42,4 +42,29 @@ sealed class SyncExclusionEditError(message: String) : Exception(message) {
     class UnsupportedTarget(val target: SyncExclusionTarget) : SyncExclusionEditError(
         "$target is not a target this app can author"
     )
+
+    /**
+     * Both size bounds would hold the same value, which costs the file every rule it has.
+     *
+     * The SDK reads the bounds as a lower and an upper limit and stops reading the file at the
+     * first line that makes them equal, so an equal pair does not merely fail to exclude by size:
+     * none of the file's rules take effect at all.
+     *
+     * @property bytes the value both bounds would hold
+     */
+    class EqualSizeBounds(val bytes: Long) : SyncExclusionEditError(
+        "Both size bounds would be $bytes bytes, which makes the SDK abandon the whole file"
+    )
+
+    /**
+     * A size bound that is not a size any file can be measured against.
+     *
+     * Zero is refused as well as negative, because the upper bound starts level with a lower bound
+     * of zero: an `exclude-larger` of zero is equal bounds on its own, before any second line.
+     *
+     * @property bytes the bound the edit supplied
+     */
+    class UnusableSizeBound(val bytes: Long) : SyncExclusionEditError(
+        "$bytes is not a size a bound can hold"
+    )
 }
