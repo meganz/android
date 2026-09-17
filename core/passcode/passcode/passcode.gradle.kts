@@ -3,9 +3,12 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
 }
 
 android {
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+
     lint {
         abortOnError = true
     }
@@ -31,9 +34,17 @@ dependencies {
     implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.navigation3.runtime)
     implementation(androidx.compose.activity)
+    implementation(androidx.compose.runtime.retain)
     implementation(androidx.bundles.compose.bom)
     implementation(platform(androidx.compose.bom))
     implementation(androidx.material3)
+    implementation(lib.compose.state.events)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
+    screenshotTestImplementation(project(":core-test"))
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core:analytics:analytics-test"))

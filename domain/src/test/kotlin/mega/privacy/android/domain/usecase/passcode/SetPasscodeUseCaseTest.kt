@@ -8,7 +8,9 @@ import mega.privacy.android.domain.repository.security.PasscodeRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -110,6 +112,30 @@ class SetPasscodeUseCaseTest {
         )
 
         verify(passcodeRepository).setPasscodeType(expected)
+    }
+
+    @Test
+    internal fun `test that passcode is enabled`() = runTest {
+        underTest(
+            SetPasscodeRequest(
+                PasscodeType.Password, "password"
+            )
+        )
+
+        verify(passcodeRepository).setPasscodeEnabled(true)
+    }
+
+    @Test
+    internal fun `test that passcode is not enabled if the request is rejected`() = runTest {
+        assertThrows<IllegalArgumentException> {
+            underTest(
+                SetPasscodeRequest(
+                    PasscodeType.Password, ""
+                )
+            )
+        }
+
+        verify(passcodeRepository, never()).setPasscodeEnabled(any())
     }
 
     @Test

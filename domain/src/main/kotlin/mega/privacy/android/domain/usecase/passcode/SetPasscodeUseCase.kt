@@ -25,6 +25,7 @@ class SetPasscodeUseCase @Inject constructor(private val passcodeRepository: Pas
 
         passcodeRepository.setPasscodeType(type)
         passcodeRepository.setPasscode(passcode)
+        passcodeRepository.setPasscodeEnabled(true)
     }
 
     private fun verifyType(

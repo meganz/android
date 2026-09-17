@@ -2741,6 +2741,22 @@
     <string name="unlock_pin_title">Enter your passcode</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
     <string name="unlock_pin_title_2">Re-enter your passcode</string>
+    <!-- Title of the screen where the user changes their existing passcode -->
+    <string name="title_change_passcode">Change passcode lock</string>
+    <!-- Title of the screen where the user types the replacement passcode -->
+    <string name="reset_pin_title">Enter your new passcode</string>
+    <!-- Title of the screen where the user types the replacement passcode a second time to confirm it -->
+    <string name="reset_pin_title_2">Re-enter your new passcode</string>
+    <!-- Button which opens the list of passcode formats the user can choose from -->
+    <string name="settings_passcode_option">Passcode options</string>
+    <!-- Passcode format option: a passcode made of four digits -->
+    <string name="four_pin_lock">4 digits</string>
+    <!-- Passcode format option: a passcode made of six digits -->
+    <string name="six_pin_lock">6 digits</string>
+    <!-- Passcode format option: a passcode made of letters and numbers -->
+    <string name="AN_pin_lock">Alphanumeric</string>
+    <!-- Error message shown when the passcode typed to confirm does not match the one typed first -->
+    <string name="pin_lock_not_match">Passcodes did not match. Try again.</string>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">You will be logged out and your offline files will be deleted after 10 failed attempts</string>
     <!-- Button where the user can sign off or logout -->
