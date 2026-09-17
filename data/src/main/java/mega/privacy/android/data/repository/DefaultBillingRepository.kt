@@ -3,7 +3,10 @@ package mega.privacy.android.data.repository
 import android.app.Activity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
@@ -173,8 +176,13 @@ internal class DefaultBillingRepository @Inject constructor(
         }
     }
 
-    override fun monitorDismissedSubscriptionOfferCampaigns(): Flow<Set<Long>> =
-        paymentPreferencesGateway.monitorDismissedSubscriptionOfferCampaigns(megaApiGateway.myUserHandle)
+    override fun monitorDismissedSubscriptionOfferCampaigns(): Flow<Set<Long>> = flow {
+        emitAll(
+            paymentPreferencesGateway.monitorDismissedSubscriptionOfferCampaigns(
+                megaApiGateway.myUserHandle
+            )
+        )
+    }.flowOn(ioDispatcher)
 
     override suspend fun addDismissedSubscriptionOfferCampaign(campaignId: Long) =
         withContext(ioDispatcher) {
@@ -184,8 +192,13 @@ internal class DefaultBillingRepository @Inject constructor(
             )
         }
 
-    override fun monitorDismissedSubscriptionOfferMenuCampaigns(): Flow<Set<Long>> =
-        paymentPreferencesGateway.monitorDismissedSubscriptionOfferMenuCampaigns(megaApiGateway.myUserHandle)
+    override fun monitorDismissedSubscriptionOfferMenuCampaigns(): Flow<Set<Long>> = flow {
+        emitAll(
+            paymentPreferencesGateway.monitorDismissedSubscriptionOfferMenuCampaigns(
+                megaApiGateway.myUserHandle
+            )
+        )
+    }.flowOn(ioDispatcher)
 
     override suspend fun addDismissedSubscriptionOfferMenuCampaign(campaignId: Long) =
         withContext(ioDispatcher) {
