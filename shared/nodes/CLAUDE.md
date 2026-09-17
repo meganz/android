@@ -14,7 +14,7 @@ Packages under `src/main/java/mega/privacy/android/shared/nodes/`:
 - `components/` — Compose UI for node display: `NodesView`, `NodeListView`/`NodeListViewItem`, `NodeGridView`/`NodeGridViewItem`, `NodeViewWithHeader`, `NodeHeaderItem`, `NodeThumbnailView`, `NodeSelectionModeAppBar`, `NodeSkeletons`, `NodeLabelCircle`, `SortBottomSheet`. `components/previewdata/` holds `@Preview` data providers and `NodeUiItemFactory`.
 - `mapper/` — domain→UI mappers (see Key Components).
 - `model/` — UI state and item models plus `NodeHeaderItemViewModel`/`NodeHeaderItemUiState`.
-- `selection/` — multi-selection state holder (`NodeSelectionState`).
+- `selection/` — multi-selection: `NodeSelectionState` (the id set) and `NodeSelection` / `rememberNodeSelection` (binds it to the items on screen: `selectedNodes`, `isAllSelected`, select-all across pages).
 - `dialog/` — shared dialogs: new file (`dialog/newfile/`), new folder (`dialog/newfolder/`), `TakeDownDialog`, `DiscardScanWarningDialog`. The new-file/new-folder dialogs include their own ViewModel + UiState.
 - `sheet/` — bottom sheets such as `PublicLinkAuthAlertBottomSheet`.
 - `extension/` — `NodeIconExt` (node icon resolution helpers).

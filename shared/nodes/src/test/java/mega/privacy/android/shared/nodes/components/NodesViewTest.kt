@@ -44,7 +44,6 @@ class NodesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClicked = {},
                 nodeSelectionState = selectionState,
-                inSelectionMode = selectionState.isInSelectionMode,
             )
         }
     }

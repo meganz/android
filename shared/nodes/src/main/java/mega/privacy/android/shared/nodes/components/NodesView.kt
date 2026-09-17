@@ -208,12 +208,19 @@ fun <T : TypedNode> NodesView(
     showChangeViewType: Boolean = true,
     showSortOrder: Boolean = true,
     showMediaDiscoveryButton: Boolean = false,
-    inSelectionMode: Boolean = false,
+    inSelectionMode: Boolean = nodeSelectionState.isInSelectionMode,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     bannerHeader: (@Composable () -> Unit)? = null,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
+    val onNodeClicked: (T) -> Unit = { node ->
+        if (node.isTakenDown && node !is FolderNode) {
+            showTakenDownDialog = true
+        } else {
+            onItemClicked(node)
+        }
+    }
 
     val highlightedIndex = remember(items) {
         items.indexOfFirst { it.isHighlighted }
@@ -245,13 +252,7 @@ fun <T : TypedNode> NodesView(
             nodeSelectionState = nodeSelectionState,
             isNextPageLoading = isNextPageLoading,
             onMenuClick = onMenuClicked,
-            onItemClicked = {
-                if (it.isTakenDown && it !is FolderNode) {
-                    showTakenDownDialog = true
-                } else {
-                    onItemClicked(it)
-                }
-            },
+            onItemClicked = onNodeClicked,
             onLongClick = onLongClicked,
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             sortConfiguration = sortConfiguration,
@@ -274,13 +275,7 @@ fun <T : TypedNode> NodesView(
             nodeSelectionState = nodeSelectionState,
             isNextPageLoading = isNextPageLoading,
             onMenuClicked = onMenuClicked,
-            onItemClicked = {
-                if (it.isTakenDown && it !is FolderNode) {
-                    showTakenDownDialog = true
-                } else {
-                    onItemClicked(it)
-                }
-            },
+            onItemClicked = onNodeClicked,
             onLongClicked = onLongClicked,
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             spanCount = spanCount,
