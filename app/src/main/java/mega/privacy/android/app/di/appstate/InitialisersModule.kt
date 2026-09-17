@@ -9,6 +9,7 @@ import mega.privacy.android.app.appstate.global.initialisation.appstart.FileServ
 import mega.privacy.android.app.appstate.global.initialisation.appstart.DownloadOverQuotaInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appstart.MigrateVideoPlaybackInfoInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appstart.StreamOverQuotaInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.appstart.TransferQuotaStateInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CheckBusinessStatusInitialiser
@@ -214,6 +215,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideStreamOverQuotaInitialiser(initialiser: StreamOverQuotaInitialiser): AppStartInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideTransferQuotaStateInitialiser(initialiser: TransferQuotaStateInitialiser): AppStartInitialiser =
         initialiser
 
     @Provides
