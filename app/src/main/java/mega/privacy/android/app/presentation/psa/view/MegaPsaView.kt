@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -166,18 +167,19 @@ private fun MegaPsaViewContent(
 }
 
 @Composable
-private fun MegaButtonRow(
+internal fun MegaButtonRow(
     positiveButton: @Composable (() -> Unit)?,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val horizontalArrangement =
         if (positiveButton == null) Arrangement.Start else Arrangement.SpaceAround
-    Row(
+    FlowRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(top = 22.dp, bottom = 16.dp),
         horizontalArrangement = horizontalArrangement,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         positiveButton?.invoke()
 

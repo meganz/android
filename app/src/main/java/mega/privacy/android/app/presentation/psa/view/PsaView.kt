@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.psa.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -175,18 +176,19 @@ private fun PsaViewContent(
 }
 
 @Composable
-private fun ButtonRow(
+internal fun ButtonRow(
     positiveButton: @Composable (() -> Unit)?,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val horizontalArrangement =
         if (positiveButton == null) Arrangement.Start else Arrangement.SpaceAround
-    Row(
+    FlowRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(top = 22.dp, bottom = 16.dp),
         horizontalArrangement = horizontalArrangement,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         positiveButton?.invoke()
 
