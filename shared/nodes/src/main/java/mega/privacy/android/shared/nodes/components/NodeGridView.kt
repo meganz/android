@@ -61,7 +61,6 @@ internal fun <T : TypedNode> NodeGridView(
     showChangeViewType: Boolean = true,
     inSelectionMode: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
-    bannerHeader: (@Composable () -> Unit)? = null,
 ) {
     FastScrollLazyVerticalGrid(
         state = gridState,
@@ -74,15 +73,6 @@ internal fun <T : TypedNode> NodeGridView(
         verticalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
         contentPadding = listContentPadding
     ) {
-        if (bannerHeader != null) {
-            item(
-                key = "bannerHeader",
-                span = { GridItemSpan(currentLineSpan = spanCount) }
-            ) {
-                bannerHeader()
-            }
-        }
-
         if (showSortOrder || showChangeViewType) {
             item(
                 key = "header",

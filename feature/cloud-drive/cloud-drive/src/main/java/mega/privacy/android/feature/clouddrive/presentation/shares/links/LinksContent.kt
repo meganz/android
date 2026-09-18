@@ -50,7 +50,7 @@ fun LinksContent(
     onSortOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showNodeHeader: Boolean = true,
+    isActive: Boolean = true,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
@@ -68,7 +68,6 @@ fun LinksContent(
                 NodesViewSkeleton(
                     isListView = isListView,
                     spanCount = spanCount,
-                    contentPadding = PaddingValues(top = 12.dp),
                     delay = NodeSkeletons.defaultDelay,
                 )
             }
@@ -82,7 +81,7 @@ fun LinksContent(
 
             else -> {
                 ScrollToHideNodeHeaderItem(
-                    visible = showNodeHeader,
+                    isActive = isActive,
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = { onAction(LinksAction.ChangeViewTypeClicked) },
                     sortConfiguration = uiState.selectedSortConfiguration,
@@ -93,10 +92,7 @@ fun LinksContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    listContentPadding = PaddingValues(
-                        top = 12.dp,
-                        bottom = contentPadding.calculateSafeBottomPadding()
-                    ),
+                    listContentPadding = PaddingValues(bottom = contentPadding.calculateSafeBottomPadding()),
                     listState = listState,
                     gridState = gridState,
                     spanCount = spanCount,
@@ -109,10 +105,8 @@ fun LinksContent(
                     onLongClicked = { onAction(LinksAction.ItemLongClicked(it)) },
                     sortConfiguration = uiState.selectedSortConfiguration,
                     isListView = isListView,
-                    onSortOrderClick = onSortOrderClick,
                     showSortOrder = false,
                     showChangeViewType = false,
-                    onChangeViewTypeClicked = { onAction(LinksAction.ChangeViewTypeClicked) },
                     inSelectionMode = uiState.isInSelectionMode,
                 )
             }

@@ -59,7 +59,7 @@ import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NewFolderDialogNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
-import mega.privacy.android.shared.nodes.dialog.newfolder.rememberNewFolderResult
+import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderResultEffect
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -171,7 +171,7 @@ internal fun ExplorerScreen(
 
     BackHandler(enabled = showSearch) { onCloseSearch() }
 
-    rememberNewFolderResult(
+    NewFolderResultEffect(
         monitorResult = monitorResult,
         clearResult = clearResult,
         onFolderCreated = { folderId ->

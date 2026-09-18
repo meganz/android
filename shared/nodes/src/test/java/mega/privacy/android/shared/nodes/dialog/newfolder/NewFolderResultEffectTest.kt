@@ -13,7 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class RememberNewFolderResultTest {
+class NewFolderResultEffectTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -27,7 +27,7 @@ class RememberNewFolderResultTest {
         }
 
         composeTestRule.setContent {
-            rememberNewFolderResult(
+            NewFolderResultEffect(
                 monitorResult = monitorResult,
                 clearResult = { clearedKey = it },
                 onFolderCreated = { createdNode = it },
@@ -44,7 +44,7 @@ class RememberNewFolderResultTest {
         var clearedKey: String? = null
 
         composeTestRule.setContent {
-            rememberNewFolderResult(
+            NewFolderResultEffect(
                 monitorResult = { emptyFlow() },
                 clearResult = { clearedKey = it },
                 onFolderCreated = { createdNode = it },

@@ -23,7 +23,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,6 +34,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.banner.InlineErrorBanner
 import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
@@ -77,7 +77,7 @@ import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
-import mega.privacy.android.shared.nodes.dialog.newfolder.rememberNewFolderResult
+import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderResultEffect
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.selection.NodeSelection
@@ -113,7 +113,7 @@ internal fun CloudDriveContent(
     navigateToFolder: (TypedFolderNode, NodeSourceType) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
-    showNodeHeader: Boolean = true,
+    isActive: Boolean = true,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
     onPrepareScanDocument: () -> Unit = {},
@@ -122,26 +122,11 @@ internal fun CloudDriveContent(
     val overQuotaUiState by overQuotaStatusViewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val resources = LocalResources.current
     val snackbarHostState = LocalSnackBarHostState.current
     val megaResultContract = rememberMegaResultContract()
     val megaNavigator = rememberMegaNavigator()
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     val uploadUrisEventState = rememberUploadUrisEventState()
-
-    rememberNewFolderResult(
-        monitorResult = navigationHandler::monitorResult,
-        clearResult = navigationHandler::clearResult,
-        onFolderCreated = { folderId ->
-            navigationHandler.navigate(
-                CloudDriveNavKey(
-                    nodeHandle = folderId.longValue,
-                    nodeSourceType = uiState.nodeSourceType
-                )
-            )
-        },
-    )
-
     val captureHandler = rememberCaptureHandler(
         onPhotoCaptured = { uri ->
             pitagTrigger = PitagTrigger.CameraCapture
@@ -181,8 +166,6 @@ internal fun CloudDriveContent(
         } ?: false
         val inactivityBannerData = (uiState as? CloudDriveUiState.Data)
             ?.takeIf { it.showInactivityBanner && !selection.isInSelectionMode }
-        val topPadding =
-            if ((showContactVerificationBanner || inactivityBannerData != null || isTabContent) && !showOverQuotaWarning) 12.dp else 0.dp
 
         if (showContactVerificationBanner) {
             UnverifiedContactShareBanner(
@@ -225,7 +208,6 @@ internal fun CloudDriveContent(
                 NodesViewSkeleton(
                     isListView = isListView,
                     spanCount = spanCount,
-                    contentPadding = PaddingValues(top = topPadding),
                     delay = NodeSkeletons.defaultDelay,
                 )
             }
@@ -272,8 +254,17 @@ internal fun CloudDriveContent(
                         )
                     }
 
+                    if (showOverQuotaWarning) {
+                        OverQuotaWarningBanner(
+                            overQuotaUiState.overQuotaStatus,
+                            onDismissed = { overQuotaStatusViewModel.dismissWarning() },
+                            onUpgradeClicked = { megaNavigator.openUpgradeAccount(context) },
+                            modifier = Modifier.applyScrollToHideBehavior(contributesHeight = isActive),
+                        )
+                    }
+
                     ScrollToHideNodeHeaderItem(
-                        visible = showNodeHeader,
+                        isActive = isActive,
                         onSortOrderClick = onSortOrderClick,
                         onChangeViewTypeClick = onChangeViewTypeClick,
                         onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
@@ -286,11 +277,7 @@ internal fun CloudDriveContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-
-                        listContentPadding = PaddingValues(
-                            top = topPadding,
-                            bottom = contentPadding.calculateSafeBottomPadding()
-                        ),
+                        listContentPadding = PaddingValues(bottom = contentPadding.calculateSafeBottomPadding()),
                         listState = listState,
                         gridState = gridState,
                         spanCount = spanCount,
@@ -319,25 +306,8 @@ internal fun CloudDriveContent(
                         onLongClicked = { selection.toggle(it.id) },
                         sortConfiguration = uiState.selectedSortConfiguration,
                         isListView = isListView,
-                        onSortOrderClick = onSortOrderClick,
-                        onChangeViewTypeClicked = onChangeViewTypeClick,
                         showSortOrder = false,
                         showChangeViewType = false,
-                        showMediaDiscoveryButton = uiState.isMediaDiscoveryAllowed,
-                        onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                        bannerHeader = if (showOverQuotaWarning) {
-                            {
-                                OverQuotaWarningBanner(
-                                    overQuotaUiState.overQuotaStatus,
-                                    onDismissed = {
-                                        overQuotaStatusViewModel.dismissWarning()
-                                    },
-                                    onUpgradeClicked = {
-                                        megaNavigator.openUpgradeAccount(context)
-                                    },
-                                )
-                            }
-                        } else null,
                         nodeSelectionState = selection.state,
                     )
 
@@ -353,7 +323,6 @@ internal fun CloudDriveContent(
                             onNavigate = navigationHandler::navigate,
                         )
                     }
-
                 }
 
                 EventEffect(
@@ -362,8 +331,6 @@ internal fun CloudDriveContent(
                 ) {
                     onNavigateBack()
                 }
-
-
 
                 UploadingFiles(
                     nameCollisionLauncher = nameCollisionLauncher,
@@ -374,7 +341,6 @@ internal fun CloudDriveContent(
                     onStartUpload = { transferTriggerEvent ->
                         onTransfer(transferTriggerEvent)
                         pitagTrigger = PitagTrigger.NotApplicable
-
                     },
                 )
 
@@ -421,7 +387,6 @@ internal fun CloudDriveContent(
                     )
                 }
 
-
                 if (showSortBottomSheet) {
                     SortBottomSheet(
                         title = stringResource(sharedR.string.action_sort_by_header),
@@ -450,8 +415,20 @@ internal fun CloudDriveContent(
                 }
             }
         }
-
     }
+
+    NewFolderResultEffect(
+        monitorResult = navigationHandler::monitorResult,
+        clearResult = navigationHandler::clearResult,
+        onFolderCreated = { folderId ->
+            navigationHandler.navigate(
+                CloudDriveNavKey(
+                    nodeHandle = folderId.longValue,
+                    nodeSourceType = uiState.nodeSourceType
+                )
+            )
+        },
+    )
 }
 
 /**

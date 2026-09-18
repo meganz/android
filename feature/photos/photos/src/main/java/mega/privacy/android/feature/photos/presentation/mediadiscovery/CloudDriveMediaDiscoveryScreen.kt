@@ -105,7 +105,7 @@ import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
-import mega.privacy.android.shared.nodes.dialog.newfolder.rememberNewFolderResult
+import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderResultEffect
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as sharedR
@@ -150,7 +150,7 @@ fun CloudDriveMediaDiscoveryRoute(
     val uploadUrisEventState = rememberUploadUrisEventState()
     val parentId = NodeId(viewModel.folderId)
 
-    rememberNewFolderResult(
+    NewFolderResultEffect(
         monitorResult = navigationHandler::monitorResult,
         clearResult = navigationHandler::clearResult,
         onFolderCreated = { folderId ->

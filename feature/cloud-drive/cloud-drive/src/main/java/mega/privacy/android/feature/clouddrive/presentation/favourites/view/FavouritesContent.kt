@@ -49,6 +49,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
@@ -98,7 +99,6 @@ internal fun FavouritesContent(
                 NodesViewSkeleton(
                     isListView = isListView,
                     spanCount = spanCount,
-                    contentPadding = PaddingValues(top = 12.dp),
                     delay = NodeSkeletons.defaultDelay,
                 )
             }
@@ -111,43 +111,50 @@ internal fun FavouritesContent(
                 )
             }
 
-            else -> NodesView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                listContentPadding = PaddingValues(
-                    bottom = contentPadding.calculateSafeBottomPadding(),
-                ),
-                listState = listState,
-                gridState = gridState,
-                spanCount = spanCount,
-                items = uiState.items,
-                isNextPageLoading = false,
-                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                // Sensitive nodes are already excluded at fetch when required, so never re-filter here
-                showHiddenNodes = true,
-                onMenuClicked = {
-                    showNodeOptionsBottomSheet(
-                        NodeOptionsBottomSheetNavKey(
-                            nodeHandle = it.id.longValue,
-                            nodeSourceType = NodeSourceType.FAVOURITES
+            else -> {
+                ScrollToHideNodeHeaderItem(
+                    onSortOrderClick = { showSortBottomSheet = true },
+                    onChangeViewTypeClick = {
+                        Analytics.tracker.trackEvent(ViewModeButtonPressedEvent)
+                        onAction(ChangeViewTypeClicked)
+                    },
+                    sortConfiguration = uiState.selectedSortConfiguration,
+                    isListView = isListView,
+                )
+
+                NodesView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    listContentPadding = PaddingValues(
+                        bottom = contentPadding.calculateSafeBottomPadding(),
+                    ),
+                    listState = listState,
+                    gridState = gridState,
+                    spanCount = spanCount,
+                    items = uiState.items,
+                    isNextPageLoading = false,
+                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                    // Sensitive nodes are already excluded at fetch when required, so never re-filter here
+                    showHiddenNodes = true,
+                    onMenuClicked = {
+                        showNodeOptionsBottomSheet(
+                            NodeOptionsBottomSheetNavKey(
+                                nodeHandle = it.id.longValue,
+                                nodeSourceType = NodeSourceType.FAVOURITES
+                            )
                         )
-                    )
-                },
-                onItemClicked = { onAction(ItemClicked(it)) },
-                onLongClicked = { onAction(ItemLongClicked(it)) },
-                sortConfiguration = uiState.selectedSortConfiguration,
-                isListView = isListView,
-                onSortOrderClick = { showSortBottomSheet = true },
-                onChangeViewTypeClicked = {
-                    Analytics.tracker.trackEvent(ViewModeButtonPressedEvent)
-                    onAction(ChangeViewTypeClicked)
-                },
-                showMediaDiscoveryButton = false,
-                onEnterMediaDiscoveryClick = {},
-                inSelectionMode = uiState.isInSelectionMode,
-                isContactVerificationOn = false
-            )
+                    },
+                    onItemClicked = { onAction(ItemClicked(it)) },
+                    onLongClicked = { onAction(ItemLongClicked(it)) },
+                    sortConfiguration = uiState.selectedSortConfiguration,
+                    isListView = isListView,
+                    showSortOrder = false,
+                    showChangeViewType = false,
+                    inSelectionMode = uiState.isInSelectionMode,
+                    isContactVerificationOn = false
+                )
+            }
         }
 
         EventEffect(

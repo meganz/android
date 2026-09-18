@@ -17,7 +17,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
@@ -25,7 +24,6 @@ import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.rememberScrollUpVisibility
 import mega.privacy.android.feature.clouddrive.presentation.shares.contactshares.model.ContactSharedFoldersUiState
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
@@ -64,14 +62,10 @@ internal fun ContactSharedFoldersScreen(
 
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-    val scrollToHideBehavior = rememberScrollToHideBehavior()
-    val showNodeHeader = rememberScrollUpVisibility(scrollToHideBehavior)
-
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        scrollToHideBehavior = scrollToHideBehavior,
         topBar = {
             if (isInSelectionMode) {
                 NodeSelectionModeAppBar(
@@ -119,7 +113,6 @@ internal fun ContactSharedFoldersScreen(
             onAction = onIncomingShareAction,
             onShowNodeOptions = onShowNodeOptions,
             onSortOrderClick = { showSortBottomSheet = true },
-            showNodeHeader = showNodeHeader,
             contentPadding = paddingValues,
         )
     }

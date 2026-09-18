@@ -36,6 +36,7 @@ import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
@@ -54,7 +55,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveEmptyView
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.rememberScrollUpVisibility
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trackAnalyticsEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
@@ -128,7 +128,6 @@ internal fun FolderLinkScreen(
     )
 
     val scrollToHideBehavior = rememberScrollToHideBehavior()
-    val showNodeHeader = rememberScrollUpVisibility(scrollToHideBehavior)
 
     // Folders open within this screen, so the new folder starts at the top of an unscrolled list
     LaunchedEffect(uiState.currentFolderNode?.id) {
@@ -248,7 +247,6 @@ internal fun FolderLinkScreen(
         FolderLinkContent(
             uiState = uiState,
             isListView = isListView,
-            showNodeHeader = showNodeHeader,
             spanCount = spanCount,
             onNavigate = onNavigate,
             onAction = { action ->
@@ -344,7 +342,6 @@ internal fun FolderLinkContent(
     onLoginClicked: () -> Unit,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
-    showNodeHeader: Boolean = true,
     onShowSortBottomSheet: () -> Unit = {},
 ) {
     Column(modifier = modifier) {
@@ -391,8 +388,18 @@ internal fun FolderLinkContent(
 
             FolderLinkContentState.Loaded -> {
                 if (uiState.items.isNotEmpty()) {
+                    if (uiState.showGuestBanner) {
+                        FolderLinkGuestBanner(
+                            onCreateAccountClicked = onCreateAccountClicked,
+                            onLoginClicked = onLoginClicked,
+                            onDismissClicked = { onAction(FolderLinkAction.GuestBannerDismissed) },
+                            modifier = Modifier
+                                .applyScrollToHideBehavior()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                    }
+
                     ScrollToHideNodeHeaderItem(
-                        visible = showNodeHeader,
                         onSortOrderClick = onShowSortBottomSheet,
                         onChangeViewTypeClick = {
                             onAction(FolderLinkAction.ChangeViewTypeClicked)
@@ -451,28 +458,9 @@ internal fun FolderLinkContent(
                                 onLongClicked = { onAction(FolderLinkAction.ItemLongClicked(it)) },
                                 sortConfiguration = uiState.selectedSortConfiguration,
                                 isListView = isListView,
-                                onSortOrderClick = onShowSortBottomSheet,
-                                onChangeViewTypeClicked = {
-                                    onAction(FolderLinkAction.ChangeViewTypeClicked)
-                                },
                                 showSortOrder = false,
                                 showChangeViewType = false,
-                                showMediaDiscoveryButton = uiState.hasMediaItems,
-                                onEnterMediaDiscoveryClick = onMediaDiscoveryClicked,
                                 inSelectionMode = uiState.isInSelectionMode,
-                                bannerHeader = {
-                                    if (uiState.showGuestBanner) {
-                                        FolderLinkGuestBanner(
-                                            onCreateAccountClicked = onCreateAccountClicked,
-                                            onLoginClicked = onLoginClicked,
-                                            onDismissClicked = { onAction(FolderLinkAction.GuestBannerDismissed) },
-                                            modifier = Modifier.padding(
-                                                horizontal = 16.dp,
-                                                vertical = 8.dp
-                                            ),
-                                        )
-                                    }
-                                }
                             )
                         }
                     }

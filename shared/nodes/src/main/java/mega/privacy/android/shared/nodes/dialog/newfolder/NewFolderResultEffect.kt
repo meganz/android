@@ -15,7 +15,7 @@ import mega.privacy.android.navigation.destination.NewFolderDialogNavKey
  * untyped `NavigationHandler.monitorResult` channel.
  */
 @Composable
-fun rememberNewFolderResult(
+fun NewFolderResultEffect(
     monitorResult: (String) -> Flow<Any?>,
     clearResult: (String) -> Unit,
     onFolderCreated: (NodeId) -> Unit,

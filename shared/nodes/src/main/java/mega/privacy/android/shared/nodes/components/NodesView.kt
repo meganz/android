@@ -63,8 +63,8 @@ fun <T : TypedNode> NodesView(
     onLongClicked: (NodeUiItem<T>) -> Unit,
     sortConfiguration: NodeSortConfiguration,
     isListView: Boolean,
-    onSortOrderClick: () -> Unit,
-    onChangeViewTypeClicked: () -> Unit,
+    onSortOrderClick: () -> Unit = {},
+    onChangeViewTypeClicked: () -> Unit = {},
     modifier: Modifier = Modifier,
     isNextPageLoading: Boolean = false,
     listState: LazyListState = rememberLazyListState(),
@@ -80,7 +80,6 @@ fun <T : TypedNode> NodesView(
     isContactVerificationOn: Boolean = false,
     inSelectionMode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
-    bannerHeader: (@Composable () -> Unit)? = null,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val initialSelectedIds = remember {
@@ -153,7 +152,6 @@ fun <T : TypedNode> NodesView(
         showMediaDiscoveryButton = showMediaDiscoveryButton,
         inSelectionMode = inSelectionMode,
         onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-        bannerHeader = bannerHeader,
         listContentPadding = listContentPadding,
         nodeSelectionState = nodeSelectionState,
     )
@@ -183,7 +181,6 @@ fun <T : TypedNode> NodesView(
  * @param onEnterMediaDiscoveryClick callback for enter media discovery click
  * @param listContentPadding the content padding of the list/lazyColumn
  * @param inSelectionMode whether to show selection mode
- * @param bannerHeader the header to show at the top of the list
  * @param nodeSelectionState the state of the selection
  * @param highlightText the text to highlight in the title and description
  */
@@ -195,8 +192,8 @@ fun <T : TypedNode> NodesView(
     onLongClicked: (T) -> Unit,
     sortConfiguration: NodeSortConfiguration,
     isListView: Boolean,
-    onSortOrderClick: () -> Unit,
-    onChangeViewTypeClicked: () -> Unit,
+    onSortOrderClick: () -> Unit = {},
+    onChangeViewTypeClicked: () -> Unit = {},
     nodeSelectionState: NodeSelectionState,
     modifier: Modifier = Modifier,
     isNextPageLoading: Boolean = false,
@@ -210,7 +207,6 @@ fun <T : TypedNode> NodesView(
     showMediaDiscoveryButton: Boolean = false,
     inSelectionMode: Boolean = nodeSelectionState.isInSelectionMode,
     onEnterMediaDiscoveryClick: () -> Unit = {},
-    bannerHeader: (@Composable () -> Unit)? = null,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
@@ -265,7 +261,6 @@ fun <T : TypedNode> NodesView(
             listState = listState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             inSelectionMode = inSelectionMode,
-            bannerHeader = bannerHeader,
         )
     } else {
         NodeGridView(
@@ -288,7 +283,6 @@ fun <T : TypedNode> NodesView(
             gridState = gridState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             inSelectionMode = inSelectionMode,
-            bannerHeader = bannerHeader,
         )
     }
 

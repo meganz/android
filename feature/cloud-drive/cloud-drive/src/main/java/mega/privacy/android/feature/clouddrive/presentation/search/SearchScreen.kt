@@ -16,7 +16,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
@@ -45,6 +44,7 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
@@ -140,16 +140,23 @@ fun SearchScreen(
         },
         loadingContent = {
             NodesViewSkeleton(
-                contentPadding = PaddingValues(top = 8.dp),
                 isListView = isListView,
                 spanCount = spanCount,
             )
         },
     ) { contentPadding ->
+        ScrollToHideNodeHeaderItem(
+            onSortOrderClick = { showSortBottomSheet = true },
+            onChangeViewTypeClick = {
+                viewModel.processAction(SearchUiAction.ChangeViewTypeClicked)
+            },
+            sortConfiguration = uiState.selectedSortConfiguration,
+            isListView = isListView,
+        )
+
         NodesView(
             modifier = Modifier.fillMaxWidth(),
             listContentPadding = PaddingValues(
-                top = 8.dp,
                 bottom = contentPadding.calculateSafeBottomPadding()
             ),
             spanCount = spanCount,
@@ -176,12 +183,8 @@ fun SearchScreen(
             },
             sortConfiguration = uiState.selectedSortConfiguration,
             isListView = isListView,
-            onSortOrderClick = { showSortBottomSheet = true },
-            onChangeViewTypeClicked = {
-                viewModel.processAction(SearchUiAction.ChangeViewTypeClicked)
-            },
-            showMediaDiscoveryButton = false,
-            onEnterMediaDiscoveryClick = { /* No-op */ },
+            showSortOrder = false,
+            showChangeViewType = false,
             inSelectionMode = uiState.isInSelectionMode,
             isContactVerificationOn = uiState.isContactVerificationOn
         )

@@ -28,7 +28,6 @@ import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludeTopPadding
-import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
@@ -45,7 +44,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.rememberScrollUpVisibility
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncListTabFab
 import mega.privacy.android.feature.sync.ui.synclist.rememberSyncListFabState
@@ -60,9 +58,9 @@ import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
-import mega.privacy.android.navigation.destination.SyncStalledIssueResolutionNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SyncSettingsNavKey
+import mega.privacy.android.navigation.destination.SyncStalledIssueResolutionNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
@@ -141,14 +139,10 @@ internal fun DriveSyncScreen(
         AppBarNavigationType.None
     }
 
-    val scrollToHideBehavior = rememberScrollToHideBehavior()
-    val showNodeHeader = rememberScrollUpVisibility(scrollToHideBehavior)
-
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        scrollToHideBehavior = scrollToHideBehavior,
         topBar = {
             when (val state = cloudDriveUiState) {
                 is CloudDriveUiState.Loading -> {
@@ -261,10 +255,10 @@ internal fun DriveSyncScreen(
                         title = stringResource(sharedR.string.general_section_cloud_drive),
                         testTag = DRIVE_SYNCS_CLOUD_DRIVE_TAB_TAG
                     ),
-                ) { _, modifier ->
+                ) { isActive, modifier ->
                     CloudDriveContent(
                         isTabContent = true,
-                        showNodeHeader = showNodeHeader,
+                        isActive = isActive,
                         navigationHandler = navigationHandler,
                         contentPadding = paddingValues.excludeTopPadding(),
                         uiState = cloudDriveUiState,

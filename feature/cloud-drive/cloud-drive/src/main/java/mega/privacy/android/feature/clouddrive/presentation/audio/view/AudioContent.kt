@@ -42,6 +42,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
@@ -85,7 +86,6 @@ internal fun AudioContent(
                 NodesViewSkeleton(
                     isListView = isListView,
                     spanCount = spanCount,
-                    contentPadding = PaddingValues(top = 12.dp),
                     delay = NodeSkeletons.defaultDelay,
                 )
             }
@@ -98,45 +98,52 @@ internal fun AudioContent(
                     )
                 }
 
-                else -> NodesView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    listContentPadding = PaddingValues(
-                        bottom = contentPadding.calculateSafeBottomPadding(),
-                    ),
-                    listState = listState,
-                    gridState = gridState,
-                    spanCount = spanCount,
-                    items = uiState.items,
-                    isNextPageLoading = false,
-                    onMenuClicked = {
-                        showNodeOptionsBottomSheet(
-                            NodeOptionsBottomSheetNavKey(
-                                nodeHandle = it.id.longValue,
-                                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                else -> {
+                    ScrollToHideNodeHeaderItem(
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        onChangeViewTypeClick = {
+                            Analytics.tracker.trackEvent(ViewModeButtonPressedEvent)
+                            onAction(ChangeViewTypeClicked)
+                        },
+                        sortConfiguration = uiState.selectedSortConfiguration,
+                        isListView = isListView,
+                    )
+
+                    NodesView(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        listContentPadding = PaddingValues(
+                            bottom = contentPadding.calculateSafeBottomPadding(),
+                        ),
+                        listState = listState,
+                        gridState = gridState,
+                        spanCount = spanCount,
+                        items = uiState.items,
+                        isNextPageLoading = false,
+                        onMenuClicked = {
+                            showNodeOptionsBottomSheet(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = it.id.longValue,
+                                    nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                                )
                             )
-                        )
-                    },
-                    onItemClicked = {
-                        if (selection.isInSelectionMode) {
-                            selection.toggle(it.id)
-                        } else {
-                            onAction(ItemClicked(it))
-                        }
-                    },
-                    onLongClicked = { selection.toggle(it.id) },
-                    sortConfiguration = uiState.selectedSortConfiguration,
-                    isListView = isListView,
-                    onSortOrderClick = { showSortBottomSheet = true },
-                    onChangeViewTypeClicked = {
-                        Analytics.tracker.trackEvent(ViewModeButtonPressedEvent)
-                        onAction(ChangeViewTypeClicked)
-                    },
-                    showMediaDiscoveryButton = false,
-                    onEnterMediaDiscoveryClick = {},
-                    nodeSelectionState = selection.state,
-                )
+                        },
+                        onItemClicked = {
+                            if (selection.isInSelectionMode) {
+                                selection.toggle(it.id)
+                            } else {
+                                onAction(ItemClicked(it))
+                            }
+                        },
+                        onLongClicked = { selection.toggle(it.id) },
+                        sortConfiguration = uiState.selectedSortConfiguration,
+                        isListView = isListView,
+                        showSortOrder = false,
+                        showChangeViewType = false,
+                        nodeSelectionState = selection.state,
+                    )
+                }
             }
         }
 

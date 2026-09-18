@@ -42,7 +42,7 @@ fun IncomingSharesContent(
     onSortOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showNodeHeader: Boolean = true,
+    isActive: Boolean = true,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
@@ -58,7 +58,6 @@ fun IncomingSharesContent(
                 NodesViewSkeleton(
                     isListView = isListView,
                     spanCount = spanCount,
-                    contentPadding = PaddingValues(top = 12.dp),
                     delay = NodeSkeletons.defaultDelay,
                 )
             }
@@ -72,7 +71,7 @@ fun IncomingSharesContent(
 
             else -> {
                 ScrollToHideNodeHeaderItem(
-                    visible = showNodeHeader,
+                    isActive = isActive,
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = { onAction(IncomingSharesAction.ChangeViewTypeClicked) },
                     sortConfiguration = uiState.selectedSortConfiguration,
@@ -83,10 +82,7 @@ fun IncomingSharesContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    listContentPadding = PaddingValues(
-                        top = 12.dp,
-                        bottom = contentPadding.calculateSafeBottomPadding(),
-                    ),
+                    listContentPadding = PaddingValues(bottom = contentPadding.calculateSafeBottomPadding()),
                     listState = listState,
                     gridState = gridState,
                     spanCount = spanCount,
@@ -99,10 +95,8 @@ fun IncomingSharesContent(
                     onLongClicked = { onAction(IncomingSharesAction.ItemLongClicked(it)) },
                     sortConfiguration = uiState.selectedSortConfiguration,
                     isListView = isListView,
-                    onSortOrderClick = onSortOrderClick,
                     showSortOrder = false,
                     showChangeViewType = false,
-                    onChangeViewTypeClicked = { onAction(IncomingSharesAction.ChangeViewTypeClicked) },
                     inSelectionMode = uiState.isInSelectionMode,
                 )
             }
