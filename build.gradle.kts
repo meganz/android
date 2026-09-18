@@ -84,6 +84,39 @@ allprojects {
     }
 }
 
+/**
+ * Which modules CI has to verify for a given merge request.
+ *
+ * Paths listed here are the ones whose blast radius is the whole build; everything else is either
+ * owned by a declared module or, if it belongs to no module at all, forces a full run anyway. That
+ * fail-safe is deliberate: selecting too many modules only costs time, while selecting too few
+ * silently skips tests that would have failed.
+ *
+ * AffectedModulesConfigTest in build-logic keeps this list honest against the repository layout.
+ */
+affectedModules {
+    targetBranch = "develop"
+    alwaysFullPaths = listOf(
+        ".gitattributes",
+        ".gitlab-ci.yml",
+        ".gitmodules",
+        "build-logic",
+        "build.gradle.kts",
+        "buildSrc",
+        "custom_lint.xml",
+        "gradle",
+        "gradle.properties",
+        "gradlew",
+        "gradlew.bat",
+        "jenkinsfile",
+        "settings.gradle.kts",
+        "tools",
+    )
+    releaseBranchPrefixes = listOf("release/")
+    excludedModules = listOf(":baselineprofile")
+    narrowableResourceModules = listOf(":resources:string-resources")
+}
+
 tasks.register("clean", Delete::class) {
     delete(rootProject.layout.buildDirectory.get())
 }

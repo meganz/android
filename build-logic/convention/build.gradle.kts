@@ -10,6 +10,10 @@ dependencies {
     compileOnly(kotlin("stdlib"))
     compileOnly(gradleApi())
     testImplementation(testlib.truth)
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.junit.jupiter.api)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 gradlePlugin {
@@ -117,3 +121,7 @@ gradlePlugin {
     }
 }
 
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
