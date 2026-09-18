@@ -90,8 +90,11 @@ internal class FileLinkViewModel @AssistedInject constructor(
                         runCatching { ThumbnailUriRequest(UriPath.fromFile(File(path))) }.getOrNull()
                     }
                     val autoOpenPreview = pendingFileLinkPreviewAutoOpen.consume()
+                    // For a link opened without its decryption key, [url] is the full one
+                    // rebuilt from the typed key, so it replaces the url in state.
                     _uiState.update {
                         it.copy(
+                            url = url,
                             contentState = FileLinkContentState.Loaded(
                                 iconRes = iconRes,
                                 thumbnailData = thumbnailData,

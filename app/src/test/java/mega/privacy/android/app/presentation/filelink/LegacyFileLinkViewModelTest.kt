@@ -189,6 +189,43 @@ class LegacyFileLinkViewModelTest {
     }
 
     @Test
+    fun `test that url is updated with the decryption key when decrypt succeeds`() = runTest {
+        val linkWithoutKey = "https://mega.nz/file/abc"
+        val key = "decryptionKey"
+        val linkWithKey = "$linkWithoutKey#$key"
+        val publicNode = mockFileNode()
+        val intent = mock<Intent>()
+        whenever(intent.dataString).thenReturn(linkWithoutKey)
+        whenever(getPublicNodeUseCase(linkWithoutKey))
+            .thenThrow(PublicNodeException.DecryptionKeyRequired())
+        whenever(getPublicNodeUseCase(linkWithKey)).thenReturn(publicNode)
+
+        underTest.state.test {
+            underTest.handleIntent(intent)
+            underTest.decrypt(key)
+            assertThat(expectMostRecentItem().url).isEqualTo(linkWithKey)
+        }
+    }
+
+    @Test
+    fun `test that url is not updated when decrypt fails with an incorrect key`() = runTest {
+        val linkWithoutKey = "https://mega.nz/file/abc"
+        val wrongKey = "wrongKey"
+        val intent = mock<Intent>()
+        whenever(intent.dataString).thenReturn(linkWithoutKey)
+        whenever(getPublicNodeUseCase(linkWithoutKey))
+            .thenThrow(PublicNodeException.DecryptionKeyRequired())
+        whenever(getPublicNodeUseCase("$linkWithoutKey#$wrongKey"))
+            .thenThrow(PublicNodeException.InvalidDecryptionKey())
+
+        underTest.state.test {
+            underTest.handleIntent(intent)
+            underTest.decrypt(wrongKey)
+            assertThat(expectMostRecentItem().url).isEqualTo(linkWithoutKey)
+        }
+    }
+
+    @Test
     fun `test that on getting DecryptionKeyRequired exception askForDecryptionDialog values is set`() =
         runTest {
             val url = "https://mega.co.nz/abc"

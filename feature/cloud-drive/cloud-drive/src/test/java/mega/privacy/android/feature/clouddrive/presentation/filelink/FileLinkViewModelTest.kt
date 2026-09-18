@@ -26,7 +26,6 @@ import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileL
 import mega.privacy.android.navigation.PendingFileLinkPreviewAutoOpen
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -306,7 +305,49 @@ internal class FileLinkViewModelTest {
         }
     }
 
-    @Disabled("Stubbing is incorrect. Possible need to convert icon extension to mapper for mocking")
+    @Test
+    fun `test that url is updated to the link with the key when DecryptionKeyEntered succeeds`() =
+        runTest {
+            val url = "https://mega.nz/file/abc"
+            val key = "decryptionKey"
+            val combined = "$url#$key"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(getPublicNodeUseCase(url))
+                .thenThrow(PublicNodeException.DecryptionKeyRequired())
+            val node = mockFileNode()
+            whenever(getPublicNodeUseCase(combined)).thenReturn(node)
+            initViewModel(uriString = url)
+            advanceUntilIdle()
+
+            underTest.processAction(FileLinkAction.DecryptionKeyEntered(key))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().url).isEqualTo(combined)
+            }
+        }
+
+    @Test
+    fun `test that url is not updated when DecryptionKeyEntered fails with an incorrect key`() =
+        runTest {
+            val url = "https://mega.nz/file/abc"
+            val wrongKey = "wrongKey"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(getPublicNodeUseCase(url))
+                .thenThrow(PublicNodeException.DecryptionKeyRequired())
+            whenever(getPublicNodeUseCase("$url#$wrongKey"))
+                .thenThrow(PublicNodeException.InvalidDecryptionKey())
+            initViewModel(uriString = url)
+            advanceUntilIdle()
+
+            underTest.processAction(FileLinkAction.DecryptionKeyEntered(wrongKey))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().url).isEqualTo(url)
+            }
+        }
+
     @Test
     fun `test that DecryptionKeyEntered combines url and key with hash for new file link format`() =
         runTest {
@@ -316,7 +357,8 @@ internal class FileLinkViewModelTest {
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getPublicNodeUseCase(url))
                 .thenThrow(PublicNodeException.DecryptionKeyRequired())
-            whenever(getPublicNodeUseCase(combined)).thenReturn(mockFileNode())
+            val node = mockFileNode()
+            whenever(getPublicNodeUseCase(combined)).thenReturn(node)
             initViewModel(uriString = url)
             advanceUntilIdle()
 
@@ -330,7 +372,6 @@ internal class FileLinkViewModelTest {
             }
         }
 
-    @Disabled("Stubbing is incorrect. Possible need to convert icon extension to mapper for mocking")
     @Test
     fun `test that DecryptionKeyEntered combines url and key with bang for old file link format`() =
         runTest {
@@ -340,7 +381,8 @@ internal class FileLinkViewModelTest {
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getPublicNodeUseCase(url))
                 .thenThrow(PublicNodeException.DecryptionKeyRequired())
-            whenever(getPublicNodeUseCase(combined)).thenReturn(mockFileNode())
+            val node = mockFileNode()
+            whenever(getPublicNodeUseCase(combined)).thenReturn(node)
             initViewModel(uriString = url)
             advanceUntilIdle()
 

@@ -137,9 +137,9 @@ class LegacyFileLinkViewModel @Inject constructor(
                         originShares = false,
                         fileTypeIconMapper = fileTypeIconMapper
                     )
-                    _state.update {
-                        it.copyWithTypedNode(node, iconResource)
-                    }
+                    // For a link opened without its decryption key, [link] is the full one
+                    // rebuilt after the user typed the key in, so it replaces the url in state.
+                    _state.update { it.copyWithTypedNode(node, iconResource).copy(url = link) }
                     queryAds(node.id.longValue)
                     saveViewedNode(link, node)
                     resetJobInProgressState()
