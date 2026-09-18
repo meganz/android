@@ -40,11 +40,13 @@ class PendingBackStackNavigationHandler(
         Timber.d("PendingBackStackNavigationHandler::init")
         if (hasRootNode.not()) {
             val rootNodeDestinations = removeRootNodeRequiredDestinations()
-            backstack.pending = rootNodeDestinations + backstack.pending
+            backstack.pendingNavigations =
+                rootNodeDestinations.asPendingNavigations() + backstack.pendingNavigations
         }
         if (currentAuthStatus.isLoggedIn.not()) {
             val authRequiredDestinations = replaceAuthRequiredDestinations(initialLoginDestination)
-            backstack.pending = authRequiredDestinations + backstack.pending
+            backstack.pendingNavigations =
+                authRequiredDestinations.asPendingNavigations() + backstack.pendingNavigations
         }
         ensureNotEmpty()
         onPasscodeStateChanged(isPasscodeLocked)
@@ -64,7 +66,9 @@ class PendingBackStackNavigationHandler(
 
     override fun remove(navKey: NavKey) {
         Timber.d("PendingBackStackNavigationHandler::remove $navKey")
-        backstack.pending = backstack.pending.filterNot { it == navKey }
+        backstack.pendingNavigations = backstack.pendingNavigations.mapNotNull { navigation ->
+            navigation.removeDestinations { it == navKey }
+        }
         backstack.remove(navKey)
         ensureNotEmpty()
     }
@@ -76,10 +80,15 @@ class PendingBackStackNavigationHandler(
 
     override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
+        performNavigate(destinations, navOptions?.toPendingNavOptions())
+    }
+
+    private fun performNavigate(destinations: List<NavKey>, navOptions: PendingNavOptions?) {
         if (navOptions?.dropIfAlreadyShown == true && isAlreadyShown(destinations)) {
             Timber.d("Destinations are already on the backstack, dropping navigation")
             return
         }
+        if (deferBehindPasscode(PendingNavigation.Navigate(destinations, navOptions))) return
         applyNavOptions(navOptions, destinations)
         if (backstack.takeLast(destinations.size).containsAll(destinations)) {
             Timber.d("Destinations are already on the backstack")
@@ -89,17 +98,17 @@ class PendingBackStackNavigationHandler(
         val topDestination = destinations.last()
         when {
             topDestination is NoSessionNavKey.Mandatory && isLoggedOut().not() -> {
-                backstack.pending += destinations
+                queueDestinations(destinations)
                 if (backstack.isEmpty()) navigate(defaultLandingScreen)
             }
 
             isLoggedOut() && topDestination !is NoSessionNavKey -> {
-                backstack.pending += destinations
+                queueDestinations(destinations)
                 if (backstack.isEmpty()) backstack.add(defaultLoginDestination)
             }
 
             isLoggedInNoRoot() && topDestination !is NoNodeNavKey -> {
-                backstack.pending += destinations
+                queueDestinations(destinations)
                 val fetchNodesDestinationOrLogin =
                     currentFetchNodesDestinationOrNull(currentAuthStatus) ?: defaultLoginDestination
                 if (backstack.lastOrNull() != fetchNodesDestinationOrLogin) backstack.add(
@@ -135,8 +144,20 @@ class PendingBackStackNavigationHandler(
     }
 
     override fun navigateAndClearBackStack(destination: NavKey, navOptions: NavOptions?) {
+        performNavigateAndClearBackStack(
+            listOf(destination),
+            navOptions?.toPendingNavOptions()
+        )
+    }
+
+    private fun performNavigateAndClearBackStack(
+        destinations: List<NavKey>,
+        navOptions: PendingNavOptions?,
+    ) {
+        val navigation = PendingNavigation.ClearBackStack(destinations, navOptions)
+        if (deferBehindPasscode(navigation)) return
         backstack.clear()
-        navigate(destination, navOptions)
+        performNavigate(destinations, navOptions)
     }
 
     override fun navigateAndClearTo(
@@ -145,8 +166,25 @@ class PendingBackStackNavigationHandler(
         inclusive: Boolean,
         navOptions: NavOptions?,
     ) {
+        performNavigateAndClearTo(
+            destination,
+            newParent,
+            inclusive,
+            navOptions?.toPendingNavOptions()
+        )
+    }
+
+    private fun performNavigateAndClearTo(
+        destinations: List<NavKey>,
+        newParent: NavKey,
+        inclusive: Boolean,
+        navOptions: PendingNavOptions?,
+    ) {
+        val navigation =
+            PendingNavigation.ClearTo(destinations, newParent, inclusive, navOptions)
+        if (deferBehindPasscode(navigation)) return
         removeFromBackStackTo(newParent, inclusive)
-        navigate(destination, navOptions)
+        performNavigate(destinations, navOptions)
     }
 
     override fun <T> returnResult(key: String, value: T) {
@@ -216,6 +254,7 @@ class PendingBackStackNavigationHandler(
             if (backstack.contains(passcodeDestination)) {
                 backstack.removeAll { it == passcodeDestination }
                 ensureNotEmpty()
+                navigateToPendingScreens()
             }
         }
     }
@@ -223,7 +262,7 @@ class PendingBackStackNavigationHandler(
     fun displayDialog(dialogDestination: NavKey) {
         if (backstack.base.isEmpty()) {
             if (!backstack.pending.contains(dialogDestination)) {
-                backstack.pending += dialogDestination
+                queueDestinations(listOf(dialogDestination))
             }
         } else {
             // remove duplicated content and add new one at top
@@ -247,7 +286,9 @@ class PendingBackStackNavigationHandler(
         if (backstack.isEmpty()) backstack.addAll(setOf(initialLoginDestination, newDestination))
         // show non-required destinations immediately
         backstack.addAll(backstack.pending.filter { it is NoSessionNavKey && it !in backstack })
-        backstack.pending = backstack.pending.filterNot { it is NoSessionNavKey }
+        backstack.pendingNavigations = backstack.pendingNavigations.mapNotNull { navigation ->
+            navigation.removeDestinations { it is NoSessionNavKey }
+        }
         logBackStack("removeAuthRequiredDestinations")
         return authRequiredDestinations
     }
@@ -297,7 +338,7 @@ class PendingBackStackNavigationHandler(
         return destinations.all { it::class in backStackClasses }
     }
 
-    private fun applyNavOptions(navOptions: NavOptions?, destinations: List<NavKey>) {
+    private fun applyNavOptions(navOptions: PendingNavOptions?, destinations: List<NavKey>) {
         if (navOptions == null) return
         if (navOptions.launchSingleTop) {
             val backStackKeys = backstack.takeLast(destinations.size)
@@ -314,12 +355,16 @@ class PendingBackStackNavigationHandler(
         removeFromBackStackTo(popUpToKey, popUpTo.inclusive)
     }
 
-    private fun findPopUpToKey(popUpTo: NavOptions.PopUpTo): NavKey? =
-        when {
-            popUpTo.routeClass == null -> backstack.firstOrNull()
-            popUpTo.firstOccurrence -> backstack.firstOrNull { it::class == popUpTo.routeClass }
-            else -> backstack.lastOrNull { it::class == popUpTo.routeClass }
+    private fun findPopUpToKey(popUpTo: PendingNavOptions.PopUpTo): NavKey? {
+        val routeClassName = popUpTo.routeClassName ?: return backstack.firstOrNull()
+        return if (popUpTo.firstOccurrence) {
+            backstack.firstOrNull { it.isOfRoute(routeClassName) }
+        } else {
+            backstack.lastOrNull { it.isOfRoute(routeClassName) }
         }
+    }
+
+    private fun NavKey.isOfRoute(routeClassName: String) = this::class.java.name == routeClassName
 
     /**
      * Removes elements from the back stack up to the specified destination.
@@ -338,6 +383,35 @@ class PendingBackStackNavigationHandler(
         }
     }
 
+    /**
+     * Queues [destinations] instead of applying them, for destinations that cannot be shown yet
+     * because the session or the root node they need is missing. The queue is replayed once the
+     * missing state arrives.
+     */
+    private fun queueDestinations(destinations: List<NavKey>) {
+        backstack.pendingNavigations += PendingNavigation.Navigate(destinations, navOptions = null)
+    }
+
+    /**
+     * Queues [navigation] instead of applying it while the passcode screen is gating the app, and
+     * returns whether it was queued.
+     *
+     * Nothing renders above the top of the back stack, so a destination added now would be shown
+     * over a passcode screen that is still locked. The queue is replayed by
+     * [onPasscodeStateChanged] once the passcode is unlocked.
+     *
+     * Gating is keyed on the passcode destination actually being on the back stack rather than on
+     * [isPasscodeLocked] alone: the lock survives a logout, and the destinations that replace the
+     * passcode screen then - the login flow and the fetch nodes screen - must still be able to
+     * navigate.
+     */
+    private fun deferBehindPasscode(navigation: PendingNavigation<NavKey>): Boolean {
+        if (isPasscodeLocked.not() || backstack.contains(passcodeDestination).not()) return false
+        backstack.pendingNavigations += navigation
+        logBackStack("deferred behind passcode : ${navigation.destinations}")
+        return true
+    }
+
     private fun showPasscodeScreen() {
         if (backstack.isNotEmpty() && backstack.last() == passcodeDestination) {
             return
@@ -345,16 +419,46 @@ class PendingBackStackNavigationHandler(
         backstack.add(passcodeDestination)
     }
 
+    /**
+     * Replays the queue in the order it was built.
+     *
+     * The leading run of requests carrying no options is replayed as a single navigation because
+     * the branch a navigation takes is decided by its topmost destination: replaying a hierarchy
+     * one destination at a time would evaluate intermediate destinations on their own. Everything
+     * after that run is replayed as the operation it was requested as, so the back stack
+     * manipulation the caller asked for is applied against the back stack as it stands now.
+     */
     private fun navigateToPendingScreens() {
+        val queued = backstack.pendingNavigations
+        backstack.pendingNavigations = emptyList()
+
+        val plain = queued.takeWhile { it.isPlainNavigation }
         val pending = mutableListOf<NavKey>().apply {
             if (backstack.isEmpty()) {
                 add(defaultLandingScreen)
             }
-        }.union(backstack.pending)
+        }.union(plain.flatMap { it.destinations })
             .filterNot { it in backstack }
-        backstack.pending = emptyList()
         if (pending.isNotEmpty()) {
-            navigate(pending.toList())
+            performNavigate(pending.toList(), navOptions = null)
+        }
+        queued.drop(plain.size).forEach { replay(it) }
+    }
+
+    private fun replay(navigation: PendingNavigation<NavKey>) {
+        when (navigation) {
+            is PendingNavigation.Navigate ->
+                performNavigate(navigation.destinations, navigation.navOptions)
+
+            is PendingNavigation.ClearBackStack ->
+                performNavigateAndClearBackStack(navigation.destinations, navigation.navOptions)
+
+            is PendingNavigation.ClearTo -> performNavigateAndClearTo(
+                navigation.destinations,
+                navigation.newParent,
+                navigation.inclusive,
+                navigation.navOptions
+            )
         }
     }
 

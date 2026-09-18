@@ -48,6 +48,9 @@ class PendingBackStackNavigationHandlerTest {
     @Serializable
     private data object Destination3 : NavKey
 
+    @Serializable
+    private data class ParameterisedDestination(val id: Int) : NavKey
+
     private data object PasscodeDestination : NavKey
 
     private data object DefaultLandingScreen : NavKey
@@ -462,6 +465,203 @@ class PendingBackStackNavigationHandlerTest {
                 PasscodeDestination
             )
             assertThat(backStack.pending).isEmpty()
+        }
+
+    @Test
+    fun `test that navigating while the passcode is locked does not show the destination above the passcode screen`() =
+        runTest {
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigate(Destination1)
+
+            assertThat(backStack.last()).isEqualTo(PasscodeDestination)
+        }
+
+    @Test
+    fun `test that a destination navigated to while the passcode is locked is shown once it unlocks`() =
+        runTest {
+            underTest.onPasscodeStateChanged(true)
+            underTest.navigate(Destination1)
+
+            underTest.onPasscodeStateChanged(false)
+
+            assertThat(backStack.last()).isEqualTo(Destination1)
+            assertThat(backStack).doesNotContain(PasscodeDestination)
+        }
+
+    @Test
+    fun `test that destinations navigated to while the passcode is locked are shown in order once it unlocks`() =
+        runTest {
+            underTest.onPasscodeStateChanged(true)
+            underTest.navigate(Destination1)
+            underTest.navigate(Destination2)
+
+            underTest.onPasscodeStateChanged(false)
+
+            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2)
+                .inOrder()
+            assertThat(backStack.pending).isEmpty()
+        }
+
+    @Test
+    fun `test that navigateAndClearBackStack does not remove the passcode screen when the passcode is locked`() =
+        runTest {
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigateAndClearBackStack(Destination1)
+
+            assertThat(backStack).containsExactly(DefaultLandingScreen, PasscodeDestination)
+                .inOrder()
+            assertThat(backStack.pending).containsExactly(Destination1)
+        }
+
+    @Test
+    fun `test that navigateAndClearBackStack clears the back stack when replayed after the passcode unlocks`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigateAndClearBackStack(Destination3)
+            underTest.onPasscodeStateChanged(false)
+
+            assertThat(backStack).containsExactly(Destination3)
+        }
+
+    @Test
+    fun `test that navigateAndClearBackStack clears the back stack when replayed after navigating to the same destination`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigate(Destination3)
+            underTest.navigateAndClearBackStack(Destination3)
+            underTest.onPasscodeStateChanged(false)
+
+            assertThat(backStack).containsExactly(Destination3)
+        }
+
+    @Test
+    fun `test that navigateAndClearTo pops to the new parent when replayed after the passcode unlocks`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigateAndClearTo(
+                Destination3,
+                newParent = Destination1,
+                inclusive = false
+            )
+            underTest.onPasscodeStateChanged(false)
+
+            assertThat(backStack).containsExactly(
+                DefaultLandingScreen,
+                Destination1,
+                Destination3
+            ).inOrder()
+        }
+
+    @Test
+    fun `test that navigateAndClearTo pops the new parent when replayed inclusive after the passcode unlocks`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigateAndClearTo(
+                Destination3,
+                newParent = Destination1,
+                inclusive = true
+            )
+            underTest.onPasscodeStateChanged(false)
+
+            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination3).inOrder()
+        }
+
+    @Test
+    fun `test that navigate applies popUpTo when replayed after the passcode unlocks`() = runTest {
+        backStack.addAll(listOf(Destination1, Destination2))
+        underTest.onPasscodeStateChanged(true)
+
+        underTest.navigate(
+            Destination3,
+            navOptions { popUpTo(Destination1::class) { inclusive = true } }
+        )
+        underTest.onPasscodeStateChanged(false)
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination3).inOrder()
+    }
+
+    @Test
+    fun `test that navigate applies launchSingleTop when replayed after the passcode unlocks`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, ParameterisedDestination(1)))
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigate(
+                ParameterisedDestination(2),
+                navOptions { launchSingleTop = true }
+            )
+            underTest.onPasscodeStateChanged(false)
+
+            assertThat(backStack).containsExactly(
+                DefaultLandingScreen,
+                Destination1,
+                ParameterisedDestination(2)
+            ).inOrder()
+        }
+
+    @Test
+    fun `test that navigate with popUpTo does not change the back stack while the passcode is locked`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigate(
+                Destination3,
+                navOptions { popUpTo(Destination1::class) { inclusive = true } }
+            )
+
+            assertThat(backStack).containsExactly(
+                DefaultLandingScreen,
+                Destination1,
+                Destination2,
+                PasscodeDestination
+            ).inOrder()
+        }
+
+    @Test
+    fun `test that navigateAndClearTo does not change the back stack while the passcode is locked`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+            underTest.onPasscodeStateChanged(true)
+
+            underTest.navigateAndClearTo(
+                Destination3,
+                newParent = Destination1,
+                inclusive = true
+            )
+
+            assertThat(backStack).containsExactly(
+                DefaultLandingScreen,
+                Destination1,
+                Destination2,
+                PasscodeDestination
+            ).inOrder()
+        }
+
+    @Test
+    fun `test that navigate is not deferred when the passcode is locked but the passcode screen is not shown`() =
+        runTest {
+            val tempBackStack = PendingBackStack<NavKey>(NavBackStack(DefaultLandingScreen))
+            val tempHandler = initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
+                isPasscodeLocked = true,
+            )
+            assertThat(tempBackStack).doesNotContain(PasscodeDestination)
+
+            tempHandler.navigate(NoSessionDestination1)
+
+            assertThat(tempBackStack.last()).isEqualTo(NoSessionDestination1)
         }
 
     @Test
