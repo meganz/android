@@ -24,7 +24,7 @@ import mega.privacy.android.shared.nodes.model.TypedNodeItem
  * @property state the underlying selection, exposed for [mega.privacy.android.shared.nodes.components.NodesView]
  * @property isInSelectionMode true while the user is selecting
  * @property isSelecting true while a select-all is waiting for the remaining pages to load
- * @property selectedCount number of selected items among the current items
+ * @property selectedCount number of selected ids
  * @property selectedNodes the selected nodes among the current items, in item order
  * @property isAllSelected true when every current item is selected
  */
@@ -40,8 +40,7 @@ class NodeSelection<T : TypedNode> internal constructor(
         }
     }
 
-    val isInSelectionMode: Boolean
-        get() = state.isInSelectionMode
+    val isInSelectionMode: Boolean by derivedStateOf { state.isInSelectionMode }
 
     val isSelecting: Boolean
         get() = state.selectAllAwaitingMoreItems
@@ -56,7 +55,7 @@ class NodeSelection<T : TypedNode> internal constructor(
     }
 
     val selectedCount: Int
-        get() = selectedNodes.size
+        get() = state.selectedItemsCount
 
     val isAllSelected: Boolean by derivedStateOf {
         items.value.isNotEmpty() && selectedNodes.size == items.value.size

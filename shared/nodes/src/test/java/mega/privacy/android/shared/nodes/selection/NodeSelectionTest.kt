@@ -37,11 +37,11 @@ class NodeSelectionTest {
     }
 
     @Test
-    fun `test that selectedNodes and selectedCount ignore ids that are not in items`() {
+    fun `test that selectedNodes ignores ids that are not in items while selectedCount counts them`() {
         val selection = underTest(NodeSelectionState(initialSelectedIds = setOf(NodeId(2L), NodeId(99L))))
 
         assertThat(selection.selectedNodes.map { it.id }).containsExactly(NodeId(2L))
-        assertThat(selection.selectedCount).isEqualTo(1)
+        assertThat(selection.selectedCount).isEqualTo(2)
     }
 
     @Test

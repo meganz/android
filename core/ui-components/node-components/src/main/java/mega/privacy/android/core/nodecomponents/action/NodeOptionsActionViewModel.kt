@@ -1127,7 +1127,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         uiState.update { it.copy(loginRequiredEvent = consumed) }
     }
 
-    fun updateSelectionModeAvailableActions(
+    private fun updateSelectionModeActions(
         selectedNodes: Set<TypedNode>,
         nodeSourceType: NodeSourceType,
     ) {
@@ -1295,7 +1295,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }
     }
 
-    fun resetDismiss() {
+    private fun consumeDismissEvent() {
         uiState.update {
             it.copy(dismissEvent = consumed)
         }
@@ -1319,11 +1319,50 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }
     }
 
-    fun resetActionTriggered() {
+    private fun consumeActionTriggeredEvent() {
         uiState.update {
             it.copy(actionTriggeredEvent = consumed)
         }
     }
+
+    /**
+     * Process a [NodeOptionsActionIntent] and call the relevant method.
+     */
+    fun processIntent(intent: NodeOptionsActionIntent) {
+        when (intent) {
+            is NodeOptionsActionIntent.SelectedNodesChanged ->
+                updateSelectionModeActions(intent.nodes, intent.nodeSourceType)
+
+            NodeOptionsActionIntent.ActionTriggeredConsumed -> consumeActionTriggeredEvent()
+            NodeOptionsActionIntent.DismissConsumed -> consumeDismissEvent()
+        }
+    }
+
+    @Deprecated(
+        "Route through processIntent",
+        ReplaceWith(
+            "processIntent(NodeOptionsActionIntent.SelectedNodesChanged(selectedNodes, nodeSourceType))"
+        ),
+    )
+    fun updateSelectionModeAvailableActions(
+        selectedNodes: Set<TypedNode>,
+        nodeSourceType: NodeSourceType,
+    ) = processIntent(
+        NodeOptionsActionIntent.SelectedNodesChanged(selectedNodes, nodeSourceType)
+    )
+
+    @Deprecated(
+        "Route through processIntent",
+        ReplaceWith("processIntent(NodeOptionsActionIntent.DismissConsumed)"),
+    )
+    fun resetDismiss() = processIntent(NodeOptionsActionIntent.DismissConsumed)
+
+    @Deprecated(
+        "Route through processIntent",
+        ReplaceWith("processIntent(NodeOptionsActionIntent.ActionTriggeredConsumed)"),
+    )
+    fun resetActionTriggered() =
+        processIntent(NodeOptionsActionIntent.ActionTriggeredConsumed)
 
     fun triggerCollisionsResult(result: NodeNameCollisionsResult) {
         uiState.update {

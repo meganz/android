@@ -6,8 +6,27 @@ import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.shared.nodes.selection.NodeSelection
 import mega.privacy.android.shared.resources.R as sharedResR
 import java.util.Locale
+
+/**
+ * Selection-mode app bar driven by a [NodeSelection].
+ */
+@Composable
+fun NodeSelectionModeAppBar(
+    selection: NodeSelection<*>,
+    modifier: Modifier = Modifier,
+) {
+    NodeSelectionModeAppBar(
+        count = selection.selectedCount,
+        isAllSelected = selection.isAllSelected,
+        isSelecting = selection.isSelecting,
+        onSelectAllClicked = selection::selectAll,
+        onCancelSelectionClicked = selection::deselectAll,
+        modifier = modifier,
+    )
+}
 
 @Composable
 fun NodeSelectionModeAppBar(

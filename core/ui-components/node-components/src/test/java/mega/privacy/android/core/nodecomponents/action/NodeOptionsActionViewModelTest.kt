@@ -2126,6 +2126,65 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
+    fun `test that processIntent SelectedNodesChanged recomputes the selection mode actions`() =
+        runTest {
+            whenever(checkNodeCanBeMovedToTargetNode(any(), any())).thenReturn(true)
+
+            initViewModel()
+
+            val selectedNodes = setOf(mockFileNode)
+
+            viewModel.processIntent(
+                NodeOptionsActionIntent.SelectedNodesChanged(
+                    nodes = selectedNodes,
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                )
+            )
+
+            viewModel.uiState.test {
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(nodeSelectionModeActionMapper).invoke(
+                options = setOf(mockNodeSelectionMenuItem),
+                hasNodeAccessPermission = true,
+                selectedNodes = selectedNodes.toList(),
+                allNodeCanBeMovedToTarget = true,
+                noNodeInBackups = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+        }
+
+    @Test
+    fun `test that processIntent ActionTriggeredConsumed consumes the action triggered event`() =
+        runTest {
+            initViewModel()
+            viewModel.onActionTriggered()
+
+            viewModel.processIntent(NodeOptionsActionIntent.ActionTriggeredConsumed)
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().actionTriggeredEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that processIntent DismissConsumed consumes the dismiss event`() =
+        runTest {
+            val handle = 999L
+            whenever(removeRecentlyWatchedItemUseCase(handle)).thenReturn(Unit)
+            initViewModel()
+            viewModel.removeRecentlyWatchedItem(handle)
+            advanceUntilIdle()
+
+            viewModel.processIntent(NodeOptionsActionIntent.DismissConsumed)
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().dismissEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
     fun `test updateSelectionModeAvailableActions when node is in backups sets noNodeInBackups to false`() =
         runTest {
             val expected = true

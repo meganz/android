@@ -14,10 +14,15 @@ import mega.privacy.android.shared.nodes.model.NodeViewItem
 @Stable
 sealed interface AudioUiState {
 
+    /** The audio nodes to show; empty while loading. */
+    val items: List<NodeViewItem<TypedNode>>
+
     /**
      * Loading
      */
-    data object Loading : AudioUiState
+    data object Loading : AudioUiState {
+        override val items: List<NodeViewItem<TypedNode>> = emptyList()
+    }
 
     /**
      * Loaded state for the cloud drive audio list.
@@ -29,7 +34,7 @@ sealed interface AudioUiState {
      * @property selectedSortConfiguration Sort UI state for the nodes header.
      */
     data class Data(
-        val items: List<NodeViewItem<TypedNode>>,
+        override val items: List<NodeViewItem<TypedNode>>,
         val currentViewType: ViewType,
         val openedFileNode: TypedFileNode?,
         val selectedSortOrder: SortOrder,

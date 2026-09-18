@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,14 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -50,7 +47,7 @@ import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.selection.NodeSelectionState
+import mega.privacy.android.shared.nodes.selection.NodeSelection
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 
@@ -63,17 +60,11 @@ internal fun AudioContent(
     onTransfer: (TransferTriggerEvent) -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
     showNodeOptionsBottomSheet: (NodeOptionsBottomSheetNavKey) -> Unit,
-    selectionState: NodeSelectionState,
-    isInSelectionMode: Boolean,
-    selectedNodes: List<TypedNode>,
+    selection: NodeSelection<TypedNode>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
-        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
-            creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
-        ),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
@@ -84,13 +75,6 @@ internal fun AudioContent(
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(selectedNodes) {
-        nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-            selectedNodes.toSet(),
-            NodeSourceType.CLOUD_DRIVE
-        )
-    }
 
     Column(
         modifier = modifier
@@ -135,13 +119,13 @@ internal fun AudioContent(
                         )
                     },
                     onItemClicked = {
-                        if (isInSelectionMode) {
-                            selectionState.toggleSelection(it.id)
+                        if (selection.isInSelectionMode) {
+                            selection.toggle(it.id)
                         } else {
                             onAction(ItemClicked(it))
                         }
                     },
-                    onLongClicked = { selectionState.toggleSelection(it.id) },
+                    onLongClicked = { selection.toggle(it.id) },
                     sortConfiguration = uiState.selectedSortConfiguration,
                     isListView = isListView,
                     onSortOrderClick = { showSortBottomSheet = true },
@@ -151,8 +135,7 @@ internal fun AudioContent(
                     },
                     showMediaDiscoveryButton = false,
                     onEnterMediaDiscoveryClick = {},
-                    inSelectionMode = isInSelectionMode,
-                    nodeSelectionState = selectionState,
+                    nodeSelectionState = selection.state,
                 )
             }
         }

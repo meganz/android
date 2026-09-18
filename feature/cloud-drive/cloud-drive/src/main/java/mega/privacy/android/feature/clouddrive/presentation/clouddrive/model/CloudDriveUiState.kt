@@ -19,6 +19,8 @@ import mega.privacy.android.shared.nodes.model.TypedNodeItem
  * @property nodeSourceType
  * @property currentViewType
  * @property isMediaDiscoveryAllowed
+ * @property items the nodes to show; empty while loading
+ * @property nodesLoadingState
  */
 @Immutable
 sealed interface CloudDriveUiState {
@@ -26,6 +28,8 @@ sealed interface CloudDriveUiState {
     val nodeSourceType: NodeSourceType
     val currentViewType: ViewType
     val isMediaDiscoveryAllowed: Boolean
+    val items: List<TypedNodeItem<TypedNode>>
+    val nodesLoadingState: NodesLoadingState
 
     /**
      * Loading
@@ -38,8 +42,10 @@ sealed interface CloudDriveUiState {
         override val title: LocalizedText,
         override val nodeSourceType: NodeSourceType,
         override val currentViewType: ViewType,
-    ) : CloudDriveUiState{
+    ) : CloudDriveUiState {
         override val isMediaDiscoveryAllowed: Boolean = false
+        override val items: List<TypedNodeItem<TypedNode>> = emptyList()
+        override val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading
     }
 
     /**
@@ -64,10 +70,10 @@ sealed interface CloudDriveUiState {
      */
     data class Data(
         override val title: LocalizedText,
-        val nodesLoadingState: NodesLoadingState,
+        override val nodesLoadingState: NodesLoadingState,
         val currentFolderId: NodeId,
         val isCloudDriveRoot: Boolean,
-        val items: List<TypedNodeItem<TypedNode>>,
+        override val items: List<TypedNodeItem<TypedNode>>,
         override val currentViewType: ViewType,
         val navigateBack: StateEvent,
         val hasMediaItems: Boolean,
