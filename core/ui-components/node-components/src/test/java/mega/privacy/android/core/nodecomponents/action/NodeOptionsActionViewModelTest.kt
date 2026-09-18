@@ -75,6 +75,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisio
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -126,6 +127,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -792,6 +794,71 @@ class NodeOptionsActionViewModelTest {
             verify(copyPublicNodeUseCase).invoke(publicNode, NodeId(targetHandle), null)
             verify(copyNodesUseCase, never()).invoke(any())
             verify(setCopyLatestTargetPathUseCase).invoke(targetHandle)
+        }
+
+    /**
+     * Selects a single [PublicLinkFile] whose copy fails with [error], and returns the
+     * destination handle to pass to [NodeOptionsActionViewModel.copyPublicLinkFile].
+     */
+    private suspend fun stubFailingPublicLinkCopy(error: Throwable): Long {
+        val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(101L) }
+        val targetHandle = sampleNode.id.longValue
+        // MegaException extends Throwable, not RuntimeException, so Mockito rejects thenThrow.
+        whenever(copyPublicNodeUseCase(publicNode, NodeId(targetHandle), null))
+            .thenAnswer { throw error }
+        initViewModel()
+        viewModel.updateSelectedNodes(listOf(publicNode))
+        return targetHandle
+    }
+
+    @Test
+    fun `test that copyPublicLinkFile shows the quota dialog when the copy fails with over quota`() =
+        runTest {
+            val targetHandle = stubFailingPublicLinkCopy(QuotaExceededMegaException(errorCode = -17))
+
+            viewModel.copyPublicLinkFile(targetHandle)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showQuotaDialog)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.showQuotaDialog as StateEventWithContentTriggered).content)
+                    .isTrue()
+            }
+        }
+
+    @Test
+    fun `test that copyPublicLinkFile does not show a snackbar when the copy fails with over quota`() =
+        runTest {
+            val targetHandle = stubFailingPublicLinkCopy(QuotaExceededMegaException(errorCode = -17))
+
+            viewModel.copyPublicLinkFile(targetHandle)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.infoToShowEvent)
+                    .isNotInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that copyPublicLinkFile shows a failure message when the copy fails with an unhandled error`() =
+        runTest {
+            val targetHandle = stubFailingPublicLinkCopy(RuntimeException("network down"))
+            whenever(moveRequestMessageMapper(any())).thenReturn("1 item failed to copy")
+
+            viewModel.copyPublicLinkFile(targetHandle)
+
+            verify(moveRequestMessageMapper).invoke(
+                argThat { count == 1 && errorCount == 1 }
+            )
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showQuotaDialog)
+                    .isNotInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat(state.infoToShowEvent)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
         }
 
     @Test

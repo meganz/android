@@ -347,13 +347,15 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
                         it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
                     }
                 }
-                .onFailure {
-                    Timber.e(it)
-                    val message = moveRequestMessageMapper(
-                        MoveRequestResult.Copy(count = 0, errorCount = 1)
-                    )
-                    uiState.update {
-                        it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
+                .onFailure { error ->
+                    Timber.e(error)
+                    if (!manageCopyMoveError(error)) {
+                        val message = moveRequestMessageMapper(
+                            MoveRequestResult.Copy(count = 1, errorCount = 1)
+                        )
+                        uiState.update {
+                            it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
+                        }
                     }
                 }
         }
@@ -504,17 +506,27 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }
     }
 
-    private fun manageCopyMoveError(error: Throwable?) = when (error) {
-        is ForeignNodeException -> uiState.update { it.copy(showForeignNodeDialog = triggered) }
-        is QuotaExceededMegaException -> uiState.update {
-            it.copy(showQuotaDialog = triggered(true))
+    /** Returns true when [error] was surfaced as a dialog, so callers can skip their own message. */
+    private fun manageCopyMoveError(error: Throwable?): Boolean = when (error) {
+        is ForeignNodeException -> {
+            uiState.update { it.copy(showForeignNodeDialog = triggered) }
+            true
         }
 
-        is NotEnoughQuotaMegaException -> uiState.update {
-            it.copy(showQuotaDialog = triggered(false))
+        is QuotaExceededMegaException -> {
+            uiState.update { it.copy(showQuotaDialog = triggered(true)) }
+            true
         }
 
-        else -> Timber.e("Error copying/moving nodes $error")
+        is NotEnoughQuotaMegaException -> {
+            uiState.update { it.copy(showQuotaDialog = triggered(false)) }
+            true
+        }
+
+        else -> {
+            Timber.e("Error copying/moving nodes $error")
+            false
+        }
     }
 
     /**
