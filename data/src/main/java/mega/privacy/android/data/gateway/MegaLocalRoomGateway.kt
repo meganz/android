@@ -100,7 +100,7 @@ interface MegaLocalRoomGateway {
      * @param handle
      * @return
      */
-    fun monitorContactByHandle(handle: Long): Flow<Contact>
+    fun monitorContactByHandle(handle: Long): Flow<Contact?>
 
     /**
      * Find contact by email

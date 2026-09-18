@@ -176,11 +176,11 @@ internal class MegaLocalRoomFacade @Inject constructor(
         }
     }
 
-    override fun monitorContactByHandle(handle: Long): Flow<Contact> =
+    override fun monitorContactByHandle(handle: Long): Flow<Contact?> =
         flow {
             val encryptedHandle = encryptData(handle.toString())
             emitAll(contactDao.get().monitorContactByHandle(encryptedHandle))
-        }.map { contactModelMapper(it) }
+        }.map { entity -> entity?.let { contactModelMapper(it) } }
 
     override suspend fun getContactByEmail(email: String?): Contact? =
         contactDao.get().getContactByEmail(encryptData(email))?.let { contactModelMapper(it) }

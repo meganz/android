@@ -518,7 +518,7 @@ interface ContactsRepository {
      * @param contactId The contact's ID
      * @return The [Contact]
      */
-    fun monitorContactByHandle(contactId: Long): Flow<Contact>
+    fun monitorContactByHandle(contactId: Long): Flow<Contact?>
 
     /**
      * Get contact from cache by its email

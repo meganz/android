@@ -26,6 +26,7 @@ import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
+import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
 import mega.privacy.android.data.database.entity.NonContactEntity
@@ -63,6 +64,7 @@ import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMap
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -280,6 +282,34 @@ internal class MegaLocalRoomFacadeTest {
 
         assertThat(underTest.getNonContactByHandle(NON_CONTACT_HANDLE)).isNull()
         verifyNoInteractions(nonContactModelMapper)
+    }
+
+    @Test
+    fun `test that monitorContactByHandle emits the mapped contact`() = runTest {
+        val entity = mock<ContactEntity>()
+        val expected = mock<Contact>()
+        whenever(encryptData(CONTACT_HANDLE.toString())).thenReturn(ENCRYPTED_CONTACT_HANDLE)
+        whenever(contactDao.monitorContactByHandle(ENCRYPTED_CONTACT_HANDLE))
+            .thenReturn(flowOf(entity))
+        whenever(contactModelMapper(entity)).thenReturn(expected)
+
+        underTest.monitorContactByHandle(CONTACT_HANDLE).test {
+            assertThat(awaitItem()).isEqualTo(expected)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that monitorContactByHandle emits null when the contact is not cached`() = runTest {
+        whenever(encryptData(CONTACT_HANDLE.toString())).thenReturn(ENCRYPTED_CONTACT_HANDLE)
+        whenever(contactDao.monitorContactByHandle(ENCRYPTED_CONTACT_HANDLE))
+            .thenReturn(flowOf(null))
+
+        underTest.monitorContactByHandle(CONTACT_HANDLE).test {
+            assertThat(awaitItem()).isNull()
+            awaitComplete()
+        }
+        verifyNoInteractions(contactModelMapper)
     }
 
     @Test
@@ -1185,5 +1215,7 @@ internal class MegaLocalRoomFacadeTest {
 
     private companion object {
         const val NON_CONTACT_HANDLE = 1234L
+        const val CONTACT_HANDLE = 5678L
+        const val ENCRYPTED_CONTACT_HANDLE = "encryptedContactHandle"
     }
 }

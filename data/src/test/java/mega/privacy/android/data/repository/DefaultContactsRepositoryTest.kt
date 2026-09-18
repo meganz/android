@@ -1583,6 +1583,20 @@ class DefaultContactsRepositoryTest {
     }
 
     @Test
+    fun `test that null is returned when the local contact is not cached`() = runTest {
+        val contactId = 123L
+        whenever(megaLocalRoomGateway.monitorContactByHandle(contactId)) doReturn flow {
+            emit(null)
+            awaitCancellation()
+        }
+
+        underTest.monitorContactByHandle(contactId).test {
+            assertThat(awaitItem()).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test that monitor online status by handle returns the initial status`() = runTest {
         val initialStatus = MegaChatApi.STATUS_ONLINE
         val mappedInitialStatus = UserChatStatus.Online

@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -232,6 +233,42 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
                     contact = contact.copy(email = userEmail),
                     user = user
                 )
+            )
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the visible contacts are all returned when one of them is not cached`() =
+        runTest {
+            val uncachedUserHandle = 111L
+            val cachedUserHandle = 222L
+            val uncachedUser = newUser(
+                withHandle = uncachedUserHandle,
+                withEmail = "uncached@test.com",
+                withVisibility = UserVisibility.Visible
+            )
+            val cachedUser = newUser(
+                withHandle = cachedUserHandle,
+                withEmail = "cached@test.com",
+                withVisibility = UserVisibility.Visible
+            )
+            whenever(contactsRepository.getAvailableContacts()) doReturn
+                    listOf(uncachedUser, cachedUser)
+            whenever(getChatRoomByUserUseCase(uncachedUserHandle)) doReturn null
+            whenever(getChatRoomByUserUseCase(cachedUserHandle)) doReturn null
+            val cachedContact = Contact(
+                userId = cachedUserHandle,
+                email = "cached@test.com"
+            )
+            whenever(monitorContactByHandleUseCase(uncachedUserHandle)) doReturn flowOf(null)
+            whenever(monitorContactByHandleUseCase(cachedUserHandle)) doReturn
+                    flow { emit(cachedContact) }
+
+            val actual = underTest()
+
+            val expected = listOf(
+                UserContact(contact = null, user = uncachedUser),
+                UserContact(contact = cachedContact, user = cachedUser)
             )
             assertThat(actual).isEqualTo(expected)
         }

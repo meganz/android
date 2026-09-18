@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.usecase.contact
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.repository.ContactsRepository
 import javax.inject.Inject
 
@@ -16,7 +18,8 @@ class MonitorContactByHandleUseCase @Inject constructor(
      * Invocation method.
      *
      * @param contactId The ID of the contact.
+     * @return A [Flow] of the cached [Contact], emitting null while the contact is not cached.
      */
-    operator fun invoke(contactId: Long) =
+    operator fun invoke(contactId: Long): Flow<Contact?> =
         contactsRepository.monitorContactByHandle(contactId)
 }

@@ -22,7 +22,7 @@ internal interface ContactDao {
     suspend fun getContactByHandle(handle: String?): ContactEntity?
 
     @Query("SELECT * FROM contacts WHERE handle = :handle")
-    fun monitorContactByHandle(handle: String?): Flow<ContactEntity>
+    fun monitorContactByHandle(handle: String?): Flow<ContactEntity?>
 
     @Query("SELECT * FROM contacts WHERE mail = :mail")
     fun monitorContactByEmail(mail: String): Flow<ContactEntity?>

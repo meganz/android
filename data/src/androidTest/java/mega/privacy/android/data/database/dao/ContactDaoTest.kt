@@ -122,6 +122,13 @@ class ContactDaoTest {
     }
 
     @Test
+    fun test_that_null_is_returned_by_monitor_contact_if_no_user_exists() = runTest {
+        contactDao.monitorContactByHandle("nonExistentHandle").test {
+            assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
     fun test_that_updates_to_a_contact_is_reflected_in_monitor_contact() = runTest {
         val handle = "handle"
         val contact = ContactEntity(
@@ -135,10 +142,10 @@ class ContactDaoTest {
         val expectedNickname = "UberDevMeister"
 
         contactDao.monitorContactByHandle(handle).test {
-            val stored = awaitItem()
+            val stored = requireNotNull(awaitItem())
             assertThat(stored.copy(id = null)).isEqualTo(contact)
             contactDao.insertOrUpdateContact(stored.copy(nickName = expectedNickname))
-            assertThat(awaitItem().nickName).isEqualTo(expectedNickname)
+            assertThat(awaitItem()?.nickName).isEqualTo(expectedNickname)
         }
     }
 
