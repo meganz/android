@@ -3533,6 +3533,11 @@
     <string name="contact_info_manage_chat_history_subtitle">Automatically delete messages older than:</string>
     <!-- Contact info: chat history retention time of one year -->
     <string name="contact_info_retention_time_year">1 year</string>
+    <!-- Contact info: chat history retention time in years. %1$d is the number of years -->
+    <plurals name="contact_info_retention_time_years">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
     <!-- Contact info: chat history retention time in months. %1$d is the number of months -->
     <plurals name="contact_info_retention_time_months">
         <item quantity="one">%1$d month</item>

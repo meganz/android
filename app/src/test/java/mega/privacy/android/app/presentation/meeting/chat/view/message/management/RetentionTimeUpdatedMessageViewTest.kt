@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.RetentionTimeUpdatedMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.SECONDS_IN_DAY
@@ -53,6 +54,33 @@ class RetentionTimeUpdatedMessageViewTest {
                 )
             )
         ).assertExists()
+    }
+
+    @Test
+    fun `test that retention time updated messages shows correctly when it is enabled or updated for several years`() {
+        val retentionTime = 2 * SECONDS_IN_YEAR
+
+        initComposeRuleContent(retentionTime = retentionTime)
+
+        composeTestRule.onNodeWithText(
+            TextUtil.removeFormatPlaceholder(
+                composeTestRule.activity.getString(
+                    R.string.retention_history_changed_by,
+                    ownerActionFullName,
+                    getRetentionTimeString(composeTestRule.activity, retentionTime),
+                )
+            )
+        ).assertExists()
+    }
+
+    @Test
+    fun `test that getRetentionTimeString returns a pluralised year count when the time is a multiple of a year`() {
+        assertThat(getRetentionTimeString(composeTestRule.activity, SECONDS_IN_YEAR))
+            .isEqualTo("1 year")
+        assertThat(getRetentionTimeString(composeTestRule.activity, 2 * SECONDS_IN_YEAR))
+            .isEqualTo("2 years")
+        assertThat(getRetentionTimeString(composeTestRule.activity, 3 * SECONDS_IN_YEAR))
+            .isEqualTo("3 years")
     }
 
     @Test

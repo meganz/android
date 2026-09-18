@@ -70,9 +70,21 @@ class ContactInfoRetentionTimeTest {
     }
 
     @Test
-    fun `test that getRetentionTimeString returns a year when the time is a year`() {
-        assertThat(retentionTimeStrings(SECONDS_IN_YEAR))
-            .containsExactly(context.getString(sharedR.string.contact_info_retention_time_year))
+    fun `test that getRetentionTimeString returns years when the time is a number of years`() {
+        assertThat(retentionTimeStrings(SECONDS_IN_YEAR, 2 * SECONDS_IN_YEAR, 3 * SECONDS_IN_YEAR))
+            .containsExactly(
+                quantityString(sharedR.plurals.contact_info_retention_time_years, 1),
+                quantityString(sharedR.plurals.contact_info_retention_time_years, 2),
+                quantityString(sharedR.plurals.contact_info_retention_time_years, 3),
+            )
+            .inOrder()
+    }
+
+    @Test
+    fun `test that getRetentionTimeString returns a pluralised year count when the time is a multiple of a year`() {
+        assertThat(retentionTimeStrings(SECONDS_IN_YEAR, 2 * SECONDS_IN_YEAR))
+            .containsExactly("1 year", "2 years")
+            .inOrder()
     }
 
     private fun retentionTimeStrings(vararg timesInSeconds: Long): List<String?> {

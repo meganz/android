@@ -93,7 +93,10 @@ internal fun getRetentionTimeString(context: Context, timeInSeconds: Long) = whe
     }
 
     timeInSeconds % SECONDS_IN_YEAR == 0L -> {
-        context.getString(R.string.subtitle_properties_manage_chat_label_year)
+        val numberOfYears = (timeInSeconds / SECONDS_IN_YEAR).toInt()
+        context.resources.getQuantityString(
+            R.plurals.subtitle_properties_manage_chat_label_years, numberOfYears, numberOfYears
+        )
     }
 
     timeInSeconds % SECONDS_IN_MONTH_30 == 0L -> {

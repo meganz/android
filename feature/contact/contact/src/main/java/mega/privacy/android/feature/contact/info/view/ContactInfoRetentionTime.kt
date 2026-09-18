@@ -2,7 +2,6 @@ package mega.privacy.android.feature.contact.info.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -15,8 +14,14 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun getRetentionTimeString(timeInSeconds: Long): String? = when {
     timeInSeconds == 0L -> null
 
-    timeInSeconds % SECONDS_IN_YEAR == 0L ->
-        stringResource(sharedR.string.contact_info_retention_time_year)
+    timeInSeconds % SECONDS_IN_YEAR == 0L -> {
+        val numberOfYears = (timeInSeconds / SECONDS_IN_YEAR).toInt()
+        pluralStringResource(
+            sharedR.plurals.contact_info_retention_time_years,
+            numberOfYears,
+            numberOfYears,
+        )
+    }
 
     timeInSeconds % SECONDS_IN_MONTH_30 == 0L -> {
         val numberOfMonths = (timeInSeconds / SECONDS_IN_MONTH_30).toInt()
