@@ -16,15 +16,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileExplorerActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openNameCollisionActivity
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent
@@ -48,6 +59,8 @@ internal class ImportMessageAction(
         val error = stringResource(id = R.string.import_success_error)
         var handleWhereToImport by rememberSaveable { mutableStateOf<Long?>(null) }
         var collisionsResult by rememberSaveable { mutableStateOf<String?>(null) }
+        var foreignNodeWarning by rememberSaveable { mutableStateOf(false) }
+        var storageOverQuota by rememberSaveable { mutableStateOf<Boolean?>(null) }
         val folderPickerLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -120,9 +133,16 @@ internal class ImportMessageAction(
                             onHandled()
                         }
                     }
-                }.onFailure {
-                    snackbarHostState?.showAutoDurationSnackbar(error)
-                    onHandled()
+                }.onFailure { throwable ->
+                    when (throwable) {
+                        is ForeignNodeException -> foreignNodeWarning = true
+                        is QuotaExceededMegaException -> storageOverQuota = true
+                        is NotEnoughQuotaMegaException -> storageOverQuota = false
+                        else -> {
+                            snackbarHostState?.showAutoDurationSnackbar(error)
+                            onHandled()
+                        }
+                    }
                 }
             }
         }
@@ -130,6 +150,40 @@ internal class ImportMessageAction(
             LaunchedEffect(Unit) {
                 collisionsResult?.let { snackbarHostState?.showAutoDurationSnackbar(it) }
                 onHandled()
+            }
+        }
+        if (foreignNodeWarning) {
+            LaunchedEffect(Unit) {
+                showForeignStorageOverQuotaWarningDialog(context)
+                foreignNodeWarning = false
+                onHandled()
+            }
+        }
+        storageOverQuota?.let { isOverQuota ->
+            FeatureFlagGate(
+                feature = ApiFeatures.QuotaWarningUpsellScreen,
+                disabled = {
+                    LaunchedEffect(Unit) {
+                        context.startActivity(
+                            MegaActivity.getIntentWithExtraDestinations(
+                                context,
+                                listOf(OverQuotaDialogNavKey(isOverQuota = isOverQuota)),
+                            )
+                        )
+                        storageOverQuota = null
+                        onHandled()
+                    }
+                },
+            ) {
+                LaunchedEffect(Unit) {
+                    context.megaNavigator.openQuotaWarningUpsell(
+                        context = context,
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                    storageOverQuota = null
+                    onHandled()
+                }
             }
         }
     }

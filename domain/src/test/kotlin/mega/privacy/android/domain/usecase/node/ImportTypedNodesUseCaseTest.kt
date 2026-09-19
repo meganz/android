@@ -7,15 +7,23 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.namecollision.TypedNodeNameCollisionResult
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.node.namecollision.CheckTypedNodeNameCollisionUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito.reset
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ImportTypedNodesUseCaseTest {
@@ -169,4 +177,25 @@ class ImportTypedNodesUseCaseTest {
             Truth.assertThat(underTest(nodes, handleWhereToImport))
                 .isEqualTo(ImportNodesResult(1, 1, collisions))
         }
+
+    @ParameterizedTest
+    @MethodSource("provideErrorsWorthWarningAbout")
+    fun `test that invoke rethrows the error when a copy fails with a quota or foreign node error`(
+        error: Throwable,
+    ) = runTest {
+        whenever(checkTypedNodeNameCollisionUseCase(nodes, handleWhereToImport)).thenReturn(
+            TypedNodeNameCollisionResult(nodes, emptyList())
+        )
+        whenever(copyTypedNodeUseCase(node1, parentNodeId)).thenAnswer { throw error }
+
+        val thrown = assertThrows<Throwable> { underTest(nodes, handleWhereToImport) }
+
+        Truth.assertThat(thrown).isSameInstanceAs(error)
+    }
+
+    private fun provideErrorsWorthWarningAbout() = Stream.of(
+        Arguments.of(QuotaExceededMegaException(-17)),
+        Arguments.of(NotEnoughQuotaMegaException(-24, null)),
+        Arguments.of(ForeignNodeException()),
+    )
 }
