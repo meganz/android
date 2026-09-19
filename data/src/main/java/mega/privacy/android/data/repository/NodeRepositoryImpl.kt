@@ -637,15 +637,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         val parent = getMegaNodeByHandle(newNodeParent, true)
         requireNotNull(node) { "Node to copy with handle $nodeToCopy not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("copyNode") { NodeId(it.nodeHandle) }
-            megaApiGateway.copyNode(
-                nodeToCopy = node,
-                newNodeParent = parent,
-                newNodeName = newNodeName,
-                listener = listener
-            )
-        }
+        copyNode(node, parent, newNodeName)
     }
 
     override suspend fun copyNode(
@@ -657,15 +649,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         val parent = getMegaNodeByHandle(newNodeParent, true)
         requireNotNull(node) { "Node to copy $nodeToCopy not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("copyNode") { NodeId(it.nodeHandle) }
-            megaApiGateway.copyNode(
-                nodeToCopy = node,
-                newNodeParent = parent,
-                newNodeName = newNodeName,
-                listener = listener
-            )
-        }
+        copyNode(node, parent, newNodeName)
     }
 
     override suspend fun copyPublicNode(
@@ -677,8 +661,24 @@ internal class NodeRepositoryImpl @Inject constructor(
         val parent = getMegaNodeByHandle(newNodeParent, true)
         requireNotNull(node) { "Node to copy with handle $publicNodeToCopy not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("copyNode") { NodeId(it.nodeHandle) }
+        copyNode(node, parent, newNodeName)
+    }
+
+    /**
+     * [MegaError.API_EOVERQUOTA] means a full account or a full target owner alike, and only a
+     * foreign target tells them apart: an inbound share spends its owner's quota, not the caller's.
+     */
+    private suspend fun copyNode(
+        node: MegaNode,
+        parent: MegaNode,
+        newNodeName: String?,
+    ): NodeId {
+        val result = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    continuation.resumeWith(Result.success(request to error))
+                }
+            )
             megaApiGateway.copyNode(
                 nodeToCopy = node,
                 newNodeParent = parent,
@@ -686,8 +686,14 @@ internal class NodeRepositoryImpl @Inject constructor(
                 listener = listener
             )
         }
-    }
+        return when {
+            result.second.errorCode == MegaError.API_OK -> NodeId(result.first.nodeHandle)
+            result.second.errorCode == MegaError.API_EOVERQUOTA
+                    && megaApiGateway.isForeignNode(parent.handle) -> throw ForeignNodeException()
 
+            else -> throw result.second.toException("copyNode")
+        }
+    }
 
     override suspend fun moveNode(
         nodeToMove: NodeId,

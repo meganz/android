@@ -69,6 +69,7 @@ import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
@@ -808,6 +809,62 @@ internal class NodeRepositoryImplTest {
                 assertThat(e).isInstanceOf(ForeignNodeException::class.java)
             }
         }
+
+    @Test
+    fun `test that copy node returns the copied node id when the SDK returns API_OK`() = runTest {
+        val node = NodeId(1L)
+        val destination = NodeId(2L)
+        val copiedNode = NodeId(3L)
+        stubCopyNode(node, destination, MegaError.API_OK, copiedNode.longValue)
+
+        assertThat(underTest.copyNode(node, null, destination, null)).isEqualTo(copiedNode)
+    }
+
+    @ParameterizedTest(name = "when the SDK returns {0} and the target is foreign: {1}")
+    @MethodSource("provideCopyNodeErrors")
+    fun `test that copy node throws the exception matching the SDK error and the target ownership`(
+        errorCode: Int,
+        isForeignTarget: Boolean,
+        expected: Class<out Throwable>,
+    ) = runTest {
+        val node = NodeId(1L)
+        val destination = NodeId(2L)
+        stubCopyNode(node, destination, errorCode)
+        whenever(megaApiGateway.isForeignNode(destination.longValue)).thenReturn(isForeignTarget)
+
+        val exception = assertThrows<Throwable> {
+            underTest.copyNode(node, null, destination, null)
+        }
+
+        assertThat(exception).isInstanceOf(expected)
+    }
+
+    private fun provideCopyNodeErrors() = Stream.of(
+        Arguments.of(MegaError.API_EOVERQUOTA, true, ForeignNodeException::class.java),
+        Arguments.of(MegaError.API_EOVERQUOTA, false, QuotaExceededMegaException::class.java),
+        Arguments.of(MegaError.API_EACCESS, false, MegaException::class.java),
+    )
+
+    private suspend fun stubCopyNode(
+        node: NodeId,
+        destination: NodeId,
+        errorCode: Int,
+        copiedNodeHandle: Long = 0L,
+    ) {
+        val destinationMegaNode = mock<MegaNode> {
+            on { handle }.thenReturn(destination.longValue)
+        }
+        whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(mock())
+        whenever(megaApiGateway.getMegaNodeByHandle(destination.longValue))
+            .thenReturn(destinationMegaNode)
+        whenever(megaApiGateway.copyNode(any(), any(), anyOrNull(), any())).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock { on { nodeHandle }.thenReturn(copiedNodeHandle) },
+                error = mock { on { this.errorCode }.thenReturn(errorCode) },
+            )
+        }
+    }
 
     @Test
     fun `test that getNodesByHandle invokes correct function`() = runTest {
