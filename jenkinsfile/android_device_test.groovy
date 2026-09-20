@@ -57,8 +57,11 @@ def common
 
 pipeline {
     // Apple Silicon only: on Intel machines (labelled mac-intel) the emulator is too slow to
-    // render the app and every UI test times out.
-    agent { label '(mac-jenkins-slave-android || mac-jenkins-slave) && !mac-intel' }
+    // render the app and every UI test times out. cibuild-macmini6 is excluded until its emulator
+    // is re-provisioned: there, system_server segfaults in its app-compaction path
+    // (CachedAppOptimizer -> compactProcess) around 175 seconds after boot and takes the run with
+    // it, which happened on all five runs that landed on that agent.
+    agent { label '(mac-jenkins-slave-android || mac-jenkins-slave) && !mac-intel && !cibuild-macmini6' }
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()

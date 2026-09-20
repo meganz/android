@@ -35,7 +35,7 @@ import javax.inject.Inject
 /**
  * Full-app instrumented test for the archived-chats entry point wired in AND-24900: the archive
  * action in the chat-list top bar opens the archived-chats screen, which shows the archived rooms
- * (and not the active ones).
+ * (and not the active ones), and whose back affordance returns to the chat list.
  *
  * Built on the `:data-test` fake-SDK framework following [ChatListSelectionTest]: the whole app runs
  * as in production; only the SDK gateways are faked. Active and archived rooms are seeded together —
@@ -117,7 +117,6 @@ class ChatListArchivedNavigationTest {
         // Chats tab shows the active chat and not the archived one.
         awaitObject(chatRow(ACTIVE_TITLE), LAUNCH_TIMEOUT, "active-chat-row")
         assertThat(device.hasObject(chatRow(ARCHIVED_TITLE))).isFalse()
-        Thread.sleep(2_000)
 
         // Open the archived chats screen from the top-bar archive action.
         device.findObject(By.res(ARCHIVED_ACTION_TAG)).click()
@@ -128,7 +127,11 @@ class ChatListArchivedNavigationTest {
         awaitObject(By.text(archivedTitle), LOAD_TIMEOUT, "archived-app-bar-title")
         awaitObject(chatRow(ARCHIVED_TITLE), LOAD_TIMEOUT, "archived-chat-row")
         assertThat(device.hasObject(chatRow(ACTIVE_TITLE))).isFalse()
-        Thread.sleep(2_000)
+
+        // Back returns to the chat list the archive action was opened from.
+        device.pressBack()
+        awaitObject(By.res(CHAT_LIST_SCREEN_TAG), LOAD_TIMEOUT, "chat-list-restored")
+        awaitObject(chatRow(ACTIVE_TITLE), LOAD_TIMEOUT, "active-chat-row-restored")
     }
 
     private fun seedRoom(chatId: Long, title: String, archived: Boolean) {
@@ -179,6 +182,7 @@ class ChatListArchivedNavigationTest {
         const val ACTIVE_TITLE = "Design Team"
         const val ARCHIVED_TITLE = "Old Project"
 
+        const val CHAT_LIST_SCREEN_TAG = "chat_list_screen:screen"
         const val CHAT_ROOM_ITEM_TAG = "chat_room_item:row"
         const val ARCHIVED_ACTION_TAG = "chat_list_top_app_bar:archived_action"
         const val ARCHIVED_SCREEN_TAG = "archived_chats_screen:screen"

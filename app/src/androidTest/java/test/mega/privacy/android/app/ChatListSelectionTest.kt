@@ -1,6 +1,7 @@
 package mega.privacy.android.app
 
 import android.content.Intent
+import android.os.SystemClock
 import android.util.Log
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
@@ -40,7 +41,8 @@ import javax.inject.Inject
  * navigation bar, the new Compose chat list is opened from the bar and driven into selection
  * mode: long-pressing a row enters multi-select, further taps toggle rows, the selection top
  * app bar reflects the count and offers select-all, and its overflow surfaces the bulk-actions
- * bottom sheet. Back exits selection.
+ * bottom sheet. Back exits selection. A second journey follows a bulk action through: archiving a
+ * two-chat selection must reach the chat gateway once per selected chat and drop out of selection.
  *
  * Built on the `:data-test` fake-SDK framework following [MenuHiddenSectionsTest] and
  * [ChatRoomTest]: the whole app runs as in production — real navigation, ViewModels, the chat
@@ -124,37 +126,79 @@ class ChatListSelectionTest {
         // The list renders the seeded rooms and starts out of selection mode.
         awaitObject(chatRow(TITLES[0]), LAUNCH_TIMEOUT, "first-chat-row")
         assertThat(device.hasObject(By.res(SELECTION_BAR_TAG))).isFalse()
-        Thread.sleep(2_000)
 
         // Long-press the first row → selection mode, one selected.
         device.findObject(chatRow(TITLES[0])).longClick()
         awaitObject(By.res(SELECTION_BAR_TAG), LOAD_TIMEOUT, "selection-bar")
         awaitObject(selectionCount("1"), LOAD_TIMEOUT, "selection-count-1")
-        Thread.sleep(2_000)
 
         // Tap a second row → two selected.
         device.findObject(chatRow(TITLES[1])).click()
         awaitObject(selectionCount("2"), LOAD_TIMEOUT, "selection-count-2")
-        Thread.sleep(2_000)
 
         // Select-all → every seeded room selected.
         device.findObject(By.res(SELECT_ALL_TAG)).click()
         awaitObject(selectionCount(TITLES.size.toString()), LOAD_TIMEOUT, "selection-count-all")
-        Thread.sleep(2_000)
 
         // Overflow → the bulk-actions bottom sheet. The sheet is a ModalBottomSheet in its own
         // window where testTagsAsResourceId does not apply, so assert on a bulk action label.
         device.findObject(By.res(MORE_TAG)).click()
         val archiveLabel = targetContext.getString(sharedR.string.general_archive)
         awaitObject(By.text(archiveLabel), LOAD_TIMEOUT, "bulk-actions-sheet")
-        Thread.sleep(2_000)
 
         // Dismiss the sheet, then exit selection mode with Back.
         device.pressBack()
         awaitGone(By.text(archiveLabel), "bulk-actions-sheet-dismissed")
         device.pressBack()
         awaitGone(By.res(SELECTION_BAR_TAG), "selection-bar-dismissed")
-        Thread.sleep(2_000)
+    }
+
+    @Test
+    fun bulkArchiveArchivesEverySelectedChatAndLeavesSelection() {
+        val intent = MegaActivity.getIntentWithExtraDestinations(
+            targetContext,
+            listOf(ChatListNavKey(showMeetingTab = false)),
+        )
+        ActivityScenario.launch<MegaActivity>(intent)
+
+        awaitObject(chatRow(TITLES[0]), LAUNCH_TIMEOUT, "first-chat-row")
+        device.findObject(chatRow(TITLES[0])).longClick()
+        awaitObject(selectionCount("1"), LOAD_TIMEOUT, "selection-count-1")
+        device.findObject(chatRow(TITLES[1])).click()
+        awaitObject(selectionCount("2"), LOAD_TIMEOUT, "selection-count-2")
+
+        // Archive applies to both selected chats and needs no confirmation, so it runs on tap.
+        device.findObject(By.res(MORE_TAG)).click()
+        val archiveLabel = targetContext.getString(sharedR.string.general_archive)
+        awaitObject(By.text(archiveLabel), LOAD_TIMEOUT, "bulk-actions-sheet")
+        device.findObject(By.text(archiveLabel)).click()
+
+        awaitArchiveInvocation(FIRST_CHAT_ID)
+        awaitArchiveInvocation(FIRST_CHAT_ID + 1)
+
+        // Running an action clears the selection, so the selection bar goes away with the sheet.
+        awaitGone(By.res(SELECTION_BAR_TAG), "selection-bar-dismissed")
+    }
+
+    /**
+     * The archive command is dispatched from a `viewModelScope.launch`, so its invocation is not
+     * recorded synchronously after the tap that triggered it.
+     */
+    private fun awaitArchiveInvocation(chatId: Long) {
+        val deadline = SystemClock.uptimeMillis() + LOAD_TIMEOUT
+        while (SystemClock.uptimeMillis() < deadline) {
+            val matched = fakeMegaChat.invocations.any {
+                it.methodName == "archiveChat" &&
+                        it.arguments.getOrNull(0) == chatId &&
+                        it.arguments.getOrNull(1) == true
+            }
+            if (matched) return
+            Thread.sleep(POLL_INTERVAL_MS)
+        }
+        throw AssertionError(
+            "Timed out after ${LOAD_TIMEOUT}ms waiting for archiveChat($chatId, archive=true); " +
+                    "recorded methods=${fakeMegaChat.invocations.map { it.methodName }}"
+        )
     }
 
     private fun seedChatRooms() {
@@ -214,6 +258,7 @@ class ChatListSelectionTest {
     private companion object {
         const val LAUNCH_TIMEOUT = 60_000L
         const val LOAD_TIMEOUT = 30_000L
+        const val POLL_INTERVAL_MS = 100L
 
         const val FIRST_CHAT_ID = 5_001L
         const val PEER_HANDLE_BASE = 6_001L

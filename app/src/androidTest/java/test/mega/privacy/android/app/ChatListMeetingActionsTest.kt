@@ -36,8 +36,9 @@ import javax.inject.Inject
  *
  * The chat list FAB is tab-aware: on the Chats tab it opens the new-chat flow, on the Meetings tab
  * it opens a bottom sheet offering Start meeting now / Join meeting / Schedule meeting. This test
- * walks that journey end to end, rotating the device while the sheet is open to prove the sheet and
- * the selected tab survive the activity recreation rotation causes.
+ * walks that journey end to end — including the tab switch itself, where each tab must list only
+ * its own rooms — rotating the device while the sheet is open to prove the sheet and the selected
+ * tab survive the activity recreation rotation causes.
  *
  * Built on the `:data-test` fake-SDK framework following [ChatListFabAndEmptyStateTest]: the whole
  * app runs as in production with only the SDK gateways faked; the UI is driven with UiAutomator, and
@@ -129,32 +130,31 @@ class ChatListMeetingActionsTest {
         )
         ActivityScenario.launch<MegaActivity>(intent)
 
-        // Chats tab: the FAB opens the new-chat flow.
+        // Chats tab: only the non-meeting room is listed and the FAB opens the new-chat flow.
+        awaitObject(chatRow(CHAT_TITLE), LAUNCH_TIMEOUT, "chat-row")
         awaitObject(By.res(CHAT_LIST_FAB_TAG), LAUNCH_TIMEOUT, "new-chat-fab")
-        Thread.sleep(2_000)
+        awaitGone(chatRow(MEETING_TITLE), "meeting-row-hidden-on-chats-tab")
 
-        // Switching to Meetings swaps the FAB for the meeting one.
+        // Switching to Meetings swaps both the listed rooms and the FAB.
         val meetingsTab = targetContext.getString(sharedR.string.chat_tab_meetings_title)
         device.findObject(By.text(meetingsTab)).click()
+        awaitObject(chatRow(MEETING_TITLE), LOAD_TIMEOUT, "meeting-row")
+        awaitGone(chatRow(CHAT_TITLE), "chat-row-hidden-on-meetings-tab")
         awaitObject(By.res(CHAT_LIST_MEETING_FAB_TAG), LOAD_TIMEOUT, "meeting-fab")
         awaitGone(By.res(CHAT_LIST_FAB_TAG), "new-chat-fab-hidden")
-        Thread.sleep(2_000)
 
         // The meeting FAB opens the actions sheet.
         device.findObject(By.res(CHAT_LIST_MEETING_FAB_TAG)).click()
         awaitSheetActions("meeting-actions-sheet")
-        Thread.sleep(2_000)
 
         // Rotating recreates the activity; the sheet and the selected tab must come back.
         device.setOrientationLeft()
         device.waitForIdle()
         awaitSheetActions("meeting-actions-sheet-landscape")
-        Thread.sleep(2_000)
 
         device.setOrientationNatural()
         device.waitForIdle()
         awaitSheetActions("meeting-actions-sheet-portrait")
-        Thread.sleep(2_000)
 
         // Join meeting opens the dialog asking for a meeting link.
         device.findObject(By.text(joinMeetingLabel)).click()
@@ -162,14 +162,12 @@ class ChatListMeetingActionsTest {
         awaitObject(By.text(dialogTitle), LOAD_TIMEOUT, "join-meeting-dialog-title")
         val linkHint = targetContext.getString(sharedR.string.chat_join_meeting_dialog_hint)
         awaitObject(By.text(linkHint), LOAD_TIMEOUT, "join-meeting-dialog-hint")
-        Thread.sleep(2_000)
 
         // Cancelling returns to the Meetings tab with its meeting FAB.
         val cancel = targetContext.getString(sharedR.string.general_dialog_cancel_button)
         device.findObject(By.text(cancel)).click()
         awaitGone(By.text(dialogTitle), "join-meeting-dialog-dismissed")
         awaitObject(By.res(CHAT_LIST_MEETING_FAB_TAG), LOAD_TIMEOUT, "meeting-fab-restored")
-        Thread.sleep(2_000)
     }
 
     /**
@@ -184,10 +182,13 @@ class ChatListMeetingActionsTest {
     }
 
     private fun seedRooms() {
-        seedRoom(FIRST_CHAT_ID, "Team standup", isMeeting = false)
-        seedRoom(FIRST_CHAT_ID + 1, "Weekly sync", isMeeting = true)
+        seedRoom(FIRST_CHAT_ID, CHAT_TITLE, isMeeting = false)
+        seedRoom(FIRST_CHAT_ID + 1, MEETING_TITLE, isMeeting = true)
         seedRoom(FIRST_CHAT_ID + 2, "Design review", isMeeting = true)
     }
+
+    private fun chatRow(title: String): BySelector =
+        By.res(CHAT_ROOM_ITEM_TAG).hasDescendant(By.text(title))
 
     private fun seedRoom(chatId: Long, title: String, isMeeting: Boolean) {
         fakeMegaChat.chatState.chatRooms[chatId] = StubMegaChatRoom(
@@ -243,7 +244,11 @@ class ChatListMeetingActionsTest {
         const val PEER_HANDLE_BASE = 9_100L
         const val BASE_TIMESTAMP = 1_749_000_000L
 
-        /** Mirror ChatListScreen test tags. */
+        const val CHAT_TITLE = "Team standup"
+        const val MEETING_TITLE = "Weekly sync"
+
+        /** Mirror ChatListScreen / ChatRoomItemView test tags. */
+        const val CHAT_ROOM_ITEM_TAG = "chat_room_item:row"
         const val CHAT_LIST_FAB_TAG = "chat_list_screen:new_chat_fab"
         const val CHAT_LIST_MEETING_FAB_TAG = "chat_list_screen:new_meeting_fab"
     }

@@ -45,6 +45,9 @@ import javax.inject.Inject
  * is stubbed with Espresso-Intents so it stays in-app and is asserted — then taps the FAB and
  * verifies the new-chat picker opens.
  *
+ * A second journey covers the other way into that flow: arriving with `createNewChat` set on the
+ * navigation key must open the new-chat picker without any tap.
+ *
  * Built on the `:data-test` fake-SDK framework following [ChatListSelectionTest]: the whole app runs
  * as in production with only the SDK gateways faked; the UI is driven with UiAutomator, and Compose
  * test tags are matched as resource ids because MegaActivity sets `testTagsAsResourceId = true`.
@@ -127,7 +130,6 @@ class ChatListFabAndEmptyStateTest {
         val emptyTitle = targetContext.getString(sharedR.string.chat_recent_list_empty_title)
         awaitObject(By.text(emptyTitle), LOAD_TIMEOUT, "empty-title")
         awaitObject(By.textContains(LEARN_MORE_TEXT), LOAD_TIMEOUT, "learn-more-link")
-        Thread.sleep(2_000)
 
         // Tap Learn more; its ACTION_VIEW is stubbed so it stays in-app and is asserted. The link
         // is an inline annotated span inside a single (non-clickable) description Text — there is no
@@ -155,13 +157,29 @@ class ChatListFabAndEmptyStateTest {
         } finally {
             Intents.release()
         }
-        Thread.sleep(2_000)
 
         // Tap the new-chat FAB -> the new-chat picker opens.
         device.findObject(By.res(CHAT_LIST_FAB_TAG)).click()
         val pickerTitle = targetContext.getString(sharedR.string.new_chat_title)
         awaitObject(By.text(pickerTitle), LOAD_TIMEOUT, "new-chat-picker")
-        Thread.sleep(2_000)
+    }
+
+    @Test
+    fun createNewChatKeyOpensTheNewChatFlowOnArrival() {
+        // Callers that ask for the new-chat flow (the Home shortcut, deep links) navigate here with
+        // the flag on the key rather than tapping the FAB themselves.
+        val intent = MegaActivity.getIntentWithExtraDestinations(
+            targetContext,
+            listOf(ChatListNavKey(createNewChat = true)),
+        )
+        ActivityScenario.launch<MegaActivity>(intent)
+
+        val pickerTitle = targetContext.getString(sharedR.string.new_chat_title)
+        awaitObject(By.text(pickerTitle), LAUNCH_TIMEOUT, "new-chat-picker")
+
+        // Leaving the picker lands on the chat list the key also asked for.
+        device.pressBack()
+        awaitObject(By.res(CHAT_LIST_EMPTY_TAG), LOAD_TIMEOUT, "chat-empty-state")
     }
 
     private fun awaitObject(selector: BySelector, timeout: Long, name: String) {
