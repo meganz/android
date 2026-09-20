@@ -61,23 +61,21 @@ import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSource
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSourceType
+import mega.privacy.android.app.presentation.videoplayer.model.toVideoPlayerLaunchSourceType
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
-import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
-import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
-import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
@@ -160,7 +158,6 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_LINK_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
@@ -382,15 +379,18 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     }
 
     private fun adapterTypeToNodeSourceType(): NodeSourceType =
-        when (args.adapterType) {
-            OFFLINE_ADAPTER -> NodeSourceType.OFFLINE
-            RUBBISH_BIN_ADAPTER -> NodeSourceType.RUBBISH_BIN
-            FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING -> NodeSourceType.FOLDER_LINK
-            FROM_CHAT -> NodeSourceType.CHAT
-            FILE_LINK_ADAPTER -> NodeSourceType.FILE_LINK
-            FROM_IMAGE_VIEWER -> NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER
-            VERSIONS_ADAPTER -> NodeSourceType.MEDIA_PLAYER_VERSIONS
-            ZIP_ADAPTER -> NodeSourceType.MEDIA_PLAYER_ZIP_FILE
+        when (args.sourceType) {
+            VideoPlayerLaunchSourceType.Offline -> NodeSourceType.OFFLINE
+            VideoPlayerLaunchSourceType.RubbishBin -> NodeSourceType.RUBBISH_BIN
+            VideoPlayerLaunchSourceType.FolderLink,
+            VideoPlayerLaunchSourceType.AlbumSharing,
+                -> NodeSourceType.FOLDER_LINK
+
+            VideoPlayerLaunchSourceType.Chat -> NodeSourceType.CHAT
+            VideoPlayerLaunchSourceType.FileLink -> NodeSourceType.FILE_LINK
+            VideoPlayerLaunchSourceType.ImageViewer -> NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER
+            VideoPlayerLaunchSourceType.Versions -> NodeSourceType.MEDIA_PLAYER_VERSIONS
+            VideoPlayerLaunchSourceType.Zip -> NodeSourceType.MEDIA_PLAYER_ZIP_FILE
             else -> NodeSourceType.MEDIA_PLAYER_DEFAULT
         }
 
@@ -522,7 +522,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         playerRetry = 0
 
         val currentPlayingUri =
-            getCurrentPlayingUri(uri, args.adapterType, currentPlayingHandle)
+            getCurrentPlayingUri(uri, args.sourceType, currentPlayingHandle)
         if (currentPlayingUri == null) {
             logInvalidParam("folder link uri is null")
             return
@@ -540,17 +540,24 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         )
 
         if (!source.isPlaylist) {
-            setPlayingItem(currentPlayingHandle, currentPlayingFileName, args.adapterType)
+            setPlayingItem(currentPlayingHandle, currentPlayingFileName, args.sourceType)
             return
         }
 
-        if (args.adapterType != OFFLINE_ADAPTER && args.adapterType != ZIP_ADAPTER) {
+        if (args.sourceType != VideoPlayerLaunchSourceType.Offline &&
+            args.sourceType != VideoPlayerLaunchSourceType.Zip
+        ) {
             needStopStreamingServer =
-                needStopStreamingServer || setupStreamingServer(args.adapterType)
+                needStopStreamingServer || setupStreamingServer(args.sourceType)
         }
 
         withContext(ioDispatcher) {
-            handlePlaybackSourceByLaunchSource(source, args.adapterType, currentPlayingHandle)
+            handlePlaybackSourceByLaunchSource(
+                source = source,
+                launchSource = args.sourceType,
+                launchAdapterType = args.adapterType,
+                playingHandle = currentPlayingHandle,
+            )
         }
     }
 
@@ -561,6 +568,9 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 false
             }
 
+            // Deliberately the raw sentinel, not sourceType: INVALID_VALUE means "no launch source
+            // was supplied", whereas Unknown also covers values this player does not recognise,
+            // which are allowed through to the general-source path.
             source.adapterType == INVALID_VALUE -> {
                 logInvalidParam("Launch source is invalid")
                 false
@@ -591,17 +601,22 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         uiState.update { it.copy(retryFailedEvent = triggered) }
     }
 
-    private suspend fun setupStreamingServer(launchSource: Int): Boolean {
-        val isServerRunning = httpServerIsRunningUseCase(launchSource == FOLDER_LINK_ADAPTER)
+    private suspend fun setupStreamingServer(launchSource: VideoPlayerLaunchSourceType): Boolean {
+        val isFolderLink = launchSource == VideoPlayerLaunchSourceType.FolderLink
+        val isServerRunning = httpServerIsRunningUseCase(isFolderLink)
         if (isServerRunning != 0) return false
 
-        httpServerStartUseCase(launchSource == FOLDER_LINK_ADAPTER)
+        httpServerStartUseCase(isFolderLink)
         return true
     }
 
-    private suspend fun getCurrentPlayingUri(uri: Uri?, launchSource: Int, handle: Long) =
+    private suspend fun getCurrentPlayingUri(
+        uri: Uri?,
+        launchSource: VideoPlayerLaunchSourceType,
+        handle: Long,
+    ) =
         when (launchSource) {
-            FOLDER_LINK_ADAPTER -> {
+            VideoPlayerLaunchSourceType.FolderLink -> {
                 val url = getLocalFolderLinkUseCase(handle)
                 url?.toUri()
             }
@@ -657,7 +672,11 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             }
         }
 
-    private suspend fun setPlayingItem(handle: Long, fileName: String?, source: Int) {
+    private suspend fun setPlayingItem(
+        handle: Long,
+        fileName: String?,
+        source: VideoPlayerLaunchSourceType,
+    ) {
         val node = getVideoNodeByHandleUseCase(handle)
         val thumbnail = getThumbnailForNode(node, handle, source)
         val playingItem = videoPlayerItemMapper(
@@ -680,10 +699,10 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private suspend fun getThumbnailForNode(
         node: TypedVideoNode?,
         handle: Long,
-        source: Int,
+        source: VideoPlayerLaunchSourceType,
     ) = when {
         node == null -> null
-        source == OFFLINE_ADAPTER -> getThumbnailUseCase(handle)
+        source == VideoPlayerLaunchSourceType.Offline -> getThumbnailUseCase(handle)
         else -> runCatching {
             File(
                 ThumbnailUtils.getThumbFolder(context),
@@ -694,13 +713,14 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
 
     private suspend fun handlePlaybackSourceByLaunchSource(
         source: VideoPlayerLaunchSource,
-        launchSource: Int,
+        launchSource: VideoPlayerLaunchSourceType,
+        launchAdapterType: Int,
         playingHandle: Long,
     ) {
         when (launchSource) {
-            OFFLINE_ADAPTER -> handleOfflineSource(source, playingHandle)
-            ZIP_ADAPTER -> handleZipSource(source, playingHandle)
-            else -> handleGeneralSource(source, launchSource, playingHandle)
+            VideoPlayerLaunchSourceType.Offline -> handleOfflineSource(source, playingHandle)
+            VideoPlayerLaunchSourceType.Zip -> handleZipSource(source, playingHandle)
+            else -> handleGeneralSource(source, launchAdapterType, playingHandle)
         }
     }
 
@@ -2043,7 +2063,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         uiState.update { it.copy(showSubTitlesOptions = value) }
     }
 
-    internal fun isShowSubtitleIcon() = args.adapterType != OFFLINE_ADAPTER
+    internal fun isShowSubtitleIcon() = args.sourceType != VideoPlayerLaunchSourceType.Offline
 
     internal fun clearSubtitleInfo(currentPlayingIndex: Int) {
         if (uiState.value.addedSubtitleInfo != null) {
@@ -2094,6 +2114,12 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         val fileName: String,
         val collectionTitle: String?,
         val collectionId: Long?,
-    )
+    ) {
+        /**
+         * @see VideoPlayerLaunchSource.sourceType for why this is computed rather than stored.
+         */
+        val sourceType: VideoPlayerLaunchSourceType
+            get() = adapterType.toVideoPlayerLaunchSourceType()
+    }
 }
 

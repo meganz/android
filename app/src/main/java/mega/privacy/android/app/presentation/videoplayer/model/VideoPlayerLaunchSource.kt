@@ -47,4 +47,17 @@ data class VideoPlayerLaunchSource(
     val localFilePath: String? = null,
     val collectionTitle: String? = null,
     val collectionId: Long? = null,
-)
+) {
+    /**
+     * [adapterType] resolved to a named source. Match on this rather than on the raw integer.
+     *
+     * Computed rather than stored so it can never drift from [adapterType] — a stored
+     * property would survive `copy(adapterType = ...)` unchanged and silently describe the
+     * wrong source.
+     *
+     * The mapping lives in [toVideoPlayerLaunchSourceType] so that both this model and the Intent
+     * bridge depend on it, rather than on each other.
+     */
+    val sourceType: VideoPlayerLaunchSourceType
+        get() = adapterType.toVideoPlayerLaunchSourceType()
+}
