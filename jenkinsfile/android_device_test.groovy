@@ -1,9 +1,13 @@
 /**
  * This script runs the connected device instrumented tests on a Gradle Managed Device.
  *
- * It runs every day at 4am, and can also be triggered by the "device_test" MR command or a manual
- * run. The result is posted to the MR when there is one, and to Slack: a passed run goes to the
- * default channel, a failed run to the default channel and the Android dev team channel.
+ * Two Jenkins jobs share it: the MR job, triggered by the "device_test" MR command, builds the MR
+ * source branch; the nightly job builds develop on a schedule. The schedule lives in the nightly
+ * job configuration, not here: a `triggers` directive would be registered on both jobs, and the MR
+ * job checks out `origin/${gitlabSourceBranch}`, which a timer build cannot resolve.
+ *
+ * The result is posted to the MR when there is one, and to Slack: a passed run goes to the default
+ * channel, a failed run to the default channel and the Android dev team channel.
  */
 
 BUILD_STEP = ''
@@ -41,7 +45,8 @@ DEVICE_TEST_REPORT_ZIP = "device_test_report.zip"
 DEVICE_TEST_REPORT_LINK = ""
 
 /**
- * Artifactory folder of the uploaded console log and test report. MR runs get a MR-<n> sub folder.
+ * Artifactory folder of the uploaded console log and test report. MR runs get a MR-<n> sub folder,
+ * the other runs a sub folder per job.
  */
 ARTIFACTORY_FOLDER = "android_device_test"
 
@@ -54,7 +59,6 @@ pipeline {
     // Apple Silicon only: on Intel machines (labelled mac-intel) the emulator is too slow to
     // render the app and every UI test times out.
     agent { label '(mac-jenkins-slave-android || mac-jenkins-slave) && !mac-intel' }
-    triggers { cron('0 4 * * *') }   // every day at 4.00am NZ time
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
@@ -187,15 +191,16 @@ pipeline {
 }
 
 /**
- * Artifactory folder for this build's uploads: a MR-<n> sub folder for MR-triggered builds,
- * the plain pipeline folder for timer / manual runs.
+ * Artifactory folder for this build's uploads: a MR-<n> sub folder for MR-triggered builds, a
+ * per-job sub folder for scheduled / manual runs, whose build numbers would otherwise collide
+ * between the jobs sharing this script.
  *
  * @param common the loaded common.groovy script
  */
 private String artifactoryFolder(common) {
     return common.hasGitLabMergeRequest()
             ? "${ARTIFACTORY_FOLDER}/MR-${common.getMrNumber()}"
-            : ARTIFACTORY_FOLDER
+            : "${ARTIFACTORY_FOLDER}/${env.JOB_BASE_NAME}"
 }
 
 /**
