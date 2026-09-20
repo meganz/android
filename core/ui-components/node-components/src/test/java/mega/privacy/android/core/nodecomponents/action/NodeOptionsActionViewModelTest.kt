@@ -26,7 +26,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction

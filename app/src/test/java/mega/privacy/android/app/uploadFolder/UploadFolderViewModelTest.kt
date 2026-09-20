@@ -8,8 +8,8 @@ import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.InstantExecutorExtension
-import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionResultUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.document.DocumentEntity

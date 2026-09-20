@@ -28,12 +28,12 @@ import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.namecollision.data.FileVersioningInfo
-import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
-import mega.privacy.android.app.namecollision.data.toDomainEntity
-import mega.privacy.android.app.namecollision.data.toUiEntity
+import mega.privacy.android.shared.nodes.namecollision.FileVersioningInfo
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionActionResult
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionType
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
+import mega.privacy.android.shared.nodes.namecollision.toDomainEntity
+import mega.privacy.android.shared.nodes.namecollision.toUiEntity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
@@ -263,7 +263,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     )
 
                     if (isFile && collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
-                        requestFileThumbnail(collisionResult.nameCollision.absolutePath)
+                        requestFileThumbnail((collisionResult.nameCollision as NameCollisionUiEntity.Upload).absolutePath)
                     }
                 }
             }
@@ -329,7 +329,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 )
 
                 if (collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
-                    requestFileThumbnail(collisionResult.nameCollision.absolutePath)
+                    requestFileThumbnail((collisionResult.nameCollision as NameCollisionUiEntity.Upload).absolutePath)
                 }
             }
             this.name.text = collisionResult.collisionName
@@ -379,7 +379,7 @@ class NameCollisionActivity : PasscodeActivity() {
                         )
 
                         if (isFile && collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
-                            requestFileThumbnail(collisionResult.nameCollision.absolutePath)
+                            requestFileThumbnail((collisionResult.nameCollision as NameCollisionUiEntity.Upload).absolutePath)
                         }
                     }
                 }

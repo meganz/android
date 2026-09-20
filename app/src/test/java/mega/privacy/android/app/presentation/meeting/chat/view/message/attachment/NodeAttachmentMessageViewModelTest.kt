@@ -4,8 +4,8 @@ import android.content.Intent
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestResult
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper

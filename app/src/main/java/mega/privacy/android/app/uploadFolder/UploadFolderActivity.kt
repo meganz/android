@@ -42,8 +42,8 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.namecollision.NameCollisionActivity
-import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionResultUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter

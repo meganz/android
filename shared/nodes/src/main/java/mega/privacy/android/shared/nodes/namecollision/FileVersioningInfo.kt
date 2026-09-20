@@ -1,4 +1,4 @@
-package mega.privacy.android.app.namecollision.data
+package mega.privacy.android.shared.nodes.namecollision
 
 /**
  * Info required to present the replace, update or merge option of a name collision.

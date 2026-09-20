@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId

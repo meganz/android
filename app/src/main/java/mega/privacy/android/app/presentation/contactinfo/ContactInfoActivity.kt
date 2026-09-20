@@ -96,7 +96,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialo
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState

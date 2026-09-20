@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -16,7 +16,7 @@ import javax.inject.Inject
  * View model for share folder access dialog
  * @property applicationScope [kotlinx.coroutines.CoroutineScope]
  * @property sharedFolderUseCase [mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase]
- * @property nodeMoveRequestMessageMapper [mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper]
+ * @property nodeMoveRequestMessageMapper [mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper]
  * @property snackBarHandler [mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler]
  */
 @HiltViewModel

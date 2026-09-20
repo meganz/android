@@ -25,8 +25,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList

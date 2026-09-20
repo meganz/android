@@ -12,7 +12,7 @@ import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId

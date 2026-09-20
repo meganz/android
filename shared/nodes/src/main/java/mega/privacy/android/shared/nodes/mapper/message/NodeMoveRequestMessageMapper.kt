@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.mapper.message
+package mega.privacy.android.shared.nodes.mapper.message
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext

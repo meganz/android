@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -18,7 +18,7 @@ import javax.inject.Inject
  * @property applicationScope [kotlinx.coroutines.CoroutineScope]
  * @property deleteNodesUseCase [mega.privacy.android.domain.usecase.node.DeleteNodesUseCase]
  * @property moveNodesToRubbishUseCase [mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase]
- * @property nodeMoveRequestMessageMapper [mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper]
+ * @property nodeMoveRequestMessageMapper [mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper]
  * @property snackBarHandler [mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler]
  */
 @HiltViewModel

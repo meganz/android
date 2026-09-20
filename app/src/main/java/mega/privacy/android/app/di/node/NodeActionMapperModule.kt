@@ -6,8 +6,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapperImpl
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapperImpl
 
 /**
  * Node Action Module

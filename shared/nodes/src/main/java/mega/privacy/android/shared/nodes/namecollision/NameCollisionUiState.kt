@@ -1,4 +1,4 @@
-package mega.privacy.android.app.namecollision.model
+package mega.privacy.android.shared.nodes.namecollision
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed

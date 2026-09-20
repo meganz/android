@@ -35,7 +35,7 @@ import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.triggeredContent
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo

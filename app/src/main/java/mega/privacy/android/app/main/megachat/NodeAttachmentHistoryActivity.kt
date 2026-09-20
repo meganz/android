@@ -56,7 +56,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattach
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel
 import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity.Companion.createSecondaryIntent
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource

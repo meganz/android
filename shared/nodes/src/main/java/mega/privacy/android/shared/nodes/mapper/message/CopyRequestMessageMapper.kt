@@ -1,6 +1,4 @@
-package mega.privacy.android.app.presentation.copynode.mapper
-
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+package mega.privacy.android.shared.nodes.mapper.message
 
 /**
  * Mapper to get Copy Request message after copying node

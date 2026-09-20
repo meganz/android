@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
-import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
+import mega.privacy.android.shared.nodes.mapper.message.toCopyRequestResult
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision

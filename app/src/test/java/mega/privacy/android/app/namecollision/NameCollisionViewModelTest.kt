@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.extensions.withCoroutineExceptions
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.MoveRequestResult

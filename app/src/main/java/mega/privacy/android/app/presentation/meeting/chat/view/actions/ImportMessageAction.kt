@@ -17,7 +17,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.NameCollisionActivity
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileExplorerActivity

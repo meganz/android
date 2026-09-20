@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
-import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
+import mega.privacy.android.shared.nodes.mapper.message.toCopyRequestResult
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri

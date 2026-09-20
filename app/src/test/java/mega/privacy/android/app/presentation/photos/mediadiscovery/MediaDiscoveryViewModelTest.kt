@@ -17,7 +17,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
 import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity

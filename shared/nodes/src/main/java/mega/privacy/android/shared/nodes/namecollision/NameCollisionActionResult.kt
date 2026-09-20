@@ -1,4 +1,4 @@
-package mega.privacy.android.app.namecollision.data
+package mega.privacy.android.shared.nodes.namecollision
 
 /**
  * Data class for showing the result of the performed action after resolving a name collision.

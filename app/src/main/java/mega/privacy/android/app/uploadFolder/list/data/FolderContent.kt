@@ -2,7 +2,7 @@ package mega.privacy.android.app.uploadFolder.list.data
 
 import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 
 /**
  * View item which represents a Folder Content, related to upload folders, at UI level.

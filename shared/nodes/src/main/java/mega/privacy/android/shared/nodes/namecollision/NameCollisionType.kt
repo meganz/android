@@ -1,4 +1,4 @@
-package mega.privacy.android.app.namecollision.data
+package mega.privacy.android.shared.nodes.namecollision
 
 /**
  * Enum class for defining the type of a collision.

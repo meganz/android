@@ -1,8 +1,8 @@
-package mega.privacy.android.app.namecollision.data
+package mega.privacy.android.shared.nodes.namecollision
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity.Upload.Companion.toFileNameCollision
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity.Upload.Companion.toFileNameCollision
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollision

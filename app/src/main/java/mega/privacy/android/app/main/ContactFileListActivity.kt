@@ -49,7 +49,7 @@ import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
@@ -78,7 +78,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternal
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.namecollision.data
+package mega.privacy.android.shared.nodes.namecollision
 
 import android.net.Uri
 import android.os.Parcelable

@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
+import mega.privacy.android.shared.nodes.mapper.message.CopyRequestMessageMapper
+import mega.privacy.android.shared.nodes.mapper.message.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState

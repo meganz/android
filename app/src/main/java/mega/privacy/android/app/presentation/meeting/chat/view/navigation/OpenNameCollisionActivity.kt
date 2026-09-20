@@ -6,7 +6,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.os.bundleOf
 import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.namecollision.NameCollisionActivity
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 import mega.privacy.android.app.utils.Constants
 
 internal fun openNameCollisionActivity(
