@@ -33,10 +33,14 @@ import mega.privacy.android.feature.sync.domain.exception.SyncExclusionEditError
  * retry without re-entering them
  * @property isDiscardPromptShown whether the user is being asked to confirm losing unsaved edits
  * @property isFinished whether the screen has nothing left to do and should be left
+ * @property syncName the sync's name, shown under the title so the screen says which folder these
+ * exclusions belong to. Absent until it is read, and left absent if it cannot be: a screen without
+ * a subtitle is better than one that blocks on a name it only displays
  */
 internal data class ManageSyncExclusionsUiState(
     val loaded: ParsedMegaIgnore? = null,
     val staged: ParsedMegaIgnore? = null,
+    val syncName: String? = null,
     val isWritable: Boolean = false,
     val isLoading: Boolean = true,
     val hasLoadFailed: Boolean = false,
@@ -70,4 +74,51 @@ internal data class ManageSyncExclusionsUiState(
      */
     val canSave: Boolean
         get() = isDirty && isWritable && !isSaving
+
+    /**
+     * Whether the staged file bounds the size of what it syncs.
+     *
+     * Read apart from the rules because a file holding only size bounds still has exclusions, and
+     * showing it the empty state would invite the user to add a first exclusion over one that is
+     * already there.
+     */
+    val hasSizeBounds: Boolean
+        get() = staged?.size?.isUnbounded == false
+
+    /**
+     * Whether the sync refuses the staged file, in which case it enforces none of it.
+     *
+     * Drawn instead of the rules rather than beside them, because listing rules the sync is not
+     * applying reports the opposite of what is happening to the user's files.
+     */
+    val isRejected: Boolean
+        get() = staged?.isRejectedBySdk == true
+
+    /**
+     * Whether the file excludes something the screen cannot draw.
+     *
+     * Only the rules and the size bounds are rendered, so a file whose exclusions are all regex
+     * rules or re-includes would otherwise be reported as excluding nothing. Comments and the
+     * `sync` directives are preserved too but exclude nothing, so they are not counted; a line is
+     * taken for a rule when it is neither blank nor a comment, which over-reports a preserved
+     * directive and under-reports nothing.
+     */
+    val hasUnshownRules: Boolean
+        get() = staged?.preservedLines.orEmpty().any {
+            val line = it.trim()
+            line.isNotEmpty() && !line.startsWith(COMMENT_PREFIX)
+        }
+
+    /**
+     * Whether there is nothing for the list to draw, whatever the file may also hold.
+     *
+     * Read from the staged model rather than from the rendered lists, so that it cannot disagree
+     * with them on a frame where one has been recomputed and the other has not.
+     */
+    val hasNothingToShow: Boolean
+        get() = staged?.rules.isNullOrEmpty() && !hasSizeBounds
+
+    private companion object {
+        const val COMMENT_PREFIX = "#"
+    }
 }

@@ -3,12 +3,27 @@ package mega.privacy.android.feature.sync.navigation
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
 import mega.privacy.android.feature.sync.ui.exclusion.AddSyncExclusionRuleRoute
 import mega.privacy.android.feature.sync.ui.exclusion.EditSyncExclusionRuleRoute
 import mega.privacy.android.feature.sync.ui.exclusion.EditSyncSizeExclusionRoute
+import mega.privacy.android.feature.sync.ui.exclusion.ManageSyncExclusionsRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
+
+/**
+ * Full-screen destination listing everything one sync leaves out.
+ *
+ * @param syncId id of the sync whose exclusions these are. Required, unlike on the Add and Edit
+ * keys: those are reachable while a folder pair is still being set up, and this screen is not
+ * @param localRoot the sync's local root, which is the folder whose `.megaignore` is read
+ */
+@Serializable
+data class ManageSyncExclusionsNavKey(
+    val syncId: Long,
+    val localRoot: UriPath,
+) : NavKey
 
 /**
  * Full-screen destination for authoring a new sync exclusion rule.
@@ -79,15 +94,42 @@ data class EditSyncSizeExclusionNavKey(
 ) : NavKey
 
 /**
- * Registers the exclusion rule destinations.
+ * Registers the exclusion destinations.
  *
- * Every destination builds a change but none yet writes one, so saving and deleting only close
- * the screen. Nothing navigates to any of them, so no surface can reach a rule that would be
- * dropped.
+ * The Manage destination writes: its save hands the staged file to the repository and the sync
+ * rescans. The Add, Edit and size destinations still only close, and nothing carries their result
+ * back to the Manage screen, so a rule authored there is discarded when the screen closes. The
+ * Manage screen reaches them all, so that gap is now reachable by a user rather than merely
+ * latent; it is the whole of SAT-2470.
  */
 fun EntryProviderScope<NavKey>.syncExclusionScreens(
     navigationHandler: NavigationHandler,
 ) {
+    entry<ManageSyncExclusionsNavKey> { navKey ->
+        ManageSyncExclusionsRoute(
+            syncId = navKey.syncId,
+            localRoot = navKey.localRoot,
+            onFinished = { navigationHandler.back() },
+            onAddExclusion = { syncId ->
+                navigationHandler.navigate(AddSyncExclusionRuleNavKey(syncId))
+            },
+            onEditRule = { row ->
+                navigationHandler.navigate(
+                    EditSyncExclusionRuleNavKey(
+                        ruleIndex = row.ruleIndex,
+                        rule = row.rule,
+                        syncId = navKey.syncId,
+                    ),
+                )
+            },
+            onEditSize = { exclusion ->
+                navigationHandler.navigate(
+                    EditSyncSizeExclusionNavKey(exclusion, navKey.syncId),
+                )
+            },
+        )
+    }
+
     entry<AddSyncExclusionRuleNavKey> {
         AddSyncExclusionRuleRoute(
             onConfirm = { navigationHandler.back() },

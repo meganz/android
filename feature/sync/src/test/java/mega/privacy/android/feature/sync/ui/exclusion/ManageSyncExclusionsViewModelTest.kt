@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.exclusion
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -7,8 +8,14 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.domain.entity.ExclusionsSnapshot
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.entity.InvalidLineReason
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreEntry
 import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
@@ -27,11 +34,17 @@ import mega.privacy.android.feature.sync.domain.usecase.exclusion.ReplaceSyncExc
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.RestoreDefaultSyncExclusionsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.SetSyncExclusionsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.SetSyncSizeBoundsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionChipMapper
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionPatternMapper
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionRowMapper
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionSupportingTextMapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
@@ -47,10 +60,11 @@ internal class ManageSyncExclusionsViewModelTest {
 
     private val getSyncExclusionsUseCase = mock<GetSyncExclusionsUseCase>()
     private val setSyncExclusionsUseCase = mock<SetSyncExclusionsUseCase>()
+    private val getFolderPairsUseCase = mock<GetFolderPairsUseCase>()
 
     @AfterEach
     fun tearDown() {
-        reset(getSyncExclusionsUseCase, setSyncExclusionsUseCase)
+        reset(getSyncExclusionsUseCase, setSyncExclusionsUseCase, getFolderPairsUseCase)
     }
 
     @Test
@@ -579,6 +593,142 @@ internal class ManageSyncExclusionsViewModelTest {
 
     // endregion
 
+    @Test
+    fun `test that init exposes the name of the sync it was opened for`() = runTest {
+        stubRead(threeRules)
+        stubFolderPairs(folderPair(SYNC_ID, "Documents"), folderPair(SYNC_ID + 1, "Photos"))
+
+        val underTest = underTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().syncName).isEqualTo("Documents")
+        }
+    }
+
+    @Test
+    fun `test that init leaves the name absent when no sync matches the id`() = runTest {
+        stubRead(threeRules)
+        stubFolderPairs(folderPair(SYNC_ID + 1, "Photos"))
+
+        val underTest = underTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().syncName).isNull()
+        }
+    }
+
+    @Test
+    fun `test that a name lookup that throws leaves the exclusions readable`() = runTest {
+        stubRead(threeRules)
+        getFolderPairsUseCase.stub { onBlocking { invoke() } doAnswer { throw RuntimeException() } }
+
+        val underTest = underTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.syncName).isNull()
+            assertThat(state.hasLoadFailed).isFalse()
+            assertThat(state.staged).isEqualTo(threeRules)
+        }
+    }
+
+    @Test
+    fun `test that chips and rows split the staged rules between them`() = runTest {
+        stubRead(ParsedMegaIgnore(entries = MegaIgnoreDefaults.RULES.map {
+            MegaIgnoreEntry.RuleEntry(it)
+        }))
+        stubFolderPairs()
+
+        val underTest = underTest()
+
+        underTest.chips.test {
+            assertThat(awaitItem()).hasSize(3)
+        }
+        underTest.rows.test {
+            assertThat(awaitItem()).hasSize(5)
+        }
+    }
+
+    @Test
+    fun `test that removing a rule republishes the rows without it`() = runTest {
+        stubRead(threeRules)
+        stubFolderPairs()
+        val underTest = underTest()
+
+        underTest.rows.test {
+            val before = awaitItem()
+            underTest.onRuleRemoved(before.first().ruleIndex, before.first().rule)
+            assertThat(awaitItem()).hasSize(before.size - 1)
+        }
+    }
+
+    @Test
+    fun `test that a file the sync refuses is reported as rejected`() = runTest {
+        stubRead(
+            ParsedMegaIgnore(
+                entries = listOf(
+                    MegaIgnoreEntry.RuleEntry(rule("*.tmp")),
+                    MegaIgnoreEntry.InvalidEntry(
+                        line = "nonsense",
+                        reason = InvalidLineReason.MissingSeparator,
+                    ),
+                )
+            )
+        )
+        stubFolderPairs()
+
+        val underTest = underTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isRejected).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that a file of only regex rules is not reported as having nothing to exclude`() =
+        runTest {
+            stubRead(
+                ParsedMegaIgnore(entries = listOf(MegaIgnoreEntry.PreservedEntry("-r:^backup_.*")))
+            )
+            stubFolderPairs()
+
+            val underTest = underTest()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.hasNothingToShow).isTrue()
+                assertThat(state.hasUnshownRules).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that a comment alone is not counted as a rule the screen cannot show`() = runTest {
+        stubRead(
+            ParsedMegaIgnore(entries = listOf(MegaIgnoreEntry.PreservedEntry("# just a note")))
+        )
+        stubFolderPairs()
+
+        val underTest = underTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().hasUnshownRules).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that a file holding only size bounds is not reported as empty`() = runTest {
+        stubRead(
+            ParsedMegaIgnore(entries = listOf(MegaIgnoreEntry.SizeLargerEntry(bytes = 1_024L)))
+        )
+        stubFolderPairs()
+
+        val underTest = underTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().hasSizeBounds).isTrue()
+        }
+    }
+
     private fun TestScope.underTest() = ManageSyncExclusionsViewModel(
         args = ManageSyncExclusionsViewModel.Args(syncId = SYNC_ID, localRoot = LOCAL_ROOT),
         applicationScope = CoroutineScope(UnconfinedTestDispatcher(testScheduler)),
@@ -589,6 +739,27 @@ internal class ManageSyncExclusionsViewModelTest {
         removeSyncExclusionUseCase = RemoveSyncExclusionUseCase(),
         restoreDefaultSyncExclusionsUseCase = RestoreDefaultSyncExclusionsUseCase(),
         setSyncSizeBoundsUseCase = SetSyncSizeBoundsUseCase(),
+        getFolderPairsUseCase = getFolderPairsUseCase,
+        chipMapper = SyncExclusionChipMapper(SyncExclusionPatternMapper()),
+        rowMapper = SyncExclusionRowMapper(
+            patternMapper = SyncExclusionPatternMapper(),
+            supportingTextMapper = SyncExclusionSupportingTextMapper(),
+        ),
+    )
+
+    private fun stubFolderPairs(vararg pairs: FolderPair) {
+        getFolderPairsUseCase.stub {
+            onBlocking { invoke() } doReturn pairs.toList()
+        }
+    }
+
+    private fun folderPair(id: Long, name: String) = FolderPair(
+        id = id,
+        syncType = SyncType.TYPE_TWOWAY,
+        pairName = name,
+        localFolderPath = "/local",
+        remoteFolder = RemoteFolder(id = NodeId(1L), name = "remote"),
+        syncStatus = SyncStatus.SYNCED,
     )
 
     private fun stubRead(exclusions: ParsedMegaIgnore, isWritable: Boolean = true) {

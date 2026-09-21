@@ -1739,13 +1739,13 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months.
     is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years.
     is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
@@ -1783,10 +1783,10 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
     is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
     is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
@@ -4141,6 +4141,80 @@
     <string name="sync_exclusions_add_extension_invalid_error">Extensions can’t contain spaces, dots, or slashes</string>
     <!-- Sync exclusions Add form: error under the extensions field when an existing rule already excludes one of the typed extensions. %1$s is that extension, without a leading dot, for example mp3. -->
     <string name="sync_exclusions_add_extension_duplicate_error">You’ve already excluded %1$s</string>
+    <!-- Sync exclusions Add screen: title of the full screen where a new exclusion rule is created. -->
+    <string name="sync_exclusions_add_title">Add exclusion</string>
+    <!-- Sync exclusions Edit screen: title of the full screen where an existing exclusion rule is changed or deleted. -->
+    <string name="sync_exclusions_edit_title">Edit exclusion</string>
+    <!-- Sync exclusions Add screen: label of the tab where a rule is described by the name it matches. -->
+    <string name="sync_exclusions_add_tab_by_name">By name</string>
+    <!-- Sync exclusions Add screen: label of the tab where a rule is described by how large a file is. -->
+    <string name="sync_exclusions_add_tab_by_size">By size</string>
+    <!-- Sync exclusions Add screen: button that saves the rule being created and closes the screen. -->
+    <string name="sync_exclusions_add_confirm">Add exclusion</string>
+    <!-- Sync exclusions Add form: line under the tabs on the By size tab, telling the user what the tab is for. -->
+    <string name="sync_exclusions_add_description_size">Choose what to leave out, based on file size</string>
+    <!-- Sync exclusions Add form: title of the picker listing the ways a file size can be matched. Files only, as size rules never apply to folders. -->
+    <string name="sync_exclusions_add_size_condition_title">Exclude files</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files above the size the user types. -->
+    <string name="sync_exclusions_add_size_condition_bigger_than">Bigger than</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files below the size the user types. -->
+    <string name="sync_exclusions_add_size_condition_smaller_than">Smaller than</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files outside the range between the two sizes the user types. -->
+    <string name="sync_exclusions_add_size_condition_not_between">Not between</string>
+    <!-- Sync exclusions Add form: word joining the two sizes of a range, as in “Not between 1 KB and 2 GB”. -->
+    <string name="sync_exclusions_add_size_range_conjunction">and</string>
+    <!-- Sync exclusions Add form: title of the picker listing the units a file size can be typed in. -->
+    <string name="sync_exclusions_add_size_unit_title">Unit</string>
+    <!-- Sync exclusions Add form: size unit, bytes. Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_bytes">B</string>
+    <!-- Sync exclusions Add form: size unit, kilobytes (1024 bytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_kilobytes">KB</string>
+    <!-- Sync exclusions Add form: size unit, megabytes (1024 kilobytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_megabytes">MB</string>
+    <!-- Sync exclusions Add form: size unit, gigabytes (1024 megabytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_gigabytes">GB</string>
+    <!-- Sync exclusions Manage screen: screen title. The screen lists everything a sync leaves out, and is where rules are added, edited and removed. -->
+    <string name="sync_exclusions_manage_title">Manage exclusions</string>
+    <!-- Sync exclusions Manage screen: heading over the file extensions the sync leaves out, shown as chips. -->
+    <string name="sync_exclusions_manage_section_extensions">File extensions</string>
+    <!-- Sync exclusions Manage screen: heading over the rules that match a file or folder by its name. -->
+    <string name="sync_exclusions_manage_section_names">File and folder names</string>
+    <!-- Sync exclusions Manage screen: heading over the rules that leave files out by how large they are. -->
+    <string name="sync_exclusions_manage_section_size">File size</string>
+    <!-- Sync exclusions Manage screen: button that writes the changed exclusions to the folder. Edits are collected and written once, so this confirms all of them together. -->
+    <string name="sync_exclusions_manage_save">Save</string>
+    <!-- Sync exclusions Manage screen: button that opens the screen for adding a new exclusion. -->
+    <string name="sync_exclusions_manage_add">Add exclusion</string>
+    <!-- Sync exclusions Manage screen: heading shown when the folder has no exclusions at all. -->
+    <string name="sync_exclusions_manage_empty_title">Add your first exclusion</string>
+    <!-- Sync exclusions Manage screen: body text under the empty-state heading, explaining what an exclusion does. -->
+    <string name="sync_exclusions_manage_empty_body">Everything in this folder syncs. Add an exclusion to leave files out.</string>
+    <!-- Sync exclusions Manage screen: body text shown in place of the usual empty-state text when the folder does exclude things, but only through rules this screen cannot show, such as ones written by another MEGA app. Avoids telling the user that everything syncs when it does not. -->
+    <string name="sync_exclusions_manage_empty_body_unshown">This folder has exclusions that were set elsewhere and can’t be shown here. Add one to leave more files out.</string>
+    <!-- Sync exclusions Manage screen: heading shown when the folder’s exclusion file is one sync refuses, so none of its rules are in effect. -->
+    <string name="sync_exclusions_manage_rejected_title">Exclusions aren’t being applied</string>
+    <!-- Sync exclusions Manage screen: body text under the heading shown when sync refuses the folder’s exclusion file. Nothing is left out while this is the case, which is the opposite of what the rules say. -->
+    <string name="sync_exclusions_manage_rejected_body">Sync couldn’t read this folder’s exclusions, so nothing is being left out.</string>
+    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out every file larger than a size. %1$s is a formatted file size, for example “1 GB”. -->
+    <string name="sync_exclusions_manage_size_bigger_than">Files bigger than %1$s</string>
+    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out every file smaller than a size. %1$s is a formatted file size, for example “1 KB”. -->
+    <string name="sync_exclusions_manage_size_smaller_than">Files smaller than %1$s</string>
+    <!-- Sync exclusions Manage screen: row summarising a rule that keeps only files between two sizes, leaving out everything outside that range. %1$s is the smaller size and %2$s the larger, both formatted, for example “1 KB” and “2 GB”. -->
+    <string name="sync_exclusions_manage_size_not_between">Files not between %1$s and %2$s</string>
+    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out only the files inside a size range, keeping everything outside it. The opposite of the “not between” rule. %1$s is the smaller size and %2$s the larger, both formatted, for example “1 KB” and “2 GB”. -->
+    <string name="sync_exclusions_manage_size_between">Files between %1$s and %2$s</string>
+    <!-- Sync exclusions Manage screen: confirmation shown briefly after a new exclusion is added. -->
+    <string name="sync_exclusions_manage_snackbar_added">Exclusion added</string>
+    <!-- Sync exclusions Manage screen: spoken label for the control that stops excluding a file extension. Not shown on screen; it describes the small dismiss control on an extension chip. %1$s is the extension, for example “tmp”. -->
+    <string name="sync_exclusions_manage_remove_extension">Stop excluding %1$s</string>
+    <!-- Sync exclusions Manage screen: heading shown when the folder’s exclusions could not be read. Deliberately distinct from the empty state, because presenting a failed read as “no exclusions” would invite saving that over rules that do exist. -->
+    <string name="sync_exclusions_manage_load_error_title">Couldn’t load exclusions</string>
+    <!-- Sync exclusions Manage screen: body text under the load-error heading. The exclusions are read from a file in the synced folder on the device, so the cause is a local one — the folder moved, or the app lost access to it — never the network. -->
+    <string name="sync_exclusions_manage_load_error_body">Check the folder is still on this device and try again.</string>
+    <!-- Sync exclusions Manage screen: button that retries reading the folder’s exclusions after a failed read. -->
+    <string name="sync_exclusions_manage_load_error_retry">Try again</string>
+    <!-- Sync exclusions Manage screen: message shown when the changed exclusions could not be written. The edits are kept, so the user can retry without entering them again. -->
+    <string name="sync_exclusions_manage_save_failed">Couldn’t save your changes. Try again.</string>
     <!-- Title of the personal QR code screen -->
     <string name="contacts_qr_screen_title">QR code</string>
     <!-- Button that generates the user's personal QR code -->
@@ -4205,36 +4279,6 @@
     <string name="chat_meeting_blocked_by_call_dialog_title">Ongoing call</string>
     <!-- Title of the dialog shown when the Bluetooth permission needed to start a meeting was denied -->
     <string name="chat_start_meeting_bluetooth_permission_title">Permission required</string>
-    <!-- Sync exclusions Add screen: title of the full screen where a new exclusion rule is created. -->
-    <string name="sync_exclusions_add_title">Add exclusion</string>
-    <!-- Sync exclusions Add screen: label of the tab where a rule is described by the name it matches. -->
-    <string name="sync_exclusions_add_tab_by_name">By name</string>
-    <!-- Sync exclusions Add screen: label of the tab where a rule is described by how large a file is. -->
-    <string name="sync_exclusions_add_tab_by_size">By size</string>
-    <!-- Sync exclusions Add screen: button that saves the rule being created and closes the screen. -->
-    <string name="sync_exclusions_add_confirm">Add exclusion</string>
-    <!-- Sync exclusions Add form: line under the tabs on the By size tab, telling the user what the tab is for. -->
-    <string name="sync_exclusions_add_description_size">Choose what to leave out, based on file size</string>
-    <!-- Sync exclusions Add form: title of the picker listing the ways a file size can be matched. Files only, as size rules never apply to folders. -->
-    <string name="sync_exclusions_add_size_condition_title">Exclude files</string>
-    <!-- Sync exclusions Add form: size condition picker entry, leaving out files above the size the user types. -->
-    <string name="sync_exclusions_add_size_condition_bigger_than">Bigger than</string>
-    <!-- Sync exclusions Add form: size condition picker entry, leaving out files below the size the user types. -->
-    <string name="sync_exclusions_add_size_condition_smaller_than">Smaller than</string>
-    <!-- Sync exclusions Add form: size condition picker entry, leaving out files outside the range between the two sizes the user types. -->
-    <string name="sync_exclusions_add_size_condition_not_between">Not between</string>
-    <!-- Sync exclusions Add form: word joining the two sizes of a range, as in “Not between 1 KB and 2 GB”. -->
-    <string name="sync_exclusions_add_size_range_conjunction">and</string>
-    <!-- Sync exclusions Add form: title of the picker listing the units a file size can be typed in. -->
-    <string name="sync_exclusions_add_size_unit_title">Unit</string>
-    <!-- Sync exclusions Add form: size unit, bytes. Keep the abbreviation short; it sits inside a narrow field beside the number. -->
-    <string name="sync_exclusions_add_size_unit_bytes">B</string>
-    <!-- Sync exclusions Add form: size unit, kilobytes (1024 bytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
-    <string name="sync_exclusions_add_size_unit_kilobytes">KB</string>
-    <!-- Sync exclusions Add form: size unit, megabytes (1024 kilobytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
-    <string name="sync_exclusions_add_size_unit_megabytes">MB</string>
-    <!-- Sync exclusions Add form: size unit, gigabytes (1024 megabytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
-    <string name="sync_exclusions_add_size_unit_gigabytes">GB</string>
     <!-- Snackbar message shown after archiving a single chat from the chat list. %s is the chat title -->
     <string name="success_archive_chat">%s was archived</string>
     <!-- Snackbar message shown when archiving a single chat from the chat list fails. %s is the chat title -->
@@ -4271,8 +4315,6 @@
     </plurals>
     <!-- Sync exclusions Add form: error under the two size fields of a “Not between” rule when the first size is not smaller than the second. Such a range would leave out every file. -->
     <string name="sync_exclusions_add_size_range_error">The first size must be smaller than the second</string>
-    <!-- Sync exclusions Edit screen: title of the full screen where an existing exclusion rule is changed or deleted. -->
-    <string name="sync_exclusions_edit_title">Edit exclusion</string>
     <!-- Title of the screen where the user changes their existing passcode -->
     <string name="title_change_passcode">Change passcode</string>
     <!-- Title of the screen where the user types the replacement passcode -->

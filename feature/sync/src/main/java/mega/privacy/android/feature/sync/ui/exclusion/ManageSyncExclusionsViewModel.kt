@@ -8,7 +8,10 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -25,7 +28,12 @@ import mega.privacy.android.feature.sync.domain.usecase.exclusion.ReplaceSyncExc
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.RestoreDefaultSyncExclusionsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.SetSyncExclusionsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.SetSyncSizeBoundsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionChipMapper
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionRowMapper
 import mega.privacy.android.feature.sync.ui.model.exclusion.ManageSyncExclusionsUiState
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionChipUiItem
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionRowUiItem
 
 /**
  * Stages the user's changes to a sync's `.megaignore` and writes them once, on save.
@@ -55,13 +63,32 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
     private val removeSyncExclusionUseCase: RemoveSyncExclusionUseCase,
     private val restoreDefaultSyncExclusionsUseCase: RestoreDefaultSyncExclusionsUseCase,
     private val setSyncSizeBoundsUseCase: SetSyncSizeBoundsUseCase,
+    private val getFolderPairsUseCase: GetFolderPairsUseCase,
+    private val chipMapper: SyncExclusionChipMapper,
+    private val rowMapper: SyncExclusionRowMapper,
 ) : ViewModel() {
 
     val uiState: StateFlow<ManageSyncExclusionsUiState>
         field = MutableStateFlow(ManageSyncExclusionsUiState())
 
+    /**
+     * The staged rules split into the two halves the screen draws.
+     *
+     * Derived from [uiState] rather than written into it, so that every path that stages an edit
+     * republishes them without having to remember to. The two mappers partition the file's rules
+     * between them, so a rule appears in exactly one.
+     */
+    val chips: StateFlow<List<SyncExclusionChipUiItem>> = uiState
+        .map { state -> state.staged?.let(chipMapper::invoke).orEmpty() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val rows: StateFlow<List<SyncExclusionRowUiItem>> = uiState
+        .map { state -> state.staged?.let(rowMapper::invoke).orEmpty() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     init {
         load()
+        loadSyncName()
     }
 
     /**
@@ -186,6 +213,23 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
                     }
                 },
             )
+        }
+    }
+
+    /**
+     * Reads the sync's name for the subtitle, separately from the exclusions.
+     *
+     * Kept out of [load] because the two answer different questions and fail independently: the
+     * name is decoration, so a lookup that fails leaves the subtitle absent rather than presenting
+     * the screen as unreadable, and a retry of a failed read has no reason to fetch it again.
+     */
+    private fun loadSyncName() {
+        viewModelScope.launch {
+            val name = runCatching { getFolderPairsUseCase() }.getOrNull()
+                ?.firstOrNull { it.id == args.syncId }
+                ?.pairName
+                ?: return@launch
+            uiState.update { it.copy(syncName = name) }
         }
     }
 
