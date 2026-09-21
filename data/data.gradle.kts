@@ -75,7 +75,6 @@ dependencies {
     // sqlcipherlib
     implementation(lib.sqlcipher) { artifact { type = "aar" } }
 
-    implementation(androidx.security.crypto)
     implementation(google.tink)
 
     implementation(google.protobuff)
@@ -95,4 +94,5 @@ dependencies {
     androidTestImplementation(lib.bundles.unit.test)
     androidTestImplementation(testlib.junit.test.ktx)
     androidTestImplementation(testlib.runner)
+    androidTestImplementation(androidx.security.crypto)
 }

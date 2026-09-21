@@ -8,7 +8,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.security.crypto.MasterKey
+import com.google.crypto.tink.StreamingAead
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -107,7 +107,7 @@ internal object DataStoreModule {
     fun providePasscodeDataStore(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-        masterKey: MasterKey?,
+        streamingAead: StreamingAead?,
         v1ToV2Migration: PasscodeDatastoreV1ToV2Migration,
     ): DataStore<Preferences> = PreferenceDataStoreFactory.createEncrypted(
         corruptionHandler = ReplaceFileCorruptionHandler(
@@ -115,7 +115,7 @@ internal object DataStoreModule {
         ),
         migrations = listOf(v1ToV2Migration),
         scope = CoroutineScope(ioDispatcher),
-        masterKey = masterKey,
+        streamingAead = streamingAead,
         context = context,
         fileName = passcodeDatastoreName
     )
@@ -173,7 +173,7 @@ internal object DataStoreModule {
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         migration: CredentialsPreferencesMigration,
-        masterKey: MasterKey?,
+        streamingAead: StreamingAead?,
     ): DataStore<Preferences> {
         return PreferenceDataStoreFactory.createEncrypted(
             corruptionHandler = ReplaceFileCorruptionHandler(
@@ -183,7 +183,7 @@ internal object DataStoreModule {
                 migration
             ),
             scope = CoroutineScope(ioDispatcher),
-            masterKey = masterKey,
+            streamingAead = streamingAead,
             context = context,
             fileName = credentialDataStoreName
         )
@@ -195,14 +195,14 @@ internal object DataStoreModule {
     fun provideQAAccountCacheDataStore(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-        masterKey: MasterKey?,
+        streamingAead: StreamingAead?,
     ): DataStore<Preferences> {
         return PreferenceDataStoreFactory.createEncrypted(
             corruptionHandler = ReplaceFileCorruptionHandler(
                 produceNewData = { emptyPreferences() }
             ),
             scope = CoroutineScope(ioDispatcher),
-            masterKey = masterKey,
+            streamingAead = streamingAead,
             context = context,
             fileName = qaAccountCacheDataStoreName
         )

@@ -1,8 +1,9 @@
 package mega.privacy.android.data.database
 
 import android.content.Context
-import androidx.security.crypto.EncryptedFile
+import com.google.crypto.tink.StreamingAead
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.data.cryptography.FileStreamingAeadFactory
 import net.zetetic.database.sqlcipher.SQLiteDatabase
 import timber.log.Timber
 import java.io.File
@@ -22,7 +23,7 @@ internal enum class DatabaseState {
 internal data class SQLCipherManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val passphraseFile: File,
-    private val passphraseEncryptedFile: EncryptedFile?,
+    private val streamingAead: StreamingAead?,
 ) {
 
     fun migrateToSecureDatabase(name: String, passphrase: ByteArray) {
@@ -152,9 +153,9 @@ internal data class SQLCipherManager @Inject constructor(
     fun getPassphrase(): ByteArray {
         return if (passphraseFile.exists()) {
             Timber.d("Passphrase file exists")
-            passphraseEncryptedFile?.let { encryptedFile ->
+            streamingAead?.let { aead ->
                 Timber.d("Reading passphrase from encrypted file")
-                encryptedFile.openFileInput().use { it.readBytes() }
+                readEncryptedPassphrase(aead)
             } ?: run {
                 Timber.d("Reading passphrase from file")
                 passphraseFile.readBytes()
@@ -172,12 +173,13 @@ internal data class SQLCipherManager @Inject constructor(
                 random.nextBytes(result)
             }
             Timber.d("Passphrase file does not exist")
-            passphraseEncryptedFile?.let { encryptedFile ->
+            streamingAead?.let { aead ->
                 Timber.d("Writing passphrase to encrypted file")
-                encryptedFile.openFileOutput().use {
-                    it.write(result)
-                    it.flush()
-                }
+                aead.newEncryptingStream(passphraseFile.outputStream(), passphraseAssociatedData)
+                    .use {
+                        it.write(result)
+                        it.flush()
+                    }
             } ?: run {
                 Timber.d("Writing passphrase to file")
                 passphraseFile.outputStream().use {
@@ -188,6 +190,23 @@ internal data class SQLCipherManager @Inject constructor(
             result
         }
     }
+
+    /**
+     * A passphrase written while encryption was unavailable is stored as the raw
+     * [PASSPHRASE_LENGTH] bytes, which is shorter than any valid ciphertext, so it is still
+     * readable once encryption becomes available on the device.
+     */
+    private fun readEncryptedPassphrase(aead: StreamingAead): ByteArray = runCatching {
+        aead.newDecryptingStream(passphraseFile.inputStream(), passphraseAssociatedData)
+            .use { it.readBytes() }
+    }.getOrElse { error ->
+        if (passphraseFile.length() != PASSPHRASE_LENGTH.toLong()) throw error
+        Timber.w(error, "Passphrase file is not encrypted, reading it as plaintext")
+        passphraseFile.readBytes()
+    }
+
+    private val passphraseAssociatedData: ByteArray
+        get() = FileStreamingAeadFactory.associatedData(passphraseFile.name)
 
     companion object {
         private const val PASSPHRASE_LENGTH = 32

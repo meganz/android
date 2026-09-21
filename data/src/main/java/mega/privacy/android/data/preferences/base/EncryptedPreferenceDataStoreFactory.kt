@@ -10,8 +10,7 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.MasterKey
+import com.google.crypto.tink.StreamingAead
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,20 +19,12 @@ import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 /**
- * Creates Preferences DataStore instance stored in [EncryptedFile].
+ * Creates Preferences DataStore instance whose file is encrypted with [streamingAead].
  * The file must have the extension "preferences_pb".
  *
- * Basic usage:
- * ```
- * val dataStore = PreferenceDataStoreFactory.createEncrypted {
- *     EncryptedFile.Builder(
- *          context.dataStoreFile("filename.preferences_pb"),
- *          context,
- *          MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
- *          EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
- *     ).build()
- * }
- * ```
+ * Falls back to an unencrypted DataStore when [streamingAead] is null or the encrypted
+ * DataStore cannot be created.
+ *
  * @see PreferenceDataStoreFactory.create
  */
 fun PreferenceDataStoreFactory.createEncrypted(
@@ -41,29 +32,23 @@ fun PreferenceDataStoreFactory.createEncrypted(
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     migrations: List<DataMigration<Preferences>> = listOf(),
     scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-    masterKey: MasterKey?,
+    streamingAead: StreamingAead?,
     fileName: String,
 ): DataStore<Preferences> {
     return try {
-        masterKey ?: throw IllegalArgumentException("Failed to create MasterKey")
-        val encryptedFile = EncryptedFile.Builder(
-            context,
-            context.preferencesDataStoreFile(fileName),
-            masterKey,
-            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-        ).build()
+        streamingAead ?: throw IllegalArgumentException("Failed to create StreamingAead")
         val delegate = DataStoreFactory.createEncrypted(
             serializer = PreferencesSerializer,
+            streamingAead = streamingAead,
             corruptionHandler = corruptionHandler,
             migrations = migrations,
             scope = scope,
-            produceFile = { encryptedFile },
+            produceFile = { context.preferencesDataStoreFile(fileName) },
         )
         PreferenceDataStore(delegate)
     } catch (e: Exception) {
-        // rollback to unencrypted DataStore if failed to create EncryptedFile
         // https://console.firebase.google.com/u/1/project/megapoc-25443/crashlytics/app/android:mega.privacy.android.app/issues/8a1e160bcab8e85c2ecc3334d19a75ea
-        Timber.e(e, "Failed to create EncryptedFile for $fileName")
+        Timber.e(e, "Failed to create encrypted DataStore for $fileName")
         create(
             corruptionHandler = corruptionHandler,
             scope = scope,

@@ -7,12 +7,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.security.crypto.MasterKey
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.cryptography.FileStreamingAeadFactory
 import mega.privacy.android.data.preferences.base.createEncrypted
 import org.junit.After
 import org.junit.Test
@@ -50,14 +50,12 @@ internal class EncryptedPreferenceDataStoreTest {
     }
 
     private fun createDataStore(scope: CoroutineScope): DataStore<Preferences> {
-        val masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+        val streamingAead = FileStreamingAeadFactory(context)()
         return PreferenceDataStoreFactory.createEncrypted(
             scope = scope,
             context = context,
             fileName = "test",
-            masterKey = masterKey
+            streamingAead = streamingAead
         )
     }
 }

@@ -5,41 +5,29 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
-import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.file
-import androidx.security.crypto.streamingAead
+import com.google.crypto.tink.StreamingAead
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import mega.privacy.android.data.cryptography.FileStreamingAeadFactory
+import java.io.File
 
 /**
- * Creates DataStore instance stored in [EncryptedFile].
- *
- * Basic usage:
- * ```
- * val dataStore = DataStoreFactory.createEncrypted(serializer) {
- *     EncryptedFile.Builder(
- *          context.dataStoreFile("filename"),
- *          context,
- *          MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
- *          EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
- *     ).build()
- * }
+ * Creates DataStore instance whose file content is encrypted with [streamingAead], using the
+ * file name as associated data.
  *
  * @see DataStoreFactory.create
  */
 internal fun <T> DataStoreFactory.createEncrypted(
     serializer: Serializer<T>,
+    streamingAead: StreamingAead,
     corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
     migrations: List<DataMigration<T>> = listOf(),
     scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-    produceFile: () -> EncryptedFile
+    produceFile: () -> File,
 ): DataStore<T> {
-    val encryptedFile = produceFile()
-
-    val streamingAead = encryptedFile.streamingAead
-    val file = encryptedFile.file
-    val associatedData = file.name.toByteArray()
+    val file = produceFile()
+    val associatedData = FileStreamingAeadFactory.associatedData(file.name)
 
     return create(
         serializer = serializer.encrypted(streamingAead, associatedData),
@@ -49,4 +37,3 @@ internal fun <T> DataStoreFactory.createEncrypted(
         produceFile = { file },
     )
 }
-

@@ -2,15 +2,15 @@ package mega.privacy.android.data.di
 
 import android.content.Context
 import android.provider.Settings
-import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.MasterKey
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
+import com.google.crypto.tink.StreamingAead
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.data.cryptography.FileStreamingAeadFactory
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.MegaDatabaseConstant
@@ -169,37 +169,9 @@ internal object RoomDatabaseModule {
 
     @Provides
     @Singleton
-    internal fun providePassphraseEncryptedFile(
-        @ApplicationContext context: Context,
-        masterKey: MasterKey?,
-        passphraseFile: File,
-    ): EncryptedFile? {
-        masterKey ?: return null
-        return runCatching {
-            EncryptedFile.Builder(
-                context,
-                passphraseFile,
-                masterKey,
-                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-            ).build()
-        }.onFailure {
-            Timber.e(it)
-        }.getOrNull()
-    }
-
-    @Provides
-    @Singleton
-    internal fun provideMasterKey(
-        @ApplicationContext context: Context,
-    ): MasterKey? {
-        return runCatching {
-            MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-        }.onFailure {
-            Timber.e(it, "Failed to create MasterKey")
-        }.getOrNull()
-    }
+    internal fun provideFileStreamingAead(
+        factory: FileStreamingAeadFactory,
+    ): StreamingAead? = factory()
 
     @Provides
     @Singleton

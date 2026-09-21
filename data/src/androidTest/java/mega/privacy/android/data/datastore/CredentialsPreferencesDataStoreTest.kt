@@ -5,12 +5,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.security.crypto.MasterKey
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.cryptography.FileStreamingAeadFactory
 import mega.privacy.android.data.preferences.CredentialsPreferencesDataStore
 import mega.privacy.android.data.preferences.base.createEncrypted
 import mega.privacy.android.data.preferences.credentialDataStoreName
@@ -136,14 +136,12 @@ class CredentialsPreferencesDataStoreTest {
     }
 
     private fun createDataStore(scope: CoroutineScope): DataStore<Preferences> {
-        val masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+        val streamingAead = FileStreamingAeadFactory(context)()
         return PreferenceDataStoreFactory.createEncrypted(
             scope = scope,
             context = context,
             fileName = credentialDataStoreName,
-            masterKey = masterKey
+            streamingAead = streamingAead
         )
     }
 }

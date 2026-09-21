@@ -317,7 +317,6 @@ dependencies {
     implementation(androidx.credentials)
     implementation(androidx.credentials.play)
     implementation(androidx.datastore.preferences)
-    implementation(androidx.security.crypto)
     implementation(androidx.emoji2)
     implementation(androidx.emojiPicker)
     implementation(androidx.exifinterface)
