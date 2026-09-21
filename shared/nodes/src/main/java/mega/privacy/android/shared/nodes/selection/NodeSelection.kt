@@ -62,8 +62,8 @@ class NodeSelection<T : TypedNode> internal constructor(
     }
 
     /**
-     * Selects every current item. While the list is still loading, the selection is completed
-     * automatically as further pages arrive.
+     * Replaces the selection with every current item. While the list is still loading, the
+     * selection is completed automatically as further pages arrive.
      */
     fun selectAll() {
         state.selectAll(items.value.mapTo(HashSet()) { it.id }, loadingState.value)
@@ -91,7 +91,7 @@ fun <T : TypedNode> rememberNodeSelection(
     val currentLoadingState = rememberUpdatedState(loadingState)
     val selection = remember(state) { NodeSelection(state, currentItems, currentLoadingState) }
 
-    LaunchedEffect(selection, state.selectAllAwaitingMoreItems, items, loadingState) {
+    LaunchedEffect(selection, items, loadingState) {
         if (state.selectAllAwaitingMoreItems) {
             selection.selectAll()
         }

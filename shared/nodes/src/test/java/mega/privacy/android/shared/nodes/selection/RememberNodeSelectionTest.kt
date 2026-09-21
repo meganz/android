@@ -36,7 +36,7 @@ class RememberNodeSelectionTest {
     }
 
     @Test
-    fun `test that a select all during partial load extends to items that arrive later`() {
+    fun `test that selectAll extends to items that arrive later when started during partial load`() {
         setContent()
         composeTestRule.runOnIdle { selection.selectAll() }
 
@@ -53,7 +53,7 @@ class RememberNodeSelectionTest {
     }
 
     @Test
-    fun `test that a manual selection does not grow when items arrive later`() {
+    fun `test that rememberNodeSelection does not grow a manual selection when items arrive later`() {
         setContent()
         composeTestRule.runOnIdle { selection.toggle(NodeId(1L)) }
 
@@ -68,7 +68,7 @@ class RememberNodeSelectionTest {
     }
 
     @Test
-    fun `test that the same selection instance is returned across recompositions`() {
+    fun `test that rememberNodeSelection returns the same instance across recompositions`() {
         setContent()
         val first = selection
 

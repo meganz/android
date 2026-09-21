@@ -2,7 +2,11 @@ package mega.privacy.android.feature.cloudexplorer.presentation.explorer
 
 import android.content.Context
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -81,13 +85,16 @@ internal class SelectedItemsCountTest {
     }
 
     @Test
-    fun `test that disabled nodes are not counted as selected`() {
+    fun `test that a disabled node cannot be tapped into the selection`() {
         setContent(
             explorerMode = ExplorerMode.AddVideosToPlaylist,
             items = listOf(previewFileNodeUiItem(id = FILE_ID, name = FILE_NAME)),
             disabledNodeIds = setOf(NodeId(FILE_ID)),
         )
 
+        composeTestRule
+            .onAllNodes(hasClickAction() and hasAnyDescendant(hasText(FILE_NAME)))
+            .assertCountEquals(0)
         composeTestRule.onNodeWithText(SELECTED_COUNT).assertDoesNotExist()
     }
 

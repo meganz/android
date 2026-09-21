@@ -61,7 +61,7 @@ import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderResultEffect
 import mega.privacy.android.shared.nodes.model.NodeViewItem
-import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
+import mega.privacy.android.shared.nodes.selection.rememberNodeIdSelection
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.search.presentation.component.SearchTopAppBar
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
@@ -123,19 +123,22 @@ internal fun ExplorerScreen(
         if (uiState.isConnected) onNavigate(navKey) else showNoConnectionSnackbar()
     }
     val chatExplorerSelectionState = rememberChatExplorerSelectionState()
-    val nodeSelectionState = rememberNodeSelectionState()
+    val selection = rememberNodeIdSelection(
+        selectableNodeIds = uiState.selectableNodeIds,
+        loadingState = uiState.nodesLoadingState,
+    )
     val hasSelection = when {
-        !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
+        !explorerMode.isFolderPicker -> selection.isInSelectionMode
         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
         else -> false
     }
     val selectedItemsCount = when {
-        !explorerMode.isFolderPicker -> (nodeSelectionState.selectedNodeIds - disabledNodeIds).size
+        !explorerMode.isFolderPicker -> selection.selectedCount
         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.selectedItemsCount
         else -> 0
     }
     val clearSelection: () -> Unit = {
-        nodeSelectionState.deselectAll()
+        selection.deselectAll()
         chatExplorerSelectionState.deselectAll()
     }
     val onCloseSearch: () -> Unit = {
@@ -143,8 +146,6 @@ internal fun ExplorerScreen(
         searchText = ""
         showSearch = false
     }
-    val isAllSelected = uiState.selectableNodeIds.all { it in nodeSelectionState.selectedNodeIds }
-
     if (!isInnerNavigation) {
         LaunchedOnceEffect {
             Analytics.tracker.trackEvent(CloudExplorerScreenEvent)
@@ -157,17 +158,6 @@ internal fun ExplorerScreen(
         event = uiState.noConnectionEvent,
         onConsumed = viewModel::onNoConnectionEventConsumed,
     ) { showNoConnectionSnackbar() }
-
-    // Keep "select all" extending to nodes that arrive after the initial click while still loading.
-    LaunchedEffect(
-        nodeSelectionState.selectAllAwaitingMoreItems,
-        uiState.selectableNodeIds,
-        uiState.nodesLoadingState,
-    ) {
-        if (nodeSelectionState.selectAllAwaitingMoreItems) {
-            nodeSelectionState.selectAll(uiState.selectableNodeIds, uiState.nodesLoadingState)
-        }
-    }
 
     BackHandler(enabled = showSearch) { onCloseSearch() }
 
@@ -237,7 +227,7 @@ internal fun ExplorerScreen(
                     },
                     title = when {
                         uiState.isLoading -> stringResource(explorerMode.titleStringId)
-                        nodeSelectionState.selectAllAwaitingMoreItems ->
+                        selection.isSelecting ->
                             stringResource(sharedR.string.app_bar_selection_mode_description)
 
                         selectedItemsCount > 0 -> selectedItemsCount.toString()
@@ -264,18 +254,13 @@ internal fun ExplorerScreen(
                         }
                         if (!explorerMode.isFolderPicker) {
                             when {
-                                nodeSelectionState.selectAllAwaitingMoreItems ->
+                                selection.isSelecting ->
                                     add(MenuActionWithClick(CommonMenuAction.Selecting) {})
 
-                                uiState.selectableNodeIds.isNotEmpty() && !isAllSelected ->
+                                uiState.selectableNodeIds.isNotEmpty() && !selection.isAllSelected ->
                                     add(
                                         MenuActionWithClick(CommonMenuAction.SelectAll) {
-                                            protectedUserTap {
-                                                nodeSelectionState.selectAll(
-                                                    uiState.selectableNodeIds,
-                                                    uiState.nodesLoadingState,
-                                                )
-                                            }
+                                            protectedUserTap { selection.selectAll() }
                                         }
                                     )
                             }
@@ -325,7 +310,7 @@ internal fun ExplorerScreen(
                                 text = stringResource(explorerMode.actionStringId),
                                 enabled = !isProcessingAction && when {
                                     !explorerMode.isFolderPicker ->
-                                        nodeSelectionState.isInSelectionMode
+                                        selection.isInSelectionMode
 
                                     selectedTabIndex == CLOUD_TAB_INDEX ->
                                         pickerRestrictions?.isPickEnabled
@@ -362,7 +347,7 @@ internal fun ExplorerScreen(
                                                 onFolderPicked(nodeExplorerId)
 
                                             else ->
-                                                onFilesPicked(nodeSelectionState.selectedNodeIds.toList())
+                                                onFilesPicked(selection.selectedNodeIds.toList())
                                         }
                                     }
                                 },
@@ -394,7 +379,7 @@ internal fun ExplorerScreen(
                     protectedUserTap = protectedUserTap,
                     onNavigate = onConnectedNavigate,
                     onNavigateBack = onNavigateBack,
-                    selectionState = nodeSelectionState,
+                    selectionState = selection.state,
                     isFileSelectionEnabled = !explorerMode.isFolderPicker,
                     disabledNodeIds = disabledNodeIds,
                     videosOnly = explorerMode.isVideoPicker,
@@ -416,7 +401,7 @@ internal fun ExplorerScreen(
                         protectedUserTap = protectedUserTap,
                         onNavigate = onConnectedNavigate,
                         onNavigateBack = onNavigateBack,
-                        selectionState = nodeSelectionState,
+                        selectionState = selection.state,
                         isSelectionModeEnabled = !explorerMode.isFolderPicker,
                         allowsFolderSelection = explorerMode.allowsFolderSelection,
                         disabledNodeIds = disabledNodeIds,
@@ -434,7 +419,7 @@ internal fun ExplorerScreen(
                         protectedUserTap = protectedUserTap,
                         onNavigate = onConnectedNavigate,
                         onNavigateBack = onNavigateBack,
-                        selectionState = nodeSelectionState,
+                        selectionState = selection.state,
                         isSelectionModeEnabled = !explorerMode.isFolderPicker,
                         disabledNodeIds = disabledNodeIds,
                         videosOnly = explorerMode.isVideoPicker,
