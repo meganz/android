@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,10 +18,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
@@ -95,124 +94,119 @@ fun MarkdownFormattingToolbar(
     textStyleEnabled: Boolean = true,
     disabledActions: Set<MarkdownFormatAction> = emptySet(),
 ) {
-    // Same floating pill styling as core-ui's MegaFloatingToolbar.
-    Card(
-        shape = CircleShape,
-        colors = CardDefaults.cardColors(
-            containerColor = DSTokens.colors.background.surface1,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = ToolbarElevation),
+    Box(
         modifier = modifier
             .fillMaxWidth()
+            .background(DSTokens.colors.background.pageBackground)
+            .height(ToolbarHeight)
             .testTag(MARKDOWN_TOOLBAR_TAG),
     ) {
-        Box(
+        HorizontalDivider(
+            color = DSTokens.colors.border.subtle,
+            modifier = Modifier.align(Alignment.TopCenter),
+        )
+        val scrollState = rememberScrollState()
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(ToolbarHeight),
+                .fillMaxHeight()
+                .horizontalScroll(scrollState),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            val scrollState = rememberScrollState()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .horizontalScroll(scrollState)
-                    .padding(horizontal = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TextStyleChip(
-                    headingLevel = formats.headingLevel,
-                    enabled = textStyleEnabled,
-                    onTextStyleSelected = onTextStyleSelected,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.Bold,
-                    icon = IconPack.Medium.Thin.Outline.TextBold,
-                    contentDescription = "Bold",
-                    isActive = formats.isBold,
-                    enabled = MarkdownFormatAction.Bold !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.Italic,
-                    icon = IconPack.Medium.Thin.Outline.TextItalic,
-                    contentDescription = "Italic",
-                    isActive = formats.isItalic,
-                    enabled = MarkdownFormatAction.Italic !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.Underline,
-                    icon = IconPack.Medium.Thin.Outline.TextUnderline,
-                    contentDescription = "Underline",
-                    isActive = formats.isUnderline,
-                    enabled = MarkdownFormatAction.Underline !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.Strikethrough,
-                    icon = IconPack.Medium.Thin.Outline.TextStrikethrough,
-                    contentDescription = "Strikethrough",
-                    isActive = formats.isStrikethrough,
-                    enabled = MarkdownFormatAction.Strikethrough !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.TaskList,
-                    icon = IconPack.Medium.Thin.Outline.Checklist,
-                    contentDescription = "Checklist",
-                    isActive = formats.isTaskList,
-                    enabled = MarkdownFormatAction.TaskList !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.BulletList,
-                    icon = IconPack.Medium.Thin.Outline.ListSmall,
-                    contentDescription = "Bulleted list",
-                    isActive = formats.isBulletList,
-                    enabled = MarkdownFormatAction.BulletList !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.OrderedList,
-                    icon = IconPack.Medium.Thin.Outline.ListNumbers,
-                    contentDescription = "Numbered list",
-                    isActive = formats.isOrderedList,
-                    enabled = MarkdownFormatAction.OrderedList !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.Quote,
-                    icon = IconPack.Medium.Thin.Outline.TextQuote,
-                    contentDescription = "Quote",
-                    isActive = formats.isQuote,
-                    enabled = MarkdownFormatAction.Quote !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.InlineCode,
-                    icon = IconPack.Medium.Thin.Outline.Code,
-                    contentDescription = "Code",
-                    isActive = formats.isInlineCode,
-                    enabled = MarkdownFormatAction.InlineCode !in disabledActions,
-                    onAction = onAction,
-                )
-                ToolbarToggleButton(
-                    action = MarkdownFormatAction.Link,
-                    icon = IconPack.Medium.Thin.Outline.Url,
-                    contentDescription = "Link",
-                    isActive = formats.isLink,
-                    enabled = MarkdownFormatAction.Link !in disabledActions,
-                    onAction = onAction,
-                )
-            }
-            if (scrollState.canScrollBackward) {
-                ScrollEdgeShade(isStart = true, modifier = Modifier.align(Alignment.CenterStart))
-            }
-            if (scrollState.canScrollForward) {
-                ScrollEdgeShade(isStart = false, modifier = Modifier.align(Alignment.CenterEnd))
-            }
+            Spacer(Modifier.width(2.dp))
+            TextStyleChip(
+                headingLevel = formats.headingLevel,
+                enabled = textStyleEnabled,
+                onTextStyleSelected = onTextStyleSelected,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.Bold,
+                icon = IconPack.Medium.Thin.Outline.TextBold,
+                contentDescription = "Bold",
+                isActive = formats.isBold,
+                enabled = MarkdownFormatAction.Bold !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.Italic,
+                icon = IconPack.Medium.Thin.Outline.TextItalic,
+                contentDescription = "Italic",
+                isActive = formats.isItalic,
+                enabled = MarkdownFormatAction.Italic !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.Underline,
+                icon = IconPack.Medium.Thin.Outline.TextUnderline,
+                contentDescription = "Underline",
+                isActive = formats.isUnderline,
+                enabled = MarkdownFormatAction.Underline !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.Strikethrough,
+                icon = IconPack.Medium.Thin.Outline.TextStrikethrough,
+                contentDescription = "Strikethrough",
+                isActive = formats.isStrikethrough,
+                enabled = MarkdownFormatAction.Strikethrough !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.TaskList,
+                icon = IconPack.Medium.Thin.Outline.Checklist,
+                contentDescription = "Checklist",
+                isActive = formats.isTaskList,
+                enabled = MarkdownFormatAction.TaskList !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.BulletList,
+                icon = IconPack.Medium.Thin.Outline.ListSmall,
+                contentDescription = "Bulleted list",
+                isActive = formats.isBulletList,
+                enabled = MarkdownFormatAction.BulletList !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.OrderedList,
+                icon = IconPack.Medium.Thin.Outline.ListNumbers,
+                contentDescription = "Numbered list",
+                isActive = formats.isOrderedList,
+                enabled = MarkdownFormatAction.OrderedList !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.Quote,
+                icon = IconPack.Medium.Thin.Outline.TextQuote,
+                contentDescription = "Quote",
+                isActive = formats.isQuote,
+                enabled = MarkdownFormatAction.Quote !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.InlineCode,
+                icon = IconPack.Medium.Thin.Outline.Code,
+                contentDescription = "Code",
+                isActive = formats.isInlineCode,
+                enabled = MarkdownFormatAction.InlineCode !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.Link,
+                icon = IconPack.Medium.Thin.Outline.Url,
+                contentDescription = "Link",
+                isActive = formats.isLink,
+                enabled = MarkdownFormatAction.Link !in disabledActions,
+                onAction = onAction,
+            )
+            Spacer(Modifier.width(2.dp))
+        }
+        if (scrollState.canScrollBackward) {
+            ScrollEdgeShade(isStart = true, modifier = Modifier.align(Alignment.CenterStart))
+        }
+        if (scrollState.canScrollForward) {
+            ScrollEdgeShade(isStart = false, modifier = Modifier.align(Alignment.CenterEnd))
         }
     }
 }
@@ -225,23 +219,15 @@ private fun TextStyleChip(
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     Box {
-        // Local chip: MegaChip pins 32dp height and a 16dp corner shape, so a 36dp fully
-        // rounded variant needs its own container.
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .height(TextStyleChipHeight)
-                .clip(CircleShape)
-                .background(
-                    if (headingLevel != null) {
-                        DSTokens.colors.background.surface3
-                    } else {
-                        Color.Transparent
-                    },
-                )
+                .clip(DSTokens.shapes.small)
+                .background(Color.Transparent)
                 .clickable(enabled = enabled) { menuExpanded = true }
-                .padding(start = 12.dp, end = 10.dp)
+                .padding(start = 10.dp, end = 6.dp)
                 .testTag(MARKDOWN_TEXT_STYLE_CHIP_TAG),
         ) {
             Text(
@@ -298,8 +284,8 @@ private fun TextStyleChip(
             ) {
                 Box(modifier = Modifier.padding(TextStyleMenuShadowMargin)) {
                     Surface(
-                        shape = DSTokens.shapes.medium,
-                        color = DSTokens.colors.background.pageBackground,
+                        shape = DSTokens.shapes.extraSmall,
+                        color = DSTokens.colors.background.surface1,
                         shadowElevation = TextStyleMenuElevation,
                         modifier = Modifier.testTag(MARKDOWN_TEXT_STYLE_MENU_TAG),
                     ) {
@@ -308,7 +294,7 @@ private fun TextStyleChip(
                         Column(
                             modifier = Modifier
                                 .width(IntrinsicSize.Max)
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = 4.dp),
                         ) {
                             TextStyleMenuItems(
                                 headingLevel = headingLevel,
@@ -397,12 +383,12 @@ private fun ToolbarToggleButton(
         colors = IconButtonDefaults.iconToggleButtonColors(
             containerColor = Color.Transparent,
             contentColor = DSTokens.colors.icon.primary,
-            checkedContainerColor = DSTokens.colors.background.surface3,
+            checkedContainerColor = DSTokens.colors.background.surface2,
             checkedContentColor = DSTokens.colors.icon.primary,
             disabledContainerColor = Color.Transparent,
             disabledContentColor = DSTokens.colors.icon.disabled,
         ),
-        shape = CircleShape,
+        shape = DSTokens.shapes.small,
         modifier = Modifier
             .size(36.dp)
             .testTag(markdownToolbarActionTag(action)),
@@ -417,20 +403,19 @@ private fun ToolbarToggleButton(
 
 private val TextStyleLevels: List<Int?> = listOf(1, 2, 3, null)
 private val ToolbarHeight = 48.dp
-private val ToolbarShadeWidth = 24.dp
-private val ToolbarElevation = 3.dp
+private val ToolbarShadeWidth = 16.dp
 private val TextStyleChipHeight = 36.dp
 private val TextStyleMenuMinWidth = 220.dp
-private val TextStyleMenuItemPadding = 16.dp
+private val TextStyleMenuItemPadding = 12.dp
 
 private val TextStyleMenuElevation = 3.dp
 
 /**
- * Space between the menu's bottom edge and the anchor chip's top. The toolbar pill's top
- * edge sits 6dp above the chip, so the visible gap to the pill is this minus 6dp.
+ * Space between the menu's bottom edge and the anchor chip's top. The docked bar's top
+ * edge sits 8dp above the chip, so the visible gap to the bar is this minus 8dp.
  */
-private val TextStyleMenuGap = 14.dp
-private val TextStyleMenuShadowMargin = 16.dp
+private val TextStyleMenuGap = 16.dp
+private val TextStyleMenuShadowMargin = 10.dp
 
 /** Pulls the menu's start edge slightly left of the chip's start. */
 private val TextStyleMenuStartNudge = 4.dp

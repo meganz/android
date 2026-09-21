@@ -3,8 +3,6 @@ package mega.privacy.android.feature.texteditor.components.markdown.rich
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.BringIntoViewSpec
-import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -13,14 +11,9 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -64,7 +57,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.TextToolbar
@@ -73,7 +65,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import kotlinx.coroutines.CoroutineScope
@@ -108,8 +99,6 @@ fun richTableCellTag(block: Int, row: Int, column: Int): String =
 
 private val TailTapAreaHeight = 160.dp
 
-private val CursorHandleClearance = 32.dp
-
 /** Idle time after which a typing burst is checkpointed for undo. */
 private val UndoCheckpointDebounce = 1.seconds
 
@@ -121,13 +110,12 @@ private val UndoCheckpointDebounce = 1.seconds
  * @param autoFocusWhenEmpty Focus the first block and open the keyboard when the document is
  * a single empty block (a freshly created file); an existing document is never grabbed.
  */
-@OptIn(FlowPreview::class, ExperimentalFoundationApi::class)
+@OptIn(FlowPreview::class)
 @Composable
 fun RichDocumentEditor(
     state: RichDocumentState,
     modifier: Modifier = Modifier,
     autoFocusWhenEmpty: Boolean = false,
-    bottomOverlayClearance: Dp = 0.dp,
 ) {
     val visualStyles = rememberRichSpanVisualStyles()
     val colors = rememberMarkdownColors()
@@ -276,34 +264,7 @@ fun RichDocumentEditor(
             backgroundColor = colors.text.copy(alpha = 0.3f),
         )
     }
-    // Focus and caret bring-into-view stop at the viewport edge, whose last
-    // [bottomOverlayClearance] is covered by the floating toolbar; shrink the target area so
-    // a tapped field scrolls clear of it, teardrop handle included.
-    val clearancePx = with(LocalDensity.current) {
-        (bottomOverlayClearance + CursorHandleClearance).toPx()
-    }
-    val bringIntoViewSpec = remember(clearancePx) {
-        object : BringIntoViewSpec {
-            override fun calculateScrollDistance(
-                offset: Float,
-                size: Float,
-                containerSize: Float,
-            ): Float {
-                val visibleEnd = containerSize - clearancePx
-                val trailing = offset + size
-                return when {
-                    offset >= 0f && trailing <= visibleEnd -> 0f
-                    size > visibleEnd -> offset
-                    offset < 0f -> offset
-                    else -> trailing - visibleEnd
-                }
-            }
-        }
-    }
-    CompositionLocalProvider(
-        LocalTextSelectionColors provides selectionColors,
-        LocalBringIntoViewSpec provides bringIntoViewSpec,
-    ) {
+    CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
         Box(modifier = modifier) {
             RichDocumentBlocks(
                 state = state,
@@ -316,7 +277,6 @@ fun RichDocumentEditor(
                 haptics = haptics,
                 scope = scope,
                 listState = listState,
-                bottomOverlayClearance = bottomOverlayClearance,
             )
             DocumentSelectionHandles(
                 state = state,
@@ -344,7 +304,6 @@ private fun RichDocumentBlocks(
     haptics: HapticFeedback,
     scope: CoroutineScope,
     listState: LazyListState,
-    bottomOverlayClearance: Dp,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -390,13 +349,12 @@ private fun RichDocumentBlocks(
             .testTag(RICH_DOCUMENT_EDITOR_TAG),
         // No top padding: matches the chunked source editor so switching edit modes does not
         // shift the content down (the collapsing top bar already provides the top spacing).
-        // ime excluded: the editor container already applies imePadding.
+        // Bottom system insets are the caller's concern: the viewport ends above the
+        // docked toolbar.
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
-            bottom = 16.dp + bottomOverlayClearance +
-                    WindowInsets.navigationBars.exclude(WindowInsets.ime)
-                        .asPaddingValues().calculateBottomPadding(),
+            bottom = 16.dp,
         ),
     ) {
         items(

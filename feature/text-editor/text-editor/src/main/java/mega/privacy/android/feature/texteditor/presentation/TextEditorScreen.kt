@@ -114,8 +114,8 @@ private const val ENTRANCE_ANIMATION_MS = 300
 private const val FLING_SNAP_ANIMATION_MS = 150
 private val BottomBarSlideDistance = 100.dp
 
-/** Formatting toolbar height plus its bottom margin, kept scrollable-clear at the editor's end. */
-private val RichToolbarStripHeight = 56.dp
+/** Docked formatting toolbar height (40dp slot plus 4dp padding): the editor viewport ends above it. */
+private val RichToolbarStripHeight = 48.dp
 private val SnackbarBottomBarClearance = 112.dp
 private val SnackbarHorizontalPadding = 16.dp
 
@@ -482,8 +482,16 @@ fun TextEditorScreen(
                                         state = richState,
                                         autoFocusWhenEmpty =
                                             uiState.mode == TextEditorMode.Create,
-                                        modifier = Modifier.fillMaxSize(),
-                                        bottomOverlayClearance = RichToolbarStripHeight,
+                                        // The viewport ends at the docked toolbar's top edge
+                                        // so the cursor handle hides there, exactly like at
+                                        // the keyboard.
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .windowInsetsPadding(
+                                                WindowInsets.navigationBars
+                                                    .exclude(WindowInsets.ime),
+                                            )
+                                            .padding(bottom = RichToolbarStripHeight),
                                     )
                                 } else if (useRichText) {
                                     // One frame while ensureRichDocumentState builds the model.
@@ -557,11 +565,6 @@ fun TextEditorScreen(
                                             .windowInsetsPadding(
                                                 WindowInsets.navigationBars
                                                     .exclude(WindowInsets.ime),
-                                            )
-                                            .padding(
-                                                start = 16.dp,
-                                                end = 16.dp,
-                                                bottom = 8.dp,
                                             ),
                                     )
                                 }
