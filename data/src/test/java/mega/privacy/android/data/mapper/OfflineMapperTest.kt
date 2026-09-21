@@ -63,7 +63,7 @@ internal class OfflineMapperTest {
             ).map { Triple(it.first, it.second, isFolderNode) }
         }.map { (expected, input, isFolderNode) ->
             DynamicTest.dynamicTest("test that ${input::class.java.simpleName} is mapped to correct values. Folder: $isFolderNode") {
-                assertThat(underTest(input, parentId)).isEqualTo(
+                assertThat(underTest(input, parentId, isOfflineRoot = true)).isEqualTo(
                     getExpected(
                         expected,
                         isFolderNode
@@ -80,6 +80,7 @@ internal class OfflineMapperTest {
         parentId = parentId,
         type = if (isFolderNode) FOLDER else FILE,
         origin = origin,
-        handleIncoming = if (origin == Offline.INCOMING) expectedIncomingHandle else ""
+        handleIncoming = if (origin == Offline.INCOMING) expectedIncomingHandle else "",
+        isOfflineRoot = true,
     )
 }

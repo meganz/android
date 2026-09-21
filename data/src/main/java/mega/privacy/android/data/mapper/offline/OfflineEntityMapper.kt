@@ -16,6 +16,7 @@ internal class OfflineEntityMapper @Inject constructor(
         encryptedType = encryptData(offline.type),
         incoming = offline.origin,
         encryptedIncomingHandle = encryptData(offline.handleIncoming),
-        lastModifiedTime = offline.lastModifiedTime
+        lastModifiedTime = offline.lastModifiedTime,
+        isOfflineRoot = offline.isOfflineRoot,
     )
 }

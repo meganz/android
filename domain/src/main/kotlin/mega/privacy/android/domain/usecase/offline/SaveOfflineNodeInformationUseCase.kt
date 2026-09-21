@@ -39,6 +39,7 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
                 driveRootNodeId = driveRootNode,
                 backupRootNodeId = backupRootNodeId,
                 originalName = originalName,
+                isOfflineRoot = transfer.isRootTransfer,
             )
         }
     }
@@ -51,18 +52,26 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
      * @param driveRootNodeId this node won't be saved as its children appear as root nodes in offline
      * @param backupRootNodeId this node needs to be saved, but not its parent ("Vault")
      * @param originalName The original name of the node we want to save
+     * @param isOfflineRoot true for the node the user chose to make available offline, false for
+     * the ancestors saved only to mirror the cloud folder structure
      */
     private suspend fun saveNodeAndItsParentsRecursively(
         currentNode: Node,
         driveRootNodeId: NodeId,
         backupRootNodeId: NodeId,
         originalName: String? = null,
+        isOfflineRoot: Boolean,
     ): Long? {
         if (currentNode.id == driveRootNodeId) return null
-        val offlineNodeInformation = nodeRepository.getOfflineNodeInformation(currentNode.id)
-        return offlineNodeInformation?.id?.toLong() ?: nodeRepository.saveOfflineNodeInformation(
+        nodeRepository.getOfflineNodeInformation(currentNode.id)?.id?.let { existingId ->
+            // a node already saved as an ancestor can later be chosen by the user itself
+            if (isOfflineRoot) nodeRepository.setOfflineNodeRoot(existingId, true)
+            return existingId.toLong()
+        }
+        return nodeRepository.saveOfflineNodeInformation(
             getOfflineNodeInformationUseCase(currentNode, originalName),
-            getParentOfflineInfoId(currentNode, backupRootNodeId, driveRootNodeId)
+            getParentOfflineInfoId(currentNode, backupRootNodeId, driveRootNodeId),
+            isOfflineRoot,
         )
     }
 
@@ -77,6 +86,7 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
                     currentNode = it,
                     driveRootNodeId = driveRootNodeId,
                     backupRootNodeId = backupRootNodeId,
+                    isOfflineRoot = false,
                 )
             }
         }

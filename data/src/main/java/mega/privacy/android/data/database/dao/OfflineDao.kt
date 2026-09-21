@@ -42,6 +42,9 @@ internal interface OfflineDao {
     @Query("SELECT * FROM offline WHERE parentId = :parentId")
     suspend fun getOfflineByParentId(parentId: Int): List<OfflineEntity>?
 
+    @Query("UPDATE offline SET isOfflineRoot = :isOfflineRoot WHERE id = :id")
+    suspend fun setOfflineRoot(id: Int, isOfflineRoot: Boolean)
+
     @Query("SELECT * FROM offline WHERE id = :id")
     suspend fun getOfflineById(id: Int): OfflineEntity?
 

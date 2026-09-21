@@ -13,6 +13,8 @@ package mega.privacy.android.domain.entity
  * @property origin
  * @property handleIncoming
  * @property lastModifiedTime
+ * @property isOfflineRoot true when the user explicitly made this node available offline, as
+ * opposed to it being stored only as an ancestor of such a node
  */
 data class Offline(
     val id: Int,
@@ -23,7 +25,8 @@ data class Offline(
     val type: String?,
     val origin: Int,
     val handleIncoming: String,
-    val lastModifiedTime: Long = 0
+    val lastModifiedTime: Long = 0,
+    val isOfflineRoot: Boolean = false,
 ) {
 
     /**

@@ -485,11 +485,21 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun saveOfflineNodeInformation(
         offlineNodeInformation: OfflineNodeInformation,
         parentOfflineInformationId: Long?,
+        isOfflineRoot: Boolean,
     ) = withContext(ioDispatcher) {
         megaLocalRoomGateway.saveOfflineInformation(
-            offlineInformationMapper(offlineNodeInformation, parentOfflineInformationId?.toInt())
+            offlineInformationMapper(
+                offlineNodeInformation,
+                parentOfflineInformationId?.toInt(),
+                isOfflineRoot,
+            )
         )
     }
+
+    override suspend fun setOfflineNodeRoot(offlineInformationId: Int, isOfflineRoot: Boolean) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.setOfflineRoot(offlineInformationId, isOfflineRoot)
+        }
 
     override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
         megaApiGateway.base64ToHandle(base64)

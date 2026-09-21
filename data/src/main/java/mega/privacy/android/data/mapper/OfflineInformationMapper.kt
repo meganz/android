@@ -13,6 +13,7 @@ internal class OfflineInformationMapper @Inject constructor() {
     internal operator fun invoke(
         offlineNode: OfflineNodeInformation,
         parentId: Int?,
+        isOfflineRoot: Boolean,
     ): Offline = Offline(
         id = -1, // id is not known at this point will be generated when inserted to db
         handle = offlineNode.handle,
@@ -22,7 +23,8 @@ internal class OfflineInformationMapper @Inject constructor() {
         type = if (offlineNode.isFolder) FOLDER else FILE,
         origin = offlineNode.getOrigin(),
         handleIncoming = offlineNode.getIncomingHandle(),
-        lastModifiedTime = offlineNode.lastModifiedTime ?: System.currentTimeMillis()
+        lastModifiedTime = offlineNode.lastModifiedTime ?: System.currentTimeMillis(),
+        isOfflineRoot = isOfflineRoot,
     )
 
     private fun OfflineNodeInformation.getOrigin() =

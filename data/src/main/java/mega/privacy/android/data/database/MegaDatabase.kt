@@ -59,6 +59,7 @@ import mega.privacy.android.data.database.spec.AutoMigrationDeleteActiveTransfer
 import mega.privacy.android.data.database.spec.AutoMigrationSpec100to101
 import mega.privacy.android.data.database.spec.AutoMigrationSpec102to103
 import mega.privacy.android.data.database.spec.AutoMigrationSpec118to119
+import mega.privacy.android.data.database.spec.AutoMigrationSpec126to127
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 import mega.privacy.android.data.database.spec.AutoMigrationSpec81to82
 import mega.privacy.android.data.database.spec.AutoMigrationSpec95to96
@@ -137,6 +138,7 @@ import timber.log.Timber
         AutoMigration(121, 122),
         AutoMigration(122, 123),
         AutoMigration(123, 124),
+        AutoMigration(126, 127, spec = AutoMigrationSpec126to127::class),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {

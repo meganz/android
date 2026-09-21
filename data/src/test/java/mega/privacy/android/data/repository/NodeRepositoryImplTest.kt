@@ -719,11 +719,16 @@ internal class NodeRepositoryImplTest {
             whenever(
                 offlineInformationMapper(
                     offlineNodeInformation,
-                    parentOfflineInfoId.toInt()
+                    parentOfflineInfoId.toInt(),
+                    true,
                 )
             ).thenReturn(mapped)
 
-            underTest.saveOfflineNodeInformation(offlineNodeInformation, parentOfflineInfoId)
+            underTest.saveOfflineNodeInformation(
+                offlineNodeInformation,
+                parentOfflineInfoId,
+                isOfflineRoot = true,
+            )
 
             verify(megaLocalRoomGateway).saveOfflineInformation(mapped)
         }

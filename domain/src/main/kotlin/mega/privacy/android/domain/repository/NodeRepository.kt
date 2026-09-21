@@ -285,11 +285,22 @@ interface NodeRepository {
      *
      * @param offlineNodeInformation [OfflineNodeInformation]
      * @param parentOfflineInformationId the id of the node's parent offline information
+     * @param isOfflineRoot true when the user explicitly made this node available offline, false
+     * when it is saved only because it is an ancestor of such a node
      */
     suspend fun saveOfflineNodeInformation(
         offlineNodeInformation: OfflineNodeInformation,
         parentOfflineInformationId: Long?,
+        isOfflineRoot: Boolean,
     ): Long
+
+    /**
+     * Set whether an already saved offline node is one the user explicitly made available offline.
+     *
+     * @param offlineInformationId the offline information id
+     * @param isOfflineRoot the new value
+     */
+    suspend fun setOfflineNodeRoot(offlineInformationId: Int, isOfflineRoot: Boolean)
 
     /**
      * Convert Base 64 string to handle

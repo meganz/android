@@ -457,6 +457,14 @@ interface MegaLocalRoomGateway {
     suspend fun getOfflineInfoByParentId(parentId: Int): List<Offline>
 
     /**
+     * Set whether an already stored offline node is one the user explicitly made available offline
+     *
+     * @param id the offline information id
+     * @param isOfflineRoot the new value
+     */
+    suspend fun setOfflineRoot(id: Int, isOfflineRoot: Boolean)
+
+    /**
      * Get offline node by ID
      */
     suspend fun getOfflineLineById(id: Int): Offline?

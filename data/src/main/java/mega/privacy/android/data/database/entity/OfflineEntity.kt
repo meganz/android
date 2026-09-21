@@ -16,7 +16,8 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
  * @property encryptedType
  * @property incoming
  * @property lastModifiedTime
- * @property lastModifiedTime
+ * @property isOfflineRoot true when the user explicitly made this node available offline, as
+ * opposed to it being stored only as an ancestor of such a node
  */
 @Entity(
     tableName = MegaDatabaseConstant.TABLE_OFFLINE,
@@ -32,5 +33,6 @@ internal data class OfflineEntity(
     @ColumnInfo(name = "type") val encryptedType: String?,
     @ColumnInfo(name = "incoming") val incoming: Int?,
     @ColumnInfo(name = "incomingHandle") val encryptedIncomingHandle: String?,
-    @ColumnInfo(name = "lastModifiedTime") val lastModifiedTime: Long?
+    @ColumnInfo(name = "lastModifiedTime") val lastModifiedTime: Long?,
+    @ColumnInfo(name = "isOfflineRoot", defaultValue = "0") val isOfflineRoot: Boolean = false,
 )

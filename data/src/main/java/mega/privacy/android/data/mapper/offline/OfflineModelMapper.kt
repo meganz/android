@@ -17,6 +17,7 @@ internal class OfflineModelMapper @Inject constructor(
         type = decryptData(offlineEntity.encryptedType).orEmpty(),
         origin = offlineEntity.incoming ?: -1,
         handleIncoming = decryptData(offlineEntity.encryptedIncomingHandle).orEmpty(),
-        lastModifiedTime = offlineEntity.lastModifiedTime ?: 0
+        lastModifiedTime = offlineEntity.lastModifiedTime ?: 0,
+        isOfflineRoot = offlineEntity.isOfflineRoot,
     )
 }

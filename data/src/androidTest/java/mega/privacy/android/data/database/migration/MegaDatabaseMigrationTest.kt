@@ -162,8 +162,40 @@ class MegaDatabaseMigrationTest {
         assertThat(exception).hasMessageThat().contains("no such table: $TABLE_NON_CONTACTS_LEGACY")
     }
 
+    @Test
+    @Throws(IOException::class)
+    fun migrate126To127() {
+        helper.createDatabase(testDatabaseName, 126).apply {
+            execSQL(
+                "INSERT INTO $TABLE_OFFLINE (handle, path, name, parentId, type, incoming, " +
+                        "incomingHandle, lastModifiedTime) " +
+                        "VALUES ('top_level', '/', 'folder', -1, '1', 0, '', 0)"
+            )
+            execSQL(
+                "INSERT INTO $TABLE_OFFLINE (handle, path, name, parentId, type, incoming, " +
+                        "incomingHandle, lastModifiedTime) " +
+                        "VALUES ('child', '/folder/', 'file', 1, '0', 0, '', 0)"
+            )
+            close()
+        }
+
+        val db =
+            helper.runMigrationsAndValidate(testDatabaseName, 127, true, *MegaDatabase.MIGRATIONS)
+
+        db.query("SELECT handle, isOfflineRoot FROM $TABLE_OFFLINE ORDER BY id").use {
+            assertThat(it.count).isEqualTo(2)
+            it.moveToFirst()
+            assertThat(it.getString(0)).isEqualTo("top_level")
+            assertThat(it.getInt(1)).isEqualTo(1)
+            it.moveToNext()
+            assertThat(it.getString(0)).isEqualTo("child")
+            assertThat(it.getInt(1)).isEqualTo(0)
+        }
+    }
+
     companion object {
         const val TABLE_NON_CONTACTS = "non_contacts"
+        const val TABLE_OFFLINE = "offline"
         const val TABLE_NON_CONTACTS_LEGACY = "noncontacts"
         const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
         const val KEY_TRANSFER_FILENAME = "transferfilename"

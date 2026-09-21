@@ -64,6 +64,7 @@ class BarResidentOfflineTest : BottomNavigationTestBase() {
                 parentId = -1,
             ),
             parentOfflineInformationId = null,
+            isOfflineRoot = true,
         )
         nodeRepository.saveOfflineNodeInformation(
             offlineNodeInformation = OtherOfflineNodeInformation(
@@ -76,6 +77,7 @@ class BarResidentOfflineTest : BottomNavigationTestBase() {
                 parentId = folderRowId.toInt(),
             ),
             parentOfflineInformationId = folderRowId,
+            isOfflineRoot = false,
         )
     }
 

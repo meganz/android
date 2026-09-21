@@ -63,6 +63,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
             on {
                 saveOfflineNodeInformation(
                     eq(nodeOfflineInformation),
+                    anyOrNull(),
                     anyOrNull()
                 )
             }.thenReturn(
@@ -72,6 +73,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
             on {
                 saveOfflineNodeInformation(
                     eq(parentOfflineInformation),
+                    anyOrNull(),
                     anyOrNull()
                 )
             }.thenReturn(
@@ -87,7 +89,8 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(mock<OtherOfflineNodeInformation>())
 
         underTest(transferFinishEvent)
-        verify(nodeRepository, times(0)).saveOfflineNodeInformation(anyOrNull(), anyOrNull())
+        verify(nodeRepository, times(0))
+            .saveOfflineNodeInformation(anyOrNull(), anyOrNull(), anyOrNull())
     }
 
     @Test
@@ -98,7 +101,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
 
         underTest(transferFinishEvent)
-        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
+        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null, false)
     }
 
     @Test
@@ -112,11 +115,13 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         underTest(transferFinishEvent)
         verify(nodeRepository).saveOfflineNodeInformation(
             nodeOfflineInformation,
-            nodeParentOfflineInformationId
+            nodeParentOfflineInformationId,
+            false
         )
         verify(nodeRepository).saveOfflineNodeInformation(
             parentOfflineInformation,
-            null
+            null,
+            false
         )
     }
 
@@ -130,8 +135,9 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getRootNode()).thenReturn(parent)
 
         underTest(transferFinishEvent)
-        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
-        verify(nodeRepository, times(0)).saveOfflineNodeInformation(parentOfflineInformation, null)
+        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null, false)
+        verify(nodeRepository, times(0))
+            .saveOfflineNodeInformation(parentOfflineInformation, null, false)
     }
 
     @Test
@@ -146,13 +152,96 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         underTest(transferFinishEvent)
         verify(nodeRepository).saveOfflineNodeInformation(
             nodeOfflineInformation,
-            nodeParentOfflineInformationId
+            nodeParentOfflineInformationId,
+            false
         )
         verify(nodeRepository).saveOfflineNodeInformation(
             parentOfflineInformation,
-            null
+            null,
+            false
         )
     }
+
+    @Test
+    fun `test that node is saved as offline root when the transfer is a root transfer`() = runTest {
+        stubDriveNodeWithParent()
+        stubNodeOfflineInfo()
+        stubParentOfflineInfo()
+
+        whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
+
+        underTest(rootTransferFinishEvent)
+
+        verify(nodeRepository).saveOfflineNodeInformation(
+            nodeOfflineInformation,
+            nodeParentOfflineInformationId,
+            true
+        )
+    }
+
+    @Test
+    fun `test that ancestors are not saved as offline roots when the transfer is a root transfer`() =
+        runTest {
+            stubDriveNodeWithParent()
+            stubNodeOfflineInfo()
+            stubParentOfflineInfo()
+
+            whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
+
+            underTest(rootTransferFinishEvent)
+
+            verify(nodeRepository).saveOfflineNodeInformation(
+                parentOfflineInformation,
+                null,
+                false
+            )
+        }
+
+    @Test
+    fun `test that node is not saved as offline root when the transfer is a child transfer`() =
+        runTest {
+            stubDriveNodeWithParent()
+            stubNodeOfflineInfo()
+            stubParentOfflineInfo()
+
+            whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
+
+            underTest(transferFinishEvent)
+
+            verify(nodeRepository).saveOfflineNodeInformation(
+                nodeOfflineInformation,
+                nodeParentOfflineInformationId,
+                false
+            )
+        }
+
+    @Test
+    fun `test that an already saved node is marked as offline root when the transfer is a root transfer`() =
+        runTest {
+            stubDriveNodeWithoutParent()
+            val alreadySaved = mock<OtherOfflineNodeInformation> {
+                on { id } doReturn nodeOfflineInformationId.toInt()
+            }
+            whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(alreadySaved)
+
+            underTest(rootTransferFinishEvent)
+
+            verify(nodeRepository).setOfflineNodeRoot(nodeOfflineInformationId.toInt(), true)
+        }
+
+    @Test
+    fun `test that an already saved node is not marked as offline root when the transfer is a child transfer`() =
+        runTest {
+            stubDriveNodeWithoutParent()
+            val alreadySaved = mock<OtherOfflineNodeInformation> {
+                on { id } doReturn nodeOfflineInformationId.toInt()
+            }
+            whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(alreadySaved)
+
+            underTest(transferFinishEvent)
+
+            verify(nodeRepository, times(0)).setOfflineNodeRoot(anyOrNull(), anyOrNull())
+        }
 
     @Test
     fun `test that chat node is obtained from the repository when app data is chat download`() =
@@ -171,7 +260,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
             underTest(transferFinishEvent)
 
-            verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
+            verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null, false)
         }
 
     private fun stubDriveNodeWithoutParent() = runTest {
@@ -223,7 +312,14 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         private val transfer = mock<Transfer> {
             on { this.nodeHandle } doReturn nodeId.longValue
             on { this.fileName } doReturn originalName
+            on { this.isRootTransfer } doReturn false
         }
         private val transferFinishEvent = TransferEvent.TransferFinishEvent(transfer, null)
+        private val rootTransfer = mock<Transfer> {
+            on { this.nodeHandle } doReturn nodeId.longValue
+            on { this.fileName } doReturn originalName
+            on { this.isRootTransfer } doReturn true
+        }
+        private val rootTransferFinishEvent = TransferEvent.TransferFinishEvent(rootTransfer, null)
     }
 }
