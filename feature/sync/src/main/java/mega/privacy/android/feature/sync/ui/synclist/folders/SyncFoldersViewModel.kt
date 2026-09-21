@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSet
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -177,6 +178,13 @@ internal class SyncFoldersViewModel @Inject constructor(
                     )
                 }
             }
+        }
+
+        viewModelScope.launch {
+            val value = runCatching { getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions) }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(false)
+            _uiState.update { state -> state.copy(isExclusionsEnabled = value) }
         }
 
         viewModelScope.launch {

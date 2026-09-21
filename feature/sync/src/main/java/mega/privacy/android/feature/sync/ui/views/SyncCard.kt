@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -72,6 +73,8 @@ internal fun SyncCard(
     modifier: Modifier = Modifier,
     syncPauseReason: SyncPauseReason? = null,
     onLocalFolderSelected: (Uri) -> Unit = {},
+    isExclusionsEnabled: Boolean = false,
+    onExclusionsClicked: () -> Unit = {},
 ) {
     CardSurface(
         surfaceColor = SurfaceColor.Surface1,
@@ -129,7 +132,9 @@ internal fun SyncCard(
                 isError = errorRes != null && errorRes != sharedR.string.general_sync_storage_overquota,
                 expanded = sync.expanded,
                 isLocalRootChangeNeeded = sync.isLocalRootChangeNeeded,
-                onLocalFolderSelected = onLocalFolderSelected
+                onLocalFolderSelected = onLocalFolderSelected,
+                isExclusionsEnabled = isExclusionsEnabled,
+                onExclusionsClicked = onExclusionsClicked,
             )
         },
     )
@@ -367,6 +372,8 @@ private fun SyncCardFooter(
     expanded: Boolean,
     isLocalRootChangeNeeded: Boolean,
     onLocalFolderSelected: (Uri) -> Unit = {},
+    isExclusionsEnabled: Boolean = false,
+    onExclusionsClicked: () -> Unit = {},
 ) {
     val launcher = launchFolderPicker(
         onFolderSelected = { uri ->
@@ -422,6 +429,21 @@ private fun SyncCardFooter(
                     text = stringResource(id = sharedR.string.general_settings),
                 )
             } else {
+                // a root the app holds no SAF grant on, or one the SDK already failed to write an
+                // ignore file into, can have its .megaignore read but never written back, so the
+                // screen would open and refuse every save; camera and media uploads are excluded
+                // for the same reason by sitting outside this branch
+                if (isExclusionsEnabled && !isLocalRootChangeNeeded) {
+                    SyncCardActionButton(
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp)
+                            .testTag(TEST_TAG_SYNC_CARD_EXCLUSIONS),
+                        onClick = onExclusionsClicked,
+                        icon = iconPackR.drawable.ic_filter_medium_thin_outline,
+                        text = stringResource(id = sharedR.string.sync_exclusions_card_action),
+                    )
+                }
                 SyncCardActionButton(
                     modifier = Modifier
                         .padding(end = 16.dp)
@@ -614,3 +636,5 @@ private fun SyncCardCollapsedWithBannerPreview(
         )
     }
 }
+
+internal const val TEST_TAG_SYNC_CARD_EXCLUSIONS = "sync_card:exclusions_action"

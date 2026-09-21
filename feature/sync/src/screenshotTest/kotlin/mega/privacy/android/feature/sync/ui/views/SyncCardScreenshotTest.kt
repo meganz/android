@@ -52,6 +52,75 @@ class SyncCardScreenshotTest {
         }
     }
 
+    /**
+     * The exclusions action the SyncExclusions flag adds. The footer is drawn outside the
+     * expand/collapse animation, so it shows on a collapsed card too; collapsed is what the list
+     * renders by default and what fits three cards in one frame.
+     */
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun SyncCardExclusionsAction() {
+        AndroidThemeForPreviews {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                listOf(
+                    SyncType.TYPE_TWOWAY to "Product roadmap",
+                    SyncType.TYPE_BACKUP to "Design handoff",
+                    SyncType.TYPE_CAMERA_UPLOADS to "Camera uploads",
+                ).forEach { (syncType, folderPairName) ->
+                    ExclusionsCard(
+                        sync = pausedSync(folderPairName).copy(
+                            syncType = syncType,
+                            status = SyncStatus.SYNCING,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * The widest the footer gets: a stalled sync adds Issues info, so the exclusions action makes
+     * a fifth. The row neither wraps nor scrolls, so this is the case that overflows first.
+     */
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun SyncCardExclusionsActionWithStalledIssues() {
+        AndroidThemeForPreviews {
+            Column(modifier = Modifier.padding(16.dp)) {
+                ExclusionsCard(
+                    sync = pausedSync("Product roadmap").copy(
+                        status = SyncStatus.SYNCING,
+                        hasStalledIssues = true,
+                    ),
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun ExclusionsCard(sync: SyncUiItem) {
+        SyncCard(
+            sync = sync,
+            expandClicked = {},
+            pauseRunClicked = {},
+            removeFolderClicked = {},
+            issuesInfoClicked = {},
+            onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
+            isLowBatteryLevel = false,
+            isStorageOverQuota = false,
+            errorRes = null,
+            deviceName = "Device Name",
+            isExclusionsEnabled = true,
+        )
+    }
+
     private fun pausedSync(folderPairName: String) = SyncUiItem(
         id = folderPairName.hashCode().toLong(),
         syncType = SyncType.TYPE_TWOWAY,

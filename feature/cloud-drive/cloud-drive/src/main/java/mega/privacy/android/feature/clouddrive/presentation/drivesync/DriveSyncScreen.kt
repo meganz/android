@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
+import mega.privacy.android.feature.sync.navigation.ManageSyncExclusionsNavKey
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncListTabFab
 import mega.privacy.android.feature.sync.ui.synclist.rememberSyncListFabState
@@ -306,6 +307,11 @@ internal fun DriveSyncScreen(
                         },
                         onOpenMegaFolderClicked = { handle ->
                             navigationHandler.navigate(CloudDriveNavKey(nodeHandle = handle))
+                        },
+                        onExclusionsClicked = { syncId, localRoot ->
+                            navigationHandler.navigate(
+                                ManageSyncExclusionsNavKey(syncId, localRoot)
+                            )
                         },
                         onCameraUploadsSettingsClicked = {
                             navigationHandler.navigate(SettingsCameraUploadsNavKey)

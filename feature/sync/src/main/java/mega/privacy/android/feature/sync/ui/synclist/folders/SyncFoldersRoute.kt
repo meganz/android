@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnRemoveFolderDialogDismissed
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed
@@ -33,6 +34,7 @@ internal fun SyncFoldersRoute(
     onSelectStopBackupDestinationClicked: (String?) -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onExclusionsClicked: (syncId: Long, localRoot: UriPath) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     onAction: (SyncFoldersAction) -> Unit,
     uiState: SyncFoldersUiState,
@@ -81,6 +83,10 @@ internal fun SyncFoldersRoute(
                     uri = uri,
                 )
             )
+        },
+        isExclusionsEnabled = uiState.isExclusionsEnabled,
+        onExclusionsClicked = { sync ->
+            onExclusionsClicked(sync.id, sync.uriPath)
         },
     )
 

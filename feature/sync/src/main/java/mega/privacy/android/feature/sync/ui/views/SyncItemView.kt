@@ -25,6 +25,8 @@ internal fun SyncItemView(
     @StringRes errorRes: Int? = null,
     syncPauseReason: SyncPauseReason? = null,
     onLocalFolderSelected: (SyncUiItem, Uri) -> Unit = { _, _ -> },
+    isExclusionsEnabled: Boolean = false,
+    onExclusionsClicked: (SyncUiItem) -> Unit = {},
 ) {
     SyncCard(
         modifier = modifier.testTag(TEST_TAG_SYNC_ITEM_VIEW),
@@ -51,6 +53,10 @@ internal fun SyncItemView(
         syncPauseReason = syncPauseReason,
         onLocalFolderSelected = {
             onLocalFolderSelected(sync, it)
+        },
+        isExclusionsEnabled = isExclusionsEnabled,
+        onExclusionsClicked = {
+            onExclusionsClicked(sync)
         },
     )
 }

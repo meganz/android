@@ -4215,6 +4215,8 @@
     <string name="sync_exclusions_manage_load_error_retry">Try again</string>
     <!-- Sync exclusions Manage screen: message shown when the changed exclusions could not be written. The edits are kept, so the user can retry without entering them again. -->
     <string name="sync_exclusions_manage_save_failed">Couldn’t save your changes. Try again.</string>
+    <!-- Sync list: action on a sync or backup card that opens the screen listing everything that sync leaves out. Sits beside Open, Pause and Stop, so keep it to a single short word if the language allows. -->
+    <string name="sync_exclusions_card_action">Exclusions</string>
     <!-- Title of the personal QR code screen -->
     <string name="contacts_qr_screen_title">QR code</string>
     <!-- Button that generates the user's personal QR code -->

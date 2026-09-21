@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
@@ -47,6 +48,7 @@ import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
  * @param isInCloudDrive Indicates whether the user is currently within the cloud drive context. Defaults to false.
  * @param selectedChip The currently selected chip in the sync list UI. Defaults to [SyncChip.SYNC_FOLDERS].
  * @param onOpenMegaFolderClicked Callback invoked when the user clicks to open a specific Mega folder.
+ * @param onExclusionsClicked Callback invoked when the user opens the exclusions of a specific sync.
  * @param onStalledIssueMoreClicked Callback invoked with the id of the stalled issue whose resolution options were requested.
  * @param fabState Shared with the [SyncListTabFab] the host places in its scaffold when [isInCloudDrive] is true.
  */
@@ -59,6 +61,7 @@ fun SyncListRoute(
     onOpenUpgradeAccountClicked: () -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     onOpenMegaFolderClicked: (Long) -> Unit,
+    onExclusionsClicked: (syncId: Long, localRoot: UriPath) -> Unit,
     onStalledIssueMoreClicked: (issueId: String) -> Unit,
     isInCloudDrive: Boolean = false,
     onSyncSettingsClicked: (() -> Unit)? = null,
@@ -83,6 +86,7 @@ fun SyncListRoute(
         viewModel = hiltViewModel(),
         selectedChip = selectedChip,
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+        onExclusionsClicked = onExclusionsClicked,
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         fabState = fabState,
         onFabExpanded = onFabExpanded,
@@ -105,6 +109,7 @@ internal fun SyncListRoute(
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onExclusionsClicked: (syncId: Long, localRoot: UriPath) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: (String?) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
@@ -132,6 +137,7 @@ internal fun SyncListRoute(
             onAddNewBackupClicked = onBackupFolderClicked,
             onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
             onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+            onExclusionsClicked = onExclusionsClicked,
             onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
             moreClicked = { stalledIssueItem -> onStalledIssueMoreClicked(stalledIssueItem.id) },
             issuesInfoClicked = onIssuesInfoClicked,
@@ -208,6 +214,7 @@ private fun SelectedChipScreen(
     onAddNewBackupClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: (String?) -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onExclusionsClicked: (syncId: Long, localRoot: UriPath) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     issuesInfoClicked: () -> Unit,
@@ -229,6 +236,7 @@ private fun SelectedChipScreen(
                 uiState = syncFoldersUiState,
                 deviceName = deviceName,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                onExclusionsClicked = onExclusionsClicked,
                 onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
             )
         }

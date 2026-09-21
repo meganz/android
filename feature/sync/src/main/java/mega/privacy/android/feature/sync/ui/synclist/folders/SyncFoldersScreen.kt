@@ -71,6 +71,8 @@ internal fun SyncFoldersScreen(
     modifier: Modifier = Modifier,
     syncPauseReason: SyncPauseReason? = null,
     onLocalFolderSelected: (SyncUiItem, Uri) -> Unit = { _, _ -> },
+    isExclusionsEnabled: Boolean = false,
+    onExclusionsClicked: (SyncUiItem) -> Unit = {},
 ) {
     Box(
         modifier = modifier.fillMaxSize()
@@ -123,7 +125,9 @@ internal fun SyncFoldersScreen(
                         errorRes = syncUiItems[itemIndex].error,
                         deviceName = deviceName,
                         syncPauseReason = syncPauseReason,
-                        onLocalFolderSelected = onLocalFolderSelected
+                        onLocalFolderSelected = onLocalFolderSelected,
+                        isExclusionsEnabled = isExclusionsEnabled,
+                        onExclusionsClicked = onExclusionsClicked,
                     )
                 }
             }

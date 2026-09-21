@@ -96,6 +96,9 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 onOpenMegaFolderClicked = { handle ->
                     navigationHandler.navigate(CloudDriveNavKey(nodeHandle = handle))
                 },
+                onExclusionsClicked = { syncId, localRoot ->
+                    navigationHandler.navigate(ManageSyncExclusionsNavKey(syncId, localRoot))
+                },
                 onCameraUploadsSettingsClicked = {
                     navigationHandler.navigate(SettingsCameraUploadsNavKey)
                 },

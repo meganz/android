@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -1045,6 +1046,144 @@ internal class SyncCardTest {
                 errorRes = null,
                 deviceName = "Device Name",
                 syncPauseReason = syncPauseReason,
+            )
+        }
+    }
+
+    @Test
+    fun `test that the exclusions action is shown when the feature flag is enabled`() {
+        composeTestRule.setContentWithExclusionsCard(isExclusionsEnabled = true)
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the exclusions action is hidden when the feature flag is disabled`() {
+        composeTestRule.setContentWithExclusionsCard(isExclusionsEnabled = false)
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the exclusions action is shown on a backup card when the feature flag is enabled`() {
+        composeTestRule.setContentWithExclusionsCard(
+            isExclusionsEnabled = true,
+            syncType = SyncType.TYPE_BACKUP,
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).assertIsDisplayed()
+    }
+
+    /**
+     * A camera or media uploads root is a bare filesystem path the app holds no SAF grant on, so
+     * its `.megaignore` can be read but never written back.
+     */
+    @Test
+    fun `test that the exclusions action is hidden on a camera uploads card`() {
+        composeTestRule.setContentWithExclusionsCard(
+            isExclusionsEnabled = true,
+            syncType = SyncType.TYPE_CAMERA_UPLOADS,
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the exclusions action is hidden on a media uploads card`() {
+        composeTestRule.setContentWithExclusionsCard(
+            isExclusionsEnabled = true,
+            syncType = SyncType.TYPE_MEDIA_UPLOADS,
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).assertDoesNotExist()
+    }
+
+    /**
+     * A root the app lost its SAF grant on, or one the SDK could not write an ignore file into.
+     * The screen would open and then refuse every save.
+     */
+    @Test
+    fun `test that the exclusions action is hidden when the local root needs changing`() {
+        composeTestRule.setContentWithExclusionsCard(
+            isExclusionsEnabled = true,
+            isLocalRootChangeNeeded = true,
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that tapping the exclusions action reports the click`() {
+        var clicked = false
+        composeTestRule.setContentWithExclusionsCard(
+            isExclusionsEnabled = true,
+            onExclusionsClicked = { clicked = true },
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).performClick()
+
+        assertThat(clicked).isTrue()
+    }
+
+    /**
+     * The exclusions action makes a fifth button on a stalled card, and the footer row neither
+     * wraps nor scrolls. 360dp is the narrowest width the app supports, so it is where a row that
+     * has outgrown the card shows up first.
+     */
+    @Test
+    @Config(qualifiers = "w360dp-h800dp-xhdpi")
+    fun `test that every footer action stays on screen at the narrowest supported width`() {
+        composeTestRule.setContentWithExclusionsCard(
+            isExclusionsEnabled = true,
+            hasStalledIssues = true,
+        )
+
+        listOf(
+            composeTestRule.activity.getString(R.string.sync_card_sync_issues_info),
+            composeTestRule.activity.getString(sharedR.string.general_open_button),
+            composeTestRule.activity.getString(sharedR.string.sync_exclusions_card_action),
+            composeTestRule.activity.getString(R.string.sync_card_pause_sync),
+            composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button),
+        ).forEach { label ->
+            composeTestRule.onNodeWithText(label).assertIsDisplayed()
+        }
+    }
+
+    private fun AndroidComposeTestRule<*, ComponentActivity>.setContentWithExclusionsCard(
+        isExclusionsEnabled: Boolean,
+        syncType: SyncType = SyncType.TYPE_TWOWAY,
+        isLocalRootChangeNeeded: Boolean = false,
+        hasStalledIssues: Boolean = false,
+        onExclusionsClicked: () -> Unit = {},
+    ) {
+        setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = syncType,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = hasStalledIssues,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
+                    isLocalRootChangeNeeded = isLocalRootChangeNeeded,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                isStorageOverQuota = false,
+                errorRes = null,
+                deviceName = "Device Name",
+                isExclusionsEnabled = isExclusionsEnabled,
+                onExclusionsClicked = onExclusionsClicked,
             )
         }
     }

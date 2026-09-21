@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSet
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -239,6 +240,7 @@ internal class SyncFoldersViewModelTest {
             clearSelectedMegaFolderUseCase,
             getCompleteFolderInfoUseCase,
             monitorSyncPauseReasonUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -592,6 +594,41 @@ internal class SyncFoldersViewModelTest {
             assertThat(state.isDisableBatteryOptimizationEnabled).isTrue()
         }
     }
+
+    @Test
+    fun `test that init enables the exclusions entry point when the SyncExclusions flag is on`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions)).thenReturn(true)
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isExclusionsEnabled).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that init hides the exclusions entry point when the SyncExclusions flag is off`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions)).thenReturn(false)
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isExclusionsEnabled).isFalse()
+            }
+        }
+
+    /** A flag the app cannot read is treated as off, so a failed read never opens the feature. */
+    @Test
+    fun `test that init hides the exclusions entry point when the SyncExclusions flag read throws`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions))
+                .thenThrow(RuntimeException("flag unavailable"))
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isExclusionsEnabled).isFalse()
+            }
+        }
 
     @Test
     fun `test that complete folder info use case is called for sync items`() = runTest {

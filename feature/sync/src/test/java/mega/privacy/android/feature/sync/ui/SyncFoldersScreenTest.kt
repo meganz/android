@@ -34,6 +34,7 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
+import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_CARD_EXCLUSIONS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -91,6 +92,7 @@ class SyncFoldersScreenTest {
                 onAddNewBackupClicked = {},
                 issuesInfoClicked = {},
                 onOpenMegaFolderClicked = {},
+                onExclusionsClicked = { _, _ -> },
                 onCameraUploadsSettingsClicked = {},
                 uiState = syncFoldersUiState,
                 deviceName = "Device Name",
@@ -118,6 +120,7 @@ class SyncFoldersScreenTest {
                 uiState = syncFoldersUiState,
                 deviceName = "Device Name",
                 onOpenMegaFolderClicked = {},
+                onExclusionsClicked = { _, _ -> },
                 onCameraUploadsSettingsClicked = {},
             )
         }
@@ -150,6 +153,7 @@ class SyncFoldersScreenTest {
                 uiState = syncFoldersUiState,
                 deviceName = "Device Name",
                 onOpenMegaFolderClicked = {},
+                onExclusionsClicked = { _, _ -> },
                 onCameraUploadsSettingsClicked = {},
             )
         }
@@ -354,4 +358,80 @@ class SyncFoldersScreenTest {
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertIsDisplayed().performClick()
         assertThat(analyticsRule.events).isEmpty()
     }
+
+
+    /**
+     * The route is the only place that reads the flag out of state and turns a card into the pair
+     * the Manage destination is keyed on, so both are asserted here rather than on the screen.
+     */
+    @Test
+    fun `test that the route passes the exclusions flag down to the card`() {
+        setRouteContent(isExclusionsEnabled = true)
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the route hides the exclusions action when the flag is off`() {
+        setRouteContent(isExclusionsEnabled = false)
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the route reports the sync id and local root of the card that was tapped`() {
+        var reported: Pair<Long, UriPath>? = null
+        setRouteContent(
+            isExclusionsEnabled = true,
+            onExclusionsClicked = { syncId, localRoot -> reported = syncId to localRoot },
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).performClick()
+
+        assertThat(reported).isEqualTo(EXCLUSIONS_SYNC_ID to UriPath(EXCLUSIONS_LOCAL_ROOT))
+    }
+
+    private fun setRouteContent(
+        isExclusionsEnabled: Boolean,
+        onExclusionsClicked: (Long, UriPath) -> Unit = { _, _ -> },
+    ) {
+        val uiState = SyncFoldersUiState(
+            syncUiItems = persistentListOf(
+                SyncUiItem(
+                    id = EXCLUSIONS_SYNC_ID,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    folderPairName = "Folder name",
+                    status = SyncStatus.SYNCING,
+                    hasStalledIssues = false,
+                    deviceStoragePath = "Folder name",
+                    megaStoragePath = "Folder name",
+                    megaStorageNodeId = NodeId(9999L),
+                    expanded = true,
+                    uriPath = UriPath(EXCLUSIONS_LOCAL_ROOT),
+                )
+            ),
+            isExclusionsEnabled = isExclusionsEnabled,
+        )
+        whenever(state.value).thenReturn(uiState)
+        whenever(viewModel.uiState).thenReturn(state)
+        composeTestRule.setContent {
+            SyncFoldersRoute(
+                onAction = viewModel::handleAction,
+                onSelectStopBackupDestinationClicked = {},
+                onAddNewSyncClicked = {},
+                onAddNewBackupClicked = {},
+                issuesInfoClicked = {},
+                onOpenMegaFolderClicked = {},
+                onExclusionsClicked = onExclusionsClicked,
+                onCameraUploadsSettingsClicked = {},
+                uiState = uiState,
+                deviceName = "Device Name",
+            )
+        }
+    }
 }
+
+/** Distinct from the card's MEGA node handle, so a mix-up of the two fails the assertion. */
+private const val EXCLUSIONS_SYNC_ID = 4321L
+private const val EXCLUSIONS_LOCAL_ROOT =
+    "content://com.android.externalstorage.documents/tree/primary%3ADocuments"

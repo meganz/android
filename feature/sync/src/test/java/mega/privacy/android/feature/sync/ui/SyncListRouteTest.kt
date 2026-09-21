@@ -139,6 +139,7 @@ internal class SyncListRouteTest {
                 syncIssueNotificationViewModel = syncIssueNotificationViewModel,
                 onSyncSettingsClicked = {},
                 onOpenMegaFolderClicked = {},
+                onExclusionsClicked = { _, _ -> },
                 onCameraUploadsSettingsClicked = {},
                 onStalledIssueMoreClicked = {},
             )
@@ -258,6 +259,7 @@ internal class SyncListRouteTest {
                     syncIssueNotificationViewModel = syncIssueNotificationViewModel,
                     onSyncSettingsClicked = {},
                     onOpenMegaFolderClicked = {},
+                    onExclusionsClicked = { _, _ -> },
                     onCameraUploadsSettingsClicked = {},
                     onStalledIssueMoreClicked = {},
                 )
@@ -348,6 +350,7 @@ internal class SyncListRouteTest {
                         syncIssueNotificationViewModel = syncIssueNotificationViewModel,
                         onSyncSettingsClicked = {},
                         onOpenMegaFolderClicked = {},
+                        onExclusionsClicked = { _, _ -> },
                         onCameraUploadsSettingsClicked = {},
                         onStalledIssueMoreClicked = {},
                         fabState = fabState,
@@ -488,6 +491,7 @@ internal class SyncListRouteTest {
                     syncIssueNotificationViewModel = syncIssueNotificationViewModel,
                     onSyncSettingsClicked = {},
                     onOpenMegaFolderClicked = {},
+                    onExclusionsClicked = { _, _ -> },
                     onCameraUploadsSettingsClicked = {},
                     onStalledIssueMoreClicked = {},
                 )
