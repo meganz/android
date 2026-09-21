@@ -5,10 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -35,17 +35,24 @@ internal fun ManageSyncExclusionsRoute(
     val chips by viewModel.chips.collectAsStateWithLifecycle()
     val rows by viewModel.rows.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackBarHostState.current
-    val resources = LocalResources.current
+    // hoisted so the effects below capture only stable values and are not restarted
+    // mid-snackbar by an unrelated recomposition
+    val saveFailedMessage = stringResource(sharedR.string.sync_exclusions_manage_save_failed)
+    val defaultsRestoredMessage =
+        stringResource(sharedR.string.sync_exclusions_manage_snackbar_defaults_restored)
 
-    LaunchedEffect(uiState.hasSaveFailed) {
-        if (!uiState.hasSaveFailed) return@LaunchedEffect
-        try {
-            snackbarHostState?.showSnackbar(
-                resources.getString(sharedR.string.sync_exclusions_manage_save_failed),
-            )
-        } finally {
-            viewModel.onSaveFailureShown()
-        }
+    EventEffect(
+        event = uiState.saveFailedEvent,
+        onConsumed = viewModel::onSaveFailureShown,
+    ) {
+        snackbarHostState?.showSnackbar(saveFailedMessage)
+    }
+
+    EventEffect(
+        event = uiState.defaultsRestoredEvent,
+        onConsumed = viewModel::onDefaultsRestoredShown,
+    ) {
+        snackbarHostState?.showSnackbar(defaultsRestoredMessage)
     }
 
     LaunchedEffect(uiState.isFinished) {
@@ -79,6 +86,7 @@ internal fun ManageSyncExclusionsRoute(
         onRuleClicked = onEditRule,
         onExtensionRemoved = { viewModel.onRuleRemoved(it.ruleIndex, it.rule) },
         onSizeClicked = { uiState.staged?.size?.let(onEditSize) },
+        onRestoreDefaultsClicked = viewModel::onDefaultsRestored,
         modifier = modifier,
     )
 }

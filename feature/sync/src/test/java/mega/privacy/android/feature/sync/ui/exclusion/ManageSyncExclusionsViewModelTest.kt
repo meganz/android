@@ -2,6 +2,9 @@ package mega.privacy.android.feature.sync.ui.exclusion
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
@@ -215,7 +218,9 @@ internal class ManageSyncExclusionsViewModelTest {
 
         underTest.onRuleRemoved(ruleIndex = 1, expected = rule(pattern = "Moved*"))
 
-        assertThat(underTest.uiState.value.editError)
+        val reported = underTest.uiState.value.editErrorEvent
+        assertThat(reported).isInstanceOf(StateEventWithContentTriggered::class.java)
+        assertThat((reported as StateEventWithContentTriggered).content)
             .isInstanceOf(SyncExclusionEditError.StaleRuleTarget::class.java)
         assertThat(underTest.uiState.value.staged).isEqualTo(threeRules)
         assertThat(underTest.uiState.value.isDirty).isFalse()
@@ -229,7 +234,7 @@ internal class ManageSyncExclusionsViewModelTest {
 
         underTest.onEditErrorShown()
 
-        assertThat(underTest.uiState.value.editError).isNull()
+        assertThat(underTest.uiState.value.editErrorEvent).isEqualTo(consumed())
     }
 
     /**
@@ -305,8 +310,68 @@ internal class ManageSyncExclusionsViewModelTest {
 
         assertThat(underTest.uiState.value.staged?.entries).containsExactlyElementsIn(
             MegaIgnoreDefaults.RULES.map { MegaIgnoreEntry.RuleEntry(it) } +
-                    listOf(comment, largerBound, syncDirective, smallerBound)
+                    listOf(comment, syncDirective)
         ).inOrder()
+    }
+
+    /** Every section the screen draws comes back to the defaults, the size row included. */
+    @Test
+    fun `test that restoring the defaults empties the size row`() = runTest {
+        stubRead(mixed)
+        val underTest = underTest()
+        assertThat(underTest.uiState.value.hasSizeBounds).isTrue()
+
+        underTest.onDefaultsRestored()
+
+        assertThat(underTest.uiState.value.hasSizeBounds).isFalse()
+    }
+
+    @Test
+    fun `test that restoring the defaults confirms it`() = runTest {
+        stubRead(mixed)
+        val underTest = underTest()
+
+        underTest.onDefaultsRestored()
+
+        assertThat(underTest.uiState.value.defaultsRestoredEvent).isEqualTo(triggered)
+    }
+
+    /**
+     * Nothing changes on screen in this case, so a confirmation is the only thing telling the
+     * user the action ran rather than being ignored.
+     */
+    @Test
+    fun `test that restoring the defaults confirms it when the file already held them`() =
+        runTest {
+            stubRead(defaults)
+            val underTest = underTest()
+
+            underTest.onDefaultsRestored()
+
+            assertThat(underTest.uiState.value.defaultsRestoredEvent).isEqualTo(triggered)
+            assertThat(underTest.uiState.value.isDirty).isFalse()
+        }
+
+    @Test
+    fun `test that restoring the defaults confirms nothing when the file was never read`() =
+        runTest {
+            stubReadFailure()
+            val underTest = underTest()
+
+            underTest.onDefaultsRestored()
+
+            assertThat(underTest.uiState.value.defaultsRestoredEvent).isEqualTo(consumed)
+        }
+
+    @Test
+    fun `test that showing the confirmation clears it`() = runTest {
+        stubRead(mixed)
+        val underTest = underTest()
+        underTest.onDefaultsRestored()
+
+        underTest.onDefaultsRestoredShown()
+
+        assertThat(underTest.uiState.value.defaultsRestoredEvent).isEqualTo(consumed)
     }
 
     /**
@@ -469,7 +534,7 @@ internal class ManageSyncExclusionsViewModelTest {
 
         underTest.onSaveClicked()
 
-        assertThat(underTest.uiState.value.hasSaveFailed).isTrue()
+        assertThat(underTest.uiState.value.saveFailedEvent).isEqualTo(triggered)
         assertThat(underTest.uiState.value.staged?.rules).contains(added)
         assertThat(underTest.uiState.value.isDirty).isTrue()
         assertThat(underTest.uiState.value.isSaving).isFalse()
@@ -495,7 +560,7 @@ internal class ManageSyncExclusionsViewModelTest {
 
         underTest.onSaveFailureShown()
 
-        assertThat(underTest.uiState.value.hasSaveFailed).isFalse()
+        assertThat(underTest.uiState.value.saveFailedEvent).isEqualTo(consumed)
     }
 
     // endregion
@@ -791,6 +856,10 @@ internal class ManageSyncExclusionsViewModelTest {
     private val first = rule(pattern = "First*")
     private val second = rule(pattern = "Second*")
     private val third = rule(pattern = "Third*")
+
+    private val defaults = ParsedMegaIgnore(
+        entries = MegaIgnoreDefaults.RULES.map { MegaIgnoreEntry.RuleEntry(it) },
+    )
 
     private val threeRules = ParsedMegaIgnore(
         entries = listOf(

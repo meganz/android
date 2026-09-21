@@ -2,26 +2,35 @@ package mega.privacy.android.core.test.weblate
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.tooltip.direction.TooltipDirection
 import mega.android.core.ui.components.tooltip.model.TooltipPointerSizeInPx
 import mega.android.core.ui.components.tooltip.popup.simple.SimpleTooltipContentBodyOnly
 import mega.android.core.ui.components.tooltip.shape.MegaTooltipShape
 import mega.android.core.ui.theme.spacing.LocalSpacing
+import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 
 const val WEBLATE_SNACKBAR_TAG = "weblate_snackbar:snackbar"
 const val WEBLATE_CONTENT_DESCRIPTION_TOOLTIP_TAG = "weblate_content_description:tooltip"
+const val WEBLATE_OVERFLOW_MENU_TAG = "weblate_overflow_menu:menu"
 
 /**
  * Renders [screenContent] with a MEGA-styled snackbar pinned to the bottom, for Weblate
@@ -133,6 +142,56 @@ fun WeblateContentDescriptionScreenshot(
                 .testTag(WEBLATE_CONTENT_DESCRIPTION_TOOLTIP_TAG),
         ) {
             SimpleTooltipContentBodyOnly(description).Content()
+        }
+    }
+}
+
+/**
+ * Renders [screenContent] with the top app bar's overflow menu drawn open, for Weblate
+ * screenshot tests of strings that only ever appear inside it.
+ *
+ * The real menu is a [androidx.compose.material3.DropdownMenu] rendered into a
+ * [androidx.compose.ui.window.Popup], a separate window the screenshot engine cannot capture.
+ * This helper assembles the same [DropdownMenuItem] and [MegaText] the design system uses, on a
+ * surface taking the same token, directly in the hierarchy.
+ *
+ * Must be wrapped in `AndroidThemeForPreviews`. The token is not decoration: `Surface` falls back
+ * to `MaterialTheme.colorScheme.surface`, which the MEGA theme leaves at the Material default in
+ * both themes, so an untokened panel renders near-white behind near-white text in dark mode.
+ *
+ * @param menuItems the menu's items, top to bottom (the strings under translation)
+ * @param menuWidth the menu's width. The real one sizes to its content, within the Material
+ * minimum and maximum, so pick something close to how the longest item renders
+ * @param topPadding how far below the top of the screen the menu hangs
+ * @param screenContent the screen the menu belongs to, for translator context
+ */
+@Composable
+fun WeblateOverflowMenuScreenshot(
+    menuItems: List<String>,
+    menuWidth: Dp = 200.dp,
+    topPadding: Dp = 60.dp,
+    screenContent: @Composable () -> Unit = {},
+) {
+    Box {
+        screenContent()
+        Surface(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = topPadding, end = LocalSpacing.current.x8)
+                .width(menuWidth)
+                .testTag(WEBLATE_OVERFLOW_MENU_TAG),
+            shape = RoundedCornerShape(4.dp),
+            color = DSTokens.colors.background.surface1,
+            shadowElevation = 3.dp,
+        ) {
+            Column(modifier = Modifier.padding(vertical = LocalSpacing.current.x8)) {
+                menuItems.forEach { item ->
+                    DropdownMenuItem(
+                        onClick = {},
+                        text = { MegaText(text = item, textColor = TextColor.Primary) },
+                    )
+                }
+            }
         }
     }
 }

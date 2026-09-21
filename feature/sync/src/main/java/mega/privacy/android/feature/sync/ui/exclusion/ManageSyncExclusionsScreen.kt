@@ -19,9 +19,11 @@ import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.Button
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
 import mega.privacy.android.feature.sync.ui.model.exclusion.ManageSyncExclusionsUiState
+import mega.privacy.android.feature.sync.ui.model.exclusion.RestoreDefaultsMenuAction
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionChipUiItem
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionRowDescription
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionRowUiItem
@@ -50,6 +52,7 @@ internal fun ManageSyncExclusionsScreen(
     onRuleClicked: (SyncExclusionRowUiItem) -> Unit,
     onExtensionRemoved: (SyncExclusionChipUiItem) -> Unit,
     onSizeClicked: () -> Unit,
+    onRestoreDefaultsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MegaScaffold(
@@ -59,6 +62,18 @@ internal fun ManageSyncExclusionsScreen(
                 title = stringResource(sharedR.string.sync_exclusions_manage_title),
                 subtitle = uiState.syncName,
                 navigationType = AppBarNavigationType.Back(onBackPressed),
+                // an action carrying no icon is what the design system puts in the overflow
+                // menu, which is where the design draws this one
+                actions = if (uiState.canRestoreDefaults) {
+                    listOf(
+                        MenuActionWithClick(
+                            RestoreDefaultsMenuAction,
+                            onRestoreDefaultsClicked,
+                        ),
+                    )
+                } else {
+                    emptyList()
+                },
             )
         },
         bottomBar = {

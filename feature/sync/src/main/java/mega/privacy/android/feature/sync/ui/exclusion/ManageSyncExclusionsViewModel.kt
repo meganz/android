@@ -6,6 +6,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -120,14 +122,18 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
     }
 
     fun onDefaultsRestored() {
-        stage { restoreDefaultSyncExclusionsUseCase(it) }
+        // confirmed even when the file already held the defaults, because the user cannot tell
+        // an unchanged list from an action that did nothing
+        if (stage { restoreDefaultSyncExclusionsUseCase(it) }) {
+            uiState.update { it.copy(defaultsRestoredEvent = triggered) }
+        }
     }
 
     fun onSaveClicked() {
         val staged = uiState.value.staged ?: return
         if (!uiState.value.canSave) return
 
-        uiState.update { it.copy(isSaving = true, hasSaveFailed = false) }
+        uiState.update { it.copy(isSaving = true, saveFailedEvent = consumed) }
         // the write is followed by the rescan that makes the running sync read it, and the two
         // only add up to an applied change together, so leaving the screen must not cancel them
         applicationScope.launch {
@@ -139,7 +145,7 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
                     // already saved
                     it.copy(isSaving = false, loaded = staged)
                 } else {
-                    it.copy(isSaving = false, hasSaveFailed = true)
+                    it.copy(isSaving = false, saveFailedEvent = triggered)
                 }
             }
         }
@@ -177,11 +183,15 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
     }
 
     fun onEditErrorShown() {
-        uiState.update { it.copy(editError = null) }
+        uiState.update { it.copy(editErrorEvent = consumed()) }
     }
 
     fun onSaveFailureShown() {
-        uiState.update { it.copy(hasSaveFailed = false) }
+        uiState.update { it.copy(saveFailedEvent = consumed) }
+    }
+
+    fun onDefaultsRestoredShown() {
+        uiState.update { it.copy(defaultsRestoredEvent = consumed) }
     }
 
     private fun load() {
@@ -196,8 +206,8 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
                             isWritable = snapshot.isWritable,
                             isLoading = false,
                             hasLoadFailed = false,
-                            editError = null,
-                            hasSaveFailed = false,
+                            editErrorEvent = consumed(),
+                            saveFailedEvent = consumed,
                             isDiscardPromptShown = false,
                         )
                     }
@@ -233,9 +243,11 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
         }
     }
 
-    private fun stage(transform: (ParsedMegaIgnore) -> ParsedMegaIgnore) {
-        val current = uiState.value.staged ?: return
+    /** Applies [transform] to the staged model, reporting whether there was one to apply it to. */
+    private fun stage(transform: (ParsedMegaIgnore) -> ParsedMegaIgnore): Boolean {
+        val current = uiState.value.staged ?: return false
         uiState.update { it.copy(staged = transform(current)) }
+        return true
     }
 
     private fun stageResult(transform: (ParsedMegaIgnore) -> Result<ParsedMegaIgnore>) {
@@ -244,7 +256,7 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
             .onSuccess { staged -> uiState.update { it.copy(staged = staged) } }
             .onFailure { error ->
                 val refusal = error as? SyncExclusionEditError ?: throw error
-                uiState.update { it.copy(editError = refusal) }
+                uiState.update { it.copy(editErrorEvent = triggered(refusal)) }
             }
     }
 

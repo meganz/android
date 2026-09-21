@@ -16,11 +16,15 @@ internal class RestoreDefaultSyncExclusionsUseCase @Inject constructor() {
      * Writes [MegaIgnoreDefaults.RULES] at the top of [current] and drops the exclusion rules it
      * held, keeping every other line in its original relative order.
      *
-     * Only an excluding [MegaIgnoreEntry.RuleEntry] is this app's to reset. An including one is
-     * kept, because the list this app presents cannot express a rule's class at all: an include is
-     * therefore not a rule the user can see here, and a hand added `+:*.tmp` that puts a file type
-     * back into the sync has to survive a reset of the exclusions it was written to override. Size
-     * bounds, lines this app does not model and lines the SDK refuses are kept for the same reason.
+     * Everything the exclusions UI both owns and draws is reset: the excluding
+     * [MegaIgnoreEntry.RuleEntry] items behind the name and extension lists, and the size bounds
+     * behind the size row. The defaults carry no size bound, so restoring has to clear one for the
+     * list to come back to what the SDK sets up.
+     *
+     * Everything the UI cannot show is kept, because the user cannot have authored it here and
+     * would not see it go: an including rule, since the list cannot express a rule's class, so a
+     * hand added `+:*.tmp` has to survive a reset of the exclusions it was written to override;
+     * and lines this app does not model or the SDK refuses.
      *
      * The defaults go first, rather than into the position of the rule they replace, so that
      * everything the user or another client authored sits after them and wins under the SDK's last
@@ -35,9 +39,16 @@ internal class RestoreDefaultSyncExclusionsUseCase @Inject constructor() {
      */
     operator fun invoke(current: ParsedMegaIgnore): ParsedMegaIgnore = current.copy(
         entries = MegaIgnoreDefaults.RULES.map { MegaIgnoreEntry.RuleEntry(it) } +
-                current.entries.filterNot { it.isExclusionRule() }
+                current.entries.filterNot { it.isDrawnByTheExclusionsUi() }
     )
 
-    private fun MegaIgnoreEntry.isExclusionRule(): Boolean =
-        this is MegaIgnoreEntry.RuleEntry && rule.exclusionClass == SyncExclusionClass.Exclude
+    // exhaustive rather than an else, so a new kind of entry has to be placed on one side or the
+    // other instead of silently surviving a reset
+    private fun MegaIgnoreEntry.isDrawnByTheExclusionsUi(): Boolean = when (this) {
+        is MegaIgnoreEntry.RuleEntry -> rule.exclusionClass == SyncExclusionClass.Exclude
+        is MegaIgnoreEntry.SizeSmallerEntry -> true
+        is MegaIgnoreEntry.SizeLargerEntry -> true
+        is MegaIgnoreEntry.PreservedEntry -> false
+        is MegaIgnoreEntry.InvalidEntry -> false
+    }
 }

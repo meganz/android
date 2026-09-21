@@ -1,5 +1,8 @@
 package mega.privacy.android.feature.sync.ui.model.exclusion
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.exception.SyncExclusionEditError
 
@@ -27,10 +30,14 @@ import mega.privacy.android.feature.sync.domain.exception.SyncExclusionEditError
  * because presenting a failed read as "no exclusions" invites the user to save that over a file
  * that may hold rules
  * @property isSaving whether a write is in flight
- * @property editError why the last mutation was refused, for the screen to report. Cleared by
- * [ManageSyncExclusionsViewModel.onEditErrorShown]
- * @property hasSaveFailed whether the last save failed. The edits survive it, so the user can
- * retry without re-entering them
+ * @property editErrorEvent why the last mutation was refused, for the screen to report.
+ * Consumed through [ManageSyncExclusionsViewModel.onEditErrorShown]. Nothing reads it yet, so a
+ * refused edit is currently silent
+ * @property saveFailedEvent that the last save failed. The edits survive it, so the user can
+ * retry without re-entering them. Consumed through
+ * [ManageSyncExclusionsViewModel.onSaveFailureShown]
+ * @property defaultsRestoredEvent that the defaults have just been put back, for the screen to
+ * confirm. Consumed through [ManageSyncExclusionsViewModel.onDefaultsRestoredShown]
  * @property isDiscardPromptShown whether the user is being asked to confirm losing unsaved edits
  * @property isFinished whether the screen has nothing left to do and should be left
  * @property syncName the sync's name, shown under the title so the screen says which folder these
@@ -45,8 +52,9 @@ internal data class ManageSyncExclusionsUiState(
     val isLoading: Boolean = true,
     val hasLoadFailed: Boolean = false,
     val isSaving: Boolean = false,
-    val editError: SyncExclusionEditError? = null,
-    val hasSaveFailed: Boolean = false,
+    val editErrorEvent: StateEventWithContent<SyncExclusionEditError> = consumed(),
+    val saveFailedEvent: StateEvent = consumed,
+    val defaultsRestoredEvent: StateEvent = consumed,
     val isDiscardPromptShown: Boolean = false,
     val isFinished: Boolean = false,
 ) {
@@ -74,6 +82,17 @@ internal data class ManageSyncExclusionsUiState(
      */
     val canSave: Boolean
         get() = isDirty && isWritable && !isSaving
+
+    /**
+     * Whether putting the exclusions back to the defaults is currently possible.
+     *
+     * A file that was never read has nothing to reset; one the sync refuses would go on
+     * refusing it, because restoring keeps the line it rejects; and a root that cannot be
+     * written can never save the result. Each would confirm a reset the user cannot see, or
+     * one the sync will never apply.
+     */
+    val canRestoreDefaults: Boolean
+        get() = staged != null && !isLoading && !hasLoadFailed && !isRejected && isWritable
 
     /**
      * Whether the staged file bounds the size of what it syncs.

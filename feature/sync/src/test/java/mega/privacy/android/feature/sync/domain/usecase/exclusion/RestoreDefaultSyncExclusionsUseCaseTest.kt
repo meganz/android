@@ -53,7 +53,6 @@ internal class RestoreDefaultSyncExclusionsUseCaseTest {
                 MegaIgnoreEntry.PreservedEntry("# header"),
                 MegaIgnoreEntry.PreservedEntry(REGEX_INCLUDE),
                 MegaIgnoreEntry.RuleEntry(includeRule("*.tmp")),
-                MegaIgnoreEntry.SizeLargerEntry(bytes = 4096L),
                 MegaIgnoreEntry.InvalidEntry("Thumbs.db", InvalidLineReason.MissingExclusionClass),
             )
         ).inOrder()
@@ -70,8 +69,12 @@ internal class RestoreDefaultSyncExclusionsUseCaseTest {
         assertThat(result.entries.last()).isEqualTo(include)
     }
 
+    /**
+     * The size row is part of the list this screen resets, and the defaults declare no bound, so a
+     * restore that left one behind would report a default set the SDK does not have.
+     */
     @Test
-    fun `test that invoke keeps the size bounds and their position`() {
+    fun `test that invoke clears the size bounds`() {
         val current = ParsedMegaIgnore(
             entries = listOf(
                 MegaIgnoreEntry.SizeSmallerEntry(bytes = 1024L),
@@ -82,15 +85,28 @@ internal class RestoreDefaultSyncExclusionsUseCaseTest {
 
         val result = underTest(current)
 
-        assertThat(result.entries).containsExactlyElementsIn(
-            defaultEntries() + listOf(
-                MegaIgnoreEntry.SizeSmallerEntry(bytes = 1024L),
+        assertThat(result.entries).containsExactlyElementsIn(defaultEntries()).inOrder()
+        assertThat(result.size).isEqualTo(SyncSizeExclusion())
+        assertThat(result.size.isUnbounded).isTrue()
+    }
+
+    /** A bound the file repeats is cleared entirely, not reduced to its last occurrence. */
+    @Test
+    fun `test that invoke clears every occurrence of a repeated size bound`() {
+        val current = ParsedMegaIgnore(
+            entries = listOf(
+                MegaIgnoreEntry.SizeLargerEntry(bytes = 1024L),
+                MegaIgnoreEntry.PreservedEntry("# header"),
                 MegaIgnoreEntry.SizeLargerEntry(bytes = 4096L),
-            )
-        ).inOrder()
-        assertThat(result.size).isEqualTo(
-            SyncSizeExclusion(excludeSmallerThanBytes = 1024L, excludeLargerThanBytes = 4096L)
+            ),
         )
+
+        val result = underTest(current)
+
+        assertThat(result.entries).containsExactlyElementsIn(
+            defaultEntries() + MegaIgnoreEntry.PreservedEntry("# header")
+        ).inOrder()
+        assertThat(result.size.isUnbounded).isTrue()
     }
 
     @Test

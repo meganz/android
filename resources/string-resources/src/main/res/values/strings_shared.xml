@@ -4217,6 +4217,10 @@
     <string name="sync_exclusions_manage_save_failed">Couldn’t save your changes. Try again.</string>
     <!-- Sync list: action on a sync or backup card that opens the screen listing everything that sync leaves out. Sits beside Open, Pause and Stop, so keep it to a single short word if the language allows. -->
     <string name="sync_exclusions_card_action">Exclusions</string>
+    <!-- Sync exclusions Manage screen: overflow menu action that puts the folder back to the exclusions MEGA sets up by default, replacing the file and folder rules listed above it. “Defaults” means that predefined set of exclusions, not device or app settings. -->
+    <string name="sync_exclusions_manage_restore_defaults">Restore defaults</string>
+    <!-- Sync exclusions Manage screen: confirmation shown briefly after the default exclusions have been put back. -->
+    <string name="sync_exclusions_manage_snackbar_defaults_restored">Default exclusions restored</string>
     <!-- Title of the personal QR code screen -->
     <string name="contacts_qr_screen_title">QR code</string>
     <!-- Button that generates the user's personal QR code -->

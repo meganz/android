@@ -9,6 +9,7 @@ import com.android.tools.screenshot.PreviewTest
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.test.weblate.WeblateContentDescriptionScreenshot
+import mega.privacy.android.core.test.weblate.WeblateOverflowMenuScreenshot
 import mega.privacy.android.core.test.weblate.WeblateSnackbarScreenshot
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
 import mega.privacy.android.feature.sync.domain.entity.InvalidLineReason
@@ -223,6 +224,36 @@ class ManageSyncExclusionsScreenScreenshotTest {
         }
     }
 
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ManageSyncExclusionsDefaultsRestoredSnackbar() {
+        AndroidThemeForPreviews {
+            WeblateSnackbarScreenshot(
+                snackbarText = stringResource(
+                    sharedR.string.sync_exclusions_manage_snackbar_defaults_restored,
+                ),
+            ) {
+                DefaultsScreen()
+            }
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ManageSyncExclusionsRestoreDefaultsMenu() {
+        AndroidThemeForPreviews {
+            WeblateOverflowMenuScreenshot(
+                menuItems = listOf(
+                    stringResource(sharedR.string.sync_exclusions_manage_restore_defaults),
+                ),
+            ) {
+                DefaultsScreen()
+            }
+        }
+    }
+
     @Composable
     private fun SizeBoundsScreen(vararg bounds: MegaIgnoreEntry) {
         val parsed = ParsedMegaIgnore(
@@ -256,6 +287,7 @@ class ManageSyncExclusionsScreenScreenshotTest {
             onRuleClicked = {},
             onExtensionRemoved = {},
             onSizeClicked = {},
+            onRestoreDefaultsClicked = {},
         )
     }
 
