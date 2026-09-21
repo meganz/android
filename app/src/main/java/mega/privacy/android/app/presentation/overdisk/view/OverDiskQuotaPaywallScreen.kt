@@ -36,6 +36,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.SpannedText
 import mega.android.core.ui.components.button.PrimaryFilledButton
@@ -43,9 +44,11 @@ import mega.android.core.ui.components.button.TextOnlyButton
 import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
+import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.overdisk.model.OverDiskQuotaPaywallUiState
@@ -74,6 +77,7 @@ fun OverDiskQuotaPaywallScreen(
     uiState: OverDiskQuotaPaywallUiState,
     onDismiss: () -> Unit,
     onUpgrade: () -> Unit,
+    onLearnMore: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isLandscape =
@@ -94,6 +98,7 @@ fun OverDiskQuotaPaywallScreen(
                 uiState = uiState,
                 onDismiss = onDismiss,
                 onUpgrade = onUpgrade,
+                onLearnMore = onLearnMore,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
@@ -112,6 +117,7 @@ fun OverDiskQuotaPaywallScreen(
                 uiState = uiState,
                 onDismiss = onDismiss,
                 onUpgrade = onUpgrade,
+                onLearnMore = onLearnMore,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -143,6 +149,7 @@ private fun PaywallContent(
     uiState: OverDiskQuotaPaywallUiState,
     onDismiss: () -> Unit,
     onUpgrade: () -> Unit,
+    onLearnMore: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -150,7 +157,7 @@ private fun PaywallContent(
             .padding(start = 24.dp, end = 18.dp, bottom = 30.dp),
     ) {
         MegaText(
-            text = stringResource(id = R.string.over_disk_quota_paywall_title),
+            text = stringResource(id = sharedR.string.account_over_disk_quota_paywall_title),
             textColor = TextColor.Primary,
             style = AppTheme.typography.titleMedium,
             modifier = Modifier.padding(top = 27.dp),
@@ -163,10 +170,18 @@ private fun PaywallContent(
                     .testTag(TEST_TAG_ODQ_LOADING)
             )
         } else {
-            MegaText(
-                text = bodyText(uiState),
-                textColor = TextColor.Primary,
-                style = AppTheme.typography.bodyLarge,
+            val body = bodyText(uiState)
+            LinkSpannedText(
+                value = body,
+                spanStyles = mapOf(
+                    SpanIndicator('A') to SpanStyleWithAnnotation(
+                        MegaSpanStyle.LinkColorStyle(SpanStyle(), LinkColor.Primary),
+                        STORAGE_LIMITS_HELP_URL,
+                    ),
+                ),
+                onAnnotationClick = onLearnMore,
+                baseStyle = AppTheme.typography.bodyLarge,
+                baseTextColor = TextColor.Primary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 22.dp)
@@ -221,7 +236,7 @@ private fun PaywallContent(
             )
             Spacer(modifier = Modifier.width(26.dp))
             PrimaryFilledButton(
-                text = stringResource(id = sharedR.string.general_upgrade_button),
+                text = stringResource(id = sharedR.string.account_over_disk_quota_paywall_upgrade_now_button),
                 onClick = onUpgrade,
                 modifier = Modifier
                     .wrapContentSize()
@@ -239,32 +254,28 @@ private fun bodyText(uiState: OverDiskQuotaPaywallUiState): String {
     val context = LocalContext.current
     val size = getSizeString(uiState.usedStorage, context)
     val proPlan = proPlanNeeded(uiState.products, uiState.usedStorage)
-    val files = uiState.fileCount
+    // Cap the count so narrowing to Int cannot overflow into a wrong plural quantity.
+    val fileCount = uiState.fileCount.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
     val warnings = uiState.warningTimestamps
 
-    fun date(timestamp: Long) = formatDate(timestamp, DATE_LONG_FORMAT, false, context)
-
     return when {
-        warnings.isEmpty() -> stringResource(
-            id = R.string.over_disk_quota_paywall_text_no_warning_dates_info,
-            uiState.email, files.toString(), size, proPlan,
+        warnings.isEmpty() -> pluralStringResource(
+            id = sharedR.plurals.account_over_disk_quota_paywall_body_no_warning_dates,
+            count = fileCount,
+            fileCount, size, proPlan,
         )
 
         warnings.size == 1 -> pluralStringResource(
-            id = R.plurals.over_disk_quota_paywall_text,
-            count = 1,
-            uiState.email, date(warnings[0]), files.toString(), size, proPlan,
+            id = sharedR.plurals.account_over_disk_quota_paywall_body_single_warning_date,
+            count = fileCount,
+            formatDate(warnings[0], DATE_LONG_FORMAT, false, context), fileCount, size, proPlan,
         )
 
-        else -> {
-            val lastIndex = warnings.size - 1
-            val dates = warnings.subList(0, lastIndex).joinToString(", ") { date(it) }
-            pluralStringResource(
-                id = R.plurals.over_disk_quota_paywall_text,
-                count = warnings.size,
-                uiState.email, dates, date(warnings[lastIndex]), files.toString(), size, proPlan,
-            )
-        }
+        else -> pluralStringResource(
+            id = sharedR.plurals.account_over_disk_quota_paywall_body_multiple_warning_dates,
+            count = fileCount,
+            fileCount, size, proPlan,
+        )
     }
 }
 
@@ -328,6 +339,7 @@ private fun OverDiskQuotaPaywallScreenNoWarningsPreview() {
             ),
             onDismiss = {},
             onUpgrade = {},
+            onLearnMore = {},
         )
     }
 }
@@ -347,6 +359,7 @@ private fun OverDiskQuotaPaywallScreenWithDeadlinePreview() {
             ),
             onDismiss = {},
             onUpgrade = {},
+            onLearnMore = {},
         )
     }
 }
@@ -367,6 +380,7 @@ private fun OverDiskQuotaPaywallScreenLandscapePreview() {
             ),
             onDismiss = {},
             onUpgrade = {},
+            onLearnMore = {},
         )
     }
 }
@@ -379,6 +393,7 @@ private fun OverDiskQuotaPaywallScreenLoadingPreview() {
             uiState = OverDiskQuotaPaywallUiState(isLoading = true),
             onDismiss = {},
             onUpgrade = {},
+            onLearnMore = {},
         )
     }
 }
@@ -408,6 +423,10 @@ const val TEST_TAG_ODQ_DELETION_WARNING = "over_disk_quota_paywall:deletion_warn
  * Test tag for the loading indicator.
  */
 const val TEST_TAG_ODQ_LOADING = "over_disk_quota_paywall:loading"
+
+/** Help page the body's [A] link opens. */
+private const val STORAGE_LIMITS_HELP_URL =
+    "https://help.mega.io/plans-storage/space-storage/storage-exceeded"
 
 /**
  * The deletion-warning source string nests [M] inside [B]. [SpannedText] does not support

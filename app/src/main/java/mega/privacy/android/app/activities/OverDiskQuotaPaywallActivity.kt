@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
 import mega.privacy.android.app.presentation.overdisk.view.OverDiskQuotaPaywallScreen
@@ -38,6 +39,7 @@ class OverDiskQuotaPaywallActivity : FragmentActivity() {
                     uiState = uiState,
                     onDismiss = ::onDismiss,
                     onUpgrade = ::onUpgrade,
+                    onLearnMore = ::onLearnMore,
                 )
             }
         }
@@ -68,6 +70,10 @@ class OverDiskQuotaPaywallActivity : FragmentActivity() {
             Timber.e(it)
         }
         finish()
+    }
+
+    private fun onLearnMore(url: String) {
+        launchUrl(url)
     }
 
     private fun launchMegaActivity() {
