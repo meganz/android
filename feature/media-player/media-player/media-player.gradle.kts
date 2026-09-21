@@ -5,11 +5,14 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "mega.privacy.android.feature.mediaplayer"
+
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -54,4 +57,9 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testRuntimeOnly(testlib.junit.jupiter.engine)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 }
