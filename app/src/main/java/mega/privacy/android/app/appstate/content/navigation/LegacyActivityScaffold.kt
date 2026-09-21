@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retainRetainedValuesStoreRegistry
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -76,6 +77,9 @@ fun LegacyActivityScaffold(
     popTransitionSpec: AnimatedContentTransitionScope<*>.() -> ContentTransform = { fadeTransition },
     entryContent: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit,
 ) {
+    // [container] removes the whole body from composition while the passcode lock is up, so the
+    // registry is created outside it for the entries' retained values to outlive the lock.
+    val retainedValuesStoreRegistry = retainRetainedValuesStoreRegistry()
     container {
         val (backStack, baseNavigationHandler) = rememberLegacyActivityNavigation(
             initialKey = initialKey,
@@ -127,7 +131,7 @@ fun LegacyActivityScaffold(
                 entryDecorators = listOf(
                     rememberSaveableStateHolderNavEntryDecorator(),
                     rememberSharedViewModelStoreNavEntryDecorator(),
-                    rememberRetainedValuesStoreNavEntryDecorator(),
+                    rememberRetainedValuesStoreNavEntryDecorator(retainedValuesStoreRegistry),
                 ),
                 transitionSpec = transitionSpec,
                 popTransitionSpec = popTransitionSpec,

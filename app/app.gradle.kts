@@ -303,6 +303,7 @@ dependencies {
     implementation(androidx.bundles.lifecycle)
     implementation(androidx.bundles.navigation)
     implementation(androidx.navigation3.ui)
+    implementation(androidx.compose.runtime.retain)
     implementation(androidx.appcompat)
     implementation(androidx.biometric)
     implementation(androidx.camera.camera2)

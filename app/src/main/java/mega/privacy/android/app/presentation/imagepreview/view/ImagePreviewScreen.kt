@@ -34,7 +34,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.TopAppBar
@@ -74,7 +73,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -190,10 +188,15 @@ internal fun ImagePreviewScreen(
             viewState.pageCount
         }
 
-        val coroutineScope = rememberCoroutineScope()
         val modalSheetState = rememberModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
             skipHalfExpanded = false,
+        )
+        val optionsSheetState = rememberImagePreviewOptionsSheetState()
+
+        SyncImagePreviewOptionsSheet(
+            optionsSheetState = optionsSheetState,
+            modalSheetState = modalSheetState,
         )
 
         var flickOffsetFraction by remember { mutableFloatStateOf(0f) }
@@ -231,7 +234,7 @@ internal fun ImagePreviewScreen(
                 cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                 onConfirm = {
                     onClickMoveToRubbishBin(currentImageNode)
-                    hideBottomSheet(coroutineScope, modalSheetState)
+                    optionsSheetState.hide()
                     showMoveToRubbishBinDialog = false
                 },
                 onDismiss = {
@@ -314,11 +317,7 @@ internal fun ImagePreviewScreen(
                                 onClickSaveToDevice = onClickSaveToDevice,
                                 onClickGetLink = { onClickGetLink(imageNode) },
                                 onClickShare = { onClickShare(imageNode) },
-                                onClickMore = {
-                                    coroutineScope.launch {
-                                        modalSheetState.show()
-                                    }
-                                },
+                                onClickMore = optionsSheetState::show,
                                 modifier = Modifier
                                     .navigationBarsLandscapePadding()
                                     .statusBarsPadding(),
@@ -347,7 +346,7 @@ internal fun ImagePreviewScreen(
                     },
                 )
 
-                if (modalSheetState.isVisible) {
+                if (optionsSheetState.isShown || modalSheetState.isVisible) {
                     Box(modifier = Modifier.safeDrawingPadding()) {
                         ImagePreviewBottomSheet(
                             modalSheetState = modalSheetState,
@@ -384,58 +383,58 @@ internal fun ImagePreviewScreen(
                             getImageThumbnailPath = viewModel::getLowestResolutionImagePath,
                             onClickInfo = {
                                 onClickInfo(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickFavourite = {
                                 onClickFavourite(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickLabel = {
                                 onClickLabel(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickDispute = {},
                             onClickOpenWith = {
                                 onClickOpenWith(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickForward = {
                                 onClickSendTo(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickSaveToDevice = {
                                 onClickSaveToDevice()
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickImport = {
                                 onClickImport(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onSwitchAvailableOffline = { checked ->
                                 onSwitchAvailableOffline?.invoke(checked, currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickGetLink = {
                                 onClickGetLink(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickRemoveLink = {
                                 if (!currentImageNode.isTakenDown) {
                                     onClickRemoveLink(currentImageNode)
                                 }
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickSendToChat = {
                                 onClickSendTo(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickShare = {
                                 onClickShare(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickRename = {
                                 onClickRename(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickHide = {
                                 Analytics.tracker.trackEvent(ImagePreviewHideNodeMenuToolBarEvent)
@@ -445,39 +444,39 @@ internal fun ImagePreviewScreen(
                                     isBusinessAccountExpired,
                                     isHiddenNodesOnboarded
                                 )
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickHideHelp = {
                                 onClickHideHelp()
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickUnhide = {
                                 onClickUnhide(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickMove = {
                                 onClickMove(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickCopy = {
                                 onClickCopy(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickRestore = {
                                 onClickRestore(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickRemove = {
                                 showRemoveDialog = true
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickMoveToRubbishBin = {
                                 showMoveToRubbishBinDialog = true
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                             onClickAddToAlbum = {
                                 onClickAddToAlbum(currentImageNode)
-                                hideBottomSheet(coroutineScope, modalSheetState)
+                                optionsSheetState.hide()
                             },
                         )
                     }
@@ -490,15 +489,6 @@ internal fun ImagePreviewScreen(
             onConsumeEvent = viewModel::consumeTransferEvent,
             snackBarHostState = scaffoldState.snackbarHostState,
         )
-    }
-}
-
-private fun hideBottomSheet(
-    coroutineScope: CoroutineScope,
-    modalSheetState: ModalBottomSheetState,
-) {
-    coroutineScope.launch {
-        modalSheetState.hide()
     }
 }
 
