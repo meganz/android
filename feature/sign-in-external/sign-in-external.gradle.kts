@@ -39,7 +39,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     // Project modules
-    implementation(project(":domain"))
+    implementation(project(":domain:common"))
     implementation(project(":data"))
     implementation(project(":core:feature-flags"))
     implementation(project(":resources:string-resources"))

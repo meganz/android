@@ -19,7 +19,7 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":core:ui-components:node-components"))
-    implementation(project(":domain"))
+    implementation(project(":domain:common"))
     implementation(project(":shared:nodes"))
 
     //core components

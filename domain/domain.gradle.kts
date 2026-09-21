@@ -11,6 +11,7 @@ lint {
 
 dependencies {
     lintChecks(project(":lint"))
+    api(project(":domain:common"))
     implementation(lib.coroutines.core)
     implementation(lib.javax.inject)
 

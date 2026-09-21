@@ -32,7 +32,7 @@ dependencies {
     androidTestImplementation(project(":feature:settings"))
     androidTestImplementation(project(":feature:transfers:transfers"))
     androidTestImplementation(project(":feature:payment:payment-snowflake-components"))
-    androidTestImplementation(project(":domain"))
+    androidTestImplementation(project(":domain:common"))
     androidTestImplementation(project(":core:analytics:analytics-test"))
     androidTestImplementation(project(":resources:string-resources"))
     androidTestImplementation(lib.mega.core.ui)
