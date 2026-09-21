@@ -602,9 +602,9 @@
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Videolar</string>
     <!-- Passcode with 4 digits -->
-    <string name="four_pin_lock">4 basamaklı</string>
+    <string name="four_pin_lock">4 haneli</string>
     <!-- Passcode with 6 digits -->
-    <string name="six_pin_lock">6 basamaklı</string>
+    <string name="six_pin_lock">6 haneli</string>
     <!-- Passcode alphanumeric -->
     <string name="AN_pin_lock">Alfa sayısal</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
@@ -1583,7 +1583,7 @@
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">Neden iki faktörlü kimlik doğrulamasına ihtiyacınız var?</string>
     <!--  -->
-    <string name="two_factor_authentication_explain">İki faktörlü kimlik doğrulama, hesabınız için ikinci bir güvenlik katmanıdır. Bu, birisi şifrenizi bilse bile, yalnızca sizin erişebileceğiniz 6 basamaklı koda erişmeden hesabınıza erişemeyeceği anlamına gelir.</string>
+    <string name="two_factor_authentication_explain">İki faktörlü kimlik doğrulama, hesabınız için ikinci bir güvenlik katmanıdır. Bu, birisi şifrenizi bilse bile, yalnızca sizin erişebileceğiniz 6 haneli koda erişmeden hesabınıza erişemeyeceği anlamına gelir.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Kuruluma başla</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
@@ -1591,7 +1591,7 @@
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Cihazınızı kaybetmeniz durumunda bu kodu güvenli bir yere yedeklediğinizden emin olun.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Lütfen kimlik doğrulayıcı uygulamanız tarafından oluşturulan 6 basamaklı kodu girin.</string>
+    <string name="explain_confirm_2fa">Lütfen kimlik doğrulayıcı uygulamanız tarafından oluşturulan 6 haneli kodu girin.</string>
     <!-- Text button -->
     <string name="general_next">Sonraki</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -1599,7 +1599,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">İki faktörlü kimlik doğrulama etkinleştirildi</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Hesabınıza bir sonraki girişinizde, kimlik doğrulama uygulamanız tarafından sağlanan 6 basamaklı bir kodu girmeniz istenecek.</string>
+    <string name="description_2fa_enabled">Hesabınıza bir sonraki girişinizde, kimlik doğrulama uygulamanız tarafından sağlanan 6 haneli bir kodu girmeniz istenecek.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled"><b>Kurtarma anahtarınızı</b> güvenli bir yerde saklayın. Uygulamanıza erişiminizi kaybetmeniz veya iki faktörlü kimlik doğrulamayı devre dışı bırakmak istemeniz durumunda sorun yaşamamak için bu önemlidir.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2852,9 +2852,9 @@
     <!-- Setting which allows to choose the start screen. -->
     <string name="start_screen_setting">Başlangıç ekranı</string>
     <!-- Setting which allows to hide or show the recent activity. -->
-    <string name="hide_recent_setting">Son etkinliği gizle</string>
+    <string name="hide_recent_setting">Son etkinlikleri gizle</string>
     <!-- Context of a setting which allows to hide or show the recent activity. -->
-    <string name="hide_recent_setting_context">Ana sayfadaki son etkinliği gizle.</string>
+    <string name="hide_recent_setting_context">Ana sayfadaki son etkinlikleri gizle.</string>
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">Başlangıç ekranınızı seçin</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
@@ -4782,4 +4782,8 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Kamera yüklemeleri etkinleştirildi</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Bu konum artık mevcut değil.</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="one">%1$d yıl</item>
+        <item quantity="other">%1$d yıl</item>
+    </plurals>
 </resources>

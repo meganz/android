@@ -5206,4 +5206,10 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Загрузки из камеры включены</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Эта папка больше не существует.</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="one">%1$d год</item>
+        <item quantity="few">%1$d года</item>
+        <item quantity="many">%1$d лет</item>
+        <item quantity="other">%1$d лет</item>
+    </plurals>
 </resources>

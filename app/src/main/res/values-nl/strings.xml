@@ -4780,4 +4780,8 @@
     <string name="location_not_exist">Deze locatie bestaat niet langer.</string>
     <string name="dialog_taken_down_folder_description">Deze map is verwijderd in overeenstemming met ons [A]Beleid voor verwijderingsrichtlijnen[/A]. U kunt bezwaar maken tegen deze verwijdering als u van mening bent dat wij een fout hebben gemaakt.</string>
     <string name="dialog_taken_down_file_description">Dit bestand is verwijderd in overeenstemming met ons [A]Beleid voor verwijderingsrichtlijnen[/A]. U kunt bezwaar maken tegen deze verwijdering als u van mening bent dat wij een fout hebben gemaakt.</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="one">%1$d jaar</item>
+        <item quantity="other">%1$d jaar</item>
+    </plurals>
 </resources>

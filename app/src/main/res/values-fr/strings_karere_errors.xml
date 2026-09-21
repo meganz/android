@@ -5,7 +5,7 @@
     <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
     <string name="error_args">L’argument est invalide</string>
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-    <string name="error_access">L’accès a été refusé</string>
+    <string name="error_access">Accès refusé</string>
     <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
     <string name="error_noent">La ressource n’existe pas.</string>
     <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->

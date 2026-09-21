@@ -25,7 +25,7 @@
     <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
     <string name="api_ecircular">Un lien circulaire a été détecté</string>
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-    <string name="api_eaccess">L’accès a été refusé</string>
+    <string name="api_eaccess">Accès refusé</string>
     <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
     <string name="api_eexist">Existe déjà</string>
     <!-- Label to show that an error related with an Incomplete SDK operation. -->

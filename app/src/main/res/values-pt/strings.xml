@@ -4993,4 +4993,9 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Esta localização já não existe.</string>
     <string name="invalid_link">Link inválido. Por favor, tente novamente ou solicite um novo link.</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="one">%1$d ano</item>
+        <item quantity="many">%1$d de anos</item>
+        <item quantity="other">%1$d anos</item>
+    </plurals>
 </resources>

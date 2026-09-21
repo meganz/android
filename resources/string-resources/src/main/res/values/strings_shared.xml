@@ -1303,8 +1303,6 @@
     <string name="context_remove_link_menu">Remove link</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="general_remove">Remove</string>
-    <!-- Content description of the delete action in a screen top bar, drawn as a bin icon -->
-    <string name="general_delete">Delete</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Remove share</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1741,12 +1739,14 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1783,9 +1783,11 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2741,22 +2743,6 @@
     <string name="unlock_pin_title">Enter your passcode</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
     <string name="unlock_pin_title_2">Re-enter your passcode</string>
-    <!-- Title of the screen where the user changes their existing passcode -->
-    <string name="title_change_passcode">Change passcode lock</string>
-    <!-- Title of the screen where the user types the replacement passcode -->
-    <string name="reset_pin_title">Enter your new passcode</string>
-    <!-- Title of the screen where the user types the replacement passcode a second time to confirm it -->
-    <string name="reset_pin_title_2">Re-enter your new passcode</string>
-    <!-- Button which opens the list of passcode formats the user can choose from -->
-    <string name="settings_passcode_option">Passcode options</string>
-    <!-- Passcode format option: a passcode made of four digits -->
-    <string name="four_pin_lock">4 digits</string>
-    <!-- Passcode format option: a passcode made of six digits -->
-    <string name="six_pin_lock">6 digits</string>
-    <!-- Passcode format option: a passcode made of letters and numbers -->
-    <string name="AN_pin_lock">Alphanumeric</string>
-    <!-- Error message shown when the passcode typed to confirm does not match the one typed first -->
-    <string name="pin_lock_not_match">Passcodes did not match. Try again.</string>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">You will be logged out and your offline files will be deleted after 10 failed attempts</string>
     <!-- Button where the user can sign off or logout -->
@@ -2957,16 +2943,6 @@
     <string name="contacts_action_contact_info">Contact info</string>
     <!-- Contact list bottom sheet: destructive action that removes the contact from the user's contact list -->
     <string name="contacts_action_remove_contact">Remove contact</string>
-    <!-- Contact attachment: top bar title of the screen listing the contacts attached to a chat message -->
-    <string name="activity_title_contacts_attached">Contacts attached</string>
-    <!-- Contact attachment: action that sends a contact invitation to the attached user(s) not yet in the contact list -->
-    <string name="menu_add_contact">Add contact</string>
-    <!-- Contact attachment: action that opens or starts a chat conversation with the attached contact(s) -->
-    <string name="group_chat_start_conversation_label">Start conversation</string>
-    <!-- Contact attachment: snackbar shown when tapping an attached user that is not in the contact list -->
-    <string name="alert_user_is_not_contact">The user is not a contact</string>
-    <!-- Contact attachment: empty state shown when the message no longer has any attached contacts -->
-    <string name="contact_attachment_empty_state">No contacts attached</string>
     <!-- Contact list: placeholder displayed inside the search field on the contacts screen -->
     <string name="contacts_search_hint">Search contacts</string>
     <!-- Contact list: title of the dialog asking the user to confirm removing a contact. %1$s is the contact display name. -->
@@ -3533,11 +3509,6 @@
     <string name="contact_info_manage_chat_history_subtitle">Automatically delete messages older than:</string>
     <!-- Contact info: chat history retention time of one year -->
     <string name="contact_info_retention_time_year">1 year</string>
-    <!-- Contact info: chat history retention time in years. %1$d is the number of years -->
-    <plurals name="contact_info_retention_time_years">
-        <item quantity="one">%1$d year</item>
-        <item quantity="other">%1$d years</item>
-    </plurals>
     <!-- Contact info: chat history retention time in months. %1$d is the number of months -->
     <plurals name="contact_info_retention_time_months">
         <item quantity="one">%1$d month</item>
@@ -4170,10 +4141,72 @@
     <string name="sync_exclusions_add_extension_invalid_error">Extensions can’t contain spaces, dots, or slashes</string>
     <!-- Sync exclusions Add form: error under the extensions field when an existing rule already excludes one of the typed extensions. %1$s is that extension, without a leading dot, for example mp3. -->
     <string name="sync_exclusions_add_extension_duplicate_error">You’ve already excluded %1$s</string>
+    <!-- Title of the personal QR code screen -->
+    <string name="contacts_qr_screen_title">QR code</string>
+    <!-- Button that generates the user's personal QR code -->
+    <string name="contacts_qr_create_action">Create QR code</string>
+    <!-- Overflow menu action that generates a new QR code, replacing the current one -->
+    <string name="contacts_qr_reset_action">Reset QR code</string>
+    <!-- Overflow menu action that deletes the user's QR code and contact link -->
+    <string name="contacts_qr_delete_action">Delete QR code</string>
+    <!-- Loading message shown while the user's QR code is being generated -->
+    <string name="contacts_qr_generating">Generating QR code&#8230;</string>
+    <!-- Snackbar confirming the QR code was reset and a new contact link generated -->
+    <string name="contacts_qr_reset_success">QR code reset</string>
+    <!-- Snackbar shown when resetting the QR code failed -->
+    <string name="contacts_qr_reset_error">Couldn’t reset your QR code. Try again</string>
+    <!-- Snackbar shown when deleting the QR code failed -->
+    <string name="contacts_qr_delete_error">Couldn’t delete your QR code. Try again</string>
+    <!-- Snackbar confirming the QR code image was saved to the device. %1$s is the destination path -->
+    <string name="contacts_qr_save_success">Saved QR code to %1$s</string>
+    <!-- Body of the invite dialog when the scanned contact is already in the user's contacts. %1$s is the contact's name -->
+    <string name="contacts_qr_contact_already_exists">%1$s is already a contact</string>
+    <!-- Button that opens the scanned contact's info when they are already a contact -->
+    <string name="contacts_qr_view_contact_action">View</string>
+    <!-- Title of the dialog confirming a contact invitation was sent -->
+    <string name="contacts_qr_invite_sent_dialog_title">Invitation sent</string>
+    <!-- Body of the dialog confirming a contact invitation was sent. %1$s is the invited email -->
+    <string name="contacts_qr_invite_sent_dialog_body">Request sent to %1$s. View it in Sent requests tab.</string>
+    <!-- Body of the dialog shown when an invitation to the scanned contact was already sent before. %1$s is the invited email -->
+    <string name="contacts_qr_already_sent_dialog_body">You’ve already sent an invitation to %1$s. View it in the Sent requests tab.</string>
+    <!-- Body of the dialog shown when the scanned contact link resolves to the user's own account -->
+    <string name="contacts_qr_own_email_dialog_body">This email address belongs to your account</string>
+    <!-- Body of the dialog shown when a contact invitation could not be sent due to an error -->
+    <string name="contacts_qr_invite_error_dialog_body">Something went wrong. Try again.</string>
+    <!-- Contact attachment: top bar title of the screen listing the contacts attached to a chat message -->
+    <string name="activity_title_contacts_attached">Contacts attached</string>
+    <!-- Contact attachment: action that sends a contact invitation to the attached user(s) not yet in the contact list -->
+    <string name="menu_add_contact">Add contact</string>
+    <!-- Contact attachment: action that opens or starts a chat conversation with the attached contact(s) -->
+    <string name="group_chat_start_conversation_label">Start conversation</string>
+    <!-- Contact attachment: snackbar shown when tapping an attached user that is not in the contact list -->
+    <string name="alert_user_is_not_contact">The user is not a contact</string>
+    <!-- Contact attachment: empty state shown when the message no longer has any attached contacts -->
+    <string name="contact_attachment_empty_state">No contacts attached</string>
+    <!-- Content description of the delete action in a screen top bar, drawn as a bin icon -->
+    <string name="general_delete">Delete</string>
+    <!-- Action in the chat list meetings bottom sheet that starts an unscheduled meeting immediately -->
+    <string name="chat_meeting_actions_start_now">Start meeting now</string>
+    <!-- Action in the chat list meetings bottom sheet that opens the dialog for joining a meeting by link -->
+    <string name="chat_meeting_actions_join">Join meeting</string>
+    <!-- Action in the chat list meetings bottom sheet that opens the schedule meeting screen -->
+    <string name="chat_meeting_actions_schedule">Schedule meeting</string>
+    <!-- Title of the dialog asking the user to paste the link of the meeting they were invited to -->
+    <string name="chat_join_meeting_dialog_title">You are invited to a meeting.</string>
+    <!-- Instruction shown in the dialog asking the user to paste a meeting link -->
+    <string name="chat_join_meeting_dialog_description">Tap the Meeting link sent to you or paste it here</string>
+    <!-- Placeholder of the input field where the user pastes a meeting link -->
+    <string name="chat_join_meeting_dialog_hint">Meeting link</string>
+    <!-- Message shown when the user tries to start a meeting while already in another call -->
+    <string name="chat_start_meeting_already_in_call_error">Another call in progress. Please end your current call before making another.</string>
+    <!-- Warning shown when the user denies the Bluetooth permission needed to start a meeting -->
+    <string name="chat_start_meeting_bluetooth_permission_warning">Go to Settings to allow MEGA permission to access your nearby devices using Bluetooth.</string>
+    <!-- Title of the dialog shown when a meeting cannot be started or joined because a call is already in progress -->
+    <string name="chat_meeting_blocked_by_call_dialog_title">Ongoing call</string>
+    <!-- Title of the dialog shown when the Bluetooth permission needed to start a meeting was denied -->
+    <string name="chat_start_meeting_bluetooth_permission_title">Permission required</string>
     <!-- Sync exclusions Add screen: title of the full screen where a new exclusion rule is created. -->
     <string name="sync_exclusions_add_title">Add exclusion</string>
-    <!-- Sync exclusions Edit screen: title of the full screen where an existing exclusion rule is changed or deleted. -->
-    <string name="sync_exclusions_edit_title">Edit exclusion</string>
     <!-- Sync exclusions Add screen: label of the tab where a rule is described by the name it matches. -->
     <string name="sync_exclusions_add_tab_by_name">By name</string>
     <!-- Sync exclusions Add screen: label of the tab where a rule is described by how large a file is. -->
@@ -4202,76 +4235,12 @@
     <string name="sync_exclusions_add_size_unit_megabytes">MB</string>
     <!-- Sync exclusions Add form: size unit, gigabytes (1024 megabytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
     <string name="sync_exclusions_add_size_unit_gigabytes">GB</string>
-    <!-- Sync exclusions Add form: error under the two size fields of a “Not between” rule when the first size is not smaller than the second. Such a range would leave out every file. -->
-    <string name="sync_exclusions_add_size_range_error">The first size must be smaller than the second</string>
-    <!-- Title of the personal QR code screen -->
-    <string name="contacts_qr_screen_title">QR code</string>
-    <!-- Button that generates the user's personal QR code -->
-    <string name="contacts_qr_create_action">Create QR code</string>
-    <!-- Overflow menu action that generates a new QR code, replacing the current one -->
-    <string name="contacts_qr_reset_action">Reset QR code</string>
-    <!-- Overflow menu action that deletes the user's QR code and contact link -->
-    <string name="contacts_qr_delete_action">Delete QR code</string>
-    <!-- Loading message shown while the user's QR code is being generated -->
-    <string name="contacts_qr_generating">Generating QR code&#8230;</string>
-    <!-- Snackbar confirming the QR code was reset and a new contact link generated -->
-    <string name="contacts_qr_reset_success">QR code reset</string>
-    <!-- Snackbar shown when resetting the QR code failed -->
-    <string name="contacts_qr_reset_error">QR code not reset due to an error. Please try again.</string>
-    <!-- Snackbar shown when deleting the QR code failed -->
-    <string name="contacts_qr_delete_error">QR code not deleted due to an error. Please try again.</string>
-    <!-- Snackbar confirming the QR code image was saved to the device. %1$s is the destination path -->
-    <string name="contacts_qr_save_success">The QR code has been saved to %1$s</string>
-    <!-- Body of the invite dialog when the scanned contact is already in the user's contacts. %1$s is the contact's name -->
-    <string name="contacts_qr_contact_already_exists">%1$s is already a contact</string>
-    <!-- Button that opens the scanned contact's info when they are already a contact -->
-    <string name="contacts_qr_view_contact_action">View</string>
-    <!-- Title of the dialog confirming a contact invitation was sent -->
-    <string name="contacts_qr_invite_sent_dialog_title">Invitation sent</string>
-    <!-- Body of the dialog confirming a contact invitation was sent. %1$s is the invited email -->
-    <string name="contacts_qr_invite_sent_dialog_body">Request sent to %1$s. View in Sent requests tab.</string>
-    <!-- Body of the dialog shown when an invitation to the scanned contact was already sent before. %1$s is the invited email -->
-    <string name="contacts_qr_already_sent_dialog_body">The invitation to contact %1$s has been sent before and can be consulted in the Sent Requests tab.</string>
-    <!-- Body of the dialog shown when the scanned contact link resolves to the user's own account -->
-    <string name="contacts_qr_own_email_dialog_body">There\’s no need to add your own email address</string>
-    <!-- Body of the dialog shown when a contact invitation could not be sent due to an error -->
-    <string name="contacts_qr_invite_error_dialog_body">An error occurred and the invitation has not been sent.</string>
-    <!-- Action in the chat list meetings bottom sheet that starts an unscheduled meeting immediately -->
-    <string name="chat_meeting_actions_start_now">Start meeting now</string>
-    <!-- Action in the chat list meetings bottom sheet that opens the dialog for joining a meeting by link -->
-    <string name="chat_meeting_actions_join">Join meeting</string>
-    <!-- Action in the chat list meetings bottom sheet that opens the schedule meeting screen -->
-    <string name="chat_meeting_actions_schedule">Schedule meeting</string>
-    <!-- Title of the dialog asking the user to paste the link of the meeting they were invited to -->
-    <string name="chat_join_meeting_dialog_title">You are invited to a meeting.</string>
-    <!-- Instruction shown in the dialog asking the user to paste a meeting link -->
-    <string name="chat_join_meeting_dialog_description">Tap the Meeting link sent to you or paste it here</string>
-    <!-- Placeholder of the input field where the user pastes a meeting link -->
-    <string name="chat_join_meeting_dialog_hint">Meeting link</string>
-    <!-- Message shown when the user tries to start a meeting while already in another call -->
-    <string name="chat_start_meeting_already_in_call_error">Another call in progress. Please end your current call before making another.</string>
-    <!-- Warning shown when the user denies the Bluetooth permission needed to start a meeting -->
-    <string name="chat_start_meeting_bluetooth_permission_warning">Go to Settings to allow MEGA permission to access your nearby devices using Bluetooth.</string>
-    <!-- Title of the dialog shown when a meeting cannot be started or joined because a call is already in progress -->
-    <string name="chat_meeting_blocked_by_call_dialog_title">Ongoing call</string>
-    <!-- Title of the dialog shown when the Bluetooth permission needed to start a meeting was denied -->
-    <string name="chat_start_meeting_bluetooth_permission_title">Permission required</string>
     <!-- Snackbar message shown after archiving a single chat from the chat list. %s is the chat title -->
     <string name="success_archive_chat">%s was archived</string>
     <!-- Snackbar message shown when archiving a single chat from the chat list fails. %s is the chat title -->
     <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
-    <!-- Snackbar message shown over the chat list after archiving several chats at once. %1$d is the number of chats that were archived -->
-    <plurals name="chat_list_chats_archived_message">
-        <item quantity="one">%1$d chat was archived</item>
-        <item quantity="other">%1$d chats were archived</item>
-    </plurals>
     <!-- Snackbar message shown after restoring an archived chat to the chat list. %s is the chat title -->
     <string name="success_unarchive_chat">%s was unarchived</string>
-    <!-- Snackbar message shown over the archived chats list after restoring several chats to the chat list at once. %1$d is the number of chats that were unarchived -->
-    <plurals name="chat_list_chats_unarchived_message">
-        <item quantity="one">%1$d chat was unarchived</item>
-        <item quantity="other">%1$d chats were unarchived</item>
-    </plurals>
     <!-- Snackbar message shown when restoring an archived chat to the chat list fails. %s is the chat title -->
     <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
     <!-- Snackbar message shown after the message history of a chat has been cleared -->
@@ -4291,5 +4260,38 @@
     <!-- Chat list toolbar subtitle shown while the chat connection is being re-established -->
     <string name="invalid_connection_state">Reconnecting to chat</string>
     <!-- Chat list toolbar subtitle shown while the chat connection is being established -->
-    <string name="chat_connecting">Connecting…</string>
+    <string name="chat_connecting">Connecting&#8230;</string>
+    <plurals name="chat_list_chats_archived_message">
+        <item quantity="one">%1$d chat was archived</item>
+        <item quantity="other">%1$d chats were archived</item>
+    </plurals>
+    <plurals name="chat_list_chats_unarchived_message">
+        <item quantity="one">%1$d chat was unarchived</item>
+        <item quantity="other">%1$d chats were unarchived</item>
+    </plurals>
+    <!-- Sync exclusions Add form: error under the two size fields of a “Not between” rule when the first size is not smaller than the second. Such a range would leave out every file. -->
+    <string name="sync_exclusions_add_size_range_error">The first size must be smaller than the second</string>
+    <!-- Sync exclusions Edit screen: title of the full screen where an existing exclusion rule is changed or deleted. -->
+    <string name="sync_exclusions_edit_title">Edit exclusion</string>
+    <!-- Title of the screen where the user changes their existing passcode -->
+    <string name="title_change_passcode">Change passcode</string>
+    <!-- Title of the screen where the user types the replacement passcode -->
+    <string name="reset_pin_title">Enter your new passcode</string>
+    <!-- Title of the screen where the user types the replacement passcode a second time to confirm it -->
+    <string name="reset_pin_title_2">Re-enter your new passcode</string>
+    <!-- Button which opens the list of passcode formats the user can choose from -->
+    <string name="settings_passcode_option">Passcode options</string>
+    <!-- Passcode format option: a passcode made of four digits -->
+    <string name="four_pin_lock">4-digit</string>
+    <!-- Passcode format option: a passcode made of six digits -->
+    <string name="six_pin_lock">6-digit</string>
+    <!-- Passcode format option: a passcode made of letters and numbers -->
+    <string name="AN_pin_lock">Alphanumeric</string>
+    <!-- Error message shown when the passcode typed to confirm does not match the one typed first -->
+    <string name="pin_lock_not_match">Passcodes don’t match. Try again.</string>
+    <!-- Contact info: chat history retention time in years. %1$d is the number of years -->
+    <plurals name="contact_info_retention_time_years">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
 </resources>

@@ -4570,4 +4570,7 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">カメラアップロードが有効になりました</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">この場所はもう存在しません。</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="other">%1$d年</item>
+    </plurals>
 </resources>

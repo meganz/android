@@ -1137,7 +1137,7 @@
     <!--  -->
     <string name="contact_is_me">옵션이 존재하지 않습니다, 자신을 선택하였습니다</string>
     <!-- Confirmation before deleting one attachment -->
-    <string name="confirmation_delete_one_attachment">첨부물을 제거할까요?</string>
+    <string name="confirmation_delete_one_attachment">첨부 파일을 제거할까요?</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">조용히</string>
     <!-- part of the string in incoming shared folder notification -->

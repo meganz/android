@@ -2515,11 +2515,6 @@
         <item quantity="one">%1$d month</item>
         <item quantity="other">%1$d months</item>
     </plurals>
-    <!-- Text on the label indicating that the oldest messages of several years will be automatically deleted. -->
-    <plurals name="subtitle_properties_manage_chat_label_years">
-        <item quantity="one">%1$d year</item>
-        <item quantity="other">%1$d years</item>
-    </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Select transfers</string>
     <!-- Title option to send separated the link and decryption key -->
@@ -4787,4 +4782,9 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Camera uploads enabled</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
+    <!-- Text on the label indicating that the oldest messages of several years will be automatically deleted. -->
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
 </resources>

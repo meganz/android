@@ -4567,4 +4567,7 @@
     <string name="invalid_link">ลิงก์ไม่ถูกต้อง กรุณาลองใหม่อีกครั้งหรือขอรับลิงก์ใหม่</string>
     <string name="dialog_taken_down_folder_description">โฟลเดอร์นี้ถูกลบเนื้อหาตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา หากคุณเชื่อว่าเป็นข้อผิดพลาด คุณสามารถยื่นคำโต้แย้งได้</string>
     <string name="dialog_taken_down_file_description">ไฟล์นี้ถูกลบเนื้อหาตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา หากคุณเชื่อว่าเป็นข้อผิดพลาด คุณสามารถยื่นคำโต้แย้งได้</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="other">%1$d ปี</item>
+    </plurals>
 </resources>

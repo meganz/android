@@ -5204,4 +5204,10 @@
     <string name="location_not_exist">Ta lokalizacja już nie istnieje.</string>
     <string name="dialog_taken_down_folder_description">Ten folder został usunięty zgodnie z naszą [A]Polityką wytycznych dotyczących usuwania treści[/A]. Możesz wnieść sprzeciw wobec tego usunięcia, jeśli uważasz, że popełniliśmy błąd.</string>
     <string name="dialog_taken_down_file_description">Ten plik został usunięty zgodnie z naszą [A]Polityką wytycznych dotyczących usuwania treści[/A]. Możesz odwołać się od tego usunięcia, jeśli uważasz, że popełniliśmy błąd.</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="one">%1$d rok</item>
+        <item quantity="few">%1$d lata</item>
+        <item quantity="many">%1$d lat</item>
+        <item quantity="other">%1$d lat</item>
+    </plurals>
 </resources>
