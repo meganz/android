@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.settings.passcode.navigation
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -11,9 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import mega.privacy.android.app.activities.contract.PassCodeActivityContract
 import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsViewModel
 import mega.privacy.android.app.presentation.settings.passcode.biometric.BiometricAuth
 import mega.privacy.android.app.presentation.settings.passcode.biometric.BiometricAuthError
@@ -27,8 +24,8 @@ import timber.log.Timber
 internal const val PasscodeSettingsDestination = "PasscodeSettingsDestination"
 
 internal fun NavGraphBuilder.passCodeSettings(
-    navController: NavHostController,
     biometricAuth: BiometricAuth,
+    navigateToSetOrChangePasscode: (isEdit: Boolean) -> Unit,
     navigateToSelectTimeout: () -> Unit,
 ) {
     composable(PasscodeSettingsDestination) {
@@ -40,21 +37,11 @@ internal fun NavGraphBuilder.passCodeSettings(
             biometricCapability = hasBiometricCapability(context)
         }
 
-        val launcher = rememberLauncherForActivityResult(
-            contract = PassCodeActivityContract()
-        ) { isSuccess ->
-            if (!isSuccess) {
-                Timber.w("Set passcode pin failed when enabling passcode")
-            } else {
-                viewModel.onPasscodeEnabled()
-            }
-        }
-
         PasscodeSettingsView(
             state = uiState,
             onDisablePasscode = viewModel::disablePasscode,
             onDisableBiometrics = viewModel::disableBiometrics,
-            navigateToSetOrChangePasscode = launcher::launch,
+            navigateToSetOrChangePasscode = navigateToSetOrChangePasscode,
             navigateToSelectTimeout = navigateToSelectTimeout,
             hasBiometricCapability = biometricCapability,
             authenticateBiometrics = { onSuccess, onComplete ->

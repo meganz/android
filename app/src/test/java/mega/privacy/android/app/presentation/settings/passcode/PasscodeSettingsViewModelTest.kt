@@ -17,7 +17,6 @@ import mega.privacy.android.domain.usecase.passcode.DisablePasscodeUseCase
 import mega.privacy.android.domain.usecase.passcode.EnableBiometricsUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeTimeOutUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeTypeUseCase
-import mega.privacy.android.domain.usecase.passcode.SetPasscodeTimeoutUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -38,14 +37,12 @@ class PasscodeSettingsViewModelTest {
     private val disablePasscodeUseCase = mock<DisablePasscodeUseCase>()
     private val disableBiometricPasscodeUseCase = mock<DisableBiometricPasscodeUseCase>()
     private val enableBiometricsUseCase = mock<EnableBiometricsUseCase>()
-    private val setPasscodeTimeoutUseCase = mock<SetPasscodeTimeoutUseCase>()
 
     @BeforeEach
     internal fun setUp() {
         reset(
             monitorPasscodeLockPreferenceUseCase,
             monitorPasscodeTypeUseCase,
-            setPasscodeTimeoutUseCase,
         )
 
         stubFlows()
@@ -60,7 +57,6 @@ class PasscodeSettingsViewModelTest {
             disablePasscodeUseCase = disablePasscodeUseCase,
             disableBiometricPasscodeUseCase = disableBiometricPasscodeUseCase,
             enableBiometricsUseCase = enableBiometricsUseCase,
-            setPasscodeTimeoutUseCase = setPasscodeTimeoutUseCase
         )
     }
 
@@ -149,17 +145,6 @@ class PasscodeSettingsViewModelTest {
         underTest.enableBiometrics()
 
         verify(enableBiometricsUseCase).invoke()
-    }
-
-    @Test
-    fun `test that default timeout is set if not found`() = runTest {
-        stubFlows(timeOut = null)
-
-        initUnderTest()
-
-        underTest.onPasscodeEnabled()
-
-        verify(setPasscodeTimeoutUseCase).invoke(PasscodeTimeout.DEFAULT)
     }
 
     @Test

@@ -179,13 +179,13 @@ class SettingsOptions2Test {
         click(By.res(ENABLE_PASSCODE_TILE), LOAD_TIMEOUT, "enable-passcode-tile")
         dismissAutofillIfShown()
 
-        // Legacy PasscodeLockActivity in set mode.
+        // The Compose set-passcode screen in set mode.
         awaitObject(By.text(str("unlock_pin_title")), LOAD_TIMEOUT, "enter-passcode-title")
-        awaitObject(By.res(viewId("pass_first_input")), LOAD_TIMEOUT, "passcode-first-input")
+        awaitObject(By.res(SETUP_PASSCODE_FIELD), LOAD_TIMEOUT, "passcode-field")
         Thread.sleep(1_500)
 
         // tc03 — the passcode options sheet renders its type choices.
-        click(By.res(viewId("passcode_options_button")), LOAD_TIMEOUT, "passcode-options-button")
+        click(By.res(SETUP_PASSCODE_OPTIONS_BUTTON), LOAD_TIMEOUT, "passcode-options-button")
         awaitObject(By.text(str("four_pin_lock")), LOAD_TIMEOUT, "four-digits-option")
         awaitObject(By.text(str("six_pin_lock")), LOAD_TIMEOUT, "six-digits-option")
         awaitObject(By.text(str("AN_pin_lock")), LOAD_TIMEOUT, "alphanumeric-option")
@@ -368,15 +368,13 @@ class SettingsOptions2Test {
     }
 
     /**
-     * Types [digits] into the legacy passcode inputs by setting each field's text directly, which
-     * is independent of the fields' auto-advancing focus.
+     * Types [digits] into the set-passcode field as hardware key events; the field requests focus
+     * itself, so wait for that before injecting them.
      */
     private fun enterPasscode(digits: String) {
-        digits.forEachIndexed { index, digit ->
-            val selector = By.res(viewId(PASSCODE_INPUT_IDS[index]))
-            awaitObject(selector, LOAD_TIMEOUT, "passcode-input-$index")
-            device.findObject(selector).text = digit.toString()
-        }
+        awaitObject(By.res(SETUP_PASSCODE_FIELD), LOAD_TIMEOUT, "passcode-field")
+        device.wait(Until.hasObject(By.focused(true)), LOAD_TIMEOUT)
+        digits.forEach { device.pressKeyCode(KeyEvent.KEYCODE_0 + (it - '0')) }
     }
 
     // endregion
@@ -414,9 +412,6 @@ class SettingsOptions2Test {
         require(id != 0) { "string resource not found: $name" }
         return targetContext.getString(id)
     }
-
-    /** Fully-qualified resource id for a legacy view id in the app package. */
-    private fun viewId(name: String): String = "${targetContext.packageName}:id/$name"
 
     private fun click(selector: BySelector, timeout: Long, name: String) {
         awaitObject(selector, timeout, name)
@@ -502,16 +497,12 @@ class SettingsOptions2Test {
         const val CHANGE_PASSCODE_TILE = "change_passcode_tile:generic_two_line_list_item"
         const val REQUIRE_PASSCODE_TILE = "require_passcode_tile:generic_two_line_list_item"
 
+        /** Mirror the internal SETUP_PASSCODE_* tags of the core-ui set-passcode screen. */
+        const val SETUP_PASSCODE_FIELD = "setup_passcode_screen:passcode_field"
+        const val SETUP_PASSCODE_OPTIONS_BUTTON = "setup_passcode_screen:button_passcode_options"
+
         /** 2FA setup screen seed box tag (Compose, `testTagsAsResourceId`). */
         const val SEED_BOX_TAG = "authentication_setup_screen:mega_seed_box_codes"
-
-        /** Legacy PasscodeLockActivity digit inputs, in entry order. */
-        val PASSCODE_INPUT_IDS = listOf(
-            "pass_first_input",
-            "pass_second_input",
-            "pass_third_input",
-            "pass_fourth_input",
-        )
 
         /** Base32-looking seed delivered by the stubbed `getMultiFactorAuthCode` request. */
         /** Exactly 52 base32 chars — the setup screen substrings the seed into 13 groups of 4. */

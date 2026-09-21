@@ -16,8 +16,10 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.passcode.biometric.BiometricAuth
 import mega.privacy.android.app.presentation.settings.passcode.navigation.PasscodeSettingsDestination
 import mega.privacy.android.app.presentation.settings.passcode.navigation.PasscodeTimeOutDestination
+import mega.privacy.android.app.presentation.settings.passcode.navigation.SetupPasscodeDestination
 import mega.privacy.android.app.presentation.settings.passcode.navigation.passCodeSettings
 import mega.privacy.android.app.presentation.settings.passcode.navigation.passCodeTimeOut
+import mega.privacy.android.app.presentation.settings.passcode.navigation.setupPasscode
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -68,9 +70,15 @@ private fun PasscodeSettingsGraph(biometricAuth: BiometricAuth) {
 
     NavHost(navController = navController, startDestination = PasscodeSettingsDestination) {
         passCodeSettings(
-            navController = navController,
+            navigateToSetOrChangePasscode = { isEdit ->
+                navController.navigate(SetupPasscodeDestination(isEdit = isEdit))
+            },
             navigateToSelectTimeout = { navController.navigate(PasscodeTimeOutDestination) },
             biometricAuth = biometricAuth
+        )
+
+        setupPasscode(
+            navController = navController
         )
 
         passCodeTimeOut(
