@@ -111,6 +111,7 @@ import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.destination.VideoRecentlyWatchedNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.mobile.analytics.event.VideoPlaylistCreationButtonPressedEvent
 
 @SuppressLint("ComposeViewModelForwarding")
 @Composable
@@ -609,6 +610,7 @@ fun MediaMainScreen(
                     if (currentTabIndex == MediaScreen.Albums.ordinal) {
                         navigationHandler.navigate(CreateAlbumDialogNavKey)
                     } else {
+                        Analytics.tracker.trackEvent(VideoPlaylistCreationButtonPressedEvent)
                         videoPlaylistsTabViewModel.showCreateVideoPlaylistDialog()
                     }
                 }

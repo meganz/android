@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -45,6 +46,7 @@ import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationEr
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -328,6 +330,7 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             runCatching {
                 createVideoPlaylistUseCase(title.trim())
             }.onSuccess { videoPlaylist ->
+                Analytics.tracker.trackEvent(PlaylistCreatedSuccessfullyEvent)
                 (videoPlaylist as? UserVideoPlaylist)?.let { playlist ->
                     videoPlaylistEditState.update {
                         it.copy(createVideoPlaylistSuccessEvent = triggered(playlist))

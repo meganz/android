@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -44,6 +45,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
@@ -54,6 +56,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import kotlin.time.Duration.Companion.minutes
 
 @ExperimentalCoroutinesApi
@@ -762,6 +765,38 @@ class VideoPlaylistsTabViewModelTest {
         }
 
     @Test
+    fun `test that createNewPlaylist reports the playlist created event`() =
+        runTest {
+            val title = "My New Playlist"
+            stubInitialValues()
+            whenever(createVideoPlaylistUseCase(title))
+                .thenReturn(createVideoPlaylist(expectedPlaylist))
+
+            underTest.createNewPlaylist(title)
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events).contains(PlaylistCreatedSuccessfullyEvent)
+        }
+
+    @Test
+    fun `test that createNewPlaylist does not report the playlist created event when creation fails`() =
+        runTest {
+            whenever(createVideoPlaylistUseCase(any())).thenAnswer {
+                throw PlaylistNameValidationException.Exists
+            }
+            whenever(
+                videoPlaylistTitleValidationErrorMessageMapper(
+                    PlaylistNameValidationException.Exists
+                )
+            ).thenReturn("Playlist already exists")
+
+            underTest.createNewPlaylist("Duplicate")
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events).doesNotContain(PlaylistCreatedSuccessfullyEvent)
+        }
+
+    @Test
     fun `test that createNewPlaylist sets error message when PlaylistNameValidationException is thrown`() =
         runTest {
             val title = "Duplicate"
@@ -884,4 +919,10 @@ class VideoPlaylistsTabViewModelTest {
             totalDuration = 0.minutes,
             videos = emptyList()
         )
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+    }
 }
