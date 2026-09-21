@@ -9,7 +9,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -19,6 +18,7 @@ import mega.privacy.android.feature.contact.invite.model.SmsInvite
 import mega.privacy.android.feature.contact.invite.navigation.InviteContactEntry
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.ContactRequestsNavKey
+import mega.privacy.android.navigation.destination.QrCodeNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -59,7 +59,7 @@ fun InviteContactAppHost(
             )
         },
         onOpenMyQr = {
-            context.startActivity(Intent(context, QRCodeComposeActivity::class.java))
+            navigationHandler.navigate(QrCodeNavKey)
         },
         onSendSms = { smsInvite ->
             val recipient = "smsto:${smsInvite.phoneNumbers.joinToString(separator = ";")}"

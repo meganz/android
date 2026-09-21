@@ -41,6 +41,15 @@ data class InviteContactNavKey(
 }
 
 /**
+ * QR code nav key. Hosts the personal "My QR code" screen and the QR scan / invite flow, mirroring
+ * the single legacy QR screen where scanning is an action on the personal screen rather than a
+ * separate destination. Cross-module so the app can route its QR entry points here through the
+ * `ContactComposeFeature`-gated navigator.
+ */
+@Serializable
+data object QrCodeNavKey : NavKey
+
+/**
  * Add chat participants nav key. Opens the MEGA-contacts multi-select picker filtered to the
  * contacts that are not already participants of chat [chatId]; the selected contact emails are
  * published as a `List<String>` under [KEY].

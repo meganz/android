@@ -5,21 +5,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.contact.qrcode.mycode.MyQrCodeViewModel
 import mega.privacy.android.feature.contact.qrcode.mycode.view.MyQrCodeScreen
 import mega.privacy.android.feature.contact.qrcode.scan.ScanQrCodeViewModel
 import mega.privacy.android.feature.contact.qrcode.scan.view.ScanQrCodeScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
-
-/**
- * Navigation key for the QR code screen. It hosts both the personal "My QR code" UI and the QR
- * scan / invite flow, mirroring the single legacy QR screen where scanning is an action on the
- * personal screen rather than a separate destination.
- */
-@Serializable
-data object QrCodeNavKey : NavKey
+import mega.privacy.android.navigation.destination.QrCodeNavKey
 
 /**
  * Wires the [MyQrCodeScreen] and [ScanQrCodeScreen] to their independent view models. Both are

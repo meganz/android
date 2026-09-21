@@ -28,7 +28,6 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountHomeView
-import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
@@ -141,9 +140,7 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
         if (CallUtil.isNecessaryDisableLocalCamera() != Constants.INVALID_VALUE.toLong()) {
             CallUtil.showConfirmationOpenCamera(requireActivity(), Constants.ACTION_OPEN_QR, false)
         } else {
-            val intent = Intent(requireContext(), QRCodeComposeActivity::class.java)
-            intent.putExtra(Constants.OPEN_SCAN_QR, false)
-            startActivity(intent)
+            megaNavigator.openMyQrCode(requireContext())
         }
     }
 

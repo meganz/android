@@ -21,7 +21,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.preference.SetCustomiseNavigationTooltipShownUseCase
-import mega.privacy.android.feature.contact.qrcode.navigation.QrCodeNavKey
+import mega.privacy.android.navigation.destination.QrCodeNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import nz.mega.sdk.MegaRequest
 import org.junit.After

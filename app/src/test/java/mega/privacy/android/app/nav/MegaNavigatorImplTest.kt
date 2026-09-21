@@ -17,6 +17,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMappe
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -31,11 +32,13 @@ import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
+import mega.privacy.android.navigation.destination.QrCodeNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
@@ -330,6 +333,36 @@ class MegaNavigatorImplTest {
             isNull(),
         )
     }
+
+    @Test
+    fun `test that openMyQrCode emits the QrCodeNavKey when ContactComposeFeature is enabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
+
+            underTest.openMyQrCode(context = context)
+
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 && navKeys[0] == QrCodeNavKey
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+            verify(context, never()).startActivity(any())
+        }
+
+    @Test
+    fun `test that openMyQrCode starts the legacy activity when ContactComposeFeature is disabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
+
+            underTest.openMyQrCode(context = context)
+
+            verify(context).startActivity(any())
+            verify(navigationQueue, never()).emit(any<List<NavKey>>(), any(), anyOrNull())
+        }
 
     @Test
     fun `test that openChatAfterSharing opens the chat room for a single chat`() = runTest {

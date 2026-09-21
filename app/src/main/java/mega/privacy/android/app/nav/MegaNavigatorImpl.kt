@@ -41,6 +41,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
+import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
@@ -120,6 +121,7 @@ import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
+import mega.privacy.android.navigation.destination.QrCodeNavKey
 import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.ShareLinkNavKey
@@ -383,6 +385,22 @@ internal class MegaNavigatorImpl @Inject constructor(
         navigateForSingleActivity(
             context = context, singleActivityDestination = ContactsNavKey
         )
+    }
+
+    override fun openMyQrCode(context: Context) {
+        applicationScope.launch {
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
+            }.getOrDefault(false)
+            withContext(mainDispatcher) {
+                if (isContactComposeFeatureEnabled) {
+                    launchMegaActivityIfNeeded(context)
+                    navigationQueue.emit(listOf(QrCodeNavKey))
+                } else {
+                    context.startActivity(Intent(context, QRCodeComposeActivity::class.java))
+                }
+            }
+        }
     }
 
     override fun openTransfers(context: Context) {

@@ -207,6 +207,14 @@ interface AppNavigator {
     fun openContactList(context: Context)
 
     /**
+     * Navigate to the personal "My QR code" screen, routed through the `ContactComposeFeature` flag
+     * so it decides between the Compose
+     * [mega.privacy.android.navigation.destination.QrCodeNavKey] destination and the legacy
+     * QR-code activity.
+     */
+    fun openMyQrCode(context: Context)
+
+    /**
      * Navigate to the transfers section.
      */
     fun openTransfers(context: Context)
