@@ -426,6 +426,7 @@ data class LegacyImageViewerNavKey(
  * Branch in the destination by: chatId != null -> chat; localPath != null -> local file; else -> cloud node.
  */
 @Serializable
+@Parcelize
 data class LegacyTextEditorNavKey(
     val nodeHandle: Long? = null,
     val mode: String = TextEditorMode.View.value,
@@ -442,7 +443,7 @@ data class LegacyTextEditorNavKey(
     val serializedNode: String? = null,
     /** Folder link URL the open file belongs to; only reopens it after authentication. */
     val folderLinkUrl: String? = null,
-) : NoSessionNavKey.Optional {
+) : NoSessionNavKey.Optional, Parcelable {
     override fun toString() = "LegacyTextEditorNavKey(nodeHandle=$nodeHandle, mode=$mode, " +
             "nodeSourceType=$nodeSourceType, fromHome=$fromHome, " +
             "hasLocalPath=${localPath != null}, chatId=$chatId, messageId=$messageId, " +

@@ -100,7 +100,7 @@ private fun shouldShowDownload(nodeSourceType: Int?): Boolean {
 
 /**
  * True when Share should be shown for this source type.
- * Matches [TextEditorActivity.refreshMenuOptionsVisibility]: rubbish bin hides Share (only Remove + line numbers);
+ * Rubbish bin hides Share (only Remove + line numbers);
  * also hidden for folder link, versions, incoming shares, and chat.
  */
 internal fun shouldShowShare(nodeSourceType: Int?): Boolean {

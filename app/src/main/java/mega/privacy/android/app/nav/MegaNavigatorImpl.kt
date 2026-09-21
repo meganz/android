@@ -47,7 +47,6 @@ import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLau
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -57,7 +56,6 @@ import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
-import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING
@@ -75,7 +73,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
-import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -883,36 +880,32 @@ internal class MegaNavigatorImpl @Inject constructor(
                 ),
             )
 
-            is OpenTextEditorParams.Chat -> navigateIfInSingleActivity(
-                singleActivityDestination = LegacyTextEditorNavKey(
+            is OpenTextEditorParams.Chat -> {
+                val navKey = LegacyTextEditorNavKey(
                     chatId = params.chatId,
                     messageId = params.messageId,
-                ),
-                legacyNavigation = {
-                    withContext(mainDispatcher) {
-                        context.startActivity(
-                            Intent(context, TextEditorActivity::class.java).apply {
-                                putExtra(
-                                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                                    Constants.FROM_CHAT
-                                )
-                                putExtra(ChatNavKey.LEGACY_MESSAGE_ID, params.messageId)
-                                putExtra(ChatNavKey.LEGACY_CHAT_ID, params.chatId)
-                            }
-                        )
-                    }
-                },
-            )
-
-            is OpenTextEditorParams.FileLink -> {
-                val intent = Intent(context, TextEditorActivity::class.java).apply {
-                    putExtra(EXTRA_SERIALIZE_STRING, params.serializedNode)
-                    putExtra(URL_FILE_LINK, params.urlFileLink)
-                    putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FILE_LINK_ADAPTER)
-                    putExtra(TextEditorViewModel.MODE, params.mode.value)
-                }
-                context.startActivity(intent)
+                )
+                navigateIfInSingleActivity(
+                    singleActivityDestination = navKey,
+                    legacyNavigation = {
+                        withContext(mainDispatcher) {
+                            context.startActivity(TextEditorActivity.createIntent(context, navKey))
+                        }
+                    },
+                )
             }
+
+            is OpenTextEditorParams.FileLink -> context.startActivity(
+                TextEditorActivity.createIntent(
+                    context = context,
+                    navKey = LegacyTextEditorNavKey(
+                        mode = params.mode.value,
+                        nodeSourceType = FILE_LINK_ADAPTER,
+                        publicUrl = params.urlFileLink,
+                        serializedNode = params.serializedNode,
+                    ),
+                )
+            )
         }
     }
 
