@@ -46,7 +46,8 @@ import javax.inject.Inject
  *
  * Skipped: the tc02 save-to-file branch (legacy in-app `FileStorageActivity` picker gated on the
  * WRITE_EXTERNAL_STORAGE permission flow — not cleanly stubbable), the tc04 relock-after-timeout
- * tail (requires 20s of real backgrounding), tc07 (the Advanced sub-menu with "Don't use HTTP" no
+ * tail (covered by [PasscodeSetupTest], which pins the timeout to immediate instead of waiting out
+ * the default), tc07 (the Advanced sub-menu with "Don't use HTTP" no
  * longer exists in the app — the Transfers settings screen only exposes connection counts and the
  * `setting_title_use_https_only` string is unreferenced by any screen), and tc08/tc09/tc11–tc15
  * (real web pages, app-store hand-offs and cookie web links — out of scope).

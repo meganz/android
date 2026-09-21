@@ -367,11 +367,6 @@
             android:name=".getLink.GetLinkActivity"
             android:configChanges="screenSize|orientation" />
         <activity
-            android:name=".activities.settingsActivities.passcodelock.PasscodeLockActivity"
-            android:label="@string/settings_passcode_lock"
-            android:launchMode="singleInstance"
-            android:windowSoftInputMode="adjustResize|stateVisible" />
-        <activity
             android:name=".presentation.zipbrowser.ZipBrowserComposeActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/zip_browser_activity" />

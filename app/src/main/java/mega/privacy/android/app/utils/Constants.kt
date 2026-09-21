@@ -5,10 +5,6 @@ import java.io.File
 import java.util.regex.Pattern
 
 object Constants {
-    const val PIN_4: String = "4"
-    const val PIN_6: String = "6"
-    const val PIN_ALPHANUMERIC: String = "alphanumeric"
-
     const val DEFAULT_AVATAR_WIDTH_HEIGHT: Int = 250 //in pixels
 
     const val REQUEST_CODE_SELECT_FOLDER_TO_MOVE: Int = 1001
