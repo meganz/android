@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.texteditor.components.markdown.rich
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.BringIntoViewSpec
 import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
@@ -399,7 +399,20 @@ private fun RichDocumentBlocks(
                         .asPaddingValues().calculateBottomPadding(),
         ),
     ) {
-        items(count = state.blocks.size, key = { it }) { index ->
+        items(
+            count = state.blocks.size,
+            key = { it },
+            // Reuse pools are segregated by text style: a recycled text field does not
+            // re-layout on a style-only change, mis-sizing the caret and its handle.
+            contentType = { index ->
+                when (val block = state.blocks[index]) {
+                    is RichTextBlockEditState ->
+                        (block.kind as? RichBlockKind.Heading)?.level ?: 0
+
+                    else -> block::class
+                }
+            },
+        ) { index ->
             when (val block = state.blocks[index]) {
                 is RichTextBlockEditState -> RichTextBlockRow(
                     index = index,
