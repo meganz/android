@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":shared:nodes"))
     implementation(project(":shared:original-core-ui"))
     implementation(project(":domain"))
+    implementation(project(":domain:mediaplayer"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
