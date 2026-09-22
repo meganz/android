@@ -605,7 +605,7 @@
         <provider
             android:name=".providers.documentprovider.CloudDriveDocumentProvider"
             android:authorities="${cloudDriveDocumentProviderAuthority}"
-            android:enabled="false"
+            android:enabled="true"
             android:exported="true"
             android:grantUriPermissions="true"
             android:permission="android.permission.MANAGE_DOCUMENTS">

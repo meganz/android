@@ -275,13 +275,6 @@ enum class ApiFeatures(
         defaultValue = false
     ),
 
-    CloudDriveDocumentProvider(
-        experimentName = "cdsp",
-        description = "Enable MEGA Cloud Drive as a SAF root in the Android system file picker",
-        singleCheckPerRun = false,
-        defaultValue = false,
-    ),
-
     /**
      * Display MEGA core features in Home Screen
      */

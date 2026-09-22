@@ -1,27 +1,20 @@
 package mega.privacy.android.app.listeners.global
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.pm.PackageManager
-import android.provider.DocumentsContract
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.BuildConfig
-import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentProvider
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastMiscStateUseCase
 import nz.mega.sdk.MegaEvent
 import timber.log.Timber
@@ -34,7 +27,6 @@ class GlobalOnEventHandler @Inject constructor(
     private val setSecurityUpgradeInAppUseCase: SetSecurityUpgradeInAppUseCase,
     private val broadcastMiscStateUseCase: BroadcastMiscStateUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val updateDomainNameUseCase: UpdateDomainNameUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
@@ -69,7 +61,6 @@ class GlobalOnEventHandler @Inject constructor(
                 applicationScope.launch {
                     broadcastMiscStateUseCase(MiscLoadedState.FlagsReady)
                     updateDomainName()
-                    updateCloudDriveDocumentProviderState()
                 }
                 cookieEnabledCheckWrapper.checkEnabledCookies()
             }
@@ -87,38 +78,6 @@ class GlobalOnEventHandler @Inject constructor(
             }.onFailure {
                 Timber.e(it)
             }
-        }
-    }
-
-    /**
-     * Enable or disable [CloudDriveDocumentProvider] based on the
-     * [ApiFeatures.CloudDriveDocumentProvider] feature flag, then notify SAF so DocumentsUI
-     * re-scans roots.
-     */
-    private suspend fun updateCloudDriveDocumentProviderState() {
-        val isEnabled = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.CloudDriveDocumentProvider)
-        }.getOrElse {
-            false
-        }
-        Timber.d("CloudDriveDocumentProvider ff value $isEnabled")
-        runCatching {
-            val component = ComponentName(appContext, CloudDriveDocumentProvider::class.java)
-            val currentState = appContext.packageManager.getComponentEnabledSetting(component)
-            val desiredState = if (isEnabled) PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-
-            if (currentState != desiredState) {
-                appContext.packageManager.setComponentEnabledSetting(
-                    component, desiredState, PackageManager.DONT_KILL_APP,
-                )
-                appContext.contentResolver.notifyChange(
-                    DocumentsContract.buildRootsUri(BuildConfig.CLOUD_DRIVE_DOCUMENT_PROVIDER_AUTHORITY),
-                    null,
-                )
-            }
-        }.onFailure {
-            Timber.e(it, "Failed to update CloudDriveDocumentProvider state")
         }
     }
 
