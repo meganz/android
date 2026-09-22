@@ -303,6 +303,25 @@ interface NodeRepository {
     suspend fun setOfflineNodeRoot(offlineInformationId: Int, isOfflineRoot: Boolean)
 
     /**
+     * Check whether an offline node is one the user explicitly made available offline.
+     *
+     * @param offlineInformationId the offline information id
+     */
+    suspend fun isOfflineRootNode(offlineInformationId: Int): Boolean
+
+    /**
+     * Check whether a node is available offline because the user made it, or one of its
+     * ancestors, available offline.
+     *
+     * Folders are also stored offline to mirror the cloud structure whenever a descendant is made
+     * available offline. Those folders are not available offline themselves, and this returns
+     * false for them.
+     *
+     * @param nodeId [NodeId] of the node
+     */
+    suspend fun isNodeUnderOfflineRoot(nodeId: NodeId): Boolean
+
+    /**
      * Convert Base 64 string to handle
      */
     suspend fun convertBase64ToHandle(base64: String): Long

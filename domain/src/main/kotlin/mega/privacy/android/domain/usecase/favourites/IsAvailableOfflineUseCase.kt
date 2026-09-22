@@ -21,12 +21,17 @@ class IsAvailableOfflineUseCase @Inject constructor(
      * Invoke
      *
      * @param node [TypedNode]
-     * @return true if the file is available offline and up to date
+     * @return true if the file is available offline and up to date, or if the folder was made
+     * available offline by the user, directly or through one of its ancestors
      */
     suspend operator fun invoke(node: TypedNode): Boolean {
         val offlineNodeInformation =
             nodeRepository.getOfflineNodeInformation(node.id) ?: return false
-        return offlineNodeInformation.isFolder || fileUpToDate(node, offlineNodeInformation)
+        return if (offlineNodeInformation.isFolder) {
+            nodeRepository.isNodeUnderOfflineRoot(node.id)
+        } else {
+            fileUpToDate(node, offlineNodeInformation)
+        }
     }
 
     private fun fileUpToDate(

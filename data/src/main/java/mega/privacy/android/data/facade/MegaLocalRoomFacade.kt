@@ -482,6 +482,11 @@ internal class MegaLocalRoomFacade @Inject constructor(
             offlineModelMapper(it)
         } ?: emptyList()
 
+    override suspend fun getOfflineRoots(): List<Offline> =
+        offlineDao.get().getOfflineRoots().map {
+            offlineModelMapper(it)
+        }
+
     override suspend fun setOfflineRoot(id: Int, isOfflineRoot: Boolean) {
         offlineDao.get().setOfflineRoot(id, isOfflineRoot)
     }

@@ -6,6 +6,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveOfflineMen
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.offline.IsNodeUnderOfflineRootUseCase
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -32,8 +33,15 @@ class RemoveOfflineSelectionMenuItemTest {
         on { isAvailableOffline } doReturn true
     }
 
+    /**
+     * Only folders consult the offline database, and only once they already have an offline copy;
+     * these tests exercise files, which answer from the node itself.
+     */
+    private val isNodeUnderOfflineRootUseCase = mock<IsNodeUnderOfflineRootUseCase>()
+
     private val underTest = RemoveOfflineSelectionMenuItem(
         mock<RemoveOfflineMenuAction>(),
+        isNodeUnderOfflineRootUseCase = isNodeUnderOfflineRootUseCase,
     )
 
     @ParameterizedTest(name = "noNodeTakenDown={0}, selectedNodesKind={1} -> expected={2}")

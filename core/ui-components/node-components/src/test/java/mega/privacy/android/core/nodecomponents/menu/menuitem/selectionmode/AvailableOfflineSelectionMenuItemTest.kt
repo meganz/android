@@ -7,11 +7,13 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.offline.IsNodeUnderOfflineRootUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.util.stream.Stream
@@ -34,8 +36,15 @@ class AvailableOfflineSelectionMenuItemTest {
         on { isAvailableOffline } doReturn false
     }
 
+    /**
+     * Only folders consult the offline database, and only once they already have an offline copy;
+     * these tests exercise files, which answer from the node itself.
+     */
+    private val isNodeUnderOfflineRootUseCase = mock<IsNodeUnderOfflineRootUseCase>()
+
     private val underTest = AvailableOfflineSelectionMenuItem(
         mock<AvailableOfflineMenuAction>(),
+        isNodeUnderOfflineRootUseCase = isNodeUnderOfflineRootUseCase,
     )
 
     @ParameterizedTest(name = "noNodeTakenDown={0}, selectedNodesKind={1} -> expected={2}")

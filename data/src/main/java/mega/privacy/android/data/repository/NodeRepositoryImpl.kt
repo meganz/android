@@ -501,6 +501,21 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaLocalRoomGateway.setOfflineRoot(offlineInformationId, isOfflineRoot)
         }
 
+    override suspend fun isOfflineRootNode(offlineInformationId: Int) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.getOfflineLineById(offlineInformationId)?.isOfflineRoot == true
+    }
+
+    override suspend fun isNodeUnderOfflineRoot(nodeId: NodeId) = withContext(ioDispatcher) {
+        var current = getOfflineNode(nodeId.longValue)
+        val visited = mutableSetOf<Int>()
+        while (current != null && visited.add(current.id)) {
+            if (current.isOfflineRoot) return@withContext true
+            if (current.parentId == ROOT_OFFLINE_PARENT_ID) break
+            current = megaLocalRoomGateway.getOfflineLineById(current.parentId)
+        }
+        false
+    }
+
     override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
         megaApiGateway.base64ToHandle(base64)
     }
@@ -1023,7 +1038,13 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getOfflineNodesByParentId(parentId: Int): List<OfflineNodeInformation> =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.getOfflineInfoByParentId(parentId).map {
+            // The root of the Offline section lists what the user chose to make available offline,
+            // not the top level rows, as ancestors are stored to mirror the cloud folder structure
+            if (parentId == ROOT_OFFLINE_PARENT_ID) {
+                megaLocalRoomGateway.getOfflineRoots()
+            } else {
+                megaLocalRoomGateway.getOfflineInfoByParentId(parentId)
+            }.map {
                 offlineNodeInformationMapper(it)
             }
         }
@@ -1485,5 +1506,10 @@ internal class NodeRepositoryImpl @Inject constructor(
          * consecutive emissions instead of one huge one.
          */
         internal const val NODE_UPDATES_CHUNK_SIZE = 5_000
+
+        /**
+         * Parent id used by callers to request the root of the Offline section.
+         */
+        internal const val ROOT_OFFLINE_PARENT_ID = -1
     }
 }

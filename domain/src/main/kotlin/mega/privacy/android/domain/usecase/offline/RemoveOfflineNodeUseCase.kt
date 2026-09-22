@@ -30,19 +30,64 @@ class RemoveOfflineNodeUseCase @Inject constructor(
      * @param nodeId [NodeId]
      */
     suspend operator fun invoke(nodeId: NodeId) = withContext(ioDispatcher) {
-        nodeRepository.getOfflineNodeInformation(nodeId)?.let {
-            if (it.isFolder) {
-                val childNodes = nodeRepository.getOfflineNodesByParentId(it.id)
-                deleteChildrenInDb(childNodes)
+        nodeRepository.getOfflineNodeInformation(nodeId)?.let { offlineInfo ->
+            if (offlineInfo.isFolder && containsOfflineRoot(offlineInfo)) {
+                removeDescendantsKeepingOfflineRoots(offlineInfo)
+                // the folder is no longer one the user chose, but it still has to exist to
+                // address the nodes below it that the user chose separately
+                nodeRepository.setOfflineNodeRoot(offlineInfo.id, false)
+            } else {
+                removeWithSubtree(offlineInfo)
             }
-            //remove red arrow from current item
-            val parentId = it.parentId
-            removeOffline(it)
-            if (parentId != -1) {
-                updateParentOfflineStatus(parentId)
-            }
-            deleteFileByNode(it)
         }
+    }
+
+    private suspend fun removeWithSubtree(offlineNodeInformation: OfflineNodeInformation) {
+        if (offlineNodeInformation.isFolder) {
+            deleteChildrenInDb(nodeRepository.getOfflineNodesByParentId(offlineNodeInformation.id))
+        }
+        //remove red arrow from current item
+        val parentId = offlineNodeInformation.parentId
+        removeOffline(offlineNodeInformation)
+        if (parentId != ROOT_PARENT_ID) {
+            updateParentOfflineStatus(parentId)
+        }
+        deleteFileByNode(offlineNodeInformation)
+    }
+
+    /**
+     * Check whether anything below [offlineNodeInformation] was made available offline by the
+     * user in its own right, and so has to outlive the removal of this folder.
+     */
+    private suspend fun containsOfflineRoot(offlineNodeInformation: OfflineNodeInformation): Boolean =
+        nodeRepository.getOfflineNodesByParentId(offlineNodeInformation.id).any { child ->
+            nodeRepository.isOfflineRootNode(child.id) ||
+                    (child.isFolder && containsOfflineRoot(child))
+        }
+
+    /**
+     * Remove the descendants of [offlineNodeInformation], keeping the ones the user made
+     * available offline separately along with the folders that lead down to them.
+     *
+     * @return true when something below [offlineNodeInformation] was kept
+     */
+    private suspend fun removeDescendantsKeepingOfflineRoots(
+        offlineNodeInformation: OfflineNodeInformation,
+    ): Boolean {
+        var kept = false
+        nodeRepository.getOfflineNodesByParentId(offlineNodeInformation.id).forEach { child ->
+            when {
+                nodeRepository.isOfflineRootNode(child.id) -> kept = true
+
+                child.isFolder && removeDescendantsKeepingOfflineRoots(child) -> kept = true
+
+                else -> {
+                    removeOffline(child)
+                    deleteFileByNode(child)
+                }
+            }
+        }
+        return kept
     }
 
     private suspend fun deleteFileByNode(offlineNodeInformation: OfflineNodeInformation) {
@@ -87,18 +132,21 @@ class RemoveOfflineNodeUseCase @Inject constructor(
      * Delete empty parent folders recursively
      */
     private suspend fun updateParentOfflineStatus(parentId: Int) {
-        val siblings = nodeRepository.getOfflineNodesByParentId(parentId)
-        siblings.let {
-            if (it.isNotEmpty()) {
-                return
-            }
-            val parentNode = nodeRepository.getOfflineNodeById(parentId)
-            parentNode?.let { offlineInfo ->
-                val grandParentId = offlineInfo.parentId
-                removeOffline(offlineInfo)
-                deleteFileByNode(offlineInfo)
+        if (nodeRepository.getOfflineNodesByParentId(parentId).isNotEmpty()) return
+        // a folder the user chose to make available offline stays listed even once it is empty
+        if (nodeRepository.isOfflineRootNode(parentId)) return
+        val parentNode = nodeRepository.getOfflineNodeById(parentId)
+        parentNode?.let { offlineInfo ->
+            val grandParentId = offlineInfo.parentId
+            removeOffline(offlineInfo)
+            deleteFileByNode(offlineInfo)
+            if (grandParentId != ROOT_PARENT_ID) {
                 updateParentOfflineStatus(grandParentId)
             }
         }
+    }
+
+    private companion object {
+        const val ROOT_PARENT_ID = -1
     }
 }

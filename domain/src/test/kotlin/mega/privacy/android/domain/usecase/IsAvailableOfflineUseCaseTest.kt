@@ -85,7 +85,7 @@ class IsAvailableOfflineUseCaseTest {
         }
 
     @Test
-    fun `test that true is returned if offline information is found for folder in offline database`() =
+    fun `test that true is returned if the folder was made available offline by the user`() =
         runTest {
             val node = mock<TypedFolderNode> {
                 on { id }.thenReturn(nodeId)
@@ -94,7 +94,22 @@ class IsAvailableOfflineUseCaseTest {
             whenever(nodeRepository.getOfflineNodeInformation(node.id)).thenReturn(
                 offlineNodeInformation
             )
+            whenever(nodeRepository.isNodeUnderOfflineRoot(node.id)).thenReturn(true)
             assertThat(underTest(node)).isTrue()
+        }
+
+    @Test
+    fun `test that false is returned if the folder is only stored as an ancestor of an offline node`() =
+        runTest {
+            val node = mock<TypedFolderNode> {
+                on { id }.thenReturn(nodeId)
+            }
+            whenever(offlineNodeInformation.isFolder).thenReturn(true)
+            whenever(nodeRepository.getOfflineNodeInformation(node.id)).thenReturn(
+                offlineNodeInformation
+            )
+            whenever(nodeRepository.isNodeUnderOfflineRoot(node.id)).thenReturn(false)
+            assertThat(underTest(node)).isFalse()
         }
 
     @Test

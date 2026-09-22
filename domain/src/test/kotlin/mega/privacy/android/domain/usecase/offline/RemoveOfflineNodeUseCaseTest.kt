@@ -127,8 +127,132 @@ class RemoveOfflineNodeUseCaseTest {
             )
         }
 
+    @Test
+    fun `test that an empty parent is removed when it is not an offline root`() = runTest {
+        stubChildRemovalUnderParent(isParentOfflineRoot = false)
+
+        underTest(nodeId = nodeId2)
+
+        verify(nodeRepository).removeOfflineNodeById(nodeId1.longValue.toInt())
+    }
+
+    @Test
+    fun `test that an empty parent is kept when it is an offline root`() = runTest {
+        stubChildRemovalUnderParent(isParentOfflineRoot = true)
+
+        underTest(nodeId = nodeId2)
+
+        verify(nodeRepository, never()).removeOfflineNodeById(nodeId1.longValue.toInt())
+    }
+
+    @Test
+    fun `test that a separately chosen descendant survives the removal of its parent folder`() =
+        runTest {
+            stubFolderWithSeparatelyChosenFile()
+
+            underTest(nodeId = nodeId1)
+
+            verify(nodeRepository, never()).removeOfflineNodeById(nodeId2.longValue.toInt())
+            verify(fileRepository, never()).deleteFolderAndItsFiles(
+                "$offlineRoot${File.separator}$fileName1${File.separator}$fileName2"
+            )
+        }
+
+    @Test
+    fun `test that the removed folder is kept as an ancestor when a descendant survives`() =
+        runTest {
+            stubFolderWithSeparatelyChosenFile()
+
+            underTest(nodeId = nodeId1)
+
+            verify(nodeRepository).setOfflineNodeRoot(nodeId1.longValue.toInt(), false)
+            verify(nodeRepository, never()).removeOfflineNodeById(nodeId1.longValue.toInt())
+            verify(fileRepository, never()).deleteFolderAndItsFiles(
+                "$offlineRoot${File.separator}$fileName1"
+            )
+        }
+
+    @Test
+    fun `test that a sibling that was not separately chosen is removed with its parent folder`() =
+        runTest {
+            stubFolderWithSeparatelyChosenFile()
+
+            underTest(nodeId = nodeId1)
+
+            verify(nodeRepository).removeOfflineNodeById(nodeId3.longValue.toInt())
+            verify(fileRepository).deleteFolderAndItsFiles(
+                "$offlineRoot${File.separator}$fileName1${File.separator}$fileName3"
+            )
+        }
+
+    /**
+     * A folder the user made available offline, holding a file they had already chosen in its own
+     * right plus one that only came down with the folder.
+     */
+    private fun stubFolderWithSeparatelyChosenFile() = runTest {
+        val folderId = nodeId1.longValue.toInt()
+        val chosenChildId = nodeId2.longValue.toInt()
+        val incidentalChildId = nodeId3.longValue.toInt()
+        val folder: OtherOfflineNodeInformation = mock {
+            whenever(it.id).thenReturn(folderId)
+            whenever(it.parentId).thenReturn(-1)
+            whenever(it.isFolder).thenReturn(true)
+            whenever(it.path).thenReturn(File.separator)
+            whenever(it.name).thenReturn(fileName1)
+            whenever(it.handle).thenReturn(handle1)
+        }
+        val chosenChild: OtherOfflineNodeInformation = mock {
+            whenever(it.id).thenReturn(chosenChildId)
+            whenever(it.parentId).thenReturn(folderId)
+            whenever(it.isFolder).thenReturn(false)
+            whenever(it.path).thenReturn("${File.separator}$fileName1${File.separator}")
+            whenever(it.name).thenReturn(fileName2)
+            whenever(it.handle).thenReturn(handle2)
+        }
+        val incidentalChild: OtherOfflineNodeInformation = mock {
+            whenever(it.id).thenReturn(incidentalChildId)
+            whenever(it.parentId).thenReturn(folderId)
+            whenever(it.isFolder).thenReturn(false)
+            whenever(it.path).thenReturn("${File.separator}$fileName1${File.separator}")
+            whenever(it.name).thenReturn(fileName3)
+            whenever(it.handle).thenReturn(handle3)
+        }
+        whenever(nodeRepository.getOfflineNodeInformation(nodeId1)).thenReturn(folder)
+        whenever(nodeRepository.getOfflineNodesByParentId(folderId))
+            .thenReturn(listOf(chosenChild, incidentalChild))
+        whenever(nodeRepository.isOfflineRootNode(chosenChildId)).thenReturn(true)
+        whenever(nodeRepository.isOfflineRootNode(incidentalChildId)).thenReturn(false)
+        whenever(fileRepository.getOfflinePath()).thenReturn(offlineRoot)
+    }
+
+    private fun stubChildRemovalUnderParent(isParentOfflineRoot: Boolean) = runTest {
+        val parentId = nodeId1.longValue.toInt()
+        val child: OtherOfflineNodeInformation = mock {
+            whenever(it.id).thenReturn(nodeId2.longValue.toInt())
+            whenever(it.parentId).thenReturn(parentId)
+            whenever(it.isFolder).thenReturn(false)
+            whenever(it.path).thenReturn("${File.separator}$fileName1${File.separator}")
+            whenever(it.name).thenReturn(fileName2)
+            whenever(it.handle).thenReturn(handle2)
+        }
+        val parent: OtherOfflineNodeInformation = mock {
+            whenever(it.id).thenReturn(parentId)
+            whenever(it.parentId).thenReturn(-1)
+            whenever(it.isFolder).thenReturn(true)
+            whenever(it.path).thenReturn(File.separator)
+            whenever(it.name).thenReturn(fileName1)
+            whenever(it.handle).thenReturn(handle1)
+        }
+        whenever(nodeRepository.getOfflineNodeInformation(nodeId2)).thenReturn(child)
+        whenever(nodeRepository.getOfflineNodesByParentId(parentId)).thenReturn(emptyList())
+        whenever(nodeRepository.getOfflineNodeById(parentId)).thenReturn(parent)
+        whenever(nodeRepository.isOfflineRootNode(parentId)).thenReturn(isParentOfflineRoot)
+        whenever(fileRepository.getOfflinePath()).thenReturn(offlineRoot)
+    }
+
     private fun stubPaths() = runTest {
         whenever(fileRepository.getOfflinePath()).thenReturn(offlinePath)
+        whenever(nodeRepository.isOfflineRootNode(any())).thenReturn(false)
         val offlineRootFolderNodeInformation1: OtherOfflineNodeInformation = mock {
             whenever(it.id).thenReturn(nodeId1.longValue.toInt())
             whenever(it.parentId).thenReturn(-1)

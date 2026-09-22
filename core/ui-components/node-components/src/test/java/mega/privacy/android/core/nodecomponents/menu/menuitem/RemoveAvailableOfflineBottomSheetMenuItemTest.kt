@@ -5,11 +5,14 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.model.OfflineTypedFileNode
 import mega.privacy.android.core.nodecomponents.model.OfflineTypedFolderNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
+import mega.privacy.android.domain.usecase.offline.IsNodeUnderOfflineRootUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
@@ -20,9 +23,17 @@ import org.mockito.kotlin.whenever
 class RemoveAvailableOfflineBottomSheetMenuItemTest {
 
     private val isFolderEmptyUseCase = mock<IsFolderEmptyUseCase>()
+
+    /**
+     * Only folders consult the offline database, and only once they already have an offline copy;
+     * these tests exercise files, which answer from the node itself.
+     */
+    private val isNodeUnderOfflineRootUseCase = mock<IsNodeUnderOfflineRootUseCase>()
+
     private val underTest = RemoveAvailableOfflineBottomSheetMenuItem(
         menuAction = mock<RemoveOfflineMenuAction>(),
         isFolderEmptyUseCase = isFolderEmptyUseCase,
+        isNodeUnderOfflineRootUseCase = isNodeUnderOfflineRootUseCase,
     )
 
     @Test
@@ -115,6 +126,50 @@ class RemoveAvailableOfflineBottomSheetMenuItemTest {
         )
         assertThat(result).isFalse()
     }
+
+    @Test
+    fun `test that shouldDisplay returns false when the folder is only stored as an ancestor of an offline node`() =
+        runTest {
+            val node = mock<TypedFolderNode> {
+                on { id } doReturn NodeId(1L)
+                on { isAvailableOffline } doReturn true
+                on { isTakenDown } doReturn false
+            }
+            whenever(isFolderEmptyUseCase(node)).thenReturn(false)
+            whenever(isNodeUnderOfflineRootUseCase(node.id)).thenReturn(false)
+
+            val result = underTest.shouldDisplay(
+                isNodeInRubbish = false,
+                accessPermission = null,
+                isInBackups = false,
+                node = node,
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that shouldDisplay returns true when the folder was made available offline by the user`() =
+        runTest {
+            val node = mock<TypedFolderNode> {
+                on { id } doReturn NodeId(1L)
+                on { isAvailableOffline } doReturn true
+                on { isTakenDown } doReturn false
+            }
+            whenever(isFolderEmptyUseCase(node)).thenReturn(false)
+            whenever(isNodeUnderOfflineRootUseCase(node.id)).thenReturn(true)
+
+            val result = underTest.shouldDisplay(
+                isNodeInRubbish = false,
+                accessPermission = null,
+                isInBackups = false,
+                node = node,
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+            assertThat(result).isTrue()
+        }
 
     @Test
     fun `test that shouldDisplay returns true for OfflineTypedFileNode without checking isFolderEmptyUseCase`() =

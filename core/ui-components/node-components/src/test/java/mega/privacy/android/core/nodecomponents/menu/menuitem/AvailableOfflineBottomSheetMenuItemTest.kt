@@ -6,6 +6,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOffline
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.offline.IsNodeUnderOfflineRootUseCase
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -17,9 +18,17 @@ import org.mockito.kotlin.whenever
 class AvailableOfflineBottomSheetMenuItemTest {
 
     private val isFolderEmptyUseCase = mock<IsFolderEmptyUseCase>()
+
+    /**
+     * Only folders consult the offline database, and only once they already have an offline copy;
+     * these tests exercise files, which answer from the node itself.
+     */
+    private val isNodeUnderOfflineRootUseCase = mock<IsNodeUnderOfflineRootUseCase>()
+
     private val underTest = AvailableOfflineBottomSheetMenuItem(
         menuAction = mock<AvailableOfflineMenuAction>(),
         isFolderEmptyUseCase = isFolderEmptyUseCase,
+        isNodeUnderOfflineRootUseCase = isNodeUnderOfflineRootUseCase,
     )
 
     @Test

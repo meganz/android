@@ -109,6 +109,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -1346,6 +1347,135 @@ internal class NodeRepositoryImplTest {
         val expected = OfflineFolderInfo(1, 1)
         val actual = underTest.getOfflineFolderInfo(parentId)
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getOfflineNodesByParentId returns the offline roots when the parent id is the root one`() =
+        runTest {
+            val offline = mock<Offline>()
+            val mapped = mock<OtherOfflineNodeInformation>()
+            whenever(megaLocalRoomGateway.getOfflineRoots()).thenReturn(listOf(offline))
+            whenever(offlineNodeInformationMapper(offline)).thenReturn(mapped)
+
+            val actual = underTest.getOfflineNodesByParentId(-1)
+
+            assertThat(actual).containsExactly(mapped)
+            verify(megaLocalRoomGateway, never()).getOfflineInfoByParentId(-1)
+        }
+
+    @Test
+    fun `test that getOfflineNodesByParentId returns the children when the parent id is not the root one`() =
+        runTest {
+            val parentId = 12
+            val offline = mock<Offline>()
+            val mapped = mock<OtherOfflineNodeInformation>()
+            whenever(megaLocalRoomGateway.getOfflineInfoByParentId(parentId))
+                .thenReturn(listOf(offline))
+            whenever(offlineNodeInformationMapper(offline)).thenReturn(mapped)
+
+            val actual = underTest.getOfflineNodesByParentId(parentId)
+
+            assertThat(actual).containsExactly(mapped)
+            verify(megaLocalRoomGateway, never()).getOfflineRoots()
+        }
+
+    @Test
+    fun `test that isOfflineRootNode returns true when the stored offline node is an offline root`() =
+        runTest {
+            val id = 8
+            val offline = offlineNode(id = id, isOfflineRoot = true)
+            whenever(megaLocalRoomGateway.getOfflineLineById(id)).thenReturn(offline)
+
+            assertThat(underTest.isOfflineRootNode(id)).isTrue()
+        }
+
+    @Test
+    fun `test that isOfflineRootNode returns false when the stored offline node is not an offline root`() =
+        runTest {
+            val id = 8
+            val offline = offlineNode(id = id, isOfflineRoot = false)
+            whenever(megaLocalRoomGateway.getOfflineLineById(id)).thenReturn(offline)
+
+            assertThat(underTest.isOfflineRootNode(id)).isFalse()
+        }
+
+    @Test
+    fun `test that isNodeUnderOfflineRoot returns true when the node itself is an offline root`() =
+        runTest {
+            val handle = 55L
+            whenever(megaLocalRoomGateway.getOfflineInformation(handle))
+                .thenReturn(offlineNode(id = 1, isOfflineRoot = true))
+
+            assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isTrue()
+        }
+
+    @Test
+    fun `test that isNodeUnderOfflineRoot returns true when an ancestor is an offline root`() =
+        runTest {
+            val handle = 55L
+            whenever(megaLocalRoomGateway.getOfflineInformation(handle))
+                .thenReturn(offlineNode(id = 3, isOfflineRoot = false, parentId = 2))
+            whenever(megaLocalRoomGateway.getOfflineLineById(2))
+                .thenReturn(offlineNode(id = 2, isOfflineRoot = false, parentId = 1))
+            whenever(megaLocalRoomGateway.getOfflineLineById(1))
+                .thenReturn(offlineNode(id = 1, isOfflineRoot = true))
+
+            assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isTrue()
+        }
+
+    @Test
+    fun `test that isNodeUnderOfflineRoot returns false when no ancestor is an offline root`() =
+        runTest {
+            val handle = 55L
+            whenever(megaLocalRoomGateway.getOfflineInformation(handle))
+                .thenReturn(offlineNode(id = 2, isOfflineRoot = false, parentId = 1))
+            whenever(megaLocalRoomGateway.getOfflineLineById(1))
+                .thenReturn(offlineNode(id = 1, isOfflineRoot = false))
+
+            assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isFalse()
+        }
+
+    @Test
+    fun `test that isNodeUnderOfflineRoot returns false when the node is not stored offline`() =
+        runTest {
+            val handle = 55L
+            whenever(megaLocalRoomGateway.getOfflineInformation(handle)).thenReturn(null)
+
+            assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isFalse()
+        }
+
+    @Test
+    fun `test that isNodeUnderOfflineRoot returns false when the parent chain contains a cycle`() =
+        runTest {
+            val handle = 55L
+            whenever(megaLocalRoomGateway.getOfflineInformation(handle))
+                .thenReturn(offlineNode(id = 1, isOfflineRoot = false, parentId = 2))
+            whenever(megaLocalRoomGateway.getOfflineLineById(2))
+                .thenReturn(offlineNode(id = 2, isOfflineRoot = false, parentId = 1))
+            whenever(megaLocalRoomGateway.getOfflineLineById(1))
+                .thenReturn(offlineNode(id = 1, isOfflineRoot = false, parentId = 2))
+
+            assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isFalse()
+        }
+
+    private fun offlineNode(id: Int, isOfflineRoot: Boolean, parentId: Int = -1) = Offline(
+        id = id,
+        handle = "$id",
+        path = "path",
+        name = "name",
+        parentId = parentId,
+        type = Offline.FOLDER,
+        origin = Offline.OTHER,
+        handleIncoming = "",
+        isOfflineRoot = isOfflineRoot,
+    )
+
+    @Test
+    fun `test that isOfflineRootNode returns false when the offline node is not stored`() = runTest {
+        val id = 8
+        whenever(megaLocalRoomGateway.getOfflineLineById(id)).thenReturn(null)
+
+        assertThat(underTest.isOfflineRootNode(id)).isFalse()
     }
 
     @Test
