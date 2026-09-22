@@ -46,17 +46,15 @@ import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeByFingerprintAndParentNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveCollidedNodesUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionResultUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionsResultUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.IsCopyToOriginUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.ReorderNodeNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.UpdateNodeNameCollisionsResultUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -73,12 +71,11 @@ class NameCollisionViewModel @Inject constructor(
     private val copyCollidedNodeUseCase: CopyCollidedNodeUseCase,
     private val copyCollidedNodesUseCase: CopyCollidedNodesUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
-    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
+    private val isCopyToOriginUseCase: IsCopyToOriginUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
-    private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase,
     private val moveCollidedNodeUseCase: MoveCollidedNodeUseCase,
     private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
     private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
@@ -133,28 +130,10 @@ class NameCollisionViewModel @Inject constructor(
      *
      * @param collision [NodeNameCollision] to resolve.
      */
-    private suspend fun checkCopyToOrigin(collision: NodeNameCollision.Default) {
-        if (collision.type != NodeNameCollisionType.COPY) return
-        runCatching {
-            getNodeByHandleUseCase(collision.nodeHandle, true)
-        }.getOrNull()?.let {
-            isCopyToOrigin = it.parentId.longValue == collision.parentHandle
-        } ?: runCatching {
-            val node = MegaNode.unserialize(collision.serializedData)
-            requireNotNull(node)
-            if (!node.isForeign) {
-                node.fingerprint?.let { fingerprint ->
-                    getNodeByFingerprintAndParentNodeUseCase(
-                        fingerprint = fingerprint,
-                        parentNodeId = NodeId(collision.parentHandle),
-                    )?.let {
-                        isCopyToOrigin = it.parentId.longValue == collision.parentHandle
-                    }
-                }
-            }
-        }.onFailure {
-            Timber.w(it, "Fingerprint is null")
-        }
+    private suspend fun checkCopyToOrigin(collision: NodeNameCollision) {
+        isCopyToOrigin = runCatching { isCopyToOriginUseCase(collision) }
+            .onFailure { Timber.w(it, "Error checking whether the copy targets the origin") }
+            .getOrDefault(false)
     }
 
     /**
@@ -169,7 +148,7 @@ class NameCollisionViewModel @Inject constructor(
         uploadedFilesCount = 0
         viewModelScope.launch {
             runCatching {
-                if (collision is NodeNameCollision.Default) {
+                if (collision is NodeNameCollision.Default || collision is NodeNameCollision.FileLink) {
                     checkCopyToOrigin(collision)
                 }
                 updateCurrentCollision(collision, true)
@@ -220,7 +199,7 @@ class NameCollisionViewModel @Inject constructor(
             runCatching {
                 require(collisions.isNotEmpty()) { "Collisions list is empty" }
                 collisions.first().let {
-                    if (it is NodeNameCollision.Default) {
+                    if (it is NodeNameCollision.Default || it is NodeNameCollision.FileLink) {
                         checkCopyToOrigin(it)
                     }
                 }
@@ -316,7 +295,7 @@ class NameCollisionViewModel @Inject constructor(
         collision: NameCollision? = currentCollision.value?.nameCollision,
     ): NameCollisionType =
         when (collision) {
-            is NodeNameCollision.Chat -> {
+            is NodeNameCollision.Chat, is NodeNameCollision.FileLink -> {
                 NameCollisionType.COPY
             }
 

@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.node
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -18,7 +19,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 internal class CopyCollidedNodeUseCaseTest {
@@ -50,12 +53,10 @@ internal class CopyCollidedNodeUseCaseTest {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
                 on { renameName } doReturn "new name"
-                on { serializedData } doReturn null
             }
             whenever(
                 nodeRepository.copyNode(
                     NodeId(1L),
-                    null,
                     NodeId(2L),
                     "new name"
                 )
@@ -78,12 +79,10 @@ internal class CopyCollidedNodeUseCaseTest {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
                 on { renameName } doReturn "new name"
-                on { serializedData } doReturn null
             }
             whenever(
                 nodeRepository.copyNode(
                     NodeId(any()),
-                    anyOrNull(),
                     NodeId(any()),
                     anyOrNull()
                 )
@@ -106,7 +105,6 @@ internal class CopyCollidedNodeUseCaseTest {
                 on { parentHandle } doReturn 2L
                 on { chatId } doReturn 1L
                 on { messageId } doReturn 1L
-                on { serializedData } doReturn null
             }
             whenever(getChatFilesUseCase(1L, 1L)).thenReturn(listOf(chatFile))
             whenever(copyTypedNodeUseCase(chatFile, NodeId(2L), null)).thenReturn(NodeId(2L))
@@ -173,12 +171,10 @@ internal class CopyCollidedNodeUseCaseTest {
             val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
-                on { serializedData } doReturn null
             }
             whenever(
                 nodeRepository.copyNode(
                     NodeId(any()),
-                    anyOrNull(),
                     NodeId(any()),
                     anyOrNull()
                 )
@@ -196,12 +192,10 @@ internal class CopyCollidedNodeUseCaseTest {
             val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
-                on { serializedData } doReturn "data"
             }
             whenever(
                 nodeRepository.copyNode(
                     NodeId(any()),
-                    anyOrNull(),
                     NodeId(any()),
                     anyOrNull()
                 )
@@ -220,12 +214,10 @@ internal class CopyCollidedNodeUseCaseTest {
             val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
-                on { serializedData } doReturn "data"
             }
             whenever(
                 nodeRepository.copyNode(
                     NodeId(any()),
-                    anyOrNull(),
                     NodeId(any()),
                     anyOrNull()
                 )
@@ -233,6 +225,62 @@ internal class CopyCollidedNodeUseCaseTest {
                 .thenAnswer {
                     throw QuotaExceededMegaException(1, "")
                 }
+
+            assertThrows<QuotaExceededMegaException> {
+                underTest(nodeNameCollision, false)
+            }
+        }
+
+    @Test
+    fun `test that a file link node is copied from its serialized data when there is no exception`() =
+        runTest {
+            val publicNode = mock<FileNode>()
+            val nodeNameCollision = mock<NodeNameCollision.FileLink> {
+                on { nodeHandle } doReturn 1L
+                on { parentHandle } doReturn 2L
+                on { renameName } doReturn "new name"
+                on { serializedData } doReturn "data"
+            }
+            whenever(nodeRepository.getNodeFromSerializedData("data")).thenReturn(publicNode)
+            whenever(nodeRepository.copyPublicNode(publicNode, NodeId(2L), "new name"))
+                .thenReturn(NodeId(3L))
+
+            val result = underTest(nodeNameCollision, rename = true)
+
+            assertThat(result.count).isEqualTo(1)
+            assertThat(result.errorCount).isEqualTo(0)
+            verify(nodeRepository, never()).copyNode(any<NodeId>(), any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that an error is counted when the file link node cannot be deserialized`() =
+        runTest {
+            val nodeNameCollision = mock<NodeNameCollision.FileLink> {
+                on { nodeHandle } doReturn 1L
+                on { parentHandle } doReturn 2L
+                on { serializedData } doReturn "data"
+            }
+            whenever(nodeRepository.getNodeFromSerializedData("data")).thenReturn(null)
+
+            val result = underTest(nodeNameCollision, rename = false)
+
+            assertThat(result.count).isEqualTo(1)
+            assertThat(result.errorCount).isEqualTo(1)
+            verify(nodeRepository, never()).copyPublicNode(any(), any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that CopyCollidedNodeUseCase throws exception when copy public node throw QuotaExceededMegaException`() =
+        runTest {
+            val publicNode = mock<FileNode>()
+            val nodeNameCollision = mock<NodeNameCollision.FileLink> {
+                on { nodeHandle } doReturn 1L
+                on { parentHandle } doReturn 2L
+                on { serializedData } doReturn "data"
+            }
+            whenever(nodeRepository.getNodeFromSerializedData("data")).thenReturn(publicNode)
+            whenever(nodeRepository.copyPublicNode(publicNode, NodeId(2L), null))
+                .thenAnswer { throw QuotaExceededMegaException(1, "") }
 
             assertThrows<QuotaExceededMegaException> {
                 underTest(nodeNameCollision, false)

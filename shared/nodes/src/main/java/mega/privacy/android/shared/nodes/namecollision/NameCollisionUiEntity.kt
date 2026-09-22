@@ -136,14 +136,29 @@ sealed class NameCollisionUiEntity : Parcelable {
                 parentHandle = nameCollision.parentHandle,
                 isFile = nameCollision.isFile,
                 renameName = nameCollision.renameName,
-                serializedNode = nameCollision.serializedData
+                serializedNode = (nameCollision as? NodeNameCollision.FileLink)?.serializedData,
             )
         }
 
         /**
-         * Creates a [NodeNameCollision.Default] from a [NameCollisionUiEntity.Copy]
+         * Creates a [NodeNameCollision.FileLink] from a [NameCollisionUiEntity.Copy] carrying a
+         * serialized node, or a [NodeNameCollision.Default] copy otherwise.
          */
-        fun Copy.toNodeNameCollision() = NodeNameCollision.Default(
+        fun Copy.toNodeNameCollision(): NodeNameCollision = serializedNode?.let {
+            NodeNameCollision.FileLink(
+                collisionHandle = collisionHandle,
+                nodeHandle = nodeHandle,
+                name = name,
+                size = size ?: -1L,
+                childFolderCount = childFolderCount,
+                childFileCount = childFileCount,
+                lastModified = lastModified,
+                parentHandle = parentHandle,
+                isFile = isFile,
+                renameName = renameName,
+                serializedData = it,
+            )
+        } ?: NodeNameCollision.Default(
             collisionHandle = collisionHandle,
             nodeHandle = nodeHandle,
             name = name,
@@ -153,7 +168,6 @@ sealed class NameCollisionUiEntity : Parcelable {
             lastModified = lastModified,
             parentHandle = parentHandle,
             isFile = isFile,
-            serializedData = serializedNode,
             renameName = renameName,
             type = NodeNameCollisionType.COPY,
         )
@@ -217,7 +231,6 @@ sealed class NameCollisionUiEntity : Parcelable {
             lastModified = lastModified,
             parentHandle = parentHandle,
             isFile = isFile,
-            serializedData = null,
             renameName = renameName,
             chatId = chatId,
             messageId = messageId,
@@ -276,7 +289,6 @@ sealed class NameCollisionUiEntity : Parcelable {
             lastModified = lastModified,
             parentHandle = parentHandle,
             isFile = isFile,
-            serializedData = null,
             renameName = renameName,
             type = NodeNameCollisionType.MOVE,
         )
@@ -309,5 +321,6 @@ fun NameCollision.toUiEntity() = when (this) {
     }
 
     is NodeNameCollision.Chat -> NameCollisionUiEntity.Import.fromNodeNameCollision(this)
+    is NodeNameCollision.FileLink -> NameCollisionUiEntity.Copy.fromNodeNameCollision(this)
     is FileNameCollision -> NameCollisionUiEntity.Upload.fromFileNameCollision(this)
 }

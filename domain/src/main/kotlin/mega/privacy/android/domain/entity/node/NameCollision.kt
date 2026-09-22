@@ -35,6 +35,7 @@ fun NameCollision.copy(renameName: String?): NameCollision {
     return when (this) {
         is NodeNameCollision.Default -> copy(renameName = renameName)
         is NodeNameCollision.Chat -> copy(renameName = renameName)
+        is NodeNameCollision.FileLink -> copy(renameName = renameName)
         is FileNameCollision -> copy(renameName = renameName)
     }
 }

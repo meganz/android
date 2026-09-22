@@ -436,7 +436,6 @@ interface NodeRepository {
      * Copy a [Node] and move it to a new [Node] while updating its name if set
      *
      * @param nodeToCopy the [NodeId] to copy
-     * @param nodeToCopySerializedData optional node serialized data when a node from link needs to be copied
      * @param newNodeParent the [NodeId] that [nodeToCopy] will be moved to
      * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
      *
@@ -444,7 +443,6 @@ interface NodeRepository {
      */
     suspend fun copyNode(
         nodeToCopy: NodeId,
-        nodeToCopySerializedData: String? = null,
         newNodeParent: NodeId,
         newNodeName: String?,
     ): NodeId

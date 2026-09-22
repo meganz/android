@@ -25,6 +25,9 @@ class MoveCollidedNodeUseCase @Inject constructor(
         nodeNameCollision: NodeNameCollision,
         rename: Boolean,
     ): MoveRequestResult.GeneralMovement {
+        require(nodeNameCollision is NodeNameCollision.Default) {
+            "Only nodes in the account tree can be moved: $nodeNameCollision"
+        }
         // Moving a node to the folder it already lives in is a no-op: the
         // colliding node is the node itself. Resolving such a collision by
         // sending the collision node to the rubbish bin would delete the very

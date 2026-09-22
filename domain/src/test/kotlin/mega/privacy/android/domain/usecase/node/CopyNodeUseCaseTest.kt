@@ -45,7 +45,6 @@ class CopyNodeUseCaseTest {
         whenever(
             nodeRepository.copyNode(
                 nodeToCopy,
-                nodeToCopySerializedData = null,
                 newNodeParent = newNodeParent,
                 newNodeName = newNodeName
             )

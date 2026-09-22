@@ -818,7 +818,7 @@ internal class NodeRepositoryImplTest {
         val copiedNode = NodeId(3L)
         stubCopyNode(node, destination, MegaError.API_OK, copiedNode.longValue)
 
-        assertThat(underTest.copyNode(node, null, destination, null)).isEqualTo(copiedNode)
+        assertThat(underTest.copyNode(node, destination, null)).isEqualTo(copiedNode)
     }
 
     @ParameterizedTest(name = "when the SDK returns {0} and the target is foreign: {1}")
@@ -834,7 +834,7 @@ internal class NodeRepositoryImplTest {
         whenever(megaApiGateway.isForeignNode(destination.longValue)).thenReturn(isForeignTarget)
 
         val exception = assertThrows<Throwable> {
-            underTest.copyNode(node, null, destination, null)
+            underTest.copyNode(node, destination, null)
         }
 
         assertThat(exception).isInstanceOf(expected)

@@ -191,4 +191,22 @@ internal class MoveCollidedNodeUseCaseTest {
             assertThat(result.count).isEqualTo(1)
             assertThat(result.errorCount).isEqualTo(1)
         }
+
+    @Test
+    fun `test that invoke throws IllegalArgumentException when the collision is a chat collision`() =
+        runTest {
+            assertThrows<IllegalArgumentException> {
+                underTest(mock<NodeNameCollision.Chat>(), rename = false)
+            }
+            verifyNoInteractions(moveNodeUseCase, moveNodeToRubbishBinUseCase)
+        }
+
+    @Test
+    fun `test that invoke throws IllegalArgumentException when the collision is a file link collision`() =
+        runTest {
+            assertThrows<IllegalArgumentException> {
+                underTest(mock<NodeNameCollision.FileLink>(), rename = false)
+            }
+            verifyNoInteractions(moveNodeUseCase, moveNodeToRubbishBinUseCase)
+        }
 }

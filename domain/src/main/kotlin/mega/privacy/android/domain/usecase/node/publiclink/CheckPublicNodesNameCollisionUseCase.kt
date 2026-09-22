@@ -52,7 +52,6 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
                             currentNode = currentNode,
                             parent = parent,
                             conflictNode = conflictNode,
-                            type = type
                         )
                     )
                 } ?: run {
@@ -67,8 +66,7 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
         currentNode: UnTypedNode,
         parent: Node,
         conflictNode: UnTypedNode,
-        type: NodeNameCollisionType,
-    ) = NodeNameCollision.Default(
+    ) = NodeNameCollision.FileLink(
         collisionHandle = conflictNode.id.longValue,
         nodeHandle = currentNode.id.longValue,
         parentHandle = parent.id.longValue,
@@ -78,8 +76,9 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
         childFileCount = (parent as? FolderNode)?.childFileCount ?: 0,
         lastModified = if (currentNode is FileNode) currentNode.modificationTime else currentNode.creationTime,
         isFile = currentNode is FileNode,
-        serializedData = currentNode.serializedData,
-        type = type,
+        serializedData = requireNotNull(currentNode.serializedData) {
+            "Public node ${currentNode.id.longValue} has no serialized data and cannot be imported"
+        },
     )
 
     private suspend fun getParentOrRootNode(parentHandle: Long) =

@@ -24,7 +24,6 @@ class CopyNodeUseCase @Inject constructor(private val nodeRepository: NodeReposi
         newNodeName: String?,
     ) = nodeRepository.copyNode(
         nodeToCopy = nodeToCopy,
-        nodeToCopySerializedData = null,
         newNodeParent = newNodeParent,
         newNodeName = newNodeName,
     )

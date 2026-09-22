@@ -28,26 +28,40 @@ class CopyCollidedNodeUseCase @Inject constructor(
         nameCollision: NodeNameCollision,
         rename: Boolean,
     ): MoveRequestResult {
+        val newNodeParent = NodeId(nameCollision.parentHandle)
+        val newNodeName = if (rename) nameCollision.renameName else null
         try {
-            if (nameCollision is NodeNameCollision.Chat) {
-                val nodes = getChatFilesUseCase(
-                    nameCollision.chatId,
-                    nameCollision.messageId
-                )
-                val chatNode = nodes.firstOrNull { it.id.longValue == nameCollision.nodeHandle }
+            when (nameCollision) {
+                is NodeNameCollision.Chat -> {
+                    val nodes = getChatFilesUseCase(
+                        nameCollision.chatId,
+                        nameCollision.messageId
+                    )
+                    val chatNode = nodes.firstOrNull { it.id.longValue == nameCollision.nodeHandle }
 
-                requireNotNull(chatNode) { "Chat file not found" }
-                copyTypedNodeUseCase(
-                    nodeToCopy = chatNode,
-                    newNodeParent = NodeId(nameCollision.parentHandle),
-                    newNodeName = if (rename) nameCollision.renameName else null
-                )
-            } else {
-                nodeRepository.copyNode(
+                    requireNotNull(chatNode) { "Chat file not found" }
+                    copyTypedNodeUseCase(
+                        nodeToCopy = chatNode,
+                        newNodeParent = newNodeParent,
+                        newNodeName = newNodeName
+                    )
+                }
+
+                is NodeNameCollision.FileLink -> {
+                    val publicNode =
+                        nodeRepository.getNodeFromSerializedData(nameCollision.serializedData)
+                    requireNotNull(publicNode) { "Public node could not be deserialized" }
+                    nodeRepository.copyPublicNode(
+                        publicNodeToCopy = publicNode,
+                        newNodeParent = newNodeParent,
+                        newNodeName = newNodeName
+                    )
+                }
+
+                is NodeNameCollision.Default -> nodeRepository.copyNode(
                     nodeToCopy = NodeId(nameCollision.nodeHandle),
-                    nodeToCopySerializedData = nameCollision.serializedData,
-                    newNodeParent = NodeId(nameCollision.parentHandle),
-                    newNodeName = if (rename) nameCollision.renameName else null
+                    newNodeParent = newNodeParent,
+                    newNodeName = newNodeName
                 )
             }
             return MoveRequestResult.Copy(

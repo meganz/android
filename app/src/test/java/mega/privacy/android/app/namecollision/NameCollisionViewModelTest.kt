@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionResultUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionsResultUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.IsCopyToOriginUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.NodeCollisionsWithSize
 import mega.privacy.android.domain.usecase.node.namecollision.ReorderNodeNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.UpdateNodeNameCollisionsResultUseCase
@@ -74,6 +75,7 @@ internal class NameCollisionViewModelTest {
         mock()
     private val deleteCacheFilesUseCase = mock<DeleteCacheFilesUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
+    private val isCopyToOriginUseCase = mock<IsCopyToOriginUseCase>()
 
     private fun initUnderTest() {
         underTest = NameCollisionViewModel(
@@ -85,12 +87,11 @@ internal class NameCollisionViewModelTest {
             copyCollidedNodesUseCase = copyCollidedNodesUseCase,
             copyCollidedNodeUseCase = copyCollidedNodeUseCase,
             monitorUserUpdates = monitorUserUpdates,
-            getNodeByHandleUseCase = mock(),
+            isCopyToOriginUseCase = isCopyToOriginUseCase,
             setCopyLatestTargetPathUseCase = mock(),
             setMoveLatestTargetPathUseCase = mock(),
             copyRequestMessageMapper = copyRequestMessageMapper,
             nodeMoveRequestMessageMapper = mock(),
-            getNodeByFingerprintAndParentNodeUseCase = mock(),
             moveCollidedNodeUseCase = mock(),
             moveCollidedNodesUseCase = mock(),
             deleteCacheFilesUseCase = deleteCacheFilesUseCase,
@@ -108,6 +109,7 @@ internal class NameCollisionViewModelTest {
             monitorUserUpdates,
             deleteCacheFilesUseCase,
             getNodeAccessPermission,
+            isCopyToOriginUseCase,
         )
     }
 
@@ -596,5 +598,49 @@ internal class NameCollisionViewModelTest {
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
+
+    @ParameterizedTest(name = "isCopyToOriginUseCase returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isCopyToOrigin is set from isCopyToOriginUseCase when a file link collision is set`(
+        expected: Boolean,
+    ) = runTest {
+        val collision = mock<NodeNameCollision.FileLink>()
+        whenever(isCopyToOriginUseCase(collision)).thenReturn(expected)
+        whenever(getNodeNameCollisionResultUseCase(collision))
+            .thenReturn(NodeNameCollisionResult(nameCollision = collision))
+
+        initUnderTest()
+        underTest.setSingleData(collision)
+        advanceUntilIdle()
+
+        assertThat(underTest.isCopyToOrigin).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that isCopyToOrigin is false when isCopyToOriginUseCase throws`() = runTest {
+        val collision = mock<NodeNameCollision.Default>()
+        whenever(isCopyToOriginUseCase(collision)).thenThrow(RuntimeException())
+        whenever(getNodeNameCollisionResultUseCase(collision))
+            .thenReturn(NodeNameCollisionResult(nameCollision = collision))
+
+        initUnderTest()
+        underTest.setSingleData(collision)
+        advanceUntilIdle()
+
+        assertThat(underTest.isCopyToOrigin).isFalse()
+    }
+
+    @Test
+    fun `test that isCopyToOriginUseCase is not invoked when a chat collision is set`() = runTest {
+        val collision = mock<NodeNameCollision.Chat>()
+        whenever(getNodeNameCollisionResultUseCase(collision))
+            .thenReturn(NodeNameCollisionResult(nameCollision = collision))
+
+        initUnderTest()
+        underTest.setSingleData(collision)
+        advanceUntilIdle()
+
+        verifyNoInteractions(isCopyToOriginUseCase)
     }
 }

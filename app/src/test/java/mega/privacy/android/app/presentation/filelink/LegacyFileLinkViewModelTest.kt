@@ -326,7 +326,7 @@ class LegacyFileLinkViewModelTest {
 
     @Test
     fun `test that collision value is not null on importing node with same name `() = runTest {
-        val nodeNameCollision = mock<NodeNameCollision.Default> {
+        val nodeNameCollision = mock<NodeNameCollision.FileLink> {
             on { collisionHandle }.thenReturn(123)
             on { nodeHandle }.thenReturn(1234)
             on { name }.thenReturn("name")
