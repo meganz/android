@@ -4,6 +4,7 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
+    alias(convention.plugins.mega.android.managed.device)
     alias(plugin.plugins.kotlin.serialisation)
 }
 

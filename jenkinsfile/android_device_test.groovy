@@ -13,28 +13,44 @@
 BUILD_STEP = ''
 
 /**
- * Test task of the Gradle Managed Device defined in app/app.gradle.kts (testOptions.managedDevices).
+ * Modules whose instrumented tests this pipeline runs, in the order they run.
+ *
+ * Each entry carries the module's Gradle Managed Device test task and the two variant folders
+ * that task writes into: the JUnit XML results and the HTML report, each of which gets a
+ * per-device sub folder underneath. Everything the pipeline invokes, collects, publishes and
+ * reports is derived from this list, so covering another module is one more entry here.
  */
-DEVICE_TEST_GRADLE_TASK = ":app:ciPixelGmsDebugAndroidTest"
+DEVICE_TEST_MODULES = [
+        [
+                name   : "app",
+                task   : ":app:ciPixelGmsDebugAndroidTest",
+                results: "app/build/outputs/androidTest-results/managedDevice/debug/flavors/gms",
+                report : "app/build/reports/androidTests/managedDevice/debug/flavors/gms",
+        ],
+        [
+                name   : "data",
+                task   : ":data:ciPixelDebugAndroidTest",
+                results: "data/build/outputs/androidTest-results/managedDevice/debug",
+                report : "data/build/reports/androidTests/managedDevice/debug",
+        ],
+]
 
 /**
  * System image used by the managed device. Must match the device definition
- * (apiLevel / systemImageSource / ABI) in app/app.gradle.kts.
+ * (apiLevel / systemImageSource / ABI) in
+ * build-logic/convention/src/main/kotlin/mega/privacy/android/gradle/ManagedDevices.kt.
  */
 DEVICE_TEST_SYSTEM_IMAGE = "system-images;android-36;google_apis;arm64-v8a"
 
 /**
- * Folder holding the JUnit XML results of the managed device run.
+ * Folder the HTML reports and per-test logcat of every module are collected into, one sub folder
+ * per module, before being zipped. Modules produce identically named files, so they can only
+ * share one zip once each has its own folder.
  */
-DEVICE_TEST_RESULTS_FOLDER = "app/build/outputs/androidTest-results/managedDevice/debug/flavors/gms"
+DEVICE_TEST_REPORT_FOLDER = "device_test_report"
 
 /**
- * Folder holding the HTML report of the managed device run.
- */
-DEVICE_TEST_REPORT_FOLDER = "app/build/reports/androidTests/managedDevice/debug/flavors/gms"
-
-/**
- * Zip of the HTML test report and the per-test logcat, uploaded to Artifactory so it can be
+ * Zip of the HTML test reports and the per-test logcat, uploaded to Artifactory so it can be
  * downloaded from the MR or the Slack message.
  */
 DEVICE_TEST_REPORT_ZIP = "device_test_report.zip"
@@ -166,21 +182,21 @@ pipeline {
                         fi
                     """
 
-                    // --rerun forces test execution even when Gradle considers the task up-to-date
-                    sh "./gradlew --no-daemon ${DEVICE_TEST_GRADLE_TASK} --rerun"
+                    // --continue so that a failure in one module still runs and reports the rest
+                    sh "./gradlew --no-daemon --continue ${deviceTestGradleTasks()}"
                 }
             }
             // collect results even when tests fail, so Jenkins still shows the failure details
             post {
                 always {
-                    junit(testResults: "${DEVICE_TEST_RESULTS_FOLDER}/**/*.xml", allowEmptyResults: true)
-                    archiveArtifacts(artifacts: "${DEVICE_TEST_REPORT_FOLDER}/**", allowEmptyArchive: true)
-                    archiveArtifacts(artifacts: "${DEVICE_TEST_RESULTS_FOLDER}/**/logcat-*.txt", allowEmptyArchive: true)
+                    junit(testResults: deviceTestPaths("results", "/**/*.xml"), allowEmptyResults: true)
+                    archiveArtifacts(artifacts: deviceTestPaths("report", "/**"), allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: deviceTestPaths("results", "/**/logcat-*.txt"), allowEmptyArchive: true)
                     script {
                         try {
+                            stageDeviceTestReport()
                             if (fileExists(DEVICE_TEST_REPORT_FOLDER)) {
-                                sh "cd ${DEVICE_TEST_REPORT_FOLDER} && zip -qr ${WORKSPACE}/${DEVICE_TEST_REPORT_ZIP} ."
-                                stageDeviceTestLogcat()
+                                sh "cd ${WORKSPACE}/${DEVICE_TEST_REPORT_FOLDER} && zip -qr ${WORKSPACE}/${DEVICE_TEST_REPORT_ZIP} ."
                                 DEVICE_TEST_REPORT_LINK = common.uploadFileToArtifactory(artifactoryFolder(common), DEVICE_TEST_REPORT_ZIP)
                             }
                         } catch (Exception e) {
@@ -191,6 +207,32 @@ pipeline {
             }
         }
     }
+}
+
+/**
+ * The task arguments of the test run: every module's managed device task, each followed by its
+ * own `--rerun` so that Gradle executes it instead of considering a previous run up to date.
+ */
+private String deviceTestGradleTasks() {
+    String tasks = ""
+    for (int i = 0; i < DEVICE_TEST_MODULES.size(); i++) {
+        tasks += " ${DEVICE_TEST_MODULES[i].task} --rerun"
+    }
+    return tasks.trim()
+}
+
+/**
+ * One comma separated Ant pattern per module, for the steps that take a single pattern string.
+ *
+ * @param folder the module entry key of the folder to build the patterns from ("results" or "report")
+ * @param suffix appended to each module's folder to form that module's pattern
+ */
+private String deviceTestPaths(String folder, String suffix) {
+    List<String> patterns = []
+    for (int i = 0; i < DEVICE_TEST_MODULES.size(); i++) {
+        patterns.add("${DEVICE_TEST_MODULES[i][folder]}${suffix}")
+    }
+    return patterns.join(",")
 }
 
 /**
@@ -242,7 +284,7 @@ private String branchLines(String lineBreak) {
  */
 private String deviceTestFailureMessage(String lineBreak, String logFile, boolean slackFormat) {
     return ":x: Android Device Test Failed!(BuildNumber: ${env.BUILD_NUMBER}, Node: ${env.NODE_NAME})" +
-            "${lineBreak}Test Summary:\t${readDeviceTestSummary()}" +
+            "${lineBreak}Test Summary:${deviceTestSummaryLines(lineBreak)}" +
             "${lineBreak}Total Time:\t${buildDuration()}" +
             branchLines(lineBreak) +
             "${lineBreak}Author:\t${triggerAuthor()}" +
@@ -260,7 +302,7 @@ private String deviceTestFailureMessage(String lineBreak, String logFile, boolea
  */
 private String deviceTestSuccessMessage(String lineBreak, boolean slackFormat) {
     return ":white_check_mark: Android Device Test Passed!(BuildNumber: ${env.BUILD_NUMBER}, Node: ${env.NODE_NAME})" +
-            "${lineBreak}Test Summary:\t${readDeviceTestSummary()}" +
+            "${lineBreak}Test Summary:${deviceTestSummaryLines(lineBreak)}" +
             "${lineBreak}Total Time:\t${buildDuration()}" +
             branchLines(lineBreak) +
             "${lineBreak}Author:\t${triggerAuthor()}" +
@@ -296,14 +338,31 @@ private String deviceTestReportLine(String lineBreak, boolean slackFormat) {
 }
 
 /**
- * Read the executed/failed/skipped test counts from the managed device JUnit XML results.
+ * One indented summary line per module, so that a failure is attributed to the module it came
+ * from and a module whose run never produced results is visible rather than silently missing.
+ *
+ * @param lineBreak the line break used between the lines
+ */
+private String deviceTestSummaryLines(String lineBreak) {
+    String lines = ""
+    for (int i = 0; i < DEVICE_TEST_MODULES.size(); i++) {
+        def module = DEVICE_TEST_MODULES[i]
+        lines += "${lineBreak}\t${module.name}:\t${readDeviceTestSummary(module.results)}"
+    }
+    return lines
+}
+
+/**
+ * Read the executed/failed/skipped test counts from one module's managed device JUnit XML results.
+ *
+ * @param resultsFolder the module's results folder
  * @return summary line, e.g. "3 tests, 0 failures, 0 skipped", or "no test results found"
  */
-private String readDeviceTestSummary() {
+private String readDeviceTestSummary(String resultsFolder) {
     return sh(
             script: """
-                if ls ${DEVICE_TEST_RESULTS_FOLDER}/*/TEST-*.xml > /dev/null 2>&1; then
-                    grep -h '<testsuite ' ${DEVICE_TEST_RESULTS_FOLDER}/*/TEST-*.xml | \\
+                if ls ${resultsFolder}/*/TEST-*.xml > /dev/null 2>&1; then
+                    grep -h '<testsuite ' ${resultsFolder}/*/TEST-*.xml | \\
                         awk -F'"' '{ for (i = 1; i < NF; i++) {
                                 if (\$i ~ /tests=\$/) t += \$(i+1);
                                 if (\$i ~ / failures=\$/) f += \$(i+1);
@@ -319,18 +378,32 @@ private String readDeviceTestSummary() {
 }
 
 /**
- * Add the managed device's per-test logcat files to the uploaded test report zip.
+ * Collect every module's HTML report and per-test logcat into one folder to be zipped, each
+ * module under its own sub folder.
  *
  * A crash that kills the instrumentation process explains itself only in logcat; the HTML report
- * records that the run died but not why. The files are added under the device folder they were
- * produced in, so each one sits beside the HTML for the same run.
+ * records that the run died but not why. The logcat files are staged under the device folder they
+ * were produced in, which is the same folder name the HTML of that run sits in, so each one ends
+ * up beside its own report.
  */
-private void stageDeviceTestLogcat() {
-    sh """
-        if ls ${DEVICE_TEST_RESULTS_FOLDER}/*/logcat-*.txt > /dev/null 2>&1; then
-            cd ${DEVICE_TEST_RESULTS_FOLDER} && zip -qr ${WORKSPACE}/${DEVICE_TEST_REPORT_ZIP} . -i '*/logcat-*.txt'
-        else
-            echo "No device test logcat files to add to ${DEVICE_TEST_REPORT_ZIP}"
-        fi
-    """
+private void stageDeviceTestReport() {
+    sh("rm -rf ${WORKSPACE}/${DEVICE_TEST_REPORT_FOLDER} ${WORKSPACE}/${DEVICE_TEST_REPORT_ZIP}")
+    for (int i = 0; i < DEVICE_TEST_MODULES.size(); i++) {
+        def module = DEVICE_TEST_MODULES[i]
+        String staged = "${WORKSPACE}/${DEVICE_TEST_REPORT_FOLDER}/${module.name}"
+        sh """
+            if [ -d "${module.report}" ]; then
+                mkdir -p "${staged}"
+                cp -R ${module.report}/. "${staged}/"
+            else
+                echo "No device test report for ${module.name}"
+            fi
+            for logcat in ${module.results}/*/logcat-*.txt; do
+                [ -f "\$logcat" ] || continue
+                device=\$(basename \$(dirname "\$logcat"))
+                mkdir -p "${staged}/\$device"
+                cp "\$logcat" "${staged}/\$device/"
+            done
+        """
+    }
 }

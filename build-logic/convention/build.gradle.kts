@@ -36,6 +36,12 @@ gradlePlugin {
         }
     }
     plugins {
+        register("androidManagedDevice") {
+            id = "mega.android.managed.device"
+            implementationClass = "AndroidManagedDeviceConventionPlugin"
+        }
+    }
+    plugins {
         register("androidAccessibilityTest") {
             id = "mega.android.a11y.test"
             implementationClass = "AndroidAccessibilityTestConventionPlugin"

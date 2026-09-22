@@ -24,6 +24,7 @@ class AndroidAccessibilityTestConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply("mega.android.library")
             pluginManager.apply("mega.android.library.compose")
+            pluginManager.apply("mega.android.managed.device")
 
             configureAccessibilityTest(extensions.getByType<LibraryExtension>())
         }

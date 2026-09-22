@@ -10,14 +10,15 @@
 BUILD_STEP = ""
 
 /**
- * Test task of the Gradle Managed Device defined in a11y-test/a11y-test.gradle.kts
- * (testOptions.managedDevices).
+ * Test task of the Gradle Managed Device the mega.android.managed.device convention plugin gives
+ * every module it is applied to.
  */
 A11Y_TEST_GRADLE_TASK = ":a11y-test:ciPixelDebugAndroidTest"
 
 /**
  * System image used by the managed device. Must match the device definition
- * (apiLevel / systemImageSource / ABI) in a11y-test/a11y-test.gradle.kts.
+ * (apiLevel / systemImageSource / ABI) in
+ * build-logic/convention/src/main/kotlin/mega/privacy/android/gradle/ManagedDevices.kt.
  */
 A11Y_TEST_SYSTEM_IMAGE = "system-images;android-36;google_apis;arm64-v8a"
 

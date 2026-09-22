@@ -5,15 +5,6 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 /**
- * The managed device every accessibility check runs on, and the only definition of it.
- *
- * The checks measure rendered pixels and touch target sizes, so a run is only comparable to the
- * baseline it is judged against when the density, font scale and platform accessibility
- * behaviour are identical. Pinning one device for every module keeps the whole suite comparable.
- */
-internal const val ACCESSIBILITY_DEVICE_NAME = "ciPixel"
-
-/**
  * The per-module entry point CI and the root aggregate task call.
  */
 internal const val ACCESSIBILITY_CHECK_TASK_NAME = "accessibilityCheck"
@@ -33,15 +24,6 @@ internal fun Project.configureAccessibilityTest(commonExtension: CommonExtension
         defaultConfig.testInstrumentationRunnerArguments["useTestStorageService"] = "true"
         runMode.orNull?.let {
             defaultConfig.testInstrumentationRunnerArguments[ACCESSIBILITY_RUN_MODE_PROPERTY] = it
-        }
-
-        testOptions.managedDevices.localDevices.create(ACCESSIBILITY_DEVICE_NAME) {
-            device = "Pixel 10"
-            apiLevel = 36
-            systemImageSource = "google"
-            // Pinned so GMD never falls back to the x86_64 image on a mismatched host; CI runs
-            // this device on Apple Silicon agents only.
-            testedAbi = "arm64-v8a"
         }
     }
 
@@ -80,8 +62,8 @@ internal fun Project.configureAccessibilityTest(commonExtension: CommonExtension
     tasks.register(ACCESSIBILITY_CHECK_TASK_NAME) {
         group = "Verification"
         description =
-            "Runs this module's accessibility checks on the $ACCESSIBILITY_DEVICE_NAME managed device"
-        dependsOn("${ACCESSIBILITY_DEVICE_NAME}DebugAndroidTest")
+            "Runs this module's accessibility checks on the $CI_MANAGED_DEVICE_NAME managed device"
+        dependsOn("${CI_MANAGED_DEVICE_NAME}DebugAndroidTest")
     }
 }
 
