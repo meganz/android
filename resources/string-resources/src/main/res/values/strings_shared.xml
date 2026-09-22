@@ -2470,6 +2470,46 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">Incorrect password</string>
     <!-- Fast scroll thumb tooltip: line number at current position. %1$d is the 1-based line number -->
     <string name="text_editor_fast_scroll_line_tooltip">Line %1$d</string>
+    <!-- Content description for the bold button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_bold">Bold</string>
+    <!-- Content description for the italic button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_italic">Italic</string>
+    <!-- Content description for the underline button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_underline">Underline</string>
+    <!-- Content description for the strikethrough button in the rich text editor's formatting toolbar, which draws a line through the selected text -->
+    <string name="text_editor_format_strikethrough">Strikethrough</string>
+    <!-- Content description for the checklist button in the rich text editor's formatting toolbar, which turns the current line into a list of tickable items -->
+    <string name="text_editor_format_checklist">Checklist</string>
+    <!-- Content description for the bulleted list button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_bulleted_list">Bulleted list</string>
+    <!-- Content description for the numbered list button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_numbered_list">Numbered list</string>
+    <!-- Content description for the quote button in the rich text editor's formatting toolbar, which indents the current line as a quotation -->
+    <string name="text_editor_format_quote">Quote</string>
+    <!-- Content description for the code button in the rich text editor's formatting toolbar, which styles the selected text as a snippet of computer code -->
+    <string name="text_editor_format_code">Code</string>
+    <!-- Content description for the link button in the rich text editor's formatting toolbar, which opens the dialog for adding a web link -->
+    <string name="text_editor_format_link">Link</string>
+    <!-- Label of the text style chip in the rich text editor's formatting toolbar when the current line is ordinary paragraph text rather than a heading -->
+    <string name="text_editor_text_style_body">Body</string>
+    <!-- Label of the text style chip in the rich text editor's formatting toolbar when the current line is a heading. %1$d is the heading level, 1 being the largest -->
+    <string name="text_editor_text_style_heading">Heading %1$d</string>
+    <!-- Content description for the tick shown beside the option currently in use, in the rich text editor's text style and editing mode menus -->
+    <string name="text_editor_menu_option_selected">Selected</string>
+    <!-- Content description for the button in the text editor toolbar that opens the menu for choosing between plain text and rich text editing -->
+    <string name="text_editor_edit_mode_menu">Text editing mode</string>
+    <!-- Menu option in the text editor that switches to editing the file as plain text, showing the Markdown formatting characters -->
+    <string name="text_editor_edit_mode_plain_text">Plain text</string>
+    <!-- Menu option in the text editor that switches to editing the file as rich text, showing formatted text instead of Markdown formatting characters -->
+    <string name="text_editor_edit_mode_rich_text">Rich text</string>
+    <!-- Title of the dialog for adding a web link to the text being edited in the rich text editor -->
+    <string name="text_editor_link_dialog_title">Add link</string>
+    <!-- Label of the input field for the web address, in the rich text editor's add link dialog -->
+    <string name="text_editor_link_dialog_url_label">Link</string>
+    <!-- Label of the input field for the words the reader will see and tap, in the rich text editor's add link dialog -->
+    <string name="text_editor_link_dialog_text_label">Text</string>
+    <!-- Button in the rich text editor's add link dialog that turns an existing link back into ordinary text, keeping the words but dropping the web address -->
+    <string name="text_editor_link_dialog_remove">Remove link</string>
     <!-- Description of search empty view in select videos search screen-->
     <string name="select_videos_search_empty_view_description">Search videos in your Cloud drive</string>
     <!-- Bullet point shown when a folder link has been removed due to ToS violation -->

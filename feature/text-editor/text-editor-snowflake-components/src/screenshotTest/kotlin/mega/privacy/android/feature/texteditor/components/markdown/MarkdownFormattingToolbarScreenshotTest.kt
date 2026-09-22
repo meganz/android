@@ -1,6 +1,9 @@
 package mega.privacy.android.feature.texteditor.components.markdown
 
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.android.tools.screenshot.PreviewTest
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -43,6 +46,25 @@ class MarkdownFormattingToolbarScreenshotTest {
         }
     }
 
+    /**
+     * The actions that scroll off the right edge at phone width (quote, code, link), which the
+     * goldens above cut off. Over-wide on purpose: the preview canvas keeps the device width,
+     * so the row overflows and the capture lands on its trailing end.
+     */
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ToolbarTrailingActions() {
+        AndroidThemeForPreviews {
+            MarkdownFormattingToolbar(
+                formats = MarkdownSelectionFormats.Empty,
+                onAction = {},
+                onTextStyleSelected = {},
+                modifier = Modifier.requiredWidth(680.dp),
+            )
+        }
+    }
+
     @PreviewTest
     @CombinedThemePreviews
     @Composable
@@ -53,6 +75,23 @@ class MarkdownFormattingToolbarScreenshotTest {
                 url = "https://mega.io",
                 onLinkTextChanged = {},
                 onUrlChanged = {},
+            )
+        }
+    }
+
+    /** The whole dialog, including its title and the Remove link action. */
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun LinkDialogExistingLink() {
+        AndroidThemeForPreviews {
+            MarkdownLinkDialog(
+                initialText = "MEGA",
+                initialUrl = "https://mega.io",
+                showRemove = true,
+                onConfirm = { _, _ -> },
+                onRemove = {},
+                onDismiss = {},
             )
         }
     }

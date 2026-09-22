@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -52,6 +53,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.feature.texteditor.components.markdownHeadingStyle
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
 /** Formatting actions the toolbar can emit. [Link] opens the link dialog before any text edit. */
 enum class MarkdownFormatAction {
@@ -70,9 +72,6 @@ enum class MarkdownFormatAction {
 const val MARKDOWN_TOOLBAR_TAG = "markdown_formatting_toolbar"
 const val MARKDOWN_TEXT_STYLE_CHIP_TAG = "markdown_formatting_toolbar:text_style_chip"
 const val MARKDOWN_TEXT_STYLE_MENU_TAG = "markdown_formatting_toolbar:text_style_menu"
-
-// TODO Replace the hardcoded content descriptions with shared string resources and run the
-//  Weblate flow.
 
 fun markdownToolbarActionTag(action: MarkdownFormatAction): String =
     "markdown_formatting_toolbar:action_${action.name.lowercase()}"
@@ -123,7 +122,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.Bold,
                 icon = IconPack.Medium.Thin.Outline.TextBold,
-                contentDescription = "Bold",
+                contentDescription = stringResource(sharedR.string.text_editor_format_bold),
                 isActive = formats.isBold,
                 enabled = MarkdownFormatAction.Bold !in disabledActions,
                 onAction = onAction,
@@ -131,7 +130,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.Italic,
                 icon = IconPack.Medium.Thin.Outline.TextItalic,
-                contentDescription = "Italic",
+                contentDescription = stringResource(sharedR.string.text_editor_format_italic),
                 isActive = formats.isItalic,
                 enabled = MarkdownFormatAction.Italic !in disabledActions,
                 onAction = onAction,
@@ -139,7 +138,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.Underline,
                 icon = IconPack.Medium.Thin.Outline.TextUnderline,
-                contentDescription = "Underline",
+                contentDescription = stringResource(sharedR.string.text_editor_format_underline),
                 isActive = formats.isUnderline,
                 enabled = MarkdownFormatAction.Underline !in disabledActions,
                 onAction = onAction,
@@ -147,7 +146,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.Strikethrough,
                 icon = IconPack.Medium.Thin.Outline.TextStrikethrough,
-                contentDescription = "Strikethrough",
+                contentDescription = stringResource(sharedR.string.text_editor_format_strikethrough),
                 isActive = formats.isStrikethrough,
                 enabled = MarkdownFormatAction.Strikethrough !in disabledActions,
                 onAction = onAction,
@@ -155,7 +154,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.TaskList,
                 icon = IconPack.Medium.Thin.Outline.Checklist,
-                contentDescription = "Checklist",
+                contentDescription = stringResource(sharedR.string.text_editor_format_checklist),
                 isActive = formats.isTaskList,
                 enabled = MarkdownFormatAction.TaskList !in disabledActions,
                 onAction = onAction,
@@ -163,7 +162,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.BulletList,
                 icon = IconPack.Medium.Thin.Outline.ListSmall,
-                contentDescription = "Bulleted list",
+                contentDescription = stringResource(sharedR.string.text_editor_format_bulleted_list),
                 isActive = formats.isBulletList,
                 enabled = MarkdownFormatAction.BulletList !in disabledActions,
                 onAction = onAction,
@@ -171,7 +170,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.OrderedList,
                 icon = IconPack.Medium.Thin.Outline.ListNumbers,
-                contentDescription = "Numbered list",
+                contentDescription = stringResource(sharedR.string.text_editor_format_numbered_list),
                 isActive = formats.isOrderedList,
                 enabled = MarkdownFormatAction.OrderedList !in disabledActions,
                 onAction = onAction,
@@ -179,7 +178,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.Quote,
                 icon = IconPack.Medium.Thin.Outline.TextQuote,
-                contentDescription = "Quote",
+                contentDescription = stringResource(sharedR.string.text_editor_format_quote),
                 isActive = formats.isQuote,
                 enabled = MarkdownFormatAction.Quote !in disabledActions,
                 onAction = onAction,
@@ -187,7 +186,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.InlineCode,
                 icon = IconPack.Medium.Thin.Outline.Code,
-                contentDescription = "Code",
+                contentDescription = stringResource(sharedR.string.text_editor_format_code),
                 isActive = formats.isInlineCode,
                 enabled = MarkdownFormatAction.InlineCode !in disabledActions,
                 onAction = onAction,
@@ -195,7 +194,7 @@ fun MarkdownFormattingToolbar(
             ToolbarToggleButton(
                 action = MarkdownFormatAction.Link,
                 icon = IconPack.Medium.Thin.Outline.Url,
-                contentDescription = "Link",
+                contentDescription = stringResource(sharedR.string.text_editor_format_link),
                 isActive = formats.isLink,
                 enabled = MarkdownFormatAction.Link !in disabledActions,
                 onAction = onAction,
@@ -333,7 +332,7 @@ private fun TextStyleMenuItems(
                 if (level == headingLevel) {
                     Icon(
                         imageVector = IconPack.Medium.Thin.Outline.Check,
-                        contentDescription = "Selected",
+                        contentDescription = stringResource(sharedR.string.text_editor_menu_option_selected),
                         tint = DSTokens.colors.icon.primary,
                         modifier = Modifier.size(24.dp),
                     )
@@ -348,7 +347,12 @@ private fun TextStyleMenuItems(
     }
 }
 
-private fun textStyleLabel(level: Int?): String = if (level == null) "Body" else "Heading $level"
+@Composable
+private fun textStyleLabel(level: Int?): String = if (level == null) {
+    stringResource(sharedR.string.text_editor_text_style_body)
+} else {
+    stringResource(sharedR.string.text_editor_text_style_heading, level)
+}
 
 @Composable
 private fun ScrollEdgeShade(

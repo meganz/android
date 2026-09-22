@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -23,10 +24,9 @@ import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.android.core.ui.components.dialogs.HORIZONTAL
 import mega.android.core.ui.components.dialogs.VERTICAL
 import mega.android.core.ui.components.inputfields.TextInputField
+import mega.privacy.android.shared.resources.R as sharedR
 
 const val MARKDOWN_LINK_DIALOG_TAG = "markdown_link_dialog"
-
-// TODO Replace the hardcoded strings with shared string resources and run the Weblate flow.
 
 /**
  * Dialog for inserting or editing a Markdown link from the formatting toolbar. Pre-filled when
@@ -53,13 +53,25 @@ fun MarkdownLinkDialog(
     }
 
     BasicDialog(
-        title = "Add link",
+        title = stringResource(sharedR.string.text_editor_link_dialog_title),
         buttons = buildList {
-            if (showRemove) add(BasicDialogButton(text = "Remove link", onClick = onRemove))
-            add(BasicDialogButton(text = "Cancel", onClick = onDismiss))
+            if (showRemove) {
+                add(
+                    BasicDialogButton(
+                        text = stringResource(sharedR.string.text_editor_link_dialog_remove),
+                        onClick = onRemove,
+                    ),
+                )
+            }
             add(
                 BasicDialogButton(
-                    text = "Save",
+                    text = stringResource(sharedR.string.general_dialog_cancel_button),
+                    onClick = onDismiss,
+                ),
+            )
+            add(
+                BasicDialogButton(
+                    text = stringResource(sharedR.string.general_action_save),
                     onClick = { onConfirm(linkText, url) },
                     enabled = url.isNotBlank(),
                 ),
@@ -95,14 +107,14 @@ internal fun MarkdownLinkDialogContent(
         keyboardType = KeyboardType.Uri,
         imeAction = ImeAction.Next,
         text = url,
-        label = "Link",
+        label = stringResource(sharedR.string.text_editor_link_dialog_url_label),
         onValueChanged = onUrlChanged,
     )
     TextInputField(
         modifier = Modifier.fillMaxWidth(),
         keyboardType = KeyboardType.Text,
         text = linkText,
-        label = "Text",
+        label = stringResource(sharedR.string.text_editor_link_dialog_text_label),
         onValueChanged = onLinkTextChanged,
     )
 }

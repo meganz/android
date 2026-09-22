@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -22,10 +23,9 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
 const val MARKDOWN_EDIT_MODE_MENU_BUTTON_TAG = "markdown_edit_mode_menu:button"
-
-// TODO Replace the hardcoded strings with shared string resources and run the Weblate flow.
 
 /**
  * Top bar overflow that switches a Markdown file between plain (raw source) and rich text
@@ -47,7 +47,7 @@ fun MarkdownEditModeMenu(
             MegaIcon(
                 imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
                 tint = IconColor.Primary,
-                contentDescription = "Text editing mode",
+                contentDescription = stringResource(sharedR.string.text_editor_edit_mode_menu),
             )
         }
         // Material's menu rather than MegaDropDownMenu: that one pins the container shape,
@@ -58,16 +58,33 @@ fun MarkdownEditModeMenu(
             shape = DSTokens.shapes.medium,
             containerColor = DSTokens.colors.background.surface1,
         ) {
-            EditModeMenuItem(text = "Plain text", selected = !isRichText) {
-                expanded = false
-                onSelectRichText(false)
-            }
-            EditModeMenuItem(text = "Rich text", selected = isRichText) {
-                expanded = false
-                onSelectRichText(true)
-            }
+            MarkdownEditModeMenuContent(
+                isRichText = isRichText,
+                onSelectRichText = {
+                    expanded = false
+                    onSelectRichText(it)
+                },
+            )
         }
     }
+}
+
+/** The menu's rows, separate from the popup so a screenshot test can render them. */
+@Composable
+internal fun MarkdownEditModeMenuContent(
+    isRichText: Boolean,
+    onSelectRichText: (Boolean) -> Unit,
+) {
+    EditModeMenuItem(
+        text = stringResource(sharedR.string.text_editor_edit_mode_plain_text),
+        selected = !isRichText,
+        onClick = { onSelectRichText(false) },
+    )
+    EditModeMenuItem(
+        text = stringResource(sharedR.string.text_editor_edit_mode_rich_text),
+        selected = isRichText,
+        onClick = { onSelectRichText(true) },
+    )
 }
 
 @Composable
@@ -89,7 +106,7 @@ private fun EditModeMenuItem(
                 MegaIcon(
                     imageVector = IconPack.Medium.Thin.Outline.Check,
                     tint = IconColor.Primary,
-                    contentDescription = "Selected",
+                    contentDescription = stringResource(sharedR.string.text_editor_menu_option_selected),
                 )
             }
         },
