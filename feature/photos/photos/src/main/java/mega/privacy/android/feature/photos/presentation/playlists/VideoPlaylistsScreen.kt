@@ -28,6 +28,7 @@ import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -50,6 +51,8 @@ import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.MediaScreenCreateVideoPlaylistDialogConfirmedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenCreateVideoPlaylistDialogDismissedEvent
 
 @Composable
 fun VideoPlaylistsTabRoute(
@@ -197,10 +200,14 @@ internal fun VideoPlaylistsTabScreen(
                     title = stringResource(id = sharedR.string.video_section_playlists_create_playlist_dialog_title),
                     positiveButtonText = stringResource(id = sharedR.string.general_create_label),
                     onConfirm = { _, title ->
+                        Analytics.tracker.trackEvent(MediaScreenCreateVideoPlaylistDialogConfirmedEvent)
                         createVideoPlaylist(title)
                     },
                     resetErrorMessage = resetErrorMessage,
                     onDismiss = {
+                        // Covers the cancel button, the back key and tapping outside; the
+                        // confirm button must not also report it or one cancel counts twice.
+                        Analytics.tracker.trackEvent(MediaScreenCreateVideoPlaylistDialogDismissedEvent)
                         resetShowCreateVideoPlaylistDialog()
                     },
                     inputPlaceHolderText = {

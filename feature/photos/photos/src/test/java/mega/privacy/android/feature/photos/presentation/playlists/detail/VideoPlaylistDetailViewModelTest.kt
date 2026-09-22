@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
@@ -52,11 +53,15 @@ import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlayedFromPlaylistEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideosAddedToPlaylistEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideosRemovedFromPlaylistEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
@@ -158,6 +163,81 @@ class VideoPlaylistDetailViewModelTest {
             getFeatureFlagValueUseCase
         )
         sortOrderFlow.value = SortOrder.ORDER_DEFAULT_ASC
+    }
+
+    @Test
+    fun `test that playing a video from the playlist reports the played event`() = runTest {
+        stubInitialValues()
+        advanceUntilIdle()
+
+        underTest.onItemClicked(createVideoUiEntity(handle = 1L))
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events).contains(MediaScreenVideoPlayedFromPlaylistEvent)
+    }
+
+    @Test
+    fun `test that tapping a video in selection mode does not report the played event`() = runTest {
+        stubInitialValues()
+        advanceUntilIdle()
+        val video = createVideoUiEntity(handle = 1L, elementID = 10L)
+        underTest.onItemLongClicked(video)
+        advanceUntilIdle()
+
+        underTest.onItemClicked(video)
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events)
+            .doesNotContain(MediaScreenVideoPlayedFromPlaylistEvent)
+    }
+
+    @Test
+    fun `test that adding videos reports the added event once`() = runTest {
+        stubInitialValues()
+        whenever(addVideosToPlaylistUseCase(any(), any())).thenReturn(3)
+
+        underTest.addVideosToPlaylist(listOf(NodeId(1L), NodeId(2L), NodeId(3L)))
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events.count { it == MediaScreenVideosAddedToPlaylistEvent })
+            .isEqualTo(1)
+    }
+
+    @Test
+    fun `test that adding videos does not report the event when nothing was added`() = runTest {
+        stubInitialValues()
+        whenever(addVideosToPlaylistUseCase(any(), any())).thenReturn(0)
+
+        underTest.addVideosToPlaylist(listOf(NodeId(1L)))
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events)
+            .doesNotContain(MediaScreenVideosAddedToPlaylistEvent)
+    }
+
+    @Test
+    fun `test that removing videos does not report the event when nothing was removed`() = runTest {
+        stubInitialValues()
+        whenever(removeVideosFromPlaylistUseCase(any(), any())).thenReturn(0)
+
+        underTest.removeVideosFromPlaylist(listOf(10L))
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events)
+            .doesNotContain(MediaScreenVideosRemovedFromPlaylistEvent)
+    }
+
+    @Test
+    fun `test that removing videos reports the removed event once`() = runTest {
+        stubInitialValues()
+        whenever(removeVideosFromPlaylistUseCase(any(), any())).thenReturn(2)
+
+        underTest.removeVideosFromPlaylist(listOf(10L, 20L))
+        advanceUntilIdle()
+
+        assertThat(
+            analyticsExtension.events.count { it == MediaScreenVideosRemovedFromPlaylistEvent }
+        ).isEqualTo(1)
     }
 
     @Test
@@ -1098,4 +1178,10 @@ class VideoPlaylistDetailViewModelTest {
         watchedTimestamp = 0L,
         collectionTitle = null,
     )
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+    }
 }

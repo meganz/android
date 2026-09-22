@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -34,11 +35,13 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.mapper.SelectVideoItemUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
+import mega.privacy.mobile.analytics.event.MediaScreenVideosAddedToPlaylistEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
@@ -191,6 +194,17 @@ class SelectVideosForPlaylistViewModelTest {
             addVideosToPlaylistUseCase = addVideosToPlaylistUseCase,
             args = args,
         )
+    }
+
+    @Test
+    fun `test that adding videos reports the added event once`() = runTest {
+        whenever(addVideosToPlaylistUseCase(any(), any())).thenReturn(2)
+
+        underTest.addVideosToPlaylist(videoIDs = listOf(NodeId(1L), NodeId(2L)))
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events.count { it == MediaScreenVideosAddedToPlaylistEvent })
+            .isEqualTo(1)
     }
 
     @Test
@@ -657,4 +671,10 @@ class SelectVideosForPlaylistViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+    }
 }

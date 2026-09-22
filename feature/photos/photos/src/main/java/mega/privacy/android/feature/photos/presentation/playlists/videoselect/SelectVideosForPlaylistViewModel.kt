@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -46,6 +47,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.videoselect.mo
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.mobile.analytics.event.MediaScreenVideosAddedToPlaylistEvent
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -239,6 +241,9 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
             runCatching {
                 addVideosToPlaylistUseCase(playlistID, videoIDs)
             }.onSuccess { numberOfAddedVideos ->
+                if (numberOfAddedVideos > 0) {
+                    Analytics.tracker.trackEvent(MediaScreenVideosAddedToPlaylistEvent)
+                }
                 numberOfAddedVideosEvent.update {
                     triggered(numberOfAddedVideos)
                 }

@@ -56,6 +56,9 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistDeletedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistRenamedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistsBulkDeletedEvent
 import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import kotlin.time.Duration.Companion.minutes
 
@@ -129,6 +132,61 @@ class VideoPlaylistsTabViewModelTest {
             createVideoPlaylistUseCase,
             getNextDefaultAlbumNameUseCase
         )
+    }
+
+    @Test
+    fun `test that deleting one playlist reports the single delete event`() = runTest {
+        stubInitialValues()
+        val playlist = expectedPlaylist
+        whenever(removeVideoPlaylistsUseCase(any())).thenReturn(listOf(playlist.id.longValue))
+
+        underTest.removeVideoPlaylists(setOf(playlist))
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events).contains(MediaScreenVideoPlaylistDeletedEvent)
+        assertThat(analyticsExtension.events)
+            .doesNotContain(MediaScreenVideoPlaylistsBulkDeletedEvent)
+    }
+
+    @Test
+    fun `test that deleting several playlists reports the bulk delete event once`() = runTest {
+        stubInitialValues()
+        val first = expectedPlaylist
+        val second = expectedPlaylist.copy(id = NodeId(999L), title = "Second")
+        whenever(removeVideoPlaylistsUseCase(any()))
+            .thenReturn(listOf(first.id.longValue, second.id.longValue))
+
+        underTest.removeVideoPlaylists(setOf(first, second))
+        advanceUntilIdle()
+
+        assertThat(
+            analyticsExtension.events.count { it == MediaScreenVideoPlaylistsBulkDeletedEvent }
+        ).isEqualTo(1)
+        assertThat(analyticsExtension.events).doesNotContain(MediaScreenVideoPlaylistDeletedEvent)
+    }
+
+    @Test
+    fun `test that deleting reports nothing when no playlist was removed`() = runTest {
+        stubInitialValues()
+        whenever(removeVideoPlaylistsUseCase(any())).thenReturn(emptyList())
+
+        underTest.removeVideoPlaylists(setOf(expectedPlaylist))
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events).doesNotContain(MediaScreenVideoPlaylistDeletedEvent)
+        assertThat(analyticsExtension.events)
+            .doesNotContain(MediaScreenVideoPlaylistsBulkDeletedEvent)
+    }
+
+    @Test
+    fun `test that renaming a playlist reports the renamed event`() = runTest {
+        stubInitialValues()
+        whenever(updateVideoPlaylistTitleUseCase(any(), any())).thenReturn("Renamed")
+
+        underTest.updateVideoPlaylistTitle(NodeId(1L), "Renamed")
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events).contains(MediaScreenVideoPlaylistRenamedEvent)
     }
 
     @Test

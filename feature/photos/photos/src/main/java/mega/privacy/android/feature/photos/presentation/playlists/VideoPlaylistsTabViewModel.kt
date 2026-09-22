@@ -46,6 +46,9 @@ import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationEr
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistDeletedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistRenamedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistsBulkDeletedEvent
 import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import timber.log.Timber
 import javax.inject.Inject
@@ -209,6 +212,12 @@ class VideoPlaylistsTabViewModel @Inject constructor(
                 val ids = deletedItems.map { it.id }
                 removeVideoPlaylistsUseCase(ids)
             }.onSuccess { deletedPlaylistIDs ->
+                if (deletedPlaylistIDs.isNotEmpty()) {
+                    Analytics.tracker.trackEvent(
+                        if (deletedItems.size == 1) MediaScreenVideoPlaylistDeletedEvent
+                        else MediaScreenVideoPlaylistsBulkDeletedEvent
+                    )
+                }
                 optimisticallyRemovedIds.update { current ->
                     current + deletedPlaylistIDs.map { NodeId(it) }.toSet()
                 }
@@ -250,6 +259,7 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             runCatching {
                 updateVideoPlaylistTitleUseCase(playlistID, title)
             }.onSuccess { title ->
+                Analytics.tracker.trackEvent(MediaScreenVideoPlaylistRenamedEvent)
                 Timber.d("Updated video playlist title: $title")
                 videoPlaylistEditState.update { it.copy(updateTitleSuccessEvent = triggered) }
             }.onFailure { exception ->

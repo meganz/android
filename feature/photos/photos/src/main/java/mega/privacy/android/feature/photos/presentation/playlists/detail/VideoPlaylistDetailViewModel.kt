@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -61,6 +62,12 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlayedFromPlaylistEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistDeletedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistRenamedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistsBulkDeletedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideosAddedToPlaylistEvent
+import mega.privacy.mobile.analytics.event.MediaScreenVideosRemovedFromPlaylistEvent
 import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -196,6 +203,7 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
             runCatching {
                 updateVideoPlaylistTitleUseCase(playlistID, title)
             }.onSuccess { title ->
+                Analytics.tracker.trackEvent(MediaScreenVideoPlaylistRenamedEvent)
                 Timber.d("Updated video playlist title: $title")
                 videoPlaylistEditState.update { it.copy(updateTitleSuccessEvent = triggered) }
             }.onFailure { exception ->
@@ -250,6 +258,12 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
                 val ids = deletedItems.map { it.id }
                 removeVideoPlaylistsUseCase(ids)
             }.onSuccess { deletedPlaylistIDs ->
+                if (deletedPlaylistIDs.isNotEmpty()) {
+                    Analytics.tracker.trackEvent(
+                        if (deletedItems.size == 1) MediaScreenVideoPlaylistDeletedEvent
+                        else MediaScreenVideoPlaylistsBulkDeletedEvent
+                    )
+                }
                 val deletedTitlesById = deletedItems.associate {
                     it.id.longValue to it.title
                 }
@@ -279,6 +293,7 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
         if (selectedVideoIdsFlow.value.isNotEmpty()) {
             toggleItemSelection(item)
         } else {
+            Analytics.tracker.trackEvent(MediaScreenVideoPlayedFromPlaylistEvent)
             navigateToVideoPlayer(item)
         }
     }
@@ -346,6 +361,9 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
             runCatching {
                 removeVideosFromPlaylistUseCase(NodeId(handle), videoElementIDs)
             }.onSuccess { numberOfRemovedItems ->
+                if (numberOfRemovedItems > 0) {
+                    Analytics.tracker.trackEvent(MediaScreenVideosRemovedFromPlaylistEvent)
+                }
                 videoPlaylistEditState.update {
                     it.copy(
                         numberOfRemovedVideosEvent = triggered(numberOfRemovedItems)
@@ -372,6 +390,9 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
             runCatching {
                 addVideosToPlaylistUseCase(NodeId(handle), videoIDs)
             }.onSuccess { numberOfAddedVideos ->
+                if (numberOfAddedVideos > 0) {
+                    Analytics.tracker.trackEvent(MediaScreenVideosAddedToPlaylistEvent)
+                }
                 videoPlaylistEditState.update {
                     it.copy(
                         numberOfAddedVideosEvent = triggered(numberOfAddedVideos)
