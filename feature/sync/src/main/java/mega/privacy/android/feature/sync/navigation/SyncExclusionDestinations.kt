@@ -30,9 +30,10 @@ data class ManageSyncExclusionsNavKey(
 /**
  * Full-screen destination for authoring a new sync exclusion rule.
  *
- * The destination persists the rule itself before it returns, so nothing about the rule travels
- * back: [RESULT] carries only the confirmation the exclusions list puts in a snackbar, already
- * localised by the destination, and the list rereads the file to pick the rule up.
+ * The destination writes nothing itself: [RESULT] carries the rules or the bounds the user
+ * authored, and the exclusions list stages them into the file it holds, to be written on its own
+ * save. The rules travel back because the list never rereads the file — a reread would take the
+ * file as it was before the edits it is staging.
  *
  * @param syncId id of the sync the rule belongs to, or null while the rule is staged during setup,
  * before a folder pair exists.
@@ -43,12 +44,12 @@ data class AddSyncExclusionRuleNavKey(
 ) : NavKey {
     companion object {
         /**
-         * Result key for the confirmation of the rule that was added.
+         * Result key for what the user authored.
          *
          * Returning a result pops this destination on its own, so a destination that also removes
          * itself takes the exclusions list down with it. The result then stays put until it is
-         * cleared, so the list has to clear it as it shows the confirmation; left in place, it is
-         * replayed to the next collector and confirms a rule the user only cancelled.
+         * cleared, so the list has to clear it as it stages the change; left in place, it is
+         * replayed to the next collector and adds a rule the user only cancelled.
          */
         const val RESULT = "AddSyncExclusionRuleNavKey::result"
     }
@@ -78,6 +79,11 @@ data class EditSyncExclusionRuleNavKey(
 ) : NavKey {
     override fun toString() = "EditSyncExclusionRuleNavKey(ruleIndex=$ruleIndex, " +
             "matchType=${rule.matchType}, target=${rule.target}, syncId=$syncId)"
+
+    companion object {
+        /** Result key for the change, or the deletion, the user asked for. */
+        const val RESULT = "EditSyncExclusionRuleNavKey::result"
+    }
 }
 
 /**
@@ -96,16 +102,20 @@ data class EditSyncExclusionRuleNavKey(
 data class EditSyncSizeExclusionNavKey(
     val exclusion: SyncSizeExclusion,
     val syncId: Long? = null,
-) : NavKey
+) : NavKey {
+    companion object {
+        /** Result key for the bounds the file should end up declaring, which the trash empties. */
+        const val RESULT = "EditSyncSizeExclusionNavKey::result"
+    }
+}
 
 /**
  * Registers the exclusion destinations.
  *
- * The Manage destination writes: its save hands the staged file to the repository and the sync
- * rescans. The Add, Edit and size destinations still only close, and nothing carries their result
- * back to the Manage screen, so a rule authored there is discarded when the screen closes. The
- * Manage screen reaches them all, so that gap is now reachable by a user rather than merely
- * latent; it is the whole of SAT-2470.
+ * Only the Manage destination writes: its save hands the staged file to the repository and the
+ * sync rescans. The Add, Edit and size destinations hand back what the user authored, which the
+ * Manage screen stages alongside its own edits, so a single save covers a whole visit however many
+ * screens it passed through.
  */
 fun EntryProviderScope<NavKey>.syncExclusionScreens(
     navigationHandler: NavigationHandler,
@@ -114,6 +124,8 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
         ManageSyncExclusionsRoute(
             syncId = navKey.syncId,
             localRoot = navKey.localRoot,
+            monitorResult = navigationHandler::monitorResult,
+            clearResult = navigationHandler::clearResult,
             onFinished = { navigationHandler.back() },
             onAddExclusion = { syncId ->
                 navigationHandler.navigate(AddSyncExclusionRuleNavKey(syncId))
@@ -135,9 +147,12 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
         )
     }
 
+    // returning a result pops the destination itself, so none of these also asks to go back
     entry<AddSyncExclusionRuleNavKey> {
         AddSyncExclusionRuleRoute(
-            onConfirm = { navigationHandler.back() },
+            onConfirm = {
+                navigationHandler.returnResult(AddSyncExclusionRuleNavKey.RESULT, it)
+            },
             onDismiss = { navigationHandler.back() },
         )
     }
@@ -145,8 +160,18 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
     entry<EditSyncExclusionRuleNavKey> { navKey ->
         EditSyncExclusionRuleRoute(
             rule = navKey.rule,
-            onDelete = { navigationHandler.back() },
-            onSave = { navigationHandler.back() },
+            onDelete = {
+                navigationHandler.returnResult(
+                    EditSyncExclusionRuleNavKey.RESULT,
+                    EditSyncExclusionRuleResult.Deleted(navKey.ruleIndex, navKey.rule),
+                )
+            },
+            onSave = { edit ->
+                navigationHandler.returnResult(
+                    EditSyncExclusionRuleNavKey.RESULT,
+                    EditSyncExclusionRuleResult.Saved(navKey.ruleIndex, navKey.rule, edit),
+                )
+            },
             onDismiss = { navigationHandler.back() },
         )
     }
@@ -154,8 +179,18 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
     entry<EditSyncSizeExclusionNavKey> { navKey ->
         EditSyncSizeExclusionRoute(
             exclusion = navKey.exclusion,
-            onDelete = { navigationHandler.back() },
-            onSave = { navigationHandler.back() },
+            onDelete = {
+                navigationHandler.returnResult(
+                    EditSyncSizeExclusionNavKey.RESULT,
+                    EditSyncSizeExclusionResult(SyncSizeExclusion()),
+                )
+            },
+            onSave = { bounds ->
+                navigationHandler.returnResult(
+                    EditSyncSizeExclusionNavKey.RESULT,
+                    EditSyncSizeExclusionResult(bounds),
+                )
+            },
             onDismiss = { navigationHandler.back() },
         )
     }

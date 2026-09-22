@@ -5,16 +5,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.feature.sync.navigation.AddSyncExclusionResult
 
 /**
  * Binds [AddSyncExclusionRuleScreen] to the drafts the view model holds.
  *
- * @param onConfirm invoked when the user accepts the rule they have built
+ * @param onConfirm invoked with what the user accepted, for the exclusions list to stage. The
+ * control is offered only while the drafts hold something that can be added, and a draft that does
+ * not falls back to [onDismiss]
  * @param onDismiss invoked when the user closes or cancels, discarding every draft
  */
 @Composable
 internal fun AddSyncExclusionRuleRoute(
-    onConfirm: () -> Unit,
+    onConfirm: (AddSyncExclusionResult) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AddSyncExclusionRuleViewModel = hiltViewModel(),
@@ -33,7 +36,10 @@ internal fun AddSyncExclusionRuleRoute(
         onFirstBoundUnitSelected = viewModel::onFirstBoundUnitSelected,
         onSecondBoundValueChanged = viewModel::onSecondBoundValueChanged,
         onSecondBoundUnitSelected = viewModel::onSecondBoundUnitSelected,
-        onConfirm = onConfirm,
+        onConfirm = {
+            val result = viewModel.buildResult()
+            if (result == null) onDismiss() else onConfirm(result)
+        },
         onDismiss = onDismiss,
         modifier = modifier,
     )

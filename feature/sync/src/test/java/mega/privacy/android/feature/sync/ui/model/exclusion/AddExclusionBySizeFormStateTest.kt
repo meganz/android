@@ -211,56 +211,23 @@ internal class AddExclusionBySizeFormStateTest {
         assertThat(underTest.showsRangeError).isFalse()
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = ["0", "abc", "9999999999"])
-    fun `test that hasUnusableBound reports a bound typed as something that is not a size`(
-        value: String,
-    ) {
-        val underTest = AddExclusionBySizeFormState(
-            condition = SyncSizeCondition.BiggerThan,
-            firstBound = SyncSizeBoundInput(value = value, unit = SyncSizeUnit.Gigabytes),
-        )
-
-        assertThat(underTest.hasUnusableBound).isTrue()
-    }
-
     @Test
-    fun `test that hasUnusableBound ignores a bound that has not been typed yet`() {
-        val underTest = AddExclusionBySizeFormState(condition = SyncSizeCondition.NotBetween)
-
-        assertThat(underTest.hasUnusableBound).isFalse()
-    }
-
-    @Test
-    fun `test that hasUnusableBound ignores the second bound of a single bound condition`() {
-        val underTest = AddExclusionBySizeFormState(
-            condition = SyncSizeCondition.BiggerThan,
-            firstBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Gigabytes),
-            secondBound = SyncSizeBoundInput(value = "0", unit = SyncSizeUnit.Bytes),
-        )
-
-        assertThat(underTest.hasUnusableBound).isFalse()
-    }
-
-    @Test
-    fun `test that a bound too large to hold is unusable rather than out of order`() {
+    fun `test that showsRangeError stays quiet when the second bound is too large to hold`() {
         val underTest = range(
             first = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Bytes),
             second = SyncSizeBoundInput(value = "9999999999", unit = SyncSizeUnit.Gigabytes),
         )
 
-        assertThat(underTest.hasUnusableBound).isTrue()
         assertThat(underTest.showsRangeError).isFalse()
     }
 
     @Test
-    fun `test that a zero bound is unusable rather than out of order`() {
+    fun `test that showsRangeError stays quiet when a bound is zero`() {
         val underTest = range(
             first = SyncSizeBoundInput(value = "5", unit = SyncSizeUnit.Gigabytes),
             second = SyncSizeBoundInput(value = "0", unit = SyncSizeUnit.Bytes),
         )
 
-        assertThat(underTest.hasUnusableBound).isTrue()
         assertThat(underTest.showsRangeError).isFalse()
     }
 

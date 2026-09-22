@@ -31,6 +31,7 @@ import mega.privacy.android.feature.sync.domain.usecase.exclusion.RestoreDefault
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.SetSyncExclusionsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.SetSyncSizeBoundsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.navigation.AddSyncExclusionResult
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionChipMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionRowMapper
 import mega.privacy.android.feature.sync.ui.model.exclusion.ManageSyncExclusionsUiState
@@ -107,6 +108,28 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
 
     fun onRuleAdded(rule: SyncExclusionRule) {
         stage { addSyncExclusionUseCase(it, rule) }
+    }
+
+    /**
+     * Stages what the Add exclusion screen authored, and confirms it only once something has been
+     * staged: a refused change or a file that was never read leaves the user nothing to have added.
+     *
+     * Bounds arrive over the file's own rather than replacing the pair, because the Add screen
+     * states one direction at a time and is never prefilled: taking it whole would clear the
+     * opposite bound the file already held, which the user never asked for and would not see.
+     */
+    fun onExclusionAdded(result: AddSyncExclusionResult) {
+        val staged = when (result) {
+            is AddSyncExclusionResult.Rules -> result.rules
+                .map { rule -> stage { addSyncExclusionUseCase(it, rule) } }
+                .any { it }
+
+            is AddSyncExclusionResult.SizeBounds ->
+                stageResult { setSyncSizeBoundsUseCase(it, it.size.with(result.bounds)) }
+        }
+        if (staged) {
+            uiState.update { it.copy(exclusionAddedEvent = triggered) }
+        }
     }
 
     fun onRuleEdited(ruleIndex: Int, expected: SyncExclusionRule, edit: SyncExclusionEdit) {
@@ -194,6 +217,10 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
         uiState.update { it.copy(defaultsRestoredEvent = consumed) }
     }
 
+    fun onExclusionAddedShown() {
+        uiState.update { it.copy(exclusionAddedEvent = consumed) }
+    }
+
     private fun load() {
         uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
@@ -250,14 +277,21 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
         return true
     }
 
-    private fun stageResult(transform: (ParsedMegaIgnore) -> Result<ParsedMegaIgnore>) {
-        val current = uiState.value.staged ?: return
-        transform(current)
+    /**
+     * Applies a [transform] that can refuse, reporting whether it went through. A refusal is
+     * reported to the user instead of being staged.
+     */
+    private fun stageResult(
+        transform: (ParsedMegaIgnore) -> Result<ParsedMegaIgnore>,
+    ): Boolean {
+        val current = uiState.value.staged ?: return false
+        return transform(current)
             .onSuccess { staged -> uiState.update { it.copy(staged = staged) } }
             .onFailure { error ->
                 val refusal = error as? SyncExclusionEditError ?: throw error
                 uiState.update { it.copy(editErrorEvent = triggered(refusal)) }
             }
+            .isSuccess
     }
 
     @AssistedFactory
@@ -280,3 +314,13 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
         val localRoot: UriPath,
     )
 }
+
+/**
+ * These bounds with each of [stated] that is declared put over them, leaving the rest as they are.
+ *
+ * A caller that states both replaces the pair outright, which is what picking a range does.
+ */
+private fun SyncSizeExclusion.with(stated: SyncSizeExclusion) = SyncSizeExclusion(
+    excludeSmallerThanBytes = stated.excludeSmallerThanBytes ?: excludeSmallerThanBytes,
+    excludeLargerThanBytes = stated.excludeLargerThanBytes ?: excludeLargerThanBytes,
+)

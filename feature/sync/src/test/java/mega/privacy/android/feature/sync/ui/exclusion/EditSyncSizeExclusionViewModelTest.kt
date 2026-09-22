@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncSizeExclusionFormMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncSizeExclusionPrefillMapper
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeUnit
@@ -19,6 +20,7 @@ internal class EditSyncSizeExclusionViewModelTest {
     private fun underTest(exclusion: SyncSizeExclusion) = EditSyncSizeExclusionViewModel(
         exclusion = exclusion,
         prefillMapper = SyncSizeExclusionPrefillMapper(),
+        formMapper = SyncSizeExclusionFormMapper(),
     )
 
     @Test
@@ -33,7 +35,7 @@ internal class EditSyncSizeExclusionViewModelTest {
             assertThat(initial.bySize.condition).isEqualTo(SyncSizeCondition.BiggerThan)
             assertThat(initial.bySize.firstBound.value).isEqualTo("100")
             assertThat(initial.bySize.firstBound.unit).isEqualTo(SyncSizeUnit.Megabytes)
-            assertThat(initial.showsBlockingError).isFalse()
+            assertThat(initial.canSave).isTrue()
         }
     }
 
@@ -45,7 +47,41 @@ internal class EditSyncSizeExclusionViewModelTest {
             val initial = awaitItem()
 
             assertThat(initial.bySize.condition).isNull()
-            assertThat(initial.showsBlockingError).isFalse()
+            assertThat(initial.canSave).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canSave stays false while a range is missing its second bound`() = runTest {
+        val viewModel = underTest(SyncSizeExclusion())
+
+        viewModel.uiState.test {
+            assertThat(awaitItem().canSave).isFalse()
+
+            viewModel.onConditionSelected(SyncSizeCondition.NotBetween)
+
+            assertThat(awaitItem().canSave).isFalse()
+
+            viewModel.onFirstBoundValueChanged("1")
+
+            assertThat(awaitItem().canSave).isFalse()
+
+            viewModel.onSecondBoundValueChanged("2")
+
+            assertThat(awaitItem().canSave).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that canSave turns false when a bound is not a size a rule can use`() = runTest {
+        val viewModel = underTest(SyncSizeExclusion(excludeLargerThanBytes = 1024))
+
+        viewModel.uiState.test {
+            assertThat(awaitItem().canSave).isTrue()
+
+            viewModel.onFirstBoundValueChanged("0")
+
+            assertThat(awaitItem().canSave).isFalse()
         }
     }
 
@@ -56,7 +92,28 @@ internal class EditSyncSizeExclusionViewModelTest {
         )
 
         viewModel.uiState.test {
-            assertThat(awaitItem().showsBlockingError).isTrue()
+            assertThat(awaitItem().canSave).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canSave stays false while a range names the same size twice`() = runTest {
+        val viewModel = underTest(SyncSizeExclusion())
+
+        viewModel.uiState.test {
+            awaitItem()
+
+            viewModel.onConditionSelected(SyncSizeCondition.NotBetween)
+            viewModel.onFirstBoundValueChanged("1024")
+            viewModel.onFirstBoundUnitSelected(SyncSizeUnit.Bytes)
+            viewModel.onSecondBoundValueChanged("1")
+            viewModel.onSecondBoundUnitSelected(SyncSizeUnit.Kilobytes)
+
+            assertThat(expectMostRecentItem().canSave).isFalse()
+
+            viewModel.onSecondBoundUnitSelected(SyncSizeUnit.Megabytes)
+
+            assertThat(awaitItem().canSave).isTrue()
         }
     }
 
@@ -135,13 +192,13 @@ internal class EditSyncSizeExclusionViewModelTest {
         )
 
         viewModel.uiState.test {
-            assertThat(awaitItem().showsBlockingError).isFalse()
+            assertThat(awaitItem().canSave).isTrue()
 
             viewModel.onSecondBoundValueChanged("1")
             viewModel.onSecondBoundUnitSelected(SyncSizeUnit.Bytes)
 
             awaitItem()
-            assertThat(awaitItem().showsBlockingError).isTrue()
+            assertThat(awaitItem().canSave).isFalse()
         }
     }
 }

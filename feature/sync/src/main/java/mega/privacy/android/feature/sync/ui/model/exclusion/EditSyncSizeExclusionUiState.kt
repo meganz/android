@@ -5,15 +5,11 @@ package mega.privacy.android.feature.sync.ui.model.exclusion
  *
  * The bounds belong to the file rather than to a rule, so unlike the by-name screen there is
  * nothing here identifying which entry is being edited.
+ *
+ * @property canSave whether the form declares bounds the file could hold. Read from the mapper that
+ * builds them rather than judged here, so a save cannot close the screen having staged nothing
  */
 internal data class EditSyncSizeExclusionUiState(
     val bySize: AddExclusionBySizeFormState = AddExclusionBySizeFormState(),
-) {
-
-    /**
-     * Whether the form is holding bounds that cannot be saved. The primary button stays enabled
-     * and refuses the tap, rather than going grey, matching the Add screen.
-     */
-    val showsBlockingError: Boolean
-        get() = bySize.showsRangeError || bySize.hasUnusableBound
-}
+    val canSave: Boolean = false,
+)

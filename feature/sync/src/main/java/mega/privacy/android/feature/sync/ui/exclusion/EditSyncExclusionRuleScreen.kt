@@ -31,6 +31,7 @@ internal fun EditSyncExclusionRuleScreen(
     modifier: Modifier = Modifier,
 ) {
     EditExclusionScaffold(
+        canSave = uiState.canSave,
         onDelete = onDelete,
         onSave = onSave,
         onDismiss = onDismiss,
@@ -66,6 +67,7 @@ private class EditSyncExclusionRuleUiStateProvider :
                 condition = SyncExclusionCondition.EndingWith,
                 value = "tmp",
             ),
+            canSave = true,
         ),
         EditSyncExclusionRuleUiState(
             byName = AddExclusionByNameFormState(
@@ -73,6 +75,7 @@ private class EditSyncExclusionRuleUiStateProvider :
                 condition = SyncExclusionCondition.MatchingWildcard,
                 value = "draft?.*",
             ),
+            canSave = true,
         ),
     )
 }

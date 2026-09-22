@@ -30,6 +30,7 @@ class EditSyncSizeExclusionScreenScreenshotTest {
                             unit = SyncSizeUnit.Megabytes,
                         ),
                     ),
+                    canSave = true,
                 )
             )
         }
@@ -50,6 +51,7 @@ class EditSyncSizeExclusionScreenScreenshotTest {
                             unit = SyncSizeUnit.Gigabytes,
                         ),
                     ),
+                    canSave = true,
                 )
             )
         }

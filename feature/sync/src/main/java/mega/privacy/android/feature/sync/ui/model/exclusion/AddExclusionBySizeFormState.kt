@@ -47,17 +47,9 @@ internal data class AddExclusionBySizeFormState(
         get() = condition?.usesSecondBound == true
 
     /**
-     * Whether a bound the condition reads is typed but is not a size a rule can use: zero, or too
-     * large to hold in bytes. The design draws no copy for either, so this refuses the rule
-     * without naming a reason.
-     */
-    val hasUnusableBound: Boolean
-        get() = activeBounds.any { !it.isEmpty && it.bytes == null }
-
-    /**
      * Whether the range reads downwards. Equal bounds count: "not between 1 KB and 1 KB" leaves
      * out every file. Only two readable sizes are compared, so the copy cannot claim an order
-     * about a bound that has no size — [hasUnusableBound] carries that instead.
+     * about a bound that has no size, which is refused without a reason drawn for it.
      */
     val showsRangeError: Boolean
         get() {

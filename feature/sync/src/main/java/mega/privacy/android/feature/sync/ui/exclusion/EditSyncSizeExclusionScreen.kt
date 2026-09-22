@@ -36,8 +36,9 @@ internal fun EditSyncSizeExclusionScreen(
     modifier: Modifier = Modifier,
 ) {
     EditExclusionScaffold(
+        canSave = uiState.canSave,
         onDelete = onDelete,
-        onSave = { if (!uiState.showsBlockingError) onSave() },
+        onSave = onSave,
         onDismiss = onDismiss,
         modifier = modifier,
     ) {
@@ -60,6 +61,7 @@ private class EditSyncSizeExclusionUiStateProvider :
                 condition = SyncSizeCondition.BiggerThan,
                 firstBound = SyncSizeBoundInput(value = "100", unit = SyncSizeUnit.Megabytes),
             ),
+            canSave = true,
         ),
         EditSyncSizeExclusionUiState(
             bySize = AddExclusionBySizeFormState(
@@ -67,6 +69,7 @@ private class EditSyncSizeExclusionUiStateProvider :
                 firstBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Kilobytes),
                 secondBound = SyncSizeBoundInput(value = "2", unit = SyncSizeUnit.Gigabytes),
             ),
+            canSave = true,
         ),
     )
 }

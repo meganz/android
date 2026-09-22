@@ -20,22 +20,18 @@ internal enum class AddExclusionTab(@get:StringRes val labelRes: Int) {
  * Each tab keeps its own draft, so a half-filled name rule cannot follow the user into the size
  * form or the reverse. Nothing is persisted until the rule is confirmed, and closing the screen
  * discards every draft with the screen.
+ *
+ * @property canConfirm whether the showing draft would add something. Read from the mapper that
+ * builds the result rather than judged here, so the button cannot offer a confirm that stages
+ * nothing
  */
 internal data class AddSyncExclusionRuleUiState(
     val selectedTab: AddExclusionTab = AddExclusionTab.ByName,
     val byName: AddExclusionByNameFormState = AddExclusionByNameFormState(),
     val byExtension: AddExclusionByExtensionFormState = AddExclusionByExtensionFormState(),
     val bySize: AddExclusionBySizeFormState = AddExclusionBySizeFormState(),
+    val canConfirm: Boolean = false,
 ) {
-
-    /**
-     * Whether the size tab is holding a rule that cannot be added. The primary button stays
-     * enabled and refuses the tap, rather than going grey. The By name tab has no producer for
-     * its own error yet, so nothing on it blocks.
-     */
-    val showsBlockingError: Boolean
-        get() = selectedTab == AddExclusionTab.BySize &&
-                (bySize.showsRangeError || bySize.hasUnusableBound)
 
     /** Whether the By name tab is showing extension entry rather than the name form. */
     val showsExtensionForm: Boolean

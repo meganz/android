@@ -5,6 +5,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import mega.privacy.android.feature.sync.navigation.AddSyncExclusionResult
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.AddSyncExclusionResultMapper
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddSyncExclusionRuleUiState
@@ -21,13 +23,18 @@ import javax.inject.Inject
  * showing one tab cannot lose what was typed into the other.
  */
 @HiltViewModel
-internal class AddSyncExclusionRuleViewModel @Inject constructor() : ViewModel() {
+internal class AddSyncExclusionRuleViewModel @Inject constructor(
+    private val resultMapper: AddSyncExclusionResultMapper,
+) : ViewModel() {
 
     val uiState: StateFlow<AddSyncExclusionRuleUiState>
-        field = MutableStateFlow(AddSyncExclusionRuleUiState())
+        field = MutableStateFlow(gated(AddSyncExclusionRuleUiState()))
+
+    /** What the drafts would add, or null while they would add nothing. */
+    fun buildResult(): AddSyncExclusionResult? = resultMapper(uiState.value)
 
     fun onTabSelected(tab: AddExclusionTab) {
-        uiState.update { it.copy(selectedTab = tab) }
+        updateState { it.copy(selectedTab = tab) }
     }
 
     /**
@@ -36,7 +43,7 @@ internal class AddSyncExclusionRuleViewModel @Inject constructor() : ViewModel()
      */
     fun onTypeOptionSelected(typeOption: SyncExclusionTypeOption) {
         val keepsCondition = typeOption != SyncExclusionTypeOption.Extensions
-        uiState.update { state ->
+        updateState { state ->
             state.copy(
                 byName = state.byName.copy(
                     typeOption = typeOption,
@@ -47,15 +54,15 @@ internal class AddSyncExclusionRuleViewModel @Inject constructor() : ViewModel()
     }
 
     fun onConditionSelected(condition: SyncExclusionCondition) {
-        uiState.update { it.copy(byName = it.byName.copy(condition = condition)) }
+        updateState { it.copy(byName = it.byName.copy(condition = condition)) }
     }
 
     fun onNameValueChanged(value: String) {
-        uiState.update { it.copy(byName = it.byName.copy(value = value)) }
+        updateState { it.copy(byName = it.byName.copy(value = value)) }
     }
 
     fun onExtensionValueChanged(value: String) {
-        uiState.update { it.copy(byExtension = it.byExtension.copy(value = value)) }
+        updateState { it.copy(byExtension = it.byExtension.copy(value = value)) }
     }
 
     fun onSizeConditionSelected(condition: SyncSizeCondition) {
@@ -81,6 +88,20 @@ internal class AddSyncExclusionRuleViewModel @Inject constructor() : ViewModel()
     private fun updateSize(
         transform: (AddExclusionBySizeFormState) -> AddExclusionBySizeFormState,
     ) {
-        uiState.update { it.copy(bySize = transform(it.bySize)) }
+        updateState { it.copy(bySize = transform(it.bySize)) }
     }
+
+    /**
+     * The one way a draft changes, so that a field added later is covered by the confirm gate
+     * without its author having to remember it.
+     */
+    private fun updateState(
+        transform: (AddSyncExclusionRuleUiState) -> AddSyncExclusionRuleUiState,
+    ) {
+        uiState.update { gated(transform(it)) }
+    }
+
+    /** [state] with the confirm gate taken from what the mapper would build out of it. */
+    private fun gated(state: AddSyncExclusionRuleUiState) =
+        state.copy(canConfirm = resultMapper(state) != null)
 }

@@ -38,6 +38,7 @@ import mega.privacy.android.feature.sync.domain.usecase.exclusion.RestoreDefault
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.SetSyncExclusionsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.SetSyncSizeBoundsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.navigation.AddSyncExclusionResult
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionChipMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionPatternMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionRowMapper
@@ -127,6 +128,37 @@ internal class ManageSyncExclusionsViewModelTest {
 
         assertThat(underTest.uiState.value.isLoading).isFalse()
         assertThat(underTest.uiState.value.hasLoadFailed).isTrue()
+    }
+
+    /**
+     * A rule authored before there is a file to stage it onto is dropped, so the screen must not
+     * offer the Add screen until the read has landed.
+     */
+    @Test
+    fun `test that adding is refused while the file is being read`() = runTest {
+        val read = CompletableDeferred<Result<ExclusionsSnapshot>>()
+        getSyncExclusionsUseCase.stub {
+            onBlocking { invoke(any()) } doSuspendableAnswer { read.await() }
+        }
+
+        val underTest = underTest()
+
+        assertThat(underTest.uiState.value.canAddExclusion).isFalse()
+
+        read.complete(
+            Result.success(ExclusionsSnapshot(exclusions = threeRules, isWritable = true))
+        )
+
+        assertThat(underTest.uiState.value.canAddExclusion).isTrue()
+    }
+
+    @Test
+    fun `test that adding is refused when the file could not be read`() = runTest {
+        stubReadFailure()
+
+        val underTest = underTest()
+
+        assertThat(underTest.uiState.value.canAddExclusion).isFalse()
     }
 
     @Test
@@ -362,6 +394,136 @@ internal class ManageSyncExclusionsViewModelTest {
 
             assertThat(underTest.uiState.value.defaultsRestoredEvent).isEqualTo(consumed)
         }
+
+    // region adding from another screen
+
+    @Test
+    fun `test that adding stages every rule the Add screen authored`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+        val mp3 = rule(pattern = "*.mp3")
+        val jpg = rule(pattern = "*.jpg")
+
+        underTest.onExclusionAdded(AddSyncExclusionResult.Rules(listOf(mp3, jpg)))
+
+        assertThat(underTest.uiState.value.staged?.rules).containsExactly(
+            first, second, third, mp3, jpg,
+        ).inOrder()
+        verifyNoInteractions(setSyncExclusionsUseCase)
+    }
+
+    @Test
+    fun `test that adding confirms the exclusion`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(AddSyncExclusionResult.Rules(listOf(rule(pattern = "New*"))))
+
+        assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that adding stages the size bounds the Add screen authored`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.SizeBounds(SyncSizeExclusion(excludeLargerThanBytes = 1024)),
+        )
+
+        assertThat(underTest.uiState.value.staged?.size)
+            .isEqualTo(SyncSizeExclusion(excludeLargerThanBytes = 1024))
+        assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(triggered)
+    }
+
+    /**
+     * The Add screen states one direction at a time and is never prefilled, so the bound it leaves
+     * out is the file's to keep rather than one the user cleared.
+     */
+    @Test
+    fun `test that adding a size bound keeps the bound the file already held`() = runTest {
+        stubRead(ParsedMegaIgnore(entries = listOf(largerBound)))
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.SizeBounds(SyncSizeExclusion(excludeSmallerThanBytes = 1024)),
+        )
+
+        assertThat(underTest.uiState.value.staged?.size).isEqualTo(
+            SyncSizeExclusion(excludeSmallerThanBytes = 1024, excludeLargerThanBytes = 102400),
+        )
+        assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that adding a range replaces both of the bounds the file held`() = runTest {
+        stubRead(ParsedMegaIgnore(entries = listOf(smallerBound, largerBound)))
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.SizeBounds(
+                SyncSizeExclusion(excludeSmallerThanBytes = 2048, excludeLargerThanBytes = 4096),
+            ),
+        )
+
+        assertThat(underTest.uiState.value.staged?.size).isEqualTo(
+            SyncSizeExclusion(excludeSmallerThanBytes = 2048, excludeLargerThanBytes = 4096),
+        )
+    }
+
+    /** Clearing stays the Edit screen's, which states the pair whole rather than one bound of it. */
+    @Test
+    fun `test that changing the size bounds still clears the bound that is left out`() = runTest {
+        stubRead(ParsedMegaIgnore(entries = listOf(smallerBound, largerBound)))
+        val underTest = underTest()
+
+        underTest.onSizeBoundsChanged(SyncSizeExclusion(excludeLargerThanBytes = 4096))
+
+        assertThat(underTest.uiState.value.staged?.size)
+            .isEqualTo(SyncSizeExclusion(excludeLargerThanBytes = 4096))
+    }
+
+    @Test
+    fun `test that adding confirms nothing when the file was never read`() = runTest {
+        stubReadFailure()
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(AddSyncExclusionResult.Rules(listOf(rule(pattern = "New*"))))
+
+        assertThat(underTest.uiState.value.staged).isNull()
+        assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(consumed)
+    }
+
+    /** A refusal is reported instead, so confirming as well would state both outcomes at once. */
+    @Test
+    fun `test that adding confirms nothing when the size bounds are refused`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.SizeBounds(
+                SyncSizeExclusion(excludeSmallerThanBytes = 1024, excludeLargerThanBytes = 1024),
+            ),
+        )
+
+        assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(consumed)
+        assertThat(underTest.uiState.value.editErrorEvent)
+            .isInstanceOf(StateEventWithContentTriggered::class.java)
+        assertThat(underTest.uiState.value.staged).isEqualTo(threeRules)
+    }
+
+    @Test
+    fun `test that showing the added confirmation clears it`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+        underTest.onExclusionAdded(AddSyncExclusionResult.Rules(listOf(rule(pattern = "New*"))))
+
+        underTest.onExclusionAddedShown()
+
+        assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(consumed)
+    }
+
+    // endregion
 
     @Test
     fun `test that showing the confirmation clears it`() = runTest {

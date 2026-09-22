@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.sync.ui.exclusion
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -91,6 +93,24 @@ internal class ManageSyncExclusionsScreenTest {
         setContent(loadedState(rejected))
 
         composeTestRule.onNodeWithTag(TAG_TOP_APP_BAR_ACTIONS_SHOW_MORE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that adding is offered once the exclusions have been read`() {
+        setContent()
+
+        composeTestRule
+            .onNodeWithText(string(sharedR.string.sync_exclusions_manage_add))
+            .assertIsEnabled()
+    }
+
+    @Test
+    fun `test that adding is not offered while there is no file to stage a rule onto`() {
+        setContent(ManageSyncExclusionsUiState(syncName = "Documents", hasLoadFailed = true))
+
+        composeTestRule
+            .onNodeWithText(string(sharedR.string.sync_exclusions_manage_add))
+            .assertIsNotEnabled()
     }
 
     private fun setContent(uiState: ManageSyncExclusionsUiState = loadedState(defaults)) {

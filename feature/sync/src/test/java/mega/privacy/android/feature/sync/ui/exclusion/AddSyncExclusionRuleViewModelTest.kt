@@ -4,6 +4,9 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.AddSyncExclusionResultMapper
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionPatternMapper
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncSizeExclusionFormMapper
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
@@ -23,7 +26,12 @@ internal class AddSyncExclusionRuleViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = AddSyncExclusionRuleViewModel()
+        underTest = AddSyncExclusionRuleViewModel(
+            resultMapper = AddSyncExclusionResultMapper(
+                patternMapper = SyncExclusionPatternMapper(),
+                sizeFormMapper = SyncSizeExclusionFormMapper(),
+            ),
+        )
     }
 
     @Test
@@ -37,6 +45,141 @@ internal class AddSyncExclusionRuleViewModelTest {
             assertThat(initial.byExtension.value).isEmpty()
             assertThat(initial.bySize).isEqualTo(AddExclusionBySizeFormState())
             assertThat(initial.showsExtensionForm).isFalse()
+            assertThat(initial.canConfirm).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canConfirm stays false while the name form is incomplete`() = runTest {
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().canConfirm).isFalse()
+
+            underTest.onConditionSelected(SyncExclusionCondition.EndingWith)
+
+            assertThat(awaitItem().canConfirm).isFalse()
+
+            underTest.onNameValueChanged("   ")
+
+            assertThat(awaitItem().canConfirm).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canConfirm turns true once the name form names a rule`() = runTest {
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+        underTest.onConditionSelected(SyncExclusionCondition.EndingWith)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().canConfirm).isFalse()
+
+            underTest.onNameValueChanged("tmp")
+
+            assertThat(awaitItem().canConfirm).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that canConfirm follows the extensions field once extensions is the type`() =
+        runTest {
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+            underTest.onConditionSelected(SyncExclusionCondition.EndingWith)
+            underTest.onNameValueChanged("tmp")
+
+            underTest.uiState.test {
+                assertThat(awaitItem().canConfirm).isTrue()
+
+                underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+
+                assertThat(awaitItem().canConfirm).isFalse()
+
+                underTest.onExtensionValueChanged("mp3")
+
+                assertThat(awaitItem().canConfirm).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that canConfirm stays false while the size form is incomplete`() = runTest {
+        underTest.onTabSelected(AddExclusionTab.BySize)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().canConfirm).isFalse()
+
+            underTest.onSizeConditionSelected(SyncSizeCondition.BiggerThan)
+
+            assertThat(awaitItem().canConfirm).isFalse()
+
+            underTest.onFirstBoundValueChanged("0")
+
+            assertThat(awaitItem().canConfirm).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canConfirm turns true once the size form declares a bound`() = runTest {
+        underTest.onTabSelected(AddExclusionTab.BySize)
+        underTest.onSizeConditionSelected(SyncSizeCondition.BiggerThan)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().canConfirm).isFalse()
+
+            underTest.onFirstBoundValueChanged("10")
+
+            assertThat(awaitItem().canConfirm).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that canConfirm stays false while a range reads downwards`() = runTest {
+        underTest.onTabSelected(AddExclusionTab.BySize)
+        underTest.onSizeConditionSelected(SyncSizeCondition.NotBetween)
+        underTest.onFirstBoundValueChanged("2")
+        underTest.onFirstBoundUnitSelected(SyncSizeUnit.Gigabytes)
+        underTest.onSecondBoundValueChanged("1")
+        underTest.onSecondBoundUnitSelected(SyncSizeUnit.Kilobytes)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().canConfirm).isFalse()
+
+            underTest.onFirstBoundUnitSelected(SyncSizeUnit.Bytes)
+
+            assertThat(awaitItem().canConfirm).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that canConfirm stays false while a range names the same size twice`() = runTest {
+        underTest.onTabSelected(AddExclusionTab.BySize)
+        underTest.onSizeConditionSelected(SyncSizeCondition.NotBetween)
+        underTest.onFirstBoundValueChanged("1024")
+        underTest.onFirstBoundUnitSelected(SyncSizeUnit.Bytes)
+        underTest.onSecondBoundValueChanged("1")
+        underTest.onSecondBoundUnitSelected(SyncSizeUnit.Kilobytes)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().canConfirm).isFalse()
+
+            underTest.onSecondBoundUnitSelected(SyncSizeUnit.Megabytes)
+
+            assertThat(awaitItem().canConfirm).isTrue()
+        }
+    }
+
+    /** The tab decides which draft is read, so a complete draft on the hidden tab must not count. */
+    @Test
+    fun `test that canConfirm reads the showing tab only`() = runTest {
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+        underTest.onConditionSelected(SyncExclusionCondition.EndingWith)
+        underTest.onNameValueChanged("tmp")
+
+        underTest.uiState.test {
+            assertThat(awaitItem().canConfirm).isTrue()
+
+            underTest.onTabSelected(AddExclusionTab.BySize)
+
+            assertThat(awaitItem().canConfirm).isFalse()
         }
     }
 

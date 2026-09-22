@@ -27,6 +27,7 @@ class EditSyncExclusionRuleScreenScreenshotTest {
                         condition = SyncExclusionCondition.Containing,
                         value = "temp",
                     ),
+                    canSave = true,
                 )
             )
         }

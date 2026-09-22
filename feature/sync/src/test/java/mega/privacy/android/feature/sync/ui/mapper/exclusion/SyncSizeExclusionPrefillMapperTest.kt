@@ -106,6 +106,6 @@ internal class SyncSizeExclusionPrefillMapperTest {
         val actual = underTest(SyncSizeExclusion(excludeLargerThanBytes = 0))
 
         assertThat(actual.firstBound.value).isEqualTo("0")
-        assertThat(actual.hasUnusableBound).isTrue()
+        assertThat(actual.firstBound.bytes).isNull()
     }
 }

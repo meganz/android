@@ -47,6 +47,7 @@ class AddSyncExclusionRuleScreenScreenshotTest {
                             unit = SyncSizeUnit.Gigabytes,
                         ),
                     ),
+                    canConfirm = true,
                 )
             )
         }

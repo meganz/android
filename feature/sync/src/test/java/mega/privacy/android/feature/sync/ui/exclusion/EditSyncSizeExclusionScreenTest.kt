@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.exclusion
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -36,6 +37,7 @@ internal class EditSyncSizeExclusionScreenTest {
             condition = SyncSizeCondition.BiggerThan,
             firstBound = SyncSizeBoundInput(value = "100", unit = SyncSizeUnit.Megabytes),
         ),
+        canSave = true,
     )
 
     private fun setContent(uiState: EditSyncSizeExclusionUiState = prefilled) {
@@ -127,6 +129,7 @@ internal class EditSyncSizeExclusionScreenTest {
         composeTestRule.onNodeWithTag(ADD_EXCLUSION_SIZE_RANGE_ERROR_TAG).assertIsDisplayed()
         composeTestRule
             .onNodeWithText(string(sharedR.string.general_action_save))
+            .assertIsNotEnabled()
             .performClick()
 
         assertThat(saved).isEqualTo(0)
@@ -180,6 +183,19 @@ internal class EditSyncSizeExclusionScreenTest {
         composeTestRule.onNodeWithTag(ADD_EXCLUSION_SIZE_RANGE_ERROR_TAG).assertDoesNotExist()
         composeTestRule
             .onNodeWithText(string(sharedR.string.general_action_save))
+            .assertIsNotEnabled()
+            .performClick()
+
+        assertThat(saved).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that save is disabled while no condition has been picked`() {
+        setContent(EditSyncSizeExclusionUiState())
+
+        composeTestRule
+            .onNodeWithText(string(sharedR.string.general_action_save))
+            .assertIsNotEnabled()
             .performClick()
 
         assertThat(saved).isEqualTo(0)

@@ -83,6 +83,7 @@ internal fun ManageSyncExclusionsScreen(
                         Button.TextOnlyButtonM3(
                             text = stringResource(sharedR.string.sync_exclusions_manage_add),
                             onClick = onAddClicked,
+                            enabled = uiState.canAddExclusion,
                         )
                     },
                     {

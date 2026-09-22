@@ -178,7 +178,7 @@ class ManageSyncExclusionsScreenScreenshotTest {
         }
     }
 
-    /** The confirmation the Add flow will raise once SAT-2470 returns its result. */
+    /** The confirmation raised once an exclusion authored on another screen has been staged. */
     @PreviewTest
     @CombinedThemePreviews
     @Composable
@@ -186,6 +186,21 @@ class ManageSyncExclusionsScreenScreenshotTest {
         AndroidThemeForPreviews {
             WeblateSnackbarScreenshot(
                 snackbarText = stringResource(sharedR.string.sync_exclusions_manage_snackbar_added),
+            ) {
+                DefaultsScreen()
+            }
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ManageSyncExclusionsSizeConflictSnackbar() {
+        AndroidThemeForPreviews {
+            WeblateSnackbarScreenshot(
+                snackbarText = stringResource(
+                    sharedR.string.sync_exclusions_manage_snackbar_size_conflict,
+                ),
             ) {
                 DefaultsScreen()
             }

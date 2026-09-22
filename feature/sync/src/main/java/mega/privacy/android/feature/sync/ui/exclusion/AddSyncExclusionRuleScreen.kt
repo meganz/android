@@ -77,7 +77,8 @@ internal fun AddSyncExclusionRuleScreen(
                     {
                         Button.PrimaryButtonM3(
                             text = stringResource(sharedR.string.sync_exclusions_add_confirm),
-                            onClick = { if (!uiState.showsBlockingError) onConfirm() },
+                            onClick = onConfirm,
+                            enabled = uiState.canConfirm,
                         )
                     },
                 ),
@@ -150,6 +151,7 @@ private class AddSyncExclusionRuleUiStateProvider :
                 condition = SyncExclusionCondition.EndingWith,
                 value = "tmp",
             ),
+            canConfirm = true,
         ),
         AddSyncExclusionRuleUiState(
             selectedTab = AddExclusionTab.BySize,
@@ -158,6 +160,7 @@ private class AddSyncExclusionRuleUiStateProvider :
                 firstBound = SyncSizeBoundInput(value = "1", unit = SyncSizeUnit.Kilobytes),
                 secondBound = SyncSizeBoundInput(value = "2", unit = SyncSizeUnit.Gigabytes),
             ),
+            canConfirm = true,
         ),
     )
 }

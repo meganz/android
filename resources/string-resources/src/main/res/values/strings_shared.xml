@@ -4205,6 +4205,8 @@
     <string name="sync_exclusions_manage_size_between">Files between %1$s and %2$s</string>
     <!-- Sync exclusions Manage screen: confirmation shown briefly after a new exclusion is added. -->
     <string name="sync_exclusions_manage_snackbar_added">Exclusion added</string>
+    <!-- Sync exclusions Manage screen: shown briefly when a size the user just added cannot be kept, because the folder already leaves out files at that exact size in the opposite direction. Excluding everything smaller than 1 KB as well as everything larger than 1 KB would leave only files of exactly that size, so the two cannot both stand. -->
+    <string name="sync_exclusions_manage_snackbar_size_conflict">You’ve already excluded files of this size</string>
     <!-- Sync exclusions Manage screen: spoken label for the control that stops excluding a file extension. Not shown on screen; it describes the small dismiss control on an extension chip. %1$s is the extension, for example “tmp”. -->
     <string name="sync_exclusions_manage_remove_extension">Stop excluding %1$s</string>
     <!-- Sync exclusions Manage screen: heading shown when the folder’s exclusions could not be read. Deliberately distinct from the empty state, because presenting a failed read as “no exclusions” would invite saving that over rules that do exist. -->

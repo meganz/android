@@ -13,14 +13,16 @@ import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
  * @param exclusion the bounds the exclusions list showed, which the form opens prefilled from
  * @param onDelete invoked when the user takes the bounds out through the trash action, clearing
  * both bounds rather than only the one the chosen condition names
- * @param onSave invoked when the user keeps the bounds as the form now reads them
+ * @param onSave invoked with the bounds the form declares, for the exclusions list to stage. The
+ * control is offered only while the form declares bounds the file could hold, and a draft
+ * declaring none falls back to [onDismiss]
  * @param onDismiss invoked when the user backs out or cancels, discarding the draft
  */
 @Composable
 internal fun EditSyncSizeExclusionRoute(
     exclusion: SyncSizeExclusion,
     onDelete: () -> Unit,
-    onSave: () -> Unit,
+    onSave: (SyncSizeExclusion) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditSyncSizeExclusionViewModel =
@@ -38,7 +40,10 @@ internal fun EditSyncSizeExclusionRoute(
         onSecondBoundValueChanged = viewModel::onSecondBoundValueChanged,
         onSecondBoundUnitSelected = viewModel::onSecondBoundUnitSelected,
         onDelete = onDelete,
-        onSave = onSave,
+        onSave = {
+            val bounds = viewModel.buildBounds()
+            if (bounds == null) onDismiss() else onSave(bounds)
+        },
         onDismiss = onDismiss,
         modifier = modifier,
     )

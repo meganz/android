@@ -27,6 +27,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * Deleting asks for no confirmation, because the screen hands the deletion back for the
  * exclusions list to stage: Cancel there still undoes it.
  *
+ * @param canSave whether the form describes something to save. The trash is left out of it: an
+ * exclusion this form cannot describe is one the user can only get rid of
  * @param onDelete invoked when the user takes the exclusion out through the trash action. It
  * carries no argument because the trash removes the whole exclusion, never part of one
  * @param onSave invoked when the user keeps the exclusion as the form now reads it
@@ -34,6 +36,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  */
 @Composable
 internal fun EditExclusionScaffold(
+    canSave: Boolean,
     onDelete: () -> Unit,
     onSave: () -> Unit,
     onDismiss: () -> Unit,
@@ -65,6 +68,7 @@ internal fun EditExclusionScaffold(
                         Button.PrimaryButtonM3(
                             text = stringResource(sharedR.string.general_action_save),
                             onClick = onSave,
+                            enabled = canSave,
                         )
                     },
                 ),

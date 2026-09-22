@@ -30,14 +30,16 @@ import mega.privacy.android.feature.sync.domain.exception.SyncExclusionEditError
  * because presenting a failed read as "no exclusions" invites the user to save that over a file
  * that may hold rules
  * @property isSaving whether a write is in flight
- * @property editErrorEvent why the last mutation was refused, for the screen to report.
- * Consumed through [ManageSyncExclusionsViewModel.onEditErrorShown]. Nothing reads it yet, so a
- * refused edit is currently silent
+ * @property editErrorEvent why the last mutation was refused, for the screen to report as a
+ * snackbar. Consumed through [ManageSyncExclusionsViewModel.onEditErrorShown]
  * @property saveFailedEvent that the last save failed. The edits survive it, so the user can
  * retry without re-entering them. Consumed through
  * [ManageSyncExclusionsViewModel.onSaveFailureShown]
  * @property defaultsRestoredEvent that the defaults have just been put back, for the screen to
  * confirm. Consumed through [ManageSyncExclusionsViewModel.onDefaultsRestoredShown]
+ * @property exclusionAddedEvent that an exclusion authored on another screen has just been staged,
+ * for the screen to confirm. Consumed through
+ * [ManageSyncExclusionsViewModel.onExclusionAddedShown]
  * @property isDiscardPromptShown whether the user is being asked to confirm losing unsaved edits
  * @property isFinished whether the screen has nothing left to do and should be left
  * @property syncName the sync's name, shown under the title so the screen says which folder these
@@ -55,6 +57,7 @@ internal data class ManageSyncExclusionsUiState(
     val editErrorEvent: StateEventWithContent<SyncExclusionEditError> = consumed(),
     val saveFailedEvent: StateEvent = consumed,
     val defaultsRestoredEvent: StateEvent = consumed,
+    val exclusionAddedEvent: StateEvent = consumed,
     val isDiscardPromptShown: Boolean = false,
     val isFinished: Boolean = false,
 ) {
@@ -82,6 +85,15 @@ internal data class ManageSyncExclusionsUiState(
      */
     val canSave: Boolean
         get() = isDirty && isWritable && !isSaving
+
+    /**
+     * Whether an exclusion can be authored.
+     *
+     * A file that was never read has nothing to stage a new rule onto, so one authored then would
+     * be dropped without the user being told, having taken them through a whole screen.
+     */
+    val canAddExclusion: Boolean
+        get() = staged != null
 
     /**
      * Whether putting the exclusions back to the defaults is currently possible.

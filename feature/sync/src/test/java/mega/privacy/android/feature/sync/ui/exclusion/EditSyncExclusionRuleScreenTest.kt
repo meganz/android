@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.exclusion
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -36,6 +37,16 @@ internal class EditSyncExclusionRuleScreenTest {
             typeOption = SyncExclusionTypeOption.Folders,
             condition = SyncExclusionCondition.Containing,
             value = "temp",
+        ),
+        canSave = true,
+    )
+
+    /** A rule this app has no type for: the form shows its pattern whole and describes no edit. */
+    private val undescribed = EditSyncExclusionRuleUiState(
+        byName = AddExclusionByNameFormState(
+            typeOption = null,
+            condition = SyncExclusionCondition.MatchingWildcard,
+            value = "draft*",
         ),
     )
 
@@ -111,21 +122,38 @@ internal class EditSyncExclusionRuleScreenTest {
 
     @Test
     fun `test that a rule with no type shows its whole pattern and no condition`() {
-        setContent(
-            EditSyncExclusionRuleUiState(
-                byName = AddExclusionByNameFormState(
-                    typeOption = null,
-                    condition = SyncExclusionCondition.MatchingWildcard,
-                    value = "draft*",
-                ),
-            )
-        )
+        setContent(undescribed)
 
         composeTestRule.onNodeWithText("draft*").assertIsDisplayed()
         composeTestRule.onNodeWithTag(ADD_EXCLUSION_CONDITION_CHIP_TAG).assertDoesNotExist()
         composeTestRule
             .onNodeWithTag(ADD_EXCLUSION_TYPE_CHIP_TAG)
             .assertContentDescriptionEquals(string(sharedR.string.sync_exclusions_add_type))
+    }
+
+    /**
+     * The form cannot say what such a rule is, so saving it would stage nothing. The trash is the
+     * only way left to get rid of it, and the test below pins that it stays available.
+     */
+    @Test
+    fun `test that save is disabled for a rule the form cannot describe`() {
+        setContent(undescribed)
+
+        composeTestRule
+            .onNodeWithText(string(sharedR.string.general_action_save))
+            .assertIsNotEnabled()
+            .performClick()
+
+        assertThat(saved).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that the trash stays available for a rule the form cannot describe`() {
+        setContent(undescribed)
+
+        composeTestRule.onNodeWithTag(CommonMenuAction.Delete.testTag).performClick()
+
+        assertThat(deleted).isEqualTo(1)
     }
 
     @Test

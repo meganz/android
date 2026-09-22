@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.exclusion
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyAncestor
@@ -19,6 +20,7 @@ import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionByNameFo
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddSyncExclusionRuleUiState
+import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOption
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeBoundInput
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncSizeCondition
@@ -175,8 +177,18 @@ internal class AddSyncExclusionRuleScreenTest {
     }
 
     @Test
-    fun `test that the primary button stays enabled on an empty form and confirms on tap`() {
+    fun `test that the primary button is disabled while the form would add nothing`() {
         setContent(AddSyncExclusionRuleUiState())
+
+        confirmButton().assertIsNotEnabled().performClick()
+
+        assertThat(confirmed).isEqualTo(0)
+        assertThat(dismissed).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that the primary button confirms once the form would add something`() {
+        setContent(completeNameForm())
 
         confirmButton().assertIsEnabled().performClick()
 
@@ -185,15 +197,16 @@ internal class AddSyncExclusionRuleScreenTest {
     }
 
     @Test
-    fun `test that the primary button stays enabled but refuses an inverted range`() {
+    fun `test that the primary button is disabled while a range reads downwards`() {
         setContent(
             sizeRange(
                 first = "2" to SyncSizeUnit.Gigabytes,
                 second = "1" to SyncSizeUnit.Kilobytes,
+                canConfirm = false,
             )
         )
 
-        confirmButton().assertIsEnabled().performClick()
+        confirmButton().assertIsNotEnabled().performClick()
 
         assertThat(confirmed).isEqualTo(0)
     }
@@ -224,7 +237,7 @@ internal class AddSyncExclusionRuleScreenTest {
             )
         )
 
-        confirmButton().assertIsEnabled().performClick()
+        confirmButton().assertIsNotEnabled().performClick()
 
         assertThat(confirmed).isEqualTo(0)
     }
@@ -232,10 +245,12 @@ internal class AddSyncExclusionRuleScreenTest {
     @Test
     fun `test that a size draft left in error does not block the by name tab`() {
         setContent(
-            sizeRange(
-                first = "2" to SyncSizeUnit.Gigabytes,
-                second = "1" to SyncSizeUnit.Kilobytes,
-            ).copy(selectedTab = AddExclusionTab.ByName)
+            completeNameForm().copy(
+                bySize = sizeRange(
+                    first = "2" to SyncSizeUnit.Gigabytes,
+                    second = "1" to SyncSizeUnit.Kilobytes,
+                ).bySize,
+            )
         )
 
         confirmButton().performClick()
@@ -243,9 +258,19 @@ internal class AddSyncExclusionRuleScreenTest {
         assertThat(confirmed).isEqualTo(1)
     }
 
+    private fun completeNameForm() = AddSyncExclusionRuleUiState(
+        byName = AddExclusionByNameFormState(
+            typeOption = SyncExclusionTypeOption.Files,
+            condition = SyncExclusionCondition.EndingWith,
+            value = "tmp",
+        ),
+        canConfirm = true,
+    )
+
     private fun sizeRange(
         first: Pair<String, SyncSizeUnit>,
         second: Pair<String, SyncSizeUnit>,
+        canConfirm: Boolean = true,
     ) = AddSyncExclusionRuleUiState(
         selectedTab = AddExclusionTab.BySize,
         bySize = AddExclusionBySizeFormState(
@@ -253,6 +278,7 @@ internal class AddSyncExclusionRuleScreenTest {
             firstBound = SyncSizeBoundInput(value = first.first, unit = first.second),
             secondBound = SyncSizeBoundInput(value = second.first, unit = second.second),
         ),
+        canConfirm = canConfirm,
     )
 }
 

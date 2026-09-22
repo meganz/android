@@ -4,23 +4,36 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.Flow
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
+import mega.privacy.android.feature.sync.navigation.EditSyncExclusionRuleResult
+import mega.privacy.android.feature.sync.navigation.SyncExclusionResultEffect
+import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionEditErrorMapper
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionRowUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 
-/** The Manage exclusions screen, bound to the sync named by [syncId]. */
+/**
+ * The Manage exclusions screen, bound to the sync named by [syncId].
+ *
+ * @param monitorResult the navigation results the Add, Edit and size screens hand back
+ * @param clearResult takes a result out of the channel once it has been staged
+ */
 @Composable
 internal fun ManageSyncExclusionsRoute(
     syncId: Long,
     localRoot: UriPath,
+    monitorResult: (String) -> Flow<Any?>,
+    clearResult: (String) -> Unit,
     onFinished: () -> Unit,
     onAddExclusion: (Long) -> Unit,
     onEditRule: (SyncExclusionRowUiItem) -> Unit,
@@ -35,11 +48,31 @@ internal fun ManageSyncExclusionsRoute(
     val chips by viewModel.chips.collectAsStateWithLifecycle()
     val rows by viewModel.rows.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackBarHostState.current
+    val resources = LocalResources.current
+    val editErrorMapper = remember { SyncExclusionEditErrorMapper() }
     // hoisted so the effects below capture only stable values and are not restarted
     // mid-snackbar by an unrelated recomposition
     val saveFailedMessage = stringResource(sharedR.string.sync_exclusions_manage_save_failed)
     val defaultsRestoredMessage =
         stringResource(sharedR.string.sync_exclusions_manage_snackbar_defaults_restored)
+    val exclusionAddedMessage =
+        stringResource(sharedR.string.sync_exclusions_manage_snackbar_added)
+
+    SyncExclusionResultEffect(
+        monitorResult = monitorResult,
+        clearResult = clearResult,
+        onExclusionAdded = viewModel::onExclusionAdded,
+        onRuleEdited = { result ->
+            when (result) {
+                is EditSyncExclusionRuleResult.Saved ->
+                    viewModel.onRuleEdited(result.ruleIndex, result.expected, result.edit)
+
+                is EditSyncExclusionRuleResult.Deleted ->
+                    viewModel.onRuleRemoved(result.ruleIndex, result.expected)
+            }
+        },
+        onSizeBoundsChanged = { viewModel.onSizeBoundsChanged(it.bounds) },
+    )
 
     EventEffect(
         event = uiState.saveFailedEvent,
@@ -53,6 +86,20 @@ internal fun ManageSyncExclusionsRoute(
         onConsumed = viewModel::onDefaultsRestoredShown,
     ) {
         snackbarHostState?.showSnackbar(defaultsRestoredMessage)
+    }
+
+    EventEffect(
+        event = uiState.exclusionAddedEvent,
+        onConsumed = viewModel::onExclusionAddedShown,
+    ) {
+        snackbarHostState?.showSnackbar(exclusionAddedMessage)
+    }
+
+    EventEffect(
+        event = uiState.editErrorEvent,
+        onConsumed = viewModel::onEditErrorShown,
+    ) { error ->
+        snackbarHostState?.showSnackbar(resources.getString(editErrorMapper(error)))
     }
 
     LaunchedEffect(uiState.isFinished) {
