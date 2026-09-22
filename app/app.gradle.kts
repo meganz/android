@@ -239,6 +239,7 @@ dependencies {
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))
     implementation(project(":domain:mediaplayer"))
+    implementation(project(":domain:camerauploads"))
     implementation(project(":shared:original-core-ui"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":data"))

@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":core:transfers"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":domain:camerauploads"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":feature:photos:photos-snowflake-components"))

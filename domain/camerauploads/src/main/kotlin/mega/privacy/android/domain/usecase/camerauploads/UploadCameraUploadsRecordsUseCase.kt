@@ -168,9 +168,13 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                 val parentNodeId =
                     getParentNodeId(record, primaryUploadNodeId, secondaryUploadNodeId)
 
+                // bound to a local so the null check below narrows it: a property declared in
+                // another module cannot be smart cast
+                val existingNodeId = record.existingNodeId
+
                 when {
                     // node does not exist => upload
-                    record.existingNodeId == null -> {
+                    existingNodeId == null -> {
 
                         val shouldRemoveLocationTags =
                             record.type == CameraUploadsRecordType.TYPE_PHOTO && locationTagsDisabled
@@ -396,13 +400,13 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                         trySend(
                             CameraUploadsTransferProgress.ToCopy(
                                 record = record,
-                                nodeId = record.existingNodeId,
+                                nodeId = existingNodeId,
                             )
                         )
 
                         copyNode(
                             record = record,
-                            existingNodeId = record.existingNodeId,
+                            existingNodeId = existingNodeId,
                             parentNodeId = parentNodeId,
                         ).onFailure {
                             trySend(CameraUploadsTransferProgress.Error(record, it))
@@ -411,7 +415,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                         trySend(
                             CameraUploadsTransferProgress.Copied(
                                 record = record,
-                                nodeId = record.existingNodeId,
+                                nodeId = existingNodeId,
                             )
                         )
 

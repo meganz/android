@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
     implementation(project(":domain"))
+    implementation(project(":domain:camerauploads"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":core:feature-flags"))

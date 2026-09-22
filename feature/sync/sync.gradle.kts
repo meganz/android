@@ -34,6 +34,7 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
 
     implementation(project(":domain"))
+    implementation(project(":domain:camerauploads"))
     implementation(project(":data"))
     implementation(project(":core:formatter"))
     implementation(project(":shared:original-core-ui"))

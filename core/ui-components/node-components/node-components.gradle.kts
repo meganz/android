@@ -16,6 +16,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":domain:camerauploads"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":core:formatter"))
