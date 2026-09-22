@@ -309,7 +309,7 @@ class MediaPlayerFacade @Inject constructor(
             .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
             .build().apply {
                 addListener(MetadataExtractor { title, artist, album ->
-                    crashReporter.log("playing item: ${player?.currentMediaItem?.mediaId}, title: $title")
+                    crashReporter.log("playing item: ${player?.currentMediaItem?.mediaId}")
                     nameChangeCallback(title, artist, album)
                 })
                 addListener(object : Player.Listener {

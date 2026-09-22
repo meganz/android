@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
+import mega.privacy.android.app.RecordingTimberTree
 import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderImpl
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
@@ -19,6 +20,7 @@ import mega.privacy.android.navigation.destination.MediaMainNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import timber.log.Timber
 
 class PendingBackStackNavigationHandlerTest {
     private lateinit var underTest: PendingBackStackNavigationHandler
@@ -1226,9 +1228,48 @@ class PendingBackStackNavigationHandlerTest {
         assertThat(backStack.count { it == OptionalNoSessionNavKey1 }).isEqualTo(1)
     }
 
+    @Test
+    fun `test that navigate does not log destination fields`() {
+        val tree = RecordingTimberTree()
+        Timber.plant(tree)
+        try {
+            underTest.navigate(SensitiveDestination(SENSITIVE_VALUE))
+            underTest.navigate(listOf(SensitiveDestination(SENSITIVE_VALUE), Destination1))
+        } finally {
+            Timber.uproot(tree)
+        }
+
+        assertThat(tree.messages).isNotEmpty()
+        assertThat(tree.messages.none { it.contains(SENSITIVE_VALUE) }).isTrue()
+        assertThat(tree.messages.any { it.contains("SensitiveDestination") }).isTrue()
+    }
+
+    @Test
+    fun `test that remove does not log destination fields`() {
+        val destination = SensitiveDestination(SENSITIVE_VALUE)
+        backStack.add(destination)
+        val tree = RecordingTimberTree()
+        Timber.plant(tree)
+        try {
+            underTest.remove(destination)
+        } finally {
+            Timber.uproot(tree)
+        }
+
+        assertThat(tree.messages).isNotEmpty()
+        assertThat(tree.messages.none { it.contains(SENSITIVE_VALUE) }).isTrue()
+    }
+
     private data object DialogDestination1 : DialogNavKey
     private data object DialogDestination2 : DialogNavKey
 
     @Serializable
     private data class ParameterizedDialogDestination(val value: String) : DialogNavKey
+
+    @Serializable
+    private data class SensitiveDestination(val link: String) : NavKey
+
+    private companion object {
+        const val SENSITIVE_VALUE = "https://mega.nz/file/handle#SECRET_KEY_CANARY"
+    }
 }

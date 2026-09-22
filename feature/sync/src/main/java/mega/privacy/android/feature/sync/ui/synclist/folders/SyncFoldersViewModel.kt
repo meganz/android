@@ -192,7 +192,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                 Timber.e(it)
             }.distinctUntilChanged().collect {
                 if (it != null) {
-                    Timber.d("Selected mega folder: $it")
+                    Timber.d("Selected mega folder: ${it.id}")
                     // Hide stop-backup dialog before closing the mega picker so returning from the
                     // picker does not briefly flash the confirmation dialog.
                     _uiState.update { state ->
@@ -378,7 +378,7 @@ internal class SyncFoldersViewModel @Inject constructor(
 
             is SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed -> {
                 viewModelScope.launch {
-                    Timber.d("Sync Ui Item to remove: ${uiState.value.syncUiItemToRemove}")
+                    Timber.d("Sync Ui Item to remove: ${uiState.value.syncUiItemToRemove?.id}")
                     uiState.value.syncUiItemToRemove?.let { syncUiItemToRemove ->
                         syncUiItemToRemove.apply {
                             runCatching {

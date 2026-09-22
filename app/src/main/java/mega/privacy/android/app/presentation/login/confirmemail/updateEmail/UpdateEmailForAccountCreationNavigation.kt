@@ -12,7 +12,10 @@ import mega.privacy.android.navigation.contract.suppression.withOverlaySuppressi
 data class UpdateEmailForAccountCreationScreen(
     val email: String?,
     val fullName: String?,
-) : NoSessionNavKey.Mandatory
+) : NoSessionNavKey.Mandatory {
+    override fun toString() = "UpdateEmailForAccountCreationScreen(" +
+            "hasEmail=${email != null}, hasFullName=${fullName != null})"
+}
 
 
 internal fun EntryProviderScope<NavKey>.updateEmailForAccountCreation(

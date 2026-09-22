@@ -804,7 +804,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         val megaNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
         megaApiGateway.getNodeByFingerprintAndParentNode(fingerprint, megaNode)
             ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }.also {
-                Timber.d("Found node by fingerprint with the same local fingerprint in node with handle: ${parentNodeId}, node: $it")
+                Timber.d("Found node by fingerprint with the same local fingerprint in node with handle: ${parentNodeId}, node: ${it?.id}")
             }
     }
 
@@ -813,7 +813,7 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaApiGateway.getNodeByFingerprint(fingerprint)
                 ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }
         }.also {
-            Timber.d("Found node by fingerprint with the same local fingerprint in the account, node: $it")
+            Timber.d("Found node by fingerprint with the same local fingerprint in the account, node: ${it?.id}")
         }
 
     override suspend fun getNodeGPSCoordinates(nodeId: NodeId): Pair<Double, Double> =

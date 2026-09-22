@@ -54,6 +54,7 @@ javax-inject = { module = "javax.inject:javax.inject", version.ref = "javax" }
 kotlin-ktx = { module = "androidx.core:core-ktx", version.ref = "kotlin-ktx" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 logging-logback = { module = "com.github.tony19:logback-android", version.ref = "logging-logback" }
 logging-slf4j = { module = "org.slf4j:slf4j-api", version.ref = "logging-slf4j" }

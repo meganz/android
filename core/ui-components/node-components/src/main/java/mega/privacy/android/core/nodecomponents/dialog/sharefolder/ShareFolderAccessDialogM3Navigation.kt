@@ -13,7 +13,10 @@ data class ShareFolderAccessDialogNavKey(
     val nodes: String,
     val contacts: String,
     val isFromBackups: Boolean,
-) : NavKey
+) : NavKey {
+    override fun toString() = "ShareFolderAccessDialogNavKey(nodes=$nodes, " +
+            "hasContacts=${contacts.isNotEmpty()}, isFromBackups=$isFromBackups)"
+}
 
 fun EntryProviderScope<NavKey>.shareFolderAccessDialogM3(
     onDismiss: () -> Unit,

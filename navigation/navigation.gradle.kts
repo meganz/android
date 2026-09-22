@@ -24,4 +24,7 @@ dependencies {
     testImplementation(testlib.test.core.ktx)
     testImplementation(testlib.junit)
     testImplementation(testlib.junit.test.ktx)
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
 }

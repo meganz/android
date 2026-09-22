@@ -28,6 +28,11 @@ data class NodeOptionsBottomSheetNavKey(
     val serializedData: String? = null,
 ) : NoSessionNavKey.Optional {
 
+    override fun toString() = "NodeOptionsBottomSheetNavKey(nodeHandle=$nodeHandle, " +
+            "nodeSourceType=$nodeSourceType, partiallyExpand=$partiallyExpand, chatId=$chatId, " +
+            "msgId=$msgId, hasPublicLink=${publicLinkUrl != null}, " +
+            "hasLocalFilePath=${localFilePath != null}, hasSerializedData=${serializedData != null})"
+
     companion object {
         const val RESULT = "NodeOptionsBottomSheetNavKey:extra_result"
     }
@@ -52,6 +57,11 @@ data class DarkNodeOptionsBottomSheetNavKey(
     val localFilePath: String? = null,
     val serializedData: String? = null,
 ) : NoSessionNavKey.Optional {
+    override fun toString() = "DarkNodeOptionsBottomSheetNavKey(nodeHandle=$nodeHandle, " +
+            "nodeSourceType=$nodeSourceType, partiallyExpand=$partiallyExpand, chatId=$chatId, " +
+            "msgId=$msgId, hasPublicLink=${publicLinkUrl != null}, " +
+            "hasLocalFilePath=${localFilePath != null}, hasSerializedData=${serializedData != null})"
+
     companion object {
         /** Result key used by [NodeOptionsBottomSheetNavigation]; identical to [NodeOptionsBottomSheetNavKey.RESULT]. */
         const val RESULT = NodeOptionsBottomSheetNavKey.RESULT

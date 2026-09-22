@@ -23,7 +23,9 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 data class ManageSyncExclusionsNavKey(
     val syncId: Long,
     val localRoot: UriPath,
-) : NavKey
+) : NavKey {
+    override fun toString() = "ManageSyncExclusionsNavKey(syncId=$syncId)"
+}
 
 /**
  * Full-screen destination for authoring a new sync exclusion rule.
@@ -73,7 +75,10 @@ data class EditSyncExclusionRuleNavKey(
     val ruleIndex: Int,
     val rule: SyncExclusionRule,
     val syncId: Long? = null,
-) : NavKey
+) : NavKey {
+    override fun toString() = "EditSyncExclusionRuleNavKey(ruleIndex=$ruleIndex, " +
+            "matchType=${rule.matchType}, target=${rule.target}, syncId=$syncId)"
+}
 
 /**
  * Full-screen destination for editing the size bounds of a sync's `.megaignore`, or clearing

@@ -31,7 +31,11 @@ data class RecentsBucketScreenNavKey(
     val nodeSourceType: NodeSourceType,
     val timestamp: Long,
     val fileCount: Int,
-) : NavKey
+) : NavKey {
+    override fun toString() = "RecentsBucketScreenNavKey(isMediaBucket=$isMediaBucket, " +
+            "folderHandle=$folderHandle, nodeSourceType=$nodeSourceType, " +
+            "timestamp=$timestamp, fileCount=$fileCount)"
+}
 
 /**
  * A NavKey to represent the home screens navigation state, including the root main nav item and
@@ -70,6 +74,13 @@ data class HomeScreensNavKey(
         get() = root?.let {
             serialisedDestinations.deserialiseNavKeyList()
         }
+
+    // The serialised fields hold every field of the wrapped keys, so only their types are logged.
+    override fun toString() = "HomeScreensNavKey(root=${
+        runCatching { root?.let { it::class.simpleName } }.getOrNull()
+    }, destinations=${
+        runCatching { destinations?.map { it::class.simpleName } }.getOrNull()
+    }, timestamp=$timestamp)"
 
     companion object {
         private fun <T : MainNavItemNavKey> serialiseMainNavItemNavKey(navKey: T): String =

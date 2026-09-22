@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.QueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
@@ -28,7 +29,7 @@ class QueueEventViewModel @Inject constructor(
         flow {
             for (event in navigationEventQueueReceiver.events) {
                 val queueEvent = event()
-                Timber.d("Collected event from queue: $queueEvent")
+                Timber.d("Collected event from queue: ${queueEvent.logTypeName()}")
 
                 if (queueEvent != null) {
                     eventDisplayedSignal = CompletableDeferred()

@@ -485,7 +485,6 @@ class SMSVerificationTextActivity : PasscodeActivity(),
         val clipData = clipboard.primaryClip
         if (clipData != null) {
             val code = clipData.getItemAt(0).text.toString()
-            Timber.d("code: %s", code)
             if (code.length == 6) {
                 var areDigits = true
                 for (i in 0..5) {
@@ -554,7 +553,6 @@ class SMSVerificationTextActivity : PasscodeActivity(),
             sb.append(fifthPin.text)
             sb.append(sixthPin.text)
             val pin = sb.toString().trim { it <= ' ' }
-            Timber.d("PIN: %s", pin)
             viewModel.submitPin(pin)
             return
         }

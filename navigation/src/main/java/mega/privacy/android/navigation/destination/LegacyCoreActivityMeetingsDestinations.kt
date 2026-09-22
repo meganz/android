@@ -25,20 +25,26 @@ sealed interface MeetingNavKeyInfo {
     data class JoinAsGuest(
         val meetingName: String?,
         val link: String,
-    ) : MeetingNavKeyInfo
+    ) : MeetingNavKeyInfo {
+        override fun toString() = "JoinAsGuest()"
+    }
 
     @Serializable
     data class JoinInProgressCall(
         val meetingName: String,
         val link: String,
-    ) : MeetingNavKeyInfo
+    ) : MeetingNavKeyInfo {
+        override fun toString() = "JoinInProgressCall()"
+    }
 
     @Serializable
     data class RejoinInProgressCall(
         val meetingName: String,
         val publicChatHandle: Long,
         val link: String,
-    ) : MeetingNavKeyInfo
+    ) : MeetingNavKeyInfo {
+        override fun toString() = "RejoinInProgressCall(publicChatHandle=$publicChatHandle)"
+    }
 
     @Serializable
     data class ReturnToInProgressCall(
@@ -72,10 +78,14 @@ sealed interface WaitingRoomNavKeyInfo {
     @Serializable
     data class JoinAsGuest(
         val link: String,
-    ) : WaitingRoomNavKeyInfo
+    ) : WaitingRoomNavKeyInfo {
+        override fun toString() = "JoinAsGuest()"
+    }
 
     @Serializable
     data class JoinWaitingRoom(
         val link: String,
-    ) : WaitingRoomNavKeyInfo
+    ) : WaitingRoomNavKeyInfo {
+        override fun toString() = "JoinWaitingRoom()"
+    }
 }

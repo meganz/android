@@ -27,7 +27,10 @@ data class MyAccountNavKey(
     val action: String? = null,
     val link: String? = null,
     val resultCode: Int = -1,
-) : NavKey, Parcelable
+) : NavKey, Parcelable {
+    override fun toString() =
+        "MyAccountNavKey(action=$action, hasLink=${link != null}, resultCode=$resultCode)"
+}
 
 @Serializable
 data object AchievementNavKey : NavKey
@@ -36,7 +39,9 @@ data object AchievementNavKey : NavKey
 data class WebSiteNavKey(
     val url: String,
     val isBrowserLink: Boolean = false,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "WebSiteNavKey(isBrowserLink=$isBrowserLink)"
+}
 
 @Serializable
 @Parcelize
@@ -77,6 +82,10 @@ data class ChatNavKey(
     val messageId: Long? = null,
     val isOverQuota: Int? = null,
 ) : NoSessionNavKey.Optional, Parcelable {
+    override fun toString() = "ChatNavKey(chatId=$chatId, action=$action, " +
+            "hasLink=${link != null}, hasSnackbarText=${snackbarText != null}, " +
+            "messageId=$messageId, isOverQuota=$isOverQuota)"
+
     companion object {
         @Deprecated("Use NavKeys instead")
         const val LEGACY_CHAT_ID: String = "CHAT_ID"
@@ -128,7 +137,9 @@ data class ChatListNavKey(
 data class ManageChatHistoryNavKey(
     val chatId: Long,
     val email: String? = null,
-) : NavKey, Parcelable
+) : NavKey, Parcelable {
+    override fun toString() = "ManageChatHistoryNavKey(chatId=$chatId, hasEmail=${email != null})"
+}
 
 @Serializable
 data class AddContactToShareNavKey(
@@ -153,6 +164,8 @@ data class ContactInfoNavKey(
     init {
         require(email != null || chatId != null) { "Either email or chatId must be provided" }
     }
+
+    override fun toString() = "ContactInfoNavKey(hasEmail=${email != null}, chatId=$chatId)"
 }
 
 /**
@@ -170,13 +183,17 @@ data class NodeAttachmentHistoryNavKey(val chatId: Long) : NavKey
  * @param email Email of the contact.
  */
 @Serializable
-data class ContactSharedFoldersNavKey(val email: String) : NavKey
+data class ContactSharedFoldersNavKey(val email: String) : NavKey {
+    override fun toString() = "ContactSharedFoldersNavKey()"
+}
 
 @Serializable
 data class FileContactInfoNavKey(
     val folderHandle: Long,
     val folderName: String,
-) : NavKey
+) : NavKey {
+    override fun toString() = "FileContactInfoNavKey(folderHandle=$folderHandle)"
+}
 
 @Serializable
 data class TestPasswordNavKey(
@@ -211,7 +228,9 @@ data class LegacyFileInfoNavKey(val handle: Long) : NavKey
 data class AuthenticityCredentialsNavKey(
     val email: String,
     val isIncomingShares: Boolean,
-) : NavKey
+) : NavKey {
+    override fun toString() = "AuthenticityCredentialsNavKey(isIncomingShares=$isIncomingShares)"
+}
 
 @Serializable
 @Parcelize
@@ -233,12 +252,17 @@ data class SyncNewFolderNavKey(
     val isFromDeviceCenter: Boolean = false,
     val remoteFolderHandle: Long? = null,
     val remoteFolderName: String? = null,
-) : NavKey
+) : NavKey {
+    override fun toString() = "SyncNewFolderNavKey(syncType=$syncType, " +
+            "isFromDeviceCenter=$isFromDeviceCenter, remoteFolderHandle=$remoteFolderHandle)"
+}
 
 @Serializable
 data class SyncSelectStopBackupDestinationNavKey(
     val folderName: String? = null,
-) : NavKey
+) : NavKey {
+    override fun toString() = "SyncSelectStopBackupDestinationNavKey()"
+}
 
 @Serializable
 data object SyncMegaPickerNavKey : NavKey
@@ -301,18 +325,25 @@ data class QuotaWarningUpgradeNavKey(
 data class FileStorageNavKey(
     val uriPath: String?,
     val highlightedFiles: List<String> = emptyList(),
-) : NoSessionNavKey.Optional, Parcelable
+) : NoSessionNavKey.Optional, Parcelable {
+    override fun toString() = "FileStorageNavKey(hasUriPath=${uriPath != null}, " +
+            "highlightedFileCount=${highlightedFiles.size})"
+}
 
 @Serializable
 @Parcelize
 data class LegacyZipBrowserNavKey(
     val zipFilePath: String?,
-) : NoSessionNavKey.Optional, Parcelable
+) : NoSessionNavKey.Optional, Parcelable {
+    override fun toString() = "LegacyZipBrowserNavKey()"
+}
 
 @Serializable
 data class LegacyFileLinkNavKey(
     val uriString: String?,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "LegacyFileLinkNavKey()"
+}
 
 @Serializable
 data object LegacyExportRecoveryKeyNavKey : NavKey
@@ -320,7 +351,9 @@ data object LegacyExportRecoveryKeyNavKey : NavKey
 @Serializable
 data class LegacyFolderLinkNavKey(
     val uriString: String?,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "LegacyFolderLinkNavKey()"
+}
 
 @Serializable
 data class AlbumContentPreviewNavKey(
@@ -329,13 +362,19 @@ data class AlbumContentPreviewNavKey(
     val albumType: String,
     val sortType: String,
     val title: String,
-) : NavKey
+) : NavKey {
+    override fun toString() = "AlbumContentPreviewNavKey(albumId=$albumId, photoId=$photoId, " +
+            "albumType=$albumType, sortType=$sortType)"
+}
 
 @Serializable
 data class AlbumImportPreviewNavKey(
     val photoId: Long,
     val albumLink: String? = null,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() =
+        "AlbumImportPreviewNavKey(photoId=$photoId, hasLink=${albumLink != null})"
+}
 
 @Serializable
 data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {
@@ -367,7 +406,11 @@ data class LegacyPdfViewerNavKey(
     val nodeContentUri: NodeContentUri,
     val nodeSourceType: Int? = null,
     val mimeType: String,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "LegacyPdfViewerNavKey(nodeHandle=$nodeHandle, " +
+            "contentType=${nodeContentUri::class.simpleName}, nodeSourceType=$nodeSourceType, " +
+            "mimeType=$mimeType)"
+}
 
 @Serializable
 data class LegacyImageViewerNavKey(
@@ -378,7 +421,12 @@ data class LegacyImageViewerNavKey(
     val isInShare: Boolean = false,
     val url: String? = null,
     val bucketId: String? = null,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "LegacyImageViewerNavKey(nodeHandle=$nodeHandle, " +
+            "parentNodeHandle=$parentNodeHandle, nodeSourceType=$nodeSourceType, " +
+            "nodeIdCount=${nodeIds?.size}, isInShare=$isInShare, hasUrl=${url != null}, " +
+            "hasBucketId=${bucketId != null})"
+}
 
 /**
  * Single NavKey for all text editor entry points (cloud node, local/zip file, chat attachment).
@@ -401,7 +449,13 @@ data class LegacyTextEditorNavKey(
     val serializedNode: String? = null,
     /** Folder link URL the open file belongs to; only reopens it after authentication. */
     val folderLinkUrl: String? = null,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "LegacyTextEditorNavKey(nodeHandle=$nodeHandle, mode=$mode, " +
+            "nodeSourceType=$nodeSourceType, fromHome=$fromHome, " +
+            "hasLocalPath=${localPath != null}, chatId=$chatId, messageId=$messageId, " +
+            "hasPublicUrl=${publicUrl != null}, hasSerializedNode=${serializedNode != null}, " +
+            "hasFolderLinkUrl=${folderLinkUrl != null})"
+}
 
 @Serializable
 data class LegacyMediaPlayerNavKey(
@@ -424,7 +478,16 @@ data class LegacyMediaPlayerNavKey(
     val msgId: Long? = null,
     val publicLinkUrl: String? = null,
     val localFilePath: String? = null,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "LegacyMediaPlayerNavKey(nodeHandle=$nodeHandle, " +
+            "contentType=${nodeContentUri::class.simpleName}, nodeSourceType=$nodeSourceType, " +
+            "sortOrder=$sortOrder, isFolderLink=$isFolderLink, parentHandle=$parentHandle, " +
+            "fileHandle=$fileHandle, fileType=${fileTypeInfo::class.simpleName}, " +
+            "isMediaQueueAvailable=$isMediaQueueAvailable, " +
+            "searchedItemCount=${searchedItems?.size}, nodeHandleCount=${nodeHandles?.size}, " +
+            "collectionId=$collectionId, chatId=$chatId, msgId=$msgId, " +
+            "hasPublicLink=${publicLinkUrl != null}, hasLocalFilePath=${localFilePath != null})"
+}
 
 @Serializable
 data object VideoSectionNavKey : NavKey
@@ -439,7 +502,12 @@ data class MediaTimelinePhotoPreviewNavKey(
     val totalCount: Int = 0,
     val anchorThumbnailPath: String? = null,
     val sortOrder: String = "",
-) : NavKey
+) : NavKey {
+    override fun toString() = "MediaTimelinePhotoPreviewNavKey(id=$id, sortType=$sortType, " +
+            "filterType=$filterType, mediaSource=$mediaSource, anchorIndex=$anchorIndex, " +
+            "totalCount=$totalCount, hasAnchorThumbnail=${anchorThumbnailPath != null}, " +
+            "sortOrder=$sortOrder)"
+}
 
 @Serializable
 data class LegacyAddToAlbumActivityNavKey(
@@ -504,6 +572,9 @@ data class FileExplorerNavKey(
     val shareUri: String? = null,
     val mimeType: String? = null,
 ) : NavKey {
+    override fun toString() =
+        "FileExplorerNavKey(action=$action, hasShareUri=${shareUri != null}, mimeType=$mimeType)"
+
     companion object {
         const val RESULT_FOLDER_HANDLE = "result_folder_handle"
     }

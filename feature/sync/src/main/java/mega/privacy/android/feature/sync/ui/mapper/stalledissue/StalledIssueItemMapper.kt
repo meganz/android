@@ -73,7 +73,7 @@ internal class StalledIssueItemMapper @Inject constructor(
                 }
             } ?: ""
         ).also {
-            Timber.d("StalledIssueUiItem: id ${it.id} Names ${it.nodeNames} LocalPath ${it.localPaths} issueType: ${it.issueType} actions: ${it.actions}")
+            Timber.d("StalledIssueUiItem: id ${it.id} nodes ${it.nodeNames.size} localPaths ${it.localPaths.size} issueType: ${it.issueType} actions: ${it.actions}")
         }
     }
 

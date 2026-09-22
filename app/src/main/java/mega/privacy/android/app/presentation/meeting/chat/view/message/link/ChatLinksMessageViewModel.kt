@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.contact.ContactLinkQueryFromLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
@@ -85,12 +86,15 @@ class ChatLinksMessageViewModel @Inject constructor(
                 chatId = request?.chatHandle ?: -1,
             ).also { content ->
                 mutex.withLock {
-                    Timber.d("loadChatLinkInfo set: $content, link: $link")
+                    Timber.d(
+                        "loadChatLinkInfo set: chatId=${content.chatId}, " +
+                                "participants=${content.numberOfParticipants}"
+                    )
                     contactLinks[link] = content
                 }
             }
         }.also {
-            Timber.d("loadChatLinkInfo: $it, link: $link")
+            Timber.d("loadChatLinkInfo: ${it.logTypeName()}")
         }
     }
 

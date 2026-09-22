@@ -35,4 +35,9 @@ data class TextLinkMessage(
     override val rowId: Long,
     override val isEdited: Boolean,
     val links: List<LinkDetail>,
-) : NormalMessage
+) : NormalMessage {
+    // Message content and the links it carries must never reach the logs.
+    override fun toString() = "TextLinkMessage(chatId=$chatId, msgId=$msgId, time=$time, " +
+            "isMine=$isMine, userHandle=$userHandle, status=$status, rowId=$rowId, " +
+            "isEdited=$isEdited, linkCount=${links.size})"
+}

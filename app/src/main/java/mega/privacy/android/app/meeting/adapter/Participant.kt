@@ -59,6 +59,12 @@ data class Participant(
     val isRaisedHand: Boolean = false,
 ) : Serializable {
 
+    // The display name is personal data and must never reach the logs.
+    override fun toString() = "Participant(peerId=$peerId, clientId=$clientId, isMe=$isMe, " +
+            "isModerator=$isModerator, isAudioOn=$isAudioOn, isVideoOn=$isVideoOn, " +
+            "isSpeaker=$isSpeaker, isGuest=$isGuest, isPresenting=$isPresenting, " +
+            "isScreenShared=$isScreenShared, isRaisedHand=$isRaisedHand)"
+
     /**
      * Get the display name for participant list
      *

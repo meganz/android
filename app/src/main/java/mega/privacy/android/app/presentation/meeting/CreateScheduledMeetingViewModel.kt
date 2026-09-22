@@ -968,7 +968,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private suspend fun createMeetingLink(chatId: Long) {
         runCatching {
             val chatRequest = createChatLinkUseCase(chatId)
-            Timber.d("Meeting link created successfully ${chatRequest.text}")
+            Timber.d("Meeting link created successfully for chat $chatId")
             _state.update { it.copy(meetingLink = chatRequest.text) }
         }.onFailure { exception ->
             Timber.e(exception)

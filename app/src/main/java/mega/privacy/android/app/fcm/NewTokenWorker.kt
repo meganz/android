@@ -44,7 +44,7 @@ class NewTokenWorker @AssistedInject constructor(
             if (newToken.isNullOrEmpty() || getPushTokenUseCase() == newToken) {
                 Timber.d("No need to register new token.")
             } else {
-                Timber.d("Push service's new token: $newToken")
+                Timber.d("Registering push service's new token")
                 runCatching {
                     registerPushNotificationsUseCase(
                         inputData.getInt(

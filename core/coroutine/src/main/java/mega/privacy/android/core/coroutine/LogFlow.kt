@@ -11,12 +11,13 @@ import timber.log.Timber
  * is no logging or per-item overhead.
  *
  * @param name identifies the flow in the log output.
- * @param transform maps an emitted item to its logged representation. Defaults to [toString], but
- * can be supplied to log only the relevant fields of large items.
+ * @param transform maps an emitted item to its logged representation. It is required rather than
+ * defaulting to [toString] because the emitted items are often data classes whose fields include
+ * user content, links or session tokens; the caller has to choose what is safe to log.
  */
 fun <T> Flow<T>.logFlow(
     name: String,
-    transform: (T) -> String = { it.toString() },
+    transform: (T) -> String,
 ): Flow<T> = if (BuildConfig.DEBUG) {
     onEach { Timber.d("$name emitted: ${transform(it)}") }
 } else {

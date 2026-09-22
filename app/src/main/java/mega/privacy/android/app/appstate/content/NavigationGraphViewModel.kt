@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
@@ -28,7 +29,7 @@ class NavigationGraphViewModel @Inject constructor(
 
     val state: StateFlow<NavigationGraphState> by lazy {
         getEnabledFlaggedItemsUseCase(featureDestinations)
-            .logFlow("Feature Destinations").map { featureItems ->
+            .logFlow("Feature Destinations") { "${it.size} destinations" }.map { featureItems ->
                 NavigationGraphState.Data(
                     featureDestinations = featureItems.toImmutableSet(),
                     appDialogDestinations = appDialogDestinations.toImmutableSet(),
@@ -36,7 +37,7 @@ class NavigationGraphViewModel @Inject constructor(
             }.catch {
                 Timber.e(it, "Error while building app state")
             }.distinctUntilChanged()
-            .logFlow("AppState")
+            .logFlow("AppState") { it.logTypeName() }
             .asUiStateFlow(
                 scope = viewModelScope,
                 initialValue = NavigationGraphState.Loading

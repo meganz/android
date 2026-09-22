@@ -61,6 +61,14 @@ sealed class ChatRoomItem(
     val isLastMessageNormal
         get() = lastMessageType == ChatRoomLastMessage.Normal
 
+    // Title, last message and header are user content and must never reach the logs. Declared
+    // final here so the data class subtypes cannot regenerate a field-dumping toString().
+    final override fun toString() = "${this::class.simpleName}(chatId=$chatId, " +
+            "lastMessageType=$lastMessageType, currentCallStatus=$currentCallStatus, " +
+            "unreadCount=$unreadCount, hasPermissions=$hasPermissions, isActive=$isActive, " +
+            "isMuted=$isMuted, isArchived=$isArchived, lastTimestamp=$lastTimestamp, " +
+            "highlight=$highlight, peers=$peers, hasCall=${call != null})"
+
     /**
      * Individual chat room item
      *

@@ -127,7 +127,7 @@ class ZipBrowserViewModel @Inject constructor(
             ZipItemClickedEventType.OpenFile ->
                 //If the zip file name is start with ".", it cannot be unzip. So show the alert.
                 if (item.zipEntryType == ZipEntryType.Zip && item.name.startsWith(".")) {
-                    Timber.e("zip file ${item.name} start with \".\" cannot unzip")
+                    Timber.e("zip file starting with \".\" cannot be unzipped")
                     updateShowAlertDialog(true)
                 } else {
                     _uiState.update {
@@ -154,7 +154,7 @@ class ZipBrowserViewModel @Inject constructor(
             }
 
             else -> {
-                Timber.e("zip entry: $item does not exist")
+                Timber.e("zip entry of type ${item.zipEntryType} does not exist")
                 updateShowAlertDialog(true)
             }
         }

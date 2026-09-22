@@ -14,7 +14,9 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
  * @property uriString
  */
 @Serializable
-data class OpenPasswordLinkDialogNavKey(val uriString: String) : NoSessionNavKey.Optional, DialogNavKey
+data class OpenPasswordLinkDialogNavKey(val uriString: String) : NoSessionNavKey.Optional, DialogNavKey {
+    override fun toString() = "OpenPasswordLinkDialogNavKey()"
+}
 
 fun EntryProviderScope<NavKey>.openPasswordLinkDialog(
     onBack: () -> Unit,

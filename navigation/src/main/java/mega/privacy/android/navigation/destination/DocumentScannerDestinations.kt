@@ -19,7 +19,11 @@ data class SaveScannedDocumentsNavKey(
     val cloudDriveParentHandle: Long? = null,
     val scanPdfUri: String,
     val scanSoloImageUri: String? = null,
-) : NavKey
+) : NavKey {
+    override fun toString() = "SaveScannedDocumentsNavKey(originatedFromChat=$originatedFromChat, " +
+            "cloudDriveParentHandle=$cloudDriveParentHandle, " +
+            "hasSoloImage=${scanSoloImageUri != null})"
+}
 
 @Serializable
 data class DiscardScanWarningDialogNavKey(

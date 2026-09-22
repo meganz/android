@@ -24,6 +24,7 @@ import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.BlockedState
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RootNodeState
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -61,7 +62,7 @@ class GlobalStateViewModel @Inject constructor(
         getStateValues().catch {
             Timber.e(it, "Error while building auth state")
         }.distinctUntilChanged()
-            .logFlow("AuthState")
+            .logFlow("AuthState") { it.logTypeName() }
             .asUiStateFlow(
                 scope = viewModelScope,
                 initialValue = GlobalState.Loading(ThemeMode.System)

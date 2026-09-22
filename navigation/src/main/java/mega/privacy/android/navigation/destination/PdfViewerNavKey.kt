@@ -40,6 +40,12 @@ data class PdfViewerNavKey(
     val publicLinkUrl: String? = null,
 ) : NoSessionNavKey.Optional, Parcelable {
 
+    override fun toString() = "PdfViewerNavKey(nodeHandle=$nodeHandle, " +
+            "isLocalContent=$isLocalContent, shouldStopHttpServer=$shouldStopHttpServer, " +
+            "nodeSourceType=$nodeSourceType, mimeType=$mimeType, chatId=$chatId, " +
+            "messageId=$messageId, isExternalFile=$isExternalFile, " +
+            "hasPublicLink=${publicLinkUrl != null})"
+
     companion object {
         /**
          * Result key for node options bottom sheet results

@@ -26,7 +26,11 @@ data class CloudDriveNavKey(
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val highlightedNodeHandle: Long? = null,
     val highlightedNodeNames: List<String>? = null,
-) : NavKey, Parcelable
+) : NavKey, Parcelable {
+    override fun toString() = "CloudDriveNavKey(nodeHandle=$nodeHandle, " +
+            "nodeSourceType=$nodeSourceType, highlightedNodeHandle=$highlightedNodeHandle, " +
+            "highlightedNodeCount=${highlightedNodeNames?.size})"
+}
 
 /**
  * Shares route args
@@ -45,7 +49,10 @@ data class OfflineNavKey(
     val nodeId: Int = -1,
     val path: String? = null,
     val highlightedFiles: String? = null,
-) : NoNodeNavKey, MainNavItemNavKey, Parcelable
+) : NoNodeNavKey, MainNavItemNavKey, Parcelable {
+    override fun toString() = "OfflineNavKey(nodeId=$nodeId, hasPath=${path != null}, " +
+            "hasHighlightedFiles=${highlightedFiles != null})"
+}
 
 @Serializable
 data class DriveSyncNavKey(
@@ -73,7 +80,10 @@ data class CloudDriveMediaDiscoveryNavKey(
     val folderName: String,
     val fromFolderLink: Boolean = false,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-) : NavKey, Parcelable
+) : NavKey, Parcelable {
+    override fun toString() = "CloudDriveMediaDiscoveryNavKey(folderId=$folderId, " +
+            "fromFolderLink=$fromFolderLink, nodeSourceType=$nodeSourceType)"
+}
 
 /**
  * Favourites route args
@@ -98,7 +108,10 @@ data class SearchNavKey(
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val parentHandle: Long,
     val folderLinkUrl: String? = null,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "SearchNavKey(nodeSourceType=$nodeSourceType, " +
+            "parentHandle=$parentHandle, isFolderLink=${folderLinkUrl != null})"
+}
 
 /**
  * @isOverQuota whether the user is over quota (red) or near quota (orange)
@@ -122,7 +135,9 @@ data class OverQuotaDialogNavKey(
 data class FolderLinkNavKey(
     val uriString: String? = null,
     val entryFolderHandle: Long? = null,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "FolderLinkNavKey(entryFolderHandle=$entryFolderHandle)"
+}
 
 /**
  * NavKey for file link screen
@@ -131,4 +146,6 @@ data class FolderLinkNavKey(
 @Serializable
 data class FileLinkNavKey(
     val uriString: String? = null,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Optional {
+    override fun toString() = "FileLinkNavKey()"
+}

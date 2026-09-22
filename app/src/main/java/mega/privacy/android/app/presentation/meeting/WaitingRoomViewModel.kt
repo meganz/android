@@ -566,7 +566,7 @@ class WaitingRoomViewModel @Inject constructor(
      */
     fun setGuestName(firstName: String, lastName: String) {
         if (joinMeetingAsGuestJob == null || joinMeetingAsGuestJob?.isCompleted == true) {
-            Timber.d("Joining meeting as guest with link: ${_state.value.chatLink}")
+            Timber.d("Joining meeting as guest, chat: ${_state.value.chatId}")
             joinMeetingAsGuestJob = viewModelScope.launch {
                 _state.update {
                     it.copy(

@@ -497,10 +497,10 @@ internal class BillingFacade @Inject constructor(
     }
 
     private suspend fun submitSubscriptions(purchase: MegaPurchase) {
-        Timber.d("submit subscription: $purchase")
+        Timber.d("submit subscription: sku=${purchase.sku}, state=${purchase.megaPurchaseState}")
         val token = purchase.token
         if (token in submittedPurchaseTokens) {
-            Timber.d("Purchase token already submitted, skipping: $token")
+            Timber.d("Purchase token already submitted, skipping")
             return
         }
         runCatching {

@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -65,7 +66,7 @@ class PendingBackStackNavigationHandler(
     }
 
     override fun remove(navKey: NavKey) {
-        Timber.d("PendingBackStackNavigationHandler::remove $navKey")
+        Timber.d("PendingBackStackNavigationHandler::remove ${navKey.logTypeName()}")
         backstack.pendingNavigations = backstack.pendingNavigations.mapNotNull { navigation ->
             navigation.removeDestinations { it == navKey }
         }
@@ -74,12 +75,12 @@ class PendingBackStackNavigationHandler(
     }
 
     override fun navigate(destination: NavKey, navOptions: NavOptions?) {
-        Timber.d("PendingBackStackNavigationHandler::navigate $destination")
+        Timber.d("PendingBackStackNavigationHandler::navigate ${destination.logTypeName()}")
         navigate(listOf(destination), navOptions)
     }
 
     override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
-        Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
+        Timber.d("PendingBackStackNavigationHandler::navigate ${destinations.logNames()}")
         performNavigate(destinations, navOptions?.toPendingNavOptions())
     }
 
@@ -135,7 +136,7 @@ class PendingBackStackNavigationHandler(
             }
         }
         ensureNotEmpty()
-        logBackStack("navigate : $destinations")
+        logBackStack("navigate : ${destinations.logNames()}")
     }
 
     override fun backTo(destination: NavKey, inclusive: Boolean) {
@@ -469,10 +470,13 @@ class PendingBackStackNavigationHandler(
         )
     }
 
-    private fun printBackStack(): String = backstack.joinToString("\n\t") { it.toString() }
+    private fun printBackStack(): String = backstack.joinToString("\n\t") { it.logTypeName() }
 
     private fun printPendingItems(): String =
-        backstack.pending.joinToString("\n\t") { it.toString() }
+        backstack.pending.joinToString("\n\t") { it.logTypeName() }
+
+    private fun List<NavKey>.logNames(): String =
+        joinToString(prefix = "[", postfix = "]") { it.logTypeName() }
 
     sealed interface AuthStatus {
         val isLoggedIn: Boolean

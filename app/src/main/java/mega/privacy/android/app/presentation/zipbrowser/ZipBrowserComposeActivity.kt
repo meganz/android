@@ -330,9 +330,8 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
                 // Log the Activity name that opens ZipBrowserActivity
                 hiltEntryPoint.crashReporter().log("Activity name is $localClassName")
             }
-            // Log the zip file path
             hiltEntryPoint.crashReporter()
-                .log("Path of ZipFile(zipFileFormatCheck) is $zipFilePath")
+                .log("ZipFile(zipFileFormatCheck) extension is ${zipFilePath?.substringAfterLast('.', "")}")
             var zipFile: ZipFile? = null
             try {
                 zipFile = ZipFile(zipFilePath)

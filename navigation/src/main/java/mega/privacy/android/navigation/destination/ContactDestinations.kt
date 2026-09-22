@@ -11,7 +11,9 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
  * @property email
  */
 @Serializable
-data class CannotVerifyContactDialogNavKey(val email: String) : DialogNavKey
+data class CannotVerifyContactDialogNavKey(val email: String) : DialogNavKey {
+    override fun toString() = "CannotVerifyContactDialogNavKey()"
+}
 
 /**
  * Add contacts nav key. Opens the MEGA-contacts multi-select picker; the selected

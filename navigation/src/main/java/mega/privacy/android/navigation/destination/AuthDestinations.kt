@@ -12,7 +12,10 @@ data class LoginNavKey(
     val action: String? = null,
     val link: String? = null,
     val timeStamp: Long = System.currentTimeMillis(),
-) : NoSessionNavKey.Mandatory, Parcelable
+) : NoSessionNavKey.Mandatory, Parcelable {
+    override fun toString() =
+        "LoginNavKey(action=$action, hasLink=${link != null}, timeStamp=$timeStamp)"
+}
 
 /**
  * Park account confirmation screen, opened from a park-account link.
@@ -23,7 +26,9 @@ data class LoginNavKey(
 @Parcelize
 data class ParkAccountNavKey(
     val link: String,
-) : NoSessionNavKey.Optional, Parcelable
+) : NoSessionNavKey.Optional, Parcelable {
+    override fun toString() = "ParkAccountNavKey()"
+}
 
 /**
  * Create Account Screen
@@ -33,4 +38,6 @@ data class ParkAccountNavKey(
 @Parcelize
 data class CreateAccountNavKey(
     val initialEmail: String? = null,
-) : NoSessionNavKey.Mandatory, Parcelable
+) : NoSessionNavKey.Mandatory, Parcelable {
+    override fun toString() = "CreateAccountNavKey(hasInitialEmail=${initialEmail != null})"
+}

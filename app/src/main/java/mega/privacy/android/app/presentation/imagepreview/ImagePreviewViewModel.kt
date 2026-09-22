@@ -411,7 +411,7 @@ class ImagePreviewViewModel @Inject constructor(
         monitorOfflineNodeUpdatesUseCase()
             .catch { Timber.e(it) }
             .mapLatest { offlineList ->
-                Timber.d("IP monitorOfflineNodeUpdates:$offlineList")
+                Timber.d("IP monitorOfflineNodeUpdates: ${offlineList.size} offline nodes")
                 _state.value.currentImageNode?.let { currentImageNode ->
                     val handle = currentImageNode.id.longValue.toString()
                     val index = offlineList.indexOfFirst { handle == it.handle }

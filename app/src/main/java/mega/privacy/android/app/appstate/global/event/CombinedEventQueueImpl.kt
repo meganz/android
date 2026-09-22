@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.global.event
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.channels.ReceiveChannel
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavPriority
@@ -48,7 +49,7 @@ class CombinedEventQueueImpl(
         priority: NavPriority,
         navOptions: NavOptions?,
     ) {
-        Timber.d("Emit navigation events: $navKeys")
+        Timber.d("Emit navigation events: ${navKeys.map { it.logTypeName() }}")
 
         val pendingNavKeys = mutableListOf<NavKey>()
         for (navKey in navKeys) {
@@ -97,7 +98,7 @@ class CombinedEventQueueImpl(
         event: AppDialogEvent,
         priority: NavPriority,
     ) {
-        Timber.d("Emit dialog event: $event")
+        Timber.d("Emit dialog event: ${event.dialogDestination.logTypeName()}")
         queueChannel.add(
             QueuedEvent(event = event, priority = priority, timestamp = getTime())
         )

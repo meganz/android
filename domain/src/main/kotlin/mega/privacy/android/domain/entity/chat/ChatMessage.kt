@@ -107,4 +107,10 @@ data class ChatMessage(
      * @return True if the message has changed with the specified change, false otherwise.
      */
     fun hasChanged(chatMessageChange: ChatMessageChange) = changes.contains(chatMessageChange)
+
+    // Message content and user details must never reach the logs, so only identifiers are printed.
+    override fun toString() = "ChatMessage(messageId=$messageId, tempId=$tempId, " +
+            "msgIndex=$msgIndex, userHandle=$userHandle, type=$type, status=$status, " +
+            "timestamp=$timestamp, isEdited=$isEdited, isDeleted=$isDeleted, rowId=$rowId, " +
+            "changes=$changes)"
 }

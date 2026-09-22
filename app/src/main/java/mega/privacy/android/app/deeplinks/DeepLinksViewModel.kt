@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.deeplinks.model.DeepLinksUIState
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -56,7 +57,7 @@ class DeepLinksViewModel @AssistedInject constructor(
                         ?.let { deepLinkHandler to it }
                 }?.let { (handler, navKeys) ->
                     navKeys.forEach {
-                        Timber.d("Adding NavKey from deep link: $it")
+                        Timber.d("Adding NavKey from deep link: ${it.logTypeName()}")
                     }
                     _uiState.update { state ->
                         state.copy(

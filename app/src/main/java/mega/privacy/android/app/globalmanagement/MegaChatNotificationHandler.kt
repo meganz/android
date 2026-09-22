@@ -101,7 +101,7 @@ class MegaChatNotificationHandler @Inject constructor(
                 false
             }
 
-            Timber.d("Should beep: $shouldBeep, Chat: $chatId, message: $msg?.msgId")
+            Timber.d("Should beep: $shouldBeep, Chat: $chatId, message: ${msg?.msgId}")
 
             applicationScope.launch {
                 runCatching {

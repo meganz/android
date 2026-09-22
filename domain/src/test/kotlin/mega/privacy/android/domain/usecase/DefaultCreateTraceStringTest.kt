@@ -104,6 +104,15 @@ class DefaultCreateTraceStringTest {
         ))
 
         val actual = underTest(input, loggingClasses)
-        assertThat(actual).isEqualTo("${filename}#${methodName}:${lineNumber}")
+        assertThat(actual).isEqualTo("${className}.${methodName}(${filename}:${lineNumber})")
     }
+
+    @Test
+    fun `test that format is a stack frame that can be retraced when the source file is obfuscated`() =
+        runTest {
+            val input = listOf(StackTraceElement("a.b.c", "d", "SourceFile", 14))
+
+            val actual = underTest(input, emptyList())
+            assertThat(actual).isEqualTo("a.b.c.d(SourceFile:14)")
+        }
 }

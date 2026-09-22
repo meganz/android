@@ -16,7 +16,11 @@ import mega.privacy.android.navigation.destination.ContactInfoNavKey
 
 @Serializable
 data class ContactLinkDialogNavKey(val contactLinkQueryResult: ContactLinkQueryResult) :
-    DialogNavKey
+    DialogNavKey {
+    override fun toString() = "ContactLinkDialogNavKey(" +
+            "contactHandle=${contactLinkQueryResult.contactHandle}, " +
+            "isContact=${contactLinkQueryResult.isContact})"
+}
 
 data object ContactLinkDialogDestinations : AppDialogDestinations {
     override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =

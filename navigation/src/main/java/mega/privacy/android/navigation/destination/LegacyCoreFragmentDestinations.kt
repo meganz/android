@@ -17,4 +17,7 @@ data class MediaDiscoveryNavKey(
     val nodeHandle: Long,
     val nodeName: String? = null,
     val isFromFolderLink: Boolean = false,
-) : NavKey
+) : NavKey {
+    override fun toString() =
+        "MediaDiscoveryNavKey(nodeHandle=$nodeHandle, isFromFolderLink=$isFromFolderLink)"
+}

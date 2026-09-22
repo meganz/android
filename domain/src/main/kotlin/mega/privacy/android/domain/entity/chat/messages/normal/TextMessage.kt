@@ -24,4 +24,9 @@ data class TextMessage(
     override val rowId: Long,
     override val isEdited: Boolean,
     val hasOtherLink: Boolean,
-) : NormalMessage
+) : NormalMessage {
+    // Message content must never reach the logs.
+    override fun toString() = "TextMessage(chatId=$chatId, msgId=$msgId, time=$time, " +
+            "isMine=$isMine, userHandle=$userHandle, status=$status, rowId=$rowId, " +
+            "isEdited=$isEdited, hasOtherLink=$hasOtherLink)"
+}

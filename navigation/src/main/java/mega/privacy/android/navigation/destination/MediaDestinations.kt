@@ -65,13 +65,18 @@ data class SelectVideosForPlaylistNavKey(
     val playlistHandle: Long = -1L,
     val isNewlyCreated: Boolean = false,
 ) : NavKey, Parcelable {
+    override fun toString() = "SelectVideosForPlaylistNavKey(nodeHandle=$nodeHandle, " +
+            "playlistHandle=$playlistHandle, isNewlyCreated=$isNewlyCreated)"
+
     companion object {
         const val RESULT = "SelectVideosForPlaylistNavKey::result"
     }
 }
 
 @Serializable
-data class AlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional
+data class AlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional {
+    override fun toString() = "AlbumImportNavKey(hasLink=${link != null})"
+}
 
 @Serializable
 data object VideoRecentlyWatchedNavKey : NavKey
@@ -84,6 +89,9 @@ data class SelectVideosSearchNavKey(
     val playlistHandle: Long = -1L,
     val isNewlyCreated: Boolean = false,
 ) : NavKey, Parcelable {
+    override fun toString() = "SelectVideosSearchNavKey(nodeHandle=$nodeHandle, " +
+            "playlistHandle=$playlistHandle, isNewlyCreated=$isNewlyCreated)"
+
     companion object {
         const val RESULT = "SelectVideosSearchNavKey::result"
     }

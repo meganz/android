@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -55,20 +56,26 @@ class MainNavigationStateViewModel @Inject constructor(
         combine(
             isConnected,
             getNavigationItems()
-                .logFlow("Navigation Items"),
+                .logFlow("Navigation Items") { items ->
+                    items.map { it.destination.logTypeName() }.toString()
+                },
             filteredMainNavItemsFlow
                 .filter { it.isNotEmpty() }
                 .map { itemSet -> itemSet.map { it.screen }.toSet().toImmutableSet() }
-                .logFlow("Main Nav Screens"),
+                .logFlow("Main Nav Screens") { screens ->
+                    screens.map { it.logTypeName() }.toString()
+                },
             mainNavigationBarFlow
                 .filterNotNull()
                 .map { it.startDestination }
-                .logFlow("Navigation Bar Start Destination"),
+                .logFlow("Navigation Bar Start Destination") { destination ->
+                    destination.logTypeName()
+                },
             monitorStartScreenPreferenceDestinationUseCase()
                 .map {
                     screenPreferenceDestinationMapper(it) ?: defaultStartScreen
                 }.take(1)
-                .logFlow("Start Screen Preference Destination"),
+                .logFlow("Start Screen Preference Destination") { it.logTypeName() },
         ) { isConnected, navigationItems, mainScreens, barStartDestination, startScreenPreferenceDestination ->
             MainNavState.Data(
                 mainNavItems = navigationItems,

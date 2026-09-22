@@ -436,6 +436,7 @@ dependencies {
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)
     testImplementation(lib.bundles.unit.test)
+    testImplementation(lib.kotlin.reflect)
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.truth.ext)
     testImplementation(testlib.arch.core.test)

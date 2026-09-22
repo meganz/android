@@ -26,7 +26,10 @@ data class FetchingContentNavKey(
     val session: String,
     val isFromLogin: Boolean,
     val refreshEvent: RefreshEvent? = null,
-) : NoNodeNavKey
+) : NoNodeNavKey {
+    override fun toString() =
+        "FetchingContentNavKey(isFromLogin=$isFromLogin, refreshEvent=$refreshEvent)"
+}
 
 fun EntryProviderScope<NavKey>.fetchingContentDestination(
     navigate: (NavKey) -> Unit,

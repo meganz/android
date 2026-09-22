@@ -45,7 +45,7 @@ internal class StalledIssuesMapper @Inject constructor(
                     nodeNames = nodes.map { it.nodeName },
                     id = stalledIssueSdkObject.hash.toString()
                 ).also {
-                    Timber.d("Mapped stalled issue: $it and reason: ${stalledIssueSdkObject.reason()}")
+                    Timber.d("Mapped stalled issue: id=${it.id} syncId=${it.syncId} type=${it.issueType} nodes=${it.nodeIds.size} localPaths=${it.localPaths.size} reason: ${stalledIssueSdkObject.reason()}")
                 }
             } catch (e: Exception) {
                 Timber.e(e)

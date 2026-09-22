@@ -52,4 +52,14 @@ data class ChatListItem(
     val lastMessageHandle: Long = -1,
     val numPreviewers: Long = -1,
     val isNoteToSelf: Boolean = false,
-)
+) {
+    // Title and last message are user content and must never reach the logs.
+    override fun toString() = "ChatListItem(chatId=$chatId, changes=$changes, " +
+            "ownPrivilege=$ownPrivilege, unreadCount=$unreadCount, lastMessageId=$lastMessageId, " +
+            "lastMessageType=$lastMessageType, lastMessageSender=$lastMessageSender, " +
+            "lastTimestamp=$lastTimestamp, isGroup=$isGroup, isPublic=$isPublic, " +
+            "isPreview=$isPreview, isActive=$isActive, isArchived=$isArchived, " +
+            "isDeleted=$isDeleted, isCallInProgress=$isCallInProgress, peerHandle=$peerHandle, " +
+            "lastMessagePriv=$lastMessagePriv, lastMessageHandle=$lastMessageHandle, " +
+            "numPreviewers=$numPreviewers, isNoteToSelf=$isNoteToSelf)"
+}

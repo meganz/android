@@ -13,7 +13,10 @@ internal data class ChatLegacyContainerNavKey(
     val chatId: Long,
     val action: String,
     val link: String? = null,
-) : NavKey
+) : NavKey {
+    override fun toString() =
+        "ChatLegacyContainerNavKey(chatId=$chatId, action=$action, hasLink=${link != null})"
+}
 
 /**
  * @param showMeetingTab True to open with the Meetings tab selected.

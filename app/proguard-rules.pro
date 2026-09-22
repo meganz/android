@@ -24,6 +24,12 @@
     public static <fields>;
 }
 
+###########
+# NavKeys #
+###########
+# Navigation logs print only the destination type, so keep it readable in release logs.
+-keepnames class * implements androidx.navigation3.runtime.NavKey
+
 #################
 # Serializable #
 ################

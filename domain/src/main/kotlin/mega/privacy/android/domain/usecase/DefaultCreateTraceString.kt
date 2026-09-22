@@ -11,5 +11,7 @@ internal class DefaultCreateTraceString @Inject constructor() : CreateTraceStrin
         loggingClasses: List<String>,
     ) = trace
         .firstOrNull { it.className !in loggingClasses }
-        ?.let { "${it.fileName}#${it.methodName}:${it.lineNumber}" }
+        // JVM stack frame layout: in release builds the file name collapses to "SourceFile", so the
+        // class name is what lets retrace map the frame back through mapping.txt.
+        ?.let { "${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})" }
 }

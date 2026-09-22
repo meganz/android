@@ -11,21 +11,29 @@ import mega.privacy.android.domain.entity.uri.UriPath
 sealed interface ExplorerNavKey : NavKey
 
 @Serializable
-data class ShareFilesToMegaNavKey(val shareUris: List<UriPath>) : ExplorerNavKey
+data class ShareFilesToMegaNavKey(val shareUris: List<UriPath>) : ExplorerNavKey {
+    override fun toString() = "ShareFilesToMegaNavKey(shareUriCount=${shareUris.size})"
+}
 
 @Serializable
 data class ShareTextToMegaNavKey(
     val text: String,
     val subject: String?,
     val email: String?,
-) : ExplorerNavKey
+) : ExplorerNavKey {
+    override fun toString() =
+        "ShareTextToMegaNavKey(hasSubject=${subject != null}, hasEmail=${email != null})"
+}
 
 @Serializable
 data class UploadScannedDocumentNavKey(
     val uriPath: UriPath,
     val nodeSourceType: NodeSourceType,
     val hasMultipleScans: Boolean = false,
-) : ExplorerNavKey
+) : ExplorerNavKey {
+    override fun toString() = "UploadScannedDocumentNavKey(nodeSourceType=$nodeSourceType, " +
+            "hasMultipleScans=$hasMultipleScans)"
+}
 
 @Serializable
 data object SelectCUFolderNavKey : ExplorerNavKey {
@@ -65,7 +73,9 @@ data object PinToHomeNavKey : ExplorerNavKey {
 data object SelectSyncFolderNavKey : ExplorerNavKey
 
 @Serializable
-data class SelectStopBackupDestinationNavKey(val folderName: String?) : ExplorerNavKey
+data class SelectStopBackupDestinationNavKey(val folderName: String?) : ExplorerNavKey {
+    override fun toString() = "SelectStopBackupDestinationNavKey()"
+}
 
 @Serializable
 data class CopyNavKey(val nodeIds: List<NodeId>) : ExplorerNavKey {
@@ -95,4 +105,9 @@ data class NodesExplorerNavKey(
     val startNavKey: ExplorerNavKey,
     val shareUris: List<UriPath>?,
     val disabledNodeIds: List<NodeId> = emptyList(),
-) : NavKey
+) : NavKey {
+    override fun toString() = "NodesExplorerNavKey(nodeId=$nodeId, " +
+            "nodeSourceType=$nodeSourceType, explorerMode=$explorerMode, " +
+            "startNavKey=${startNavKey::class.simpleName}, shareUriCount=${shareUris?.size}, " +
+            "disabledNodeIds=$disabledNodeIds)"
+}

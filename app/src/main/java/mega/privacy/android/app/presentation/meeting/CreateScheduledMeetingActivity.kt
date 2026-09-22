@@ -171,7 +171,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 )
                 Timber.d("Chat id ${viewModel.state.value.chatIdToOpenInfoScreen}")
                 putExtra(MEETING_TITLE_TAG, viewModel.state.value.meetingTitle)
-                Timber.d("Meeting title ${viewModel.state.value.meetingTitle}")
                 putExtra(
                     MEETING_LINK_CREATED_TAG,
                     viewModel.state.value.meetingLink?.isNotBlank() == true
@@ -180,7 +179,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                     MEETING_LINK_TAG,
                     viewModel.state.value.meetingLink
                 )
-                Timber.d("Meeting link ${viewModel.state.value.meetingLink}")
+                Timber.d("Meeting link created: ${viewModel.state.value.meetingLink?.isNotBlank() == true}")
             }
         )
         finish()

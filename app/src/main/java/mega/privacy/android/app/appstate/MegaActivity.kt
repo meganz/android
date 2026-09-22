@@ -71,6 +71,7 @@ import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.coroutine.logTypeName
 import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
 import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
@@ -172,7 +173,7 @@ class MegaActivity : FragmentActivity() {
         intent.getDestinations()?.let { navKeys ->
             //Add nav keys to navigation queue
             navKeys.forEach {
-                Timber.d("NavKey from intent: $it")
+                Timber.d("NavKey from intent: ${it.logTypeName()}")
             }
             val navOptions = if (intent.getBooleanExtra(EXTRA_NAV_DROP_IF_SHOWN, false)) {
                 navOptions { dropIfAlreadyShown = true }

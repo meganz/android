@@ -33,12 +33,12 @@ class MegaMessageService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Timber.d("Remote Message: $remoteMessage")
+        Timber.d("Remote Message received, keys: ${remoteMessage.data.keys}")
         coordinatorOrNull()?.onMessageReceived(remoteMessage.data)
     }
 
     override fun onNewToken(token: String) {
-        Timber.d("New token: $token")
+        Timber.d("New push token received")
         coordinatorOrNull()?.onNewToken(token)
     }
 
