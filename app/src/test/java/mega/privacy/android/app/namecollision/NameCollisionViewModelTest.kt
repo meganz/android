@@ -28,7 +28,6 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
-import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionResultUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionsResultUseCase
@@ -66,7 +65,6 @@ internal class NameCollisionViewModelTest {
     private val getFileVersionsOption = mock<GetFileVersionsOption>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
     private val copyCollidedNodesUseCase = mock<CopyCollidedNodesUseCase>()
-    private val copyCollidedNodeUseCase = mock<CopyCollidedNodeUseCase>()
     private val copyRequestMessageMapper = mock<CopyRequestMessageMapper>()
     private val getNodeNameCollisionResultUseCase: GetNodeNameCollisionResultUseCase = mock()
     private val getNodeNameCollisionsResultUseCase: GetNodeNameCollisionsResultUseCase = mock()
@@ -85,14 +83,12 @@ internal class NameCollisionViewModelTest {
             reorderNodeNameCollisionsUseCase = reorderNodeNameCollisionsUseCase,
             updateNodeNameCollisionsResultUseCase = updateNodeNameCollisionsResultUseCase,
             copyCollidedNodesUseCase = copyCollidedNodesUseCase,
-            copyCollidedNodeUseCase = copyCollidedNodeUseCase,
             monitorUserUpdates = monitorUserUpdates,
             isCopyToOriginUseCase = isCopyToOriginUseCase,
             setCopyLatestTargetPathUseCase = mock(),
             setMoveLatestTargetPathUseCase = mock(),
             copyRequestMessageMapper = copyRequestMessageMapper,
             nodeMoveRequestMessageMapper = mock(),
-            moveCollidedNodeUseCase = mock(),
             moveCollidedNodesUseCase = mock(),
             deleteCacheFilesUseCase = deleteCacheFilesUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
@@ -103,7 +99,6 @@ internal class NameCollisionViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            copyCollidedNodeUseCase,
             copyCollidedNodesUseCase,
             getFileVersionsOption,
             monitorUserUpdates,
@@ -136,7 +131,7 @@ internal class NameCollisionViewModelTest {
             on { parentHandle }.thenReturn(2L)
         }
         val message = "1 file copied"
-        whenever(copyCollidedNodeUseCase(nameCollision, true)).thenReturn(
+        whenever(copyCollidedNodesUseCase(listOf(nameCollision), true)).thenReturn(
             MoveRequestResult.Copy(
                 1,
                 0
@@ -156,10 +151,7 @@ internal class NameCollisionViewModelTest {
         runTest {
             val nameCollision = mock<NodeNameCollision.Default>()
             whenever(
-                copyCollidedNodeUseCase(
-                    nameCollision,
-                    true
-                )
+                copyCollidedNodesUseCase(listOf(nameCollision), true)
             ).thenThrow(RuntimeException::class.java)
 
             initUnderTest()

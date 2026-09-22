@@ -44,9 +44,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
-import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
-import mega.privacy.android.domain.usecase.node.MoveCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveCollidedNodesUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionResultUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionsResultUseCase
@@ -68,7 +66,6 @@ class NameCollisionViewModel @Inject constructor(
     private val getNodeNameCollisionsResultUseCase: GetNodeNameCollisionsResultUseCase,
     private val reorderNodeNameCollisionsUseCase: ReorderNodeNameCollisionsUseCase,
     private val updateNodeNameCollisionsResultUseCase: UpdateNodeNameCollisionsResultUseCase,
-    private val copyCollidedNodeUseCase: CopyCollidedNodeUseCase,
     private val copyCollidedNodesUseCase: CopyCollidedNodesUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val isCopyToOriginUseCase: IsCopyToOriginUseCase,
@@ -76,7 +73,6 @@ class NameCollisionViewModel @Inject constructor(
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
-    private val moveCollidedNodeUseCase: MoveCollidedNodeUseCase,
     private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
     private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
@@ -633,9 +629,11 @@ class NameCollisionViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                moveCollidedNodeUseCase(
-                    currentCollision.value?.nameCollision as? NodeNameCollision
-                        ?: throw IllegalArgumentException("Invalid collision"),
+                moveCollidedNodesUseCase(
+                    listOf(
+                        currentCollision.value?.nameCollision as? NodeNameCollision
+                        ?: throw IllegalArgumentException("Invalid collision")
+                    ),
                     rename
                 )
             }.onSuccess {
@@ -701,8 +699,8 @@ class NameCollisionViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                copyCollidedNodeUseCase(
-                    nameCollision = nameCollision,
+                copyCollidedNodesUseCase(
+                    nameCollisions = listOf(nameCollision),
                     rename = rename
                 )
             }.onSuccess {
