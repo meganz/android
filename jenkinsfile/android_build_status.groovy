@@ -54,7 +54,13 @@ CODE_REVIEW_SUMMARY_FILE = "code_review_summary.md"
 CODE_REVIEW_ERROR_REPORT_FILE = "code_review_error_report.txt"
 
 WEBLATE_GATE_REPORT_FILE = "weblate_gate_report.txt"
+
 WEBLATE_CHECK_CMD = "weblate_check"
+/**
+ * Shadow-mode record of what affected-module detection would have selected for this build.
+ * Observational only — see recordAffectedModuleShadowReport.
+ */
+AFFECTED_MODULES_SHADOW_REPORT_FILE = "affected_modules_shadow.json"
 
 /**
  * common.groovy file with common methods
@@ -305,6 +311,8 @@ pipeline {
                                     } finally {
 
                                         failedModules = detectFailedTestModules(moduleList)
+
+                                        recordAffectedModuleShadowReport(moduleList, failedModules)
 
                                         if (!failedModules.isEmpty()) {
                                             for (int i = 0; i < failedModules.size(); i++) {
@@ -702,6 +710,101 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
         result = "Unit Test report not available, perhaps test code has compilation error. Please check full build log."
     }
     return result
+}
+
+/**
+ * Records what affected-module detection *would* have selected for this merge request, without
+ * changing anything the build actually ran.
+ *
+ * This is the observation phase of the affected-module work: the full unit-test suite still runs,
+ * and the only output is a log block plus an uploaded report. The number that matters is the miss
+ * list — modules whose tests failed but which the detector would not have selected. Those are the
+ * cases where selecting a subset would have turned a red build green, and that figure has to be
+ * zero over a meaningful sample before any stage is allowed to act on the detector.
+ *
+ * Detection is compared only against modules that actually have unit tests, since the detector
+ * reports affected modules generally and most of them have nothing for this stage to run.
+ *
+ * Any failure here is swallowed: a broken shadow report must never fail a build, and it runs inside
+ * the unit-test stage's finally block where a throw would mask a real test failure.
+ *
+ * @param unitTestModules every module with unit tests, as reported by printModulesWithUnitTest
+ * @param failedModules modules whose tests actually failed in this build
+ */
+def recordAffectedModuleShadowReport(List<String> unitTestModules, List<String> failedModules) {
+    Map detection = [available: false, mode: "", modules: [], reason: "shadow detection did not run"]
+    List<String> selected = []
+    List<String> skipped = []
+    List<String> missed = []
+
+    try {
+        // `common` is declared with `def` in the pipeline body, so it is not visible from a
+        // top-level method; load it here as unitTestArchiveLink does.
+        common = load('jenkinsfile/common.groovy')
+
+        String currentBranch = env.CHANGE_BRANCH ?: env.gitlabSourceBranch ?: env.GIT_BRANCH
+        String targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET ?: env.gitlabTargetBranch ?: 'develop'
+
+        detection = common.getAffectedModules(currentBranch, targetBranch)
+    } catch (Exception e) {
+        detection = [available: false, mode: "", modules: [], reason: "shadow detection threw: ${e}".toString()]
+    }
+
+    // Comparing is kept apart from detecting so that a fault in the arithmetic cannot erase a
+    // detection that actually worked, which is how a successful run first came back reported as a
+    // failed one.
+    if (detection.available) {
+        try {
+            Map comparison = common.compareAffectedModules(
+                unitTestModules, detection.modules, failedModules
+            )
+            selected = comparison.selected
+            skipped = comparison.skipped
+            missed = comparison.missed
+        } catch (Exception e) {
+            println("AFFECTED-MODULES: comparison failed: ${e}")
+        }
+    }
+
+    println("========== AFFECTED-MODULE SHADOW REPORT ==========")
+    println("Observational only. The full unit-test suite ran; nothing was skipped.")
+    if (!detection.available) {
+        println("AFFECTED-MODULES: no comparison made - ${detection.reason}")
+    } else {
+        println("AFFECTED-MODULES: mode ${detection.mode}")
+        println("AFFECTED-MODULES: would have run ${selected.size()} of ${unitTestModules.size()} unit-test modules")
+        println("AFFECTED-MODULES: would have skipped ${skipped.size()}")
+        println("AFFECTED-MODULES: modules that actually failed: ${failedModules}")
+        if (missed.isEmpty()) {
+            println("AFFECTED-MODULES: MISSES none")
+        } else {
+            println("AFFECTED-MODULES: *** MISSES: ${missed} ***")
+            println("AFFECTED-MODULES: those modules failed but would NOT have been selected.")
+        }
+    }
+    println("==================================================")
+
+    // Publishing is deliberately separate from detecting, and runs whatever detection did. A build
+    // that uploads no report at all is indistinguishable from a stage that never ran, which is the
+    // one thing a shadow phase cannot afford to be ambiguous about.
+    try {
+        writeFile(
+            file: AFFECTED_MODULES_SHADOW_REPORT_FILE,
+            text: common.affectedModuleShadowJson(
+                env.BUILD_NUMBER, common.getMrNumber(), detection,
+                unitTestModules, selected, skipped, failedModules, missed
+            )
+        )
+        println("AFFECTED-MODULES: report uploaded to ${common.uploadFileToArtifactory(AFFECTED_MODULES_SHADOW_REPORT_FILE)}")
+
+        // While the detector is still failing, the tail in the report is rarely the whole story.
+        if (!detection.available && fileExists(common.AFFECTED_MODULES_DETECTOR_LOG)) {
+            println("AFFECTED-MODULES: detector output uploaded to " +
+                    "${common.uploadFileToArtifactory(common.AFFECTED_MODULES_DETECTOR_LOG)}")
+        }
+    } catch (Exception e) {
+        println("AFFECTED-MODULES: could not publish the shadow report: ${e}")
+    }
 }
 
 /**

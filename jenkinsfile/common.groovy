@@ -864,6 +864,226 @@ ArrayList<String> getModuleList() {
  * 
  * @return List of module paths like ["app", "domain", "feature/chat"] that contain unit tests
  */
+/**
+ * Runs printAffectedModules for a merge request and returns what the detector selected.
+ *
+ * Shadow-mode contract: this never throws and never fails a build. Callers must read `available`
+ * and treat false as "no comparison is possible for this build", never as "nothing is affected" —
+ * the two are indistinguishable if you only look at the module list, and confusing them is how a
+ * detector that is silently broken comes to look like a detector that is working perfectly.
+ *
+ * @param currentBranch branch under test
+ * @param targetBranch branch it is being merged into
+ * @return [available: boolean, mode: String, modules: List<String>] with module directories
+ */
+/**
+ * Works out what the detector's selection would have meant for the unit-test stage.
+ *
+ * Returns `selected` (modules with unit tests that the detector picked), `skipped` (those it did
+ * not) and `missed` — modules whose tests failed but which would not have been selected. `missed`
+ * is the figure the whole shadow phase exists to produce, and it must be empty over a meaningful
+ * sample before anything acts on the detector.
+ *
+ * Written with `findAll`/`contains` rather than `intersect` and list subtraction: the Jenkins script
+ * security sandbox rejects those Groovy collection methods outright, and the rejection surfaces at
+ * runtime on a real agent, where it cannot be caught by any local check.
+ */
+Map compareAffectedModules(
+        List<String> unitTestModules,
+        List<String> detectedModules,
+        List<String> failedModules
+) {
+    List<String> selected = unitTestModules.findAll { detectedModules.contains(it) }.sort()
+    List<String> skipped = unitTestModules.findAll { !selected.contains(it) }.sort()
+    List<String> missed = failedModules.findAll { skipped.contains(it) }.sort()
+    return [selected: selected, skipped: skipped, missed: missed]
+}
+
+/**
+ * Renders the affected-module shadow report as JSON, so a sample of builds can be aggregated later
+ * without re-parsing console logs.
+ */
+String affectedModuleShadowJson(
+        String buildNumber,
+        String mrNumber,
+        Map detection,
+        List<String> unitTestModules,
+        List<String> selected,
+        List<String> skipped,
+        List<String> failedModules,
+        List<String> missed
+) {
+    return """{
+  "build": "${buildNumber}",
+  "mrNumber": "${mrNumber}",
+  "detectorAvailable": ${detection.available},
+  "unavailableReason": "${jsonEscape(detection.reason)}",
+  "mode": "${detection.mode}",
+  "unitTestModuleCount": ${unitTestModules.size()},
+  "wouldRunCount": ${selected.size()},
+  "wouldSkipCount": ${skipped.size()},
+  "wouldRun": ${jsonStringArray(selected)},
+  "wouldSkip": ${jsonStringArray(skipped)},
+  "failed": ${jsonStringArray(failedModules)},
+  "missed": ${jsonStringArray(missed)}
+}
+"""
+}
+
+/** Escapes the one free-text field in the report; module paths need nothing. */
+String jsonEscape(String value) {
+    return (value ?: "").replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ").replace("\r", " ")
+}
+
+/** Minimal JSON string array. Module paths and branch names carry nothing needing escaping. */
+String jsonStringArray(List<String> values) {
+    return "[" + values.collect { "\"${it}\"" }.join(", ") + "]"
+}
+
+Map getAffectedModules(String currentBranch, String targetBranch) {
+    String current = bareBranchName(currentBranch)
+    String target = bareBranchName(targetBranch)
+
+    if (!isSafeBranchName(current) || !isSafeBranchName(target)) {
+        return unavailableAffectedModules(
+            "unusable branch names (current='${currentBranch}', target='${targetBranch}')"
+        )
+    }
+    println("AFFECTED-MODULES: comparing ${current} against ${target}")
+
+    try {
+        // Everything runs as one captured script: the fetch and the ref checks are as much a part
+        // of diagnosing a failure as the task itself, and splitting them across `sh` steps sends
+        // half the story to the console, where a passing build never keeps it.
+        //
+        // Credentials have to be supplied explicitly. Jenkins injects them for its own checkout
+        // step only, so a plain `git fetch` from a shell step fails with "could not read Username",
+        // which leaves the detector diffing against refs that were never created. They go through a
+        // credential helper rather than an authenticated remote URL so the token never reaches a
+        // command line or a remote definition.
+        //
+        // The two branches are fetched by name rather than relying on the configured refspec:
+        // Jenkins clones an MR narrowly enough that `origin/<branch>` need not exist at all, and
+        // that is exactly what `origin/target...origin/current` needs.
+        withCredentials([usernamePassword(
+            credentialsId: 'Gitlab-Access-Token',
+            usernameVariable: 'GIT_USERNAME',
+            passwordVariable: 'GIT_TOKEN'
+        )]) {
+            sh(
+                script: """
+                    HELPER='!f() { echo username=\$GIT_USERNAME; echo password=\$GIT_TOKEN; }; f'
+                    {
+                      git -c credential.helper="\$HELPER" fetch --no-tags origin '+refs/heads/${target}:refs/remotes/origin/${target}' || echo 'DIAG: fetch of ${target} failed'
+                      git -c credential.helper="\$HELPER" fetch --no-tags origin '+refs/heads/${current}:refs/remotes/origin/${current}' || echo 'DIAG: fetch of ${current} failed'
+                      git rev-parse --verify --quiet 'origin/${target}' || echo 'DIAG: origin/${target} still missing'
+                      git rev-parse --verify --quiet 'origin/${current}' || echo 'DIAG: origin/${current} still missing'
+                      ${gradleQueryCmd()} printAffectedModules --current-branch="${current}" --target-branch="${target}" -q
+                    } > ${AFFECTED_MODULES_DETECTOR_LOG} 2>&1 || true
+                """,
+                returnStatus: true
+            )
+        }
+
+        // Availability is read out of the captured log rather than the shell exit code. Nothing is
+        // returned out of withCredentials, which does not pass a value through, and the log is the
+        // better witness anyway: it distinguishes a task that failed from one that printed nothing.
+        String raw = fileExists(AFFECTED_MODULES_DETECTOR_LOG) ? readFile(AFFECTED_MODULES_DETECTOR_LOG) : ""
+        Map parsed = parseAffectedModulesOutput(raw)
+        if (!parsed.available) {
+            println("AFFECTED-MODULES: detector output was:\n${raw}")
+            return unavailableAffectedModules("detector produced no result: ${tailOf(raw, 4)}")
+        }
+        return parseAffectedModulesOutput(raw)
+    } catch (Exception e) {
+        String reason = "detector threw: ${firstLineOf(e.message)}"
+        println("AFFECTED-MODULES: ${reason}")
+        return unavailableAffectedModules(reason)
+    }
+}
+
+/** Where the detector's combined output is captured, so a failing run can be read back. */
+AFFECTED_MODULES_DETECTOR_LOG = "affected_modules_detector.log"
+
+/**
+ * The last [count] non-blank lines, capped for a report field.
+ *
+ * Gradle prints its "What went wrong" block at the end, so the tail is the part that names the
+ * cause; the head is banner noise.
+ */
+String tailOf(String text, int count) {
+    String joined = (text ?: "")
+        .readLines()
+        .findAll { it.trim() }
+        .takeRight(count)
+        .collect { it.trim() }
+        .join(" | ")
+    return joined.length() > 400 ? joined.substring(joined.length() - 400) : joined
+}
+
+/**
+ * Strips the remote prefix Jenkins often carries on `GIT_BRANCH`.
+ *
+ * The detector builds `origin/<branch>` itself, so passing `origin/feature-x` through produces
+ * `origin/origin/feature-x`, which git rejects. That failure is indistinguishable from any other
+ * once it has been caught, so it is removed at the source rather than diagnosed later.
+ */
+String bareBranchName(String name) {
+    return name?.trim()?.replaceFirst(/^origin\//, "")
+}
+
+/** First line only: a Gradle failure message runs to dozens of lines and has to fit in a report. */
+String firstLineOf(String message) {
+    return (message ?: "unknown error").readLines().find { it.trim() }?.trim() ?: "unknown error"
+}
+
+/**
+ * Parses the marker lines printAffectedModules writes to stdout. Kept free of any Jenkins step so
+ * the part most likely to break silently — recognising the markers — can be tested directly.
+ *
+ * Output with no mode line is treated as unavailable rather than as an empty selection: a task that
+ * printed nothing and a task that selected nothing must not look alike.
+ */
+Map parseAffectedModulesOutput(String raw) {
+    List<String> lines = (raw ?: "").readLines()
+
+    String mode = lines
+        .find { it.trim().startsWith("AFFECTED-MODULES-MODE:") }
+        ?.trim()
+        ?.substring("AFFECTED-MODULES-MODE:".length())
+        ?.trim()
+    if (!mode) {
+        return unavailableAffectedModules("task printed no AFFECTED-MODULES-MODE line")
+    }
+
+    List<String> modules = lines
+        .collect { it.trim() }
+        .findAll { it.startsWith("AFFECTED-MODULE:") }
+        .collect { it.substring("AFFECTED-MODULE:".length()).trim() }
+        .findAll { it }
+
+    return [available: true, mode: mode, modules: new ArrayList<String>(modules), reason: ""]
+}
+
+/**
+ * No usable detector result, and why.
+ *
+ * Distinct from a result that selected no modules. Recording the reason is what makes a shadow run
+ * that produced nothing tell you whether the detector is broken or simply had nothing to select —
+ * without it, a permanently broken detector reads exactly like a quiet one.
+ */
+Map unavailableAffectedModules(String reason) {
+    return [available: false, mode: "", modules: new ArrayList<String>(), reason: reason]
+}
+
+/**
+ * Branch names reach the shell as part of the gradle command line, so anything outside the
+ * characters git itself allows in a ref is rejected rather than quoted around.
+ */
+boolean isSafeBranchName(String name) {
+    return name != null && name.trim() ==~ /[A-Za-z0-9._\-\/]+/
+}
+
 ArrayList<String> getUnitTestModuleList() {
     def unitTestModuleListRaw = sh(
         script: "${gradleQueryCmd()} printModulesWithUnitTest -q",

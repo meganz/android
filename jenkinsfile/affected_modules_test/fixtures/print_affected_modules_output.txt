@@ -1,0 +1,14 @@
+isServerBuild = true
+mega.privacy.megagradle.plugin.CiCdPlugin applied to project MEGA
+mega.privacy.megagradle.plugin.ReleasePlugin applied to project MEGA
+AndroidApplicationJacocoConventionPlugin applied to project app
+use remote pre-built SDK
+use remote pre-built SDK
+==> Running command: git diff --name-only origin/develop...origin/atr/AND-24757-share-link-error-retry
+feature/share-link/src/main/java/mega/privacy/android/feature/sharelink/presentation/ShareLinkScreen.kt
+feature/share-link/src/test/java/mega/privacy/android/feature/sharelink/presentation/ShareLinkViewModelTest.kt
+resources/string-resources/src/main/res/values/strings_shared.xml
+
+AFFECTED-MODULES-MODE: selected (2 of 68 modules)
+AFFECTED-MODULE: app
+AFFECTED-MODULE: feature/share-link
