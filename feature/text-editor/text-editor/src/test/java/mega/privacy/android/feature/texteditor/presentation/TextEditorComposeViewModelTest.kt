@@ -434,17 +434,32 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
-    fun `test that onMenuAction SwitchEditMode toggles the markdown edit mode`() = runTest {
+    fun `test that setRichTextMode switches the markdown edit mode`() = runTest {
         val state = enterEditModeWith("body")
         assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.RichText)
 
-        underTest.onMenuAction(TextEditorTopBarAction.SwitchEditMode(isRichTextMode = true))
+        underTest.setRichTextMode(false)
         assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.Markdown)
 
-        underTest.onMenuAction(TextEditorTopBarAction.SwitchEditMode(isRichTextMode = false))
+        underTest.setRichTextMode(true)
         assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.RichText)
         assertThat(state.text.toString()).isEqualTo("body")
     }
+
+    @Test
+    fun `test that setRichTextMode does not flush rich edits when the mode is unchanged`() =
+        runTest {
+            val chunkState = enterEditModeWith("# Title")
+            underTest.ensureRichDocumentState()
+            val rich = underTest.richDocumentState.value!!
+            (rich.blocks[0] as RichTextBlockEditState).text.textFieldState.edit { append("!") }
+
+            underTest.setRichTextMode(true)
+
+            assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.RichText)
+            assertThat(chunkState.text.toString()).isEqualTo("# Title")
+            assertThat(underTest.richDocumentState.value).isSameInstanceAs(rich)
+        }
 
     @Test
     fun `test that getOrCreateRichDocumentState builds the model from the raw source`() = runTest {

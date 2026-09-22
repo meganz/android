@@ -18,11 +18,12 @@ class RichDocumentEditorScreenshotTest {
             RichBlock.Heading(1, RichText("Trip notes")),
             RichBlock.Paragraph(
                 RichText(
-                    "Planning the spring trip with flexible dates.",
+                    "Planning the spring trip with flexible dates. Run inline code here.",
                     listOf(
                         RichSpan(13, 19, RichSpanStyle.Bold),
                         RichSpan(30, 38, RichSpanStyle.Italic),
                         RichSpan(39, 44, RichSpanStyle.Underline),
+                        RichSpan(50, 61, RichSpanStyle.Code),
                     ),
                 ),
             ),

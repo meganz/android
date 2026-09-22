@@ -499,19 +499,29 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun toggleMarkdownEditMode() {
-        if (_uiState.value.markdownEditMode == MarkdownEditMode.RichText) {
+        setMarkdownEditMode(
+            when (_uiState.value.markdownEditMode) {
+                MarkdownEditMode.Markdown -> MarkdownEditMode.RichText
+                MarkdownEditMode.RichText -> MarkdownEditMode.Markdown
+            },
+        )
+    }
+
+    /** Picks an edit mode directly, as the top bar's plain/rich menu does. */
+    fun setRichTextMode(isRichText: Boolean) {
+        setMarkdownEditMode(
+            if (isRichText) MarkdownEditMode.RichText else MarkdownEditMode.Markdown,
+        )
+    }
+
+    private fun setMarkdownEditMode(mode: MarkdownEditMode) {
+        if (_uiState.value.markdownEditMode == mode) return
+        if (mode == MarkdownEditMode.Markdown) {
             // Leaving rich text: fold the rich edits back into the raw source.
             flushRichEdits()
             clearRichState()
         }
-        _uiState.update {
-            it.copy(
-                markdownEditMode = when (it.markdownEditMode) {
-                    MarkdownEditMode.Markdown -> MarkdownEditMode.RichText
-                    MarkdownEditMode.RichText -> MarkdownEditMode.Markdown
-                },
-            )
-        }
+        _uiState.update { it.copy(markdownEditMode = mode) }
     }
 
     /**
@@ -1141,8 +1151,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             TextEditorTopBarAction.GetLink -> emitManageLinkEffect()
             TextEditorTopBarAction.Share -> emitShareEffect()
             TextEditorTopBarAction.SendToChat -> emitSendToChatEffect()
-
-            is TextEditorTopBarAction.SwitchEditMode -> toggleMarkdownEditMode()
 
             TextEditorTopBarAction.Save,
             TextEditorTopBarAction.More,

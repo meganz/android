@@ -284,7 +284,7 @@ private fun TextStyleChip(
             ) {
                 Box(modifier = Modifier.padding(TextStyleMenuShadowMargin)) {
                     Surface(
-                        shape = DSTokens.shapes.extraSmall,
+                        shape = DSTokens.shapes.medium,
                         color = DSTokens.colors.background.surface1,
                         shadowElevation = TextStyleMenuElevation,
                         modifier = Modifier.testTag(MARKDOWN_TEXT_STYLE_MENU_TAG),

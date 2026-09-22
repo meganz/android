@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.texteditor.components.markdown.rich
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -74,6 +73,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mega.privacy.android.feature.texteditor.components.InlineCodeChipLayout
 import mega.privacy.android.feature.texteditor.components.MarkdownBlock
 import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing
 import mega.privacy.android.feature.texteditor.components.MarkdownCodeFrame
@@ -81,6 +81,7 @@ import mega.privacy.android.feature.texteditor.components.MarkdownColors
 import mega.privacy.android.feature.texteditor.components.MarkdownListItemChrome
 import mega.privacy.android.feature.texteditor.components.MarkdownListMarker
 import mega.privacy.android.feature.texteditor.components.MarkdownQuoteChrome
+import mega.privacy.android.feature.texteditor.components.inlineCodeChips
 import mega.privacy.android.feature.texteditor.components.markdownHeadingStyle
 import mega.privacy.android.feature.texteditor.components.parseTopLevelBlocks
 import mega.privacy.android.feature.texteditor.components.rememberMarkdownColors
@@ -431,6 +432,7 @@ private fun RichTextBlockRow(
     geometry: RichSelectionGeometry,
 ) {
     val kind = block.kind
+    val chipLayout = remember(block) { InlineCodeChipLayout() }
     DisposableEffect(geometry, index) {
         onDispose { geometry.clear(index) }
     }
@@ -494,7 +496,10 @@ private fun RichTextBlockRow(
                         state.documentSelectionIn(index)
                     }
                 },
-                onTextLayout = { getResult -> geometry.textLayoutProviders[index] = getResult },
+                onTextLayout = { getResult ->
+                    geometry.textLayoutProviders[index] = getResult
+                    chipLayout.provider = getResult
+                },
                 modifier = Modifier
                     .weight(1f)
                     .onGloballyPositioned {
@@ -537,7 +542,13 @@ private fun RichTextBlockRow(
                             else -> false
                         }
                     }
-                    .testTag(richBlockFieldTag(index)),
+                    .testTag(richBlockFieldTag(index))
+                    .inlineCodeChips(
+                        state = block.text,
+                        layout = chipLayout,
+                        fill = colors.codeBackground,
+                        border = colors.codeBorder,
+                    ),
             )
         }
     }
@@ -653,6 +664,7 @@ private fun TableEditRow(
 ) {
     Row {
         cells.forEachIndexed { columnIndex, cellState ->
+            val chipLayout = remember(cellState) { InlineCodeChipLayout() }
             LaunchedEffect(cellState) {
                 snapshotFlow { cellState.textFieldState.selection }
                     .collect { cellState.syncTypingStylesToCaret() }
@@ -674,6 +686,9 @@ private fun TableEditRow(
                 outputTransformation = remember(cellState, visualStyles) {
                     RichSpanOutputTransformation(cellState, visualStyles)
                 },
+                // Only the chip painter reads this: cells stay out of the cross-block
+                // selection geometry by design.
+                onTextLayout = { getResult -> chipLayout.provider = getResult },
                 modifier = Modifier
                     .width(TableEditCellWidth)
                     .padding(8.dp)
@@ -684,7 +699,13 @@ private fun TableEditRow(
                         }
                     }
                     .onPreviewKeyEvent { handleUndoRedoKey(it, state) }
-                    .testTag(richTableCellTag(blockIndex, rowIndex, columnIndex)),
+                    .testTag(richTableCellTag(blockIndex, rowIndex, columnIndex))
+                    .inlineCodeChips(
+                        state = cellState,
+                        layout = chipLayout,
+                        fill = colors.codeBackground,
+                        border = colors.codeBorder,
+                    ),
             )
         }
     }

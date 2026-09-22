@@ -14,13 +14,18 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -91,7 +96,9 @@ private fun rememberBlockScrollState(node: Node): ScrollState {
 internal data class MarkdownColors(
     val text: Color,
     val link: Color,
+    val codeText: Color,
     val codeBackground: Color,
+    val codeBorder: Color,
     val divider: Color,
     val quoteBar: Color,
 )
@@ -100,7 +107,9 @@ internal data class MarkdownColors(
 internal fun rememberMarkdownColors(): MarkdownColors = MarkdownColors(
     text = DSTokens.colors.text.primary,
     link = DSTokens.colors.link.primary,
+    codeText = DSTokens.colors.text.brand,
     codeBackground = DSTokens.colors.background.surface1,
+    codeBorder = DSTokens.colors.border.strong,
     divider = DSTokens.colors.border.subtle,
     quoteBar = DSTokens.colors.border.strong,
 )
@@ -136,10 +145,11 @@ internal fun MarkdownBlock(
         .fillMaxWidth()
         .then(blockSpacing(node, nested))
     when (node) {
-        is Heading -> Text(
+        is Heading -> MarkdownInlineText(
             text = rememberInline(node, colors),
             style = markdownHeadingStyle(node.level),
             color = colors.text,
+            colors = colors,
             modifier = m,
         )
 
@@ -147,6 +157,7 @@ internal fun MarkdownBlock(
             text = rememberInline(node, colors),
             style = MaterialTheme.typography.bodyMedium,
             color = colors.text,
+            colors = colors,
             modifier = m,
         )
 
@@ -198,9 +209,11 @@ internal object MarkdownInlineStyles {
         ),
     )
 
+    // No background: the chip's fill, border and corners are painted behind the text by
+    // drawInlineCodeChips, which needs the run to stay transparent.
     fun code(colors: MarkdownColors): SpanStyle = SpanStyle(
         fontFamily = FontFamily.Monospace,
-        background = colors.codeBackground,
+        color = colors.codeText,
     )
 
     fun link(colors: MarkdownColors): SpanStyle = SpanStyle(
@@ -288,29 +301,65 @@ private fun CodeBlock(
 }
 
 /**
- * Renders [text] as a single [Text], or splits it into multiple stacked Texts when it exceeds
- * [MAX_TEXT_MEASURE_CHARS] so no one native measurement blocks the main thread. [subSequence]
- * preserves inline styling within each chunk.
+ * Renders [text] as a single [MarkdownInlineText], or splits it into multiple stacked ones when
+ * it exceeds [MAX_TEXT_MEASURE_CHARS] so no one native measurement blocks the main thread.
+ * [subSequence] preserves inline styling within each chunk.
  */
 @Composable
 private fun ChunkedText(
     text: AnnotatedString,
     style: TextStyle,
     color: Color,
+    colors: MarkdownColors,
     modifier: Modifier = Modifier,
 ) {
     if (text.length <= MAX_TEXT_MEASURE_CHARS) {
-        Text(text = text, style = style, color = color, modifier = modifier)
+        MarkdownInlineText(text, style, color, colors, modifier)
         return
     }
     Column(modifier = modifier) {
         var start = 0
         while (start < text.length) {
             val end = (start + MAX_TEXT_MEASURE_CHARS).coerceAtMost(text.length)
-            Text(text = text.subSequence(start, end), style = style, color = color)
+            // Each chunk lays out on its own, so the chips are drawn per chunk against its
+            // rebased offsets.
+            MarkdownInlineText(text.subSequence(start, end), style, color, colors)
             start = end
         }
     }
+}
+
+/**
+ * A [Text] that paints the inline-code chips behind its content. Capturing the layout result
+ * here is safe because it is read ONLY from the draw lambda: that invalidates drawing, never
+ * layout, so there is no measure loop.
+ */
+@Composable
+private fun MarkdownInlineText(
+    text: AnnotatedString,
+    style: TextStyle,
+    color: Color,
+    colors: MarkdownColors,
+    modifier: Modifier = Modifier,
+) {
+    val codeStyle = MarkdownInlineStyles.code(colors)
+    val codeRanges = remember(text, codeStyle) { text.inlineCodeRanges(codeStyle) }
+    if (codeRanges.isEmpty()) {
+        Text(text = text, style = style, color = color, modifier = modifier)
+        return
+    }
+    var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
+    Text(
+        text = text,
+        style = style,
+        color = color,
+        onTextLayout = { layout = it },
+        modifier = modifier.drawBehind {
+            layout?.let {
+                drawInlineCodeChips(it, codeRanges, colors.codeBackground, colors.codeBorder)
+            }
+        },
+    )
 }
 
 @Composable
@@ -373,12 +422,13 @@ private fun TableRowView(
         var cell = row.firstChild
         while (cell != null) {
             if (cell is TableCell) {
-                Text(
+                MarkdownInlineText(
                     text = rememberInline(cell, colors),
                     style = MaterialTheme.typography.bodyMedium.let {
                         if (header) it.copy(fontWeight = FontWeight.Bold) else it
                     },
                     color = colors.text,
+                    colors = colors,
                     modifier = Modifier
                         .width(TableCellWidth)
                         .padding(8.dp),

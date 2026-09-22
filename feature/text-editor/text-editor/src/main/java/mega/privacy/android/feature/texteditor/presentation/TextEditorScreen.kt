@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -67,6 +68,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.snackbar.MegaSnackbar
@@ -80,6 +82,7 @@ import mega.android.core.ui.modifiers.ScrollToHideBehavior
 import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.applyScrollToHideBottomBarBehavior
 import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.texteditor.components.MarkdownPreview
@@ -87,6 +90,7 @@ import mega.privacy.android.feature.texteditor.components.TextEditorContent
 import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
 import mega.privacy.android.feature.texteditor.components.TextEditorLoadingUiDelay
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownEditInputTransformation
+import mega.privacy.android.feature.texteditor.components.markdown.MarkdownEditModeMenu
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatAction
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormattingToolbar
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownLinkDialog
@@ -686,6 +690,7 @@ private fun CollapsingTopBar(
                     onClose = onClose,
                     onSave = onSaveToolbar,
                     onMenuAction = viewModel::onMenuAction,
+                    onSelectRichTextMode = viewModel::setRichTextMode,
                     onTitleClick = onTitleClick,
                     isMarkdown = isMarkdown,
                     showEditModeSwitch = showEditModeSwitch,
@@ -780,10 +785,12 @@ private fun TextEditorDiscardDialog(
 
 /**
  * Edit-mode top app bar. [onTitleClick] scrolls to top and reveals the bar; action buttons
- * (Save, Line numbers, mode switch) use their own hit targets and are not affected.
+ * (Save, Line numbers, mode menu) use their own hit targets and are not affected.
  *
- * Line numbers are a plain-text affordance and disappear for Markdown files; the rich/source
- * mode switch appears (in both edit modes) only when the document is WYSIWYG-capable.
+ * Line numbers are a plain-text affordance and disappear for Markdown files; the plain/rich
+ * mode menu appears (in both edit modes) only when the document is WYSIWYG-capable. The
+ * trailing icons are laid out here rather than passed as menu actions because the mode menu
+ * has to be a sibling of its own anchor button for the popup to position itself against it.
  */
 @Composable
 private fun TextEditorEditModeTopAppBar(
@@ -791,6 +798,7 @@ private fun TextEditorEditModeTopAppBar(
     onClose: () -> Unit,
     onSave: () -> Unit,
     onMenuAction: (TextEditorTopBarAction) -> Unit,
+    onSelectRichTextMode: (Boolean) -> Unit,
     onTitleClick: () -> Unit,
     isMarkdown: Boolean,
     showEditModeSwitch: Boolean,
@@ -800,19 +808,20 @@ private fun TextEditorEditModeTopAppBar(
     MegaTopAppBar(
         title = title,
         navigationType = AppBarNavigationType.Close(onClose),
-        actions = buildList {
-            if (!showActions) return@buildList
-            if (!isMarkdown) add(TextEditorTopBarAction.LineNumbers)
-            if (showEditModeSwitch) {
-                add(TextEditorTopBarAction.SwitchEditMode(isRichTextMode))
-            }
-            add(TextEditorTopBarAction.Save)
-        },
-        onActionPressed = {
-            when (it) {
-                is TextEditorTopBarAction.Save -> onSave()
-                is TextEditorTopBarAction -> onMenuAction(it)
-                else -> Unit
+        trailingIcons = {
+            if (showActions) {
+                if (!isMarkdown) {
+                    TopBarActionButton(TextEditorTopBarAction.LineNumbers) {
+                        onMenuAction(TextEditorTopBarAction.LineNumbers)
+                    }
+                }
+                if (showEditModeSwitch) {
+                    MarkdownEditModeMenu(
+                        isRichText = isRichTextMode,
+                        onSelectRichText = onSelectRichTextMode,
+                    )
+                }
+                TopBarActionButton(TextEditorTopBarAction.Save, onSave)
             }
         },
         modifier = Modifier.clickable(
@@ -821,6 +830,21 @@ private fun TextEditorEditModeTopAppBar(
             onClick = onTitleClick,
         ),
     )
+}
+
+/** Top bar icon button drawn from a [TextEditorTopBarAction]'s own icon, description and tag. */
+@Composable
+private fun TopBarActionButton(
+    action: TextEditorTopBarAction,
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick, modifier = Modifier.testTag(action.testTag)) {
+        MegaIcon(
+            painter = action.getIconPainter(),
+            tint = IconColor.Primary,
+            contentDescription = action.getDescription(),
+        )
+    }
 }
 
 /**
