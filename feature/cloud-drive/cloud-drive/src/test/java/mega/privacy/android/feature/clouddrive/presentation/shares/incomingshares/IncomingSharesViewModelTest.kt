@@ -41,10 +41,10 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.After
 import org.junit.Before
@@ -72,7 +72,7 @@ class IncomingSharesViewModelTest {
     private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase = mock()
     private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase = mock()
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
-    private val nodeUiItemMapper: NodeUiItemMapper = mock()
+    private val nodeViewItemMapper: NodeViewItemMapper = mock()
     private val monitorOthersSortOrderUseCase: MonitorOthersSortOrderUseCase = mock()
     private val setOthersSortOrder: SetOthersSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
@@ -101,7 +101,7 @@ class IncomingSharesViewModelTest {
             monitorFolderSortOrderUseCase,
             setFolderSortOrderUseCase,
             monitorNodeUpdatesByIdUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             monitorOthersSortOrderUseCase,
             setOthersSortOrder,
             nodeSortConfigurationUiMapper,
@@ -119,7 +119,7 @@ class IncomingSharesViewModelTest {
         monitorFolderSortOrderUseCase = monitorFolderSortOrderUseCase,
         setFolderSortOrderUseCase = setFolderSortOrderUseCase,
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
-        nodeUiItemMapper = nodeUiItemMapper,
+        nodeViewItemMapper = nodeViewItemMapper,
         monitorOthersSortOrderUseCase = monitorOthersSortOrderUseCase,
         setOthersSortOrder = setOthersSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
@@ -138,19 +138,17 @@ class IncomingSharesViewModelTest {
             .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
         whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(items)
 
-        val nodeUiItems = items.map { node ->
-            NodeUiItem<TypedNode>(
-                node = node,
-                isSelected = false
-            )
-        }
+        val nodeItems = items.map { node -> NodeViewItem<TypedNode>(node = node) }
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = items,
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                isContactVerificationOn = false,
+                highlightedNodeId = null,
+                highlightedNames = null,
+                isHiddenNodesEnabled = false,
             )
-        ).thenReturn(nodeUiItems)
+        ).thenReturn(nodeItems)
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
         whenever(
             monitorNodeUpdatesByIdUseCase(
@@ -173,8 +171,6 @@ class IncomingSharesViewModelTest {
             assertThat(initialState.currentFolderId).isEqualTo(NodeId(-1L))
             assertThat(initialState.isLoading).isTrue()
             assertThat(initialState.items).isEmpty()
-            assertThat(initialState.isInSelectionMode).isFalse()
-            assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
             assertThat(initialState.navigateBack).isEqualTo(consumed)
             assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
         }
@@ -263,322 +259,6 @@ class IncomingSharesViewModelTest {
             assertThat(loadedState.items).hasSize(2)
             assertThat(loadedState.items[0].node.id).isEqualTo(NodeId(1L))
             assertThat(loadedState.items[1].node.id).isEqualTo(NodeId(2L))
-            assertThat(loadedState.items[0].isSelected).isFalse()
-            assertThat(loadedState.items[1].isSelected).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that ItemLongClicked action toggles item selection and updates items state`() =
-        runTest {
-            val node1 = mock<ShareFileNode> {
-                on { id } doReturn NodeId(1L)
-                on { name } doReturn "Test Node 1"
-            }
-            val node2 = mock<ShareFileNode> {
-                on { id } doReturn NodeId(2L)
-                on { name } doReturn "Test Node 2"
-            }
-
-            setupTestData(listOf(node1, node2))
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                awaitItem()
-                val loadedState = awaitItem()
-
-                val nodeUiItem1 = loadedState.items[0]
-                underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem1))
-                val updatedState = awaitItem()
-
-                assertThat(updatedState.isInSelectionMode).isTrue()
-                assertThat(updatedState.items[0].isSelected).isTrue()
-                assertThat(updatedState.items[1].isSelected).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that ItemClicked action in selection mode toggles item selection`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-            on { name } doReturn "Test Node 1"
-        }
-        val node2 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(2L)
-            on { name } doReturn "Test Node 2"
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem1))
-            awaitItem()
-
-            val nodeUiItem2 = loadedState.items[1]
-            underTest.processAction(IncomingSharesAction.ItemClicked(nodeUiItem2))
-            val updatedState = awaitItem()
-
-            assertThat(updatedState.isInSelectionMode).isTrue()
-            assertThat(updatedState.items[0].isSelected).isTrue()
-            assertThat(updatedState.items[1].isSelected).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that ItemClicked action in normal mode navigates to folder`() = runTest {
-        setupTestData(emptyList())
-        val underTest = createViewModel()
-
-        val folderNode = mock<ShareFolderNode>()
-        val nodeUiItem = NodeUiItem<TypedNode>(
-            node = folderNode,
-            isSelected = false
-        )
-
-        underTest.processAction(IncomingSharesAction.ItemClicked(nodeUiItem))
-
-        underTest.uiState.test {
-            val updatedState = awaitItem()
-            assertThat(updatedState.navigateToFolderEvent).isEqualTo(triggered(folderNode))
-        }
-    }
-
-    @Test
-    fun `test that ItemClicked action in normal mode does nothing for non-folder nodes`() =
-        runTest {
-            setupTestData(emptyList())
-            val underTest = createViewModel()
-
-            val fileNode = mock<ShareFileNode>()
-            val nodeUiItem = NodeUiItem<TypedNode>(
-                node = fileNode,
-                isSelected = false
-            )
-
-            underTest.processAction(IncomingSharesAction.ItemClicked(nodeUiItem))
-
-            underTest.uiState.test {
-                val updatedState = awaitItem()
-                assertThat(updatedState.navigateToFolderEvent).isEqualTo(consumed())
-            }
-        }
-
-
-    @Test
-    fun `test that DeselectAllItems action deselects all items in state`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        // Wait for initial loading to complete
-        testScheduler.advanceUntilIdle()
-
-        // Verify initial state
-        val loadedState = underTest.uiState.value
-        assertThat(loadedState.isLoading).isFalse()
-
-        underTest.processAction(IncomingSharesAction.SelectAllItems)
-        testScheduler.advanceUntilIdle()
-
-        underTest.processAction(IncomingSharesAction.DeselectAllItems)
-        testScheduler.advanceUntilIdle()
-
-        val updatedState = underTest.uiState.value
-        assertThat(updatedState.isInSelectionMode).isFalse()
-        assertThat(updatedState.items[0].isSelected).isFalse()
-        assertThat(updatedState.items[1].isSelected).isFalse()
-    }
-
-    @Test
-    fun `test that DeselectAllItems action does nothing when no items are selected`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-
-        setupTestData(listOf(node1))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            underTest.processAction(IncomingSharesAction.DeselectAllItems)
-
-            assertThat(loadedState.isInSelectionMode).isFalse()
-            assertThat(loadedState.items[0].isSelected).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that SelectAllItems selects all items`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        // Wait for initial loading to complete
-        testScheduler.advanceUntilIdle()
-
-        // Verify we're in loaded state
-        val loadedState = underTest.uiState.value
-        assertThat(loadedState.isLoading).isFalse()
-
-        underTest.processAction(IncomingSharesAction.SelectAllItems)
-        // Advance the coroutine to let it execute
-        testScheduler.advanceUntilIdle()
-
-        val stateAfterSelectAll = underTest.uiState.value
-        assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
-        assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
-        assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
-    }
-
-    @Test
-    fun `test that SelectAllItems does nothing when no items exist`() = runTest {
-        setupTestData(emptyList())
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            underTest.processAction(IncomingSharesAction.SelectAllItems)
-
-            assertThat(loadedState.isInSelectionMode).isFalse()
-            assertThat(loadedState.items).isEmpty()
-        }
-    }
-
-    @Test
-    fun `test that toggleItemSelection removes item from selection when already selected`() =
-        runTest {
-            val node1 = mock<ShareFileNode> {
-                on { id } doReturn NodeId(1L)
-            }
-
-            setupTestData(listOf(node1))
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                awaitItem()
-                val loadedState = awaitItem()
-
-                val nodeUiItem1 = loadedState.items[0]
-                underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem1))
-                val stateAfterSelection = awaitItem()
-
-                val updatedNodeUiItem1 = stateAfterSelection.items[0]
-                underTest.processAction(IncomingSharesAction.ItemLongClicked(updatedNodeUiItem1))
-                val updatedState = awaitItem()
-
-                assertThat(updatedState.isInSelectionMode).isFalse()
-                assertThat(updatedState.items[0].isSelected).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that isInSelectionMode is true when items are selected`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-
-        setupTestData(listOf(node1))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem1))
-            val state = awaitItem()
-
-            assertThat(state.isInSelectionMode).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that isInSelectionMode is false when no items are selected`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-
-        setupTestData(listOf(node1))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            assertThat(loadedState.isInSelectionMode).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that multiple items can be selected`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem1))
-            awaitItem()
-
-            val nodeUiItem2 = loadedState.items[1]
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem2))
-            val updatedState = awaitItem()
-
-            assertThat(updatedState.isInSelectionMode).isTrue()
-            assertThat(updatedState.items[0].isSelected).isTrue()
-            assertThat(updatedState.items[1].isSelected).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that NavigateToFolderEventConsumed action consumes the navigation event`() = runTest {
-        setupTestData(emptyList())
-        val underTest = createViewModel()
-
-        val folderNode = mock<TypedFolderNode>()
-        val nodeUiItem = mock<NodeUiItem<TypedNode>> {
-            on { node } doReturn folderNode
-            on { id } doReturn folderNodeId
-        }
-
-        underTest.processAction(IncomingSharesAction.ItemClicked(nodeUiItem))
-        underTest.uiState.test {
-            val stateAfterClick = awaitItem()
-            underTest.processAction(IncomingSharesAction.NavigateToFolderEventConsumed)
-            val stateAfterConsume = awaitItem()
-
-            assertThat(stateAfterClick.navigateToFolderEvent).isEqualTo(triggered(folderNode))
-            assertThat(stateAfterConsume.navigateToFolderEvent).isEqualTo(consumed())
         }
     }
 
@@ -696,32 +376,6 @@ class IncomingSharesViewModelTest {
     }
 
     @Test
-    fun `test that selectedItemsCount returns correct count`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            assertThat(loadedState.selectedItemsCount).isEqualTo(0)
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem1))
-            val stateAfterSelection = awaitItem()
-
-            assertThat(stateAfterSelection.selectedItemsCount).isEqualTo(1)
-        }
-    }
-
-    @Test
     fun `test that isEmpty returns true when no items and not loading`() = runTest {
         setupTestData(emptyList())
         val underTest = createViewModel()
@@ -763,35 +417,6 @@ class IncomingSharesViewModelTest {
     }
 
     @Test
-    fun `test that selectedNodes returns correct nodes`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            assertThat(loadedState.selectedNodes).isEmpty()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem1))
-            val stateAfterSelection = awaitItem()
-
-            assertThat(stateAfterSelection.selectedNodes).hasSize(1)
-            assertThat(stateAfterSelection.selectedNodes[0].id).isEqualTo(NodeId(1L))
-        }
-    }
-
-    // Contact Verification Tests
-
-    @Test
     fun `test that contact verification is checked when loading nodes with feature enabled`() =
         runTest {
             val node1 = mock<ShareFileNode> {
@@ -814,13 +439,15 @@ class IncomingSharesViewModelTest {
             )
             whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
-            val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
+            val nodeUiItems = listOf(NodeViewItem<TypedNode>(node = node1))
             whenever(
-                nodeUiItemMapper(
+                nodeViewItemMapper(
                     nodeList = listOf(node1),
-                    existingItems = emptyList(),
                     nodeSourceType = NodeSourceType.INCOMING_SHARES,
                     isContactVerificationOn = true,
+                    highlightedNodeId = null,
+                    highlightedNames = null,
+                    isHiddenNodesEnabled = false,
                 )
             ).thenReturn(nodeUiItems)
             whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
@@ -864,13 +491,15 @@ class IncomingSharesViewModelTest {
             )
             whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
-            val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
+            val nodeUiItems = listOf(NodeViewItem<TypedNode>(node = node1))
             whenever(
-                nodeUiItemMapper(
+                nodeViewItemMapper(
                     nodeList = listOf(node1),
-                    existingItems = emptyList(),
                     nodeSourceType = NodeSourceType.INCOMING_SHARES,
                     isContactVerificationOn = false,
+                    highlightedNodeId = null,
+                    highlightedNames = null,
+                    isHiddenNodesEnabled = false,
                 )
             ).thenReturn(nodeUiItems)
             whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
@@ -911,13 +540,15 @@ class IncomingSharesViewModelTest {
         ).thenReturn(NodeSortConfiguration.default)
         whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
-        val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
+        val nodeUiItems = listOf(NodeViewItem<TypedNode>(node = node1))
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = listOf(node1),
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
                 isContactVerificationOn = false,
+                highlightedNodeId = null,
+                highlightedNames = null,
+                isHiddenNodesEnabled = false,
             )
         ).thenReturn(nodeUiItems)
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))

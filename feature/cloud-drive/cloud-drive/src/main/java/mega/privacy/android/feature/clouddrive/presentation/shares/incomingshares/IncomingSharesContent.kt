@@ -13,12 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesUiState
@@ -30,6 +31,7 @@ import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
+import mega.privacy.android.shared.nodes.selection.NodeSelection
 import mega.privacy.android.shared.resources.R as SharedR
 
 
@@ -40,6 +42,7 @@ fun IncomingSharesContent(
     onAction: (IncomingSharesAction) -> Unit,
     onShowNodeOptions: (NodeId) -> Unit,
     onSortOrderClick: () -> Unit,
+    selection: NodeSelection<TypedNode>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     isActive: Boolean = true,
@@ -88,31 +91,28 @@ fun IncomingSharesContent(
                     spanCount = spanCount,
                     items = uiState.items,
                     isNextPageLoading = false,
-                    isHiddenNodesEnabled = false,
-                    showHiddenNodes = true,
                     onMenuClicked = { onShowNodeOptions(it.id) },
-                    onItemClicked = { onAction(IncomingSharesAction.ItemClicked(it)) },
-                    onLongClicked = { onAction(IncomingSharesAction.ItemLongClicked(it)) },
+                    onItemClicked = { node ->
+                        if (selection.isInSelectionMode) {
+                            selection.toggle(node.id)
+                        } else if (node is TypedFolderNode) {
+                            navigationHandler.navigate(
+                                CloudDriveNavKey(
+                                    nodeHandle = node.id.longValue,
+                                    nodeName = node.name,
+                                    nodeSourceType = NodeSourceType.INCOMING_SHARES
+                                )
+                            )
+                        }
+                    },
+                    onLongClicked = { selection.toggle(it.id) },
                     sortConfiguration = uiState.selectedSortConfiguration,
                     isListView = isListView,
                     showSortOrder = false,
                     showChangeViewType = false,
-                    inSelectionMode = uiState.isInSelectionMode,
+                    nodeSelectionState = selection.state,
                 )
             }
         }
-    }
-
-    EventEffect(
-        event = uiState.navigateToFolderEvent,
-        onConsumed = { onAction(IncomingSharesAction.NavigateToFolderEventConsumed) }
-    ) { node ->
-        navigationHandler.navigate(
-            CloudDriveNavKey(
-                nodeHandle = node.id.longValue,
-                nodeName = node.name,
-                nodeSourceType = NodeSourceType.INCOMING_SHARES
-            )
-        )
     }
 }

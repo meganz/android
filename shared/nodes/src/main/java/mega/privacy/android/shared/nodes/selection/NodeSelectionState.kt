@@ -68,6 +68,19 @@ class NodeSelectionState(
         selectAllAwaitingMoreItems = false
     }
 
+    /**
+     * Drops selected ids that are no longer in [nodeIds], e.g. a node removed while selected.
+     * Exits selection mode when nothing remains.
+     */
+    fun retainOnly(nodeIds: Set<NodeId>) {
+        val retained = selectedIds.removingAll { it !in nodeIds }
+        if (retained.size == selectedIds.size) return
+        selectedIds = retained
+        if (retained.isEmpty()) {
+            selectAllAwaitingMoreItems = false
+        }
+    }
+
     @Deprecated("Use selectAll(nodeIds, nodesLoadingState) instead")
     internal fun startSelecting() {
         selectAllAwaitingMoreItems = true

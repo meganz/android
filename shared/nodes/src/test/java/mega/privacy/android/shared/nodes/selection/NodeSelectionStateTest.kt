@@ -97,4 +97,39 @@ class NodeSelectionStateTest {
         assertThat(state.selectedNodeIds).isEmpty()
         assertThat(state.selectAllAwaitingMoreItems).isFalse()
     }
+
+    @Test
+    fun `test that retainOnly removes selected ids missing from the given set`() {
+        val state = NodeSelectionState(
+            initialSelectedIds = setOf(NodeId(1L), NodeId(2L), NodeId(3L))
+        )
+
+        state.retainOnly(setOf(NodeId(1L), NodeId(3L), NodeId(4L)))
+
+        assertThat(state.selectedNodeIds).containsExactly(NodeId(1L), NodeId(3L))
+    }
+
+    @Test
+    fun `test that retainOnly keeps the same instance when every id is still present`() {
+        val state = NodeSelectionState(initialSelectedIds = setOf(NodeId(1L), NodeId(2L)))
+        val before = state.selectedNodeIds
+
+        state.retainOnly(setOf(NodeId(1L), NodeId(2L), NodeId(3L)))
+
+        assertThat(state.selectedNodeIds).isSameInstanceAs(before)
+    }
+
+    @Test
+    fun `test that retainOnly exits selection mode when nothing remains`() {
+        val state = NodeSelectionState(
+            initialSelectedIds = setOf(NodeId(1L)),
+            selectAllInProgress = true,
+        )
+
+        state.retainOnly(emptySet())
+
+        assertThat(state.selectedNodeIds).isEmpty()
+        assertThat(state.selectAllAwaitingMoreItems).isFalse()
+        assertThat(state.isInSelectionMode).isFalse()
+    }
 }

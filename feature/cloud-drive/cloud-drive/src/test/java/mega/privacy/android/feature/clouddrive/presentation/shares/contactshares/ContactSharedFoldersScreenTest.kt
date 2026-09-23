@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -36,13 +37,18 @@ import mega.privacy.android.feature.transfers.components.widget.TransfersToolbar
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.nodes.components.SORT_ORDER_TAG
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
+import mega.privacy.android.shared.nodes.selection.NodeSelection
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelection
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -62,6 +68,8 @@ class ContactSharedFoldersScreenTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val navigationIconContentDescription = "Navigation Icon"
+
+    private lateinit var selection: NodeSelection<TypedNode>
 
     private val emptyStateTitle = context.getString(sharedR.string.shares_screen_incoming_empty)
         .replace("[B]", "").replace("[/B]", "")
@@ -153,33 +161,50 @@ class ContactSharedFoldersScreenTest {
     }
 
     @Test
-    fun `test that ItemClicked action is emitted when an item is clicked`() {
-        val onIncomingShareAction = mock<(IncomingSharesAction) -> Unit>()
-        val item = createNodeUiItem(id = 1L, name = "Shared folder 1")
+    fun `test that clicking an item navigates into the shared folder`() {
+        val navigationHandler = mock<NavigationHandler>()
         setupComposeContent(
-            items = listOf(item),
+            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1")),
             isLoading = false,
-            onIncomingShareAction = onIncomingShareAction,
+            navigationHandler = navigationHandler,
         )
 
         composeRule.onNodeWithText("Shared folder 1").performClick()
 
-        verify(onIncomingShareAction).invoke(IncomingSharesAction.ItemClicked(item))
+        verify(navigationHandler)
+            .navigate(argThat<CloudDriveNavKey> { nodeHandle == 1L }, anyOrNull())
     }
 
     @Test
-    fun `test that ItemLongClicked action is emitted when an item is long clicked`() {
-        val onIncomingShareAction = mock<(IncomingSharesAction) -> Unit>()
-        val item = createNodeUiItem(id = 1L, name = "Shared folder 1")
+    fun `test that long clicking an item selects it`() {
         setupComposeContent(
-            items = listOf(item),
+            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1")),
             isLoading = false,
-            onIncomingShareAction = onIncomingShareAction,
         )
 
         composeRule.onNodeWithText("Shared folder 1").performTouchInput { longClick() }
 
-        verify(onIncomingShareAction).invoke(IncomingSharesAction.ItemLongClicked(item))
+        composeRule.runOnIdle {
+            assertThat(selection.selectedNodes.map { it.id }).containsExactly(NodeId(1L))
+        }
+    }
+
+    @Test
+    fun `test that clicking an item toggles its selection when in selection mode`() {
+        setupComposeContent(
+            items = listOf(
+                createNodeUiItem(id = 1L, name = "Shared folder 1"),
+                createNodeUiItem(id = 2L, name = "Shared folder 2"),
+            ),
+            selectedIds = setOf(NodeId(1L)),
+            isLoading = false,
+        )
+
+        composeRule.onNodeWithText("Shared folder 2").performClick()
+
+        composeRule.runOnIdle {
+            assertThat(selection.selectedNodes.map { it.id }).containsExactly(NodeId(1L), NodeId(2L))
+        }
     }
 
     @Test
@@ -199,7 +224,8 @@ class ContactSharedFoldersScreenTest {
     @Test
     fun `test that selection mode app bar replaces the default app bar when an item is selected`() {
         setupComposeContent(
-            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1", isSelected = true)),
+            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1")),
+            selectedIds = setOf(NodeId(1L)),
             isLoading = false,
         )
 
@@ -212,10 +238,11 @@ class ContactSharedFoldersScreenTest {
     fun `test that selection mode app bar shows the selected items count`() {
         setupComposeContent(
             items = listOf(
-                createNodeUiItem(id = 1L, name = "Shared folder 1", isSelected = true),
-                createNodeUiItem(id = 2L, name = "Shared folder 2", isSelected = true),
-                createNodeUiItem(id = 3L, name = "Shared folder 3", isSelected = false),
+                createNodeUiItem(id = 1L, name = "Shared folder 1"),
+                createNodeUiItem(id = 2L, name = "Shared folder 2"),
+                createNodeUiItem(id = 3L, name = "Shared folder 3"),
             ),
+            selectedIds = setOf(NodeId(1L), NodeId(2L)),
             isLoading = false,
         )
 
@@ -223,26 +250,28 @@ class ContactSharedFoldersScreenTest {
     }
 
     @Test
-    fun `test that onSelectAllClicked is invoked when select all is clicked`() {
-        val onSelectAllClicked = mock<() -> Unit>()
+    fun `test that select all selects every item`() {
         setupComposeContent(
             items = listOf(
-                createNodeUiItem(id = 1L, name = "Shared folder 1", isSelected = true),
-                createNodeUiItem(id = 2L, name = "Shared folder 2", isSelected = false),
+                createNodeUiItem(id = 1L, name = "Shared folder 1"),
+                createNodeUiItem(id = 2L, name = "Shared folder 2"),
             ),
+            selectedIds = setOf(NodeId(1L)),
             isLoading = false,
-            onSelectAllClicked = onSelectAllClicked,
         )
 
         composeRule.onNodeWithTag(CommonMenuAction.SelectAll.testTag).performClick()
 
-        verify(onSelectAllClicked).invoke()
+        composeRule.runOnIdle {
+            assertThat(selection.selectedNodes.map { it.id }).containsExactly(NodeId(1L), NodeId(2L))
+        }
     }
 
     @Test
     fun `test that select all is not offered when all items are selected`() {
         setupComposeContent(
-            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1", isSelected = true)),
+            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1")),
+            selectedIds = setOf(NodeId(1L)),
             isLoading = false,
         )
 
@@ -250,23 +279,23 @@ class ContactSharedFoldersScreenTest {
     }
 
     @Test
-    fun `test that onCancelSelectionClicked is invoked when the close icon is clicked`() {
-        val onCancelSelectionClicked = mock<() -> Unit>()
+    fun `test that the close icon clears the selection`() {
         setupComposeContent(
-            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1", isSelected = true)),
+            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1")),
+            selectedIds = setOf(NodeId(1L)),
             isLoading = false,
-            onCancelSelectionClicked = onCancelSelectionClicked,
         )
 
         composeRule.onNodeWithContentDescription(navigationIconContentDescription).performClick()
 
-        verify(onCancelSelectionClicked).invoke()
+        composeRule.runOnIdle { assertThat(selection.isInSelectionMode).isFalse() }
     }
 
     @Test
     fun `test that selection mode bottom bar is shown when an item is selected`() {
         setupComposeContent(
-            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1", isSelected = true)),
+            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1")),
+            selectedIds = setOf(NodeId(1L)),
             isLoading = false,
             nodeActionState = NodeActionState(
                 visibleActions = listOf(CommonMenuAction.More),
@@ -281,7 +310,7 @@ class ContactSharedFoldersScreenTest {
     @Test
     fun `test that selection mode bottom bar is not shown when no item is selected`() {
         setupComposeContent(
-            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1", isSelected = false)),
+            items = listOf(createNodeUiItem(id = 1L, name = "Shared folder 1")),
             isLoading = false,
             nodeActionState = NodeActionState(
                 visibleActions = listOf(CommonMenuAction.More),
@@ -309,15 +338,13 @@ class ContactSharedFoldersScreenTest {
     private fun createNodeUiItem(
         id: Long,
         name: String,
-        isSelected: Boolean = false,
-    ): NodeUiItem<TypedNode> {
+    ): NodeViewItem<TypedNode> {
         val node = mock<TypedFolderNode> {
             on { this.id } doReturn NodeId(id)
             on { this.name } doReturn name
         }
-        return NodeUiItem(
+        return NodeViewItem(
             node = node,
-            isSelected = isSelected,
             title = LocalizedText.Literal(name),
             iconRes = iconPackR.drawable.ic_folder_users_medium_solid,
         )
@@ -326,14 +353,14 @@ class ContactSharedFoldersScreenTest {
     private fun setupComposeContent(
         email: String = "john@mega.co.nz",
         contactName: String? = "John Doe",
-        items: List<NodeUiItem<TypedNode>> = emptyList(),
+        items: List<NodeViewItem<TypedNode>> = emptyList(),
+        selectedIds: Set<NodeId> = emptySet(),
         isLoading: Boolean = false,
         nodeActionState: NodeActionState = NodeActionState(),
         onBack: () -> Unit = {},
         onNavigateToTransfers: () -> Unit = {},
         onShowNodeOptions: (NodeId) -> Unit = {},
-        onSelectAllClicked: () -> Unit = {},
-        onCancelSelectionClicked: () -> Unit = {},
+        navigationHandler: NavigationHandler = mock(),
         onIncomingShareAction: (IncomingSharesAction) -> Unit = {},
         setSortOrder: (NodeSortConfiguration) -> Unit = {},
     ) {
@@ -350,9 +377,13 @@ class ContactSharedFoldersScreenTest {
                 LocalViewModelStoreOwner provides viewModelStoreOwner,
             ) {
                 AndroidThemeForPreviews {
+                    selection = rememberNodeSelection(
+                        items = items,
+                        state = rememberNodeSelectionState(initialSelectedIds = selectedIds),
+                    )
                     ContactSharedFoldersScreen(
                         email = email,
-                        navigationHandler = mock(),
+                        navigationHandler = navigationHandler,
                         onBack = onBack,
                         onNavigateToTransfers = onNavigateToTransfers,
                         onShowNodeOptions = onShowNodeOptions,
@@ -360,8 +391,7 @@ class ContactSharedFoldersScreenTest {
                         uiState = uiState,
                         nodeActionState = nodeActionState,
                         selectionModeActionHandler = MultiNodeActionHandler { _, _ -> },
-                        onSelectAllClicked = onSelectAllClicked,
-                        onCancelSelectionClicked = onCancelSelectionClicked,
+                        selection = selection,
                         onIncomingShareAction = onIncomingShareAction,
                         setSortOrder = setSortOrder,
                     )

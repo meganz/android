@@ -57,6 +57,7 @@ import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelection
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.SharesScreenEvent
 
@@ -88,26 +89,27 @@ internal fun SharesScreen(
     val incomingSharesUiState by incomingSharesViewModel.uiState.collectAsStateWithLifecycle()
     val outgoingSharesUiState by outgoingSharesViewModel.uiState.collectAsStateWithLifecycle()
     val linksUiState by linksViewModel.uiState.collectAsStateWithLifecycle()
+    val incomingSelection = rememberNodeSelection(items = incomingSharesUiState.items)
 
     // Sort modal
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     val (isInSelectionMode, selectedItemsCount) = when (selectedTab) {
-        SharesTab.IncomingShares -> incomingSharesUiState.isInSelectionMode to incomingSharesUiState.selectedItemsCount
+        SharesTab.IncomingShares -> incomingSelection.isInSelectionMode to incomingSelection.selectedCount
         SharesTab.OutgoingShares -> outgoingSharesUiState.isInSelectionMode to outgoingSharesUiState.selectedItemsCount
         SharesTab.Links -> linksUiState.isInSelectionMode to linksUiState.selectedItemsCount
     }
 
     val isAllItemsSelected = when (selectedTab) {
-        SharesTab.IncomingShares -> incomingSharesUiState.isAllSelected
+        SharesTab.IncomingShares -> incomingSelection.isAllSelected
         SharesTab.OutgoingShares -> outgoingSharesUiState.isAllSelected
         SharesTab.Links -> linksUiState.isAllSelected
     }
 
     fun deselectAllItems() {
         when (selectedTab) {
-            SharesTab.IncomingShares -> incomingSharesViewModel.processAction(IncomingSharesAction.DeselectAllItems)
+            SharesTab.IncomingShares -> incomingSelection.deselectAll()
             SharesTab.OutgoingShares -> outgoingSharesViewModel.processAction(OutgoingSharesAction.DeselectAllItems)
             SharesTab.Links -> linksViewModel.processAction(LinksAction.DeselectAllItems)
         }
@@ -115,7 +117,7 @@ internal fun SharesScreen(
 
     fun selectAllItems() {
         when (selectedTab) {
-            SharesTab.IncomingShares -> incomingSharesViewModel.processAction(IncomingSharesAction.SelectAllItems)
+            SharesTab.IncomingShares -> incomingSelection.selectAll()
             SharesTab.OutgoingShares -> outgoingSharesViewModel.processAction(OutgoingSharesAction.SelectAllItems)
             SharesTab.Links -> linksViewModel.processAction(LinksAction.SelectAllItems)
 
@@ -124,7 +126,7 @@ internal fun SharesScreen(
 
     fun getSelectedNodes() = if (isInSelectionMode) {
         when (selectedTab) {
-            SharesTab.IncomingShares -> incomingSharesUiState.selectedNodes
+            SharesTab.IncomingShares -> incomingSelection.selectedNodes
             SharesTab.OutgoingShares -> outgoingSharesUiState.selectedNodes
             SharesTab.Links -> linksUiState.selectedNodes
 
@@ -233,6 +235,7 @@ internal fun SharesScreen(
                             )
                         },
                         onSortOrderClick = { showSortBottomSheet = true },
+                        selection = incomingSelection,
                         isActive = isActive,
                         contentPadding = PaddingValues(
                             bottom = paddingValues.calculateBottomPadding()

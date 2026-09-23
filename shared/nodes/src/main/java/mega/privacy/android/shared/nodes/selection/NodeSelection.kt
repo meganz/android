@@ -18,7 +18,8 @@ import mega.privacy.android.shared.nodes.model.TypedNodeItem
  *
  * Owns the derivations every multi-select screen needs so they are not re-implemented per screen:
  * which of the visible items are selected, whether all of them are, and a select-all that knows
- * about partially loaded lists. Ids in [state] that no longer match an item are ignored.
+ * about partially loaded lists. Once [items] is fully loaded, ids that no longer match an item are
+ * dropped from [state], so a node removed while selected stops counting towards the selection.
  *
  * @param T type of node
  * @property state the underlying selection, exposed for [mega.privacy.android.shared.nodes.components.NodesView]
@@ -39,6 +40,9 @@ class NodeSelection<T : TypedNode> internal constructor(
             items.value.forEachIndexed { index, item -> put(item.id, index) }
         }
     }
+
+    internal val selectableIds: Set<NodeId>
+        get() = indexById.keys
 
     val isInSelectionMode: Boolean by derivedStateOf { state.isInSelectionMode }
 
@@ -94,6 +98,11 @@ fun <T : TypedNode> rememberNodeSelection(
     LaunchedEffect(selection, items, loadingState) {
         if (state.selectAllAwaitingMoreItems) {
             selection.selectAll()
+        } else if (state.isInSelectionMode && loadingState == NodesLoadingState.FullyLoaded) {
+            // A node can disappear while selected, e.g. a share revoked by its owner. Only a
+            // fully loaded list is evidence of that: a partial page has not arrived yet, and
+            // NodesLoadingState.Failed arrives with an empty list.
+            state.retainOnly(selection.selectableIds)
         }
     }
     return selection

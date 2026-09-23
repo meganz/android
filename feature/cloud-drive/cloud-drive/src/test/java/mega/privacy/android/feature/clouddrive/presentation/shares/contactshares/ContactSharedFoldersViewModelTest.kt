@@ -36,10 +36,10 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -69,7 +69,7 @@ class ContactSharedFoldersViewModelTest {
     private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase = mock()
     private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase = mock()
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
-    private val nodeUiItemMapper: NodeUiItemMapper = mock()
+    private val nodeViewItemMapper: NodeViewItemMapper = mock()
     private val monitorOthersSortOrderUseCase: MonitorOthersSortOrderUseCase = mock()
     private val setOthersSortOrder: SetOthersSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
@@ -102,7 +102,7 @@ class ContactSharedFoldersViewModelTest {
             monitorFolderSortOrderUseCase,
             setFolderSortOrderUseCase,
             monitorNodeUpdatesByIdUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             monitorOthersSortOrderUseCase,
             setOthersSortOrder,
             nodeSortConfigurationUiMapper,
@@ -207,11 +207,13 @@ class ContactSharedFoldersViewModelTest {
             stubUseCases(isContactVerificationOn = true)
             createViewModel()
 
-            verify(nodeUiItemMapper)(
+            verify(nodeViewItemMapper)(
                 nodeList = sharedNodes,
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
                 isContactVerificationOn = true,
+                highlightedNodeId = null,
+                highlightedNames = null,
+                isHiddenNodesEnabled = false,
             )
         }
 
@@ -222,11 +224,13 @@ class ContactSharedFoldersViewModelTest {
             .thenThrow(RuntimeException("Failed to read the setting"))
         createViewModel()
 
-        verify(nodeUiItemMapper)(
+        verify(nodeViewItemMapper)(
             nodeList = sharedNodes,
-            existingItems = emptyList(),
             nodeSourceType = NodeSourceType.INCOMING_SHARES,
             isContactVerificationOn = false,
+            highlightedNodeId = null,
+            highlightedNames = null,
+            isHiddenNodesEnabled = false,
         )
     }
 
@@ -291,137 +295,6 @@ class ContactSharedFoldersViewModelTest {
             underTest.processAction(IncomingSharesAction.NavigateBackEventConsumed)
 
             assertThat(awaitItem().shares.navigateBack).isEqualTo(consumed)
-        }
-    }
-
-    @Test
-    fun `test that ItemClicked triggers navigateToFolderEvent when the item is a folder`() =
-        runTest {
-            stubUseCases()
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                val item = awaitItem().shares.items.first()
-
-                underTest.processAction(IncomingSharesAction.ItemClicked(item))
-
-                val event = awaitItem().shares.navigateToFolderEvent
-                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((event as StateEventWithContentTriggered).content).isEqualTo(folderNode)
-            }
-        }
-
-    @Test
-    fun `test that ItemClicked does not trigger navigateToFolderEvent when the item is a file`() =
-        runTest {
-            stubUseCases()
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                val item = awaitItem().shares.items.last()
-
-                underTest.processAction(IncomingSharesAction.ItemClicked(item))
-
-                expectNoEvents()
-            }
-        }
-
-    @Test
-    fun `test that NavigateToFolderEventConsumed consumes the navigate to folder event`() =
-        runTest {
-            stubUseCases()
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                val item = awaitItem().shares.items.first()
-                underTest.processAction(IncomingSharesAction.ItemClicked(item))
-                awaitItem()
-
-                underTest.processAction(IncomingSharesAction.NavigateToFolderEventConsumed)
-
-                assertThat(awaitItem().shares.navigateToFolderEvent).isEqualTo(consumed())
-            }
-        }
-
-    @Test
-    fun `test that ItemLongClicked selects the item`() = runTest {
-        stubUseCases()
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            val item = awaitItem().shares.items.first()
-
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(item))
-
-            val shares = awaitItem().shares
-            assertThat(shares.isInSelectionMode).isTrue()
-            assertThat(shares.selectedNodes).containsExactly(folderNode)
-        }
-    }
-
-    @Test
-    fun `test that ItemLongClicked deselects an already selected item`() = runTest {
-        stubUseCases()
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            val item = awaitItem().shares.items.first()
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(item))
-            val selectedItem = awaitItem().shares.items.first()
-
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(selectedItem))
-
-            assertThat(awaitItem().shares.isInSelectionMode).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that ItemClicked toggles the selection when in selection mode`() = runTest {
-        stubUseCases()
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            val items = awaitItem().shares.items
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(items.first()))
-            awaitItem()
-
-            underTest.processAction(IncomingSharesAction.ItemClicked(items.last()))
-
-            val shares = awaitItem().shares
-            assertThat(shares.selectedItemsCount).isEqualTo(2)
-            assertThat(shares.navigateToFolderEvent).isEqualTo(consumed())
-        }
-    }
-
-    @Test
-    fun `test that SelectAllItems selects every item`() = runTest {
-        stubUseCases()
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-
-            underTest.processAction(IncomingSharesAction.SelectAllItems)
-
-            val shares = awaitItem().shares
-            assertThat(shares.isAllSelected).isTrue()
-            assertThat(shares.selectedItemsCount).isEqualTo(sharedNodes.size)
-        }
-    }
-
-    @Test
-    fun `test that DeselectAllItems clears the selection`() = runTest {
-        stubUseCases()
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            underTest.processAction(IncomingSharesAction.SelectAllItems)
-            awaitItem()
-
-            underTest.processAction(IncomingSharesAction.DeselectAllItems)
-
-            assertThat(awaitItem().shares.isInSelectionMode).isFalse()
         }
     }
 
@@ -501,7 +374,7 @@ class ContactSharedFoldersViewModelTest {
         nodeUpdates: Flow<NodeChanges> = emptyFlow(),
         isContactVerificationOn: Boolean = false,
     ) {
-        val nodeUiItems = nodes.map { NodeUiItem<TypedNode>(node = it, isSelected = false) }
+        val nodeUiItems = nodes.map { NodeViewItem<TypedNode>(node = it) }
         whenever(getContactUserNameFromDatabaseUseCase(email)) doReturn "John Doe"
         whenever(monitorViewTypeUseCase()) doReturn flowOf(viewType)
         whenever(monitorFolderViewTypeUseCase(any(), any()))
@@ -518,11 +391,13 @@ class ContactSharedFoldersViewModelTest {
             getContactIncomingSharesUseCase(email = email, sortOrder = sortOrder)
         ) doReturn nodes
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
                 isContactVerificationOn = isContactVerificationOn,
+                highlightedNodeId = null,
+                highlightedNames = null,
+                isHiddenNodesEnabled = false,
             )
         ) doReturn nodeUiItems
     }
@@ -537,7 +412,7 @@ class ContactSharedFoldersViewModelTest {
         monitorFolderSortOrderUseCase = monitorFolderSortOrderUseCase,
         setFolderSortOrderUseCase = setFolderSortOrderUseCase,
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
-        nodeUiItemMapper = nodeUiItemMapper,
+        nodeViewItemMapper = nodeViewItemMapper,
         monitorOthersSortOrderUseCase = monitorOthersSortOrderUseCase,
         setOthersSortOrder = setOthersSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,

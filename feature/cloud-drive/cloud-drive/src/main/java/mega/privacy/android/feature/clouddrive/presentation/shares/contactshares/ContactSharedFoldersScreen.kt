@@ -23,6 +23,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.shares.contactshares.model.ContactSharedFoldersUiState
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
@@ -33,6 +34,7 @@ import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.selection.NodeSelection
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -50,15 +52,12 @@ internal fun ContactSharedFoldersScreen(
     uiState: ContactSharedFoldersUiState,
     nodeActionState: NodeActionState,
     selectionModeActionHandler: MultiNodeActionHandler,
-    onSelectAllClicked: () -> Unit,
-    onCancelSelectionClicked: () -> Unit,
+    selection: NodeSelection<TypedNode>,
     onIncomingShareAction: (IncomingSharesAction) -> Unit,
     setSortOrder: (NodeSortConfiguration) -> Unit,
 ) {
 
     val sharesState = uiState.shares
-    val isInSelectionMode = sharesState.isInSelectionMode
-    val selectedItemsCount = sharesState.selectedItemsCount
 
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -67,14 +66,10 @@ internal fun ContactSharedFoldersScreen(
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         topBar = {
-            if (isInSelectionMode) {
+            if (selection.isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     modifier = Modifier.testTag(CONTACT_SHARED_FOLDERS_SELECTION_MODE_APP_BAR_TAG),
-                    count = selectedItemsCount,
-                    isAllSelected = sharesState.isAllSelected,
-                    isSelecting = false,
-                    onSelectAllClicked = onSelectAllClicked,
-                    onCancelSelectionClicked = onCancelSelectionClicked,
+                    selection = selection,
                 )
             } else {
                 MegaTopAppBar(
@@ -99,10 +94,10 @@ internal fun ContactSharedFoldersScreen(
                 modifier = Modifier.testTag(CONTACT_SHARED_FOLDERS_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeActionState.availableActions,
                 visibleActions = nodeActionState.visibleActions,
-                visible = nodeActionState.visibleActions.isNotEmpty() && isInSelectionMode,
+                visible = nodeActionState.visibleActions.isNotEmpty() && selection.isInSelectionMode,
                 multiNodeActionHandler = selectionModeActionHandler,
-                selectedNodes = if (isInSelectionMode) sharesState.selectedNodes else emptyList(),
-                isSelecting = false,
+                selectedNodes = selection.selectedNodes,
+                isSelecting = selection.isSelecting,
             )
         },
     ) { paddingValues ->
@@ -113,6 +108,7 @@ internal fun ContactSharedFoldersScreen(
             onAction = onIncomingShareAction,
             onShowNodeOptions = onShowNodeOptions,
             onSortOrderClick = { showSortBottomSheet = true },
+            selection = selection,
             contentPadding = paddingValues,
         )
     }

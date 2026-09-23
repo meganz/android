@@ -1,24 +1,24 @@
 package mega.privacy.android.feature.clouddrive.presentation.shares.contactshares
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import de.palm.composestateevents.EventEffect
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionActionsEffect
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.ContactSharedFoldersNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelection
 
 fun EntryProviderScope<NavKey>.contactSharedFolders(
     navigationHandler: NavigationHandler,
@@ -54,27 +54,19 @@ fun EntryProviderScope<NavKey>.contactSharedFolders(
             megaNavigator = megaNavigator
         )
 
-        val sharesState = uiState.shares
-        val isInSelectionMode = sharesState.isInSelectionMode
-        val selectedItemsCount = sharesState.selectedItemsCount
+        val selection = rememberNodeSelection(items = uiState.shares.items)
 
-        BackHandler(enabled = isInSelectionMode) {
-            viewModel.processAction(IncomingSharesAction.DeselectAllItems)
+        BackHandler(enabled = selection.isInSelectionMode) {
+            selection.deselectAll()
         }
 
-        EventEffect(
-            nodeActionState.actionTriggeredEvent,
-            nodeOptionsActionViewModel::resetActionTriggered
-        ) {
-            viewModel.processAction(IncomingSharesAction.DeselectAllItems)
-        }
-
-        LaunchedEffect(selectedItemsCount) {
-            nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-                selectedNodes = (if (isInSelectionMode) sharesState.selectedNodes else emptyList()).toSet(),
-                nodeSourceType = NodeSourceType.INCOMING_SHARES,
-            )
-        }
+        @SuppressLint("ComposeViewModelForwarding")
+        NodeSelectionActionsEffect(
+            selection = selection,
+            nodeSourceType = NodeSourceType.INCOMING_SHARES,
+            uiState = nodeActionState,
+            onIntent = nodeOptionsActionViewModel::processIntent,
+        )
 
         ContactSharedFoldersScreen(
             email = key.email,
@@ -94,8 +86,7 @@ fun EntryProviderScope<NavKey>.contactSharedFolders(
             uiState = uiState,
             nodeActionState = nodeActionState,
             selectionModeActionHandler = selectionModeActionHandler,
-            onSelectAllClicked = { viewModel.processAction(IncomingSharesAction.SelectAllItems) },
-            onCancelSelectionClicked = { viewModel.processAction(IncomingSharesAction.DeselectAllItems) },
+            selection = selection,
             onIncomingShareAction = viewModel::processAction,
             setSortOrder = viewModel::setSortOrder,
         )

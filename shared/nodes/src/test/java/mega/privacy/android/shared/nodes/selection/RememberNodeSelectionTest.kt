@@ -76,4 +76,79 @@ class RememberNodeSelectionTest {
 
         composeTestRule.runOnIdle { assertThat(selection).isSameInstanceAs(first) }
     }
+
+    @Test
+    fun `test that rememberNodeSelection drops a selected node that leaves the items`() {
+        val itemsState = mutableStateOf((1L..3L).map { previewFolderNodeUiItem(id = it) })
+        val loading = mutableStateOf<NodesLoadingState>(NodesLoadingState.FullyLoaded)
+        lateinit var selection: NodeSelection<TypedNode>
+        composeTestRule.setContent {
+            val currentItems by itemsState
+            val currentLoading by loading
+            selection = rememberNodeSelection(currentItems, currentLoading)
+        }
+        composeTestRule.runOnIdle {
+            selection.toggle(NodeId(1L))
+            selection.toggle(NodeId(2L))
+        }
+
+        composeTestRule.runOnIdle {
+            itemsState.value = itemsState.value.filterNot { it.id == NodeId(2L) }
+        }
+
+        composeTestRule.runOnIdle {
+            assertThat(selection.selectedCount).isEqualTo(1)
+            assertThat(selection.selectedNodes.map { it.id }).containsExactly(NodeId(1L))
+        }
+    }
+
+    @Test
+    fun `test that rememberNodeSelection keeps selected ids while more pages are loading`() {
+        val itemsState = mutableStateOf((1L..3L).map { previewFolderNodeUiItem(id = it) })
+        val loading = mutableStateOf<NodesLoadingState>(NodesLoadingState.PartiallyLoaded)
+        lateinit var selection: NodeSelection<TypedNode>
+        composeTestRule.setContent {
+            val currentItems by itemsState
+            val currentLoading by loading
+            selection = rememberNodeSelection(currentItems, currentLoading)
+        }
+        composeTestRule.runOnIdle { selection.toggle(NodeId(2L)) }
+
+        composeTestRule.runOnIdle {
+            itemsState.value = itemsState.value.filterNot { it.id == NodeId(2L) }
+        }
+
+        composeTestRule.runOnIdle { assertThat(selection.selectedCount).isEqualTo(1) }
+
+        composeTestRule.runOnIdle { loading.value = NodesLoadingState.FullyLoaded }
+
+        composeTestRule.runOnIdle {
+            assertThat(selection.selectedCount).isEqualTo(0)
+            assertThat(selection.isInSelectionMode).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that rememberNodeSelection keeps the selection when the fetch fails`() {
+        val itemsState = mutableStateOf((1L..3L).map { previewFolderNodeUiItem(id = it) })
+        val loading = mutableStateOf<NodesLoadingState>(NodesLoadingState.FullyLoaded)
+        lateinit var selection: NodeSelection<TypedNode>
+        composeTestRule.setContent {
+            val currentItems by itemsState
+            val currentLoading by loading
+            selection = rememberNodeSelection(currentItems, currentLoading)
+        }
+        composeTestRule.runOnIdle { selection.toggle(NodeId(2L)) }
+
+        // A failed fetch arrives as an empty list; it is not evidence the node is gone.
+        composeTestRule.runOnIdle {
+            itemsState.value = emptyList()
+            loading.value = NodesLoadingState.Failed
+        }
+
+        composeTestRule.runOnIdle {
+            assertThat(selection.selectedCount).isEqualTo(1)
+            assertThat(selection.isInSelectionMode).isTrue()
+        }
+    }
 }

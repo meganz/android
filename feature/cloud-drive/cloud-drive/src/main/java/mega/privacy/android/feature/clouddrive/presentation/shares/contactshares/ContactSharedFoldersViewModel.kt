@@ -20,8 +20,6 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
@@ -41,9 +39,8 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesUiState
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
@@ -62,7 +59,7 @@ class ContactSharedFoldersViewModel @AssistedInject constructor(
     private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase,
     private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase,
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
-    private val nodeUiItemMapper: NodeUiItemMapper,
+    private val nodeViewItemMapper: NodeViewItemMapper,
     private val monitorOthersSortOrderUseCase: MonitorOthersSortOrderUseCase,
     private val setOthersSortOrder: SetOthersSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
@@ -91,12 +88,7 @@ class ContactSharedFoldersViewModel @AssistedInject constructor(
      */
     fun processAction(action: IncomingSharesAction) {
         when (action) {
-            is IncomingSharesAction.ItemClicked -> onItemClicked(action.nodeUiItem)
-            is IncomingSharesAction.ItemLongClicked -> onItemLongClicked(action.nodeUiItem)
             is IncomingSharesAction.ChangeViewTypeClicked -> onChangeViewTypeClicked()
-            is IncomingSharesAction.SelectAllItems -> selectAllItems()
-            is IncomingSharesAction.DeselectAllItems -> deselectAllItems()
-            is IncomingSharesAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is IncomingSharesAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
         }
     }
@@ -126,15 +118,17 @@ class ContactSharedFoldersViewModel @AssistedInject constructor(
                 email = args.email,
                 sortOrder = sortOrder,
             )
-            val nodeUiItems = nodeUiItemMapper(
+            val nodeItems = nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = uiState.value.shares.items,
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
                 isContactVerificationOn = isContactVerificationOn,
+                highlightedNodeId = null,
+                highlightedNames = null,
+                isHiddenNodesEnabled = false,
             )
             updateShares { state ->
                 state.copy(
-                    items = nodeUiItems,
+                    items = nodeItems,
                     isLoading = false,
                 )
             }
@@ -160,49 +154,8 @@ class ContactSharedFoldersViewModel @AssistedInject constructor(
         }
     }
 
-    private fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
-        if (uiState.value.shares.isInSelectionMode) {
-            toggleItemSelection(nodeUiItem)
-            return
-        }
-        (nodeUiItem.node as? TypedFolderNode)?.let { node ->
-            updateShares { state ->
-                state.copy(navigateToFolderEvent = triggered(node))
-            }
-        }
-    }
-
-    private fun onNavigateToFolderEventConsumed() {
-        updateShares { state -> state.copy(navigateToFolderEvent = consumed()) }
-    }
-
     private fun onNavigateBackEventConsumed() {
         updateShares { state -> state.copy(navigateBack = consumed) }
-    }
-
-    private fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
-        toggleItemSelection(nodeUiItem)
-    }
-
-    private fun toggleItemSelection(nodeUiItem: NodeUiItem<TypedNode>) {
-        val updatedItems = uiState.value.shares.items.map { item ->
-            if (item.node.id == nodeUiItem.node.id) {
-                item.copy(isSelected = !item.isSelected)
-            } else {
-                item
-            }
-        }
-        updateShares { state -> state.copy(items = updatedItems) }
-    }
-
-    private fun deselectAllItems() {
-        val updatedItems = uiState.value.shares.items.map { it.copy(isSelected = false) }
-        updateShares { state -> state.copy(items = updatedItems) }
-    }
-
-    private fun selectAllItems() {
-        val updatedItems = uiState.value.shares.items.map { it.copy(isSelected = true) }
-        updateShares { state -> state.copy(items = updatedItems) }
     }
 
     private fun onChangeViewTypeClicked() {
