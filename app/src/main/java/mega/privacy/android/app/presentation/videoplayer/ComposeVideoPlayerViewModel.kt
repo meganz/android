@@ -14,6 +14,7 @@ import android.view.PixelCopy
 import android.view.Surface
 import android.view.TextureView
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -65,17 +66,8 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunch
 import mega.privacy.android.app.presentation.videoplayer.model.toVideoPlayerLaunchSourceType
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
-import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
-import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
-import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
-import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
-import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
-import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
-import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
-import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
@@ -155,13 +147,6 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
@@ -391,7 +376,21 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             VideoPlayerLaunchSourceType.ImageViewer -> NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER
             VideoPlayerLaunchSourceType.Versions -> NodeSourceType.MEDIA_PLAYER_VERSIONS
             VideoPlayerLaunchSourceType.Zip -> NodeSourceType.MEDIA_PLAYER_ZIP_FILE
-            else -> NodeSourceType.MEDIA_PLAYER_DEFAULT
+
+            VideoPlayerLaunchSourceType.FileBrowser,
+            VideoPlayerLaunchSourceType.Backups,
+            VideoPlayerLaunchSourceType.Links,
+            VideoPlayerLaunchSourceType.IncomingShares,
+            VideoPlayerLaunchSourceType.OutgoingShares,
+            VideoPlayerLaunchSourceType.Favourites,
+            VideoPlayerLaunchSourceType.ContactFile,
+            VideoPlayerLaunchSourceType.MediaDiscovery,
+            VideoPlayerLaunchSourceType.Recents,
+            VideoPlayerLaunchSourceType.RecentsBucket,
+            VideoPlayerLaunchSourceType.Search,
+            VideoPlayerLaunchSourceType.VideoBrowse,
+            VideoPlayerLaunchSourceType.Unknown,
+                -> NodeSourceType.MEDIA_PLAYER_DEFAULT
         }
 
     private fun updateNameWhenNodeUpdates() {
@@ -555,7 +554,6 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             handlePlaybackSourceByLaunchSource(
                 source = source,
                 launchSource = args.sourceType,
-                launchAdapterType = args.adapterType,
                 playingHandle = currentPlayingHandle,
             )
         }
@@ -714,13 +712,12 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private suspend fun handlePlaybackSourceByLaunchSource(
         source: VideoPlayerLaunchSource,
         launchSource: VideoPlayerLaunchSourceType,
-        launchAdapterType: Int,
         playingHandle: Long,
     ) {
         when (launchSource) {
             VideoPlayerLaunchSourceType.Offline -> handleOfflineSource(source, playingHandle)
             VideoPlayerLaunchSourceType.Zip -> handleZipSource(source, playingHandle)
-            else -> handleGeneralSource(source, launchAdapterType, playingHandle)
+            else -> handleGeneralSource(source, launchSource, playingHandle)
         }
     }
 
@@ -883,23 +880,23 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
 
     private suspend fun handleGeneralSource(
         source: VideoPlayerLaunchSource,
-        launchSource: Int,
+        launchSource: VideoPlayerLaunchSourceType,
         playingHandle: Long,
     ) {
         val parentHandle = source.parentHandle
         val order = source.sortOrder
         val (title, videoNodes) = when (launchSource) {
-            VIDEO_BROWSE_ADAPTER ->
+            VideoPlayerLaunchSourceType.VideoBrowse ->
                 context.getString(R.string.sortby_type_video_first) to getVideoNodesUseCase(order)
 
-            RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
+            VideoPlayerLaunchSourceType.Recents, VideoPlayerLaunchSourceType.RecentsBucket -> {
                 val videoNodes = source.nodeHandles?.let { handles ->
                     getVideoNodesByHandlesUseCase(handles)
                 }.orEmpty()
                 context.getString(R.string.section_recents) to videoNodes
             }
 
-            FOLDER_LINK_ADAPTER -> {
+            VideoPlayerLaunchSourceType.FolderLink -> {
                 val parentNode = if (parentHandle == INVALID_HANDLE) {
                     getRootNodeFromMegaApiFolderUseCase()
                 } else {
@@ -916,7 +913,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 (parentNode?.name.orEmpty()) to videoNodes
             }
 
-            SEARCH_BY_ADAPTER -> {
+            VideoPlayerLaunchSourceType.Search -> {
                 val title = source.mediaQueueTitle.orEmpty()
                 val videoNodes = source.searchedItems
                     ?.let { handles ->
@@ -925,36 +922,36 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 title to videoNodes
             }
 
-            FILE_BROWSER_ADAPTER,
-            RUBBISH_BIN_ADAPTER,
-            BACKUPS_ADAPTER,
-            LINKS_ADAPTER,
-            INCOMING_SHARES_ADAPTER,
-            OUTGOING_SHARES_ADAPTER,
-            CONTACT_FILE_ADAPTER,
-            FROM_MEDIA_DISCOVERY,
-            FROM_IMAGE_VIEWER,
-            FROM_ALBUM_SHARING,
-            FAVOURITES_ADAPTER,
+            VideoPlayerLaunchSourceType.FileBrowser,
+            VideoPlayerLaunchSourceType.RubbishBin,
+            VideoPlayerLaunchSourceType.Backups,
+            VideoPlayerLaunchSourceType.Links,
+            VideoPlayerLaunchSourceType.IncomingShares,
+            VideoPlayerLaunchSourceType.OutgoingShares,
+            VideoPlayerLaunchSourceType.ContactFile,
+            VideoPlayerLaunchSourceType.MediaDiscovery,
+            VideoPlayerLaunchSourceType.ImageViewer,
+            VideoPlayerLaunchSourceType.AlbumSharing,
+            VideoPlayerLaunchSourceType.Favourites,
                 -> {
                 when (launchSource) {
-                    LINKS_ADAPTER if parentHandle == INVALID_HANDLE ->
+                    VideoPlayerLaunchSourceType.Links if parentHandle == INVALID_HANDLE ->
                         context.getString(sharedR.string.shares_screen_links_shares_tab_title) to getVideoNodesFromPublicLinksUseCase(
                             order
                         )
 
-                    INCOMING_SHARES_ADAPTER if parentHandle == INVALID_HANDLE ->
+                    VideoPlayerLaunchSourceType.IncomingShares if parentHandle == INVALID_HANDLE ->
                         context.getString(sharedR.string.shares_screen_incoming_shares_tab_title) to getVideoNodesFromInSharesUseCase(
                             order
                         )
 
-                    OUTGOING_SHARES_ADAPTER if parentHandle == INVALID_HANDLE ->
+                    VideoPlayerLaunchSourceType.OutgoingShares if parentHandle == INVALID_HANDLE ->
                         context.getString(sharedR.string.shares_screen_outgoing_shares_tab_title) to getVideoNodesFromOutSharesUseCase(
                             lastHandle = INVALID_HANDLE,
                             order = order
                         )
 
-                    CONTACT_FILE_ADAPTER if parentHandle == INVALID_HANDLE -> {
+                    VideoPlayerLaunchSourceType.ContactFile if parentHandle == INVALID_HANDLE -> {
                         source.contactEmail
                             ?.let { email ->
                                 val videoNodes = getVideoNodesByEmailUseCase(email).orEmpty()
@@ -971,29 +968,19 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                     else -> {
                         val parentNode =
                             if (parentHandle == INVALID_HANDLE) {
-                                when (launchSource) {
-                                    RUBBISH_BIN_ADAPTER -> getRubbishNodeUseCase()
-                                    BACKUPS_ADAPTER -> getBackupsNodeUseCase()
-                                    else -> getRootNodeUseCase()
-                                }
+                                rootParentNode(launchSource)
                             } else {
                                 getVideoNodeByHandleUseCase(parentHandle)
                             }
                         val title =
                             if (parentHandle == INVALID_HANDLE) {
-                                context.getString(
-                                    when (launchSource) {
-                                        RUBBISH_BIN_ADAPTER -> sharedR.string.general_section_rubbish_bin
-                                        BACKUPS_ADAPTER -> R.string.home_side_menu_backups_title
-                                        else -> R.string.section_cloud_drive
-                                    }
-                                )
+                                context.getString(rootSectionTitleRes(launchSource))
                             } else {
                                 parentNode?.name
                             }.orEmpty()
 
                         val videoNodes = parentNode?.let {
-                            if (launchSource == FROM_MEDIA_DISCOVERY) {
+                            if (launchSource == VideoPlayerLaunchSourceType.MediaDiscovery) {
                                 getVideosBySearchTypeUseCase(
                                     handle = it.id.longValue,
                                     recursive = monitorSubFolderMediaDiscoverySettingsUseCase().first(),
@@ -1012,9 +999,15 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 }
             }
 
-            else -> {
-                "" to emptyList()
-            }
+            // Offline and Zip never reach here — handlePlaybackSourceByLaunchSource routes them
+            // to their own handlers. The rest open a single item with no queue around it.
+            VideoPlayerLaunchSourceType.Offline,
+            VideoPlayerLaunchSourceType.Zip,
+            VideoPlayerLaunchSourceType.Chat,
+            VideoPlayerLaunchSourceType.FileLink,
+            VideoPlayerLaunchSourceType.Versions,
+            VideoPlayerLaunchSourceType.Unknown,
+                -> "" to emptyList()
         }
 
         if (videoNodes.isNotEmpty()) {
@@ -1058,11 +1051,33 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Root node of the section a queue is built from when no parent handle was supplied.
+     */
+    private suspend fun rootParentNode(launchSource: VideoPlayerLaunchSourceType) =
+        when (launchSource) {
+            VideoPlayerLaunchSourceType.RubbishBin -> getRubbishNodeUseCase()
+            VideoPlayerLaunchSourceType.Backups -> getBackupsNodeUseCase()
+            else -> getRootNodeUseCase()
+        }
+
+    /**
+     * Title of the section a queue is built from when it has no parent node — the root of the
+     * source rather than a folder inside it.
+     */
+    @StringRes
+    private fun rootSectionTitleRes(launchSource: VideoPlayerLaunchSourceType): Int =
+        when (launchSource) {
+            VideoPlayerLaunchSourceType.RubbishBin -> sharedR.string.general_section_rubbish_bin
+            VideoPlayerLaunchSourceType.Backups -> R.string.home_side_menu_backups_title
+            else -> R.string.section_cloud_drive
+        }
+
     private suspend fun buildPlaybackSourcesByNodes(
         title: String,
         videoNodes: List<TypedVideoNode>,
         firstPlayHandle: Long,
-        launchSource: Int,
+        launchSource: VideoPlayerLaunchSourceType,
     ) {
         val mediaItems = mutableListOf<MediaItem>()
         var currentPlayingIndex = -1
@@ -1097,7 +1112,10 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         )
     }
 
-    private suspend fun getMediaItemForNode(node: TypedVideoNode, launchSource: Int) =
+    private suspend fun getMediaItemForNode(
+        node: TypedVideoNode,
+        launchSource: VideoPlayerLaunchSourceType,
+    ) =
         getLocalFilePathUseCase(node).let { localPath ->
             if (localPath != null && isLocalFile(node, localPath)) {
                 MediaItem.Builder()
@@ -1106,7 +1124,9 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                     .build()
             } else {
                 when (launchSource) {
-                    FOLDER_LINK_ADAPTER -> getLocalFolderLinkUseCase(node.id.longValue)
+                    VideoPlayerLaunchSourceType.FolderLink ->
+                        getLocalFolderLinkUseCase(node.id.longValue)
+
                     else -> getLocalLinkFromMegaApiUseCase(node.id.longValue)
                 }?.let { url ->
                     MediaItem.Builder()
