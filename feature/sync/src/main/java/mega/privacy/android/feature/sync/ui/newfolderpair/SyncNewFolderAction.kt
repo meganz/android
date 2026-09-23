@@ -14,7 +14,9 @@ internal sealed interface SyncNewFolderAction {
     /**
      * @param exclusions - the exclusions configured for a folder pair that does not exist yet. They
      * become the whole `.megaignore` of the local root, replacing any file another MEGA client left
-     * there, and are discarded if the user then chooses a different local folder.
+     * there, and are discarded if the user then chooses a different local folder. Must have come
+     * from a screen that showed the user what they replace: the create-time write adds nothing of
+     * its own, not even the SDK's predefined exclusions.
      */
     data class ExclusionsStaged(val exclusions: ParsedMegaIgnore) : SyncNewFolderAction
 

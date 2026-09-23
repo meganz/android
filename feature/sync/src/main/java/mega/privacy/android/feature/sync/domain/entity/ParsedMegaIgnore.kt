@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.domain.entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * A parsed `.megaignore` file, held as the ordered list of its lines.
  *
@@ -12,6 +14,7 @@ package mega.privacy.android.feature.sync.domain.entity
  * @property hadBom whether the source began with a UTF-8 byte order mark, so that
  * editing a file authored elsewhere keeps its encoding signature
  */
+@Serializable
 data class ParsedMegaIgnore(
     val entries: List<MegaIgnoreEntry>,
     val hadBom: Boolean = false,

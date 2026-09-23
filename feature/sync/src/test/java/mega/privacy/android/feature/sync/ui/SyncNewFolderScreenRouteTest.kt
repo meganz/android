@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -65,7 +66,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -99,7 +103,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -134,7 +141,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -161,7 +171,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -189,7 +202,10 @@ internal class SyncNewFolderScreenRouteTest {
                 syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -213,7 +229,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = openNextScreenCallback,
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -239,7 +258,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = openNextScreenCallback,
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -265,7 +287,10 @@ internal class SyncNewFolderScreenRouteTest {
                 syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = openSelectMegaFolderScreenLambda,
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -291,7 +316,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -316,7 +344,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -341,7 +372,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 
@@ -369,7 +403,10 @@ internal class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
-                onBackClicked = {}
+                onBackClicked = {},
+                onManageExclusions = { _, _ -> },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
             )
         }
 

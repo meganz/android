@@ -824,6 +824,38 @@ internal class SyncNewFolderViewModelTest {
         verify(syncFolderPairUseCase).invoke(eq(syncType), anyOrNull(), eq(OTHER_LOCAL_ROOT), any())
     }
 
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that isExclusionsEnabled follows the flag`(syncType: SyncType) = runTest {
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions)).thenReturn(true)
+
+        initViewModel(syncType = syncType)
+
+        underTest.state.test {
+            val result = awaitItem()
+            assertThat(result.isExclusionsEnabled).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that isExclusionsEnabled is false when the flag read throws`(syncType: SyncType) =
+        runTest {
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions))
+                .thenThrow(RuntimeException("Flag unreachable"))
+
+            initViewModel(syncType = syncType)
+
+            underTest.state.test {
+                val result = awaitItem()
+                assertThat(result.isExclusionsEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private suspend fun stubFolderPairCreation(syncType: SyncType): RemoteFolder {
         val remoteFolder = if (syncType == SyncType.TYPE_BACKUP) {
             RemoteFolder(NodeId(-1L), "")

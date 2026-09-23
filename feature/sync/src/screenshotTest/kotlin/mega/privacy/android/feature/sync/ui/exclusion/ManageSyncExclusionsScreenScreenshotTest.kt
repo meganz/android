@@ -19,6 +19,7 @@ import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionChipMa
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionPatternMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionRowMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionSupportingTextMapper
+import mega.privacy.android.feature.sync.ui.model.exclusion.ManageExclusionsMode
 import mega.privacy.android.feature.sync.ui.model.exclusion.ManageSyncExclusionsUiState
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -84,6 +85,27 @@ class ManageSyncExclusionsScreenScreenshotTest {
                     syncName = "Documents",
                     isWritable = true,
                     isLoading = false,
+                ),
+            )
+        }
+    }
+
+    /** Review mode, reached while setting up a folder pair, before it exists to be managed. */
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ManageSyncExclusionsScreenReviewMode() {
+        val parsed = ParsedMegaIgnore(
+            entries = MegaIgnoreDefaults.RULES.map { MegaIgnoreEntry.RuleEntry(it) },
+        )
+        AndroidThemeForPreviews {
+            Screen(
+                ManageSyncExclusionsUiState(
+                    loaded = parsed,
+                    staged = parsed,
+                    isWritable = true,
+                    isLoading = false,
+                    mode = ManageExclusionsMode.Review,
                 ),
             )
         }

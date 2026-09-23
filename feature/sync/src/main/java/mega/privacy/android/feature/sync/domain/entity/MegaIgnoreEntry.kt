@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.domain.entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * A single line of a `.megaignore` file, in the position it occupies in that file.
  *
@@ -8,6 +10,7 @@ package mega.privacy.android.feature.sync.domain.entity
  * original file: the SDK evaluates filters last match wins, so reordering or
  * dropping a line silently changes which rule takes effect.
  */
+@Serializable
 sealed interface MegaIgnoreEntry {
 
     /**
@@ -15,6 +18,7 @@ sealed interface MegaIgnoreEntry {
      *
      * @property rule the modelled rule
      */
+    @Serializable
     data class RuleEntry(val rule: SyncExclusionRule) : MegaIgnoreEntry
 
     /**
@@ -22,6 +26,7 @@ sealed interface MegaIgnoreEntry {
      *
      * @property bytes the bound, in bytes
      */
+    @Serializable
     data class SizeSmallerEntry(val bytes: Long) : MegaIgnoreEntry
 
     /**
@@ -29,6 +34,7 @@ sealed interface MegaIgnoreEntry {
      *
      * @property bytes the bound, in bytes
      */
+    @Serializable
     data class SizeLargerEntry(val bytes: Long) : MegaIgnoreEntry
 
     /**
@@ -43,6 +49,7 @@ sealed interface MegaIgnoreEntry {
      *
      * @property line the line exactly as it was read, without its line terminator
      */
+    @Serializable
     data class PreservedEntry(val line: String) : MegaIgnoreEntry
 
     /**
@@ -59,6 +66,7 @@ sealed interface MegaIgnoreEntry {
      * @property line the line exactly as it was read, without its line terminator
      * @property reason why the SDK refuses it
      */
+    @Serializable
     data class InvalidEntry(
         val line: String,
         val reason: InvalidLineReason,

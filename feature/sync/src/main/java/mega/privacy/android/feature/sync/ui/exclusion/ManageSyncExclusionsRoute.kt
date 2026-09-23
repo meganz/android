@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
 import mega.privacy.android.feature.sync.navigation.EditSyncExclusionRuleResult
 import mega.privacy.android.feature.sync.navigation.SyncExclusionResultEffect
@@ -23,25 +24,32 @@ import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionRowUiIt
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * The Manage exclusions screen, bound to the sync named by [syncId].
+ * The Manage exclusions screen, bound to the sync named by [syncId], or, when [syncId] is null,
+ * configuring a model still staged for a folder pair that does not exist yet.
  *
+ * @param staged in Review mode, the model already staged by the setup screen to seed the screen
+ * from, so re-entering it shows the user's own work rather than resetting it
  * @param monitorResult the navigation results the Add, Edit and size screens hand back
  * @param clearResult takes a result out of the channel once it has been staged
+ * @param onReviewSaved hands the staged model to the setup screen once Review mode's Save is
+ * confirmed
  */
 @Composable
 internal fun ManageSyncExclusionsRoute(
-    syncId: Long,
+    syncId: Long?,
     localRoot: UriPath,
+    staged: ParsedMegaIgnore?,
     monitorResult: (String) -> Flow<Any?>,
     clearResult: (String) -> Unit,
     onFinished: () -> Unit,
-    onAddExclusion: (Long) -> Unit,
+    onAddExclusion: (Long?) -> Unit,
     onEditRule: (SyncExclusionRowUiItem) -> Unit,
     onEditSize: (SyncSizeExclusion) -> Unit,
+    onReviewSaved: (ParsedMegaIgnore) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ManageSyncExclusionsViewModel =
         hiltViewModel<ManageSyncExclusionsViewModel, ManageSyncExclusionsViewModel.Factory> {
-            it.create(ManageSyncExclusionsViewModel.Args(syncId, localRoot))
+            it.create(ManageSyncExclusionsViewModel.Args(syncId, localRoot, staged))
         },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -100,6 +108,13 @@ internal fun ManageSyncExclusionsRoute(
         onConsumed = viewModel::onEditErrorShown,
     ) { error ->
         snackbarHostState?.showSnackbar(resources.getString(editErrorMapper(error)))
+    }
+
+    EventEffect(
+        event = uiState.reviewSavedEvent,
+        onConsumed = viewModel::onReviewSavedShown,
+    ) { exclusions ->
+        onReviewSaved(exclusions)
     }
 
     LaunchedEffect(uiState.isFinished) {

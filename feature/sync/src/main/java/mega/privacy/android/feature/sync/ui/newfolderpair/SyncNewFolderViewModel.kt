@@ -103,6 +103,10 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                     checkOverQuotaStatus()
                 }
         }
+        viewModelScope.launch {
+            val enabled = isSyncExclusionsEnabled()
+            _state.update { it.copy(isExclusionsEnabled = enabled) }
+        }
     }
 
     private fun getDeviceName() {

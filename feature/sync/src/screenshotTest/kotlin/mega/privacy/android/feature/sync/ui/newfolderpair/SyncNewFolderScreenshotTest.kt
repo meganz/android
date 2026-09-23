@@ -54,10 +54,25 @@ class SyncNewFolderScreenshotTest {
         }
     }
 
+    /** The row that opens Review mode, shown once a local folder is chosen and the flag is on. */
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun SyncNewFolderWithExclusionsRow() {
+        AndroidThemeForPreviews {
+            Scaffold(
+                syncType = SyncType.TYPE_TWOWAY,
+                selectedLocalFolder = "/storage/emulated/0/DCIM",
+                showExclusionsRow = true,
+            )
+        }
+    }
+
     @Composable
     private fun Scaffold(
         syncType: SyncType,
         selectedLocalFolder: String = "",
+        showExclusionsRow: Boolean = false,
     ) {
         SyncNewFolderScreenScaffold(
             state = SyncNewFolderState(
@@ -78,6 +93,8 @@ class SyncNewFolderScreenshotTest {
             onOpenUpgradeAccount = {},
             onBackClicked = {},
             onShowSnackbarConsumed = {},
+            showExclusionsRow = showExclusionsRow,
+            onManageExclusionsClicked = {},
         )
     }
 }

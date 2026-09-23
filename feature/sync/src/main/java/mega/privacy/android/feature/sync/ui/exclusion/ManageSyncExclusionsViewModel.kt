@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
+import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreEntry
 import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionEdit
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
@@ -34,6 +36,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCa
 import mega.privacy.android.feature.sync.navigation.AddSyncExclusionResult
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionChipMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionRowMapper
+import mega.privacy.android.feature.sync.ui.model.exclusion.ManageExclusionsMode
 import mega.privacy.android.feature.sync.ui.model.exclusion.ManageSyncExclusionsUiState
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionChipUiItem
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionRowUiItem
@@ -51,9 +54,10 @@ import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionRowUiIt
  * be raised from here: the transforms compare a target against this screen's own copy, never
  * against the file. A save that refuses when the file has moved under it is not built yet.
  *
- * The sync is required to already exist. Exclusions chosen while a folder pair is still being set
- * up have no sync to write to and no id to rescan, and travel instead on the setup screen's own
- * state.
+ * The screen also serves [ManageExclusionsMode.Review]: configuring exclusions for a folder pair
+ * that does not exist yet, while it is still being set up. Review reads the local root's file but
+ * cannot write or rescan a sync that has not been created; Save instead hands the staged model back
+ * to the setup screen, which holds it until the pair is created.
  */
 @HiltViewModel(assistedFactory = ManageSyncExclusionsViewModel.Factory::class)
 internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
@@ -71,8 +75,12 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
     private val rowMapper: SyncExclusionRowMapper,
 ) : ViewModel() {
 
+    /** No sync id means there is no folder pair yet to edit the exclusions of. */
+    private val mode: ManageExclusionsMode =
+        if (args.syncId == null) ManageExclusionsMode.Review else ManageExclusionsMode.Manage
+
     val uiState: StateFlow<ManageSyncExclusionsUiState>
-        field = MutableStateFlow(ManageSyncExclusionsUiState())
+        field = MutableStateFlow(ManageSyncExclusionsUiState(mode = mode))
 
     /**
      * The staged rules split into the two halves the screen draws.
@@ -156,19 +164,35 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
         val staged = uiState.value.staged ?: return
         if (!uiState.value.canSave) return
 
-        uiState.update { it.copy(isSaving = true, saveFailedEvent = consumed) }
-        // the write is followed by the rescan that makes the running sync read it, and the two
-        // only add up to an applied change together, so leaving the screen must not cancel them
-        applicationScope.launch {
-            val written = setSyncExclusionsUseCase(args.syncId, args.localRoot, staged)
-            uiState.update {
-                if (written.isSuccess) {
-                    // the file now holds what was staged, so that becomes the baseline; taking
-                    // the current staged instead would mark an edit made during the write as
-                    // already saved
-                    it.copy(isSaving = false, loaded = staged)
-                } else {
-                    it.copy(isSaving = false, saveFailedEvent = triggered)
+        when (mode) {
+            // nothing is written here: the model travels back to the setup screen, which stages
+            // it until there is a folder pair for it to be written against
+            ManageExclusionsMode.Review -> {
+                // also settles loaded against staged, so canSave goes false and a second tap
+                // before the pop lands cannot trigger and pop a second time
+                uiState.update {
+                    it.copy(reviewSavedEvent = triggered(staged), loaded = staged)
+                }
+            }
+
+            ManageExclusionsMode.Manage -> {
+                val syncId = args.syncId ?: return
+                uiState.update { it.copy(isSaving = true, saveFailedEvent = consumed) }
+                // the write is followed by the rescan that makes the running sync read it, and
+                // the two only add up to an applied change together, so leaving the screen must
+                // not cancel them
+                applicationScope.launch {
+                    val written = setSyncExclusionsUseCase(syncId, args.localRoot, staged)
+                    uiState.update {
+                        if (written.isSuccess) {
+                            // the file now holds what was staged, so that becomes the baseline;
+                            // taking the current staged instead would mark an edit made during
+                            // the write as already saved
+                            it.copy(isSaving = false, loaded = staged)
+                        } else {
+                            it.copy(isSaving = false, saveFailedEvent = triggered)
+                        }
+                    }
                 }
             }
         }
@@ -221,15 +245,41 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
         uiState.update { it.copy(exclusionAddedEvent = consumed) }
     }
 
+    fun onReviewSavedShown() {
+        uiState.update { it.copy(reviewSavedEvent = consumed()) }
+    }
+
+    /**
+     * Reads [Args.localRoot], the same read for both modes.
+     *
+     * [ManageExclusionsMode.Review] reads before staging anything rather than starting from the
+     * defaults outright: a folder that already holds a `.megaignore` — left by an earlier sync of
+     * it, or authored by another MEGA client — has to be shown to the user first, or Save would
+     * silently replace it with a model they were never shown. The defaults stand in only once the
+     * read comes back with nothing to seed from, and only in Review mode: they are what the SDK
+     * would otherwise have set up on a fresh root. [ManageExclusionsMode.Manage] leaves an empty
+     * read as the empty model it is, because there the file is real and reporting it as anything
+     * else would misstate it.
+     */
     private fun load() {
         uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             getSyncExclusionsUseCase(args.localRoot).fold(
                 onSuccess = { snapshot ->
+                    val nothingToSeedFrom = when (mode) {
+                        ManageExclusionsMode.Review -> ParsedMegaIgnore(
+                            entries = MegaIgnoreDefaults.RULES.map(MegaIgnoreEntry::RuleEntry),
+                        )
+
+                        ManageExclusionsMode.Manage -> snapshot.exclusions
+                    }
+                    val staged = args.staged
+                        ?: snapshot.exclusions.takeIf { it.entries.isNotEmpty() }
+                        ?: nothingToSeedFrom
                     uiState.update {
                         it.copy(
-                            loaded = snapshot.exclusions,
-                            staged = snapshot.exclusions,
+                            loaded = staged,
+                            staged = staged,
                             isWritable = snapshot.isWritable,
                             isLoading = false,
                             hasLoadFailed = false,
@@ -259,8 +309,11 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
      * Kept out of [load] because the two answer different questions and fail independently: the
      * name is decoration, so a lookup that fails leaves the subtitle absent rather than presenting
      * the screen as unreadable, and a retry of a failed read has no reason to fetch it again.
+     *
+     * Returns immediately in [ManageExclusionsMode.Review]: there is no folder pair yet to name.
      */
     private fun loadSyncName() {
+        if (mode == ManageExclusionsMode.Review) return
         viewModelScope.launch {
             val name = runCatching { getFolderPairsUseCase() }.getOrNull()
                 ?.firstOrNull { it.id == args.syncId }
@@ -305,13 +358,17 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
      * Carried as a class because [UriPath] is a value class, and a factory method taking one is
      * mangled to a JVM name Dagger cannot generate against.
      *
-     * @property syncId id of the folder pair. The write rescans it, and an invalid handle would
-     * rescan every sync, so a resolved id is required
+     * @property syncId id of the folder pair, or null when no folder pair exists yet, which puts
+     * the screen into [ManageExclusionsMode.Review]. The write rescans a resolved id, and an
+     * invalid handle would rescan every sync, so [ManageExclusionsMode.Manage] requires one
      * @property localRoot the sync local root, already resolved from its folder pair
+     * @property staged in [ManageExclusionsMode.Review], the model already staged by the setup
+     * screen, or null if nothing has been staged yet
      */
     data class Args(
-        val syncId: Long,
+        val syncId: Long?,
         val localRoot: UriPath,
+        val staged: ParsedMegaIgnore?,
     )
 }
 

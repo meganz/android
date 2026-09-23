@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -37,13 +38,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import kotlinx.collections.immutable.persistentListOf
+import mega.android.core.ui.R as coreUiR
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicDialogButton
+import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -53,6 +57,7 @@ import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -65,6 +70,7 @@ import mega.privacy.android.feature.sync.ui.renamebackup.model.RenameAndCreateBa
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
 import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
@@ -84,6 +90,8 @@ internal fun SyncNewFolderScreen(
     showStorageOverQuota: Boolean,
     onDismissStorageOverQuota: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
+    showExclusionsRow: Boolean,
+    onManageExclusionsClicked: () -> Unit,
     viewModel: SyncNewFolderViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -104,6 +112,8 @@ internal fun SyncNewFolderScreen(
         onRenameAndCreateBackupSucceeded = { viewModel.openSyncListScreen() },
         onOpenUpgradeAccount = onOpenUpgradeAccount,
         onShowSnackbarConsumed = { viewModel.onShowSnackbarConsumed() },
+        showExclusionsRow = showExclusionsRow,
+        onManageExclusionsClicked = onManageExclusionsClicked,
     )
 }
 
@@ -124,6 +134,8 @@ internal fun SyncNewFolderScreenScaffold(
     onRenameAndCreateBackupSucceeded: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
     onShowSnackbarConsumed: () -> Unit,
+    showExclusionsRow: Boolean,
+    onManageExclusionsClicked: () -> Unit,
 ) {
     val syncType = state.syncType
     var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
@@ -172,7 +184,9 @@ internal fun SyncNewFolderScreenScaffold(
                         isWarningBannerDisplayed = value
                     },
                     snackBarHostState = snackBarHostState,
-                    isStorageOverQuota = state.isStorageOverQuota
+                    isStorageOverQuota = state.isStorageOverQuota,
+                    showExclusionsRow = showExclusionsRow,
+                    onManageExclusionsClicked = onManageExclusionsClicked,
                 )
 
                 val context = LocalContext.current
@@ -209,6 +223,8 @@ internal fun SyncNewFolderScreenContent(
     onOpenUpgradeAccount: () -> Unit,
     onShowSyncPermissionBannerValueChanged: (Boolean) -> Unit,
     snackBarHostState: SnackbarHostState?,
+    showExclusionsRow: Boolean,
+    onManageExclusionsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val resources = LocalResources.current
@@ -383,6 +399,29 @@ internal fun SyncNewFolderScreenContent(
                 selectedMegaFolder = selectedMegaFolder?.name ?: ""
             )
 
+            if (showExclusionsRow) {
+                FlexibleLineListItem(
+                    modifier = Modifier.testTag("settings_${SETTINGS_SYNC_NEW_FOLDER_EXCLUSIONS_KEY}:list_item"),
+                    minHeight = 58.dp,
+                    title = stringResource(sharedResR.string.sync_exclusions_manage_title),
+                    subtitle = stringResource(sharedResR.string.sync_exclusions_setup_subtitle),
+                    onClickListener = onManageExclusionsClicked,
+                    leadingElement = {
+                        MegaIcon(
+                            painter = painterResource(iconPackR.drawable.ic_filter_medium_thin_outline),
+                            tint = IconColor.Secondary,
+                        )
+                    },
+                    trailingElement = {
+                        MegaIcon(
+                            painter = painterResource(coreUiR.drawable.ic_chevron_right_medium_thin_outline),
+                            modifier = Modifier.testTag("settings_${SETTINGS_SYNC_NEW_FOLDER_EXCLUSIONS_KEY}:chevron"),
+                            tint = IconColor.Secondary,
+                        )
+                    },
+                )
+            }
+
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -431,6 +470,7 @@ internal fun SyncNewFolderScreenContent(
 internal const val TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR = "sync_new_folder_screen_toolbar_test_tag"
 internal const val TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON =
     "sync_new_folder_screen_sync_button_test_tag"
+private const val SETTINGS_SYNC_NEW_FOLDER_EXCLUSIONS_KEY = "sync_new_folder_exclusions"
 
 @CombinedThemePreviews
 @CombinedThemePhoneLandscapePreviews
@@ -458,6 +498,8 @@ private fun SyncNewFolderScreenPreview(
             onOpenUpgradeAccount = {},
             onBackClicked = {},
             onShowSnackbarConsumed = {},
+            showExclusionsRow = false,
+            onManageExclusionsClicked = {},
         )
     }
 }
@@ -486,7 +528,9 @@ private fun SyncNewFolderScreenContentPreview(
             onOpenUpgradeAccount = {},
             onShowSyncPermissionBannerValueChanged = {},
             snackBarHostState = null,
-            isStorageOverQuota = true
+            isStorageOverQuota = true,
+            showExclusionsRow = false,
+            onManageExclusionsClicked = {},
         )
     }
 }

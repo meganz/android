@@ -4215,6 +4215,8 @@
     <string name="sync_exclusions_add_size_unit_gigabytes">GB</string>
     <!-- Sync exclusions Manage screen: screen title. The screen lists everything a sync leaves out, and is where rules are added, edited and removed. -->
     <string name="sync_exclusions_manage_title">Manage exclusions</string>
+    <!-- Sync folder setup screen: subtitle of the row that opens the Manage exclusions screen before the folder pair exists, letting the user choose exclusions ahead of the first sync. -->
+    <string name="sync_exclusions_setup_subtitle">Choose what not to sync</string>
     <!-- Sync exclusions Manage screen: heading over the file extensions the sync leaves out, shown as chips. -->
     <string name="sync_exclusions_manage_section_extensions">File extensions</string>
     <!-- Sync exclusions Manage screen: heading over the rules that match a file or folder by its name. -->

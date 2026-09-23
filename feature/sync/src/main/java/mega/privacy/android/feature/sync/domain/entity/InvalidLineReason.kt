@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.domain.entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * Why the SDK refuses a `.megaignore` line, and with it the whole file.
  *
@@ -11,6 +13,7 @@ package mega.privacy.android.feature.sync.domain.entity
  * expression body is refused by the SDK too, but only when it builds the matcher, and this app
  * deliberately does not evaluate regex bodies, so such a line is not reported here.
  */
+@Serializable
 enum class InvalidLineReason {
     /**
      * The line does not begin with `+` or `-`. The class letter is mandatory and has to be the

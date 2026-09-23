@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.navigation
 
+import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionEdit
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
@@ -51,3 +52,12 @@ internal sealed interface EditSyncExclusionRuleResult {
  * is replaced whole, so an unbounded pair is how the file is told to declare none.
  */
 internal data class EditSyncSizeExclusionResult(val bounds: SyncSizeExclusion)
+
+/**
+ * What Review mode hands back once the setup screen's Save is confirmed.
+ *
+ * Carries the whole file rather than an edit against one, because there is no folder pair yet for
+ * an edit to apply to: [exclusions] becomes the setup screen's staged model, to be written whole
+ * once the pair is created.
+ */
+internal data class ManageSyncExclusionsResult(val exclusions: ParsedMegaIgnore)

@@ -43,9 +43,13 @@ internal fun SyncExclusionResultEffect(
 /**
  * Reports each value arriving under [key], having cleared it first. The value is untyped, because
  * the result channel is, so [onResult] is left to reject anything it did not expect.
+ *
+ * Internal rather than private so the setup screen's own result collector can reuse it instead of
+ * duplicating the clear-before-dispatch order, which is what stops a cancelled result being
+ * replayed.
  */
 @Composable
-private fun NavigationResultEffect(
+internal fun NavigationResultEffect(
     key: String,
     monitorResult: (String) -> Flow<Any?>,
     clearResult: (String) -> Unit,

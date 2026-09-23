@@ -167,6 +167,17 @@ fun EntryProviderScope<NavKey>.syncScreens(
             onSelectFolder = {
                 launcher.launch(null)
             },
+            onManageExclusions = { localRoot, staged ->
+                navigationHandler.navigate(
+                    ManageSyncExclusionsNavKey(
+                        syncId = null,
+                        localRoot = localRoot,
+                        staged = staged,
+                    ),
+                )
+            },
+            monitorResult = navigationHandler::monitorResult,
+            clearResult = navigationHandler::clearResult,
         )
     }
 

@@ -956,8 +956,146 @@ internal class ManageSyncExclusionsViewModelTest {
         }
     }
 
-    private fun TestScope.underTest() = ManageSyncExclusionsViewModel(
-        args = ManageSyncExclusionsViewModel.Args(syncId = SYNC_ID, localRoot = LOCAL_ROOT),
+    // region review mode
+
+    @Test
+    fun `test that init seeds the staged model from the defaults when the key carries none`() =
+        runTest {
+            stubRead(ParsedMegaIgnore(entries = emptyList()))
+
+            val underTest = underTest(syncId = null, staged = null)
+
+            assertThat(underTest.uiState.value.staged).isEqualTo(defaults)
+            assertThat(underTest.uiState.value.loaded).isEqualTo(defaults)
+            assertThat(underTest.uiState.value.isWritable).isTrue()
+            assertThat(underTest.uiState.value.isLoading).isFalse()
+        }
+
+    /**
+     * The defect Fix 1 closes: a folder re-added to a sync, or one another MEGA client already
+     * left a `.megaignore` in, must be shown to the user rather than quietly replaced by the
+     * defaults the moment Save is pressed.
+     */
+    @Test
+    fun `test that init seeds the staged model from the file when the key carries none`() =
+        runTest {
+            stubRead(threeRules)
+
+            val underTest = underTest(syncId = null, staged = null)
+
+            assertThat(underTest.uiState.value.staged).isEqualTo(threeRules)
+            assertThat(underTest.uiState.value.loaded).isEqualTo(threeRules)
+        }
+
+    @Test
+    fun `test that init carries whether the root can be written in review mode`() = runTest {
+        stubRead(threeRules, isWritable = false)
+
+        val underTest = underTest(syncId = null, staged = null)
+
+        assertThat(underTest.uiState.value.isWritable).isFalse()
+    }
+
+    /**
+     * An absent file is a successful read of an empty model; a failure is something else, and
+     * must not be papered over with the defaults, since that is the exact replacement this fix
+     * prevents.
+     */
+    @Test
+    fun `test that a failed read in review mode leaves no model to save`() = runTest {
+        stubReadFailure()
+
+        val underTest = underTest(syncId = null, staged = null)
+
+        assertThat(underTest.uiState.value.staged).isNull()
+        assertThat(underTest.uiState.value.loaded).isNull()
+        assertThat(underTest.uiState.value.hasLoadFailed).isTrue()
+    }
+
+    @Test
+    fun `test that init seeds the staged model from the key when one was staged`() = runTest {
+        stubRead(defaults)
+
+        val underTest = underTest(syncId = null, staged = threeRules)
+
+        assertThat(underTest.uiState.value.staged).isEqualTo(threeRules)
+        assertThat(underTest.uiState.value.loaded).isEqualTo(threeRules)
+    }
+
+    @Test
+    fun `test that init reads the file in review mode`() = runTest {
+        stubRead(threeRules)
+
+        underTest(syncId = null, staged = threeRules)
+
+        verify(getSyncExclusionsUseCase).invoke(LOCAL_ROOT)
+    }
+
+    @Test
+    fun `test that init never looks up the sync name in review mode`() = runTest {
+        stubRead(threeRules)
+
+        underTest(syncId = null, staged = threeRules)
+
+        verifyNoInteractions(getFolderPairsUseCase)
+    }
+
+    @Test
+    fun `test that save triggers the review saved event with the staged model instead of writing`() =
+        runTest {
+            stubRead(threeRules)
+            val underTest = underTest(syncId = null, staged = threeRules)
+            underTest.onRuleAdded(rule(pattern = "New*"))
+            val staged = underTest.uiState.value.staged
+
+            underTest.onSaveClicked()
+
+            val reviewSaved = underTest.uiState.value.reviewSavedEvent
+            assertThat(reviewSaved).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((reviewSaved as StateEventWithContentTriggered).content)
+                .isEqualTo(staged)
+            verifyNoInteractions(setSyncExclusionsUseCase)
+        }
+
+    /**
+     * A second tap before the pop lands must not trigger the review saved event a second time:
+     * Save settles `loaded` against `staged` too, so `canSave` goes false.
+     */
+    @Test
+    fun `test that saving in review mode settles loaded against staged`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest(syncId = null, staged = threeRules)
+        underTest.onRuleAdded(rule(pattern = "New*"))
+
+        underTest.onSaveClicked()
+
+        assertThat(underTest.uiState.value.isDirty).isFalse()
+        assertThat(underTest.uiState.value.canSave).isFalse()
+    }
+
+    @Test
+    fun `test that showing the review saved event clears it`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest(syncId = null, staged = threeRules)
+        underTest.onRuleAdded(rule(pattern = "New*"))
+        underTest.onSaveClicked()
+
+        underTest.onReviewSavedShown()
+
+        assertThat(underTest.uiState.value.reviewSavedEvent).isEqualTo(consumed())
+    }
+
+    // endregion
+
+    private fun TestScope.underTest(
+        syncId: Long? = SYNC_ID,
+        staged: ParsedMegaIgnore? = null,
+    ) = ManageSyncExclusionsViewModel(
+        args = ManageSyncExclusionsViewModel.Args(
+            syncId = syncId,
+            localRoot = LOCAL_ROOT,
+            staged = staged,
+        ),
         applicationScope = CoroutineScope(UnconfinedTestDispatcher(testScheduler)),
         getSyncExclusionsUseCase = getSyncExclusionsUseCase,
         setSyncExclusionsUseCase = setSyncExclusionsUseCase,

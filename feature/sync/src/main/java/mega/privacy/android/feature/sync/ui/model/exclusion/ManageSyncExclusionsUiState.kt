@@ -45,6 +45,10 @@ import mega.privacy.android.feature.sync.domain.exception.SyncExclusionEditError
  * @property syncName the sync's name, shown under the title so the screen says which folder these
  * exclusions belong to. Absent until it is read, and left absent if it cannot be: a screen without
  * a subtitle is better than one that blocks on a name it only displays
+ * @property mode whether this screen is editing an existing sync's file or a model staged for one
+ * that does not exist yet
+ * @property reviewSavedEvent the model to hand back to the setup screen once Review mode's Save is
+ * confirmed. Consumed through [ManageSyncExclusionsViewModel.onReviewSavedShown]
  */
 internal data class ManageSyncExclusionsUiState(
     val loaded: ParsedMegaIgnore? = null,
@@ -60,6 +64,8 @@ internal data class ManageSyncExclusionsUiState(
     val exclusionAddedEvent: StateEvent = consumed,
     val isDiscardPromptShown: Boolean = false,
     val isFinished: Boolean = false,
+    val mode: ManageExclusionsMode = ManageExclusionsMode.Manage,
+    val reviewSavedEvent: StateEventWithContent<ParsedMegaIgnore> = consumed(),
 ) {
 
     /**

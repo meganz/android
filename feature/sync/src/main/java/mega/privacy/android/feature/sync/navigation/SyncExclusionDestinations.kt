@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
 import mega.privacy.android.feature.sync.ui.exclusion.AddSyncExclusionRuleRoute
@@ -13,18 +14,27 @@ import mega.privacy.android.feature.sync.ui.exclusion.ManageSyncExclusionsRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
- * Full-screen destination listing everything one sync leaves out.
+ * Full-screen destination listing everything one sync leaves out, or, while a folder pair is
+ * still being set up, for configuring exclusions to hand back to the setup screen.
  *
- * @param syncId id of the sync whose exclusions these are. Required, unlike on the Add and Edit
- * keys: those are reachable while a folder pair is still being set up, and this screen is not
- * @param localRoot the sync's local root, which is the folder whose `.megaignore` is read
+ * @param syncId id of the sync whose exclusions these are, or null in Review mode, before a
+ * folder pair exists to belong to
+ * @param localRoot the folder whose `.megaignore` is read in both modes
+ * @param staged in Review mode, the model the setup screen has already staged, so that
+ * re-entering this screen shows the user's own work rather than resetting it from the file
  */
 @Serializable
 data class ManageSyncExclusionsNavKey(
-    val syncId: Long,
+    val syncId: Long?,
     val localRoot: UriPath,
+    val staged: ParsedMegaIgnore? = null,
 ) : NavKey {
     override fun toString() = "ManageSyncExclusionsNavKey(syncId=$syncId)"
+
+    companion object {
+        /** Result key for the model Review mode hands back to the setup screen. */
+        const val RESULT = "ManageSyncExclusionsNavKey::result"
+    }
 }
 
 /**
@@ -124,6 +134,7 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
         ManageSyncExclusionsRoute(
             syncId = navKey.syncId,
             localRoot = navKey.localRoot,
+            staged = navKey.staged,
             monitorResult = navigationHandler::monitorResult,
             clearResult = navigationHandler::clearResult,
             onFinished = { navigationHandler.back() },
@@ -142,6 +153,14 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
             onEditSize = { exclusion ->
                 navigationHandler.navigate(
                     EditSyncSizeExclusionNavKey(exclusion, navKey.syncId),
+                )
+            },
+            // returning a result pops the destination itself, so this does not also ask to go
+            // back
+            onReviewSaved = {
+                navigationHandler.returnResult(
+                    ManageSyncExclusionsNavKey.RESULT,
+                    ManageSyncExclusionsResult(it),
                 )
             },
         )
