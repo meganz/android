@@ -20,7 +20,7 @@ android {
 dependencies {
     lintChecks(project(":lint"))
 
-    implementation(project(":core:passcode:passcode"))
+    implementation(project(":core:passcode"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     testImplementation(project(":core-ui-test"))

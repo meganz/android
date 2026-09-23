@@ -72,9 +72,9 @@ import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.coroutine.logTypeName
-import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
-import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
-import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
+import mega.privacy.android.feature.passcode.check.PasscodeCheckViewModel
+import mega.privacy.android.feature.passcode.check.model.PasscodeCheckState
+import mega.privacy.android.feature.passcode.presentation.navigation.PasscodeNavKey
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer

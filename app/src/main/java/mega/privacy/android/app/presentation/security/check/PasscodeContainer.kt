@@ -7,10 +7,10 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
-import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
-import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
-import mega.privacy.android.core.passcode.presentation.view.PasscodeLoadingView
-import mega.privacy.android.core.passcode.presentation.view.PasscodeView
+import mega.privacy.android.feature.passcode.check.PasscodeCheckViewModel
+import mega.privacy.android.feature.passcode.check.model.PasscodeCheckState
+import mega.privacy.android.feature.passcode.presentation.view.PasscodeLoadingView
+import mega.privacy.android.feature.passcode.presentation.view.PasscodeView
 import timber.log.Timber
 
 /**

@@ -10,9 +10,9 @@ import androidx.navigation.toRoute
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
 import kotlinx.serialization.Serializable
-import mega.privacy.android.core.passcode.presentation.SetupPasscodeViewModel
-import mega.privacy.android.core.passcode.presentation.model.SetupPasscodeUiState
-import mega.privacy.android.core.passcode.presentation.view.SetupPasscodeScreen
+import mega.privacy.android.feature.passcode.presentation.SetupPasscodeViewModel
+import mega.privacy.android.feature.passcode.presentation.model.SetupPasscodeUiState
+import mega.privacy.android.feature.passcode.presentation.view.SetupPasscodeScreen
 
 /**
  * Setup passcode destination

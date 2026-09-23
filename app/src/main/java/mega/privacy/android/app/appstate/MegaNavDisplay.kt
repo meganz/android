@@ -22,7 +22,7 @@ import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.loginEntryProvider
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
-import mega.privacy.android.core.passcode.presentation.navigation.passcodeView
+import mega.privacy.android.feature.passcode.presentation.navigation.passcodeView
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent

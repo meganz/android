@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsV
 import mega.privacy.android.app.presentation.settings.passcode.biometric.BiometricAuth
 import mega.privacy.android.app.presentation.settings.passcode.biometric.BiometricAuthError
 import mega.privacy.android.app.presentation.settings.passcode.view.PasscodeSettingsView
-import mega.privacy.android.core.passcode.biometric.hasBiometricCapability
+import mega.privacy.android.feature.passcode.biometric.hasBiometricCapability
 import timber.log.Timber
 
 /**
