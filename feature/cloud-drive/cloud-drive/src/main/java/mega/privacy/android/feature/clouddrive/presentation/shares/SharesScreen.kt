@@ -44,7 +44,6 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.links.LinksVi
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesViewModel
-import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.isMainNavBarRoot
@@ -90,6 +89,7 @@ internal fun SharesScreen(
     val outgoingSharesUiState by outgoingSharesViewModel.uiState.collectAsStateWithLifecycle()
     val linksUiState by linksViewModel.uiState.collectAsStateWithLifecycle()
     val incomingSelection = rememberNodeSelection(items = incomingSharesUiState.items)
+    val outgoingSelection = rememberNodeSelection(items = outgoingSharesUiState.items)
 
     // Sort modal
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -97,20 +97,20 @@ internal fun SharesScreen(
 
     val (isInSelectionMode, selectedItemsCount) = when (selectedTab) {
         SharesTab.IncomingShares -> incomingSelection.isInSelectionMode to incomingSelection.selectedCount
-        SharesTab.OutgoingShares -> outgoingSharesUiState.isInSelectionMode to outgoingSharesUiState.selectedItemsCount
+        SharesTab.OutgoingShares -> outgoingSelection.isInSelectionMode to outgoingSelection.selectedCount
         SharesTab.Links -> linksUiState.isInSelectionMode to linksUiState.selectedItemsCount
     }
 
     val isAllItemsSelected = when (selectedTab) {
         SharesTab.IncomingShares -> incomingSelection.isAllSelected
-        SharesTab.OutgoingShares -> outgoingSharesUiState.isAllSelected
+        SharesTab.OutgoingShares -> outgoingSelection.isAllSelected
         SharesTab.Links -> linksUiState.isAllSelected
     }
 
     fun deselectAllItems() {
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSelection.deselectAll()
-            SharesTab.OutgoingShares -> outgoingSharesViewModel.processAction(OutgoingSharesAction.DeselectAllItems)
+            SharesTab.OutgoingShares -> outgoingSelection.deselectAll()
             SharesTab.Links -> linksViewModel.processAction(LinksAction.DeselectAllItems)
         }
     }
@@ -118,7 +118,7 @@ internal fun SharesScreen(
     fun selectAllItems() {
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSelection.selectAll()
-            SharesTab.OutgoingShares -> outgoingSharesViewModel.processAction(OutgoingSharesAction.SelectAllItems)
+            SharesTab.OutgoingShares -> outgoingSelection.selectAll()
             SharesTab.Links -> linksViewModel.processAction(LinksAction.SelectAllItems)
 
         }
@@ -127,7 +127,7 @@ internal fun SharesScreen(
     fun getSelectedNodes() = if (isInSelectionMode) {
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSelection.selectedNodes
-            SharesTab.OutgoingShares -> outgoingSharesUiState.selectedNodes
+            SharesTab.OutgoingShares -> outgoingSelection.selectedNodes
             SharesTab.Links -> linksUiState.selectedNodes
 
         }
@@ -262,6 +262,7 @@ internal fun SharesScreen(
                             )
                         },
                         onSortOrderClick = { showSortBottomSheet = true },
+                        selection = outgoingSelection,
                         isActive = isActive,
                         contentPadding = PaddingValues(
                             bottom = paddingValues.calculateBottomPadding()
