@@ -121,7 +121,6 @@ class NavKeyToStringTest {
         SyncSelectStopBackupDestinationNavKey(folderName = SENSITIVE),
         FileStorageNavKey(uriPath = SENSITIVE, highlightedFiles = listOf(SENSITIVE)),
         LegacyZipBrowserNavKey(zipFilePath = SENSITIVE),
-        LegacyFileLinkNavKey(uriString = SENSITIVE),
         LegacyFolderLinkNavKey(uriString = SENSITIVE),
         AlbumContentPreviewNavKey(
             albumId = 1L,

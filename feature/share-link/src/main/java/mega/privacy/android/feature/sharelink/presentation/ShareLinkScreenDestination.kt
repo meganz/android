@@ -41,7 +41,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * Gated behind [ApiFeatures.ShareLinkRevamp]: when the flag is disabled the destination
  * removes itself and redirects to the legacy screen for the subject — [GetLinkNavKey], which
  * launches `GetLinkActivity`, for nodes, or [AlbumGetLinkNavKey], which is already Compose, for an
- * album. This mirrors the `FileLinkRevamp` seam.
+ * album. This mirrors the file link seam.
  *
  * An album only reaches here with the flag on, since the album entry point gates before
  * navigating; the disabled branch covers the flag being turned off mid-session.

@@ -20,10 +20,10 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.main.dialog.link.OpenLinkViewModel
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialog
-import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
+import mega.privacy.android.navigation.destination.FileLinkNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -70,10 +71,11 @@ fun OpenLinkDialog(
         when (state.linkType) {
             RegexPatternType.FILE_LINK -> {
                 context.startActivity(
-                    Intent(context, FileLinkComposeActivity::class.java).apply {
+                    MegaActivity.getIntentWithExtraDestinations(
+                        context,
+                        listOf(FileLinkNavKey(viewModel.inputLink)),
+                    ).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        action = Constants.ACTION_OPEN_MEGA_LINK
-                        data = Uri.parse(viewModel.inputLink)
                     }
                 )
                 onDismissRequest()

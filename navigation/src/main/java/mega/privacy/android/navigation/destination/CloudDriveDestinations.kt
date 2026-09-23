@@ -144,8 +144,9 @@ data class FolderLinkNavKey(
  * @param uriString the uri string of the file link
  */
 @Serializable
+@Parcelize
 data class FileLinkNavKey(
     val uriString: String? = null,
-) : NoSessionNavKey.Optional {
+) : NoSessionNavKey.Optional, Parcelable {
     override fun toString() = "FileLinkNavKey()"
 }

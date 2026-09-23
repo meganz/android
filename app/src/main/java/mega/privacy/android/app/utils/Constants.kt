@@ -97,7 +97,6 @@ object Constants {
     const val TAKEDOWN_URL: String = "https://mega.io/takedown"
     const val TERMS_OF_SERVICE_URL: String = "https://mega.io/terms"
     const val HELP_CENTRE_HOME_URL: String = "https://help.mega.io"
-    const val ACTION_OPEN_MEGA_LINK: String = "OPEN_MEGA_LINK"
     const val ACTION_OPEN_MEGA_FOLDER_LINK: String = "OPEN_MEGA_FOLDER_LINK"
     const val ACTION_IMPORT_LINK_FETCH_NODES: String = "IMPORT_LINK_FETCH_NODES"
     const val ACTION_FILE_EXPLORER_UPLOAD: String = "FILE_EXPLORER_UPLOAD"

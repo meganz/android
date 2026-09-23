@@ -114,15 +114,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * File link revamp
-     */
-    FileLinkRevamp(
-        "aflnk",
-        "Enable file link revamp screen",
-        false,
-    ),
-
-    /**
      * Share & Manage link revamp
      */
     ShareLinkRevamp(

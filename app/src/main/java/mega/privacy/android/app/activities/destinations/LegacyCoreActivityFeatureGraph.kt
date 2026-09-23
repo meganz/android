@@ -33,7 +33,6 @@ import mega.privacy.android.app.presentation.contact.navigation.contactsListDest
 import mega.privacy.android.app.presentation.contact.navigation.createGroupChatLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.newChatLegacyDestination
 import mega.privacy.android.app.presentation.fileexplorer.fileExplorer
-import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScreen
 import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryLegacyDestination
@@ -93,7 +92,6 @@ class LegacyCoreActivityFeatureGraph(
             manageChatHistoryLegacyDestination(navigationHandler::remove)
             testPasswordLegacyDestination(navigationHandler::back)
             parkAccountDestination(navigationHandler::back)
-            legacyFileLinkScreen(navigationHandler::back)
             legacyExportRecoveryKeyScreen(navigationHandler::back)
             legacyFolderLinkScreen(navigationHandler::back)
             getLinkLegacyDestination(navigationHandler::back)

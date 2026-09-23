@@ -339,13 +339,6 @@ data class LegacyZipBrowserNavKey(
 }
 
 @Serializable
-data class LegacyFileLinkNavKey(
-    val uriString: String?,
-) : NoSessionNavKey.Optional {
-    override fun toString() = "LegacyFileLinkNavKey()"
-}
-
-@Serializable
 data object LegacyExportRecoveryKeyNavKey : NavKey
 
 @Serializable

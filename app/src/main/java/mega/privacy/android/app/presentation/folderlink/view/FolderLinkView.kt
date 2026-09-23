@@ -61,7 +61,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ads.LegacyAdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.filelink.view.ImportDownloadView
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG

@@ -23,7 +23,6 @@ import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
 import mega.privacy.android.data.test.stub.StubMegaNode
 import mega.privacy.android.data.test.stub.StubMegaRequest
 import mega.privacy.android.data.test.stub.StubMegaTransfer
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.shared.resources.R as sharedR
@@ -189,7 +188,6 @@ class CloudDriveInteractionsTest {
     /** tc05 — the FAB's "Open link" option opens the link dialog, and a file link shows its preview. */
     @Test
     fun openLinkOptionOpensTheFileLinkPreview() {
-        fakeFlags.set(ApiFeatures.FileLinkRevamp, true)
         // The FAB is only offered once the Cloud Drive has content.
         seedFile(handle = FILE_HANDLE, name = "sm4tc05-seed.txt")
         fakeMegaApi.stubRequest(

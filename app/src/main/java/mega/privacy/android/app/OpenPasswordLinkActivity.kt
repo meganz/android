@@ -8,13 +8,14 @@ import android.view.View
 import android.view.Window
 import android.widget.ProgressBar
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.DecryptAlertDialog.DecryptDialogListener
-import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.navigation.destination.FileLinkNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -110,18 +111,19 @@ class OpenPasswordLinkActivity : PasscodeActivity(), DecryptDialogListener {
                     FolderLinkComposeActivity::class.java
                 )
                 intent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                intent.setData(Uri.parse(decryptedLink))
             } else if (Util.matchRegexs(decryptedLink, Constants.FILE_LINK_REGEX_ARRAY)) {
                 Timber.d("Open link url")
-                intent = Intent(
+                // The link travels as the nav key argument; leaving it on the intent data as well
+                // would make MegaActivity also handle it as a deep link and open a second copy.
+                intent = MegaActivity.getIntentWithExtraDestinations(
                     this@OpenPasswordLinkActivity,
-                    FileLinkComposeActivity::class.java
+                    listOf(FileLinkNavKey(decryptedLink))
                 )
-                intent.setAction(Constants.ACTION_OPEN_MEGA_LINK)
             }
 
             if (intent != null) {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                intent.setData(Uri.parse(decryptedLink))
                 startActivity(intent)
                 finish()
             }
