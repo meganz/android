@@ -2,7 +2,8 @@ package mega.privacy.android.data.gateway
 
 import android.content.Context
 import android.content.Intent
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -16,18 +17,22 @@ import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
-class CacheGatewayImplTest {
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
+class CacheGatewayImplFileSystemTest {
     private lateinit var underTest: CacheGateway
     private lateinit var context: Context
 
     @Before
     fun setUp() {
-        context = InstrumentationRegistry.getInstrumentation().targetContext
+        context = ApplicationProvider.getApplicationContext()
         deleteCache()
         underTest = CacheGatewayImpl(
             context = context,

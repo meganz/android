@@ -12,9 +12,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
 class OfflineDaoTest {
     private lateinit var offlineDao: OfflineDao
     private lateinit var db: MegaDatabase
@@ -24,7 +26,11 @@ class OfflineDaoTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(
             context, MegaDatabase::class.java
-        ).build()
+        )
+            // getOfflineFiles is a blocking query, and Robolectric runs the test body on the
+            // main looper thread that Room otherwise refuses to be queried from.
+            .allowMainThreadQueries()
+            .build()
         offlineDao = db.offlineDao()
     }
 

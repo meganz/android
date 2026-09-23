@@ -3,6 +3,7 @@ package mega.privacy.android.data.database.dao
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -12,8 +13,12 @@ import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.io.IOException
 
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
 class MediaPlaybackInfoDaoTest {
     private lateinit var mediaPlaybackInfoDao: MediaPlaybackInfoDao
     private lateinit var db: MegaDatabase
