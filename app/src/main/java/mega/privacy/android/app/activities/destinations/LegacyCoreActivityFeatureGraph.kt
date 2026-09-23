@@ -49,7 +49,6 @@ import mega.privacy.android.app.presentation.videosection.legacyVideoToPlaylistD
 import mega.privacy.android.app.presentation.videosection.videoSectionLegacyDestination
 import mega.privacy.android.app.textEditor.legacyTextEditorScreen
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -61,7 +60,6 @@ import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 
 class LegacyCoreActivityFeatureGraph(
-    nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     mediaPlayerIntentMapper: MediaPlayerIntentMapper,
     nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
     nav3AudioPlayerRouteLauncher: Nav3AudioPlayerRouteLauncher,
@@ -96,7 +94,7 @@ class LegacyCoreActivityFeatureGraph(
             legacyFolderLinkScreen(navigationHandler::back)
             getLinkLegacyDestination(navigationHandler::back)
             chatListDestination(navigationHandler)
-            legacyPdfViewerScreen(navigationHandler::back, nodeContentUriIntentMapper)
+            legacyPdfViewerScreen(navigationHandler, viewTypeToNodeSourceTypeMapper)
             legacyImageViewerScreen(navigationHandler::back)
             legacyTextEditorScreen(
                 navigationHandler,

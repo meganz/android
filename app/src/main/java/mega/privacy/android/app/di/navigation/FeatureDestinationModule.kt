@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLau
 import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerFeatureDestination
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.feature.documentscanner.navigation.ContinuousScanDestination
 import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerFeatureDestination
@@ -49,7 +48,6 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideLegacyCoreActivityFeatureDestination(
-        nodeContentUriIntentMapper: NodeContentUriIntentMapper,
         mediaPlayerIntentMapper: MediaPlayerIntentMapper,
         nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
         nav3AudioPlayerRouteLauncher: Nav3AudioPlayerRouteLauncher,
@@ -61,7 +59,6 @@ class FeatureDestinationModule {
         snackbarEventQueue: SnackbarEventQueue,
     ): FeatureDestination =
         LegacyCoreActivityFeatureGraph(
-            nodeContentUriIntentMapper,
             mediaPlayerIntentMapper,
             nav3VideoPlayerRouteLauncher,
             nav3AudioPlayerRouteLauncher,
