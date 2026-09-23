@@ -1739,14 +1739,12 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months.
-    is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years.
-    is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1783,11 +1781,9 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
-    is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
-    is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2470,46 +2466,6 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">Incorrect password</string>
     <!-- Fast scroll thumb tooltip: line number at current position. %1$d is the 1-based line number -->
     <string name="text_editor_fast_scroll_line_tooltip">Line %1$d</string>
-    <!-- Content description for the bold button in the rich text editor's formatting toolbar -->
-    <string name="text_editor_format_bold">Bold</string>
-    <!-- Content description for the italic button in the rich text editor's formatting toolbar -->
-    <string name="text_editor_format_italic">Italic</string>
-    <!-- Content description for the underline button in the rich text editor's formatting toolbar -->
-    <string name="text_editor_format_underline">Underline</string>
-    <!-- Content description for the strikethrough button in the rich text editor's formatting toolbar, which draws a line through the selected text -->
-    <string name="text_editor_format_strikethrough">Strikethrough</string>
-    <!-- Content description for the checklist button in the rich text editor's formatting toolbar, which turns the current line into a list of tickable items -->
-    <string name="text_editor_format_checklist">Checklist</string>
-    <!-- Content description for the bulleted list button in the rich text editor's formatting toolbar -->
-    <string name="text_editor_format_bulleted_list">Bulleted list</string>
-    <!-- Content description for the numbered list button in the rich text editor's formatting toolbar -->
-    <string name="text_editor_format_numbered_list">Numbered list</string>
-    <!-- Content description for the quote button in the rich text editor's formatting toolbar, which indents the current line as a quotation -->
-    <string name="text_editor_format_quote">Quote</string>
-    <!-- Content description for the code button in the rich text editor's formatting toolbar, which styles the selected text as a snippet of computer code -->
-    <string name="text_editor_format_code">Code</string>
-    <!-- Content description for the link button in the rich text editor's formatting toolbar, which opens the dialog for adding a web link -->
-    <string name="text_editor_format_link">Link</string>
-    <!-- Label of the text style chip in the rich text editor's formatting toolbar when the current line is ordinary paragraph text rather than a heading -->
-    <string name="text_editor_text_style_body">Body</string>
-    <!-- Label of the text style chip in the rich text editor's formatting toolbar when the current line is a heading. %1$d is the heading level, 1 being the largest -->
-    <string name="text_editor_text_style_heading">Heading %1$d</string>
-    <!-- Content description for the tick shown beside the option currently in use, in the rich text editor's text style and editing mode menus -->
-    <string name="text_editor_menu_option_selected">Selected</string>
-    <!-- Content description for the button in the text editor toolbar that opens the menu for choosing between plain text and rich text editing -->
-    <string name="text_editor_edit_mode_menu">Text editing mode</string>
-    <!-- Menu option in the text editor that switches to editing the file as plain text, showing the Markdown formatting characters -->
-    <string name="text_editor_edit_mode_plain_text">Plain text</string>
-    <!-- Menu option in the text editor that switches to editing the file as rich text, showing formatted text instead of Markdown formatting characters -->
-    <string name="text_editor_edit_mode_rich_text">Rich text</string>
-    <!-- Title of the dialog for adding a web link to the text being edited in the rich text editor -->
-    <string name="text_editor_link_dialog_title">Add link</string>
-    <!-- Label of the input field for the web address, in the rich text editor's add link dialog -->
-    <string name="text_editor_link_dialog_url_label">Link</string>
-    <!-- Label of the input field for the words the reader will see and tap, in the rich text editor's add link dialog -->
-    <string name="text_editor_link_dialog_text_label">Text</string>
-    <!-- Button in the rich text editor's add link dialog that turns an existing link back into ordinary text, keeping the words but dropping the web address -->
-    <string name="text_editor_link_dialog_remove">Remove link</string>
     <!-- Description of search empty view in select videos search screen-->
     <string name="select_videos_search_empty_view_description">Search videos in your Cloud drive</string>
     <!-- Bullet point shown when a folder link has been removed due to ToS violation -->
@@ -4181,90 +4137,6 @@
     <string name="sync_exclusions_add_extension_invalid_error">Extensions can’t contain spaces, dots, or slashes</string>
     <!-- Sync exclusions Add form: error under the extensions field when an existing rule already excludes one of the typed extensions. %1$s is that extension, without a leading dot, for example mp3. -->
     <string name="sync_exclusions_add_extension_duplicate_error">You’ve already excluded %1$s</string>
-    <!-- Sync exclusions Add screen: title of the full screen where a new exclusion rule is created. -->
-    <string name="sync_exclusions_add_title">Add exclusion</string>
-    <!-- Sync exclusions Edit screen: title of the full screen where an existing exclusion rule is changed or deleted. -->
-    <string name="sync_exclusions_edit_title">Edit exclusion</string>
-    <!-- Sync exclusions Add screen: label of the tab where a rule is described by the name it matches. -->
-    <string name="sync_exclusions_add_tab_by_name">By name</string>
-    <!-- Sync exclusions Add screen: label of the tab where a rule is described by how large a file is. -->
-    <string name="sync_exclusions_add_tab_by_size">By size</string>
-    <!-- Sync exclusions Add screen: button that saves the rule being created and closes the screen. -->
-    <string name="sync_exclusions_add_confirm">Add exclusion</string>
-    <!-- Sync exclusions Add form: line under the tabs on the By size tab, telling the user what the tab is for. -->
-    <string name="sync_exclusions_add_description_size">Choose what to leave out, based on file size</string>
-    <!-- Sync exclusions Add form: title of the picker listing the ways a file size can be matched. Files only, as size rules never apply to folders. -->
-    <string name="sync_exclusions_add_size_condition_title">Exclude files</string>
-    <!-- Sync exclusions Add form: size condition picker entry, leaving out files above the size the user types. -->
-    <string name="sync_exclusions_add_size_condition_bigger_than">Bigger than</string>
-    <!-- Sync exclusions Add form: size condition picker entry, leaving out files below the size the user types. -->
-    <string name="sync_exclusions_add_size_condition_smaller_than">Smaller than</string>
-    <!-- Sync exclusions Add form: size condition picker entry, leaving out files outside the range between the two sizes the user types. -->
-    <string name="sync_exclusions_add_size_condition_not_between">Not between</string>
-    <!-- Sync exclusions Add form: word joining the two sizes of a range, as in “Not between 1 KB and 2 GB”. -->
-    <string name="sync_exclusions_add_size_range_conjunction">and</string>
-    <!-- Sync exclusions Add form: title of the picker listing the units a file size can be typed in. -->
-    <string name="sync_exclusions_add_size_unit_title">Unit</string>
-    <!-- Sync exclusions Add form: size unit, bytes. Keep the abbreviation short; it sits inside a narrow field beside the number. -->
-    <string name="sync_exclusions_add_size_unit_bytes">B</string>
-    <!-- Sync exclusions Add form: size unit, kilobytes (1024 bytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
-    <string name="sync_exclusions_add_size_unit_kilobytes">KB</string>
-    <!-- Sync exclusions Add form: size unit, megabytes (1024 kilobytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
-    <string name="sync_exclusions_add_size_unit_megabytes">MB</string>
-    <!-- Sync exclusions Add form: size unit, gigabytes (1024 megabytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
-    <string name="sync_exclusions_add_size_unit_gigabytes">GB</string>
-    <!-- Sync exclusions Manage screen: screen title. The screen lists everything a sync leaves out, and is where rules are added, edited and removed. -->
-    <string name="sync_exclusions_manage_title">Manage exclusions</string>
-    <!-- Sync folder setup screen: subtitle of the row that opens the Manage exclusions screen before the folder pair exists, letting the user choose exclusions ahead of the first sync. -->
-    <string name="sync_exclusions_setup_subtitle">Choose what not to sync</string>
-    <!-- Sync exclusions Manage screen: heading over the file extensions the sync leaves out, shown as chips. -->
-    <string name="sync_exclusions_manage_section_extensions">File extensions</string>
-    <!-- Sync exclusions Manage screen: heading over the rules that match a file or folder by its name. -->
-    <string name="sync_exclusions_manage_section_names">File and folder names</string>
-    <!-- Sync exclusions Manage screen: heading over the rules that leave files out by how large they are. -->
-    <string name="sync_exclusions_manage_section_size">File size</string>
-    <!-- Sync exclusions Manage screen: button that writes the changed exclusions to the folder. Edits are collected and written once, so this confirms all of them together. -->
-    <string name="sync_exclusions_manage_save">Save</string>
-    <!-- Sync exclusions Manage screen: button that opens the screen for adding a new exclusion. -->
-    <string name="sync_exclusions_manage_add">Add exclusion</string>
-    <!-- Sync exclusions Manage screen: heading shown when the folder has no exclusions at all. -->
-    <string name="sync_exclusions_manage_empty_title">Add your first exclusion</string>
-    <!-- Sync exclusions Manage screen: body text under the empty-state heading, explaining what an exclusion does. -->
-    <string name="sync_exclusions_manage_empty_body">Everything in this folder syncs. Add an exclusion to leave files out.</string>
-    <!-- Sync exclusions Manage screen: body text shown in place of the usual empty-state text when the folder does exclude things, but only through rules this screen cannot show, such as ones written by another MEGA app. Avoids telling the user that everything syncs when it does not. -->
-    <string name="sync_exclusions_manage_empty_body_unshown">This folder has exclusions that were set elsewhere and can’t be shown here. Add one to leave more files out.</string>
-    <!-- Sync exclusions Manage screen: heading shown when the folder’s exclusion file is one sync refuses, so none of its rules are in effect. -->
-    <string name="sync_exclusions_manage_rejected_title">Exclusions aren’t being applied</string>
-    <!-- Sync exclusions Manage screen: body text under the heading shown when sync refuses the folder’s exclusion file. Nothing is left out while this is the case, which is the opposite of what the rules say. -->
-    <string name="sync_exclusions_manage_rejected_body">Sync couldn’t read this folder’s exclusions, so nothing is being left out.</string>
-    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out every file larger than a size. %1$s is a formatted file size, for example “1 GB”. -->
-    <string name="sync_exclusions_manage_size_bigger_than">Files bigger than %1$s</string>
-    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out every file smaller than a size. %1$s is a formatted file size, for example “1 KB”. -->
-    <string name="sync_exclusions_manage_size_smaller_than">Files smaller than %1$s</string>
-    <!-- Sync exclusions Manage screen: row summarising a rule that keeps only files between two sizes, leaving out everything outside that range. %1$s is the smaller size and %2$s the larger, both formatted, for example “1 KB” and “2 GB”. -->
-    <string name="sync_exclusions_manage_size_not_between">Files not between %1$s and %2$s</string>
-    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out only the files inside a size range, keeping everything outside it. The opposite of the “not between” rule. %1$s is the smaller size and %2$s the larger, both formatted, for example “1 KB” and “2 GB”. -->
-    <string name="sync_exclusions_manage_size_between">Files between %1$s and %2$s</string>
-    <!-- Sync exclusions Manage screen: confirmation shown briefly after a new exclusion is added. -->
-    <string name="sync_exclusions_manage_snackbar_added">Exclusion added</string>
-    <!-- Sync exclusions Manage screen: shown briefly when a size the user just added cannot be kept, because the folder already leaves out files at that exact size in the opposite direction. Excluding everything smaller than 1 KB as well as everything larger than 1 KB would leave only files of exactly that size, so the two cannot both stand. -->
-    <string name="sync_exclusions_manage_snackbar_size_conflict">You’ve already excluded files of this size</string>
-    <!-- Sync exclusions Manage screen: spoken label for the control that stops excluding a file extension. Not shown on screen; it describes the small dismiss control on an extension chip. %1$s is the extension, for example “tmp”. -->
-    <string name="sync_exclusions_manage_remove_extension">Stop excluding %1$s</string>
-    <!-- Sync exclusions Manage screen: heading shown when the folder’s exclusions could not be read. Deliberately distinct from the empty state, because presenting a failed read as “no exclusions” would invite saving that over rules that do exist. -->
-    <string name="sync_exclusions_manage_load_error_title">Couldn’t load exclusions</string>
-    <!-- Sync exclusions Manage screen: body text under the load-error heading. The exclusions are read from a file in the synced folder on the device, so the cause is a local one — the folder moved, or the app lost access to it — never the network. -->
-    <string name="sync_exclusions_manage_load_error_body">Check the folder is still on this device and try again.</string>
-    <!-- Sync exclusions Manage screen: button that retries reading the folder’s exclusions after a failed read. -->
-    <string name="sync_exclusions_manage_load_error_retry">Try again</string>
-    <!-- Sync exclusions Manage screen: message shown when the changed exclusions could not be written. The edits are kept, so the user can retry without entering them again. -->
-    <string name="sync_exclusions_manage_save_failed">Couldn’t save your changes. Try again.</string>
-    <!-- Sync list: action on a sync or backup card that opens the screen listing everything that sync leaves out. Sits beside Open, Pause and Stop, so keep it to a single short word if the language allows. -->
-    <string name="sync_exclusions_card_action">Exclusions</string>
-    <!-- Sync exclusions Manage screen: overflow menu action that puts the folder back to the exclusions MEGA sets up by default, replacing the file and folder rules listed above it. “Defaults” means that predefined set of exclusions, not device or app settings. -->
-    <string name="sync_exclusions_manage_restore_defaults">Restore defaults</string>
-    <!-- Sync exclusions Manage screen: confirmation shown briefly after the default exclusions have been put back. -->
-    <string name="sync_exclusions_manage_snackbar_defaults_restored">Default exclusions restored</string>
     <!-- Title of the personal QR code screen -->
     <string name="contacts_qr_screen_title">QR code</string>
     <!-- Button that generates the user's personal QR code -->
@@ -4329,6 +4201,36 @@
     <string name="chat_meeting_blocked_by_call_dialog_title">Ongoing call</string>
     <!-- Title of the dialog shown when the Bluetooth permission needed to start a meeting was denied -->
     <string name="chat_start_meeting_bluetooth_permission_title">Permission required</string>
+    <!-- Sync exclusions Add screen: title of the full screen where a new exclusion rule is created. -->
+    <string name="sync_exclusions_add_title">Add exclusion</string>
+    <!-- Sync exclusions Add screen: label of the tab where a rule is described by the name it matches. -->
+    <string name="sync_exclusions_add_tab_by_name">By name</string>
+    <!-- Sync exclusions Add screen: label of the tab where a rule is described by how large a file is. -->
+    <string name="sync_exclusions_add_tab_by_size">By size</string>
+    <!-- Sync exclusions Add screen: button that saves the rule being created and closes the screen. -->
+    <string name="sync_exclusions_add_confirm">Add exclusion</string>
+    <!-- Sync exclusions Add form: line under the tabs on the By size tab, telling the user what the tab is for. -->
+    <string name="sync_exclusions_add_description_size">Choose what to leave out, based on file size</string>
+    <!-- Sync exclusions Add form: title of the picker listing the ways a file size can be matched. Files only, as size rules never apply to folders. -->
+    <string name="sync_exclusions_add_size_condition_title">Exclude files</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files above the size the user types. -->
+    <string name="sync_exclusions_add_size_condition_bigger_than">Bigger than</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files below the size the user types. -->
+    <string name="sync_exclusions_add_size_condition_smaller_than">Smaller than</string>
+    <!-- Sync exclusions Add form: size condition picker entry, leaving out files outside the range between the two sizes the user types. -->
+    <string name="sync_exclusions_add_size_condition_not_between">Not between</string>
+    <!-- Sync exclusions Add form: word joining the two sizes of a range, as in “Not between 1 KB and 2 GB”. -->
+    <string name="sync_exclusions_add_size_range_conjunction">and</string>
+    <!-- Sync exclusions Add form: title of the picker listing the units a file size can be typed in. -->
+    <string name="sync_exclusions_add_size_unit_title">Unit</string>
+    <!-- Sync exclusions Add form: size unit, bytes. Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_bytes">B</string>
+    <!-- Sync exclusions Add form: size unit, kilobytes (1024 bytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_kilobytes">KB</string>
+    <!-- Sync exclusions Add form: size unit, megabytes (1024 kilobytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_megabytes">MB</string>
+    <!-- Sync exclusions Add form: size unit, gigabytes (1024 megabytes). Keep the abbreviation short; it sits inside a narrow field beside the number. -->
+    <string name="sync_exclusions_add_size_unit_gigabytes">GB</string>
     <!-- Snackbar message shown after archiving a single chat from the chat list. %s is the chat title -->
     <string name="success_archive_chat">%s was archived</string>
     <!-- Snackbar message shown when archiving a single chat from the chat list fails. %s is the chat title -->
@@ -4365,6 +4267,8 @@
     </plurals>
     <!-- Sync exclusions Add form: error under the two size fields of a “Not between” rule when the first size is not smaller than the second. Such a range would leave out every file. -->
     <string name="sync_exclusions_add_size_range_error">The first size must be smaller than the second</string>
+    <!-- Sync exclusions Edit screen: title of the full screen where an existing exclusion rule is changed or deleted. -->
+    <string name="sync_exclusions_edit_title">Edit exclusion</string>
     <!-- Title of the screen where the user changes their existing passcode -->
     <string name="title_change_passcode">Change passcode</string>
     <!-- Title of the screen where the user types the replacement passcode -->
@@ -4385,5 +4289,162 @@
     <plurals name="contact_info_retention_time_years">
         <item quantity="one">%1$d year</item>
         <item quantity="other">%1$d years</item>
+    </plurals>
+    <!-- Sync exclusions Manage screen: screen title. The screen lists everything a sync leaves out, and is where rules are added, edited and removed. -->
+    <string name="sync_exclusions_manage_title">Manage exclusions</string>
+    <!-- Sync folder setup screen: subtitle of the row that opens the Manage exclusions screen before the folder pair exists, letting the user choose exclusions ahead of the first sync. -->
+    <string name="sync_exclusions_setup_subtitle">Choose what not to sync</string>
+    <!-- Sync exclusions Manage screen: heading over the file extensions the sync leaves out, shown as chips. -->
+    <string name="sync_exclusions_manage_section_extensions">File extensions</string>
+    <!-- Sync exclusions Manage screen: heading over the rules that match a file or folder by its name. -->
+    <string name="sync_exclusions_manage_section_names">File and folder names</string>
+    <!-- Sync exclusions Manage screen: heading over the rules that leave files out by how large they are. -->
+    <string name="sync_exclusions_manage_section_size">File size</string>
+    <!-- Sync exclusions Manage screen: button that writes the changed exclusions to the folder. Edits are collected and written once, so this confirms all of them together. -->
+    <string name="sync_exclusions_manage_save">Save</string>
+    <!-- Sync exclusions Manage screen: button that opens the screen for adding a new exclusion. -->
+    <string name="sync_exclusions_manage_add">Add exclusion</string>
+    <!-- Sync exclusions Manage screen: heading shown when the folder has no exclusions at all. -->
+    <string name="sync_exclusions_manage_empty_title">Add your first exclusion</string>
+    <!-- Sync exclusions Manage screen: body text under the empty-state heading, explaining what an exclusion does. -->
+    <string name="sync_exclusions_manage_empty_body">Everything in this folder syncs. Add an exclusion to keep certain files and folders from syncing.</string>
+    <!-- Sync exclusions Manage screen: body text shown in place of the usual empty-state text when the folder does exclude things, but only through rules this screen cannot show, such as ones written by another MEGA app. Avoids telling the user that everything syncs when it does not. -->
+    <string name="sync_exclusions_manage_empty_body_unshown">This folder has exclusions set elsewhere that can’t be shown here. Add an exclusion to keep more files and folders from syncing.</string>
+    <!-- Sync exclusions Manage screen: heading shown when the folder’s exclusion file is one sync refuses, so none of its rules are in effect. -->
+    <string name="sync_exclusions_manage_rejected_title">Exclusions aren’t being applied</string>
+    <!-- Sync exclusions Manage screen: body text under the heading shown when sync refuses the folder’s exclusion file. Nothing is left out while this is the case, which is the opposite of what the rules say. -->
+    <string name="sync_exclusions_manage_rejected_body">Sync couldn’t read this folder’s exclusions, so everything in the folder is syncing.</string>
+    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out every file larger than a size. %1$s is a formatted file size, for example “1 GB”. -->
+    <string name="sync_exclusions_manage_size_bigger_than">Files bigger than %1$s</string>
+    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out every file smaller than a size. %1$s is a formatted file size, for example “1 KB”. -->
+    <string name="sync_exclusions_manage_size_smaller_than">Files smaller than %1$s</string>
+    <!-- Sync exclusions Manage screen: row summarising a rule that keeps only files between two sizes, leaving out everything outside that range. %1$s is the smaller size and %2$s the larger, both formatted, for example “1 KB” and “2 GB”. -->
+    <string name="sync_exclusions_manage_size_not_between">Files not between %1$s and %2$s</string>
+    <!-- Sync exclusions Manage screen: row summarising a rule that leaves out only the files inside a size range, keeping everything outside it. The opposite of the “not between” rule. %1$s is the smaller size and %2$s the larger, both formatted, for example “1 KB” and “2 GB”. -->
+    <string name="sync_exclusions_manage_size_between">Files between %1$s and %2$s</string>
+    <!-- Sync exclusions Manage screen: confirmation shown briefly after a new exclusion is added. -->
+    <string name="sync_exclusions_manage_snackbar_added">Exclusion added</string>
+    <!-- Sync exclusions Manage screen: spoken label for the control that stops excluding a file extension. Not shown on screen; it describes the small dismiss control on an extension chip. %1$s is the extension, for example “tmp”. -->
+    <string name="sync_exclusions_manage_remove_extension">Stop excluding %1$s</string>
+    <!-- Sync exclusions Manage screen: heading shown when the folder’s exclusions could not be read. Deliberately distinct from the empty state, because presenting a failed read as “no exclusions” would invite saving that over rules that do exist. -->
+    <string name="sync_exclusions_manage_load_error_title">Couldn’t load exclusions</string>
+    <!-- Sync exclusions Manage screen: body text under the load-error heading. The exclusions are read from a file in the synced folder on the device, so the cause is a local one — the folder moved, or the app lost access to it — never the network. -->
+    <string name="sync_exclusions_manage_load_error_body">Check the folder is still on this device and try again.</string>
+    <!-- Sync exclusions Manage screen: button that retries reading the folder’s exclusions after a failed read. -->
+    <string name="sync_exclusions_manage_load_error_retry">Try again</string>
+    <!-- Sync exclusions Manage screen: message shown when the changed exclusions could not be written. The edits are kept, so the user can retry without entering them again. -->
+    <string name="sync_exclusions_manage_save_failed">Couldn’t save your changes. Try again.</string>
+    <!-- Sync list: action on a sync or backup card that opens the screen listing everything that sync leaves out. Sits beside Open, Pause and Stop, so keep it to a single short word if the language allows. -->
+    <string name="sync_exclusions_card_action">Exclusions</string>
+    <!-- Sync exclusions Manage screen: overflow menu action that puts the folder back to the exclusions MEGA sets up by default, discarding the ones the user added. The word "defaults" means that predefined set, not device or app settings. -->
+    <string name="sync_exclusions_manage_restore_defaults">Restore defaults</string>
+    <!-- Sync exclusions Manage screen: confirmation shown briefly after the default exclusions have been put back. -->
+    <string name="sync_exclusions_manage_snackbar_defaults_restored">Default exclusions restored</string>
+    <!-- Sync exclusions Manage screen: shown briefly when a size the user just added cannot be kept, because the folder already leaves out files at that exact size in the opposite direction. Excluding everything smaller than 1 KB as well as everything larger than 1 KB would leave only files of exactly that size, so the two cannot both stand. -->
+    <string name="sync_exclusions_manage_snackbar_size_conflict">You’ve already excluded files of this size</string>
+    <!-- Content description for the bold button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_bold">Bold</string>
+    <!-- Content description for the italic button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_italic">Italic</string>
+    <!-- Content description for the underline button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_underline">Underline</string>
+    <!-- Content description for the strikethrough button in the rich text editor's formatting toolbar, which draws a line through the selected text -->
+    <string name="text_editor_format_strikethrough">Strikethrough</string>
+    <!-- Content description for the checklist button in the rich text editor's formatting toolbar, which turns the current line into a list of tickable items -->
+    <string name="text_editor_format_checklist">Checklist</string>
+    <!-- Content description for the bulleted list button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_bulleted_list">Bulleted list</string>
+    <!-- Content description for the numbered list button in the rich text editor's formatting toolbar -->
+    <string name="text_editor_format_numbered_list">Numbered list</string>
+    <!-- Content description for the quote button in the rich text editor's formatting toolbar, which indents the current line as a quotation -->
+    <string name="text_editor_format_quote">Quote</string>
+    <!-- Content description for the code button in the rich text editor's formatting toolbar, which styles the selected text as a snippet of computer code -->
+    <string name="text_editor_format_code">Code</string>
+    <!-- Content description for the link button in the rich text editor's formatting toolbar, which opens the dialog for adding a web link -->
+    <string name="text_editor_format_link">Link</string>
+    <!-- Label of the text style chip in the rich text editor's formatting toolbar when the current line is ordinary paragraph text rather than a heading -->
+    <string name="text_editor_text_style_body">Body</string>
+    <!-- Label of the text style chip in the rich text editor's formatting toolbar when the current line is a heading. %1$d is the heading level, 1 being the largest -->
+    <string name="text_editor_text_style_heading">Heading %1$d</string>
+    <!-- Content description for the tick shown beside the option currently in use, in the rich text editor's text style and editing mode menus -->
+    <string name="text_editor_menu_option_selected">Selected</string>
+    <!-- Content description for the button in the text editor toolbar that opens the menu for choosing between plain text and rich text editing -->
+    <string name="text_editor_edit_mode_menu">Text editing mode</string>
+    <!-- Menu option in the text editor that switches to editing the file as plain text, showing the Markdown formatting characters -->
+    <string name="text_editor_edit_mode_plain_text">Plain text</string>
+    <!-- Menu option in the text editor that switches to editing the file as rich text, showing formatted text instead of Markdown formatting characters -->
+    <string name="text_editor_edit_mode_rich_text">Rich text</string>
+    <!-- Title of the dialog for adding a web link to the text being edited in the rich text editor -->
+    <string name="text_editor_link_dialog_title">Add link</string>
+    <!-- Label of the input field for the web address, in the rich text editor's add link dialog -->
+    <string name="text_editor_link_dialog_url_label">Link</string>
+    <!-- Label of the input field for the words the reader will see and tap, in the rich text editor's add link dialog -->
+    <string name="text_editor_link_dialog_text_label">Text</string>
+    <!-- Button in the rich text editor's add link dialog that turns an existing link back into ordinary text, keeping the words but dropping the web address -->
+    <string name="text_editor_link_dialog_remove">Remove link</string>
+    <!-- Title of the name collision screen shown when the item being uploaded, copied or moved has the same name as an existing one. -->
+    <string name="title_duplicated_items">Duplicated items</string>
+    <!-- Message informing that a file with the same name (%1$s) already exists at the destination. -->
+    <string name="file_already_exists_in_location">A file named [B]%1$s[/B] already exists at this destination.</string>
+    <!-- Message informing that a folder with the same name (%1$s) already exists at the destination. -->
+    <string name="folder_already_exists_in_location">A folder named [B]%1$s[/B] already exists at this destination.</string>
+    <!-- Header inviting the user to choose which of the two files (the existing one or the new one) to keep. -->
+    <string name="choose_file">Select the file you want to keep</string>
+    <!-- Header inviting the user to choose whether to merge the two colliding folders. -->
+    <string name="choose_folder">Select whether you want to merge the folders</string>
+    <!-- Label above the card showing the existing file that will be kept if the upload/copy/move is skipped. -->
+    <string name="skip_file">No files will be changed. You will keep the file below:</string>
+    <!-- Button to skip resolving a folder name collision, keeping the existing folder unchanged. -->
+    <string name="skip_folder">Skip this folder</string>
+    <!-- Button to skip uploading a file that has a name collision. -->
+    <string name="do_not_upload">Don’t upload</string>
+    <!-- Button to skip copying a file or folder that has a name collision. -->
+    <string name="do_not_copy">Don’t copy</string>
+    <!-- Button to skip moving a file or folder that has a name collision. -->
+    <string name="do_not_move">Don’t move</string>
+    <!-- Informs the file being uploaded will be renamed, shown above the renamed-item card. -->
+    <string name="warning_upload_and_rename">The file you are uploading will be renamed as:</string>
+    <!-- Button to upload the file under a new name, keeping the existing one. -->
+    <string name="upload_and_rename">Upload and rename</string>
+    <!-- Informs the file being copied will be renamed, shown above the renamed-item card. -->
+    <string name="warning_copy_and_rename">The file you are copying will be renamed as:</string>
+    <!-- Button to copy the file under a new name, keeping the existing one. -->
+    <string name="copy_and_rename">Copy and rename</string>
+    <!-- Informs the file being moved will be renamed, shown above the renamed-item card. -->
+    <string name="warning_move_and_rename">The file you are moving will be renamed as:</string>
+    <!-- Button to move the file under a new name, keeping the existing one. -->
+    <string name="move_and_rename">Move and rename</string>
+    <!-- Informs the existing file will be replaced by the one being uploaded (file versioning disabled). -->
+    <string name="warning_upload_and_replace">The current version of the file will be replaced with the file you are uploading.</string>
+    <!-- Button to replace the existing file with the one being uploaded. -->
+    <string name="upload_and_replace">Upload and replace</string>
+    <!-- Informs the existing file will be updated keeping its version history (file versioning enabled). -->
+    <string name="warning_versioning_upload_and_update">The file will be updated with version history:</string>
+    <!-- Button to update the existing file, keeping its version history, with the one being uploaded. -->
+    <string name="upload_and_update">Upload and update</string>
+    <!-- Informs the existing folder will be merged with the one being uploaded. -->
+    <string name="warning_upload_and_merge">Merge the folder at the destination with the folder you are uploading.</string>
+    <!-- Button to merge the existing folder with the one being uploaded. -->
+    <string name="upload_and_merge">Upload and merge</string>
+    <!-- Informs the existing file will be replaced by the one being copied. -->
+    <string name="warning_copy_and_replace">Replace the file in the destination folder with the file you are copying.</string>
+    <!-- Button to replace the existing file with the one being copied. -->
+    <string name="copy_and_replace">Copy and replace</string>
+    <!-- Informs the existing folder will be merged with the one being copied. -->
+    <string name="warning_copy_and_merge">Merge the folder at the destination with the folder you are copying.</string>
+    <!-- Button to merge the existing folder with the one being copied. -->
+    <string name="copy_and_merge">Copy and merge</string>
+    <!-- Informs the existing file will be replaced by the one being moved. -->
+    <string name="warning_move_and_replace">Replace the file in the destination folder with the file you are moving.</string>
+    <!-- Button to replace the existing file with the one being moved. -->
+    <string name="move_and_replace">Move and replace</string>
+    <!-- Informs the existing folder will be merged with the one being moved. -->
+    <string name="warning_move_and_merge">Merge the folder at the destination with the folder you are moving.</string>
+    <!-- Button to merge the existing folder with the one being moved. -->
+    <string name="move_and_merge">Move and merge</string>
+    <!-- Checkbox label to apply the chosen resolution to the remaining name collisions. %1$d is the number of remaining collisions. -->
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="one">Apply to the duplicate</item>
+        <item quantity="other">Apply to all %1$d duplicates</item>
     </plurals>
 </resources>

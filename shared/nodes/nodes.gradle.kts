@@ -88,4 +88,5 @@ dependencies {
     screenshotTestImplementation(platform(androidx.compose.bom))
     screenshotTestImplementation(androidx.compose.ui.tooling)
     screenshotTestImplementation(testlib.compose.screenshot)
+    screenshotTestImplementation(lib.compose.state.events)
 }
