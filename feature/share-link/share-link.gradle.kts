@@ -31,6 +31,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":domain:photos"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:coroutine"))
     implementation(project(":core:formatter"))
