@@ -28,6 +28,8 @@ pipeline {
 
         ARTIFACTORY_USER = credentials('ARTIFACTORY_USER')
         ARTIFACTORY_ACCESS_TOKEN = credentials('ARTIFACTORY_ACCESS_TOKEN')
+        GRADLE_CACHE_USER = credentials('GRADLE_CACHE_USER')
+        GRADLE_CACHE_TOKEN = credentials('GRADLE_CACHE_TOKEN')
         LC_ALL = 'en_US.UTF-8'
         LANG = 'en_US.UTF-8'
 

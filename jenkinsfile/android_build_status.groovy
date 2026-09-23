@@ -83,6 +83,9 @@ pipeline {
         LC_ALL = "en_US.UTF-8"
         LANG = "en_US.UTF-8"
 
+        GRADLE_CACHE_USER = credentials('GRADLE_CACHE_USER')
+        GRADLE_CACHE_TOKEN = credentials('GRADLE_CACHE_TOKEN')
+
         NDK_ROOT = "/opt/buildtools/android-sdk/ndk/27.1.12297006"
         JAVA_HOME = "/opt/buildtools/zulu21.40.17-ca-jdk21.0.6-macosx"
         ANDROID_HOME = "/opt/buildtools/android-sdk"

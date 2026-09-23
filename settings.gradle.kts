@@ -160,12 +160,12 @@ buildCache {
     }
 
     remote<HttpBuildCache> {
-        url =
-            uri("${System.getenv()["ARTIFACTORY_BASE_URL"]}/artifactory/android-mega/gradle-cache/")
+        url = uri(System.getenv()["GRADLE_CACHE_URL"].orEmpty())
         credentials {
-            username = System.getenv()["ARTIFACTORY_USER"]
-            password = System.getenv()["ARTIFACTORY_ACCESS_TOKEN"]
+            username = System.getenv()["GRADLE_CACHE_USER"]
+            password = System.getenv()["GRADLE_CACHE_TOKEN"]
         }
+        isUseExpectContinue = true
         isPush = isServerBuild()
         isEnabled = isServerBuild()
     }
