@@ -18,6 +18,6 @@ class GetPublicChildNodeFromIdUseCase @Inject constructor(
      */
     suspend operator fun invoke(nodeId: NodeId): PublicLinkNode? =
         folderLinkRepository.getChildNode(nodeId)?.let {
-            mapNodeToPublicLinkUseCase(it, null)
+            mapNodeToPublicLinkUseCase(it)
         }
 }

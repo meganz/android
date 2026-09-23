@@ -75,7 +75,7 @@ fun BaseHandleNodeAction(
                                 onDownloadEvent(
                                     TransferTriggerEvent.StartDownloadForPreview(
                                         node = if (isLinkNode) {
-                                            PublicLinkFile(typedFileNode, null)
+                                            PublicLinkFile(typedFileNode)
                                         } else {
                                             typedFileNode
                                         },

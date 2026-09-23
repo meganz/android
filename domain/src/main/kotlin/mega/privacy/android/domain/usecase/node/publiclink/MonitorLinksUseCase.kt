@@ -92,7 +92,7 @@ class MonitorLinksUseCase @Inject constructor(
         return publicLinks
             .mapNotNull {
                 runCatching {
-                    mapNodeToPublicLinkUseCase(it, null)
+                    mapNodeToPublicLinkUseCase(it)
                 }.getOrNull()
             }
     }

@@ -2749,8 +2749,8 @@ internal class TextEditorComposeViewModelTest {
     fun `test that download uses mapTypedNodeToPublicLinkUseCase when publicUrl is set`() =
         runTest {
             stubFileLinkInit()
-            val publicLinkFile = PublicLinkFile(fileLinkPublicNode, null)
-            whenever(mapTypedNodeToPublicLinkUseCase(fileLinkPublicNode, null))
+            val publicLinkFile = PublicLinkFile(fileLinkPublicNode)
+            whenever(mapTypedNodeToPublicLinkUseCase(fileLinkPublicNode))
                 .thenReturn(publicLinkFile)
 
             initUnderTest(publicUrl = FILE_LINK_URL, showDownload = true)
@@ -2769,7 +2769,7 @@ internal class TextEditorComposeViewModelTest {
 
     private suspend fun stubFolderLinkInit() {
         whenever(getPublicChildNodeFromIdUseCase(NodeId(FOLDER_LINK_HANDLE)))
-            .thenReturn(PublicLinkFile(folderLinkNode, null))
+            .thenReturn(PublicLinkFile(folderLinkNode))
         whenever(
             getTextContentForFolderLinkUseCase(
                 node = any(),
@@ -2837,7 +2837,7 @@ internal class TextEditorComposeViewModelTest {
         underTest.onMenuAction(TextEditorTopBarAction.Download)
         advanceUntilIdle()
 
-        verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any(), anyOrNull())
+        verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any())
         val event = underTest.uiState.value.transferEvent
         assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
         val downloadEvent =

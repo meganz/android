@@ -43,7 +43,7 @@ class GetPublicChildNodeFromIdUseCaseTest {
         val unTypedNode = mock<FileNode>()
         val expected = mock<PublicLinkFile>()
         whenever(folderLinkRepository.getChildNode(id)).thenReturn(unTypedNode)
-        whenever(mapNodeToPublicLinkUseCase(unTypedNode, null)).thenReturn(expected)
+        whenever(mapNodeToPublicLinkUseCase(unTypedNode)).thenReturn(expected)
         val actual = underTest(id)
         assertThat(actual).isEqualTo(expected)
     }

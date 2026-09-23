@@ -377,7 +377,7 @@ class NodeOptionsBottomSheetViewModelTest {
 
             verify(getNodeByIdUseCase).invoke(sampleFileNode.id)
             verify(getPublicNodeUseCase, never()).invoke(any())
-            verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any(), anyOrNull())
+            verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any())
         }
 
     @Test
@@ -410,7 +410,7 @@ class NodeOptionsBottomSheetViewModelTest {
 
             verify(getNodeByIdUseCase).invoke(sampleFileNode.id)
             verify(getPublicNodeUseCase, never()).invoke(any())
-            verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any(), anyOrNull())
+            verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any())
         }
 
     @Test

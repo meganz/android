@@ -24,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -36,7 +35,7 @@ internal class MonitorLinksUseCaseTest {
 
     private val shareRepository = mock<ShareRepository>()
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase> {
-        on { invoke(any(), anyOrNull()) }.thenReturn(mock<PublicLinkFolder>())
+        on { invoke(any()) }.thenReturn(mock<PublicLinkFolder>())
     }
     private val nodeRepository = mock<NodeRepository> {
         on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
@@ -65,7 +64,7 @@ internal class MonitorLinksUseCaseTest {
             on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
         }
         mapNodeToPublicLinkUseCase.stub {
-            on { invoke(any(), anyOrNull()) }.thenReturn(mock<PublicLinkFolder>())
+            on { invoke(any()) }.thenReturn(mock<PublicLinkFolder>())
         }
     }
 

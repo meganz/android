@@ -9,14 +9,11 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.AddNodeType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.argWhere
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -37,8 +34,8 @@ internal class MapNodeToPublicLinkUseCaseTest {
     private val publicLinkFolder = mock<PublicLinkFolder>()
 
     private val mapTypedNodeToPublicLinkUseCase = mock<MapTypedNodeToPublicLinkUseCase> {
-        on { invoke(eq(typedFileNode), any()) }.thenReturn(publicLinkFile)
-        on { invoke(eq(typedFolderNode), any()) }.thenReturn(publicLinkFolder)
+        on { invoke(typedFileNode) }.thenReturn(publicLinkFile)
+        on { invoke(typedFolderNode) }.thenReturn(publicLinkFolder)
     }
 
     @BeforeAll
@@ -51,30 +48,18 @@ internal class MapNodeToPublicLinkUseCaseTest {
 
     @Test
     internal fun `test that file node is delegated to mapTypedNodeToPublicLinkUseCase`() = runTest {
-        val parent = mock<PublicLinkFolder>()
+        val actual = underTest(mock<FileNode>())
 
-        val actual = underTest(mock<FileNode>(), parent)
-
-        verify(mapTypedNodeToPublicLinkUseCase).invoke(typedFileNode, parent)
+        verify(mapTypedNodeToPublicLinkUseCase).invoke(typedFileNode)
         assertThat(actual).isEqualTo(publicLinkFile)
     }
 
     @Test
     internal fun `test that folder node is delegated to mapTypedNodeToPublicLinkUseCase`() =
         runTest {
-            val parent = mock<PublicLinkFolder>()
+            val actual = underTest(mock<FolderNode>())
 
-            val actual = underTest(mock<FolderNode>(), parent)
-
-            verify(mapTypedNodeToPublicLinkUseCase).invoke(typedFolderNode, parent)
+            verify(mapTypedNodeToPublicLinkUseCase).invoke(typedFolderNode)
             assertThat(actual).isEqualTo(publicLinkFolder)
-        }
-
-    @Test
-    internal fun `test that null parent is passed through to mapTypedNodeToPublicLinkUseCase`() =
-        runTest {
-            underTest(mock<FileNode>(), null)
-
-            verify(mapTypedNodeToPublicLinkUseCase).invoke(typedFileNode, null)
         }
 }

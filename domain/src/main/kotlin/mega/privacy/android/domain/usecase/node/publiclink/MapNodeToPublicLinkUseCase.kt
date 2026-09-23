@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.node.publiclink
 
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.AddNodeType
 import javax.inject.Inject
@@ -20,9 +19,8 @@ class MapNodeToPublicLinkUseCase @Inject constructor(
      * Invoke
      *
      * @param node
-     * @param parent
-     * @return
+     * @return [PublicLinkNode]
      */
-    suspend operator fun invoke(node: UnTypedNode, parent: PublicLinkFolder?): PublicLinkNode =
-        mapTypedNodeToPublicLinkUseCase(addNodeType(node), parent)
+    suspend operator fun invoke(node: UnTypedNode): PublicLinkNode =
+        mapTypedNodeToPublicLinkUseCase(addNodeType(node))
 }

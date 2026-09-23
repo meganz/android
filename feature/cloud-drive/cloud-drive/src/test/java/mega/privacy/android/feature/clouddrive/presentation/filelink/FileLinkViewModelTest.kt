@@ -238,7 +238,6 @@ internal class FileLinkViewModelTest {
                 assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
                 assertThat(state.fileNode).isInstanceOf(PublicLinkFile::class.java)
                 assertThat(state.fileNode?.node).isEqualTo(node)
-                assertThat(state.fileNode?.parent).isNull()
                 assertThat(state.hasCredentials).isTrue()
             }
         }

@@ -806,7 +806,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         return runCatching { getPublicNodeUseCase(url) }
             .onFailure { Timber.e(it, "Failed to resolve public node for file-link toolbar") }
             .getOrNull()
-            ?.let { PublicLinkFile(it, null) }
+            ?.let { PublicLinkFile(it) }
     }
 
     private suspend fun loadChatFallbackNode(): TypedNode? {

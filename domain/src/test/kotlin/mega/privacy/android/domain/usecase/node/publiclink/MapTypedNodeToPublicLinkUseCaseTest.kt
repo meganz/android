@@ -1,101 +1,41 @@
 package mega.privacy.android.domain.usecase.node.publiclink
 
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
-import mega.privacy.android.domain.usecase.AddNodeType
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argWhere
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MapTypedNodeToPublicLinkUseCaseTest {
-    private lateinit var underTest: MapTypedNodeToPublicLinkUseCase
+    private val underTest = MapTypedNodeToPublicLinkUseCase()
 
-    private val typedFolderNode = mock<TypedFolderNode>()
     private val typedFileNode = mock<TypedFileNode>()
-
-    private val addNodeType = mock<AddNodeType> {
-        on { invoke(argWhere { it is FileNode }) }.thenReturn(typedFileNode)
-        on { invoke(argWhere { it is FolderNode }) }.thenReturn(typedFolderNode)
-    }
-
-    private val monitorPublicLinkFolderUseCase = mock<MonitorPublicLinkFolderUseCase>()
-
-    @BeforeAll
-    internal fun setUp() {
-        underTest = MapTypedNodeToPublicLinkUseCase(
-            addNodeType = addNodeType,
-            monitorPublicLinkFolderUseCase = monitorPublicLinkFolderUseCase,
-        )
-    }
+    private val typedFolderNode = mock<TypedFolderNode>()
 
     @Test
-    internal fun `test that file without parent is mapped to PublicLinkFile`() = runTest {
+    internal fun `test that invoke maps a file node to PublicLinkFile`() {
         val actual = underTest(typedFileNode)
 
         assertThat(actual).isInstanceOf(PublicLinkFile::class.java)
-        assertThat(actual.parent).isNull()
+        assertThat((actual as PublicLinkFile).node).isEqualTo(typedFileNode)
     }
 
     @Test
-    internal fun `test that file with parent is mapped to PublicLinkFile with correct parent`() =
-        runTest {
-            val parent = mock<PublicLinkFolder>()
-
-            val actual = underTest(typedFileNode, parent)
-
-            assertThat(actual).isInstanceOf(PublicLinkFile::class.java)
-            assertThat(actual.parent).isEqualTo(parent)
-        }
-
-    @Test
-    internal fun `test that folder without parent is mapped to PublicLinkFolder`() = runTest {
+    internal fun `test that invoke maps a folder node to PublicLinkFolder`() {
         val actual = underTest(typedFolderNode)
 
         assertThat(actual).isInstanceOf(PublicLinkFolder::class.java)
-        assertThat(actual.parent).isNull()
+        assertThat((actual as PublicLinkFolder).node).isEqualTo(typedFolderNode)
     }
 
     @Test
-    internal fun `test that folder with parent is mapped to PublicLinkFolder with correct parent`() =
-        runTest {
-            val parent = mock<PublicLinkFolder>()
-
-            val actual = underTest(typedFolderNode, parent)
-
-            assertThat(actual).isInstanceOf(PublicLinkFolder::class.java)
-            assertThat(actual.parent).isEqualTo(parent)
-        }
-
-    @Test
-    internal fun `test that fetching children returns mapped public link nodes`() = runTest {
-        val children = listOf(mock<FileNode>(), mock<FolderNode>())
-
-        monitorPublicLinkFolderUseCase.stub {
-            on { invoke(any()) }.thenReturn(flowOf(children))
-        }
-
-        val folder = underTest(typedFolderNode) as PublicLinkFolder
-        folder.children.test {
-            val actual = awaitItem()
-            assertThat(actual).hasSize(children.size)
-            assertThat(actual[0]).isInstanceOf(PublicLinkFile::class.java)
-            assertThat(actual[1]).isInstanceOf(PublicLinkFolder::class.java)
-            cancelAndIgnoreRemainingEvents()
-        }
+    internal fun `test that invoke throws when the node is neither a file nor a folder`() {
+        assertThrows<IllegalStateException> { underTest(mock<TypedNode>()) }
     }
 }

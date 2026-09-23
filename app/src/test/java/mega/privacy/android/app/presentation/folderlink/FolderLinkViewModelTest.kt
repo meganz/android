@@ -956,7 +956,7 @@ class FolderLinkViewModelTest {
         runTest {
             val node = mock<TypedFileNode>()
             val link = mock<PublicLinkFile>()
-            whenever(mapNodeToPublicLinkUseCase(node, null)).thenReturn(link)
+            whenever(mapNodeToPublicLinkUseCase(node)).thenReturn(link)
             whenever(getNodePreviewFileUseCase(node)).thenReturn(null)
             underTest.openOtherTypeFile(mock(), node)
             underTest.state.test {

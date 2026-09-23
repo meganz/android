@@ -41,7 +41,7 @@ class GetPublicNodeFromSerializedDataUseCaseTest {
         val fileNode = mock<FileNode>()
         val expected = mock<PublicLinkFile>()
         whenever(nodeRepository.getNodeFromSerializedData(serializedData)).thenReturn(fileNode)
-        whenever(mapNodeToPublicLinkUseCase(fileNode, null)).thenReturn(expected)
+        whenever(mapNodeToPublicLinkUseCase(fileNode)).thenReturn(expected)
         val actual = underTest(serializedData)
         assertThat(actual).isEqualTo(expected)
     }

@@ -101,7 +101,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
                                 formattedDuration = formattedDuration,
                                 isVideo = node.type is VideoFileTypeInfo,
                             ),
-                            fileNode = PublicLinkFile(node, null),
+                            fileNode = PublicLinkFile(node),
                             autoOpenPreview = autoOpenPreview,
                         )
                     }

@@ -748,7 +748,7 @@ class FolderLinkViewModel @Inject constructor(
                 listOfNotNull(node)
             }.mapNotNull {
                 runCatching {
-                    mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
+                    mapNodeToPublicLinkUseCase(it as UnTypedNode)
                 }.onFailure { error ->
                     Timber.e(error)
                 }.getOrNull()
@@ -876,7 +876,7 @@ class FolderLinkViewModel @Inject constructor(
      */
     private suspend fun updateNodeToPreview(node: TypedNode) =
         runCatching {
-            mapNodeToPublicLinkUseCase(node as UnTypedNode, null)
+            mapNodeToPublicLinkUseCase(node as UnTypedNode)
         }.onSuccess { linkNode ->
             _state.update {
                 it.copy(

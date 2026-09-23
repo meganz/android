@@ -686,9 +686,9 @@ internal class MediaPlayerViewModelTest {
     internal fun `test that downloadPublicLinkFile emits node via onDownloadFileLinkNode when successful`() =
         runTest {
             val url = "https://mega.nz/file/abc123"
-            val publicNode = PublicLinkFile(node = mock(), parent = null)
+            val publicNode = PublicLinkFile(node = mock())
             whenever(getPublicNodeUseCase(url)).thenReturn(mock())
-            whenever(mapTypedNodeToPublicLinkUseCase(any(), anyOrNull())).thenReturn(publicNode)
+            whenever(mapTypedNodeToPublicLinkUseCase(any())).thenReturn(publicNode)
 
             underTest.downloadPublicLinkFile(url)
             advanceUntilIdle()
