@@ -24,41 +24,6 @@ interface WorkManagerGateway {
     suspend fun enqueueChatUploadsWorkerRequest()
 
     /**
-     * Enqueue unique work request to start new media worker
-     *
-     * @param forceEnqueue True if the worker should be enqueued even if it is already running
-     *                     Used for enqueueing the same worker from itself
-     */
-    suspend fun enqueueNewMediaWorkerRequest(forceEnqueue: Boolean)
-
-    /**
-     * Queue a one time work request of camera upload to upload immediately.
-     * The worker will not be queued if a camera uploads worker is already running
-     */
-    suspend fun startCameraUploads()
-
-    /**
-     * Cancel all camera uploads workers
-     */
-    suspend fun stopCameraUploads()
-
-    /**
-     * Schedule the camera uploads worker
-     */
-    suspend fun scheduleCameraUploads()
-
-    /**
-     * Cancel all camera uploads workers.
-     * Cancel all camera uploads sync heartbeat workers.
-     */
-    suspend fun cancelCameraUploadsAndHeartbeatWorkRequest()
-
-    /**
-     * Get CameraUploadsWorker Info
-     */
-    fun monitorCameraUploadsStatusInfo(): Flow<List<WorkInfo>>
-
-    /**
      * Get DownloadsWorker Info
      */
     fun monitorDownloadsStatusInfo(): Flow<List<WorkInfo>>

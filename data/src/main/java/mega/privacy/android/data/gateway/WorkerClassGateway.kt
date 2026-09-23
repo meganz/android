@@ -3,14 +3,12 @@ package mega.privacy.android.data.gateway
 import androidx.work.CoroutineWorker
 
 /**
- * Provide the different coroutine workers class
+ * Provides the classes of the workers this module owns.
+ *
+ * Only :data's own workers belong here. A module that owns other workers schedules them itself,
+ * as [CameraUploadsWorkScheduler] does for camera uploads.
  */
 interface WorkerClassGateway {
-
-    /**
-     * Provide the camera uploads worker class
-     */
-    val cameraUploadsWorkerClass: Class<out CoroutineWorker>
 
     /**
      * Provide the downloads worker class
@@ -23,19 +21,9 @@ interface WorkerClassGateway {
     val chatUploadsWorkerClass: Class<out CoroutineWorker>
 
     /**
-     * Provide the sync heartbeat camera uploads worker class
-     */
-    val syncHeartbeatCameraUploadWorkerClass: Class<out CoroutineWorker>
-
-    /**
      * Provide the delete oldest completed transfer worker class
      */
     val deleteOldestCompletedTransferWorkerClass: Class<out CoroutineWorker>
-
-    /**
-     * Provide the new media worker class
-     */
-    val newMediaWorkerClass: Class<out CoroutineWorker>
 
     /**
      * Provide the uploads worker class

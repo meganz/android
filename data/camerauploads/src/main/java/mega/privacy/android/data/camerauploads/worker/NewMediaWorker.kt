@@ -1,4 +1,4 @@
-package mega.privacy.android.data.worker
+package mega.privacy.android.data.camerauploads.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -35,7 +35,6 @@ class NewMediaWorker @AssistedInject constructor(
     companion object {
         /**
          * Tag identifying the worker when enqueued
-         *
          */
         const val NEW_MEDIA_WORKER_TAG = "NEW_MEDIA_WORKER_TAG"
     }

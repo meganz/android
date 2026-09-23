@@ -20,7 +20,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
-import mega.privacy.android.data.gateway.WorkManagerGateway
+import mega.privacy.android.data.gateway.CameraUploadsWorkScheduler
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -84,7 +84,7 @@ class CameraUploadsRepositoryImplTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val fileGateway = mock<FileGateway>()
     private val cameraUploadsMediaGateway = mock<CameraUploadsMediaGateway>()
-    private val workManagerGateway = mock<WorkManagerGateway>()
+    private val cameraUploadsWorkScheduler = mock<CameraUploadsWorkScheduler>()
     private val heartbeatStatusIntMapper = mock<HeartbeatStatusIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
@@ -116,7 +116,7 @@ class CameraUploadsRepositoryImplTest {
             localStorageGateway = localStorageGateway,
             megaApiGateway = megaApiGateway,
             cameraUploadsMediaGateway = cameraUploadsMediaGateway,
-            workManagerGateway = workManagerGateway,
+            cameraUploadsWorkScheduler = cameraUploadsWorkScheduler,
             heartbeatStatusIntMapper = heartbeatStatusIntMapper,
             mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper = cameraUploadsHandlesMapper,
@@ -145,7 +145,7 @@ class CameraUploadsRepositoryImplTest {
             megaApiGateway,
             fileGateway,
             cameraUploadsMediaGateway,
-            workManagerGateway,
+            cameraUploadsWorkScheduler,
             heartbeatStatusIntMapper,
             mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper,
@@ -680,25 +680,25 @@ class CameraUploadsRepositoryImplTest {
         @Test
         fun `test that the worker is called to start camera uploads`() = runTest {
             underTest.startCameraUploads()
-            verify(workManagerGateway).startCameraUploads()
+            verify(cameraUploadsWorkScheduler).startCameraUploads()
         }
 
         @Test
         fun `test that the worker is called to stop camera uploads`() = runTest {
             underTest.stopCameraUploads()
-            verify(workManagerGateway).stopCameraUploads()
+            verify(cameraUploadsWorkScheduler).stopCameraUploads()
         }
 
         @Test
         fun `test that the worker is called to schedule camera uploads`() = runTest {
             underTest.scheduleCameraUploads()
-            verify(workManagerGateway).scheduleCameraUploads()
+            verify(cameraUploadsWorkScheduler).scheduleCameraUploads()
         }
 
         @Test
         fun `test that the worker is called to stop camera uploads heartbeat workers`() = runTest {
             underTest.stopCameraUploadsAndBackupHeartbeat()
-            verify(workManagerGateway).cancelCameraUploadsAndHeartbeatWorkRequest()
+            verify(cameraUploadsWorkScheduler).cancelCameraUploadsAndHeartbeatWorkRequest()
         }
 
         @Test
@@ -723,7 +723,7 @@ class CameraUploadsRepositoryImplTest {
                         workInfo.stopReason,
                     )
                 ).thenReturn(expected)
-                whenever(workManagerGateway.monitorCameraUploadsStatusInfo()).thenReturn(
+                whenever(cameraUploadsWorkScheduler.monitorCameraUploadsStatusInfo()).thenReturn(
                     workInfoFlow
                 )
                 underTest.monitorCameraUploadsStatusInfo().test {

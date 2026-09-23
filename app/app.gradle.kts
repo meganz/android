@@ -232,6 +232,7 @@ dependencies {
     implementation(project(":shared:original-core-ui"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":data"))
+    implementation(project(":data:camerauploads"))
     implementation(project(":navigation"))
     implementation(lib.profileinstaller)
     implementation(project(":shared:sync"))

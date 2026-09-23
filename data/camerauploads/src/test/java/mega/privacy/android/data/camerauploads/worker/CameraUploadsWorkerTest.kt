@@ -1,4 +1,4 @@
-package mega.privacy.android.data.worker
+package mega.privacy.android.data.camerauploads.worker
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
