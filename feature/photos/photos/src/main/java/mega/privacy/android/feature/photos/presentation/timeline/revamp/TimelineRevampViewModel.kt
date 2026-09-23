@@ -72,7 +72,6 @@ import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateCache
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFormatters
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
@@ -83,6 +82,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.MAX_CACHED_ITEMS
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineSectionDateMapper
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
@@ -109,6 +109,7 @@ class TimelineRevampViewModel @Inject constructor(
     private val getMediaTimelineSectionsUseCase: GetMediaTimelineSectionsUseCase,
     private val listMediaNodesByOffsetUseCase: ListMediaNodesByOffsetUseCase,
     private val mediaTimelineNodeUiItemMapper: MediaTimelineNodeUiItemMapper,
+    private val mediaTimelineSectionDateMapper: MediaTimelineSectionDateMapper,
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
     private val monitorTimelineGridSizeUseCase: MonitorTimelineGridSizeUseCase,
@@ -449,22 +450,22 @@ class TimelineRevampViewModel @Inject constructor(
         section: MediaTimelineSection,
         node: TypedFileNode,
     ): PhotosNodeListCard {
-        val zonedDateTime = TimelineDateCache.get(section.startDate)
-        val isCurrentYear = zonedDateTime.year == Year.now().value
+        val date = mediaTimelineSectionDateMapper(section)
+        val isCurrentYear = date.year == Year.now().value
         val cardPeriod: PhotosNodeListCardPeriod
         val formattedDate: String
         when (period) {
             MediaTimePeriod.Years -> {
                 cardPeriod = PhotosNodeListCardPeriod.Year
-                formattedDate = TimelineFormatters.year.format(zonedDateTime)
+                formattedDate = TimelineFormatters.year.format(date)
             }
 
             else -> {
                 cardPeriod = PhotosNodeListCardPeriod.Month
                 formattedDate = if (isCurrentYear) {
-                    TimelineFormatters.month.format(zonedDateTime)
+                    TimelineFormatters.month.format(date)
                 } else {
-                    TimelineFormatters.monthYear.format(zonedDateTime)
+                    TimelineFormatters.monthYear.format(date)
                 }
             }
         }
@@ -472,9 +473,9 @@ class TimelineRevampViewModel @Inject constructor(
             period = cardPeriod,
             key = node.id.longValue,
             id = node.id.longValue,
-            day = zonedDateTime.dayOfMonth,
-            month = zonedDateTime.monthValue,
-            year = zonedDateTime.year,
+            day = date.dayOfMonth,
+            month = date.monthValue,
+            year = date.year,
             formattedDate = formattedDate,
             thumbnailFilePath = node.thumbnailPath,
             previewFilePath = node.previewPath,

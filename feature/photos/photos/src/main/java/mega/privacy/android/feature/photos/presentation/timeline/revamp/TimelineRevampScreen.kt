@@ -77,7 +77,6 @@ import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotoNodeBodyV2
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateCache
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
@@ -87,6 +86,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTime
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.rememberCameraUploadsBannerHandlers
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineSectionDateMapper
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
@@ -126,6 +126,7 @@ internal fun TimelineRevampScreen(
     onPinchActiveChanged: (Boolean) -> Unit = {},
     isPinchToZoomEnabled: Boolean = false,
 ) {
+    val sectionDateMapper = remember { MediaTimelineSectionDateMapper() }
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val takenDownDialogEvent =
         (uiState as? TimelineRevampUiState.Data)?.takenDownDialogEvent ?: consumed
@@ -177,6 +178,7 @@ internal fun TimelineRevampScreen(
                 contentPadding = contentPadding,
                 sections = uiState.sections,
                 sectionStartOffsets = uiState.sectionStartOffsets,
+                sectionDateMapper = sectionDateMapper,
                 loadedNodes = uiState.loadedNodes,
                 isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                 gridSize = uiState.gridSize,
@@ -232,6 +234,7 @@ internal fun TimelineRevampScreen(
 private fun TimelineRevampContent(
     sections: List<MediaTimelineSection>,
     sectionStartOffsets: List<Int>,
+    sectionDateMapper: MediaTimelineSectionDateMapper,
     loadedNodes: Map<Int, PhotosNodeContentItemV2>,
     isHiddenNodesEnabled: Boolean,
     gridSize: TimelineGridSize,
@@ -295,7 +298,9 @@ private fun TimelineRevampContent(
             selectedPeriod.isGridPeriod() &&
             sections.isNotEmpty()
         ) {
-            val sectionIndex = sections.indexOfFirst { it.isInMonth(target.year, target.month) }
+            val sectionIndex = sections.indexOfFirst {
+                sectionDateMapper.isInMonth(it, target.year, target.month)
+            }
             sectionStartOffsets.getOrNull(sectionIndex)?.let { offset ->
                 lazyGridState.scrollToItem(sectionIndex + offset)
             }
@@ -354,6 +359,7 @@ private fun TimelineRevampContent(
             TimelineRevampGrid(
                 sections = sections,
                 sectionStartOffsets = sectionStartOffsets,
+                sectionDateMapper = sectionDateMapper,
                 loadedNodes = loadedNodes,
                 isHiddenNodesEnabled = isHiddenNodesEnabled,
                 gridSize = gridSize,
@@ -385,6 +391,7 @@ private fun TimelineRevampContent(
 private fun TimelineRevampGrid(
     sections: List<MediaTimelineSection>,
     sectionStartOffsets: List<Int>,
+    sectionDateMapper: MediaTimelineSectionDateMapper,
     loadedNodes: Map<Int, PhotosNodeContentItemV2>,
     isHiddenNodesEnabled: Boolean,
     gridSize: TimelineGridSize,
@@ -439,7 +446,7 @@ private fun TimelineRevampGrid(
         val seenMonths = HashSet<String>()
         buildSet {
             sections.forEachIndexed { index, section ->
-                val monthAdded = seenMonths.add(monthKey(section.startDate))
+                val monthAdded = seenMonths.add(monthKey(section, sectionDateMapper))
                 if (monthAdded && index != 0) {
                     add(index)
                 }
@@ -461,7 +468,7 @@ private fun TimelineRevampGrid(
             var rangeEnd = -1
             var currentMonth: String? = null
             sections.zip(sectionStartOffsets).forEach { (section, offset) ->
-                val month = monthKey(section.startDate)
+                val month = monthKey(section, sectionDateMapper)
                 if (month != currentMonth) {
                     currentMonth?.let { put(it, rangeStart..rangeEnd) }
                     currentMonth = month
@@ -494,7 +501,7 @@ private fun TimelineRevampGrid(
                 .minOrNull() ?: 0
             val sectionIndex = sectionIndexOfMedia(minVisibleIndex, sectionStartOffsets)
                 .coerceIn(sections.indices)
-            monthRanges[monthKey(sections[sectionIndex].startDate)]
+            monthRanges[monthKey(sections[sectionIndex], sectionDateMapper)]
         }
     }
 
@@ -504,7 +511,13 @@ private fun TimelineRevampGrid(
         derivedStateOf {
             val visibleMediaIndices = lazyGridState.layoutInfo.visibleItemsInfo
                 .mapNotNull { globalMediaIndexOf(it.key, offsetByGroupId) }
-            stickyDayRangeLabel(visibleMediaIndices, sections, sectionStartOffsets, locale)
+            stickyDayRangeLabel(
+                visibleMediaIndices,
+                sections,
+                sectionStartOffsets,
+                sectionDateMapper,
+                locale,
+            )
         }
     }
 
@@ -603,7 +616,7 @@ private fun TimelineRevampGrid(
 
             sections.zip(sectionStartOffsets).forEachIndexed { sectionIndex, (section, base) ->
                 if (sectionIndex in headerIndexes) {
-                    val monthHeaderKey = monthKey(section.startDate)
+                    val monthHeaderKey = monthKey(section, sectionDateMapper)
                     item(
                         key = "$HEADER_KEY_PREFIX$monthHeaderKey",
                         span = { GridItemSpan(maxLineSpan) },
@@ -613,7 +626,7 @@ private fun TimelineRevampGrid(
                         StickySectionHeader(
                             modifier = Modifier
                                 .testTag("$TIMELINE_REVAMP_SECTION_HEADER_TAG$monthHeaderKey"),
-                            title = timelineMonthLabel(section.startDate, locale),
+                            title = timelineMonthLabel(section, sectionDateMapper, locale),
                             leadingContent = selectableRange?.let { range ->
                                 {
                                     SectionSelectAllCheckbox(
@@ -689,9 +702,13 @@ private fun TimelineRevampGrid(
 private fun MediaTimePeriod.isGridPeriod(): Boolean =
     this == MediaTimePeriod.All || this == MediaTimePeriod.Days
 
-private fun MediaTimelineSection.isInMonth(year: Int, month: Int): Boolean {
-    val zonedDateTime = TimelineDateCache.get(startDate)
-    return zonedDateTime.year == year && zonedDateTime.monthValue == month
+private fun MediaTimelineSectionDateMapper.isInMonth(
+    section: MediaTimelineSection,
+    year: Int,
+    month: Int,
+): Boolean {
+    val date = this(section)
+    return date.year == year && date.monthValue == month
 }
 
 private sealed interface PendingCardScroll {
@@ -727,12 +744,13 @@ private fun stickyDayRangeLabel(
     visibleMediaIndices: List<Int>,
     sections: List<MediaTimelineSection>,
     sectionStartOffsets: List<Int>,
+    sectionDateMapper: MediaTimelineSectionDateMapper,
     locale: Locale,
 ): String {
     val topSection = sections.firstOrNull() ?: return ""
     if (visibleMediaIndices.isEmpty()) {
-        val day = TimelineDateCache.get(topSection.startDate).dayOfMonth
-        return dayRangeLabel(topSection.startDate, day, day, locale)
+        val day = sectionDateMapper(topSection).dayOfMonth
+        return dayRangeLabel(topSection, sectionDateMapper, day, day, locale)
     }
 
     val topIndex = sectionIndexOfMedia(
@@ -743,18 +761,18 @@ private fun stickyDayRangeLabel(
         visibleMediaIndices.max(),
         sectionStartOffsets
     ).coerceIn(sections.indices)
-    val top = TimelineDateCache.get(sections[topIndex].startDate)
+    val top = sectionDateMapper(sections[topIndex])
 
     var minDay = Int.MAX_VALUE
     var maxDay = Int.MIN_VALUE
     for (index in topIndex..bottomIndex) {
-        val date = TimelineDateCache.get(sections[index].startDate)
+        val date = sectionDateMapper(sections[index])
         if (date.year == top.year && date.monthValue == top.monthValue) {
             minDay = minOf(minDay, date.dayOfMonth)
             maxDay = maxOf(maxDay, date.dayOfMonth)
         }
     }
-    return dayRangeLabel(sections[topIndex].startDate, minDay, maxDay, locale)
+    return dayRangeLabel(sections[topIndex], sectionDateMapper, minDay, maxDay, locale)
 }
 
 /**
@@ -767,19 +785,20 @@ private fun sectionIndexOfMedia(globalIndex: Int, sectionStartOffsets: List<Int>
 }
 
 private fun dayRangeLabel(
-    monthStartDateSeconds: Long,
+    section: MediaTimelineSection,
+    sectionDateMapper: MediaTimelineSectionDateMapper,
     minDay: Int,
     maxDay: Int,
     locale: Locale,
 ): String {
-    val zonedDateTime = TimelineDateCache.get(monthStartDateSeconds)
+    val date = sectionDateMapper(section)
     val monthName = DateTimeFormatter
         .ofPattern(getBestDateTimePattern(locale, "LLLL"), locale)
-        .format(zonedDateTime)
+        .format(date)
     val minDayText = String.format(locale, "%02d", minDay)
     val maxDayText = String.format(locale, "%02d", maxDay)
     val dayPart = if (minDay == maxDay) minDayText else "$minDayText$DAY_RANGE_SEPARATOR$maxDayText"
-    return "$monthName $dayPart ${zonedDateTime.year}"
+    return "$monthName $dayPart ${date.year}"
 }
 
 @Composable
@@ -930,12 +949,16 @@ private fun ReportScrollInProgress(
  * Formats a month header label, mirroring the legacy tab: "May" for the current year and "May 2024"
  * otherwise, using the locale's best pattern for the skeleton.
  */
-private fun timelineMonthLabel(startDateSeconds: Long, locale: Locale): String {
-    val zonedDateTime = TimelineDateCache.get(startDateSeconds)
-    val isCurrentYear = zonedDateTime.year == Year.now().value
+private fun timelineMonthLabel(
+    section: MediaTimelineSection,
+    sectionDateMapper: MediaTimelineSectionDateMapper,
+    locale: Locale,
+): String {
+    val date = sectionDateMapper(section)
+    val isCurrentYear = date.year == Year.now().value
     val skeleton = if (isCurrentYear) "LLLL" else "LLLL yyyy"
     val pattern = getBestDateTimePattern(locale, skeleton)
-    return DateTimeFormatter.ofPattern(pattern, locale).format(zonedDateTime)
+    return DateTimeFormatter.ofPattern(pattern, locale).format(date)
 }
 
 private const val DAY_RANGE_SEPARATOR = "—"

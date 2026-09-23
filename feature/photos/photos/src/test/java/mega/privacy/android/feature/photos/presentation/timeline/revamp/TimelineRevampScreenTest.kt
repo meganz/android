@@ -41,6 +41,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import java.util.TimeZone
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
@@ -54,6 +55,7 @@ class TimelineRevampScreenTest {
 
     private companion object {
         const val MAY_HEADER_CHECKBOX_TAG = "${TIMELINE_REVAMP_SECTION_HEADER_CHECKBOX_TAG}2026-5"
+        const val JANUARY_2000_HEADER_KEY = "2000-1"
     }
 
     @Test
@@ -615,6 +617,45 @@ class TimelineRevampScreenTest {
      * (ids 2 and 3), all loaded — May gets an inline month header, June is represented by the top
      * header.
      */
+    @Test
+    fun `test that a section is headed by its own month when the device zone has since changed offset`() {
+        val originalTimeZone = TimeZone.getDefault()
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Madrid"))
+        try {
+            composeRule.setScreen(uiState = newYear2000UiState())
+
+            composeRule
+                .onNodeWithTag("$TIMELINE_REVAMP_SECTION_HEADER_TAG$JANUARY_2000_HEADER_KEY")
+                .assertIsDisplayed()
+        } finally {
+            TimeZone.setDefault(originalTimeZone)
+        }
+    }
+
+    /**
+     * Madrid is CEST (+02:00) today, so the 2000-01-01 section comes back anchored at
+     * 1999-12-31 22:00 UTC. Read back through Madrid's January offset (+01:00) that instant is
+     * 1999-12-31 23:00, which would head the section with December 1999.
+     */
+    private fun newYear2000UiState() = TimelineRevampUiState.Data(
+        sections = listOf(
+            MediaTimelineSection(
+                groupId = "1999-12-30",
+                startDate = 946_508_400L,
+                endDate = 946_594_800L,
+                count = 1,
+            ),
+            MediaTimelineSection(
+                groupId = "2000-01-01",
+                startDate = 946_677_600L,
+                endDate = 946_764_000L,
+                count = 1,
+            ),
+        ),
+        sectionStartOffsets = listOf(0, 1),
+        loadedNodes = (0..1).associateWith { index -> photoNode(id = index + 1L) },
+    )
+
     private fun twoMonthsUiState(
         selection: TimelineSelection = TimelineSelection(),
     ) = TimelineRevampUiState.Data(

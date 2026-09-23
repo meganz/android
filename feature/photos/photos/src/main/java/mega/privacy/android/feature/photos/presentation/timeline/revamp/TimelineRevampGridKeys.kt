@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateCache
+import mega.privacy.android.domain.entity.media.MediaTimelineSection
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineSectionDateMapper
 
 /**
  * Encoding and decoding of the LazyGrid item keys used by the Timeline Revamp grid.
@@ -23,9 +24,12 @@ private const val MEDIA_KEY_PREFIX = "media_"
  */
 private const val MEDIA_KEY_SEPARATOR = "@"
 
-/** Stable `<year>-<month>` key/tag suffix for the month a section's start date falls in. */
-internal fun monthKey(startDateSeconds: Long): String {
-    val date = TimelineDateCache.get(startDateSeconds)
+/** Stable `<year>-<month>` key/tag suffix for the month a section falls in. */
+internal fun monthKey(
+    section: MediaTimelineSection,
+    sectionDateMapper: MediaTimelineSectionDateMapper,
+): String {
+    val date = sectionDateMapper(section)
     return "${date.year}-${date.monthValue}"
 }
 

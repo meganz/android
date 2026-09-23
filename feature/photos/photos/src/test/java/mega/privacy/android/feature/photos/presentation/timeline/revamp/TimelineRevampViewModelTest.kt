@@ -52,6 +52,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTime
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineSectionDateMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -136,6 +137,7 @@ internal class TimelineRevampViewModelTest {
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
             listMediaNodesByOffsetUseCase = listMediaNodesByOffsetUseCase,
             mediaTimelineNodeUiItemMapper = mediaTimelineNodeUiItemMapper,
+            mediaTimelineSectionDateMapper = MediaTimelineSectionDateMapper(),
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             monitorTimelineGridSizeUseCase = monitorTimelineGridSizeUseCase,
