@@ -36,7 +36,10 @@ import mega.privacy.android.feature.sync.ui.views.SyncSingleSelectOption
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
-/** A picker chip. [chosen] drives both the check mark and the selected styling. */
+/**
+ * A picker chip. [chosen] drives both the check mark and the selected styling; the chevron stays
+ * either way because the chip always reopens its picker.
+ */
 @Composable
 internal fun ExclusionPickerChip(
     @StringRes labelRes: Int,
@@ -58,6 +61,7 @@ internal fun ExclusionPickerChip(
         selected = chosen,
         text = stringResource(labelRes),
         leadingIcon = iconPackR.drawable.ic_check_medium_thin_outline.takeIf { chosen },
+        trailingIcon = iconPackR.drawable.ic_chevron_down_small_regular_outline,
         onClick = onClick,
     )
 }
@@ -79,7 +83,7 @@ internal fun ExclusionValueField(
     TextInputField(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(start = 16.dp, top = 8.dp, end = 16.dp),
         keyboardType = KeyboardType.Text,
         capitalization = KeyboardCapitalization.None,
         text = value,
@@ -97,7 +101,7 @@ internal fun ExclusionFormDescription(
     MegaText(
         modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         text = stringResource(textRes),
-        textColor = TextColor.Secondary,
+        textColor = TextColor.Primary,
         style = AppTheme.typography.bodyMedium,
     )
 }

@@ -49,7 +49,7 @@ internal fun EditExclusionScaffold(
             MegaTopAppBar(
                 modifier = Modifier.testTag(EDIT_EXCLUSION_TOP_BAR_TAG),
                 title = stringResource(sharedR.string.sync_exclusions_edit_title),
-                navigationType = AppBarNavigationType.Back(onDismiss),
+                navigationType = AppBarNavigationType.Close(onDismiss),
                 actions = listOf(CommonMenuAction.Delete),
                 onActionPressed = { onDelete() },
             )
@@ -59,7 +59,7 @@ internal fun EditExclusionScaffold(
                 modifier = Modifier.testTag(EDIT_EXCLUSION_BUTTON_GROUP_TAG),
                 buttonGroup = listOf(
                     {
-                        Button.TextOnlyButtonM3(
+                        Button.SecondaryButtonM3(
                             text = stringResource(sharedR.string.general_dialog_cancel_button),
                             onClick = onDismiss,
                         )

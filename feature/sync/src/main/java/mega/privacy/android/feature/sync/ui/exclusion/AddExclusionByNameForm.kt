@@ -78,12 +78,14 @@ internal fun AddExclusionByNameForm(
             }
         }
 
-        ExclusionValueField(
-            value = state.value,
-            errorText = state.errorRes?.let { stringResource(it) },
-            onValueChanged = onValueChanged,
-            modifier = Modifier.testTag(ADD_EXCLUSION_NAME_FIELD_TAG),
-        )
+        if (state.showsValueField) {
+            ExclusionValueField(
+                value = state.value,
+                errorText = state.errorRes?.let { stringResource(it) },
+                onValueChanged = onValueChanged,
+                modifier = Modifier.testTag(ADD_EXCLUSION_NAME_FIELD_TAG),
+            )
+        }
 
         if (state.showsWildcardHelper) {
             ExclusionFormHelperText(

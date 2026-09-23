@@ -95,4 +95,48 @@ internal class AddExclusionByNameFormStateTest {
 
         assertThat(underTest.showsConditionChip).isTrue()
     }
+
+    @Test
+    fun `test that showsValueField is false when no type is picked`() {
+        val underTest = AddExclusionByNameFormState()
+
+        assertThat(underTest.showsValueField).isFalse()
+    }
+
+    @Test
+    fun `test that showsValueField is false when only a type is picked`() {
+        val underTest = AddExclusionByNameFormState(typeOption = SyncExclusionTypeOption.Files)
+
+        assertThat(underTest.showsValueField).isFalse()
+    }
+
+    @Test
+    fun `test that showsValueField is true when a type and a condition are picked`() {
+        val underTest = AddExclusionByNameFormState(
+            typeOption = SyncExclusionTypeOption.Files,
+            condition = SyncExclusionCondition.BeginningWith,
+        )
+
+        assertThat(underTest.showsValueField).isTrue()
+    }
+
+    @Test
+    fun `test that showsValueField is false when a value is held without a condition`() {
+        val underTest = AddExclusionByNameFormState(
+            typeOption = SyncExclusionTypeOption.Files,
+            value = "draft",
+        )
+
+        assertThat(underTest.showsValueField).isFalse()
+    }
+
+    @Test
+    fun `test that showsValueField is true when a condition is held with no value`() {
+        val underTest = AddExclusionByNameFormState(
+            typeOption = SyncExclusionTypeOption.Files,
+            condition = SyncExclusionCondition.Containing,
+        )
+
+        assertThat(underTest.showsValueField).isTrue()
+    }
 }

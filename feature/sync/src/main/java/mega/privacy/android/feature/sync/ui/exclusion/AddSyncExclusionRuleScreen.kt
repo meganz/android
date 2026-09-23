@@ -12,9 +12,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
-import mega.android.core.ui.components.tabs.MegaFixedTabRow
+import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.Button
@@ -69,7 +70,7 @@ internal fun AddSyncExclusionRuleScreen(
                 modifier = Modifier.testTag(ADD_EXCLUSION_BUTTON_GROUP_TAG),
                 buttonGroup = listOf(
                     {
-                        Button.TextOnlyButtonM3(
+                        Button.SecondaryButtonM3(
                             text = stringResource(sharedR.string.general_dialog_cancel_button),
                             onClick = onDismiss,
                         )
@@ -90,7 +91,7 @@ internal fun AddSyncExclusionRuleScreen(
                     .fillMaxSize()
                     .padding(paddingValues),
             ) {
-                MegaFixedTabRow(
+                MegaScrollableTabRow(
                     modifier = Modifier.testTag(ADD_EXCLUSION_TAB_ROW_TAG),
                     tabIndex = uiState.selectedTab.ordinal,
                     items = AddExclusionTab.entries.map {
@@ -103,7 +104,8 @@ internal fun AddSyncExclusionRuleScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .verticalScroll(rememberScrollState()),
+                        .verticalScroll(rememberScrollState())
+                        .padding(top = 16.dp),
                 ) {
                     when (uiState.selectedTab) {
                         AddExclusionTab.ByName -> if (uiState.showsExtensionForm) {

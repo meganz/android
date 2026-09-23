@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.exclusion
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -80,7 +81,7 @@ internal fun ManageSyncExclusionsScreen(
             InlineAnchoredButtonGroup(
                 buttonGroup = listOf(
                     {
-                        Button.TextOnlyButtonM3(
+                        Button.SecondaryButtonM3(
                             text = stringResource(sharedR.string.sync_exclusions_manage_add),
                             onClick = onAddClicked,
                             enabled = uiState.canAddExclusion,
@@ -143,18 +144,22 @@ private fun ExclusionsList(
     modifier: Modifier = Modifier,
 ) {
     val sizeTexts = sizeRowTexts(size)
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(top = 8.dp),
+    ) {
         if (chips.isNotEmpty()) {
             item(key = SECTION_EXTENSIONS) {
                 ExclusionSectionHeader(
                     text = stringResource(sharedR.string.sync_exclusions_manage_section_extensions),
                 )
+                MegaDivider(dividerType = DividerType.FullSize)
             }
             item(key = CHIPS) {
                 FlowRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
@@ -165,7 +170,6 @@ private fun ExclusionsList(
                         )
                     }
                 }
-                MegaDivider(dividerType = DividerType.FullSize)
             }
         }
 
@@ -173,7 +177,9 @@ private fun ExclusionsList(
             item(key = SECTION_NAMES) {
                 ExclusionSectionHeader(
                     text = stringResource(sharedR.string.sync_exclusions_manage_section_names),
+                    modifier = Modifier.padding(top = sectionGap(chips.isNotEmpty())),
                 )
+                MegaDivider(dividerType = DividerType.FullSize)
             }
             // keyed by the rule's position in the file, which is unique even when two rules differ
             // only by whether they are enabled
@@ -192,7 +198,9 @@ private fun ExclusionsList(
             item(key = SECTION_SIZE) {
                 ExclusionSectionHeader(
                     text = stringResource(sharedR.string.sync_exclusions_manage_section_size),
+                    modifier = Modifier.padding(top = sectionGap(chips.isNotEmpty() || rows.isNotEmpty())),
                 )
+                MegaDivider(dividerType = DividerType.FullSize)
             }
             items(count = sizeTexts.size, key = { sizeTexts[it] }) { index ->
                 ExclusionSizeRow(text = sizeTexts[index], onClick = onSizeClicked)
@@ -201,6 +209,9 @@ private fun ExclusionsList(
         }
     }
 }
+
+private fun sectionGap(followsAnotherSection: Boolean) =
+    if (followsAnotherSection) 12.dp else 0.dp
 
 /**
  * The size bounds as the sentences the design draws.

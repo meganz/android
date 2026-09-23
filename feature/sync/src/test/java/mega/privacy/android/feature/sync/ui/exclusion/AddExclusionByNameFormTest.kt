@@ -255,4 +255,30 @@ internal class AddExclusionByNameFormTest {
 
         assertThat(enteredValues).containsExactly("draft.txt")
     }
+
+    @Test
+    fun `test that the name field is hidden when no type is picked`() {
+        setContent(AddExclusionByNameFormState())
+
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_NAME_FIELD_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the name field is hidden when only a type is picked`() {
+        setContent(AddExclusionByNameFormState(typeOption = SyncExclusionTypeOption.Files))
+
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_NAME_FIELD_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the name field is shown when a type and a condition are picked`() {
+        setContent(
+            AddExclusionByNameFormState(
+                typeOption = SyncExclusionTypeOption.Files,
+                condition = SyncExclusionCondition.BeginningWith,
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_EXCLUSION_NAME_FIELD_TAG).assertIsDisplayed()
+    }
 }

@@ -45,6 +45,7 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.components.card.RoundCard
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.android.core.ui.components.list.FlexibleLineListItem
@@ -400,26 +401,32 @@ internal fun SyncNewFolderScreenContent(
             )
 
             if (showExclusionsRow) {
-                FlexibleLineListItem(
-                    modifier = Modifier.testTag("settings_${SETTINGS_SYNC_NEW_FOLDER_EXCLUSIONS_KEY}:list_item"),
-                    minHeight = 58.dp,
-                    title = stringResource(sharedResR.string.sync_exclusions_manage_title),
-                    subtitle = stringResource(sharedResR.string.sync_exclusions_setup_subtitle),
-                    onClickListener = onManageExclusionsClicked,
-                    leadingElement = {
-                        MegaIcon(
-                            painter = painterResource(iconPackR.drawable.ic_filter_medium_thin_outline),
-                            tint = IconColor.Secondary,
-                        )
-                    },
-                    trailingElement = {
-                        MegaIcon(
-                            painter = painterResource(coreUiR.drawable.ic_chevron_right_medium_thin_outline),
-                            modifier = Modifier.testTag("settings_${SETTINGS_SYNC_NEW_FOLDER_EXCLUSIONS_KEY}:chevron"),
-                            tint = IconColor.Secondary,
-                        )
-                    },
-                )
+                RoundCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                ) {
+                    FlexibleLineListItem(
+                        modifier = Modifier.testTag("settings_${SETTINGS_SYNC_NEW_FOLDER_EXCLUSIONS_KEY}:list_item"),
+                        minHeight = 58.dp,
+                        title = stringResource(sharedResR.string.sync_exclusions_manage_title),
+                        subtitle = stringResource(sharedResR.string.sync_exclusions_setup_subtitle),
+                        onClickListener = onManageExclusionsClicked,
+                        leadingElement = {
+                            MegaIcon(
+                                painter = painterResource(iconPackR.drawable.ic_filter_medium_thin_outline),
+                                tint = IconColor.Secondary,
+                            )
+                        },
+                        trailingElement = {
+                            MegaIcon(
+                                painter = painterResource(coreUiR.drawable.ic_chevron_right_medium_thin_outline),
+                                modifier = Modifier.testTag("settings_${SETTINGS_SYNC_NEW_FOLDER_EXCLUSIONS_KEY}:chevron"),
+                                tint = IconColor.Secondary,
+                            )
+                        },
+                    )
+                }
             }
 
             Box(

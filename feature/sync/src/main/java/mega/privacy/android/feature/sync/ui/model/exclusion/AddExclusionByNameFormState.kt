@@ -41,6 +41,14 @@ internal data class AddExclusionByNameFormState(
     val showsWildcardHelper: Boolean
         get() = condition?.allowsWildcards == true && errorRes == null
 
+    /**
+     * A name means nothing until the condition applying it is picked. Tying the field to the
+     * condition alone, not to whether a value is held, keeps it from vanishing mid-edit when the
+     * last character is deleted.
+     */
+    val showsValueField: Boolean
+        get() = condition != null
+
     /** Extensions carry no condition, and nothing is matched before a type is picked. */
     val showsConditionChip: Boolean
         get() = typeOption != null && typeOption != SyncExclusionTypeOption.Extensions
