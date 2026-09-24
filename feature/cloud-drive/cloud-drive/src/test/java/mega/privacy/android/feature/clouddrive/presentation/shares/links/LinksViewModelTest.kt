@@ -22,8 +22,6 @@ import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
@@ -31,7 +29,8 @@ import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrd
 import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
 import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
 import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
-import mega.privacy.android.domain.usecase.node.publiclink.MonitorLinksUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.GetPublicLinksUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -59,7 +58,8 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
 class LinksViewModelTest {
-    private val monitorLinksUseCase: MonitorLinksUseCase = mock()
+    private val getPublicLinksUseCase: GetPublicLinksUseCase = mock()
+    private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase = mock()
@@ -83,7 +83,8 @@ class LinksViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
         reset(
-            monitorLinksUseCase,
+            getPublicLinksUseCase,
+            monitorNodeUpdatesByIdUseCase,
             setViewTypeUseCase,
             monitorViewTypeUseCase,
             monitorFolderViewTypeUseCase,
@@ -98,7 +99,8 @@ class LinksViewModelTest {
     }
 
     private fun createViewModel() = LinksViewModel(
-        monitorLinksUseCase = monitorLinksUseCase,
+        getPublicLinksUseCase = getPublicLinksUseCase,
+        monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
         monitorFolderViewTypeUseCase = monitorFolderViewTypeUseCase,
@@ -111,14 +113,17 @@ class LinksViewModelTest {
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
     )
 
-    private suspend fun setupTestData(items: List<PublicLinkNode>) {
+    private suspend fun setupTestData(items: List<TypedNode>) {
         whenever(monitorLinksSortOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
         whenever(monitorFolderViewTypeUseCase(any(), any()))
             .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
         whenever(monitorFolderSortOrderUseCase(any(), any()))
             .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
-        whenever(monitorLinksUseCase(anyOrNull())).thenReturn(flowOf(items))
+        whenever(getPublicLinksUseCase(anyOrNull())).thenReturn(items)
+        whenever(
+            monitorNodeUpdatesByIdUseCase(NodeId(-1L), NodeSourceType.LINKS)
+        ).thenReturn(flowOf())
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
@@ -162,11 +167,11 @@ class LinksViewModelTest {
 
     @Test
     fun `test that loadLinks populates items correctly`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
             on { name } doReturn "Test Node 1"
         }
-        val node2 = mock<PublicLinkFolder> {
+        val node2 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(2L)
             on { name } doReturn "Test Node 2"
         }
@@ -190,11 +195,11 @@ class LinksViewModelTest {
     @Test
     fun `test that ItemLongClicked action toggles item selection and updates items state`() =
         runTest {
-            val node1 = mock<PublicLinkFolder> {
+            val node1 = mock<TypedFolderNode> {
                 on { id } doReturn NodeId(1L)
                 on { name } doReturn "Test Node 1"
             }
-            val node2 = mock<PublicLinkFolder> {
+            val node2 = mock<TypedFolderNode> {
                 on { id } doReturn NodeId(2L)
                 on { name } doReturn "Test Node 2"
             }
@@ -218,11 +223,11 @@ class LinksViewModelTest {
 
     @Test
     fun `test that ItemClicked action in selection mode toggles item selection`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
             on { name } doReturn "Test Node 1"
         }
-        val node2 = mock<PublicLinkFolder> {
+        val node2 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(2L)
             on { name } doReturn "Test Node 2"
         }
@@ -288,10 +293,10 @@ class LinksViewModelTest {
 
     @Test
     fun `test that DeselectAllItems action deselects all items in state`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
-        val node2 = mock<PublicLinkFolder> {
+        val node2 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(2L)
         }
 
@@ -319,7 +324,7 @@ class LinksViewModelTest {
 
     @Test
     fun `test that DeselectAllItems action does nothing when no items are selected`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
 
@@ -339,10 +344,10 @@ class LinksViewModelTest {
 
     @Test
     fun `test that SelectAllItems selects all items`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
-        val node2 = mock<PublicLinkFolder> {
+        val node2 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(2L)
         }
 
@@ -385,7 +390,7 @@ class LinksViewModelTest {
     @Test
     fun `test that toggleItemSelection removes item from selection when already selected`() =
         runTest {
-            val node1 = mock<PublicLinkFolder> {
+            val node1 = mock<TypedFolderNode> {
                 on { id } doReturn NodeId(1L)
             }
 
@@ -411,7 +416,7 @@ class LinksViewModelTest {
 
     @Test
     fun `test that isInSelectionMode is true when items are selected`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
 
@@ -432,7 +437,7 @@ class LinksViewModelTest {
 
     @Test
     fun `test that isInSelectionMode is false when no items are selected`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
 
@@ -449,10 +454,10 @@ class LinksViewModelTest {
 
     @Test
     fun `test that multiple items can be selected`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
-        val node2 = mock<PublicLinkFolder> {
+        val node2 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(2L)
         }
 
@@ -634,10 +639,10 @@ class LinksViewModelTest {
 
     @Test
     fun `test that selectedItemsCount returns correct count`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
-        val node2 = mock<PublicLinkFolder> {
+        val node2 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(2L)
         }
 
@@ -684,7 +689,7 @@ class LinksViewModelTest {
 
     @Test
     fun `test that isEmpty returns false when items exist`() = runTest {
-        val node1 = mock<PublicLinkFolder> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
 
@@ -701,19 +706,11 @@ class LinksViewModelTest {
 
     @Test
     fun `test that selectedNodes returns correct nodes`() = runTest {
-        val typedFolderNode1 = mock<TypedFolderNode> {
+        val node1 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(1L)
         }
-        val typedFolderNode2 = mock<TypedFolderNode> {
+        val node2 = mock<TypedFolderNode> {
             on { id } doReturn NodeId(2L)
-        }
-        val node1 = mock<PublicLinkFolder> {
-            on { id } doReturn NodeId(1L)
-            on { node } doReturn typedFolderNode1
-        }
-        val node2 = mock<PublicLinkFolder> {
-            on { id } doReturn NodeId(2L)
-            on { node } doReturn typedFolderNode2
         }
 
         setupTestData(listOf(node1, node2))

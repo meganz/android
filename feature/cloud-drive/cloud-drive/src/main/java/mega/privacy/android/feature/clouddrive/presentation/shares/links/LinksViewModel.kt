@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -13,6 +14,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -24,7 +27,8 @@ import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrd
 import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
 import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
 import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
-import mega.privacy.android.domain.usecase.node.publiclink.MonitorLinksUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.GetPublicLinksUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -39,7 +43,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LinksViewModel @Inject constructor(
-    private val monitorLinksUseCase: MonitorLinksUseCase,
+    private val getPublicLinksUseCase: GetPublicLinksUseCase,
+    private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
     private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase,
@@ -57,7 +62,8 @@ class LinksViewModel @Inject constructor(
 
     init {
         monitorViewType()
-        monitorSortOrderAndLinks()
+        monitorSortOrder()
+        monitorNodeUpdates()
     }
 
     /**
@@ -76,7 +82,7 @@ class LinksViewModel @Inject constructor(
         }
     }
 
-    private fun monitorSortOrderAndLinks() {
+    private fun monitorSortOrder() {
         viewModelScope.launch {
             monitorFolderSortOrderUseCase(
                 folderKey = FolderPreferenceKeys.LINKS,
@@ -91,22 +97,38 @@ class LinksViewModel @Inject constructor(
                             selectedSortOrder = sortOrder,
                         )
                     }
-                    monitorLinksUseCase(sortOrder)
-                        .catch { Timber.e(it) }
-                        .collectLatest { nodes ->
-                            val nodeUiItems = nodeUiItemMapper(
-                                nodeList = nodes,
-                                existingItems = uiState.value.items,
-                                nodeSourceType = NodeSourceType.LINKS
-                            )
-                            _uiState.update { state ->
-                                state.copy(
-                                    items = nodeUiItems,
-                                    isLoading = false,
-                                )
-                            }
-                        }
+                    loadNodes(sortOrder)
                 }
+        }
+    }
+
+    private fun monitorNodeUpdates() {
+        viewModelScope.launch {
+            monitorNodeUpdatesByIdUseCase(
+                nodeId = NodeId(-1L),
+                nodeSourceType = NodeSourceType.LINKS,
+            )
+                .catch { Timber.e(it) }
+                .collectLatest { loadNodes(uiState.value.selectedSortOrder) }
+        }
+    }
+
+    private suspend fun loadNodes(sortOrder: SortOrder) {
+        runCatching {
+            val nodeUiItems = nodeUiItemMapper(
+                nodeList = getPublicLinksUseCase(sortOrder),
+                existingItems = uiState.value.items,
+                nodeSourceType = NodeSourceType.LINKS
+            )
+            _uiState.update { state ->
+                state.copy(
+                    items = nodeUiItems,
+                    isLoading = false,
+                )
+            }
+        }.onFailure {
+            if (it is CancellationException) throw it
+            Timber.e(it)
         }
     }
 
