@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.CameraUploadsTransferType
@@ -79,14 +80,24 @@ class CameraUploadsProgressViewModelTest {
     }
 
     @Test
-    fun `test that the initial uiState is default`() = runTest {
+    fun `test that the uiState is loading while no camera uploads status has arrived`() = runTest {
         underTest.uiState.test {
             val item = expectMostRecentItem()
-            assertThat(item.isLoading).isFalse()
+            assertThat(item.isLoading).isTrue()
             assertThat(item.transfers).isEmpty()
             assertThat(item.pendingCount).isEqualTo(0)
         }
     }
+
+    @Test
+    fun `test that the loading is true when the cu status info is Started with no transfers`() =
+        runTest {
+            cuStatusInfoFlow.value = CameraUploadsStatusInfo.Started
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isLoading).isTrue()
+            }
+        }
 
     @Test
     fun `test that the loading is true when the cu status info is CheckFilesForUpload with no transfers`() =
@@ -112,6 +123,48 @@ class CameraUploadsProgressViewModelTest {
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().pendingCount).isEqualTo(7)
+            }
+        }
+
+    @Test
+    fun `test that the loading is false when the cu status info is a finish with no transfers`() =
+        runTest {
+            cuStatusInfoFlow.value = CameraUploadsStatusInfo.Finished(
+                reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP
+            )
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isLoading).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the loading is false when the cu status info is a cancelled finish with transfers`() =
+        runTest {
+            val transfer = mock<InProgressTransfer.Upload> {
+                on { priority } doReturn BigInteger.ONE
+                on { state } doReturn TransferState.STATE_ACTIVE
+            }
+            cuInProgressTransferFlow.value = mapOf(1L to transfer)
+            cuStatusInfoFlow.value = CameraUploadsStatusInfo.Finished(
+                reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP
+            )
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isLoading).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the loading is false when the cu status info is a cancelled finish and camera uploads is disabled`() =
+        runTest {
+            cuStatusInfoFlow.value = CameraUploadsStatusInfo.Finished(
+                reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP
+            )
+            cuEnabledFlow.value = false
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isLoading).isFalse()
             }
         }
 

@@ -83,7 +83,12 @@ class CameraUploadsProgressViewModel @Inject constructor(
         val isLoading: Boolean
         var pendingCount = 0
         when (statusInfo) {
-            is CameraUploadsStatusInfo.CheckFilesForUpload -> {
+            // No status has arrived yet, or the run has only just started. There is no outcome to
+            // report, so the screen waits instead of rendering as if the run had already finished.
+            is CameraUploadsStatusInfo.Unknown,
+            is CameraUploadsStatusInfo.Started,
+            is CameraUploadsStatusInfo.CheckFilesForUpload,
+                -> {
                 isLoading = transfers.isEmpty()
             }
 
