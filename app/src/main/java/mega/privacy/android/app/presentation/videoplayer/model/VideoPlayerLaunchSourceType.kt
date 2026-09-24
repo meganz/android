@@ -75,9 +75,15 @@ enum class VideoPlayerLaunchSourceType {
     VideoBrowse,
 
     /**
+     * No launch source was supplied — the caller passed the `INVALID_VALUE` sentinel, or no
+     * launch source reached the route at all. This is the only value that rejects a launch.
+     */
+    Invalid,
+
+    /**
      * An adapter type this player does not recognise. Such launches are still allowed through and
-     * fall back to the general-source path, matching the previous behaviour — only the explicit
-     * `INVALID_VALUE` sentinel rejects a launch.
+     * fall back to the general-source path, matching the previous behaviour — unlike [Invalid],
+     * which means no source was supplied in the first place.
      */
     Unknown,
 }

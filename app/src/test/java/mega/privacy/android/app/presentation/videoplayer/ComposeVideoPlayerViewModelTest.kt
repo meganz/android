@@ -33,13 +33,16 @@ import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSource
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSourceType
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
+import mega.privacy.android.app.presentation.videoplayer.model.toVideoPlayerLaunchSourceType
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -358,7 +361,7 @@ class ComposeVideoPlayerViewModelTest {
         testArgs = ComposeVideoPlayerViewModel.Args(
             fileLinkUrl = null,
             localFilePath = null,
-            adapterType = INVALID_VALUE,
+            sourceType = VideoPlayerLaunchSourceType.Invalid,
             handle = INVALID_HANDLE,
             fileName = "",
             collectionTitle = null,
@@ -555,7 +558,9 @@ class ComposeVideoPlayerViewModelTest {
             whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)).thenReturn(it)
         }
         launchSource?.let {
-            testArgs = testArgs.copy(adapterType = launchSource)
+            testArgs = testArgs.copy(sourceType = it.toVideoPlayerLaunchSourceType())
+            whenever(intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE))
+                .thenReturn(it)
         }
         whenever(intent.data).thenReturn(data)
         handle?.let {
@@ -572,6 +577,24 @@ class ComposeVideoPlayerViewModelTest {
                 intent = intent,
                 rebuildPlaylist = true,
                 launchSource = INVALID_VALUE
+            )
+            underTest.initVideoPlayerData(intent.toVideoPlayerLaunchSource())
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that retryFailedEvent is triggered when the launch source is the invalid sentinel`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = INVALID_VALUE,
+                data = mock(),
+                handle = 123456,
+                fileName = "test.mp4"
             )
             underTest.initVideoPlayerData(intent.toVideoPlayerLaunchSource())
             underTest.uiState.test {
@@ -2316,7 +2339,7 @@ class ComposeVideoPlayerViewModelTest {
     fun `test that isShowSubtitleIcon returns correctly`(
         launchSource: Int,
     ) = runTest {
-        testArgs = testArgs.copy(adapterType = launchSource)
+        testArgs = testArgs.copy(sourceType = launchSource.toVideoPlayerLaunchSourceType())
         initViewModel()
         val actual = underTest.isShowSubtitleIcon()
         assertThat(actual).isEqualTo(launchSource != OFFLINE_ADAPTER)
@@ -2755,7 +2778,7 @@ class ComposeVideoPlayerViewModelTest {
         adapterType: Int,
         expected: NodeSourceType,
     ) = runTest {
-        testArgs = testArgs.copy(adapterType = adapterType)
+        testArgs = testArgs.copy(sourceType = adapterType.toVideoPlayerLaunchSourceType())
         initViewModel()
         assertThat(underTest.uiState.value.nodeSourceType).isEqualTo(expected)
     }

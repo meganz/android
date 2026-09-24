@@ -11,8 +11,8 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.videoplayer.ComposeVideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerLaunchSourceHolder
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSourceType
 import mega.privacy.android.app.presentation.videoplayer.view.ComposeVideoPlayerRoute
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
@@ -49,7 +49,8 @@ internal fun EntryProviderScope<NavKey>.composeVideoPlayerScreen(
                         args = ComposeVideoPlayerViewModel.Args(
                             fileLinkUrl = source?.fileLinkUrl,
                             localFilePath = source?.localFilePath,
-                            adapterType = source?.adapterType ?: INVALID_VALUE,
+                            sourceType = source?.sourceType
+                                ?: VideoPlayerLaunchSourceType.Invalid,
                             handle = source?.handle ?: INVALID_HANDLE,
                             fileName = source?.fileName.orEmpty(),
                             collectionTitle = source?.collectionTitle,

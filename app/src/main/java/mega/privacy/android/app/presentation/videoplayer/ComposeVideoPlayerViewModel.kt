@@ -307,7 +307,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     init {
         uiState.update {
             it.copy(
-                nodeSourceType = adapterTypeToNodeSourceType(),
+                nodeSourceType = launchSourceToNodeSourceType(),
             )
         }
         setupTransferListener()
@@ -360,7 +360,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun adapterTypeToNodeSourceType(): NodeSourceType =
+    private fun launchSourceToNodeSourceType(): NodeSourceType =
         when (args.sourceType) {
             VideoPlayerLaunchSourceType.Offline -> NodeSourceType.OFFLINE
             VideoPlayerLaunchSourceType.RubbishBin -> NodeSourceType.RUBBISH_BIN
@@ -387,6 +387,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             VideoPlayerLaunchSourceType.Search,
             VideoPlayerLaunchSourceType.VideoBrowse,
             VideoPlayerLaunchSourceType.Unknown,
+            VideoPlayerLaunchSourceType.Invalid,
                 -> NodeSourceType.MEDIA_PLAYER_DEFAULT
         }
 
@@ -563,10 +564,9 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 false
             }
 
-            // Deliberately the raw sentinel, not sourceType: INVALID_VALUE means "no launch source
-            // was supplied", whereas Unknown also covers values this player does not recognise,
-            // which are allowed through to the general-source path.
-            source.adapterType == INVALID_VALUE -> {
+            // Invalid only, not Unknown: an unrecognised adapter type is still a permitted launch
+            // and falls through to the general-source path.
+            source.sourceType == VideoPlayerLaunchSourceType.Invalid -> {
                 logInvalidParam("Launch source is invalid")
                 false
             }
@@ -969,10 +969,12 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 }
             }
 
-            // Offline and Zip never reach here — handlePlaybackSourceByLaunchSource routes them
-            // to their own handlers. The rest open a single item with no queue around it.
+            // Three of these never reach here: handlePlaybackSourceByLaunchSource routes Offline
+            // and Zip to their own handlers, and validateLaunchSource rejects Invalid before
+            // playback starts. The rest open a single item with no queue around it.
             VideoPlayerLaunchSourceType.Offline,
             VideoPlayerLaunchSourceType.Zip,
+            VideoPlayerLaunchSourceType.Invalid,
             VideoPlayerLaunchSourceType.Chat,
             VideoPlayerLaunchSourceType.FileLink,
             VideoPlayerLaunchSourceType.Versions,
@@ -2096,17 +2098,11 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     data class Args(
         val fileLinkUrl: String?,
         val localFilePath: String?,
-        val adapterType: Int,
+        val sourceType: VideoPlayerLaunchSourceType,
         val handle: Long,
         val fileName: String,
         val collectionTitle: String?,
         val collectionId: Long?,
-    ) {
-        /**
-         * @see VideoPlayerLaunchSource.sourceType for why this is computed rather than stored.
-         */
-        val sourceType: VideoPlayerLaunchSourceType
-            get() = adapterType.toVideoPlayerLaunchSourceType()
-    }
+    )
 }
 

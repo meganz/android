@@ -6,6 +6,7 @@ import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
@@ -31,13 +32,15 @@ import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADA
  * - 2035 is read as `VERSIONS_ADAPTER`, not `VIDEO_PLAYLISTS_ADAPTER`
  * - 2036 is read as `FROM_IMAGE_VIEWER`, not `VIDEO_RECENTLY_WATCHED_ADAPTER`
  *
- * Anything unrecognised becomes [VideoPlayerLaunchSourceType.Unknown]. That is *not* the same as
- * an invalid launch: only the explicit `INVALID_VALUE` sentinel rejects one, while an unrecognised
- * value has always been allowed through to the general-source path. See
- * [VideoPlayerLaunchSourceType.Unknown].
+ * The `INVALID_VALUE` sentinel becomes [VideoPlayerLaunchSourceType.Invalid], which is the only
+ * value that rejects a launch. Anything else unrecognised becomes
+ * [VideoPlayerLaunchSourceType.Unknown] and is allowed through to the general-source path, as it
+ * always has been. Keeping the two apart is what lets callers drop the raw integer: an
+ * unstubbed `Intent.getIntExtra` returns `0`, which must stay a permitted launch.
  */
 internal fun Int.toVideoPlayerLaunchSourceType(): VideoPlayerLaunchSourceType =
     when (this) {
+        INVALID_VALUE -> VideoPlayerLaunchSourceType.Invalid
         OFFLINE_ADAPTER -> VideoPlayerLaunchSourceType.Offline
         ZIP_ADAPTER -> VideoPlayerLaunchSourceType.Zip
         FILE_BROWSER_ADAPTER -> VideoPlayerLaunchSourceType.FileBrowser

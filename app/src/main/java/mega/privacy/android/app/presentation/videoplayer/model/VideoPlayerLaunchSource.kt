@@ -10,7 +10,7 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
  * @property contentUri URI of the first item to play (was `intent.data`).
  * @property handle handle of the first playing video.
  * @property fileName file name of the first playing video.
- * @property adapterType launch source (see `NodeSourceTypeInt` / `Constants` adapter types).
+ * @property sourceType what the player was launched from.
  * @property isPlaylist whether a playlist/queue should be built around the first item.
  * @property rebuildPlaylist whether the playlist should be rebuilt.
  * @property needStopHttpServer whether the streaming server should be stopped on close.
@@ -31,7 +31,7 @@ data class VideoPlayerLaunchSource(
     val contentUri: Uri?,
     val handle: Long,
     val fileName: String?,
-    val adapterType: Int,
+    val sourceType: VideoPlayerLaunchSourceType,
     val isPlaylist: Boolean = true,
     val rebuildPlaylist: Boolean = true,
     val needStopHttpServer: Boolean = false,
@@ -47,17 +47,4 @@ data class VideoPlayerLaunchSource(
     val localFilePath: String? = null,
     val collectionTitle: String? = null,
     val collectionId: Long? = null,
-) {
-    /**
-     * [adapterType] resolved to a named source. Match on this rather than on the raw integer.
-     *
-     * Computed rather than stored so it can never drift from [adapterType] — a stored
-     * property would survive `copy(adapterType = ...)` unchanged and silently describe the
-     * wrong source.
-     *
-     * The mapping lives in [toVideoPlayerLaunchSourceType] so that both this model and the Intent
-     * bridge depend on it, rather than on each other.
-     */
-    val sourceType: VideoPlayerLaunchSourceType
-        get() = adapterType.toVideoPlayerLaunchSourceType()
-}
+)

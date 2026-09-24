@@ -62,12 +62,13 @@ class VideoPlayerLaunchSourceTypeMapperTest {
     }
 
     @Test
-    fun `test that the invalid sentinel maps to Unknown`() {
-        assertThat(Constants.INVALID_VALUE.toVideoPlayerLaunchSourceType())
+    fun `test that an unstubbed intent extra maps to Unknown rather than Invalid`() {
+        assertThat(0.toVideoPlayerLaunchSourceType())
             .isEqualTo(VideoPlayerLaunchSourceType.Unknown)
     }
 
     private fun provideAdapterTypes(): Stream<Arguments> = Stream.of(
+        Arguments.of(Constants.INVALID_VALUE, VideoPlayerLaunchSourceType.Invalid),
         Arguments.of(Constants.OFFLINE_ADAPTER, VideoPlayerLaunchSourceType.Offline),
         Arguments.of(Constants.ZIP_ADAPTER, VideoPlayerLaunchSourceType.Zip),
         Arguments.of(
@@ -104,7 +105,6 @@ class VideoPlayerLaunchSourceTypeMapperTest {
         // 0 is what a mocked Intent returns for an unstubbed getIntExtra, and it must not be
         // mistaken for a real source.
         Arguments.of(0),
-        Arguments.of(Constants.INVALID_VALUE),
         Arguments.of(Int.MAX_VALUE),
         Arguments.of(NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER),
     )

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.videoplayer
 import android.content.Intent
 import android.os.Build
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSource
+import mega.privacy.android.app.presentation.videoplayer.model.toVideoPlayerLaunchSourceType
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -37,7 +38,8 @@ internal fun Intent.toVideoPlayerLaunchSource(): VideoPlayerLaunchSource =
         contentUri = data,
         handle = getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE),
         fileName = getStringExtra(INTENT_EXTRA_KEY_FILE_NAME),
-        adapterType = getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE),
+        sourceType = getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+            .toVideoPlayerLaunchSourceType(),
         isPlaylist = getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true),
         rebuildPlaylist = getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true),
         needStopHttpServer = getBooleanExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false),
