@@ -34,6 +34,7 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
 
     implementation(project(":domain"))
+    implementation(project(":domain:account"))
     implementation(project(":data"))
     implementation(project(":navigation"))
     implementation(project(":core:formatter"))

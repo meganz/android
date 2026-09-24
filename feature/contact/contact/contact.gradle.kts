@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":core:coroutine"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":domain:account"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":shared:contact"))

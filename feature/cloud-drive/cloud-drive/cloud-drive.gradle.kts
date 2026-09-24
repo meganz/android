@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":core:coroutine"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":domain:account"))
     implementation(project(":feature:sync"))
     implementation(project(":shared:sync"))
     implementation(lib.mega.core.ui)

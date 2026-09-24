@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
     implementation(project(":domain"))
+    implementation(project(":domain:account"))
     implementation(project(":navigation"))
     implementation(project(":data"))
     implementation(project(":resources:string-resources"))

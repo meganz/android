@@ -227,6 +227,7 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))
+    implementation(project(":domain:account"))
     implementation(project(":domain:photos"))
     implementation(project(":domain:mediaplayer"))
     implementation(project(":domain:camerauploads"))

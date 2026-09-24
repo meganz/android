@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":domain:account"))
     implementation(project(":data"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)

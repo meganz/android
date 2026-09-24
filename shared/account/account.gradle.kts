@@ -23,6 +23,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":domain"))
+    implementation(project(":domain:account"))
     implementation(project(":data"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))
