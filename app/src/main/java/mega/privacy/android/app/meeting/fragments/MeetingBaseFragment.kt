@@ -6,7 +6,9 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
@@ -134,14 +136,12 @@ open class MeetingBaseFragment : Fragment() {
      * Then continue permission check without education dialog
      */
     protected fun showPermissionsEducation() {
-        val sp = requireActivity().getSharedPreferences(MEETINGS_PREFERENCE, Context.MODE_PRIVATE)
-        val showEducation = sp.getBoolean(KEY_SHOW_EDUCATION, true)
-        if (showEducation) {
-            sp.edit()
-                .putBoolean(KEY_SHOW_EDUCATION, false).apply()
-            showPermissionsEducation(requireActivity()) { permissionsRequester.launch(false) }
-        } else {
-            permissionsRequester.launch(false)
+        lifecycleScope.launch {
+            if (sharedModel.shouldShowPermissionsEducation()) {
+                showPermissionsEducation(requireActivity()) { permissionsRequester.launch(false) }
+            } else {
+                permissionsRequester.launch(false)
+            }
         }
     }
 
@@ -289,13 +289,5 @@ open class MeetingBaseFragment : Fragment() {
             }
             i++
         }
-    }
-
-    companion object {
-        // The name of the preference to retrieve.
-        protected const val KEY_SHOW_EDUCATION = "show_education"
-
-        // SharedPreference file name
-        protected const val MEETINGS_PREFERENCE = "meeting_preference"
     }
 }

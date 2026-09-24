@@ -18,6 +18,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -156,6 +157,33 @@ class PermissionRepositoryTest {
             awaitComplete()
         }
     }
+
+    @Test
+    fun `test that setMeetingPermissionsEducationShown marks the education as shown in the gateway`() =
+        runTest {
+            permissionRepository.setMeetingPermissionsEducationShown()
+
+            verify(uiPreferencesGateway).setMeetingPermissionsEducationShown()
+        }
+
+    @ParameterizedTest(name = "stored value: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isMeetingPermissionsEducationShown returns the stored value`(stored: Boolean) =
+        runTest {
+            whenever(uiPreferencesGateway.monitorMeetingPermissionsEducationShown())
+                .thenReturn(flowOf(stored))
+
+            assertThat(permissionRepository.isMeetingPermissionsEducationShown()).isEqualTo(stored)
+        }
+
+    @Test
+    fun `test that isMeetingPermissionsEducationShown returns false when nothing is stored`() =
+        runTest {
+            whenever(uiPreferencesGateway.monitorMeetingPermissionsEducationShown())
+                .thenReturn(flowOf(null))
+
+            assertThat(permissionRepository.isMeetingPermissionsEducationShown()).isFalse()
+        }
 
     @Test
     fun `test hasNotificationPermission returns true when permission is granted on TIRAMISU+`() {

@@ -106,12 +106,14 @@ import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseC
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
+import mega.privacy.android.domain.usecase.meeting.IsMeetingPermissionsEducationShownUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorAudioOutputUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MuteAllPeersUseCase
 import mega.privacy.android.domain.usecase.meeting.MutePeersUseCase
+import mega.privacy.android.domain.usecase.meeting.SetMeetingPermissionsEducationShownUseCase
 import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -168,6 +170,8 @@ import javax.inject.Inject
  * @property getStringFromStringResMapper                   [GetStringFromStringResMapper]
  * @property getCurrentSubscriptionPlanUseCase              [GetCurrentSubscriptionPlanUseCase]
  * @property monitorAudioOutputUseCase                      [MonitorAudioOutputUseCase]
+ * @property isMeetingPermissionsEducationShownUseCase       [IsMeetingPermissionsEducationShownUseCase]
+ * @property setMeetingPermissionsEducationShownUseCase      [SetMeetingPermissionsEducationShownUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -223,6 +227,8 @@ class MeetingActivityViewModel @Inject constructor(
     private val startCallUseCase: StartCallUseCase,
     private val monitorAudioOutputUseCase: MonitorAudioOutputUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
+    private val isMeetingPermissionsEducationShownUseCase: IsMeetingPermissionsEducationShownUseCase,
+    private val setMeetingPermissionsEducationShownUseCase: SetMeetingPermissionsEducationShownUseCase,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
@@ -1644,6 +1650,23 @@ class MeetingActivityViewModel @Inject constructor(
             return
 
         _recordAudioGranted.value = recordAudioPermission
+    }
+
+    /**
+     * Check whether the permissions education dialog should be shown and mark it as shown
+     * so that it is only displayed the first time.
+     *
+     * @return true if the dialog has not been shown before
+     */
+    suspend fun shouldShowPermissionsEducation(): Boolean {
+        val alreadyShown = runCatching { isMeetingPermissionsEducationShownUseCase() }
+            .onFailure { Timber.e(it) }
+            .getOrDefault(false)
+        if (!alreadyShown) {
+            runCatching { setMeetingPermissionsEducationShownUseCase() }
+                .onFailure { Timber.e(it) }
+        }
+        return !alreadyShown
     }
 
     /**

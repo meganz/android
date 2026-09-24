@@ -45,6 +45,18 @@ interface PermissionRepository {
     suspend fun monitorNotificationPermissionShownTimestamp(): Flow<Long?>
 
     /**
+     * Set the meeting permissions education dialog as shown
+     */
+    suspend fun setMeetingPermissionsEducationShown()
+
+    /**
+     * Check whether the meeting permissions education dialog has been shown
+     *
+     * @return true if it has already been shown, false otherwise
+     */
+    suspend fun isMeetingPermissionsEducationShown(): Boolean
+
+    /**
      * Has CU permission
      */
     fun hasCameraUploadsPermission(): Boolean

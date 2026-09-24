@@ -67,12 +67,14 @@ import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseC
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
+import mega.privacy.android.domain.usecase.meeting.IsMeetingPermissionsEducationShownUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorAudioOutputUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MuteAllPeersUseCase
 import mega.privacy.android.domain.usecase.meeting.MutePeersUseCase
+import mega.privacy.android.domain.usecase.meeting.SetMeetingPermissionsEducationShownUseCase
 import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -154,6 +156,10 @@ class MeetingActivityViewModelTest {
     private val createMeetingUseCase: CreateMeetingUseCase = mock()
     private val startCallUseCase: StartCallUseCase = mock()
     private val getUserAvatarUseCase: GetUserAvatarUseCase = mock()
+    private val isMeetingPermissionsEducationShownUseCase: IsMeetingPermissionsEducationShownUseCase =
+        mock()
+    private val setMeetingPermissionsEducationShownUseCase: SetMeetingPermissionsEducationShownUseCase =
+        mock()
 
     private val context: Context = mock()
 
@@ -213,6 +219,8 @@ class MeetingActivityViewModelTest {
             enableOrDisableAudioUseCase,
             enableOrDisableVideoUseCase,
             monitorAudioOutputUseCase,
+            isMeetingPermissionsEducationShownUseCase,
+            setMeetingPermissionsEducationShownUseCase,
             savedStateHandle,
         )
         wheneverBlocking { monitorChatConnectionStateUseCase() } doReturn emptyFlow()
@@ -289,12 +297,46 @@ class MeetingActivityViewModelTest {
             getUserAvatarUseCase = getUserAvatarUseCase,
             megaChatRequestHandler = mock(),
             megaChatApi = mock(),
+            isMeetingPermissionsEducationShownUseCase = isMeetingPermissionsEducationShownUseCase,
+            setMeetingPermissionsEducationShownUseCase = setMeetingPermissionsEducationShownUseCase,
         )
     }
 
     private fun stubCommon() {
         whenever(savedStateHandle.get<Long>(MeetingActivity.MEETING_CHAT_ID)).thenReturn(chatId)
     }
+
+    @Test
+    fun `test that shouldShowPermissionsEducation returns true and marks the education as shown when it has not been shown`() =
+        runTest {
+            whenever(isMeetingPermissionsEducationShownUseCase()).thenReturn(false)
+
+            initUnderTest()
+
+            assertThat(underTest.shouldShowPermissionsEducation()).isTrue()
+            verify(setMeetingPermissionsEducationShownUseCase).invoke()
+        }
+
+    @Test
+    fun `test that shouldShowPermissionsEducation returns false and does not update the preference when it has already been shown`() =
+        runTest {
+            whenever(isMeetingPermissionsEducationShownUseCase()).thenReturn(true)
+
+            initUnderTest()
+
+            assertThat(underTest.shouldShowPermissionsEducation()).isFalse()
+            verifyNoInteractions(setMeetingPermissionsEducationShownUseCase)
+        }
+
+    @Test
+    fun `test that shouldShowPermissionsEducation returns true when reading the preference fails`() =
+        runTest {
+            whenever(isMeetingPermissionsEducationShownUseCase()).thenThrow(RuntimeException())
+
+            initUnderTest()
+
+            assertThat(underTest.shouldShowPermissionsEducation()).isTrue()
+        }
 
     @ParameterizedTest
     @EnumSource(ChatConnectionStatus::class)

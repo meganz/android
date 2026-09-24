@@ -41,6 +41,8 @@ private const val LAST_VERSION_NEW_FEATURE_SHOWN = "LAST_VERSION_NEW_FEATURE_SHO
 private const val SERIALISED_NAVIGATION_ITEMS_PREFERENCE =
     "SERIALISED_NAVIGATION_ITEMS_PREFERENCE"
 private const val CUSTOMISE_NAVIGATION_TOOLTIP_SHOWN = "CUSTOMISE_NAVIGATION_TOOLTIP_SHOWN"
+private const val MEETING_PREFERENCES = "meeting_preference"
+private const val SHOW_MEETING_PERMISSIONS_EDUCATION = "show_education"
 
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
@@ -54,6 +56,11 @@ private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferences
                     PREFERRED_START_SCREEN,
                     HIDE_RECENT_ACTIVITY,
                 )
+            ),
+            SharedPreferencesMigration(
+                context = it,
+                sharedPreferencesName = MEETING_PREFERENCES,
+                keysToMigrate = setOf(SHOW_MEETING_PERMISSIONS_EDUCATION),
             ),
         )
     })
@@ -243,6 +250,17 @@ internal class UIPreferencesDatastore @Inject constructor(
         context.uiPreferenceDataStore.monitor(
             booleanPreferencesKey(CUSTOMISE_NAVIGATION_TOOLTIP_SHOWN)
         )
+
+    override suspend fun setMeetingPermissionsEducationShown() {
+        context.uiPreferenceDataStore.edit {
+            it[booleanPreferencesKey(SHOW_MEETING_PERMISSIONS_EDUCATION)] = false
+        }
+    }
+
+    override fun monitorMeetingPermissionsEducationShown() =
+        context.uiPreferenceDataStore.monitor(
+            booleanPreferencesKey(SHOW_MEETING_PERMISSIONS_EDUCATION)
+        ).map { showEducation -> showEducation?.not() }
 
     override fun monitorLastVersionNewFeatureShownPreference() =
         context.uiPreferenceDataStore.monitor(

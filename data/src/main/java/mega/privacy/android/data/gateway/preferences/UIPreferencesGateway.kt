@@ -249,4 +249,16 @@ interface UIPreferencesGateway {
      * @param value
      */
     suspend fun setLastVersionNewFeatureShownPreference(value: String)
+
+    /**
+     * Set the meeting permissions education dialog as shown
+     */
+    suspend fun setMeetingPermissionsEducationShown()
+
+    /**
+     * Monitor whether the meeting permissions education dialog has been shown
+     *
+     * @return true if the dialog has been shown, null if not set
+     */
+    fun monitorMeetingPermissionsEducationShown(): Flow<Boolean?>
 }

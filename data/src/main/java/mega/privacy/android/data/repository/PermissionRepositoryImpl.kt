@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import android.os.Environment
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.PermissionGateway
@@ -65,6 +66,14 @@ internal class PermissionRepositoryImpl @Inject constructor(
         uiPreferencesGateway
             .monitorNotificationPermissionShownTimestamp()
             .flowOn(ioDispatcher)
+
+    override suspend fun setMeetingPermissionsEducationShown() = withContext(ioDispatcher) {
+        uiPreferencesGateway.setMeetingPermissionsEducationShown()
+    }
+
+    override suspend fun isMeetingPermissionsEducationShown() = withContext(ioDispatcher) {
+        uiPreferencesGateway.monitorMeetingPermissionsEducationShown().firstOrNull() ?: false
+    }
 
     override fun hasCameraUploadsPermission(): Boolean {
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
