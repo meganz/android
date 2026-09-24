@@ -161,7 +161,7 @@ buildCache {
     }
 
     remote<HttpBuildCache> {
-        url = uri(System.getenv()["GRADLE_CACHE_URL"].orEmpty())
+        System.getenv("GRADLE_CACHE_URL")?.takeIf { it.isNotBlank() }?.let { url = uri(it) }
         credentials {
             username = System.getenv()["GRADLE_CACHE_USER"]
             password = System.getenv()["GRADLE_CACHE_TOKEN"]
