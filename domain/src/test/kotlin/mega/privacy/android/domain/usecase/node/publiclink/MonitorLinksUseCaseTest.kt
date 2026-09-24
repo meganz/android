@@ -15,9 +15,10 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -34,8 +35,8 @@ internal class MonitorLinksUseCaseTest {
     private lateinit var underTest: MonitorLinksUseCase
 
     private val shareRepository = mock<ShareRepository>()
-    private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase> {
-        on { invoke(any()) }.thenReturn(mock<PublicLinkFolder>())
+    private val addNodeType = mock<AddNodeType> {
+        onBlocking { invoke(any()) }.thenReturn(mock<TypedFolderNode>())
     }
     private val nodeRepository = mock<NodeRepository> {
         on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
@@ -46,7 +47,7 @@ internal class MonitorLinksUseCaseTest {
     internal fun setUp() {
         underTest = MonitorLinksUseCase(
             shareRepository = shareRepository,
-            mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
+            addNodeType = addNodeType,
             nodeRepository = nodeRepository,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase
         )
@@ -56,15 +57,15 @@ internal class MonitorLinksUseCaseTest {
     internal fun resetMocks() {
         reset(
             shareRepository,
-            mapNodeToPublicLinkUseCase,
+            addNodeType,
             nodeRepository,
             monitorOfflineNodeUpdatesUseCase
         )
         nodeRepository.stub {
             on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
         }
-        mapNodeToPublicLinkUseCase.stub {
-            on { invoke(any()) }.thenReturn(mock<PublicLinkFolder>())
+        addNodeType.stub {
+            onBlocking { invoke(any()) }.thenReturn(mock<TypedFolderNode>())
         }
     }
 

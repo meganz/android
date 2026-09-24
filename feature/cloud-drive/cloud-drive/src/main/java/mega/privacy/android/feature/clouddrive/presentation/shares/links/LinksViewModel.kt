@@ -17,7 +17,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
@@ -120,14 +119,6 @@ class LinksViewModel @Inject constructor(
             return
         }
         when (val item = nodeUiItem.node) {
-            is PublicLinkFile -> {
-                _uiState.update { state ->
-                    state.copy(
-                        openedFileNode = item.node
-                    )
-                }
-            }
-
             is TypedFileNode -> {
                 _uiState.update { state ->
                     state.copy(

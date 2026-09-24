@@ -8,8 +8,6 @@ import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
@@ -50,15 +48,5 @@ data class LinksUiState(
      * Returns a list of selected nodes.
      */
     val selectedNodes: List<TypedNode>
-        get() = items.mapNotNull { item ->
-            if (item.isSelected) {
-                when (val node = item.node) {
-                    is PublicLinkFolder -> node.node
-                    is PublicLinkFile -> node.node
-                    else -> node
-                }
-            } else {
-                null
-            }
-        }
+        get() = items.mapNotNull { if (it.isSelected) it.node else null }
 }
