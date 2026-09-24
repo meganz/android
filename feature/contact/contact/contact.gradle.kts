@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":domain"))
     implementation(project(":domain:account"))
+    implementation(project(":domain:contact"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":shared:contact"))
