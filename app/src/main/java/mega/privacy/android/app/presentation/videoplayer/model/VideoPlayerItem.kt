@@ -1,9 +1,8 @@
 package mega.privacy.android.app.presentation.videoplayer.model
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
-import java.io.File
+import mega.privacy.android.icon.pack.R as iconPackR
 
 
 /**
@@ -14,7 +13,6 @@ import java.io.File
  * @property icon the icon of play list item
  * @property nodeHandle node handle
  * @property nodeName node name
- * @property thumbnail thumbnail file path, null if not available
  * @property type item type
  * @property size size of the node
  * @property duration the duration of media item
@@ -25,7 +23,6 @@ data class VideoPlayerItem(
     @DrawableRes val icon: Int = iconPackR.drawable.ic_video_medium_solid,
     val nodeHandle: Long,
     val nodeName: String,
-    val thumbnail: File? = null,
     val type: MediaQueueItemType,
     val size: Long,
     val duration: String,

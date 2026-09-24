@@ -136,7 +136,6 @@ import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
@@ -224,7 +223,6 @@ class ComposeVideoPlayerViewModelTest {
         mock<GetVideosByParentHandleFromMegaApiFolderUseCase>()
     private val monitorSubFolderMediaDiscoverySettingsUseCase =
         mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
-    private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val httpServerIsRunningUseCase = mock<HttpServerIsRunningUseCase>()
     private val httpServerStartUseCase = mock<HttpServerStartUseCase>()
     private val httpServerStopUseCase = mock<HttpServerStopUseCase>()
@@ -312,7 +310,6 @@ class ComposeVideoPlayerViewModelTest {
             getParentNodeFromMegaApiFolderUseCase = getParentNodeFromMegaApiFolderUseCase,
             getVideosByParentHandleFromMegaApiFolderUseCase = getVideosByParentHandleFromMegaApiFolderUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase = monitorSubFolderMediaDiscoverySettingsUseCase,
-            getThumbnailUseCase = getThumbnailUseCase,
             httpServerIsRunningUseCase = httpServerIsRunningUseCase,
             httpServerStartUseCase = httpServerStartUseCase,
             httpServerStopUseCase = httpServerStopUseCase,
@@ -404,7 +401,6 @@ class ComposeVideoPlayerViewModelTest {
             getParentNodeFromMegaApiFolderUseCase,
             getVideosByParentHandleFromMegaApiFolderUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase,
-            getThumbnailUseCase,
             httpServerStopUseCase,
             httpServerStartUseCase,
             httpServerIsRunningUseCase,
@@ -701,7 +697,6 @@ class ComposeVideoPlayerViewModelTest {
                 videoPlayerItemMapper(
                     nodeHandle = testHandle,
                     nodeName = testFileName,
-                    thumbnail = null,
                     type = MediaQueueItemType.Playing,
                     size = 100,
                     duration = testDuration,
@@ -785,7 +780,6 @@ class ComposeVideoPlayerViewModelTest {
                     videoPlayerItemMapper(
                         file.handle.toLong(),
                         file.name,
-                        null,
                         getMediaQueueItemType(index, 1),
                         file.totalSize,
                         false,
@@ -893,7 +887,6 @@ class ComposeVideoPlayerViewModelTest {
                     videoPlayerItemMapper(
                         file.name.hashCode().toLong(),
                         file.name,
-                        null,
                         getMediaQueueItemType(index, 0),
                         file.length(),
                         false,
@@ -1051,7 +1044,6 @@ class ComposeVideoPlayerViewModelTest {
                 videoPlayerItemMapper(
                     node.id.longValue,
                     node.name,
-                    null,
                     getMediaQueueItemType(index, playingIndex),
                     node.size,
                     false,
@@ -2545,7 +2537,6 @@ class ComposeVideoPlayerViewModelTest {
                 videoPlayerItemMapper(
                     node.id.longValue,
                     node.name,
-                    null,
                     getMediaQueueItemType(index, playingIndex),
                     node.size,
                     node.isMarkedSensitive || node.isSensitiveInherited,
@@ -2919,7 +2910,6 @@ class ComposeVideoPlayerViewModelTest {
                     videoPlayerItemMapper(
                         node.id.longValue,
                         node.name,
-                        null,
                         getMediaQueueItemType(index, playingIndex),
                         node.size,
                         false,
@@ -2977,7 +2967,6 @@ class ComposeVideoPlayerViewModelTest {
                     videoPlayerItemMapper(
                         node.id.longValue,
                         node.name,
-                        null,
                         getMediaQueueItemType(index, playingIndex),
                         node.size,
                         false,

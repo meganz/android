@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.videoplayer.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
@@ -13,6 +12,7 @@ import mega.privacy.android.app.mediaplayer.queue.view.MediaQueueItemWithHeaderA
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.lists.DragDropListView
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -120,7 +120,6 @@ private fun initVideoPlayerItem(
         icon = iconPackR.drawable.ic_audio_medium_solid,
         nodeHandle = handle,
         nodeName = "Media Name",
-        thumbnail = null,
         size = 0,
         type = type,
         duration = "10: 00",

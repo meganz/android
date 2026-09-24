@@ -103,7 +103,6 @@ import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -681,7 +680,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         )
 
         if (!intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
-            setPlayingItem(currentPlayingHandle, currentPlayingFileName, args.adapterType)
+            setPlayingItem(currentPlayingHandle, currentPlayingFileName)
             return
         }
 
@@ -798,13 +797,11 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             }
         }
 
-    private suspend fun setPlayingItem(handle: Long, fileName: String?, source: Int) {
+    private suspend fun setPlayingItem(handle: Long, fileName: String?) {
         val node = getVideoNodeByHandleUseCase(handle)
-        val thumbnail = getThumbnailForNode(node, handle, source)
         val playingItem = videoPlayerItemMapper(
             nodeHandle = handle,
             nodeName = fileName.orEmpty(),
-            thumbnail = thumbnail,
             type = MediaQueueItemType.Playing,
             size = node?.size ?: INVALID_SIZE,
             duration = node?.duration ?: 0.seconds,
@@ -816,21 +813,6 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         )
 
         uiState.update { it.copy(items = listOf(playingItem)) }
-    }
-
-    private suspend fun getThumbnailForNode(
-        node: TypedVideoNode?,
-        handle: Long,
-        source: Int,
-    ) = when {
-        node == null -> null
-        source == OFFLINE_ADAPTER -> getThumbnailUseCase(handle)
-        else -> runCatching {
-            File(
-                ThumbnailUtils.getThumbFolder(context),
-                node.base64Id.plus(FileUtil.JPG_EXTENSION)
-            )
-        }.getOrNull()
     }
 
     private suspend fun handlePlaybackSourceByLaunchSource(
@@ -881,14 +863,9 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                     )
                 }
 
-                val thumbnailFile = runCatching {
-                    item.thumbnail?.let { File(it) }
-                }.getOrNull()
-
                 videoPlayerItemMapper(
                     nodeHandle = item.handle.toLong(),
                     nodeName = item.name,
-                    thumbnail = thumbnailFile,
                     type = getMediaQueueItemType(index, currentPlayingIndex),
                     size = item.totalSize,
                     duration = (item.fileTypeInfo as? VideoFileTypeInfo)?.duration ?: 0.seconds,
@@ -980,7 +957,6 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                 videoPlayerItemMapper(
                     nodeHandle = file.name.hashCode().toLong(),
                     nodeName = file.name,
-                    thumbnail = null,
                     type = getMediaQueueItemType(index, currentPlayingIndex),
                     size = file.length(),
                     duration = 0.seconds,
@@ -1224,9 +1200,6 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                         val videoPlayerItem = videoPlayerItemMapper(
                             nodeHandle = node.id.longValue,
                             nodeName = node.name,
-                            thumbnail = node.thumbnailPath?.let { path ->
-                                File(path)
-                            },
                             type = getMediaQueueItemType(index, currentPlayingIndex),
                             size = node.size,
                             duration = node.duration,

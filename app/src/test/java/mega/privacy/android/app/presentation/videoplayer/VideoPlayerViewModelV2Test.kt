@@ -796,7 +796,6 @@ class VideoPlayerViewModelV2Test {
                 videoPlayerItemMapper(
                     nodeHandle = testHandle,
                     nodeName = testFileName,
-                    thumbnail = null,
                     type = MediaQueueItemType.Playing,
                     size = 100,
                     duration = testDuration,
@@ -880,7 +879,6 @@ class VideoPlayerViewModelV2Test {
                     videoPlayerItemMapper(
                         file.handle.toLong(),
                         file.name,
-                        null,
                         getMediaQueueItemType(index, 1),
                         file.totalSize,
                         false,
@@ -988,7 +986,6 @@ class VideoPlayerViewModelV2Test {
                     videoPlayerItemMapper(
                         file.name.hashCode().toLong(),
                         file.name,
-                        null,
                         getMediaQueueItemType(index, 0),
                         file.length(),
                         false,
@@ -1146,7 +1143,6 @@ class VideoPlayerViewModelV2Test {
                 videoPlayerItemMapper(
                     node.id.longValue,
                     node.name,
-                    null,
                     getMediaQueueItemType(index, playingIndex),
                     node.size,
                     false,
@@ -1278,7 +1274,6 @@ class VideoPlayerViewModelV2Test {
                 videoPlayerItemMapper(
                     testVideoNodes[0].id.longValue,
                     testVideoNodes[0].name,
-                    null,
                     MediaQueueItemType.Playing,
                     testVideoNodes[0].size,
                     false,
@@ -1289,7 +1284,6 @@ class VideoPlayerViewModelV2Test {
                 videoPlayerItemMapper(
                     testVideoNodes[2].id.longValue,
                     testVideoNodes[2].name,
-                    null,
                     MediaQueueItemType.Next,
                     testVideoNodes[2].size,
                     false,
@@ -1392,7 +1386,6 @@ class VideoPlayerViewModelV2Test {
                 videoPlayerItemMapper(
                     testVideoNodes[0].id.longValue,
                     testVideoNodes[0].name,
-                    null,
                     MediaQueueItemType.Previous,
                     testVideoNodes[0].size,
                     false,
@@ -1403,7 +1396,6 @@ class VideoPlayerViewModelV2Test {
                 videoPlayerItemMapper(
                     testVideoNodes[2].id.longValue,
                     testVideoNodes[2].name,
-                    null,
                     MediaQueueItemType.Playing,
                     testVideoNodes[2].size,
                     false,
@@ -3231,7 +3223,6 @@ class VideoPlayerViewModelV2Test {
                 videoPlayerItemMapper(
                     node.id.longValue,
                     node.name,
-                    null,
                     getMediaQueueItemType(index, playingIndex),
                     node.size,
                     node.isMarkedSensitive || node.isSensitiveInherited,
@@ -3605,7 +3596,6 @@ class VideoPlayerViewModelV2Test {
                     videoPlayerItemMapper(
                         node.id.longValue,
                         node.name,
-                        null,
                         getMediaQueueItemType(index, playingIndex),
                         node.size,
                         false,
@@ -3663,7 +3653,6 @@ class VideoPlayerViewModelV2Test {
                     videoPlayerItemMapper(
                         node.id.longValue,
                         node.name,
-                        null,
                         getMediaQueueItemType(index, playingIndex),
                         node.size,
                         false,

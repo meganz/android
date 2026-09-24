@@ -1,9 +1,8 @@
 package mega.privacy.android.app.presentation.videoplayer.mapper
 
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
-import java.io.File
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -21,7 +20,6 @@ class VideoPlayerItemMapper @Inject constructor(
     operator fun invoke(
         nodeHandle: Long,
         nodeName: String,
-        thumbnail: File?,
         type: MediaQueueItemType,
         size: Long,
         isSensitive: Boolean,
@@ -29,7 +27,6 @@ class VideoPlayerItemMapper @Inject constructor(
     ) = VideoPlayerItem(
         nodeHandle = nodeHandle,
         nodeName = nodeName,
-        thumbnail = thumbnail,
         type = type,
         size = size,
         duration = durationInSecondsTextMapper(duration),

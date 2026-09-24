@@ -3,8 +3,8 @@ package mega.privacy.android.app.presentation.videoplayer.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.icon.pack.R
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,46 +36,20 @@ class VideoPlayerItemMapperTest {
     }
 
     @Test
-    fun `test that VideoPlayerItem can be mapped correctly when thumbnail is null`() =
+    fun `test that VideoPlayerItem can be mapped correctly`() =
         runTest {
             val videoPlayerItem = underTest(
                 nodeHandle = testNodeHandle,
                 nodeName = testNodeName,
-                thumbnail = null,
                 type = testType,
                 size = testSize,
                 duration = testDuration,
                 isSensitive = testIsSensitive,
             )
-            assertMappedVideoPlayerItem(
-                entity = videoPlayerItem,
-                expectedThumbnail = null,
-            )
+            assertMappedVideoPlayerItem(entity = videoPlayerItem)
         }
 
-    @Test
-    fun `test that VideoPlayerItem can be mapped correctly when thumbnail is not null`() =
-        runTest {
-            val file = mock<File>()
-            val videoPlayerItem = underTest(
-                nodeHandle = testNodeHandle,
-                nodeName = testNodeName,
-                thumbnail = file,
-                type = testType,
-                size = testSize,
-                duration = testDuration,
-                isSensitive = testIsSensitive,
-            )
-            assertMappedVideoPlayerItem(
-                entity = videoPlayerItem,
-                expectedThumbnail = file,
-            )
-        }
-
-    private fun assertMappedVideoPlayerItem(
-        entity: VideoPlayerItem,
-        expectedThumbnail: File?,
-    ) {
+    private fun assertMappedVideoPlayerItem(entity: VideoPlayerItem) {
         entity.let {
             Assertions.assertAll(
                 "Grouped Assertions of ${VideoPlayerItem::class.simpleName}",
@@ -86,7 +59,6 @@ class VideoPlayerItemMapperTest {
                 { assertThat(it.size).isEqualTo(testSize) },
                 { assertThat(it.duration).isEqualTo(testDurationString) },
                 { assertThat(it.type).isEqualTo(testType) },
-                { assertThat(it.thumbnail).isEqualTo(expectedThumbnail) },
                 { assertThat(it.isSensitive).isEqualTo(testIsSensitive) }
             )
         }
