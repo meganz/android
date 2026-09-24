@@ -47,11 +47,17 @@ data class ManageSyncExclusionsNavKey(
  *
  * @param syncId id of the sync the rule belongs to, or null while the rule is staged during setup,
  * before a folder pair exists.
+ * @param staged the rules the exclusions list has staged, so that a draft repeating one already in
+ * force is refused where it is typed. Checked against the staged model rather than the file, which
+ * does not yet hold the edits being staged
  */
 @Serializable
 data class AddSyncExclusionRuleNavKey(
     val syncId: Long? = null,
+    val staged: List<SyncExclusionRule>,
 ) : NavKey {
+    override fun toString() = "AddSyncExclusionRuleNavKey(syncId=$syncId, staged=${staged.size})"
+
     companion object {
         /**
          * Result key for what the user authored.
@@ -138,8 +144,8 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
             monitorResult = navigationHandler::monitorResult,
             clearResult = navigationHandler::clearResult,
             onFinished = { navigationHandler.back() },
-            onAddExclusion = { syncId ->
-                navigationHandler.navigate(AddSyncExclusionRuleNavKey(syncId))
+            onAddExclusion = { syncId, staged ->
+                navigationHandler.navigate(AddSyncExclusionRuleNavKey(syncId, staged))
             },
             onEditRule = { row ->
                 navigationHandler.navigate(
@@ -167,8 +173,9 @@ fun EntryProviderScope<NavKey>.syncExclusionScreens(
     }
 
     // returning a result pops the destination itself, so none of these also asks to go back
-    entry<AddSyncExclusionRuleNavKey> {
+    entry<AddSyncExclusionRuleNavKey> { navKey ->
         AddSyncExclusionRuleRoute(
+            staged = navKey.staged,
             onConfirm = {
                 navigationHandler.returnResult(AddSyncExclusionRuleNavKey.RESULT, it)
             },

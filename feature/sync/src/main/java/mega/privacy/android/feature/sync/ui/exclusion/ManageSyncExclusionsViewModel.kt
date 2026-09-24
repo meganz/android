@@ -141,15 +141,24 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
     }
 
     fun onRuleEdited(ruleIndex: Int, expected: SyncExclusionRule, edit: SyncExclusionEdit) {
-        stageResult { replaceSyncExclusionUseCase(it, ruleIndex, expected, edit) }
+        if (stageResult { replaceSyncExclusionUseCase(it, ruleIndex, expected, edit) }) {
+            uiState.update { it.copy(exclusionUpdatedEvent = triggered) }
+        }
     }
 
     fun onRuleRemoved(ruleIndex: Int, expected: SyncExclusionRule) {
         stageResult { removeSyncExclusionUseCase(it, ruleIndex, expected) }
     }
 
+    /**
+     * The size screen's trash hands back no bounds at all, which is a removal rather than an edit,
+     * so it is not confirmed.
+     */
     fun onSizeBoundsChanged(bounds: SyncSizeExclusion) {
-        stageResult { setSyncSizeBoundsUseCase(it, bounds) }
+        val staged = stageResult { setSyncSizeBoundsUseCase(it, bounds) }
+        if (staged && !bounds.isUnbounded) {
+            uiState.update { it.copy(exclusionUpdatedEvent = triggered) }
+        }
     }
 
     fun onDefaultsRestored() {
@@ -243,6 +252,10 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
 
     fun onExclusionAddedShown() {
         uiState.update { it.copy(exclusionAddedEvent = consumed) }
+    }
+
+    fun onExclusionUpdatedShown() {
+        uiState.update { it.copy(exclusionUpdatedEvent = consumed) }
     }
 
     fun onReviewSavedShown() {

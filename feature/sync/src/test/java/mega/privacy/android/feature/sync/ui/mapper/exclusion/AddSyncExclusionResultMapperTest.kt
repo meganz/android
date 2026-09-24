@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionClass
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionMatchType
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionTarget
 import mega.privacy.android.feature.sync.domain.entity.SyncMatchStrategy
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
@@ -272,4 +273,20 @@ internal class AddSyncExclusionResultMapperTest {
         byExtension = byExtension,
         bySize = bySize,
     )
+
+    @Test
+    fun `test that extensionRule builds the rule an extension entry stands for`() {
+        assertThat(underTest.extensionRule(".tar.gz")).isEqualTo(
+            SyncExclusionRule(
+                pattern = "*.tar.gz",
+                target = SyncExclusionTarget.All,
+                matchType = SyncExclusionMatchType.SubtreeName,
+            ),
+        )
+    }
+
+    @Test
+    fun `test that extensionRule returns null when no pattern can be built`() {
+        assertThat(underTest.extensionRule("..mp3")).isNull()
+    }
 }

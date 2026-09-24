@@ -16,6 +16,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
 import mega.privacy.android.feature.sync.navigation.EditSyncExclusionRuleResult
 import mega.privacy.android.feature.sync.navigation.SyncExclusionResultEffect
@@ -31,6 +32,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * from, so re-entering it shows the user's own work rather than resetting it
  * @param monitorResult the navigation results the Add, Edit and size screens hand back
  * @param clearResult takes a result out of the channel once it has been staged
+ * @param onAddExclusion opens the Add screen with the rules staged so far, for it to check a new
+ * rule against
  * @param onReviewSaved hands the staged model to the setup screen once Review mode's Save is
  * confirmed
  */
@@ -42,7 +45,7 @@ internal fun ManageSyncExclusionsRoute(
     monitorResult: (String) -> Flow<Any?>,
     clearResult: (String) -> Unit,
     onFinished: () -> Unit,
-    onAddExclusion: (Long?) -> Unit,
+    onAddExclusion: (syncId: Long?, staged: List<SyncExclusionRule>) -> Unit,
     onEditRule: (SyncExclusionRowUiItem) -> Unit,
     onEditSize: (SyncSizeExclusion) -> Unit,
     onReviewSaved: (ParsedMegaIgnore) -> Unit,
@@ -65,6 +68,8 @@ internal fun ManageSyncExclusionsRoute(
         stringResource(sharedR.string.sync_exclusions_manage_snackbar_defaults_restored)
     val exclusionAddedMessage =
         stringResource(sharedR.string.sync_exclusions_manage_snackbar_added)
+    val exclusionUpdatedMessage =
+        stringResource(sharedR.string.sync_exclusions_manage_snackbar_updated)
 
     SyncExclusionResultEffect(
         monitorResult = monitorResult,
@@ -101,6 +106,13 @@ internal fun ManageSyncExclusionsRoute(
         onConsumed = viewModel::onExclusionAddedShown,
     ) {
         snackbarHostState?.showSnackbar(exclusionAddedMessage)
+    }
+
+    EventEffect(
+        event = uiState.exclusionUpdatedEvent,
+        onConsumed = viewModel::onExclusionUpdatedShown,
+    ) {
+        snackbarHostState?.showSnackbar(exclusionUpdatedMessage)
     }
 
     EventEffect(
@@ -142,7 +154,7 @@ internal fun ManageSyncExclusionsRoute(
         chips = chips,
         rows = rows,
         onBackPressed = viewModel::onBackPressed,
-        onAddClicked = { onAddExclusion(syncId) },
+        onAddClicked = { onAddExclusion(syncId, uiState.staged?.rules.orEmpty()) },
         onSaveClicked = viewModel::onSaveClicked,
         onRetryClicked = viewModel::onRetryClicked,
         onRuleClicked = onEditRule,

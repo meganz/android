@@ -4,10 +4,15 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionMatchType
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionTarget
+import mega.privacy.android.feature.sync.domain.usecase.exclusion.ValidateSyncExclusionValueUseCase
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.AddSyncExclusionResultMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionPatternMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncSizeExclusionFormMapper
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionBySizeFormState
+import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionExtensionError
 import mega.privacy.android.feature.sync.ui.model.exclusion.AddExclusionTab
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionCondition
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionTypeOption
@@ -17,6 +22,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import mega.privacy.android.shared.resources.R as sharedR
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -26,13 +34,18 @@ internal class AddSyncExclusionRuleViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = AddSyncExclusionRuleViewModel(
+        underTest = createViewModel()
+    }
+
+    private fun createViewModel(staged: List<SyncExclusionRule> = emptyList()) =
+        AddSyncExclusionRuleViewModel(
+            staged = staged,
             resultMapper = AddSyncExclusionResultMapper(
                 patternMapper = SyncExclusionPatternMapper(),
                 sizeFormMapper = SyncSizeExclusionFormMapper(),
             ),
+            validateSyncExclusionValueUseCase = ValidateSyncExclusionValueUseCase(),
         )
-    }
 
     @Test
     fun `test that init opens the by name tab with empty drafts`() = runTest {
@@ -381,4 +394,221 @@ internal class AddSyncExclusionRuleViewModelTest {
             assertThat(state.byExtension.extensions).containsExactly("mp3", "mp4")
         }
     }
+
+    @Test
+    fun `test that onNameValueChanged shows the duplicate error when the rule is already in force`() =
+        runTest {
+            underTest = createViewModel(staged = listOf(draftFilesRule))
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+            underTest.onConditionSelected(SyncExclusionCondition.BeginningWith)
+
+            underTest.onNameValueChanged("draft")
+
+            val state = underTest.uiState.value
+            assertThat(state.byName.errorRes)
+                .isEqualTo(sharedR.string.sync_exclusions_add_name_duplicate_error)
+            assertThat(state.canConfirm).isFalse()
+        }
+
+    /** Adding it again turns the switched off line back on, which is what the user asked for. */
+    @Test
+    fun `test that onNameValueChanged shows no error when the matching rule is switched off`() =
+        runTest {
+            underTest = createViewModel(staged = listOf(draftFilesRule.copy(enabled = false)))
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+            underTest.onConditionSelected(SyncExclusionCondition.BeginningWith)
+
+            underTest.onNameValueChanged("draft")
+
+            val state = underTest.uiState.value
+            assertThat(state.byName.errorRes).isNull()
+            assertThat(state.canConfirm).isTrue()
+        }
+
+    @Test
+    fun `test that onNameValueChanged shows no error when the rule differs in target`() = runTest {
+        underTest = createViewModel(staged = listOf(draftFilesRule))
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Folders)
+        underTest.onConditionSelected(SyncExclusionCondition.BeginningWith)
+
+        underTest.onNameValueChanged("draft")
+
+        assertThat(underTest.uiState.value.byName.errorRes).isNull()
+        assertThat(underTest.uiState.value.canConfirm).isTrue()
+    }
+
+    @Test
+    fun `test that onNameValueChanged clears the duplicate error once the name changes`() =
+        runTest {
+            underTest = createViewModel(staged = listOf(draftFilesRule))
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+            underTest.onConditionSelected(SyncExclusionCondition.BeginningWith)
+            underTest.onNameValueChanged("draft")
+
+            underTest.onNameValueChanged("drafts")
+
+            assertThat(underTest.uiState.value.byName.errorRes).isNull()
+            assertThat(underTest.uiState.value.canConfirm).isTrue()
+        }
+
+    /** The SDK drops the trailing space as it reads the line, leaving two copies of one rule. */
+    @Test
+    fun `test that onNameValueChanged shows the duplicate error when a trailing space is all that differs`() =
+        runTest {
+            underTest = createViewModel(
+                staged = listOf(
+                    SyncExclusionRule(
+                        pattern = "Thumbs.db",
+                        matchType = SyncExclusionMatchType.SubtreeName,
+                    ),
+                ),
+            )
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.FilesAndFolders)
+            underTest.onConditionSelected(SyncExclusionCondition.MatchingExactly)
+
+            underTest.onNameValueChanged("Thumbs.db ")
+
+            assertThat(underTest.uiState.value.byName.errorRes)
+                .isEqualTo(sharedR.string.sync_exclusions_add_name_duplicate_error)
+            assertThat(underTest.uiState.value.canConfirm).isFalse()
+        }
+
+    /** The space sits before the wildcard, where the SDK keeps it, so this is a different rule. */
+    @Test
+    fun `test that onNameValueChanged shows no error when the space is inside the pattern`() =
+        runTest {
+            underTest = createViewModel(staged = listOf(draftFilesRule))
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+            underTest.onConditionSelected(SyncExclusionCondition.BeginningWith)
+
+            underTest.onNameValueChanged("draft ")
+
+            assertThat(underTest.uiState.value.byName.errorRes).isNull()
+        }
+
+    @Test
+    fun `test that onTypeOptionSelected leaves an extension error out of the name form gate`() =
+        runTest {
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+            underTest.onExtensionValueChanged("mp/3")
+
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+            underTest.onConditionSelected(SyncExclusionCondition.EndingWith)
+            underTest.onNameValueChanged("tmp")
+
+            assertThat(underTest.uiState.value.byName.errorRes).isNull()
+            assertThat(underTest.uiState.value.canConfirm).isTrue()
+        }
+
+    @Test
+    fun `test that onConditionSelected clears the duplicate error once the rule no longer matches`() =
+        runTest {
+            underTest = createViewModel(staged = listOf(draftFilesRule))
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Files)
+            underTest.onConditionSelected(SyncExclusionCondition.BeginningWith)
+            underTest.onNameValueChanged("draft")
+
+            underTest.onConditionSelected(SyncExclusionCondition.EndingWith)
+
+            assertThat(underTest.uiState.value.byName.errorRes).isNull()
+        }
+
+    @ParameterizedTest(name = "\"{0}\"")
+    @ValueSource(strings = ["mp 3", "mp/3", "mp*", "mp?", "a:b", "..mp3", "."])
+    fun `test that onExtensionValueChanged shows the invalid error for an entry an extension cannot be`(
+        entry: String,
+    ) = runTest {
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+
+        underTest.onExtensionValueChanged("txt, $entry")
+
+        val state = underTest.uiState.value
+        assertThat(state.byExtension.error).isEqualTo(AddExclusionExtensionError.Invalid)
+        assertThat(state.canConfirm).isFalse()
+    }
+
+    @ParameterizedTest(name = "\"{0}\"")
+    @ValueSource(strings = ["mp3", ".mp3", "tar.gz", "txt, mp3"])
+    fun `test that onExtensionValueChanged shows no error for valid extensions`(value: String) =
+        runTest {
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+
+            underTest.onExtensionValueChanged(value)
+
+            val state = underTest.uiState.value
+            assertThat(state.byExtension.error).isNull()
+            assertThat(state.canConfirm).isTrue()
+        }
+
+    @ParameterizedTest(name = "separator \"{0}\"")
+    @ValueSource(strings = [",", "，", "、", "،"])
+    fun `test that onExtensionValueChanged shows the duplicate error for an extension already in force`(
+        separator: String,
+    ) = runTest {
+        underTest = createViewModel(staged = listOf(extensionRule("mp3")))
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+
+        underTest.onExtensionValueChanged("txt${separator}MP3")
+
+        val state = underTest.uiState.value
+        assertThat(state.byExtension.error).isEqualTo(AddExclusionExtensionError.Duplicate("mp3"))
+        assertThat(state.canConfirm).isFalse()
+    }
+
+    @Test
+    fun `test that onExtensionValueChanged shows no error for an extension that is switched off`() =
+        runTest {
+            underTest = createViewModel(staged = listOf(extensionRule("mp3").copy(enabled = false)))
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+
+            underTest.onExtensionValueChanged("mp3")
+
+            assertThat(underTest.uiState.value.byExtension.error).isNull()
+            assertThat(underTest.uiState.value.canConfirm).isTrue()
+        }
+
+    @Test
+    fun `test that onExtensionValueChanged reports the first entry that is wrong`() = runTest {
+        underTest = createViewModel(staged = listOf(extensionRule("mp3")))
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+
+        underTest.onExtensionValueChanged("txt, mp3, mp 4")
+
+        assertThat(underTest.uiState.value.byExtension.error)
+            .isEqualTo(AddExclusionExtensionError.Duplicate("mp3"))
+    }
+
+    @Test
+    fun `test that onExtensionValueChanged clears the error once the entry is fixed`() = runTest {
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+        underTest.onExtensionValueChanged("mp/3")
+
+        underTest.onExtensionValueChanged("mp3")
+
+        assertThat(underTest.uiState.value.byExtension.error).isNull()
+        assertThat(underTest.uiState.value.canConfirm).isTrue()
+    }
+
+    @Test
+    fun `test that canConfirm ignores an error left on a body that is not showing`() = runTest {
+        underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+        underTest.onExtensionValueChanged("mp/3")
+        underTest.onTabSelected(AddExclusionTab.BySize)
+
+        underTest.onSizeConditionSelected(SyncSizeCondition.BiggerThan)
+        underTest.onFirstBoundValueChanged("10")
+
+        assertThat(underTest.uiState.value.canConfirm).isTrue()
+    }
+
+    private val draftFilesRule = SyncExclusionRule(
+        pattern = "draft*",
+        target = SyncExclusionTarget.Files,
+        matchType = SyncExclusionMatchType.SubtreeName,
+    )
+
+    private fun extensionRule(extension: String) = SyncExclusionRule(
+        pattern = "*.$extension",
+        matchType = SyncExclusionMatchType.SubtreeName,
+    )
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.surface.CardSurface
+import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
@@ -70,28 +73,29 @@ internal fun ExclusionRuleRow(
 
 /**
  * A rule's pattern, rendered as code so that the wildcards and punctuation in it read as literal
- * characters rather than as prose.
- *
- * The design draws this on a tinted surface, which cannot be built here: that colour is a design
- * token, and `mega.android.core.ui.tokens` is not on this module's classpath. Plain monospace
- * leaves the pattern legible and leaves the surface to the token that will carry it, rather than
- * hand-rolling a colour and radius that would be wrong on both counts and would then have to be
- * hunted down again.
+ * characters rather than as prose. The tint marks where the pattern starts and ends, without which
+ * a one-character pattern such as `.` or `~` is easy to miss.
  */
 @Composable
 internal fun ExclusionPatternText(
     pattern: String,
     modifier: Modifier = Modifier,
 ) {
-    MegaText(
+    CardSurface(
         modifier = modifier,
-        text = pattern,
-        textColor = TextColor.Primary,
-        style = AppTheme.typography.bodyLarge.copy(
-            fontFamily = FontFamily.Monospace,
-            letterSpacing = PATTERN_TRACKING,
-        ),
-    )
+        surfaceColor = SurfaceColor.Surface1,
+        shape = RoundedCornerShape(4.dp),
+    ) {
+        MegaText(
+            modifier = Modifier.padding(horizontal = 2.dp),
+            text = pattern,
+            textColor = TextColor.Primary,
+            style = AppTheme.typography.bodyLarge.copy(
+                fontFamily = FontFamily.Monospace,
+                letterSpacing = PATTERN_TRACKING,
+            ),
+        )
+    }
 }
 
 /**

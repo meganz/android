@@ -523,6 +523,96 @@ internal class ManageSyncExclusionsViewModelTest {
         assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(consumed)
     }
 
+    @Test
+    fun `test that onRuleEdited confirms the update when the edit is staged`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onRuleEdited(
+            ruleIndex = 0,
+            expected = first,
+            edit = SyncExclusionEdit(pattern = "Renamed*"),
+        )
+
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(triggered)
+    }
+
+    /** A refusal is reported instead, so confirming as well would state both outcomes at once. */
+    @Test
+    fun `test that onRuleEdited confirms nothing when the edit is refused`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onRuleEdited(
+            ruleIndex = 1,
+            expected = rule(pattern = "Moved*"),
+            edit = SyncExclusionEdit(pattern = "Renamed*"),
+        )
+
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(consumed)
+        assertThat(underTest.uiState.value.editErrorEvent)
+            .isInstanceOf(StateEventWithContentTriggered::class.java)
+    }
+
+    @Test
+    fun `test that onRuleRemoved confirms no update`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onRuleRemoved(ruleIndex = 0, expected = first)
+
+        assertThat(underTest.uiState.value.staged?.rules).doesNotContain(first)
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(consumed)
+    }
+
+    @Test
+    fun `test that onSizeBoundsChanged confirms the update when bounds are staged`() = runTest {
+        stubRead(ParsedMegaIgnore(entries = listOf(smallerBound, largerBound)))
+        val underTest = underTest()
+
+        underTest.onSizeBoundsChanged(SyncSizeExclusion(excludeLargerThanBytes = 4096))
+
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that onSizeBoundsChanged confirms no update when the bounds are cleared`() = runTest {
+        stubRead(ParsedMegaIgnore(entries = listOf(smallerBound, largerBound)))
+        val underTest = underTest()
+
+        underTest.onSizeBoundsChanged(SyncSizeExclusion())
+
+        assertThat(underTest.uiState.value.staged?.size?.isUnbounded).isTrue()
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(consumed)
+    }
+
+    @Test
+    fun `test that onSizeBoundsChanged confirms nothing when the bounds are refused`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onSizeBoundsChanged(
+            SyncSizeExclusion(excludeSmallerThanBytes = 1024, excludeLargerThanBytes = 1024),
+        )
+
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(consumed)
+    }
+
+    @Test
+    fun `test that onExclusionUpdatedShown clears the updated confirmation`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+        underTest.onRuleEdited(
+            ruleIndex = 0,
+            expected = first,
+            edit = SyncExclusionEdit(pattern = "Renamed*"),
+        )
+
+        underTest.onExclusionUpdatedShown()
+
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(consumed)
+    }
+
     // endregion
 
     @Test

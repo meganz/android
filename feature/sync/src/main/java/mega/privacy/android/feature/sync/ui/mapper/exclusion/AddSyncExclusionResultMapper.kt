@@ -40,25 +40,30 @@ internal class AddSyncExclusionResultMapper @Inject constructor(
         }
 
     /**
-     * One rule per extension the field names, left at every node type so that it is the same shape
-     * as a predefined extension: a narrower target is shown as a row rather than a chip, and no
-     * longer folds into the default holding that pattern, which leaves the file saying it twice.
+     * The rule one typed [extension] stands for, or null when no pattern can be built from it.
      *
-     * Entries no pattern can be built from are dropped rather than failing the rest, and repeats
-     * are folded: de-duplication elsewhere compares patterns exactly, so a list would otherwise
-     * stage the same rule twice.
+     * Left at every node type so that it is the same shape as a predefined extension: a narrower
+     * target is shown as a row rather than a chip, and no longer folds into the default holding
+     * that pattern, which leaves the file saying it twice.
      */
-    private fun extensionRules(
-        form: AddExclusionByExtensionFormState,
-    ): AddSyncExclusionResult.Rules? = form.extensions
-        .mapNotNull(patternMapper::extensionPattern)
-        .distinct()
-        .map {
+    fun extensionRule(extension: String): SyncExclusionRule? =
+        patternMapper.extensionPattern(extension)?.let {
             SyncExclusionRule(
                 pattern = it,
                 matchType = SyncExclusionMatchType.SubtreeName,
             )
         }
+
+    /**
+     * One rule per extension the field names. Entries no pattern can be built from are dropped
+     * rather than failing the rest, and repeats are folded: de-duplication elsewhere compares
+     * patterns exactly, so a list would otherwise stage the same rule twice.
+     */
+    private fun extensionRules(
+        form: AddExclusionByExtensionFormState,
+    ): AddSyncExclusionResult.Rules? = form.extensions
+        .mapNotNull(::extensionRule)
+        .distinct()
         .takeIf { it.isNotEmpty() }
         ?.let(AddSyncExclusionResult::Rules)
 

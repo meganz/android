@@ -40,6 +40,9 @@ import mega.privacy.android.feature.sync.domain.exception.SyncExclusionEditError
  * @property exclusionAddedEvent that an exclusion authored on another screen has just been staged,
  * for the screen to confirm. Consumed through
  * [ManageSyncExclusionsViewModel.onExclusionAddedShown]
+ * @property exclusionUpdatedEvent that an edit to an existing exclusion has just been staged, for
+ * the screen to confirm. A removal is not confirmed, since Cancel still undoes it. Consumed through
+ * [ManageSyncExclusionsViewModel.onExclusionUpdatedShown]
  * @property isDiscardPromptShown whether the user is being asked to confirm losing unsaved edits
  * @property isFinished whether the screen has nothing left to do and should be left
  * @property syncName the sync's name, shown under the title so the screen says which folder these
@@ -62,6 +65,7 @@ internal data class ManageSyncExclusionsUiState(
     val saveFailedEvent: StateEvent = consumed,
     val defaultsRestoredEvent: StateEvent = consumed,
     val exclusionAddedEvent: StateEvent = consumed,
+    val exclusionUpdatedEvent: StateEvent = consumed,
     val isDiscardPromptShown: Boolean = false,
     val isFinished: Boolean = false,
     val mode: ManageExclusionsMode = ManageExclusionsMode.Manage,

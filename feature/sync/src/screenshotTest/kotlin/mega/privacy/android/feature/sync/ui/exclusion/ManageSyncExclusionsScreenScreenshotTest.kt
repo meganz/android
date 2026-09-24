@@ -214,6 +214,22 @@ class ManageSyncExclusionsScreenScreenshotTest {
         }
     }
 
+    /** The confirmation raised once an edit to an existing exclusion has been staged. */
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ManageSyncExclusionsUpdatedSnackbar() {
+        AndroidThemeForPreviews {
+            WeblateSnackbarScreenshot(
+                snackbarText = stringResource(
+                    sharedR.string.sync_exclusions_manage_snackbar_updated,
+                ),
+            ) {
+                DefaultsScreen()
+            }
+        }
+    }
+
     @PreviewTest
     @CombinedThemePreviews
     @Composable

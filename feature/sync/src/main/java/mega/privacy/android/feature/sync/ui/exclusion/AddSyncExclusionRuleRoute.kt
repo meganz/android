@@ -5,11 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.navigation.AddSyncExclusionResult
 
 /**
  * Binds [AddSyncExclusionRuleScreen] to the drafts the view model holds.
  *
+ * @param staged the rules the exclusions list has staged, which a draft is checked against
  * @param onConfirm invoked with what the user accepted, for the exclusions list to stage. The
  * control is offered only while the drafts hold something that can be added, and a draft that does
  * not falls back to [onDismiss]
@@ -17,10 +19,14 @@ import mega.privacy.android.feature.sync.navigation.AddSyncExclusionResult
  */
 @Composable
 internal fun AddSyncExclusionRuleRoute(
+    staged: List<SyncExclusionRule>,
     onConfirm: (AddSyncExclusionResult) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AddSyncExclusionRuleViewModel = hiltViewModel(),
+    viewModel: AddSyncExclusionRuleViewModel =
+        hiltViewModel<AddSyncExclusionRuleViewModel, AddSyncExclusionRuleViewModel.Factory> {
+            it.create(staged)
+        },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
