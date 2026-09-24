@@ -1,6 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
 import kotlinx.coroutines.flow.retry
+import mega.privacy.android.app.presentation.meeting.navigation.ForceAppUpdateNavKey
 import mega.privacy.android.app.presentation.meeting.navigation.FreePlanParticipantsLimitNavKey
 import mega.privacy.android.app.presentation.meeting.navigation.UpgradeProPlanBottomSheetNavKey
 import mega.privacy.android.domain.entity.call.CallNotificationType
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 /**
  * Post login initialiser that monitors chat call updates and triggers navigation
- * for free plan participants limit dialog and upgrade to Pro plan bottom sheet
+ * for free plan participants limit dialog, upgrade to Pro plan bottom sheet and
+ * force app update dialog
  */
 class MeetingEventsPostLoginInitialiser @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
@@ -31,7 +33,7 @@ class MeetingEventsPostLoginInitialiser @Inject constructor(
                 Timber.e(it, "Error in monitoring meeting events")
                 true
             }.collect { call ->
-                if (!call.reportsCallLimit()) return@collect
+                if (!call.reportsTermCode()) return@collect
 
                 when (call.termCode) {
                     ChatCallTermCodeType.CallUsersLimit -> {
@@ -52,6 +54,11 @@ class MeetingEventsPostLoginInitialiser @Inject constructor(
                         }
                     }
 
+                    ChatCallTermCodeType.ProtocolVersion -> {
+                        Timber.d("Emitting ForceAppUpdateNavKey")
+                        appDialogsEventQueue.emit(AppDialogEvent(ForceAppUpdateNavKey))
+                    }
+
                     else -> Unit
                 }
             }
@@ -60,10 +67,10 @@ class MeetingEventsPostLoginInitialiser @Inject constructor(
 
 /**
  * A term code is meaningful either when the SFU ends our participation in the call, or when it
- * reports the limit as an SFU error carried by a generic notification while the call is still
+ * reports the term code as an SFU error carried by a generic notification while the call is still
  * running. Any other notification type is ignored, since acting on one can close a live call.
  */
-private fun ChatCall.reportsCallLimit() =
+private fun ChatCall.reportsTermCode() =
     status == ChatCallStatus.TerminatingUserParticipation
             || (changes?.contains(ChatCallChanges.GenericNotification) == true
             && notificationType == CallNotificationType.SFUError)

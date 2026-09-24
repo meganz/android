@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
+import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -47,6 +48,27 @@ data object FreePlanParticipantsLimitDialogDestination : AppDialogDestinations {
             ) {
                 FreePlanLimitParticipantsDialog(
                     onConfirm = {
+                        onHandled()
+                        navigationHandler.back()
+                    }
+                )
+            }
+        }
+}
+
+data object ForceAppUpdateDialogDestination : AppDialogDestinations {
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+        { navigationHandler, onHandled ->
+
+            entry<ForceAppUpdateNavKey>(
+                metadata = DialogSceneStrategy.dialog(
+                    DialogProperties(
+                        windowTitle = "Force App Update Dialog"
+                    )
+                )
+            ) {
+                ForceAppUpdateDialog(
+                    onDismiss = {
                         onHandled()
                         navigationHandler.back()
                     }

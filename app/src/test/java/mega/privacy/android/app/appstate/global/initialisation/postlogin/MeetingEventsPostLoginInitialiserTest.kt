@@ -3,6 +3,7 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.meeting.navigation.ForceAppUpdateNavKey
 import mega.privacy.android.app.presentation.meeting.navigation.FreePlanParticipantsLimitNavKey
 import mega.privacy.android.app.presentation.meeting.navigation.UpgradeProPlanBottomSheetNavKey
 import mega.privacy.android.domain.entity.call.CallNotificationType
@@ -225,6 +226,94 @@ class MeetingEventsPostLoginInitialiserTest {
         }
 
     @Test
+    fun `test that ForceAppUpdateNavKey is emitted when the call terminates with ProtocolVersion term code`() =
+        runTest {
+            val callFlow = flowOf(
+                ChatCall(
+                    chatId = 1L,
+                    callId = 1L,
+                    status = ChatCallStatus.TerminatingUserParticipation,
+                    changes = listOf(ChatCallChanges.Status),
+                    termCode = ChatCallTermCodeType.ProtocolVersion
+                )
+            )
+
+            whenever(monitorChatCallUpdatesUseCase()).thenReturn(callFlow)
+            underTest("session", false)
+
+            verify(appDialogsEventQueue).emit(
+                argThat<AppDialogEvent> { event ->
+                    event.dialogDestination == ForceAppUpdateNavKey
+                },
+                any()
+            )
+        }
+
+    @Test
+    fun `test that ForceAppUpdateNavKey is emitted when a generic notification reports SFUError with ProtocolVersion term code`() =
+        runTest {
+            val callFlow = flowOf(
+                ChatCall(
+                    chatId = 1L,
+                    callId = 1L,
+                    status = ChatCallStatus.InProgress,
+                    changes = listOf(ChatCallChanges.GenericNotification),
+                    notificationType = CallNotificationType.SFUError,
+                    termCode = ChatCallTermCodeType.ProtocolVersion
+                )
+            )
+
+            whenever(monitorChatCallUpdatesUseCase()).thenReturn(callFlow)
+            underTest("session", false)
+
+            verify(appDialogsEventQueue).emit(
+                argThat<AppDialogEvent> { event ->
+                    event.dialogDestination == ForceAppUpdateNavKey
+                },
+                any()
+            )
+        }
+
+    @Test
+    fun `test that ForceAppUpdateNavKey is not emitted when a generic notification reports another notification type`() =
+        runTest {
+            val callFlow = flowOf(
+                ChatCall(
+                    chatId = 1L,
+                    callId = 1L,
+                    status = ChatCallStatus.InProgress,
+                    changes = listOf(ChatCallChanges.GenericNotification),
+                    notificationType = CallNotificationType.SFUDeny,
+                    termCode = ChatCallTermCodeType.ProtocolVersion
+                )
+            )
+
+            whenever(monitorChatCallUpdatesUseCase()).thenReturn(callFlow)
+            underTest("session", false)
+
+            verifyNoInteractions(appDialogsEventQueue)
+        }
+
+    @Test
+    fun `test that ForceAppUpdateNavKey is not emitted when ProtocolVersion term code and call is in progress`() =
+        runTest {
+            val callFlow = flowOf(
+                ChatCall(
+                    chatId = 1L,
+                    callId = 1L,
+                    status = ChatCallStatus.InProgress,
+                    changes = listOf(ChatCallChanges.Status),
+                    termCode = ChatCallTermCodeType.ProtocolVersion
+                )
+            )
+
+            whenever(monitorChatCallUpdatesUseCase()).thenReturn(callFlow)
+            underTest("session", false)
+
+            verifyNoInteractions(appDialogsEventQueue)
+        }
+
+    @Test
     fun `test that no navigation event is emitted for other term codes`() =
         runTest {
             val callFlow = flowOf(
@@ -241,5 +330,6 @@ class MeetingEventsPostLoginInitialiserTest {
             underTest("session", false)
 
             verifyNoInteractions(navigationEventQueue)
+            verifyNoInteractions(appDialogsEventQueue)
         }
 }

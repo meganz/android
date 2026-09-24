@@ -19,3 +19,10 @@ data class FreePlanParticipantsLimitNavKey(
  */
 @Serializable
 data object UpgradeProPlanBottomSheetNavKey : NavKey
+
+/**
+ * Navigation key for the dialog prompting the user to update the app, shown when a call cannot be
+ * joined because the installed app no longer supports the call protocol version
+ */
+@Serializable
+data object ForceAppUpdateNavKey : DialogNavKey
