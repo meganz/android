@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -143,19 +144,36 @@ internal class NameCollisionViewModelTest {
             }
         }
 
-    private fun copyCollision(parentHandle: Long = 2L) = mock<NodeNameCollision.Default> {
-        on { this.parentHandle } doReturn parentHandle
-        on { type } doReturn NodeNameCollisionType.COPY
+    private fun copyCollision(parentHandle: Long = 2L, isFile: Boolean = false) =
+        mock<NodeNameCollision.Default> {
+            on { this.parentHandle } doReturn parentHandle
+            on { type } doReturn NodeNameCollisionType.COPY
+            on { this.isFile } doReturn isFile
+        }
+
+    private fun uploadCollision(
+        path: String,
+        name: String,
+        renameName: String? = null,
+        isFile: Boolean = true,
+    ) = mock<FileNameCollision> {
+        on { this.path } doReturn UriPath(path)
+        on { this.name } doReturn name
+        on { this.renameName } doReturn renameName
+        on { this.parentHandle } doReturn PARENT_HANDLE
+        on { this.isFile } doReturn isFile
     }
 
-    private fun uploadCollision(path: String, name: String, renameName: String? = null) =
-        mock<FileNameCollision> {
-            on { this.path } doReturn UriPath(path)
-            on { this.name } doReturn name
-            on { this.renameName } doReturn renameName
-            on { this.parentHandle } doReturn PARENT_HANDLE
-            on { this.isFile } doReturn true
-        }
+    /**
+     * Stubs the collision results for a queue that loads as [orderedCollisions]: the first one is the
+     * current collision and the rest are the pending ones.
+     */
+    private suspend fun stubQueue(orderedCollisions: List<NameCollision>) {
+        whenever(getNodeNameCollisionResultUseCase(orderedCollisions.first())) doReturn
+                NodeNameCollisionResult(nameCollision = orderedCollisions.first())
+        whenever(getNodeNameCollisionsResultUseCase(orderedCollisions.drop(1))) doReturn
+                orderedCollisions.drop(1).map { NodeNameCollisionResult(nameCollision = it) }
+    }
 
     private fun expectedUpload(
         pathsAndNames: Map<String, String?>,
@@ -184,10 +202,12 @@ internal class NameCollisionViewModelTest {
         advanceUntilIdle()
 
         underTest.uiState.test {
-            val event = expectMostRecentItem().outcome
+            val state = expectMostRecentItem()
+            val event = state.outcome
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
             assertThat(((event as StateEventWithContentTriggered).content as NameCollisionOutcome.ActionCompleted).result.message)
                 .isEqualTo(message)
+            assertThat(state.dismissEvent).isEqualTo(consumed)
         }
     }
 
@@ -879,6 +899,211 @@ internal class NameCollisionViewModelTest {
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().dismissEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that replaceUpdateOrMerge presents the first folder when the batched files leave folders pending`() =
+        runTest {
+            val (file1, file2) = List(2) { copyCollision(isFile = true) }
+            val (folder1, folder2) = List(2) { copyCollision(isFile = false) }
+            stubQueue(listOf(file1, file2, folder1, folder2))
+            whenever(copyCollidedNodesUseCase(listOf(file1, file2), false)) doReturn
+                    MoveRequestResult.Copy(2, 0)
+
+            initUnderTest(multipleArgs(listOf(file1, folder1, file2, folder2)))
+            advanceUntilIdle()
+            underTest.replaceUpdateOrMerge(applyOnNext = true)
+            advanceUntilIdle()
+
+            verify(copyCollidedNodesUseCase).invoke(listOf(file1, file2), false)
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.currentCollision?.nameCollision).isEqualTo(folder1)
+                assertThat(state.pendingFileCollisions).isEqualTo(0)
+                assertThat(state.pendingFolderCollisions).isEqualTo(1)
+                assertThat(state.hasPendingCollisions).isTrue()
+                assertThat(state.outcome).isEqualTo(consumed())
+                assertThat(state.dismissEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that the outcome is completed when the folders left after the batched files are resolved one by one`() =
+        runTest {
+            val (file1, file2) = List(2) { copyCollision(isFile = true) }
+            val (folder1, folder2) = List(2) { copyCollision(isFile = false) }
+            val message = "2 folders merged"
+            stubQueue(listOf(file1, file2, folder1, folder2))
+            whenever(copyCollidedNodesUseCase(listOf(file1, file2), false)) doReturn
+                    MoveRequestResult.Copy(2, 0)
+            whenever(copyCollidedNodesUseCase(listOf(folder1), false)) doReturn
+                    MoveRequestResult.Copy(1, 0)
+            whenever(copyCollidedNodesUseCase(listOf(folder2), false)) doReturn
+                    MoveRequestResult.Copy(1, 0)
+            whenever(copyRequestMessageMapper(any())) doReturn message
+
+            initUnderTest(multipleArgs(listOf(file1, folder1, file2, folder2)))
+            advanceUntilIdle()
+            underTest.replaceUpdateOrMerge(applyOnNext = true)
+            advanceUntilIdle()
+            underTest.replaceUpdateOrMerge(applyOnNext = false)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.currentCollision?.nameCollision).isEqualTo(folder2)
+                assertThat(state.pendingFolderCollisions).isEqualTo(0)
+                assertThat(state.hasPendingCollisions).isFalse()
+                assertThat(state.outcome).isEqualTo(consumed())
+            }
+
+            underTest.replaceUpdateOrMerge(applyOnNext = false)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                val event = state.outcome
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat(((event as StateEventWithContentTriggered).content as NameCollisionOutcome.ActionCompleted).result.message)
+                    .isEqualTo(message)
+                assertThat(state.dismissEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that cancel presents the first folder when the skipped files leave folders pending`() =
+        runTest {
+            val file1 = uploadCollision(path = "path1", name = "name1")
+            val file2 = uploadCollision(path = "path2", name = "name2")
+            val folder1 = uploadCollision(path = "folder1", name = "folder1", isFile = false)
+            val folder2 = uploadCollision(path = "folder2", name = "folder2", isFile = false)
+            stubQueue(listOf(file1, file2, folder1, folder2))
+
+            initUnderTest(multipleArgs(listOf(file1, folder1, file2, folder2)))
+            advanceUntilIdle()
+            underTest.cancel(applyOnNext = true)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.currentCollision?.nameCollision).isEqualTo(folder1)
+                assertThat(state.pendingFileCollisions).isEqualTo(0)
+                assertThat(state.pendingFolderCollisions).isEqualTo(1)
+                assertThat(state.hasPendingCollisions).isTrue()
+                assertThat(state.outcome).isEqualTo(consumed())
+                assertThat(state.dismissEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that the dismiss event is triggered when the folders left after the skipped files are skipped too`() =
+        runTest {
+            val file1 = uploadCollision(path = "path1", name = "name1")
+            val file2 = uploadCollision(path = "path2", name = "name2")
+            val folder1 = uploadCollision(path = "folder1", name = "folder1", isFile = false)
+            val folder2 = uploadCollision(path = "folder2", name = "folder2", isFile = false)
+            stubQueue(listOf(file1, file2, folder1, folder2))
+
+            initUnderTest(multipleArgs(listOf(file1, folder1, file2, folder2)))
+            advanceUntilIdle()
+            underTest.cancel(applyOnNext = true)
+            advanceUntilIdle()
+            underTest.cancel(applyOnNext = true)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.hasPendingCollisions).isFalse()
+                assertThat(state.outcome).isEqualTo(consumed())
+                assertThat(state.dismissEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that the batch upload carries only the files when the folders behind them are left pending`() =
+        runTest {
+            val file1 = uploadCollision(path = "path1", name = "name1")
+            val file2 = uploadCollision(path = "path2", name = "name2")
+            val folder1 = uploadCollision(path = "folder1", name = "folder1", isFile = false)
+            val folder2 = uploadCollision(path = "folder2", name = "folder2", isFile = false)
+            stubQueue(listOf(file1, file2, folder1, folder2))
+
+            initUnderTest(multipleArgs(listOf(file1, folder1, file2, folder2)))
+            advanceUntilIdle()
+            underTest.replaceUpdateOrMerge(applyOnNext = true)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().uploadEvent).isEqualTo(
+                    expectedUpload(
+                        pathsAndNames = mapOf("path1" to "name1", "path2" to "name2"),
+                        choice = null,
+                    )
+                )
+            }
+
+            underTest.consumeUploadEvent()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.currentCollision?.nameCollision).isEqualTo(folder1)
+                assertThat(state.pendingFolderCollisions).isEqualTo(1)
+                assertThat(state.uploadedFilesCount).isEqualTo(2)
+                assertThat(state.dismissEvent).isEqualTo(consumed)
+            }
+
+            underTest.replaceUpdateOrMerge(applyOnNext = true)
+            advanceUntilIdle()
+            underTest.consumeUploadEvent()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().dismissEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that the resolved outcome carries every choice when the skipped files leave folders to merge in the folder upload context`() =
+        runTest {
+            val file1 = uploadCollision(path = "path1", name = "name1")
+            val file2 = uploadCollision(path = "path2", name = "name2")
+            val folder1 = uploadCollision(path = "folder1", name = "folder1", isFile = false)
+            val folder2 = uploadCollision(path = "folder2", name = "folder2", isFile = false)
+            stubQueue(listOf(file1, file2, folder1, folder2))
+            whenever(getFileVersionsOption(any())) doReturn false
+
+            initUnderTest(
+                multipleArgs(listOf(file1, folder1, file2, folder2), isFolderUploadContext = true)
+            )
+            advanceUntilIdle()
+            underTest.cancel(applyOnNext = true)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.currentCollision?.nameCollision).isEqualTo(folder1)
+                assertThat(state.outcome).isEqualTo(consumed())
+                assertThat(state.dismissEvent).isEqualTo(consumed)
+            }
+
+            underTest.replaceUpdateOrMerge(applyOnNext = true)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = expectMostRecentItem().outcome
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val resolved = (event as StateEventWithContentTriggered).content
+                assertThat(resolved).isInstanceOf(NameCollisionOutcome.Resolved::class.java)
+                assertThat((resolved as NameCollisionOutcome.Resolved).collisions.map { it.nameCollision to it.choice })
+                    .containsExactly(
+                        file1 to NameCollisionChoice.CANCEL,
+                        file2 to NameCollisionChoice.CANCEL,
+                        folder1 to NameCollisionChoice.REPLACE_UPDATE_MERGE,
+                        folder2 to NameCollisionChoice.REPLACE_UPDATE_MERGE,
+                    )
+                    .inOrder()
             }
         }
 

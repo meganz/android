@@ -130,6 +130,14 @@ class NameCollisionViewModel @AssistedInject constructor(
     private val renameNames: List<String> get() = progress.value.renameNames
 
     /**
+     * True once every collision has been taken off the queue: nothing is presented and nothing waits
+     * behind it. The batch paths clear the current collision as they take it, so a collision that is
+     * still current is always one awaiting the user's choice.
+     */
+    private val isQueueDrained: Boolean
+        get() = progress.value.currentCollision == null && pendingCollisions.isEmpty()
+
+    /**
      * Immutable UI state.
      *
      * Lazy so the collisions are only loaded, and the file versions option only watched, once the
@@ -360,23 +368,20 @@ class NameCollisionViewModel @AssistedInject constructor(
         }
 
     /**
-     * After having the option "Apply on the next conflicts" checked, manages data to apply
-     * the same user's choice for all the pending file collisions.
+     * After having the option "Apply on the next conflicts" checked with both files and folders
+     * pending, takes the current collision and every file behind it off the queue so the caller can
+     * apply the same choice to all of them. The queue is left on the first folder, which is then
+     * presented for a choice of its own.
      *
-     * @param choice    Resolution type as [NameCollisionChoice].
-     * @return All the pending file collisions.
+     * @return The file collisions taken off the queue, the current one first.
      */
-    private fun proceedWithAllFiles(choice: NameCollisionChoice): List<NodeNameCollisionResult> {
-        val fileCollisions = mutableListOf<NodeNameCollisionResult>().apply {
-            add(currentCollision() ?: return@apply)
+    private fun proceedWithAllFiles(): List<NodeNameCollisionResult> = buildList {
+        var current = currentCollision()
+        while (current != null && current.nameCollision.isFile) {
+            add(current)
+            presentNextCollision()
+            current = currentCollision()
         }
-
-        while (pendingFileCollisions > 0) {
-            fileCollisions.add(pendingCollisions[0])
-            continueWithNext(choice)
-        }
-
-        return fileCollisions
     }
 
     /**
@@ -403,7 +408,9 @@ class NameCollisionViewModel @AssistedInject constructor(
     }
 
     /**
-     * Manages data to pass to the next collision.
+     * Records the user's [choice] for the current collision and moves the queue on to the next one.
+     * Callers decide what a drained queue means for them, since a skip or an upload leaves the screen
+     * with a dismiss while a copy or a movement raises a terminal outcome.
      *
      *  @param choice    Resolution type as [NameCollisionChoice].
      */
@@ -417,23 +424,28 @@ class NameCollisionViewModel @AssistedInject constructor(
                 return
             }
         }
+        presentNextCollision()
+    }
 
+    /**
+     * Makes the first pending collision the current one, or clears the current one when nothing is
+     * pending, leaving the queue drained for the caller to act on. The pending counts exclude the
+     * first collision of each type, so the first folder to follow the files takes nothing off the
+     * folder count.
+     */
+    private fun presentNextCollision() {
         val nextCollision = pendingCollisions.firstOrNull() ?: run {
             updateCurrentCollisionState(null)
-            // A copy or movement of the last collision has already raised its terminal outcome; the
-            // dismiss is only for the paths that leave without one, such as a skip or an upload.
-            if (progress.value.outcome !is StateEventWithContentTriggered) {
-                setDismissEvent()
-            }
             return
         }
         val isFile = nextCollision.nameCollision.isFile
+        val isFirstFolder = !isFile && currentCollision()?.nameCollision?.isFile == true
         progress.update {
             it.copy(
                 currentCollision = nextCollision,
                 pendingCollisions = it.pendingCollisions.drop(1),
                 pendingFileCollisions = if (isFile) it.pendingFileCollisions - 1 else it.pendingFileCollisions,
-                pendingFolderCollisions = if (isFile) it.pendingFolderCollisions else it.pendingFolderCollisions - 1,
+                pendingFolderCollisions = if (isFile || isFirstFolder) it.pendingFolderCollisions else it.pendingFolderCollisions - 1,
             )
         }
     }
@@ -460,10 +472,24 @@ class NameCollisionViewModel @AssistedInject constructor(
         deleteCacheFilesForPendingFileCollisions(applyOnNext)
         when {
             applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 ->
-                proceedWithAllFiles(NameCollisionChoice.CANCEL)
+                skipAllFiles()
 
             applyOnNext -> cancelAll()
-            else -> continueWithNext(NameCollisionChoice.CANCEL)
+            else -> {
+                continueWithNext(NameCollisionChoice.CANCEL)
+                if (isQueueDrained) setDismissEvent()
+            }
+        }
+    }
+
+    /**
+     * Skips the current file and the pending ones, leaving the folders to be presented. In the folder
+     * upload context the skipped files still have to be reported back to the caller with their choice.
+     */
+    private fun skipAllFiles() {
+        val skipped = proceedWithAllFiles().map { it.copy(choice = NameCollisionChoice.CANCEL) }
+        if (isFolderUploadContext) {
+            progress.update { it.copy(resolvedCollisions = it.resolvedCollisions + skipped) }
         }
     }
 
@@ -522,7 +548,7 @@ class NameCollisionViewModel @AssistedInject constructor(
         val collisionType = getCollisionType()
         when {
             applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 ->
-                proceedWithAll(collisionType, proceedWithAllFiles(choiceFor(rename)), rename)
+                proceedWithAll(collisionType, proceedWithAllFiles(), rename)
 
             applyOnNext -> proceedWithAll(collisionType, getAllPendingCollisions(), rename)
             else -> proceedWithCurrent(collisionType, rename)
@@ -554,12 +580,12 @@ class NameCollisionViewModel @AssistedInject constructor(
         if (rename) NameCollisionChoice.RENAME else NameCollisionChoice.REPLACE_UPDATE_MERGE
 
     /**
-     * Processes all the pending collisions, including the current one,
-     * and returns a list with all of them.
+     * Takes every collision off the queue, the current one included, and returns them. Nothing is
+     * left to present, so the queue is drained once the caller's action completes.
      */
     private fun getAllPendingCollisions(): List<NodeNameCollisionResult> {
         val allPendingCollisions = listOfNotNull(currentCollision()) + pendingCollisions
-        progress.update { it.copy(pendingCollisions = emptyList()) }
+        progress.update { it.copy(currentCollision = null, pendingCollisions = emptyList()) }
         return allPendingCollisions
     }
 
@@ -615,7 +641,7 @@ class NameCollisionViewModel @AssistedInject constructor(
             val resolved = resolvedCollisions + list.map { it.copy(choice = choice) }
             progress.update { it.copy(resolvedCollisions = resolved) }
 
-            if (pendingCollisions.isEmpty()) {
+            if (isQueueDrained) {
                 setOutcome(NameCollisionOutcome.Resolved(resolved))
             }
             return
@@ -652,8 +678,8 @@ class NameCollisionViewModel @AssistedInject constructor(
             runCatching {
                 moveCollidedNodesUseCase(nodeCollisions, rename)
             }.onSuccess {
-                setMovementResult(it, nodeCollisions.first().parentHandle)
                 if (thenContinue) continueWithNext(choiceFor(rename))
+                setMovementResult(it, nodeCollisions.first().parentHandle)
             }.onFailure {
                 setOutcome(NameCollisionOutcome.Failed(it))
                 Timber.w(it)
@@ -675,7 +701,7 @@ class NameCollisionViewModel @AssistedInject constructor(
             setMoveLatestPath(moveToHandle)
         // The outcome is only raised once the whole queue is resolved; the intermediate movements of a
         // sequential resolution simply advance to the next collision.
-        if (pendingCollisions.isNotEmpty()) return
+        if (!isQueueDrained) return
         setOutcome(
             NameCollisionOutcome.ActionCompleted(
                 NameCollisionActionResult(
@@ -701,11 +727,11 @@ class NameCollisionViewModel @AssistedInject constructor(
             runCatching {
                 copyCollidedNodesUseCase(nameCollisions = nodeCollisions, rename = rename)
             }.onSuccess {
+                if (thenContinue) continueWithNext(choiceFor(rename))
                 setCopyResult(
                     copyResult = it.toCopyRequestResult(),
                     copyToHandle = nodeCollisions.first().parentHandle,
                 )
-                if (thenContinue) continueWithNext(choiceFor(rename))
             }.onFailure {
                 setOutcome(NameCollisionOutcome.Failed(it))
                 Timber.w(it)
@@ -726,7 +752,7 @@ class NameCollisionViewModel @AssistedInject constructor(
             setCopyLatestPath(copyToHandle)
         // The outcome is only raised once the whole queue is resolved; the intermediate copies of a
         // sequential resolution simply advance to the next collision.
-        if (pendingCollisions.isNotEmpty()) return
+        if (!isQueueDrained) return
         setOutcome(
             NameCollisionOutcome.ActionCompleted(
                 NameCollisionActionResult(
@@ -782,13 +808,10 @@ class NameCollisionViewModel @AssistedInject constructor(
     fun consumeUploadEvent() {
         with(progress.value.uploadEvent) {
             if (this is StateEventWithContentTriggered) {
-                val choice = content.collisionChoice
-                when {
-                    choice != null -> continueWithNext(choice)
-                    // A batch upload carries no choice to advance by: it took the rest of the queue
-                    // with it, unless folders are still waiting for a choice of their own.
-                    pendingCollisions.isEmpty() -> setDismissEvent()
-                }
+                // A batch upload carries no choice to advance by: it already took its files off the
+                // queue, leaving any folders behind them to be presented for a choice of their own.
+                content.collisionChoice?.let { continueWithNext(it) }
+                if (isQueueDrained) setDismissEvent()
                 progress.update { state -> state.copy(uploadEvent = consumed()) }
             }
         }
