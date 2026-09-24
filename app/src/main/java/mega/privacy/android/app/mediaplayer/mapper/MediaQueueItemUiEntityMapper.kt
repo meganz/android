@@ -1,10 +1,10 @@
 package mega.privacy.android.app.mediaplayer.mapper
 
 import androidx.annotation.DrawableRes
-import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.mediaplayer.presentation.model.MediaQueueItemType
 import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration

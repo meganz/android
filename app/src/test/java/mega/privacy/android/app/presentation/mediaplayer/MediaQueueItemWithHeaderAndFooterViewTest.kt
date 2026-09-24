@@ -8,7 +8,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.view.AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG
@@ -18,6 +17,7 @@ import mega.privacy.android.app.mediaplayer.queue.view.MEDIA_QUEUE_ITEM_PREFIX_R
 import mega.privacy.android.app.mediaplayer.queue.view.MediaQueueItemWithHeaderAndFooterView
 import mega.privacy.android.app.mediaplayer.queue.view.VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG
+import mega.privacy.android.feature.mediaplayer.presentation.model.MediaQueueItemType
 import mega.privacy.android.icon.pack.R
 import org.junit.Rule
 import org.junit.Test

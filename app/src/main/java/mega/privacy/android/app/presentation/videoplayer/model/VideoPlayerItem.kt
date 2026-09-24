@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.videoplayer.model
 
 import androidx.annotation.DrawableRes
-import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
+import mega.privacy.android.feature.mediaplayer.presentation.model.MediaQueueItemType
 import mega.privacy.android.icon.pack.R as iconPackR
 
 

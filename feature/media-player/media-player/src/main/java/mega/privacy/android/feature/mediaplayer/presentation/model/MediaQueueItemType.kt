@@ -1,4 +1,4 @@
-package mega.privacy.android.app.mediaplayer.queue.model
+package mega.privacy.android.feature.mediaplayer.presentation.model
 
 /**
  * Enum class to represent the media queue item type.

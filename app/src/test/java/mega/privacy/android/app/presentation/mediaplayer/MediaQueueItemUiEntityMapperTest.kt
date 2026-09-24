@@ -3,10 +3,10 @@ package mega.privacy.android.app.presentation.mediaplayer
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.mediaplayer.mapper.MediaQueueItemUiEntityMapper
-import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.mediaplayer.presentation.model.MediaQueueItemType
 import mega.privacy.android.icon.pack.R
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll

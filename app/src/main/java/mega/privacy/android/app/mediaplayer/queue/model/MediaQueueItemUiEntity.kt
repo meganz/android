@@ -2,6 +2,7 @@ package mega.privacy.android.app.mediaplayer.queue.model
 
 import androidx.annotation.DrawableRes
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.mediaplayer.presentation.model.MediaQueueItemType
 import java.io.File
 
 /**
