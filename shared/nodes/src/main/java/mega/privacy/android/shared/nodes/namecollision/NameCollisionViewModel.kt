@@ -6,6 +6,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
@@ -92,6 +93,7 @@ class NameCollisionViewModel @AssistedInject constructor(
     private val collisions: List<NameCollision> = when (args) {
         is NameCollisionArgs.Single -> listOf(args.collision)
         is NameCollisionArgs.Multiple -> args.collisions
+        NameCollisionArgs.MissingLaunch -> emptyList()
     }
     private val isFolderUploadContext = args.isFolderUploadContext
     private val pitagTrigger =
@@ -114,6 +116,7 @@ class NameCollisionViewModel @AssistedInject constructor(
             uploadedFilesCount = 0,
             uploadEvent = consumed(),
             outcome = consumed(),
+            dismissEvent = consumed,
         )
     )
 
@@ -147,6 +150,7 @@ class NameCollisionViewModel @AssistedInject constructor(
                 uploadedFilesCount = resolution.uploadedFilesCount,
                 uploadEvent = resolution.uploadEvent,
                 outcome = resolution.outcome,
+                dismissEvent = resolution.dismissEvent,
             )
         }.catch { Timber.e(it) }
             .asUiStateFlow(
@@ -161,6 +165,7 @@ class NameCollisionViewModel @AssistedInject constructor(
                     uploadedFilesCount = 0,
                     uploadEvent = consumed(),
                     outcome = consumed(),
+                    dismissEvent = consumed,
                 ),
             )
     }
@@ -243,9 +248,12 @@ class NameCollisionViewModel @AssistedInject constructor(
      * collision is renamed straight away if it is being copied to its origin.
      */
     private fun loadCollisions() {
+        if (collisions.isEmpty()) {
+            setDismissEvent()
+            return
+        }
         viewModelScope.launch {
             runCatching {
-                require(collisions.isNotEmpty()) { "Collisions list is empty" }
                 (collisions.first() as? NodeNameCollision)?.let { checkCopyToOrigin(it) }
                 reorderNodeNameCollisionsUseCase(collisions)
             }.onSuccess { (reorderedCollisions, pendingFiles, pendingFolders) ->
@@ -385,8 +393,11 @@ class NameCollisionViewModel @AssistedInject constructor(
                 setOutcome(NameCollisionOutcome.Resolved(resolved))
             }
 
-            else -> progress.update {
-                it.copy(pendingCollisions = emptyList(), currentCollision = null)
+            else -> {
+                progress.update {
+                    it.copy(pendingCollisions = emptyList(), currentCollision = null)
+                }
+                setDismissEvent()
             }
         }
     }
@@ -409,6 +420,11 @@ class NameCollisionViewModel @AssistedInject constructor(
 
         val nextCollision = pendingCollisions.firstOrNull() ?: run {
             updateCurrentCollisionState(null)
+            // A copy or movement of the last collision has already raised its terminal outcome; the
+            // dismiss is only for the paths that leave without one, such as a skip or an upload.
+            if (progress.value.outcome !is StateEventWithContentTriggered) {
+                setDismissEvent()
+            }
             return
         }
         val isFile = nextCollision.nameCollision.isFile
@@ -657,11 +673,14 @@ class NameCollisionViewModel @AssistedInject constructor(
     ) {
         if (moveToHandle != -1L)
             setMoveLatestPath(moveToHandle)
+        // The outcome is only raised once the whole queue is resolved; the intermediate movements of a
+        // sequential resolution simply advance to the next collision.
+        if (pendingCollisions.isNotEmpty()) return
         setOutcome(
             NameCollisionOutcome.ActionCompleted(
                 NameCollisionActionResult(
                     message = nodeMoveRequestMessageMapper(movementResult),
-                    shouldFinish = pendingCollisions.isEmpty(),
+                    shouldFinish = true,
                 )
             )
         )
@@ -705,11 +724,14 @@ class NameCollisionViewModel @AssistedInject constructor(
     private fun setCopyResult(copyResult: CopyRequestResult, copyToHandle: Long) {
         if (copyToHandle != -1L)
             setCopyLatestPath(copyToHandle)
+        // The outcome is only raised once the whole queue is resolved; the intermediate copies of a
+        // sequential resolution simply advance to the next collision.
+        if (pendingCollisions.isNotEmpty()) return
         setOutcome(
             NameCollisionOutcome.ActionCompleted(
                 NameCollisionActionResult(
                     message = copyRequestMessageMapper(copyResult),
-                    shouldFinish = pendingCollisions.isEmpty(),
+                    shouldFinish = true,
                 )
             )
         )
@@ -760,7 +782,13 @@ class NameCollisionViewModel @AssistedInject constructor(
     fun consumeUploadEvent() {
         with(progress.value.uploadEvent) {
             if (this is StateEventWithContentTriggered) {
-                content.collisionChoice?.let { continueWithNext(it) }
+                val choice = content.collisionChoice
+                when {
+                    choice != null -> continueWithNext(choice)
+                    // A batch upload carries no choice to advance by: it took the rest of the queue
+                    // with it, unless folders are still waiting for a choice of their own.
+                    pendingCollisions.isEmpty() -> setDismissEvent()
+                }
                 progress.update { state -> state.copy(uploadEvent = consumed()) }
             }
         }
@@ -777,6 +805,17 @@ class NameCollisionViewModel @AssistedInject constructor(
         progress.update { it.copy(outcome = consumed()) }
     }
 
+    private fun setDismissEvent() {
+        progress.update { it.copy(dismissEvent = triggered) }
+    }
+
+    /**
+     * Consumes the dismiss event.
+     */
+    fun consumeDismissEvent() {
+        progress.update { it.copy(dismissEvent = consumed) }
+    }
+
     private data class CollisionProgress(
         val currentCollision: NodeNameCollisionResult?,
         val isCopyToOrigin: Boolean,
@@ -788,6 +827,7 @@ class NameCollisionViewModel @AssistedInject constructor(
         val uploadedFilesCount: Int,
         val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload.CollidedFiles>,
         val outcome: StateEventWithContent<NameCollisionOutcome>,
+        val dismissEvent: StateEvent,
     )
 
     /**

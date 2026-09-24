@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.nodes.namecollision
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
@@ -17,12 +18,15 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property pendingFileCollisions  Number of file collisions left to resolve after the current one.
  * @property pendingFolderCollisions Number of folder collisions left to resolve after the current one.
  * @property hasPendingCollisions   True while collisions are still queued behind the current one; false
- *                                  once an action has taken them all, which is when the screen may finish.
+ *                                  once an action has taken them all.
  * @property uploadedFilesCount     Number of files the user has chosen to upload so far, for the
  *                                  "upload started" message once the last collision is resolved.
  * @property uploadEvent            Event carrying the upload to be forwarded to the transfer handler.
- * @property outcome                Event carrying what became of the user's last action, see
- *                                  [NameCollisionOutcome].
+ * @property outcome                Event carrying the terminal result of the user's action to return
+ *                                  to the caller before the screen closes, see [NameCollisionOutcome].
+ * @property dismissEvent           Event asking the screen to close without returning a result, raised
+ *                                  when there is nothing to resolve or the user has skipped or uploaded
+ *                                  the last collision.
  */
 data class NameCollisionUiState(
     val currentCollision: NodeNameCollisionResult? = null,
@@ -34,4 +38,5 @@ data class NameCollisionUiState(
     val uploadedFilesCount: Int = 0,
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload.CollidedFiles> = consumed(),
     val outcome: StateEventWithContent<NameCollisionOutcome> = consumed(),
+    val dismissEvent: StateEvent = consumed,
 )

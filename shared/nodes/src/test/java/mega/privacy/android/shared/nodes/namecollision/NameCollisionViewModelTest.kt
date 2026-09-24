@@ -807,6 +807,81 @@ internal class NameCollisionViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the dismiss event is triggered when the launch source is missing`() = runTest {
+        initUnderTest(NameCollisionArgs.MissingLaunch)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().dismissEvent).isEqualTo(triggered)
+        }
+
+        underTest.consumeDismissEvent()
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().dismissEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that the dismiss event is triggered when the last collision is skipped`() = runTest {
+        val nameCollision = mock<FileNameCollision> {
+            on { this.path } doReturn UriPath("/cacheFolder/Mega/file.txt")
+        }
+        val collisionResult = mock<NodeNameCollisionResult> {
+            on { this.nameCollision } doReturn nameCollision
+        }
+        whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResult
+
+        initUnderTest(singleArgs(nameCollision))
+        advanceUntilIdle()
+        underTest.cancel(applyOnNext = false)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().dismissEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that the dismiss event is triggered when the last file upload is consumed`() = runTest {
+        val nameCollision = uploadCollision(path = "path", name = "name")
+        whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn
+                NodeNameCollisionResult(nameCollision = nameCollision)
+
+        initUnderTest(singleArgs(nameCollision))
+        advanceUntilIdle()
+        underTest.replaceUpdateOrMerge(applyOnNext = false)
+        advanceUntilIdle()
+        underTest.consumeUploadEvent()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().dismissEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that the dismiss event is triggered when the batch upload of the pending files is consumed`() =
+        runTest {
+            val nameCollision = uploadCollision(path = "path1", name = "name1")
+            val nameCollision2 = uploadCollision(path = "path2", name = "name2")
+            whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn
+                    NodeNameCollisionResult(nameCollision = nameCollision)
+            whenever(getNodeNameCollisionsResultUseCase(listOf(nameCollision2))) doReturn
+                    listOf(NodeNameCollisionResult(nameCollision = nameCollision2))
+
+            initUnderTest(multipleArgs(listOf(nameCollision, nameCollision2)))
+            advanceUntilIdle()
+            underTest.replaceUpdateOrMerge(applyOnNext = true)
+            advanceUntilIdle()
+            underTest.consumeUploadEvent()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().dismissEvent).isEqualTo(triggered)
+            }
+        }
+
     companion object {
         private const val COLLISION_HANDLE = 123L
         private const val PARENT_HANDLE = 456L

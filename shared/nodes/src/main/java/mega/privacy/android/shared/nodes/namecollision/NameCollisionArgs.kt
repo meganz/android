@@ -33,4 +33,12 @@ sealed interface NameCollisionArgs {
         val collisions: List<NameCollision>,
         override val isFolderUploadContext: Boolean,
     ) : NameCollisionArgs
+
+    /**
+     * The collision(s) could not be recovered, for example when the process was killed and the launch
+     * source was lost. There is nothing to resolve, so the screen closes itself.
+     */
+    data object MissingLaunch : NameCollisionArgs {
+        override val isFolderUploadContext: Boolean = false
+    }
 }
