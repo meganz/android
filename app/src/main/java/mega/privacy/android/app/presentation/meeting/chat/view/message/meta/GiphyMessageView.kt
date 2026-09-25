@@ -104,22 +104,24 @@ fun GiphyMessageView(
 /**
  * Gets the original src of a Giphy by replacing GIPHY_URL to the endpoint.
  *
- * @return The final src with real endpoint.
+ * Only sources served by the MEGA Giphy endpoint are accepted.
+ *
+ * @return The final src with real endpoint, or null if the src does not point to it.
  */
-fun String.toGiphyUri(): Uri? =
-    when {
-        !isNullOrEmpty() && this.contains(GiphyService.GIPHY_URL) -> {
-            Uri.parse(this.replace(GiphyService.GIPHY_URL, GiphyService.BASE_URL))
-        }
+fun String.toGiphyUri(): Uri? {
+    val url = when {
+        startsWith(GiphyService.GIPHY_URL) ->
+            GiphyService.BASE_URL + removePrefix(GiphyService.GIPHY_URL)
 
-        !isNullOrEmpty() -> {
-            Timber.e("Wrong giphyUri: $this")
-            Uri.parse(this)
-        }
-
-        else -> {
-            Timber.e("Wrong giphyUri: $this")
-            null
-        }
+        startsWith(GiphyService.BASE_URL) -> this
+        else -> null
     }
+    val uri = url?.let { Uri.parse(it) }
+        ?.takeIf { it.scheme == GIPHY_SCHEME && it.host == GIPHY_HOST }
+    if (uri == null) Timber.w("Rejected giphy src: $this")
+    return uri
+}
+
+private const val GIPHY_SCHEME = "https"
+private const val GIPHY_HOST = "giphy.mega.nz"
 
