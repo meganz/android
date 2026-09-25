@@ -15,6 +15,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeExtensionException
@@ -22,9 +23,13 @@ import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.exception.NodeNameException
 import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_TEXT_FILE_EXTENSION
+import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.RICH_TEXT_FILE_EXTENSION
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.PlainTextFileCreatedEvent
+import mega.privacy.mobile.analytics.event.RichTextFileCreatedEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -32,8 +37,11 @@ import org.mockito.kotlin.verify
 @RunWith(AndroidJUnit4::class)
 class NewTextFileNodeDialogTest {
 
+    private val composeTestRule = createComposeRule()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -303,5 +311,92 @@ class NewTextFileNodeDialogTest {
         composeTestRule.onNodeWithText(
             context.getString(sharedR.string.new_text_file_invalid_extension_error_message)
         ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that creating a plain text file reports the plain text event`() {
+        setDialogWithValidatedName("notes$DEFAULT_TEXT_FILE_EXTENSION")
+
+        assertThat(analyticsRule.events).contains(PlainTextFileCreatedEvent)
+        assertThat(analyticsRule.events).doesNotContain(RichTextFileCreatedEvent)
+    }
+
+    @Test
+    fun `test that creating a rich text file reports the rich text event`() {
+        setDialogWithValidatedName("notes$RICH_TEXT_FILE_EXTENSION")
+
+        assertThat(analyticsRule.events).contains(RichTextFileCreatedEvent)
+        assertThat(analyticsRule.events).doesNotContain(PlainTextFileCreatedEvent)
+    }
+
+    @Test
+    fun `test that a failed validation reports nothing`() {
+        setRichTextDialog(fileName = "notes$RICH_TEXT_FILE_EXTENSION")
+
+        composeTestRule.onNodeWithText(context.getString(sharedR.string.general_create_label))
+            .performClick()
+
+        assertThat(analyticsRule.events).doesNotContain(RichTextFileCreatedEvent)
+        assertThat(analyticsRule.events).doesNotContain(PlainTextFileCreatedEvent)
+    }
+
+    @Test
+    fun `test that the link dialog reports nothing when it has no rich text option`() {
+        setDialogWithValidatedName("shortcut.url", showRichTextOption = false)
+
+        assertThat(analyticsRule.events).doesNotContain(PlainTextFileCreatedEvent)
+        assertThat(analyticsRule.events).doesNotContain(RichTextFileCreatedEvent)
+    }
+
+    @Test
+    fun `test that the create button still validates the file name`() {
+        var validated = false
+        setRichTextDialog(
+            fileName = "notes$DEFAULT_TEXT_FILE_EXTENSION",
+            validateFileName = { validated = true },
+        )
+
+        composeTestRule.onNodeWithText(context.getString(sharedR.string.general_create_label))
+            .performClick()
+
+        assertThat(validated).isTrue()
+    }
+
+    private fun setRichTextDialog(
+        fileName: String,
+        validateFileName: () -> Unit = {},
+    ) {
+        composeTestRule.setContent {
+            NewTextFileNodeDialog(
+                uiState = defaultState(fileName = fileName, showRichTextOption = true),
+                title = title,
+                onConfirm = {},
+                onFileNameChanged = {},
+                validateFileName = validateFileName,
+                onValidationSuccessEventConsumed = {},
+            )
+        }
+    }
+
+    /** Renders the dialog with validation already passed for [fileName]. */
+    private fun setDialogWithValidatedName(
+        fileName: String,
+        showRichTextOption: Boolean = true,
+    ) {
+        composeTestRule.setContent {
+            NewTextFileNodeDialog(
+                uiState = defaultState(
+                    fileName = fileName,
+                    validationSuccessEvent = triggered(fileName),
+                    showRichTextOption = showRichTextOption,
+                ),
+                title = title,
+                onConfirm = {},
+                onFileNameChanged = {},
+                validateFileName = {},
+                onValidationSuccessEventConsumed = {},
+            )
+        }
+        composeTestRule.waitForIdle()
     }
 }

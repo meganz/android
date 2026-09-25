@@ -16,6 +16,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
     implementation(project(":domain:chat"))
@@ -33,9 +34,11 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(lib.logging.timber)
     implementation(project(":feature:text-editor:text-editor-snowflake-components"))
+    implementation(lib.mega.analytics)
     implementation(lib.mega.core.ui)
 
     testImplementation(project(":core-test"))
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)

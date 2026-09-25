@@ -33,6 +33,7 @@ import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.components.inputfields.TextInputField
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.exception.DotNameException
 import mega.privacy.android.domain.exception.DoubleDotNameException
 import mega.privacy.android.domain.exception.EmptyNodeNameException
@@ -45,6 +46,8 @@ import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiS
 import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.RICH_TEXT_FILE_EXTENSION
 import mega.privacy.android.shared.nodes.dialog.newfolder.INVALID_CHARACTERS
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.PlainTextFileCreatedEvent
+import mega.privacy.mobile.analytics.event.RichTextFileCreatedEvent
 
 /**
  * Stateless dialog for creating a new text-like file (e.g. a `.txt` text file or a `.url`
@@ -87,6 +90,17 @@ fun NewTextFileNodeDialog(
                 event = uiState.validationSuccessEvent,
                 onConsumed = onValidationSuccessEventConsumed,
             ) { fileName ->
+                // Reported here rather than on the Create press: validation rejects empty,
+                // invalid and duplicate names, and nothing is created in those cases.
+                if (uiState.showRichTextOption) {
+                    Analytics.tracker.trackEvent(
+                        if (fileName.endsWith(RICH_TEXT_FILE_EXTENSION, ignoreCase = true)) {
+                            RichTextFileCreatedEvent
+                        } else {
+                            PlainTextFileCreatedEvent
+                        }
+                    )
+                }
                 onConfirm(fileName)
             }
 

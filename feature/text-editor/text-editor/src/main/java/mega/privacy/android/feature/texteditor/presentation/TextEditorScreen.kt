@@ -83,6 +83,7 @@ import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.applyScrollToHideBottomBarBehavior
 import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.texteditor.components.MarkdownPreview
@@ -109,6 +110,9 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.core.event.identifier.MenuItemEventIdentifier
+import mega.privacy.mobile.analytics.event.TextEditorPlainTextModeMenuItemEvent
+import mega.privacy.mobile.analytics.event.TextEditorRichTextModeMenuItemEvent
 import kotlin.math.abs
 
 /** Epsilon in px for float comparison when deciding if top bar is fully hidden. */
@@ -818,7 +822,10 @@ private fun TextEditorEditModeTopAppBar(
                 if (showEditModeSwitch) {
                     MarkdownEditModeMenu(
                         isRichText = isRichTextMode,
-                        onSelectRichText = onSelectRichTextMode,
+                        onSelectRichText = { isRichText ->
+                            Analytics.tracker.trackEvent(editModeMenuEvent(isRichText))
+                            onSelectRichTextMode(isRichText)
+                        },
                     )
                 }
                 TopBarActionButton(TextEditorTopBarAction.Save, onSave)
@@ -831,6 +838,10 @@ private fun TextEditorEditModeTopAppBar(
         ),
     )
 }
+
+/** The menu event for the edit mode the user picked. */
+internal fun editModeMenuEvent(isRichText: Boolean): MenuItemEventIdentifier =
+    if (isRichText) TextEditorRichTextModeMenuItemEvent else TextEditorPlainTextModeMenuItemEvent
 
 /** Top bar icon button drawn from a [TextEditorTopBarAction]'s own icon, description and tag. */
 @Composable
