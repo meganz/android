@@ -32,6 +32,8 @@ sealed class ChatMessageNotificationData(open val chat: ChatRoom, open val msg: 
      * @property senderAvatar Sender avatar.
      * @property senderAvatarColor Default color of the avatar in case [senderAvatar] is null.
      * @property notificationBehaviour [NotificationBehaviour]
+     * @property myAvatar Avatar of the current user, shown next to the replies typed in the notification.
+     * @property myAvatarColor Default color of the avatar in case [myAvatar] is null.
      */
     data class Message(
         override val chat: ChatRoom,
@@ -40,5 +42,7 @@ sealed class ChatMessageNotificationData(open val chat: ChatRoom, open val msg: 
         val senderAvatar: File? = null,
         val senderAvatarColor: Int,
         val notificationBehaviour: NotificationBehaviour,
+        val myAvatar: File? = null,
+        val myAvatarColor: Int,
     ) : ChatMessageNotificationData(msg = msg, chat = chat)
 }

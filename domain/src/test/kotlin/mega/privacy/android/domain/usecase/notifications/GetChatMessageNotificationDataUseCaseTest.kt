@@ -10,6 +10,8 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -36,6 +38,8 @@ class GetChatMessageNotificationDataUseCaseTest {
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase = mock()
     private val getUserAvatarUseCase: GetUserAvatarUseCase = mock()
     private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase = mock()
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
     private val getChatMessageNotificationBehaviourUseCase: GetChatMessageNotificationBehaviourUseCase =
         mock()
 
@@ -52,6 +56,8 @@ class GetChatMessageNotificationDataUseCaseTest {
             getMessageSenderNameUseCase,
             getUserAvatarUseCase,
             getUserAvatarColorUseCase,
+            getMyAvatarFileUseCase,
+            getMyAvatarColorUseCase,
             getChatMessageNotificationBehaviourUseCase,
             UnconfinedTestDispatcher()
         )
@@ -65,6 +71,8 @@ class GetChatMessageNotificationDataUseCaseTest {
             getMessageSenderNameUseCase,
             getUserAvatarUseCase,
             getUserAvatarColorUseCase,
+            getMyAvatarFileUseCase,
+            getMyAvatarColorUseCase,
             getChatMessageNotificationBehaviourUseCase
         )
     }
@@ -109,6 +117,8 @@ class GetChatMessageNotificationDataUseCaseTest {
             val senderName = "sender"
             val senderAvatar = File("filePath")
             val senderAvatarColor = 125
+            val myAvatar = File("myAvatarPath")
+            val myAvatarColor = 250
             val notificationBehaviour = mock<NotificationBehaviour>()
             val expectedData = ChatMessageNotificationData.Message(
                 chat = chat,
@@ -116,7 +126,9 @@ class GetChatMessageNotificationDataUseCaseTest {
                 senderName = senderName,
                 senderAvatar = senderAvatar,
                 senderAvatarColor = senderAvatarColor,
-                notificationBehaviour = notificationBehaviour
+                notificationBehaviour = notificationBehaviour,
+                myAvatar = myAvatar,
+                myAvatarColor = myAvatarColor,
             )
 
             whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
@@ -124,6 +136,8 @@ class GetChatMessageNotificationDataUseCaseTest {
             whenever(getMessageSenderNameUseCase(userHandle, chatId)).thenReturn(senderName)
             whenever(getUserAvatarUseCase(userHandle)).thenReturn(senderAvatar)
             whenever(getUserAvatarColorUseCase(userHandle)).thenReturn(senderAvatarColor)
+            whenever(getMyAvatarFileUseCase(isForceRefresh = false)).thenReturn(myAvatar)
+            whenever(getMyAvatarColorUseCase()).thenReturn(myAvatarColor)
             whenever(getChatMessageNotificationBehaviourUseCase(shouldBeep, defaultSound))
                 .thenReturn(notificationBehaviour)
 
@@ -131,4 +145,30 @@ class GetChatMessageNotificationDataUseCaseTest {
                 expectedData
             )
         }
+
+    @Test
+    fun `test that a Message is returned without my avatar when fetching it fails`() = runTest {
+        val message = mock<ChatMessage> {
+            on { userHandle }.thenReturn(userHandle)
+        }
+        val chat = mock<ChatRoom>()
+
+        whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
+        whenever(getMessageSenderNameUseCase(userHandle, chatId)).thenReturn("sender")
+        whenever(getUserAvatarUseCase(userHandle)).thenReturn(null)
+        whenever(getUserAvatarColorUseCase(userHandle)).thenReturn(125)
+        whenever(getMyAvatarFileUseCase(isForceRefresh = false))
+            .thenThrow(RuntimeException("no avatar"))
+        whenever(getMyAvatarColorUseCase()).thenThrow(RuntimeException("no color"))
+        whenever(getChatMessageNotificationBehaviourUseCase(true, defaultSound))
+            .thenReturn(mock())
+
+        val result = underTest.invoke(true, chatId, msgId, defaultSound)
+
+        assertThat(result).isInstanceOf(ChatMessageNotificationData.Message::class.java)
+        assertThat((result as ChatMessageNotificationData.Message).myAvatar).isNull()
+        assertThat(result.myAvatarColor).isEqualTo(0)
+        reset(getMyAvatarFileUseCase, getMyAvatarColorUseCase)
+    }
 }

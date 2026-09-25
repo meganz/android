@@ -7,6 +7,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import mega.privacy.android.app.fcm.NewTokenWorker
 import mega.privacy.android.app.fcm.PushMessageWorker
+import mega.privacy.android.app.notifications.SendChatReplyWorker
 import mega.privacy.android.data.facade.debugWorkInfo
 import mega.privacy.android.domain.monitoring.CrashReporter
 
@@ -21,6 +22,26 @@ suspend fun WorkManager.enqueuePushMessage(data: Data, crashReporter: CrashRepor
     enqueue(
         OneTimeWorkRequestBuilder<PushMessageWorker>()
             .setInputData(data)
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .build()
+    )
+}
+
+/**
+ * Enqueues a [SendChatReplyWorker] request to send a reply typed in a chat message notification.
+ *
+ * @param chatId    Chat the reply is sent to.
+ * @param message   Reply text.
+ */
+fun WorkManager.enqueueChatReply(chatId: Long, message: String) {
+    enqueue(
+        OneTimeWorkRequestBuilder<SendChatReplyWorker>()
+            .setInputData(
+                Data.Builder()
+                    .putLong(SendChatReplyWorker.CHAT_ID, chatId)
+                    .putString(SendChatReplyWorker.MESSAGE, message)
+                    .build()
+            )
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
     )

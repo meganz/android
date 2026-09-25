@@ -7,6 +7,8 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -22,6 +24,8 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
     private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase,
+    private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getChatMessageNotificationBehaviourUseCase: GetChatMessageNotificationBehaviourUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -63,7 +67,11 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
                     val senderAvatar = async {
                         runCatching { getUserAvatarUseCase(message.userHandle) }.getOrNull()
                     }
+                    val myAvatar = async {
+                        runCatching { getMyAvatarFileUseCase(isForceRefresh = false) }.getOrNull()
+                    }
                     val senderAvatarColor = getUserAvatarColorUseCase(message.userHandle)
+                    val myAvatarColor = runCatching { getMyAvatarColorUseCase() }.getOrDefault(0)
                     val notificationBehaviour =
                         getChatMessageNotificationBehaviourUseCase(shouldBeep, defaultSound)
 
@@ -73,7 +81,9 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
                         senderName = senderName.await().orEmpty(),
                         senderAvatar = senderAvatar.await(),
                         senderAvatarColor = senderAvatarColor,
-                        notificationBehaviour = notificationBehaviour
+                        notificationBehaviour = notificationBehaviour,
+                        myAvatar = myAvatar.await(),
+                        myAvatarColor = myAvatarColor,
                     )
                 }
             }

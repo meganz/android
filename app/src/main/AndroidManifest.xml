@@ -570,6 +570,10 @@
             android:name=".presentation.transfers.notification.DefaultTransfersActionGroupProgressNotificationBuilder$ResumeTransfersReceiver"
             android:enabled="true"
             android:exported="false"></receiver>
+        <receiver
+            android:name=".notifications.ChatMessageReplyReceiver"
+            android:enabled="true"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -4449,4 +4449,6 @@
         <item quantity="one">Apply to the duplicate</item>
         <item quantity="other">Apply to all %1$d duplicates</item>
     </plurals>
+    <!-- Chat message notification: label of the inline reply action button and hint of its text field. -->
+    <string name="chat_notification_reply_action">Reply</string>
 </resources>
