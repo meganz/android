@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":core:coroutine"))
     implementation(project(":domain"))
     implementation(project(":domain:account"))
+    implementation(project(":domain:setting"))
     implementation(project(":domain:camerauploads"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))

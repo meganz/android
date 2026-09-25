@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":domain:account"))
     implementation(project(":domain:chat"))
+    implementation(project(":domain:setting"))
     implementation(project(":navigation"))
     implementation(project(":data"))
     implementation(project(":resources:string-resources"))

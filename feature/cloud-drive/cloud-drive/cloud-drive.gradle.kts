@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":domain"))
     implementation(project(":domain:account"))
+    implementation(project(":domain:setting"))
     implementation(project(":feature:sync"))
     implementation(project(":shared:sync"))
     implementation(lib.mega.core.ui)

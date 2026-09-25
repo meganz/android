@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":domain"))
     implementation(project(":domain:account"))
+    implementation(project(":domain:setting"))
     implementation(project(":domain:photos"))
     implementation(project(":domain:camerauploads"))
     implementation(project(":resources:icon-pack"))

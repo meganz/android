@@ -59,6 +59,7 @@ dependencies {
 
     implementation(project(":domain"))
     implementation(project(":domain:account"))
+    implementation(project(":domain:setting"))
     implementation(project(":data"))
     implementation(project(":navigation"))
     implementation(project(":core:formatter"))
