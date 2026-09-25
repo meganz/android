@@ -190,6 +190,39 @@ internal class AddSyncExclusionResultMapperTest {
     }
 
     @Test
+    fun `test that invoke marks the rules the extension form authored`() {
+        val actual = underTest(
+            state(
+                byName = extensionsSelected,
+                byExtension = AddExclusionByExtensionFormState(value = "mp3, jpg"),
+            ),
+        )
+
+        assertThat((actual as AddSyncExclusionResult.Rules).fromExtensionForm).isTrue()
+    }
+
+    /**
+     * Files and folders ending in `.mp3` builds the very rule the `mp3` extension does, so only the
+     * form that authored it can tell the two apart.
+     */
+    @Test
+    fun `test that invoke does not mark a name rule that builds an extension pattern`() {
+        val actual = underTest(
+            state(
+                byName = AddExclusionByNameFormState(
+                    typeOption = SyncExclusionTypeOption.FilesAndFolders,
+                    condition = SyncExclusionCondition.EndingWith,
+                    value = ".mp3",
+                ),
+            ),
+        )
+
+        val result = actual as AddSyncExclusionResult.Rules
+        assertThat(result.rules.single()).isEqualTo(underTest.extensionRule("mp3"))
+        assertThat(result.fromExtensionForm).isFalse()
+    }
+
+    @Test
     fun `test that invoke adds nothing when no extension yields a pattern`() {
         val actual = underTest(
             state(

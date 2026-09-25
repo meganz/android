@@ -81,7 +81,7 @@ internal fun ManageSyncExclusionsRoute(
                     viewModel.onRuleEdited(result.ruleIndex, result.expected, result.edit)
 
                 is EditSyncExclusionRuleResult.Deleted ->
-                    viewModel.onRuleRemoved(result.ruleIndex, result.expected)
+                    viewModel.onRuleDeleted(result.ruleIndex, result.expected)
             }
         },
         onSizeBoundsChanged = { viewModel.onSizeBoundsChanged(it.bounds) },
@@ -158,7 +158,7 @@ internal fun ManageSyncExclusionsRoute(
         onSaveClicked = viewModel::onSaveClicked,
         onRetryClicked = viewModel::onRetryClicked,
         onRuleClicked = onEditRule,
-        onExtensionRemoved = { viewModel.onRuleRemoved(it.ruleIndex, it.rule) },
+        onExtensionRemoved = { viewModel.onExtensionRemoved(it.ruleIndex, it.rule) },
         onSizeClicked = { uiState.staged?.size?.let(onEditSize) },
         onRestoreDefaultsClicked = viewModel::onDefaultsRestored,
         modifier = modifier,

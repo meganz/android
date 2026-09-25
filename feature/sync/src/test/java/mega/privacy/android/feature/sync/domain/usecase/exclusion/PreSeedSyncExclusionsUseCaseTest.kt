@@ -63,6 +63,17 @@ internal class PreSeedSyncExclusionsUseCaseTest {
         assertThat(actual.isSuccess).isTrue()
     }
 
+    /** A caller reporting on the file has to see the defaults seeded into it, not only its own. */
+    @Test
+    fun `test that invoke returns the model it wrote with the defaults it seeded`() = runTest {
+        stubWrite(Result.success(Unit))
+
+        val actual = underTest(localRoot, staged(ruleFor("*.iso")))
+
+        assertThat(actual.getOrNull()).isEqualTo(written())
+        assertThat(actual.getOrNull()?.rules).hasSize(defaultEntries.size + 1)
+    }
+
     @ParameterizedTest
     @MethodSource("writeFailures")
     fun `test that invoke returns the failure reported by the repository`(

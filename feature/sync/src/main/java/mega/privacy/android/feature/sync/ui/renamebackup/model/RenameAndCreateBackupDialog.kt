@@ -20,7 +20,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun RenameAndCreateBackupDialog(
     backupName: String,
     localPath: String,
-    onSuccess: () -> Unit,
+    onSuccess: (Boolean) -> Unit,
     onCancel: () -> Unit,
     renameAndCreateBackupViewModel: RenameAndCreateBackupViewModel = hiltViewModel(),
 ) {

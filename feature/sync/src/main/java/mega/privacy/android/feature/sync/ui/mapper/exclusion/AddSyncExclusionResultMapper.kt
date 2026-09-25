@@ -65,20 +65,21 @@ internal class AddSyncExclusionResultMapper @Inject constructor(
         .mapNotNull(::extensionRule)
         .distinct()
         .takeIf { it.isNotEmpty() }
-        ?.let(AddSyncExclusionResult::Rules)
+        ?.let { AddSyncExclusionResult.Rules(rules = it, fromExtensionForm = true) }
 
     private fun nameRule(form: AddExclusionByNameFormState): AddSyncExclusionResult.Rules? {
         val target = form.typeOption?.target ?: return null
         val condition = form.condition ?: return null
         if (form.value.isBlank()) return null
         return AddSyncExclusionResult.Rules(
-            listOf(
+            rules = listOf(
                 SyncExclusionRule(
                     pattern = patternMapper(condition, form.value),
                     target = target,
                     matchType = SyncExclusionMatchType.SubtreeName,
                 ),
             ),
+            fromExtensionForm = false,
         )
     }
 

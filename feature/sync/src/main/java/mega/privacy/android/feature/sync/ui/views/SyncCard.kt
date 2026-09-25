@@ -48,6 +48,7 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.SyncCardExclusionsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent
@@ -439,7 +440,10 @@ private fun SyncCardFooter(
                             .padding(end = 8.dp)
                             .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp)
                             .testTag(TEST_TAG_SYNC_CARD_EXCLUSIONS),
-                        onClick = onExclusionsClicked,
+                        onClick = {
+                            Analytics.tracker.trackEvent(SyncCardExclusionsButtonPressedEvent)
+                            onExclusionsClicked()
+                        },
                         icon = iconPackR.drawable.ic_filter_medium_thin_outline,
                         text = stringResource(id = sharedR.string.sync_exclusions_card_action),
                     )

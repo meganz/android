@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -16,11 +17,11 @@ import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsExc
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.ui.renamebackup.model.RenameAndCreateBackupViewModel
 import mega.privacy.android.shared.resources.R as sharedR
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doSuspendableAnswer
@@ -42,14 +43,10 @@ internal class RenameAndCreateBackupViewModelTest {
 
     private val syncFolderPairUseCase = mock<SyncFolderPairUseCase>()
 
-    @BeforeAll
-    fun setUp() {
-        underTest = RenameAndCreateBackupViewModel(syncFolderPairUseCase)
-    }
-
     @BeforeEach
-    fun resetMocks() {
+    fun setUp() {
         reset(syncFolderPairUseCase)
+        underTest = RenameAndCreateBackupViewModel(syncFolderPairUseCase)
     }
 
     @Test
@@ -57,7 +54,7 @@ internal class RenameAndCreateBackupViewModelTest {
         underTest.state.test {
             val initialState = awaitItem()
             assertThat(initialState.errorMessage).isNull()
-            assertThat(initialState.successEvent).isEqualTo(consumed)
+            assertThat(initialState.successEvent).isEqualTo(consumed())
         }
     }
 
@@ -147,7 +144,7 @@ internal class RenameAndCreateBackupViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.errorMessage).isEqualTo(sharedR.string.sync_rename_and_create_backup_dialog_error_message_name_already_exists)
-                assertThat(state.successEvent).isEqualTo(triggered)
+                assertThat(state.successEvent).isEqualTo(consumed())
             }
         }
 
@@ -168,16 +165,74 @@ internal class RenameAndCreateBackupViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.errorMessage).isNull()
-            assertThat(state.successEvent).isEqualTo(triggered)
+            assertThat(state.successEvent).isEqualTo(triggered(true))
         }
     }
 
     @Test
+    fun `test that rename and create the backup reports the backup was not created when the use case returns false`() =
+        runTest {
+            whenever(
+                syncFolderPairUseCase(
+                    syncType = SyncType.TYPE_BACKUP,
+                    name = "Backup name",
+                    localPath = "Local Path",
+                    remotePath = RemoteFolder(NodeId(-1L), ""),
+                )
+            ).thenReturn(false)
+            underTest.renameAndCreateBackup(
+                newBackupName = "Backup name",
+                localPath = "Local Path",
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.errorMessage).isNull()
+                assertThat(state.successEvent).isEqualTo(triggered(false))
+            }
+        }
+
+    /**
+     * The setup screen reports the exclusions it pre-seeded once it learns the backup was created,
+     * so reporting here as well would count the pair twice.
+     */
+    @Test
+    fun `test that rename and create the backup reports no analytics of its own`() = runTest {
+        whenever(
+            syncFolderPairUseCase(
+                syncType = SyncType.TYPE_BACKUP,
+                name = "Backup name",
+                localPath = "Local Path",
+                remotePath = RemoteFolder(NodeId(-1L), ""),
+            )
+        ).thenReturn(true)
+
+        underTest.renameAndCreateBackup(
+            newBackupName = "Backup name",
+            localPath = "Local Path",
+        )
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
     fun `test that the success event has been consumed`() = runTest {
+        whenever(
+            syncFolderPairUseCase(
+                syncType = SyncType.TYPE_BACKUP,
+                name = "Backup name",
+                localPath = "Local Path",
+                remotePath = RemoteFolder(NodeId(-1L), ""),
+            )
+        ).thenReturn(true)
+        underTest.renameAndCreateBackup(
+            newBackupName = "Backup name",
+            localPath = "Local Path",
+        )
+
         underTest.resetSuccessfulEvent()
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.successEvent).isEqualTo(consumed)
+            assertThat(state.successEvent).isEqualTo(consumed())
         }
     }
 
@@ -220,7 +275,7 @@ internal class RenameAndCreateBackupViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.errorMessage).isNull()
-                assertThat(state.successEvent).isEqualTo(triggered)
+                assertThat(state.successEvent).isEqualTo(triggered(true))
             }
 
             // Verify only one invocation occurred
@@ -232,4 +287,10 @@ internal class RenameAndCreateBackupViewModelTest {
             )
             verifyNoMoreInteractions(syncFolderPairUseCase)
         }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+    }
 }

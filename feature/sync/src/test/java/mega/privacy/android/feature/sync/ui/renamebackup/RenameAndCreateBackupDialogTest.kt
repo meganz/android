@@ -4,7 +4,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.feature.sync.ui.renamebackup.model.RENAME_AND_CREATE_BACKUP_DIALOG_TAG
 import mega.privacy.android.feature.sync.ui.renamebackup.model.RenameAndCreateBackupDialog
@@ -30,7 +32,7 @@ internal class RenameAndCreateBackupDialogTest {
     @Test
     fun `test that the rename and create backup dialog is shown`() {
         val uiState = RenameAndCreateBackupState(
-            successEvent = consumed,
+            successEvent = consumed(),
         )
 
         renameAndCreateBackupViewModel.stub {
@@ -46,5 +48,39 @@ internal class RenameAndCreateBackupDialogTest {
             )
         }
         composeTestRule.onNodeWithTag(RENAME_AND_CREATE_BACKUP_DIALOG_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that onSuccess receives that the backup was created`() {
+        val received = setContentWithSuccess(created = true)
+
+        assertThat(received).containsExactly(true)
+    }
+
+    @Test
+    fun `test that onSuccess receives that the backup was not created`() {
+        val received = setContentWithSuccess(created = false)
+
+        assertThat(received).containsExactly(false)
+    }
+
+    private fun setContentWithSuccess(created: Boolean): List<Boolean> {
+        val received = mutableListOf<Boolean>()
+        renameAndCreateBackupViewModel.stub {
+            on { state }.thenReturn(
+                MutableStateFlow(RenameAndCreateBackupState(successEvent = triggered(created)))
+            )
+        }
+        composeTestRule.setContent {
+            RenameAndCreateBackupDialog(
+                backupName = "Backup name",
+                localPath = "Local Path",
+                onSuccess = { received.add(it) },
+                onCancel = {},
+                renameAndCreateBackupViewModel = renameAndCreateBackupViewModel,
+            )
+        }
+        composeTestRule.waitForIdle()
+        return received
     }
 }

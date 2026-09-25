@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
 import mega.privacy.android.feature.sync.domain.usecase.backup.MyBackupsFolderExistsUseCase
@@ -34,6 +36,7 @@ import mega.privacy.android.feature.sync.domain.usecase.exclusion.PreSeedSyncExc
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.ui.exclusion.toSetupConfiguredEvent
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncRemoteFolderValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
@@ -72,6 +75,12 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val _state =
         MutableStateFlow(SyncNewFolderState(syncType = syncType))
     val state: StateFlow<SyncNewFolderState> = _state.asStateFlow()
+
+    /**
+     * What the last pre-seed wrote, held until the folder pair it was written for is created.
+     * Cleared on every attempt and once reported, so no pair can be reported twice.
+     */
+    private var seededExclusions: ParsedMegaIgnore? = null
 
     init {
         if (syncType == SyncType.TYPE_BACKUP) {
@@ -341,12 +350,13 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                                                     if (preSeedStagedExclusions(localRoot).not()) {
                                                         return@launch
                                                     }
-                                                    syncFolderPairUseCase(
+                                                    val created = syncFolderPairUseCase(
                                                         syncType = state.value.syncType,
                                                         name = remoteFolder.name,
                                                         localPath = localRoot,
                                                         remotePath = remoteFolder,
                                                     )
+                                                    if (created) trackExclusionsSetupConfigured()
                                                 }
                                             }
                                         }
@@ -389,6 +399,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
             )
         }.onSuccess { result ->
             onShowRenameAndCreateBackupDialogConsumed()
+            if (result) trackExclusionsSetupConfigured()
             return result
         }.onFailure { exception ->
             if (exception is BackupAlreadyExistsException) {
@@ -413,12 +424,15 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
      * @param localRoot read once by the caller, so the file and the pair cannot land on two folders
      */
     private suspend fun preSeedStagedExclusions(localRoot: String): Boolean {
+        seededExclusions = null
         val staged = state.value.stagedExclusions ?: return true
         if (isSyncExclusionsEnabled().not()) return true
         return preSeedSyncExclusionsUseCase(
             localRoot = UriPath(localRoot),
             staged = staged,
-        ).onFailure { error ->
+        ).onSuccess { written ->
+            seededExclusions = written
+        }.onFailure { error ->
             Timber.e(error)
             _state.update { state ->
                 state.copy(
@@ -429,6 +443,17 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                 )
             }
         }.isSuccess
+    }
+
+    /**
+     * Reports the exclusions pre-seeded for a folder pair, to be called only once the pair has
+     * really been created: the file is written first, and a pair that then fails leaves it
+     * describing nothing.
+     */
+    private fun trackExclusionsSetupConfigured() {
+        val written = seededExclusions ?: return
+        seededExclusions = null
+        Analytics.tracker.trackEvent(written.toSetupConfiguredEvent())
     }
 
     /**
@@ -459,9 +484,18 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     }
 
     /**
+     * Leaves for the sync list once the rename dialog has handed the backup to the SDK, reporting
+     * the exclusions the first attempt pre-seeded only if [created] says the pair exists.
+     */
+    fun onRenameAndCreateBackupSucceeded(created: Boolean) {
+        if (created) trackExclusionsSetupConfigured()
+        openSyncListScreen()
+    }
+
+    /**
      * Triggers the event to open sync list screen
      */
-    fun openSyncListScreen() {
+    private fun openSyncListScreen() {
         _state.update { state ->
             state.copy(
                 openSyncListScreen = triggered,

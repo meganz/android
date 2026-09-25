@@ -13,8 +13,16 @@ import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
  */
 internal sealed interface AddSyncExclusionResult {
 
-    /** Rules to put into the file, one per extension when the extension form authored them. */
-    data class Rules(val rules: List<SyncExclusionRule>) : AddSyncExclusionResult
+    /**
+     * Rules to put into the file, one per extension when the extension form authored them.
+     *
+     * @property fromExtensionForm whether the extension form authored [rules]. The rules cannot
+     * tell on their own: a name rule can build exactly the pattern an extension does
+     */
+    data class Rules(
+        val rules: List<SyncExclusionRule>,
+        val fromExtensionForm: Boolean,
+    ) : AddSyncExclusionResult
 
     /** Bounds to declare, which replace the file's pair rather than being added to it. */
     data class SizeBounds(val bounds: SyncSizeExclusion) : AddSyncExclusionResult

@@ -14,6 +14,7 @@ import mega.privacy.android.feature.sync.navigation.NavigationResultEffect
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.NextClicked
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncLocalFolderSelectedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncSetupManageExclusionsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncStartSyncButtonEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 
@@ -56,6 +57,7 @@ internal fun SyncNewFolderScreenRoute(
         showExclusionsRow = state.value.isExclusionsEnabled &&
                 state.value.selectedLocalFolder.isNotEmpty(),
         onManageExclusionsClicked = {
+            Analytics.tracker.trackEvent(AndroidSyncSetupManageExclusionsButtonPressedEvent)
             onManageExclusions(
                 UriPath(state.value.selectedLocalFolder),
                 state.value.stagedExclusions,

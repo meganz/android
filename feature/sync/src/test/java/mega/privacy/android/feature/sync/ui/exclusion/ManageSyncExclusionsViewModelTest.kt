@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -43,10 +44,25 @@ import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionChipMa
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionPatternMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionRowMapper
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionSupportingTextMapper
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsBiggerThanSizeLimitAddedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsBiggerThanSizeLimitEditedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsChangesDiscardedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsChangesSavedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsDefaultsRestoredEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsExtensionRulesAddedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsNameRuleAddedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsReviewSavedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsRuleDeletedFromChipEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsRuleDeletedFromEditScreenEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsRuleEditedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsSaveFailedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsSizeLimitDeletedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsSmallerThanSizeLimitAddedEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -248,7 +264,7 @@ internal class ManageSyncExclusionsViewModelTest {
         stubRead(threeRules)
         val underTest = underTest()
 
-        underTest.onRuleRemoved(ruleIndex = 1, expected = rule(pattern = "Moved*"))
+        underTest.onRuleDeleted(ruleIndex = 1, expected = rule(pattern = "Moved*"))
 
         val reported = underTest.uiState.value.editErrorEvent
         assertThat(reported).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -262,7 +278,7 @@ internal class ManageSyncExclusionsViewModelTest {
     fun `test that a reported edit failure is cleared once shown`() = runTest {
         stubRead(threeRules)
         val underTest = underTest()
-        underTest.onRuleRemoved(ruleIndex = 1, expected = rule(pattern = "Moved*"))
+        underTest.onRuleDeleted(ruleIndex = 1, expected = rule(pattern = "Moved*"))
 
         underTest.onEditErrorShown()
 
@@ -278,7 +294,7 @@ internal class ManageSyncExclusionsViewModelTest {
         stubRead(threeRules)
         val underTest = underTest()
 
-        underTest.onRuleRemoved(ruleIndex = 2, expected = third)
+        underTest.onRuleDeleted(ruleIndex = 2, expected = third)
         underTest.onRuleAdded(third)
 
         assertThat(underTest.uiState.value.staged).isEqualTo(threeRules)
@@ -298,7 +314,7 @@ internal class ManageSyncExclusionsViewModelTest {
         stubRead(mixed)
         val underTest = underTest()
 
-        underTest.onRuleRemoved(ruleIndex = 1, expected = second)
+        underTest.onRuleDeleted(ruleIndex = 1, expected = second)
 
         assertThat(underTest.uiState.value.staged?.entries).containsExactly(
             comment,
@@ -404,7 +420,9 @@ internal class ManageSyncExclusionsViewModelTest {
         val mp3 = rule(pattern = "*.mp3")
         val jpg = rule(pattern = "*.jpg")
 
-        underTest.onExclusionAdded(AddSyncExclusionResult.Rules(listOf(mp3, jpg)))
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.Rules(listOf(mp3, jpg), fromExtensionForm = true),
+        )
 
         assertThat(underTest.uiState.value.staged?.rules).containsExactly(
             first, second, third, mp3, jpg,
@@ -417,7 +435,7 @@ internal class ManageSyncExclusionsViewModelTest {
         stubRead(threeRules)
         val underTest = underTest()
 
-        underTest.onExclusionAdded(AddSyncExclusionResult.Rules(listOf(rule(pattern = "New*"))))
+        underTest.onExclusionAdded(nameRuleAdded(rule(pattern = "New*")))
 
         assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(triggered)
     }
@@ -488,7 +506,7 @@ internal class ManageSyncExclusionsViewModelTest {
         stubReadFailure()
         val underTest = underTest()
 
-        underTest.onExclusionAdded(AddSyncExclusionResult.Rules(listOf(rule(pattern = "New*"))))
+        underTest.onExclusionAdded(nameRuleAdded(rule(pattern = "New*")))
 
         assertThat(underTest.uiState.value.staged).isNull()
         assertThat(underTest.uiState.value.exclusionAddedEvent).isEqualTo(consumed)
@@ -516,7 +534,7 @@ internal class ManageSyncExclusionsViewModelTest {
     fun `test that showing the added confirmation clears it`() = runTest {
         stubRead(threeRules)
         val underTest = underTest()
-        underTest.onExclusionAdded(AddSyncExclusionResult.Rules(listOf(rule(pattern = "New*"))))
+        underTest.onExclusionAdded(nameRuleAdded(rule(pattern = "New*")))
 
         underTest.onExclusionAddedShown()
 
@@ -555,11 +573,11 @@ internal class ManageSyncExclusionsViewModelTest {
     }
 
     @Test
-    fun `test that onRuleRemoved confirms no update`() = runTest {
+    fun `test that onRuleDeleted confirms no update`() = runTest {
         stubRead(threeRules)
         val underTest = underTest()
 
-        underTest.onRuleRemoved(ruleIndex = 0, expected = first)
+        underTest.onRuleDeleted(ruleIndex = 0, expected = first)
 
         assertThat(underTest.uiState.value.staged?.rules).doesNotContain(first)
         assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(consumed)
@@ -974,7 +992,7 @@ internal class ManageSyncExclusionsViewModelTest {
 
         underTest.rows.test {
             val before = awaitItem()
-            underTest.onRuleRemoved(before.first().ruleIndex, before.first().rule)
+            underTest.onRuleDeleted(before.first().ruleIndex, before.first().rule)
             assertThat(awaitItem()).hasSize(before.size - 1)
         }
     }
@@ -1177,6 +1195,394 @@ internal class ManageSyncExclusionsViewModelTest {
 
     // endregion
 
+    // region analytics
+
+    @Test
+    fun `test that onExclusionAdded reports a rule added from the name form`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(nameRuleAdded(rule(pattern = "New*")))
+
+        assertThat(analyticsExtension.events)
+            .containsExactly(AndroidSyncExclusionsNameRuleAddedEvent)
+    }
+
+    @Test
+    fun `test that onExclusionAdded reports how many extensions the extension form added`() =
+        runTest {
+            stubRead(threeRules)
+            val underTest = underTest()
+
+            underTest.onExclusionAdded(
+                AddSyncExclusionResult.Rules(
+                    rules = listOf(rule(pattern = "*.mp3"), rule(pattern = "*.jpg")),
+                    fromExtensionForm = true,
+                ),
+            )
+
+            val reported = analyticsExtension.events
+                .filterIsInstance<AndroidSyncExclusionsExtensionRulesAddedEvent>()
+                .single()
+            assertThat(reported.info["extensionCount"]).isEqualTo(2)
+            assertThat(analyticsExtension.events)
+                .doesNotContain(AndroidSyncExclusionsNameRuleAddedEvent)
+        }
+
+    @Test
+    fun `test that onExclusionAdded reports nothing when the file was never read`() = runTest {
+        stubReadFailure()
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(nameRuleAdded(rule(pattern = "New*")))
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.Rules(listOf(rule(pattern = "*.mp3")), fromExtensionForm = true),
+        )
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.SizeBounds(SyncSizeExclusion(excludeLargerThanBytes = 1024)),
+        )
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onExclusionAdded reports the size limit added`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.SizeBounds(SyncSizeExclusion(excludeLargerThanBytes = 1024)),
+        )
+
+        assertThat(analyticsExtension.events)
+            .containsExactly(AndroidSyncExclusionsBiggerThanSizeLimitAddedEvent)
+    }
+
+    /**
+     * The file's own bound is kept alongside the stated one, so the staged pair reads as a range
+     * the user never picked.
+     */
+    @Test
+    fun `test that onExclusionAdded classifies the size limit by the bound the user stated`() =
+        runTest {
+            stubRead(ParsedMegaIgnore(entries = listOf(largerBound)))
+            val underTest = underTest()
+
+            underTest.onExclusionAdded(
+                AddSyncExclusionResult.SizeBounds(
+                    SyncSizeExclusion(excludeSmallerThanBytes = 1024),
+                ),
+            )
+
+            assertThat(analyticsExtension.events)
+                .containsExactly(AndroidSyncExclusionsSmallerThanSizeLimitAddedEvent)
+        }
+
+    @Test
+    fun `test that onExclusionAdded reports nothing when the size bounds are refused`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onExclusionAdded(
+            AddSyncExclusionResult.SizeBounds(
+                SyncSizeExclusion(excludeSmallerThanBytes = 1024, excludeLargerThanBytes = 1024),
+            ),
+        )
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onRuleEdited reports the edit when it changes the rule`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onRuleEdited(
+            ruleIndex = 0,
+            expected = first,
+            edit = SyncExclusionEdit(pattern = "Renamed*"),
+        )
+
+        assertThat(analyticsExtension.events).containsExactly(AndroidSyncExclusionsRuleEditedEvent)
+    }
+
+    @Test
+    fun `test that onRuleEdited reports nothing when the edit changes nothing`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onRuleEdited(
+            ruleIndex = 0,
+            expected = first,
+            edit = SyncExclusionEdit(pattern = first.pattern),
+        )
+
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(triggered)
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onRuleEdited reports nothing when the edit is refused`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onRuleEdited(
+            ruleIndex = 1,
+            expected = rule(pattern = "Moved*"),
+            edit = SyncExclusionEdit(pattern = "Renamed*"),
+        )
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onSizeBoundsChanged reports the kind of limit the edit leaves`() = runTest {
+        stubRead(ParsedMegaIgnore(entries = listOf(smallerBound, largerBound)))
+        val underTest = underTest()
+
+        underTest.onSizeBoundsChanged(SyncSizeExclusion(excludeLargerThanBytes = 4096))
+
+        assertThat(analyticsExtension.events)
+            .containsExactly(AndroidSyncExclusionsBiggerThanSizeLimitEditedEvent)
+    }
+
+    /** Saving the Edit screen as it opened hands the same bounds back. */
+    @Test
+    fun `test that onSizeBoundsChanged reports nothing when the bounds are unchanged`() = runTest {
+        stubRead(ParsedMegaIgnore(entries = listOf(smallerBound, largerBound)))
+        val underTest = underTest()
+
+        underTest.onSizeBoundsChanged(
+            SyncSizeExclusion(excludeSmallerThanBytes = 1024, excludeLargerThanBytes = 102400),
+        )
+
+        assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(triggered)
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onSizeBoundsChanged reports the limit deleted when the bounds are cleared`() =
+        runTest {
+            stubRead(ParsedMegaIgnore(entries = listOf(smallerBound, largerBound)))
+            val underTest = underTest()
+
+            underTest.onSizeBoundsChanged(SyncSizeExclusion())
+
+            assertThat(analyticsExtension.events)
+                .containsExactly(AndroidSyncExclusionsSizeLimitDeletedEvent)
+        }
+
+    @Test
+    fun `test that onSizeBoundsChanged reports nothing when cleared bounds held no limit`() =
+        runTest {
+            stubRead(threeRules)
+            val underTest = underTest()
+
+            underTest.onSizeBoundsChanged(SyncSizeExclusion())
+
+            assertThat(underTest.uiState.value.editErrorEvent).isEqualTo(consumed())
+            assertThat(analyticsExtension.events).isEmpty()
+        }
+
+    @Test
+    fun `test that onSizeBoundsChanged reports nothing when the bounds are refused`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onSizeBoundsChanged(
+            SyncSizeExclusion(excludeSmallerThanBytes = 1024, excludeLargerThanBytes = 1024),
+        )
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onExtensionRemoved stages the removal without confirming an update`() =
+        runTest {
+            stubRead(threeRules)
+            val underTest = underTest()
+
+            underTest.onExtensionRemoved(ruleIndex = 0, expected = first)
+
+            assertThat(underTest.uiState.value.staged?.rules).containsExactly(second, third)
+            assertThat(underTest.uiState.value.exclusionUpdatedEvent).isEqualTo(consumed)
+        }
+
+    @Test
+    fun `test that onExtensionRemoved reports the rule deleted from its chip`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onExtensionRemoved(ruleIndex = 0, expected = first)
+
+        assertThat(analyticsExtension.events)
+            .containsExactly(AndroidSyncExclusionsRuleDeletedFromChipEvent)
+    }
+
+    @Test
+    fun `test that onExtensionRemoved reports nothing when the removal is refused`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onExtensionRemoved(ruleIndex = 1, expected = rule(pattern = "Moved*"))
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onRuleDeleted reports the rule deleted from the edit screen`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onRuleDeleted(ruleIndex = 0, expected = first)
+
+        assertThat(analyticsExtension.events)
+            .containsExactly(AndroidSyncExclusionsRuleDeletedFromEditScreenEvent)
+    }
+
+    @Test
+    fun `test that onRuleDeleted reports nothing when the removal is refused`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onRuleDeleted(ruleIndex = 1, expected = rule(pattern = "Moved*"))
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onDefaultsRestored reports the restore`() = runTest {
+        stubRead(mixed)
+        val underTest = underTest()
+
+        underTest.onDefaultsRestored()
+
+        assertThat(analyticsExtension.events)
+            .containsExactly(AndroidSyncExclusionsDefaultsRestoredEvent)
+    }
+
+    @Test
+    fun `test that onDefaultsRestored reports nothing when the file was never read`() = runTest {
+        stubReadFailure()
+        val underTest = underTest()
+
+        underTest.onDefaultsRestored()
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onSaveClicked reports the counts of the model it wrote`() = runTest {
+        stubRead(defaults)
+        stubWrite(Result.success(Unit))
+        val underTest = underTest()
+        underTest.onRuleAdded(rule(pattern = "New*"))
+        underTest.onSizeBoundsChanged(SyncSizeExclusion(excludeLargerThanBytes = 4096))
+
+        underTest.onSaveClicked()
+
+        val saved = analyticsExtension.events
+            .filterIsInstance<AndroidSyncExclusionsChangesSavedEvent>()
+            .single()
+        assertThat(saved.info).isEqualTo(
+            mapOf("ruleCount" to 9, "customRuleCount" to 1, "hasSizeLimit" to true),
+        )
+        assertThat(analyticsExtension.events).doesNotContain(AndroidSyncExclusionsSaveFailedEvent)
+    }
+
+    @Test
+    fun `test that onSaveClicked counts the model written rather than a later edit`() =
+        runTest {
+            stubRead(threeRules)
+            val write = CompletableDeferred<Result<Unit>>()
+            stubSuspendingWrite(write)
+            val underTest = underTest()
+            underTest.onRuleAdded(rule(pattern = "Saved*"))
+            underTest.onSaveClicked()
+            underTest.onRuleAdded(rule(pattern = "Later*"))
+
+            write.complete(Result.success(Unit))
+
+            val saved = analyticsExtension.events
+                .filterIsInstance<AndroidSyncExclusionsChangesSavedEvent>()
+                .single()
+            assertThat(saved.info["ruleCount"]).isEqualTo(4)
+        }
+
+    @Test
+    fun `test that onSaveClicked reports the failure when the write fails`() = runTest {
+        stubRead(threeRules)
+        stubWrite(Result.failure(RuntimeException("SAF write refused")))
+        val underTest = underTest()
+        underTest.onRuleAdded(rule(pattern = "New*"))
+
+        underTest.onSaveClicked()
+
+        assertThat(analyticsExtension.events).containsExactly(AndroidSyncExclusionsSaveFailedEvent)
+    }
+
+    @Test
+    fun `test that onSaveClicked reports nothing when there is nothing to save`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+
+        underTest.onSaveClicked()
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that onSaveClicked reports the review saved in review mode`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest(syncId = null, staged = threeRules)
+        underTest.onRuleAdded(rule(pattern = "New*"))
+
+        underTest.onSaveClicked()
+
+        assertThat(analyticsExtension.events).containsExactly(AndroidSyncExclusionsReviewSavedEvent)
+    }
+
+    @Test
+    fun `test that onSaveClicked reports nothing in review mode when there is nothing to save`() =
+        runTest {
+            stubRead(threeRules)
+            val underTest = underTest(syncId = null, staged = threeRules)
+
+            underTest.onSaveClicked()
+
+            assertThat(analyticsExtension.events).isEmpty()
+        }
+
+    @Test
+    fun `test that onDiscardConfirmed reports the discard when the prompt was shown`() = runTest {
+        stubRead(threeRules)
+        val underTest = underTest()
+        underTest.onRuleAdded(rule(pattern = "New*"))
+        underTest.onBackPressed()
+
+        underTest.onDiscardConfirmed()
+
+        assertThat(analyticsExtension.events)
+            .containsExactly(AndroidSyncExclusionsChangesDiscardedEvent)
+    }
+
+    @Test
+    fun `test that onDiscardConfirmed reports nothing when the prompt was never shown`() =
+        runTest {
+            stubRead(threeRules)
+            val underTest = underTest()
+            underTest.onRuleAdded(rule(pattern = "New*"))
+
+            underTest.onDiscardConfirmed()
+
+            assertThat(analyticsExtension.events).isEmpty()
+        }
+
+    // endregion
+
+    private fun nameRuleAdded(vararg rules: SyncExclusionRule) =
+        AddSyncExclusionResult.Rules(rules = rules.toList(), fromExtensionForm = false)
+
     private fun TestScope.underTest(
         syncId: Long? = SYNC_ID,
         staged: ParsedMegaIgnore? = null,
@@ -1293,8 +1699,12 @@ internal class ManageSyncExclusionsViewModelTest {
         enabled = enabled,
     )
 
-    private companion object {
+    companion object {
         const val SYNC_ID = 42L
         val LOCAL_ROOT = UriPath("content://sync/root")
+
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }

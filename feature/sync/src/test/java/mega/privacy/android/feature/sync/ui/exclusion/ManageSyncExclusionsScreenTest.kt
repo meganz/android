@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.components.menu.TAG_TOP_APP_BAR_ACTIONS_SHOW_MORE
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.feature.sync.domain.entity.InvalidLineReason
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreEntry
@@ -20,18 +21,24 @@ import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionRowMap
 import mega.privacy.android.feature.sync.ui.mapper.exclusion.SyncExclusionSupportingTextMapper
 import mega.privacy.android.feature.sync.ui.model.exclusion.ManageSyncExclusionsUiState
 import mega.privacy.android.feature.sync.ui.model.exclusion.TEST_TAG_RESTORE_DEFAULTS_ACTION
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsAddButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import mega.privacy.android.shared.resources.R as sharedR
 
 @RunWith(AndroidJUnit4::class)
 internal class ManageSyncExclusionsScreenTest {
 
+    private val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private var restored = 0
+    private var added = 0
 
     @Test
     fun `test that the overflow menu offers restoring the defaults`() {
@@ -105,6 +112,18 @@ internal class ManageSyncExclusionsScreenTest {
     }
 
     @Test
+    fun `test that tapping add reports the click and opens the Add screen`() {
+        setContent()
+
+        composeTestRule
+            .onNodeWithText(string(sharedR.string.sync_exclusions_manage_add))
+            .performClick()
+
+        assertThat(added).isEqualTo(1)
+        assertThat(analyticsRule.events).containsExactly(AndroidSyncExclusionsAddButtonPressedEvent)
+    }
+
+    @Test
     fun `test that adding is not offered while there is no file to stage a rule onto`() {
         setContent(ManageSyncExclusionsUiState(syncName = "Documents", hasLoadFailed = true))
 
@@ -121,7 +140,7 @@ internal class ManageSyncExclusionsScreenTest {
                 chips = staged?.let(chipMapper::invoke).orEmpty(),
                 rows = staged?.let(rowMapper::invoke).orEmpty(),
                 onBackPressed = {},
-                onAddClicked = {},
+                onAddClicked = { added++ },
                 onSaveClicked = {},
                 onRetryClicked = {},
                 onRuleClicked = {},

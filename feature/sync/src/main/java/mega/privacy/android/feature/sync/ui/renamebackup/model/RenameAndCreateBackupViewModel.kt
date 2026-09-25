@@ -73,7 +73,7 @@ internal class RenameAndCreateBackupViewModel @Inject constructor(
                     }
 
                     else -> {
-                        syncFolderPairUseCase(
+                        val created = syncFolderPairUseCase(
                             syncType = SyncType.TYPE_BACKUP,
                             name = trimmedName,
                             localPath = localPath,
@@ -82,7 +82,7 @@ internal class RenameAndCreateBackupViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 errorMessage = null,
-                                successEvent = triggered
+                                successEvent = triggered(created)
                             )
                         }
                     }
@@ -109,7 +109,7 @@ internal class RenameAndCreateBackupViewModel @Inject constructor(
     /**
      * Notifies [RenameAndCreateBackupState.successEvent] that it has been consumed
      */
-    fun resetSuccessfulEvent() = _state.update { it.copy(successEvent = consumed) }
+    fun resetSuccessfulEvent() = _state.update { it.copy(successEvent = consumed()) }
 
     companion object {
         private const val INVALID_CHARACTER_REGEX = "[\\\\*/:<>?\"|]"

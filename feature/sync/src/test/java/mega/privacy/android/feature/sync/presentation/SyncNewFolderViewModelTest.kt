@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
@@ -30,6 +31,8 @@ import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreEntry
 import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionMatchType
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
 import mega.privacy.android.feature.sync.domain.usecase.backup.MyBackupsFolderExistsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.PreSeedSyncExclusionsUseCase
@@ -44,10 +47,12 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsSetupConfiguredEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -583,7 +588,8 @@ internal class SyncNewFolderViewModelTest {
         syncType: SyncType,
     ) = runTest {
         stubFolderPairCreation(syncType)
-        whenever(preSeedSyncExclusionsUseCase(any(), any())).thenReturn(Result.success(Unit))
+        whenever(preSeedSyncExclusionsUseCase(any(), any()))
+            .thenReturn(Result.success(stagedExclusions))
         initViewModel(syncType = syncType)
         selectLocalFolderAndStageExclusions()
 
@@ -606,7 +612,8 @@ internal class SyncNewFolderViewModelTest {
             stubFolderPairCreation(SyncType.TYPE_BACKUP)
             whenever(myBackupsFolderExistsUseCase()).thenReturn(false)
             whenever(setMyBackupsFolderUseCase(BACKUPS_FOLDER_NAME)).thenReturn(NodeId(9999L))
-            whenever(preSeedSyncExclusionsUseCase(any(), any())).thenReturn(Result.success(Unit))
+            whenever(preSeedSyncExclusionsUseCase(any(), any()))
+                .thenReturn(Result.success(stagedExclusions))
             initViewModel(syncType = SyncType.TYPE_BACKUP)
             selectLocalFolderAndStageExclusions()
 
@@ -856,6 +863,230 @@ internal class SyncNewFolderViewModelTest {
             }
         }
 
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that next click reports the exclusions pre-seed wrote once the folder pair is created`(
+        syncType: SyncType,
+    ) = runTest {
+        stubFolderPairCreation(syncType)
+        stubPreSeed(Result.success(seededExclusions))
+        initViewModel(syncType = syncType)
+        selectLocalFolderAndStageExclusions(customRuleOnly)
+
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+
+        val reported = setupConfiguredEvents().single()
+        assertThat(reported.info).isEqualTo(
+            mapOf("ruleCount" to 9, "customRuleCount" to 1, "hasSizeLimit" to true),
+        )
+    }
+
+    @Test
+    fun `test that next click reports the exclusions configured when the backups folder is created first`() =
+        runTest {
+            stubFolderPairCreation(SyncType.TYPE_BACKUP)
+            whenever(myBackupsFolderExistsUseCase()).thenReturn(false)
+            whenever(setMyBackupsFolderUseCase(BACKUPS_FOLDER_NAME)).thenReturn(NodeId(9999L))
+            stubPreSeed(Result.success(seededExclusions))
+            initViewModel(syncType = SyncType.TYPE_BACKUP)
+            selectLocalFolderAndStageExclusions()
+
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+            advanceUntilIdle()
+
+            assertThat(setupConfiguredEvents()).hasSize(1)
+        }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that next click reports the exclusions configured once when a retry creates the folder pair`(
+        syncType: SyncType,
+    ) = runTest {
+        stubFolderPairCreation(syncType)
+        whenever(syncFolderPairUseCase(any(), anyOrNull(), any(), any()))
+            .thenReturn(false)
+            .thenReturn(true)
+        stubPreSeed(Result.success(seededExclusions))
+        initViewModel(syncType = syncType)
+        selectLocalFolderAndStageExclusions()
+
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+
+        assertThat(setupConfiguredEvents()).hasSize(1)
+    }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that next click does not report the earlier exclusions when a retry creates the folder pair for a different folder`(
+        syncType: SyncType,
+    ) = runTest {
+        stubFolderPairCreation(syncType)
+        whenever(syncFolderPairUseCase(any(), anyOrNull(), any(), any()))
+            .thenReturn(false)
+            .thenReturn(true)
+        stubPreSeed(Result.success(seededExclusions))
+        initViewModel(syncType = syncType)
+        selectLocalFolderAndStageExclusions()
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+
+        selectLocalFolder(OTHER_LOCAL_ROOT)
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+
+        verify(syncFolderPairUseCase).invoke(eq(syncType), anyOrNull(), eq(OTHER_LOCAL_ROOT), any())
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that next click does not report the exclusions configured when the folder pair is not created`(
+        syncType: SyncType,
+    ) = runTest {
+        stubFolderPairCreation(syncType)
+        whenever(syncFolderPairUseCase(any(), anyOrNull(), any(), any())).thenReturn(false)
+        stubPreSeed(Result.success(seededExclusions))
+        initViewModel(syncType = syncType)
+        selectLocalFolderAndStageExclusions()
+
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @Test
+    fun `test that next click does not report the exclusions configured when the backup already exists`() =
+        runTest {
+            stubFolderPairCreation(SyncType.TYPE_BACKUP)
+            whenever(syncFolderPairUseCase(any(), anyOrNull(), any(), any()))
+                .thenThrow(BackupAlreadyExistsException())
+            stubPreSeed(Result.success(seededExclusions))
+            initViewModel(syncType = SyncType.TYPE_BACKUP)
+            selectLocalFolderAndStageExclusions()
+
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+            advanceUntilIdle()
+
+            assertThat(underTest.state.value.showRenameAndCreateBackupDialog).isNotNull()
+            assertThat(analyticsExtension.events).isEmpty()
+        }
+
+    @Test
+    fun `test that next click does not report the exclusions configured when the backups folder cannot be created`() =
+        runTest {
+            stubFolderPairCreation(SyncType.TYPE_BACKUP)
+            whenever(myBackupsFolderExistsUseCase()).thenReturn(true, false)
+            whenever(setMyBackupsFolderUseCase(BACKUPS_FOLDER_NAME))
+                .thenThrow(RuntimeException("Backups folder refused"))
+            whenever(syncFolderPairUseCase(any(), anyOrNull(), any(), any())).thenReturn(false)
+            stubPreSeed(Result.success(seededExclusions))
+            initViewModel(syncType = SyncType.TYPE_BACKUP)
+            selectLocalFolderAndStageExclusions()
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+            advanceUntilIdle()
+
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+            advanceUntilIdle()
+
+            verify(preSeedSyncExclusionsUseCase).invoke(any(), any())
+            assertThat(underTest.state.value.openSyncListScreen).isEqualTo(triggered)
+            assertThat(analyticsExtension.events).isEmpty()
+        }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that next click does not report the exclusions configured when the staged exclusions fail to write`(
+        syncType: SyncType,
+    ) = runTest {
+        stubFolderPairCreation(syncType)
+        stubPreSeed(Result.failure(RuntimeException("Write failed")))
+        initViewModel(syncType = syncType)
+        selectLocalFolderAndStageExclusions()
+
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that next click does not report the exclusions configured when none are staged`(
+        syncType: SyncType,
+    ) = runTest {
+        stubFolderPairCreation(syncType)
+        initViewModel(syncType = syncType)
+
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+
+        verify(syncFolderPairUseCase).invoke(eq(syncType), anyOrNull(), any(), any())
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that next click does not report the exclusions configured when the sync exclusions flag is off`(
+        syncType: SyncType,
+    ) = runTest {
+        stubFolderPairCreation(syncType)
+        initViewModel(syncType = syncType)
+        selectLocalFolderAndStageExclusions()
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions)).thenReturn(false)
+
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+        advanceUntilIdle()
+
+        verify(syncFolderPairUseCase).invoke(eq(syncType), anyOrNull(), eq(LOCAL_ROOT), any())
+        assertThat(analyticsExtension.events).isEmpty()
+    }
+
+    /**
+     * The first attempt wrote the file before finding the name taken, so the backup the rename
+     * dialog creates is the pair those exclusions were written for.
+     */
+    @Test
+    fun `test that onRenameAndCreateBackupSucceeded reports the exclusions pre-seeded for the renamed backup`() =
+        runTest {
+            stubFolderPairCreation(SyncType.TYPE_BACKUP)
+            whenever(syncFolderPairUseCase(any(), anyOrNull(), any(), any()))
+                .thenThrow(BackupAlreadyExistsException())
+            stubPreSeed(Result.success(seededExclusions))
+            initViewModel(syncType = SyncType.TYPE_BACKUP)
+            selectLocalFolderAndStageExclusions()
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+            advanceUntilIdle()
+
+            underTest.onRenameAndCreateBackupSucceeded(true)
+
+            val reported = setupConfiguredEvents().single()
+            assertThat(reported.info["ruleCount"]).isEqualTo(9)
+            assertThat(underTest.state.value.openSyncListScreen).isEqualTo(triggered)
+        }
+
+    @Test
+    fun `test that onRenameAndCreateBackupSucceeded does not report the exclusions configured when the backup was not created`() =
+        runTest {
+            stubFolderPairCreation(SyncType.TYPE_BACKUP)
+            whenever(syncFolderPairUseCase(any(), anyOrNull(), any(), any()))
+                .thenThrow(BackupAlreadyExistsException())
+            stubPreSeed(Result.success(seededExclusions))
+            initViewModel(syncType = SyncType.TYPE_BACKUP)
+            selectLocalFolderAndStageExclusions()
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+            advanceUntilIdle()
+
+            underTest.onRenameAndCreateBackupSucceeded(false)
+
+            assertThat(analyticsExtension.events).isEmpty()
+            assertThat(underTest.state.value.openSyncListScreen).isEqualTo(triggered)
+        }
+
     private suspend fun stubFolderPairCreation(syncType: SyncType): RemoteFolder {
         val remoteFolder = if (syncType == SyncType.TYPE_BACKUP) {
             RemoteFolder(NodeId(-1L), "")
@@ -898,11 +1129,20 @@ internal class SyncNewFolderViewModelTest {
         advanceUntilIdle()
     }
 
-    private suspend fun TestScope.selectLocalFolderAndStageExclusions() {
+    private suspend fun TestScope.selectLocalFolderAndStageExclusions(
+        exclusions: ParsedMegaIgnore = stagedExclusions,
+    ) {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions)).thenReturn(true)
         selectLocalFolder(LOCAL_ROOT)
-        underTest.handleAction(SyncNewFolderAction.ExclusionsStaged(stagedExclusions))
+        underTest.handleAction(SyncNewFolderAction.ExclusionsStaged(exclusions))
         advanceUntilIdle()
+    }
+
+    private fun setupConfiguredEvents() =
+        analyticsExtension.events.filterIsInstance<AndroidSyncExclusionsSetupConfiguredEvent>()
+
+    private suspend fun stubPreSeed(result: Result<ParsedMegaIgnore>) {
+        whenever(preSeedSyncExclusionsUseCase(any(), any())).thenReturn(result)
     }
 
     private fun initViewModel(
@@ -935,7 +1175,7 @@ internal class SyncNewFolderViewModelTest {
         Arguments.of(SyncType.TYPE_BACKUP),
     )
 
-    private companion object {
+    companion object {
         const val LOCAL_ROOT = "content://com.android.externalstorage.documents/tree/primary%3APhotos"
         const val OTHER_LOCAL_ROOT = "content://com.android.externalstorage.documents/tree/primary%3ADocuments"
         const val BACKUPS_FOLDER_NAME = "Backups"
@@ -943,5 +1183,23 @@ internal class SyncNewFolderViewModelTest {
         val stagedExclusions = ParsedMegaIgnore(
             entries = listOf(MegaIgnoreEntry.RuleEntry(MegaIgnoreDefaults.RULES.first())),
         )
+
+        private val customRule = MegaIgnoreEntry.RuleEntry(
+            SyncExclusionRule(pattern = "*.iso", matchType = SyncExclusionMatchType.SubtreeName),
+        )
+
+        /** What the user leaves after deleting every default. */
+        val customRuleOnly = ParsedMegaIgnore(entries = listOf(customRule))
+
+        /** What pre-seed writes for it: the defaults seeded back in front, and a size bound. */
+        val seededExclusions = ParsedMegaIgnore(
+            entries = MegaIgnoreDefaults.RULES.map { MegaIgnoreEntry.RuleEntry(it) } +
+                    customRule +
+                    MegaIgnoreEntry.SizeLargerEntry(bytes = 1_048_576L),
+        )
+
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }

@@ -19,6 +19,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.SyncCardExclusionsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent
@@ -1123,6 +1124,7 @@ internal class SyncCardTest {
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_CARD_EXCLUSIONS).performClick()
 
         assertThat(clicked).isTrue()
+        assertThat(analyticsRule.events).containsExactly(SyncCardExclusionsButtonPressedEvent)
     }
 
     /**

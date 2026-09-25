@@ -21,6 +21,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.Button
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.feature.sync.domain.entity.SyncSizeExclusion
 import mega.privacy.android.feature.sync.ui.model.exclusion.ManageSyncExclusionsUiState
@@ -33,6 +34,7 @@ import mega.privacy.android.feature.sync.ui.views.ExclusionSizeRow
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsAddButtonPressedEvent
 
 /**
  * The exclusions of one sync, in the three groups the design fixes: extensions as chips, then
@@ -83,7 +85,12 @@ internal fun ManageSyncExclusionsScreen(
                     {
                         Button.SecondaryButtonM3(
                             text = stringResource(sharedR.string.sync_exclusions_manage_add),
-                            onClick = onAddClicked,
+                            onClick = {
+                                Analytics.tracker.trackEvent(
+                                    AndroidSyncExclusionsAddButtonPressedEvent
+                                )
+                                onAddClicked()
+                            },
                             enabled = uiState.canAddExclusion,
                         )
                     },

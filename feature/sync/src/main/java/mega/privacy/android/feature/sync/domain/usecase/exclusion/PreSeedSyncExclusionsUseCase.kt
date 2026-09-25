@@ -37,11 +37,15 @@ internal class PreSeedSyncExclusionsUseCase @Inject constructor(
      * @param localRoot the local root the sync is being created on
      * @param staged the exclusions the user configured during setup, in the line order they are to
      * be written in
+     * @return the model written, which is [staged] with any seeded defaults in front of it
      */
     suspend operator fun invoke(
         localRoot: UriPath,
         staged: ParsedMegaIgnore,
-    ): Result<Unit> = syncExclusionsRepository.setExclusions(localRoot, staged.seededWithDefaults())
+    ): Result<ParsedMegaIgnore> {
+        val seeded = staged.seededWithDefaults()
+        return syncExclusionsRepository.setExclusions(localRoot, seeded).map { seeded }
+    }
 
     private fun ParsedMegaIgnore.seededWithDefaults(): ParsedMegaIgnore =
         if (carriesADefault()) {

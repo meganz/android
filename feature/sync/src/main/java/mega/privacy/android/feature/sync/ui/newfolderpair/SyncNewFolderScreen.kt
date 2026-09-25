@@ -110,7 +110,7 @@ internal fun SyncNewFolderScreen(
         showStorageOverQuota = showStorageOverQuota,
         onDismissStorageOverQuota = onDismissStorageOverQuota,
         onDismissRenameAndCreateBackupDialog = { viewModel.onShowRenameAndCreateBackupDialogConsumed() },
-        onRenameAndCreateBackupSucceeded = { viewModel.openSyncListScreen() },
+        onRenameAndCreateBackupSucceeded = { viewModel.onRenameAndCreateBackupSucceeded(it) },
         onOpenUpgradeAccount = onOpenUpgradeAccount,
         onShowSnackbarConsumed = { viewModel.onShowSnackbarConsumed() },
         showExclusionsRow = showExclusionsRow,
@@ -132,7 +132,7 @@ internal fun SyncNewFolderScreenScaffold(
     showStorageOverQuota: Boolean,
     onDismissStorageOverQuota: () -> Unit,
     onDismissRenameAndCreateBackupDialog: () -> Unit,
-    onRenameAndCreateBackupSucceeded: () -> Unit,
+    onRenameAndCreateBackupSucceeded: (Boolean) -> Unit,
     onOpenUpgradeAccount: () -> Unit,
     onShowSnackbarConsumed: () -> Unit,
     showExclusionsRow: Boolean,
@@ -220,7 +220,7 @@ internal fun SyncNewFolderScreenContent(
     onDismissStorageOverQuota: () -> Unit,
     showRenameAndCreateBackupDialog: String?,
     onDismissRenameAndCreateBackupDialog: () -> Unit,
-    onRenameAndCreateBackupSucceeded: () -> Unit,
+    onRenameAndCreateBackupSucceeded: (Boolean) -> Unit,
     onOpenUpgradeAccount: () -> Unit,
     onShowSyncPermissionBannerValueChanged: (Boolean) -> Unit,
     snackBarHostState: SnackbarHostState?,
@@ -335,9 +335,9 @@ internal fun SyncNewFolderScreenContent(
             RenameAndCreateBackupDialog(
                 backupName = folderPairName,
                 localPath = selectedLocalFolderUri,
-                onSuccess = {
+                onSuccess = { created ->
                     onDismissRenameAndCreateBackupDialog()
-                    onRenameAndCreateBackupSucceeded()
+                    onRenameAndCreateBackupSucceeded(created)
                 },
                 onCancel = {
                     proceedButtonClicked = false

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
@@ -40,6 +41,16 @@ import mega.privacy.android.feature.sync.ui.model.exclusion.ManageExclusionsMode
 import mega.privacy.android.feature.sync.ui.model.exclusion.ManageSyncExclusionsUiState
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionChipUiItem
 import mega.privacy.android.feature.sync.ui.model.exclusion.SyncExclusionRowUiItem
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsChangesDiscardedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsDefaultsRestoredEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsExtensionRulesAddedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsNameRuleAddedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsReviewSavedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsRuleDeletedFromChipEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsRuleDeletedFromEditScreenEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsRuleEditedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsSaveFailedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncExclusionsSizeLimitDeletedEvent
 
 /**
  * Stages the user's changes to a sync's `.megaignore` and writes them once, on save.
@@ -137,17 +148,34 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
         }
         if (staged) {
             uiState.update { it.copy(exclusionAddedEvent = triggered) }
+            trackExclusionAdded(result)
         }
     }
 
     fun onRuleEdited(ruleIndex: Int, expected: SyncExclusionRule, edit: SyncExclusionEdit) {
+        val before = uiState.value.staged
         if (stageResult { replaceSyncExclusionUseCase(it, ruleIndex, expected, edit) }) {
             uiState.update { it.copy(exclusionUpdatedEvent = triggered) }
+            // saving the Edit screen untouched hands the rule back as it was, which is confirmed
+            // like any save but is not an edit
+            if (uiState.value.staged != before) {
+                Analytics.tracker.trackEvent(AndroidSyncExclusionsRuleEditedEvent)
+            }
         }
     }
 
-    fun onRuleRemoved(ruleIndex: Int, expected: SyncExclusionRule) {
-        stageResult { removeSyncExclusionUseCase(it, ruleIndex, expected) }
+    /** Removes a rule through the remove action on its extension chip. */
+    fun onExtensionRemoved(ruleIndex: Int, expected: SyncExclusionRule) {
+        if (removeRule(ruleIndex, expected)) {
+            Analytics.tracker.trackEvent(AndroidSyncExclusionsRuleDeletedFromChipEvent)
+        }
+    }
+
+    /** Removes a rule through the delete action on the Edit exclusion screen. */
+    fun onRuleDeleted(ruleIndex: Int, expected: SyncExclusionRule) {
+        if (removeRule(ruleIndex, expected)) {
+            Analytics.tracker.trackEvent(AndroidSyncExclusionsRuleDeletedFromEditScreenEvent)
+        }
     }
 
     /**
@@ -155,9 +183,20 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
      * so it is not confirmed.
      */
     fun onSizeBoundsChanged(bounds: SyncSizeExclusion) {
+        val previous = uiState.value.staged?.size
         val staged = stageResult { setSyncSizeBoundsUseCase(it, bounds) }
         if (staged && !bounds.isUnbounded) {
             uiState.update { it.copy(exclusionUpdatedEvent = triggered) }
+        }
+        // compared as bounds rather than as files, because setting them can move bound lines
+        // without changing what they declare
+        if (staged && bounds != previous) {
+            val event = if (bounds.isUnbounded) {
+                AndroidSyncExclusionsSizeLimitDeletedEvent
+            } else {
+                bounds.toSizeLimitEditedEvent()
+            }
+            event?.let { Analytics.tracker.trackEvent(it) }
         }
     }
 
@@ -166,6 +205,7 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
         // an unchanged list from an action that did nothing
         if (stage { restoreDefaultSyncExclusionsUseCase(it) }) {
             uiState.update { it.copy(defaultsRestoredEvent = triggered) }
+            Analytics.tracker.trackEvent(AndroidSyncExclusionsDefaultsRestoredEvent)
         }
     }
 
@@ -182,6 +222,7 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
                 uiState.update {
                     it.copy(reviewSavedEvent = triggered(staged), loaded = staged)
                 }
+                Analytics.tracker.trackEvent(AndroidSyncExclusionsReviewSavedEvent)
             }
 
             ManageExclusionsMode.Manage -> {
@@ -202,6 +243,13 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
                             it.copy(isSaving = false, saveFailedEvent = triggered)
                         }
                     }
+                    Analytics.tracker.trackEvent(
+                        if (written.isSuccess) {
+                            staged.toChangesSavedEvent()
+                        } else {
+                            AndroidSyncExclusionsSaveFailedEvent
+                        },
+                    )
                 }
             }
         }
@@ -225,12 +273,16 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
     }
 
     fun onDiscardConfirmed() {
+        val wasPrompted = uiState.value.isDiscardPromptShown
         uiState.update {
             if (!it.isDiscardPromptShown) {
                 it
             } else {
                 it.copy(staged = it.loaded, isDiscardPromptShown = false, isFinished = true)
             }
+        }
+        if (wasPrompted) {
+            Analytics.tracker.trackEvent(AndroidSyncExclusionsChangesDiscardedEvent)
         }
     }
 
@@ -335,6 +387,27 @@ internal class ManageSyncExclusionsViewModel @AssistedInject constructor(
             uiState.update { it.copy(syncName = name) }
         }
     }
+
+    /**
+     * Reports what the Add screen authored. A size limit is classified by the bounds the user
+     * stated rather than the pair they were merged into, which can hold a bound the file already
+     * had.
+     */
+    private fun trackExclusionAdded(result: AddSyncExclusionResult) {
+        val event = when (result) {
+            is AddSyncExclusionResult.Rules -> if (result.fromExtensionForm) {
+                AndroidSyncExclusionsExtensionRulesAddedEvent(extensionCount = result.rules.size)
+            } else {
+                AndroidSyncExclusionsNameRuleAddedEvent
+            }
+
+            is AddSyncExclusionResult.SizeBounds -> result.bounds.toSizeLimitAddedEvent()
+        }
+        event?.let { Analytics.tracker.trackEvent(it) }
+    }
+
+    private fun removeRule(ruleIndex: Int, expected: SyncExclusionRule): Boolean =
+        stageResult { removeSyncExclusionUseCase(it, ruleIndex, expected) }
 
     /** Applies [transform] to the staged model, reporting whether there was one to apply it to. */
     private fun stage(transform: (ParsedMegaIgnore) -> ParsedMegaIgnore): Boolean {

@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,9 @@ import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
@@ -25,6 +28,7 @@ import mega.privacy.android.feature.sync.ui.views.SELECT_DEVICE_FOLDER_OPTION_TE
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncSetupManageExclusionsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 import org.junit.Rule
 import org.junit.Test
@@ -387,6 +391,43 @@ internal class SyncNewFolderScreenRouteTest {
     }
 
     @Test
+    fun `test that tapping the exclusions row reports the click and opens the exclusions`() {
+        val localFolder = "content://com.android.externalstorage.documents/tree/primary%3APhotos"
+        val staged = ParsedMegaIgnore(entries = emptyList())
+        val opened = mutableListOf<Pair<UriPath, ParsedMegaIgnore?>>()
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_TWOWAY,
+                deviceName = "Device Name",
+                selectedLocalFolder = localFolder,
+                selectedFolderName = "Photos",
+                stagedExclusions = staged,
+                isExclusionsEnabled = true,
+            )
+        )
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                syncPermissionsManager = syncPermissionsManager,
+                openNextScreen = {},
+                openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
+                onBackClicked = {},
+                onManageExclusions = { root, exclusions -> opened.add(root to exclusions) },
+                monitorResult = { emptyFlow() },
+                clearResult = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag(EXCLUSIONS_ROW_TAG).performScrollTo().performClick()
+
+        assertThat(opened).containsExactly(UriPath(localFolder) to staged)
+        assertThat(analyticsTestRule.events)
+            .containsExactly(AndroidSyncSetupManageExclusionsButtonPressedEvent)
+    }
+
+    @Test
     fun `test that SyncStorageQuotaExceedWarning is displayed when storage quota is exceeded`() {
         whenever(state.value).thenReturn(
             SyncNewFolderState(
@@ -416,3 +457,4 @@ internal class SyncNewFolderScreenRouteTest {
 }
 
 private const val APP_BAR_NAVIGATION_ICON_DESCRIPTION = "Navigation Icon"
+private const val EXCLUSIONS_ROW_TAG = "settings_sync_new_folder_exclusions:list_item"
