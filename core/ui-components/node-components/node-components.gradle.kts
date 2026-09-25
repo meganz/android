@@ -17,6 +17,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":domain:account"))
+    implementation(project(":domain:chat"))
     implementation(project(":domain:camerauploads"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))

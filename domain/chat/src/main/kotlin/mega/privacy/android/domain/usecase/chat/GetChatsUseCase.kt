@@ -433,9 +433,11 @@ class GetChatsUseCase @Inject constructor(
                     (firstItem.isPendingMeeting() && secondItem.isPendingMeeting()) -> {
                         firstItem as MeetingChatRoomItem
                         secondItem as MeetingChatRoomItem
+                        val firstStart = firstItem.scheduledStartTimestamp!!
+                        val secondStart = secondItem.scheduledStartTimestamp!!
                         when {
-                            firstItem.scheduledStartTimestamp!! > secondItem.scheduledStartTimestamp!! -> 1
-                            firstItem.scheduledStartTimestamp < secondItem.scheduledStartTimestamp -> -1
+                            firstStart > secondStart -> 1
+                            firstStart < secondStart -> -1
                             else -> 0
                         }
                     }
@@ -480,16 +482,12 @@ class GetChatsUseCase @Inject constructor(
 
     private suspend fun ChatRoomItem.getUserOnlineStatus(): UserChatStatus? =
         runCatching {
-            if (this is IndividualChatRoomItem && peerHandle != null)
-                getUserOnlineStatusByHandleUseCase(peerHandle)
-            else null
+            (this as? IndividualChatRoomItem)?.peerHandle?.let { getUserOnlineStatusByHandleUseCase(it) }
         }.getOrNull()
 
     private suspend fun ChatRoomItem.getUserEmail(): String? =
         runCatching {
-            if (this is IndividualChatRoomItem && peerHandle != null)
-                getUserEmail(peerHandle)
-            else null
+            (this as? IndividualChatRoomItem)?.peerHandle?.let { getUserEmail(it) }
         }.getOrNull()
 
     private suspend fun isChatMuted(chatId: Long): Boolean =

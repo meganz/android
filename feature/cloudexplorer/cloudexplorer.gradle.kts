@@ -31,6 +31,7 @@ dependencies {
     implementation(project(":core:coroutine"))
     implementation(project(":domain"))
     implementation(project(":domain:account"))
+    implementation(project(":domain:chat"))
     implementation(project(":navigation"))
     implementation(project(":data"))
     implementation(project(":resources:string-resources"))

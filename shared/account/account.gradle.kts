@@ -24,6 +24,7 @@ dependencies {
 
     implementation(project(":domain"))
     implementation(project(":domain:account"))
+    implementation(project(":domain:chat"))
     implementation(project(":data"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))

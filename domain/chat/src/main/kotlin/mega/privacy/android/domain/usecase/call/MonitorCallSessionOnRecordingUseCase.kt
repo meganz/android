@@ -25,9 +25,10 @@ class MonitorCallSessionOnRecordingUseCase @Inject constructor(
      */
     operator fun invoke(chatId: Long): Flow<CallRecordingEvent> = monitorChatSessionUpdatesUseCase()
         .filter {
-            chatId == it.call?.chatId && it.session?.changes != null
-                    && (it.session.hasChanged(ChatSessionChanges.SessionOnRecording)
-                    || (it.session.hasChanged(ChatSessionChanges.Status) && it.session.status == ChatSessionStatus.Progress && it.session.isRecording))
+            val session = it.session
+            chatId == it.call?.chatId && session?.changes != null
+                    && (session.hasChanged(ChatSessionChanges.SessionOnRecording)
+                    || (session.hasChanged(ChatSessionChanges.Status) && session.status == ChatSessionStatus.Progress && session.isRecording))
         }.map {
             it.session?.let { session ->
                 if (session.hasChanged(ChatSessionChanges.Status)) {

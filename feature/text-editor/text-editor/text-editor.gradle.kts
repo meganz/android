@@ -18,6 +18,7 @@ android {
 dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
+    implementation(project(":domain:chat"))
     implementation(project(":navigation"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))

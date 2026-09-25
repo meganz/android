@@ -16,11 +16,12 @@ class CancelScheduledMeetingOccurrenceUseCase @Inject constructor(
      * @param occurrence [ChatScheduledMeetingOccurr] to cancel
      * */
     suspend operator fun invoke(chatId: Long, occurrence: ChatScheduledMeetingOccurr) {
+        val startDateTime = occurrence.startDateTime ?: return
         updateScheduledMeetingOccurrenceUseCase(
             chatId,
             occurrence.schedId,
-            occurrence.startDateTime ?: return,
-            occurrence.startDateTime,
+            startDateTime,
+            startDateTime,
             occurrence.endDateTime ?: return,
             true
         )
