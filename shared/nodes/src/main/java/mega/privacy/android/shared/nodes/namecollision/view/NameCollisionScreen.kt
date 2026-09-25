@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.consumed
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.SpannedText
@@ -554,7 +555,14 @@ private fun NameCollisionScreenPreview() {
                     isFile = true,
                     canReplaceOrUpdate = true,
                 ),
+                isCopyToOrigin = false,
+                pendingFileCollisions = 0,
+                pendingFolderCollisions = 0,
                 hasPendingCollisions = false,
+                uploadedFilesCount = 0,
+                uploadEvent = consumed(),
+                outcome = consumed(),
+                dismissEvent = consumed,
             ),
             onReplaceUpdateMerge = {},
             onCancel = {},

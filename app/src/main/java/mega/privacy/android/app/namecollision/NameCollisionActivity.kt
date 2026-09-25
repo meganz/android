@@ -1,70 +1,62 @@
 package mega.privacy.android.app.namecollision
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
-import android.view.View
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.constraintlayout.widget.ConstraintSet
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
-import coil3.load
-import coil3.request.transformations
-import coil3.transform.RoundedCornersTransformation
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.map
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.largebundle.largeBundleHolder
-import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
-import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
-import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.shared.nodes.namecollision.FileVersioningInfo
-import mega.privacy.android.shared.nodes.namecollision.NameCollisionActionResult
-import mega.privacy.android.shared.nodes.namecollision.NameCollisionType
-import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
-import mega.privacy.android.shared.nodes.namecollision.toDomainEntity
-import mega.privacy.android.shared.nodes.namecollision.toUiEntity
+import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_SINGLE_COLLISION_RESULT
-import mega.privacy.android.app.utils.StringUtils.formatColorTag
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
-import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList
-import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionArgs
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionOutcome
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionViewModel
+import mega.privacy.android.shared.nodes.namecollision.toDomainEntity
+import mega.privacy.android.shared.nodes.namecollision.toUiEntity
+import mega.privacy.android.shared.nodes.namecollision.view.NameCollisionScreen
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Activity for showing name collisions and resolving them as per user's choices.
+ *
+ * The screen body is the shared Compose [NameCollisionScreen] backed by the shared
+ * [NameCollisionViewModel]; the intent entry points and the result Intent are kept unchanged so the
+ * existing Activity callers keep working without modification.
  */
 @AndroidEntryPoint
 class NameCollisionActivity : PasscodeActivity() {
-    private val viewModel: NameCollisionViewModel by viewModels()
 
-    private lateinit var binding: ActivityNameCollisionBinding
-
-    private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    @Inject
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val isRefreshingSession by lazy(LazyThreadSafetyMode.NONE) {
         shouldRefreshSessionDueToSDK(true)
@@ -73,486 +65,132 @@ class NameCollisionActivity : PasscodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (isRefreshingSession) return
-        viewModel.isFolderUploadContext = UPLOAD_FOLDER_CONTEXT == intent.action
-        val singleCollision =
-            intent.parcelable<NameCollisionUiEntity>(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
-        val collisionsKey = intent.getStringExtra(EXTRA_COLLISIONS_KEY)
+        enableEdgeToEdge()
 
         lifecycleScope.launch {
-            val collisionsList = collisionsKey?.let { largeBundleHolder.get(it) }
-                ?.parcelableArrayList<NameCollisionUiEntity>(INTENT_EXTRA_COLLISION_RESULTS)
-
-            when {
-                collisionsList != null -> viewModel.setData(
-                    collisionsList.map { it.toDomainEntity() }
-                )
-
-                singleCollision != null -> viewModel.setSingleData(
-                    singleCollision.toDomainEntity()
-                )
-
-                else -> {
-                    Timber.e("No collisions received")
-                    finish()
-                }
-            }
-        }
-
-        if (!viewModel.isCopyToOrigin) {
-            setTheme(R.style.Theme_Mega)
-            enableEdgeToEdge()
-            binding = ActivityNameCollisionBinding.inflate(layoutInflater)
-            consumeInsetsWithToolbar(customToolbar = binding.toolbar)
-            setContentView(binding.root)
-            setupView()
-        }
-        setupObservers()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun setupView() {
-        addStartUploadTransferView()
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            title = ""
-            setHomeButtonEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
-        }
-
-        binding.scrollView.setOnScrollChangeListener { v, _, _, _, _ ->
-            val showElevation = v.canScrollVertically(RecyclerView.NO_POSITION)
-
-            binding.toolbar.elevation = if (showElevation) elevation else 0F
-        }
-
-        binding.learnMore.setOnClickListener {
-            this.launchUrl(LEARN_MORE_URI)
-        }
-        binding.replaceUpdateMergeButton.setOnClickListener {
-            viewModel.replaceUpdateOrMerge(binding.applyForAllCheck.isChecked)
-        }
-        binding.cancelButton.setOnClickListener {
-            viewModel.cancel(binding.applyForAllCheck.isChecked)
-        }
-        binding.renameButton.setOnClickListener {
-            viewModel.rename(binding.applyForAllCheck.isChecked)
-        }
-    }
-
-    private fun addStartUploadTransferView() {
-        binding.root.addView(
-            createStartTransferView(
-                activity = this,
-                transferEventState = viewModel.uiState.map { it.uploadEvent },
-                onConsumeEvent = { },
-            ) { transferEvent ->
-                ((transferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.CollidedFiles).let {
-                    val uploadedFilesCount = viewModel.getUploadedFilesCount()
-                    // Set message based on uploaded files count
-                    val message = if (uploadedFilesCount > 0) {
-                        getString(sharedR.string.transfers_upload_started_snackbar)
-                    } else {
-                        null
-                    }
-                    setResult(
-                        NameCollisionActionResult(
-                            shouldFinish = viewModel.shouldFinish(),
-                            message = message
-                        )
-                    )
-                    viewModel.consumeUploadEvent()
-                }
-            }
-        )
-    }
-
-    private fun setupObservers() {
-        viewModel.updateCurrentCollision().observe(this, ::showCollision)
-        viewModel.getFileVersioningInfo().observe(this, ::updateFileVersioningData)
-        viewModel.onActionResult().observe(this, this::setResult)
-        viewModel.onExceptionThrown().observe(this) { error ->
-            if (!manageCopyMoveException(error) && error is MegaException) {
-                showSnackbar(error.message!!)
-            }
-        }
-        viewModel.getCollisionsResolution().observe(this, ::manageCollisionsResolution)
-    }
-
-    private fun setResult(result: NameCollisionActionResult) {
-        if (result.isForeignNode) {
-            showForeignStorageOverQuotaWarningDialog(this)
-            return
-        }
-
-        if (result.shouldFinish) {
-            setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, result.message))
-            finish()
-        }
-    }
-
-    /**
-     * Shows the current collision.
-     *
-     * @param nodeCollisionResult   Object containing all the required info to present a collision.
-     */
-    private fun showCollision(nodeCollisionResult: NodeNameCollisionResult?) {
-        val collisionResult = nodeCollisionResult?.toUiEntity()
-        if (collisionResult == null) {
-            // All collisions have been processed
-            // Check if should finish (all collisions processed) and if any files were uploaded
-            if (viewModel.shouldFinish() && !isFinishing) {
-                val uploadedFilesCount = viewModel.getUploadedFilesCount()
-                val message = if (uploadedFilesCount > 0) {
-                    getString(sharedR.string.transfers_upload_started_snackbar)
-                } else {
-                    null
-                }
-                setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, message))
+            val args = buildArgs()
+            if (args == null) {
+                Timber.e("No collisions received")
                 finish()
+                return@launch
             }
-            return
-        }
-
-        // Don't populate UI if copying to the original folder as it will automatically replicate the file
-        if (viewModel.isCopyToOrigin)
-            return
-
-        supportActionBar?.title = getString(R.string.title_duplicated_items)
-        binding.progressBarContainer.visibility = View.GONE
-
-        val collision = collisionResult.nameCollision
-        val isFile = collision.isFile
-        val name = collision.name
-
-        binding.alreadyExistsText.text = getString(
-            if (isFile) R.string.file_already_exists_in_location
-            else R.string.folder_already_exists_in_location, name
-        ).formatColorTag(this, 'B', R.color.grey_900_grey_100)
-            .toSpannedHtmlText()
-
-        binding.selectText.text = getString(
-            when {
-                isFile -> R.string.choose_file
-                collision is NameCollisionUiEntity.Upload -> sharedR.string.name_collision_choose_folder_header
-                else -> R.string.choose_folder
-            }
-        )
-
-        binding.replaceUpdateMergeView.apply {
-            val hasThumbnail = collisionResult.thumbnail != null
-            thumbnail.isVisible = hasThumbnail
-            thumbnailIcon.isVisible = !hasThumbnail
-            when {
-                hasThumbnail -> {
-                    thumbnail.load(collisionResult.thumbnail) {
-                        transformations(RoundedCornersTransformation(resources.getDimension(R.dimen.thumbnail_corner_radius)))
+            setContent {
+                val themeMode by monitorThemeModeUseCase()
+                    .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val viewModel =
+                    hiltViewModel<NameCollisionViewModel, NameCollisionViewModel.Factory> {
+                        it.create(args)
                     }
-                }
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-                else -> {
-                    thumbnailIcon.setImageResource(
-                        if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                        else IconPackR.drawable.ic_folder_medium_solid
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    NameCollisionScreen(
+                        uiState = uiState,
+                        onReplaceUpdateMerge = viewModel::replaceUpdateOrMerge,
+                        onCancel = viewModel::cancel,
+                        onRename = viewModel::rename,
+                        onLearnMore = { launchUrl(LEARN_MORE_URI) },
+                        onBack = { onBackPressedDispatcher.onBackPressed() },
                     )
-
-                    if (isFile && collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
-                        requestFileThumbnail((collisionResult.nameCollision as NameCollisionUiEntity.Upload).absolutePath)
-                    }
                 }
-            }
-            this.name.text = name
-            size.text = if (isFile) getSizeString(
-                collision.size ?: 0,
-                this@NameCollisionActivity
-            ) else getFolderContentString(collision)
-            date.text = formatLongDateTime(collisionResult.collisionLastModified ?: 0)
 
-            val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
-
-            ConstraintSet().apply {
-                clone(root)
-                connect(R.id.name, ConstraintSet.TOP, thumbnailView, ConstraintSet.TOP)
-                applyTo(root)
-            }
-        }
-
-        binding.cancelInfo.text = getString(
-            if (isFile) R.string.skip_file
-            else R.string.skip_folder
-        )
-
-        val cancelButtonId: Int
-        val renameInfoId: Int
-        val renameButtonId: Int
-
-        when (collision) {
-            is NameCollisionUiEntity.Upload -> {
-                cancelButtonId = R.string.do_not_upload
-                renameInfoId =
-                    if (isFile) R.string.warning_upload_and_rename
-                    else sharedR.string.name_collision_folder_warning_upload_and_rename
-                renameButtonId = R.string.upload_and_rename
-            }
-
-            is NameCollisionUiEntity.Copy, is NameCollisionUiEntity.Import -> {
-                cancelButtonId = R.string.do_not_copy
-                renameInfoId = R.string.warning_copy_and_rename
-                renameButtonId = R.string.copy_and_rename
-            }
-
-            is NameCollisionUiEntity.Movement -> {
-                cancelButtonId = R.string.do_not_move
-                renameInfoId = R.string.warning_move_and_rename
-                renameButtonId = R.string.move_and_rename
-            }
-        }
-
-        binding.cancelView.apply {
-            val hasThumbnail = collisionResult.thumbnail != null
-            thumbnail.isVisible = hasThumbnail
-            thumbnailIcon.isVisible = !hasThumbnail
-            if (hasThumbnail) {
-                thumbnail.load(collisionResult.thumbnail) {
-                    transformations(RoundedCornersTransformation(resources.getDimension(R.dimen.thumbnail_corner_radius)))
-                }
-            } else {
-                thumbnailIcon.setImageResource(
-                    if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                    else IconPackR.drawable.ic_folder_medium_solid
+                val snackbarHostState = remember { SnackbarHostState() }
+                LegacySnackBarWrapper(
+                    snackbarHostState = snackbarHostState,
+                    context = this@NameCollisionActivity,
                 )
-
-                if (collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
-                    requestFileThumbnail((collisionResult.nameCollision as NameCollisionUiEntity.Upload).absolutePath)
-                }
-            }
-            this.name.text = collisionResult.collisionName
-            size.text =
-                if (isFile) getSizeString(
-                    collisionResult.collisionSize ?: 0,
-                    this@NameCollisionActivity
-                )
-                else nodeCollisionResult.collisionFolderContent?.let { getFolderContentString(it) }
-            date.text = formatLongDateTime(collisionResult.collisionLastModified ?: 0)
-
-            val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
-
-            ConstraintSet().apply {
-                clone(root)
-                connect(R.id.name, ConstraintSet.TOP, thumbnailView, ConstraintSet.TOP)
-                applyTo(root)
-            }
-        }
-
-        binding.cancelButton.text = getString(cancelButtonId)
-
-        val showRename = isFile || collision is NameCollisionUiEntity.Upload
-
-        binding.renameSeparator.isVisible = showRename
-        binding.renameInfo.isVisible = showRename
-        binding.renameView.optionView.isVisible = showRename
-        binding.renameButton.isVisible = showRename
-
-        if (showRename) {
-            binding.renameInfo.text = getString(renameInfoId)
-            binding.renameView.apply {
-                val hasThumbnail = isFile && collisionResult.thumbnail != null
-                thumbnail.isVisible = hasThumbnail
-                thumbnailIcon.isVisible = !hasThumbnail
-                when {
-                    hasThumbnail -> {
-                        thumbnail.load(collisionResult.thumbnail) {
-                            transformations(RoundedCornersTransformation(resources.getDimension(R.dimen.thumbnail_corner_radius)))
+                StartTransferComponent(
+                    event = uiState.uploadEvent,
+                    onConsumeEvent = {},
+                    snackBarHostState = snackbarHostState,
+                    onScanningFinished = { event ->
+                        if (event is StartTransferEvent.FinishUploadProcessing) {
+                            viewModel.consumeUploadEvent()
                         }
-                    }
+                    },
+                )
 
-                    else -> {
-                        thumbnailIcon.setImageResource(
-                            if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                            else IconPackR.drawable.ic_folder_medium_solid
-                        )
+                EventEffect(
+                    event = uiState.outcome,
+                    onConsumed = viewModel::consumeOutcome,
+                ) { outcome ->
+                    when (outcome) {
+                        is NameCollisionOutcome.ActionCompleted -> {
+                            val result = outcome.result
+                            when {
+                                result.isForeignNode ->
+                                    showForeignStorageOverQuotaWarningDialog(this@NameCollisionActivity)
 
-                        if (isFile && collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
-                            requestFileThumbnail((collisionResult.nameCollision as NameCollisionUiEntity.Upload).absolutePath)
+                                result.shouldFinish -> finishWithMessage(result.message)
+                            }
+                        }
+
+                        is NameCollisionOutcome.Resolved ->
+                            finishWithResolvedCollisions(outcome.collisions)
+
+                        is NameCollisionOutcome.Failed -> {
+                            val throwable = outcome.throwable
+                            if (!manageCopyMoveException(throwable) && throwable is MegaException) {
+                                showSnackbar(throwable.message.orEmpty())
+                            }
                         }
                     }
                 }
-                this.name.text = collisionResult.nameCollision.renameName
-                size.isVisible = false
-                date.isVisible = false
 
-                val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
-
-                ConstraintSet().apply {
-                    clone(root)
-                    connect(
-                        thumbnailView,
-                        ConstraintSet.BOTTOM,
-                        root.id,
-                        ConstraintSet.BOTTOM
-                    )
-                    centerVertically(R.id.name, thumbnailView)
-                    applyTo(root)
+                EventEffect(
+                    event = uiState.dismissEvent,
+                    onConsumed = viewModel::consumeDismissEvent,
+                ) {
+                    finishWithMessage(uploadStartedMessage(uiState.uploadedFilesCount))
                 }
             }
-            binding.renameButton.text = getString(renameButtonId)
         }
+    }
 
-        val pendingCollisions =
-            if (isFile) viewModel.pendingFileCollisions
-            else viewModel.pendingFolderCollisions
+    private suspend fun buildArgs(): NameCollisionArgs? {
+        val isFolderUploadContext = UPLOAD_FOLDER_CONTEXT == intent.action
+        val singleCollision =
+            intent.parcelable<NameCollisionUiEntity>(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
+        val collisionsList = intent.getStringExtra(EXTRA_COLLISIONS_KEY)
+            ?.let { largeBundleHolder.get(it) }
+            ?.parcelableArrayList<NameCollisionUiEntity>(INTENT_EXTRA_COLLISION_RESULTS)
 
-        binding.applyForAllCheckLayout.isVisible = pendingCollisions > 0
-
-        if (pendingCollisions > 0) {
-            binding.applyForAllCheckMsg.text = this.resources.getQuantityString(
-                R.plurals.general_name_collision_file_apply_for_all,
-                pendingCollisions, pendingCollisions,
+        return when {
+            collisionsList != null -> NameCollisionArgs.Multiple(
+                collisions = collisionsList.map { it.toDomainEntity() },
+                isFolderUploadContext = isFolderUploadContext,
             )
+
+            singleCollision != null -> NameCollisionArgs.Single(
+                collision = singleCollision.toDomainEntity(),
+                isFolderUploadContext = isFolderUploadContext,
+            )
+
+            else -> null
         }
     }
 
-    private fun getFolderContentString(collision: FolderTreeInfo) =
-        TextUtil.getFolderInfo(collision.numberOfFolders, collision.numberOfFiles, this)
-
-    private fun getFolderContentString(collision: NameCollisionUiEntity) =
-        TextUtil.getFolderInfo(collision.childFolderCount, collision.childFileCount, this)
-
-    /**
-     * Requests the thumbnail of a file through Fresco controller and updates the UI if get.
-     *
-     * @param absolutePath The path from which the thumbnail will be requested.
-     */
-    private fun ViewNameCollisionOptionBinding.requestFileThumbnail(absolutePath: String) {
-        with(thumbnail) {
-            isVisible = true
-            load(absolutePath) {
-                transformations(RoundedCornersTransformation(resources.getDimension(R.dimen.thumbnail_corner_radius)))
-                listener(
-                    onSuccess = { _, _ -> finishThumbnailRequest(true) },
-                    onError = { _, _ -> finishThumbnailRequest(false) }
-                )
-            }
+    private fun uploadStartedMessage(uploadedFilesCount: Int): String? =
+        if (uploadedFilesCount > 0) {
+            getString(sharedR.string.transfers_upload_started_snackbar)
+        } else {
+            null
         }
+
+    private fun finishWithMessage(message: String?) {
+        setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, message))
+        finish()
     }
 
-    /**
-     * Updates the UI according to the thumbnail request.
-     *
-     * @param success True if the thumbnail was set, false otherwise.
-     */
-    private fun ViewNameCollisionOptionBinding.finishThumbnailRequest(success: Boolean) {
-        runOnUiThread {
-            val thumbnailView = if (success) {
-                thumbnailIcon.isVisible = false
-                thumbnail.id
-            } else {
-                thumbnail.isVisible = false
-                thumbnailIcon.id
-            }
-
-            root.post {
-                ConstraintSet().apply {
-                    clone(root)
-
-                    if (root.id == R.id.rename_view) {
-                        connect(
-                            thumbnailView,
-                            ConstraintSet.BOTTOM,
-                            root.id,
-                            ConstraintSet.BOTTOM
-                        )
-                        centerVertically(R.id.name, thumbnailView)
-                    } else {
-                        connect(R.id.name, ConstraintSet.TOP, thumbnailView, ConstraintSet.TOP)
-                    }
-
-                    applyTo(root)
-                }
-            }
-        }
-    }
-
-    /**
-     * Updates the UI related to file versioning.
-     *
-     * @param fileVersioningInfo [FileVersioningInfo] of the current collision.
-     */
-    private fun updateFileVersioningData(fileVersioningInfo: FileVersioningInfo) {
-        if (viewModel.isCopyToOrigin)
-            return
-
-        with(fileVersioningInfo) {
-            binding.replaceUpdateMergeInfo.isVisible = canReplaceOrUpdate
-            binding.replaceUpdateMergeView.root.isVisible = canReplaceOrUpdate
-            binding.replaceUpdateMergeButton.isVisible = canReplaceOrUpdate
-            binding.replaceUpdateMergeSeparator.isVisible = canReplaceOrUpdate
-
-            binding.learnMore.isVisible = canReplaceOrUpdate
-                    && isFileVersioningEnabled
-                    && nameCollisionType == NameCollisionType.UPLOAD
-
-            val replaceUpdateMergeInfoId: Int
-            val replaceUpdateMergeButtonId: Int
-
-            when (nameCollisionType) {
-                NameCollisionType.UPLOAD -> {
-                    replaceUpdateMergeInfoId = when {
-                        !isFile -> R.string.warning_upload_and_merge
-                        isFileVersioningEnabled -> R.string.warning_versioning_upload_and_update
-                        else -> R.string.warning_upload_and_replace
-                    }
-                    replaceUpdateMergeButtonId = when {
-                        !isFile -> R.string.upload_and_merge
-                        isFileVersioningEnabled -> R.string.upload_and_update
-                        else -> R.string.upload_and_replace
-                    }
-                }
-
-                NameCollisionType.COPY -> {
-                    replaceUpdateMergeInfoId =
-                        if (isFile) R.string.warning_copy_and_replace
-                        else R.string.warning_copy_and_merge
-                    replaceUpdateMergeButtonId =
-                        if (isFile) R.string.copy_and_replace
-                        else R.string.copy_and_merge
-                }
-
-                NameCollisionType.MOVE -> {
-                    replaceUpdateMergeInfoId =
-                        if (isFile) R.string.warning_move_and_replace
-                        else R.string.warning_move_and_merge
-                    replaceUpdateMergeButtonId =
-                        if (isFile) R.string.move_and_replace
-                        else R.string.move_and_merge
-                }
-            }
-
-            binding.replaceUpdateMergeInfo.text =
-                getString(replaceUpdateMergeInfoId)
-            binding.replaceUpdateMergeButton.text =
-                getString(replaceUpdateMergeButtonId)
-        }
-    }
-
-    private fun manageCollisionsResolution(collisionsResolution: ArrayList<NodeNameCollisionResult>) {
+    private fun finishWithResolvedCollisions(collisions: List<NodeNameCollisionResult>) {
         val key = largeBundleHolder.put(
             bundleOf(
-                INTENT_EXTRA_COLLISION_RESULTS to collisionsResolution
+                INTENT_EXTRA_COLLISION_RESULTS to collisions
                     .map { it.toUiEntity() }
                     .toCollection(ArrayList())
             )
         )
-        setResult(
-            Activity.RESULT_OK,
-            Intent().putExtra(EXTRA_COLLISIONS_KEY, key)
-        )
+        setResult(RESULT_OK, Intent().putExtra(EXTRA_COLLISIONS_KEY, key))
         finish()
     }
 
@@ -562,7 +200,6 @@ class NameCollisionActivity : PasscodeActivity() {
         }
         super.onDestroy()
     }
-
 
     companion object {
         private const val LEARN_MORE_URI =

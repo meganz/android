@@ -2,7 +2,6 @@ package mega.privacy.android.shared.nodes.namecollision
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
-import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
@@ -29,14 +28,14 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  *                                  the last collision.
  */
 data class NameCollisionUiState(
-    val currentCollision: NodeNameCollisionResult? = null,
-    val fileVersioningInfo: FileVersioningInfo? = null,
-    val isCopyToOrigin: Boolean = false,
-    val pendingFileCollisions: Int = 0,
-    val pendingFolderCollisions: Int = 0,
-    val hasPendingCollisions: Boolean = false,
-    val uploadedFilesCount: Int = 0,
-    val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload.CollidedFiles> = consumed(),
-    val outcome: StateEventWithContent<NameCollisionOutcome> = consumed(),
-    val dismissEvent: StateEvent = consumed,
+    val currentCollision: NodeNameCollisionResult?,
+    val fileVersioningInfo: FileVersioningInfo?,
+    val isCopyToOrigin: Boolean,
+    val pendingFileCollisions: Int,
+    val pendingFolderCollisions: Int,
+    val hasPendingCollisions: Boolean,
+    val uploadedFilesCount: Int,
+    val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload.CollidedFiles>,
+    val outcome: StateEventWithContent<NameCollisionOutcome>,
+    val dismissEvent: StateEvent,
 )

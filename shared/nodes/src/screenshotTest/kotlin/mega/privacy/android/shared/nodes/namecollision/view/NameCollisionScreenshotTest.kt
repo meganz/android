@@ -150,6 +150,7 @@ class NameCollisionScreenshotTest {
         uploadedFilesCount = 0,
         uploadEvent = consumed(),
         outcome = consumed(),
+        dismissEvent = consumed,
     )
 
     private fun fileVersioningInfo(
