@@ -9,7 +9,9 @@ import androidx.core.app.RemoteInput
 import androidx.core.net.toUri
 import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.data.extensions.enqueueChatReply
+import mega.privacy.mobile.analytics.event.ChatMessageNotificationReplyButtonPressedEvent
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -45,6 +47,7 @@ class ChatMessageReplyReceiver : BroadcastReceiver() {
         }
 
         Timber.d("Reply received from notification $notificationId for chat $chatId")
+        Analytics.tracker.trackEvent(ChatMessageNotificationReplyButtonPressedEvent)
         chatMessageNotificationManager.appendReply(context, notificationId, reply)
         workManager.enqueueChatReply(chatId, reply)
     }
