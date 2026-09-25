@@ -24,10 +24,8 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentFromPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
@@ -65,7 +63,6 @@ class OfflineNodeActionsViewModelTest {
     private val snackBarHandler: SnackBarHandler = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private lateinit var underTest: OfflineNodeActionsViewModel
 
@@ -80,7 +77,6 @@ class OfflineNodeActionsViewModelTest {
     private suspend fun stubCommon() {
         whenever(getOfflineFilesUseCase(any())).thenReturn(mapOf())
         whenever(exportNodesUseCase(any(), any())).thenReturn(mapOf())
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
     }
 
     private fun initViewModel() {
@@ -94,34 +90,8 @@ class OfflineNodeActionsViewModelTest {
             snackBarHandler = snackBarHandler,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             nodeShareContentUrisIntentMapper = nodeShareContentUrisIntentMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
-
-    @Test
-    fun `test that isPdfViewerComposeEnabled keeps its default when the feature flag cannot be read`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI))
-                .thenThrow(RuntimeException("no connection"))
-
-            initViewModel()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().isPdfViewerComposeEnabled).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that isPdfViewerComposeEnabled is false when the feature flag is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(false)
-
-            initViewModel()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().isPdfViewerComposeEnabled).isFalse()
-            }
-        }
 
     @Test
     fun `test that handleShareOfflineNodes emits shareFilesEvent when all nodes are files`() =
@@ -479,7 +449,6 @@ class OfflineNodeActionsViewModelTest {
             nodeShareContentUrisIntentMapper,
             getOfflineFileUseCase,
             getPathFromNodeContentUseCase,
-            getFeatureFlagValueUseCase,
             getFileTypeInfoByContentFromPathUseCase,
         )
     }

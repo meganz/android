@@ -10,10 +10,8 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
@@ -39,7 +37,6 @@ class CloudDriveDeepLinkHandler @Inject constructor(
     snackbarEventQueue: SnackbarEventQueue,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getNodeLocationUseCase: GetNodeLocationUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : DeepLinkHandler(snackbarEventQueue) {
 
     override suspend fun getNavKeys(
@@ -79,11 +76,6 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                                 content = getFileNodeContentForFileNodeUseCase(fileNode),
                                 fileNode = fileNode,
                                 nodeSourceData = NodeSourceData.Default(nodeSourceType),
-                                isPDFViewerEnabled = runCatching {
-                                    getFeatureFlagValueUseCase(
-                                        ApiFeatures.PdfViewerComposeUI
-                                    )
-                                }.getOrElse { false },
                             )
                         }.getOrNull()
                     }

@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 
 /**
@@ -96,7 +97,7 @@ data class ChatUiState(
     val myUserHandle: Long? = null,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val actionToManageEvent: StateEventWithContent<ActionToManage> = consumed(),
-    val openPdfEvent: StateEventWithContent<ChatPdfNavigation> = consumed(),
+    val openPdfEvent: StateEventWithContent<PdfViewerNavKey> = consumed(),
     val callEndedDueToFreePlanLimits: Boolean = false,
     val shouldUpgradeToProPlan: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,

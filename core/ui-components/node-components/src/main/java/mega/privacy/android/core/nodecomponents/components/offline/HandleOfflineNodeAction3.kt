@@ -14,12 +14,10 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
-import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.R as NodesR
@@ -32,7 +30,7 @@ import java.util.UUID
  * Composable function to handle offline node action clicks
  *
  * @param onNavigate Callback to navigate to a NavKey destination.
- * Used for PDF navigation with either [PdfViewerNavKey] or [LegacyPdfViewerNavKey].
+ * Used for PDF navigation with [PdfViewerNavKey].
  */
 @Composable
 fun HandleOfflineNodeAction3(
@@ -85,7 +83,6 @@ fun HandleOfflineNodeAction3(
                 coroutineScope = coroutineScope,
                 sortOrder = sortOrder,
                 megaNavigator = megaNavigator,
-                isPdfViewerComposeEnabled = uiState.isPdfViewerComposeEnabled,
                 onNavigate = onNavigate,
             )
         }
@@ -127,7 +124,6 @@ private suspend fun openFile(
     coroutineScope: CoroutineScope,
     sortOrder: SortOrder,
     megaNavigator: MegaNavigator,
-    isPdfViewerComposeEnabled: Boolean,
     onNavigate: (NavKey) -> Unit,
 ) {
     when (content) {
@@ -160,8 +156,8 @@ private suspend fun openFile(
         }
 
         is OfflineNodeActionUiEntity.Pdf -> {
-            if (isPdfViewerComposeEnabled) {
-                val navKey = PdfViewerNavKey(
+            onNavigate(
+                PdfViewerNavKey(
                     nodeHandle = content.nodeId.longValue,
                     contentUri = content.file.absolutePath,
                     isLocalContent = true,
@@ -170,16 +166,7 @@ private suspend fun openFile(
                     mimeType = content.mimeType,
                     title = content.file.name,
                 )
-                onNavigate(navKey)
-            } else {
-                val navKey = LegacyPdfViewerNavKey(
-                    nodeHandle = content.nodeId.longValue,
-                    nodeContentUri = NodeContentUri.LocalContentUri(content.file),
-                    nodeSourceType = NodeSourceTypeInt.OFFLINE_ADAPTER,
-                    mimeType = content.mimeType,
-                )
-                onNavigate(navKey)
-            }
+            )
         }
 
         is OfflineNodeActionUiEntity.Text -> {

@@ -251,25 +251,6 @@ class MegaNavigatorImplTest {
     }
 
     @Test
-    fun `test that openPdfViewerFromChat starts the legacy PdfViewerActivity`() =
-        runTest {
-            underTest.openPdfViewerFromChat(
-                context = context,
-                content = NodeContentUri.RemoteContentUri(
-                    url = "https://mega.nz/pdf",
-                    shouldStopHttpSever = false
-                ),
-                nodeHandle = 1L,
-                chatId = 2L,
-                messageId = 3L,
-                mimeType = "application/pdf",
-            )
-
-            verify(context).startActivity(any())
-            verify(navigationQueue, never()).emit(any<NavKey>(), any(), any())
-        }
-
-    @Test
     fun `test that launchMediaPlayer navigates to audio Nav3 route when audio route launcher returns route key`() =
         runTest {
             val audioFileType = AudioFileTypeInfo(

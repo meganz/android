@@ -26,10 +26,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.toDuration
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentFromPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
@@ -53,26 +51,9 @@ class OfflineNodeActionsViewModel @Inject constructor(
     private val snackBarHandler: SnackBarHandler,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OfflineNodeActionsUiState())
-
-    init {
-        loadPdfViewerFeatureFlag()
-    }
-
-    private fun loadPdfViewerFeatureFlag() {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
-            }.onSuccess { enabled ->
-                _uiState.update { it.copy(isPdfViewerComposeEnabled = enabled) }
-            }.onFailure {
-                Timber.e(it, "Failed to load PDF viewer feature flag")
-            }
-        }
-    }
 
     /**
      * Immutable UI State

@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
@@ -26,7 +25,7 @@ import mega.privacy.android.navigation.destination.DeepLinkContentUnavailableDia
 import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
@@ -57,7 +56,6 @@ class CloudDriveDeepLinkHandlerTest {
     private val fileNodeContentToNavKeyMapper = mock<FileNodeContentToNavKeyMapper>()
     private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
 
     @BeforeAll
@@ -70,7 +68,6 @@ class CloudDriveDeepLinkHandlerTest {
             snackbarEventQueue = snackbarEventQueue,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             getNodeLocationUseCase = getNodeLocationUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -84,10 +81,8 @@ class CloudDriveDeepLinkHandlerTest {
             snackbarEventQueue,
             rootNodeExistsUseCase,
             getNodeLocationUseCase,
-            getFeatureFlagValueUseCase,
         )
         wheneverBlocking { rootNodeExistsUseCase() } doReturn true
-        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.doReturn(false)
     }
 
     @ParameterizedTest
@@ -442,11 +437,9 @@ class CloudDriveDeepLinkHandlerTest {
                 false
             )
         )
-        val previewNavKey = LegacyPdfViewerNavKey(
+        val previewNavKey = PdfViewerNavKey(
             nodeHandle = nodeId.longValue,
-            nodeContentUri = fileNodeContent.uri,
-            nodeSourceType = null,
-            mimeType = "application/pdf"
+            contentUri = "http://example.com/file.pdf",
         )
         val nodeLocation = NodeLocation(
             node = fileNode,
@@ -655,11 +648,9 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
-        val previewNavKey = LegacyPdfViewerNavKey(
+        val previewNavKey = PdfViewerNavKey(
             nodeHandle = nodeId.longValue,
-            nodeContentUri = fileNodeContent.uri,
-            nodeSourceType = null,
-            mimeType = "application/pdf"
+            contentUri = "http://example.com/file.pdf",
         )
         whenever(
             fileNodeContentToNavKeyMapper(
@@ -782,11 +773,9 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
-        val previewNavKey = LegacyPdfViewerNavKey(
+        val previewNavKey = PdfViewerNavKey(
             nodeHandle = nodeId.longValue,
-            nodeContentUri = fileNodeContent.uri,
-            nodeSourceType = null,
-            mimeType = "application/pdf"
+            contentUri = "http://example.com/file.pdf",
         )
         whenever(
             fileNodeContentToNavKeyMapper(

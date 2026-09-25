@@ -17,7 +17,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
-import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
@@ -49,39 +48,7 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
-    fun `test that Pdf content maps to LegacyPdfViewerNavKey when isPDFViewerEnabled is false`() {
-        val nodeHandle = 123L
-        val nodeContentUri = NodeContentUri.RemoteContentUri("http://example.com/file.pdf", false)
-        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
-        val fileNode = createMockFileNode(
-            id = nodeHandle,
-            name = "test.pdf",
-            fileTypeInfo = PdfFileTypeInfo
-        )
-
-        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.CLOUD_DRIVE))
-            .thenReturn(expectedViewType)
-
-        val content = FileNodeContent.Pdf(uri = nodeContentUri)
-        val expected = LegacyPdfViewerNavKey(
-            nodeHandle = nodeHandle,
-            nodeContentUri = nodeContentUri,
-            nodeSourceType = expectedViewType,
-            mimeType = "application/pdf"
-        )
-
-        val result = underTest(
-            content = content,
-            fileNode = fileNode,
-            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
-            isPDFViewerEnabled = false
-        )
-
-        assertThat(result).isEqualTo(expected)
-    }
-
-    @Test
-    fun `test that Pdf content maps to PdfViewerNavKey when isPDFViewerEnabled is true with RemoteContentUri`() {
+    fun `test that Pdf content maps to PdfViewerNavKey with RemoteContentUri`() {
         val nodeHandle = 456L
         val contentUrl = "http://example.com/remote.pdf"
         val shouldStopServer = true
@@ -100,7 +67,6 @@ class FileNodeContentToNavKeyMapperTest {
             content = content,
             fileNode = fileNode,
             nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
-            isPDFViewerEnabled = true
         )
 
         val expected = PdfViewerNavKey(
@@ -116,7 +82,7 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
-    fun `test that Pdf content maps to PdfViewerNavKey when isPDFViewerEnabled is true with LocalContentUri`() {
+    fun `test that Pdf content maps to PdfViewerNavKey with LocalContentUri`() {
         val nodeHandle = 789L
         val localFile = File("/path/to/local.pdf")
         val nodeContentUri = NodeContentUri.LocalContentUri(localFile)
@@ -134,7 +100,6 @@ class FileNodeContentToNavKeyMapperTest {
             content = content,
             fileNode = fileNode,
             nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
-            isPDFViewerEnabled = true
         )
 
         val expected = PdfViewerNavKey(
@@ -168,7 +133,6 @@ class FileNodeContentToNavKeyMapperTest {
             content = content,
             fileNode = fileNode,
             nodeSourceData = NodeSourceData.FolderLink(),
-            isPDFViewerEnabled = true
         )
 
         val expected = PdfViewerNavKey(
@@ -203,7 +167,6 @@ class FileNodeContentToNavKeyMapperTest {
             content = content,
             fileNode = fileNode,
             nodeSourceData = NodeSourceData.FileLink(url = publicUrl),
-            isPDFViewerEnabled = true
         )
 
         val expected = PdfViewerNavKey(

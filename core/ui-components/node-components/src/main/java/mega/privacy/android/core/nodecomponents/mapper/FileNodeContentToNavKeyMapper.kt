@@ -9,7 +9,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
-import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
@@ -43,7 +42,6 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         textEditorMode: TextEditorMode = TextEditorMode.View,
         searchedItems: List<Long>? = null,
         isMediaQueueAvailable: Boolean = true,
-        isPDFViewerEnabled: Boolean = false,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceData.nodeSourceType)
         val recentsBucket = nodeSourceData as? NodeSourceData.RecentsBucket
@@ -53,14 +51,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
             ?: (nodeSourceData as? NodeSourceData.FolderLink)?.url
 
         return when (content) {
-            is FileNodeContent.Pdf -> if (isPDFViewerEnabled.not()) {
-                LegacyPdfViewerNavKey(
-                    nodeHandle = fileNode.id.longValue,
-                    nodeContentUri = content.uri,
-                    nodeSourceType = viewType,
-                    mimeType = fileNode.type.mimeType
-                )
-            } else {
+            is FileNodeContent.Pdf -> {
                 val (contentUri, isLocal, shouldStop) = when (val uri = content.uri) {
                     is NodeContentUri.LocalContentUri -> Triple(uri.file.path, true, false)
                     is NodeContentUri.RemoteContentUri -> Triple(

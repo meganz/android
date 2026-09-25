@@ -2,8 +2,6 @@ package mega.privacy.android.core.nodecomponents.action
 
 import android.content.Intent
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -12,8 +10,6 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,19 +28,16 @@ class NodeActionHandlerViewModelTest {
 
     private val getFileNodeContentForFileNodeUseCase = mock<GetFileNodeContentForFileNodeUseCase>()
     private val nodeContentUriIntentMapper = mock<NodeContentUriIntentMapper>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
         reset(
             getFileNodeContentForFileNodeUseCase,
             nodeContentUriIntentMapper,
-            getFeatureFlagValueUseCase
         )
         viewModel = NodeActionHandlerViewModel(
             getFileNodeContentForFileNodeUseCase = getFileNodeContentForFileNodeUseCase,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -81,30 +74,6 @@ class NodeActionHandlerViewModelTest {
 
         assertThat(result).isEqualTo(expectedContent)
         verify(getFileNodeContentForFileNodeUseCase).invoke(fileNode)
-    }
-
-    @Test
-    fun `test that state isPDFViewerEnabled emits when flag is loaded`() = runTest {
-        reset(getFeatureFlagValueUseCase)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
-
-        val viewModelUnderTest = NodeActionHandlerViewModel(
-            getFileNodeContentForFileNodeUseCase = getFileNodeContentForFileNodeUseCase,
-            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-        )
-
-        val result = viewModelUnderTest.state
-            .map { it.isPDFViewerEnabled }
-            .first { it != null }
-
-        assertThat(result).isTrue()
-        verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.PdfViewerComposeUI)
-    }
-
-    @Test
-    fun `test that initial state has null PDF viewer flag`() = runTest {
-        assertThat(viewModel.state.value.isPDFViewerEnabled).isNull()
     }
 
     private fun createMockFileNode(): TypedFileNode = mock {

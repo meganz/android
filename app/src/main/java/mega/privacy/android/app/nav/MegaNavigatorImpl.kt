@@ -803,25 +803,6 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
-    override fun openPdfViewerFromChat(
-        context: Context,
-        content: NodeContentUri,
-        nodeHandle: Long,
-        chatId: Long,
-        messageId: Long,
-        mimeType: String,
-    ) {
-        val pdfIntent = Intent(context, PdfViewerActivity::class.java).apply {
-            putExtra(INTENT_EXTRA_KEY_INSIDE, true)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
-            putExtra(INTENT_EXTRA_KEY_MSG_ID, messageId)
-            putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
-            putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
-        }
-        nodeContentUriIntentMapper(pdfIntent, content, mimeType)
-        context.startActivity(pdfIntent)
-    }
-
     override fun openImageViewerActivity(
         context: Context,
         currentFileNode: TypedFileNode,

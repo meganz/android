@@ -63,7 +63,6 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatI
 import mega.privacy.android.feature.chat.meeting.call.isJoined
 import mega.privacy.android.feature.chat.meeting.call.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatPdfNavigation
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
@@ -83,7 +82,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.shared.original.core.ui.controls.chat.ChatObserverIndicator
 import mega.privacy.android.shared.original.core.ui.controls.chat.ScrollToBottomFab
@@ -578,18 +576,8 @@ internal fun ChatView(
             EventEffect(
                 event = uiState.openPdfEvent,
                 onConsumed = onOpenPdfEventConsumed,
-            ) { navigation ->
-                when (navigation) {
-                    is ChatPdfNavigation.InPlace -> onNavigate(navigation.navKey)
-                    is ChatPdfNavigation.Legacy -> context.megaNavigator.openPdfViewerFromChat(
-                        context = context,
-                        content = navigation.content,
-                        nodeHandle = navigation.nodeHandle,
-                        chatId = navigation.chatId,
-                        messageId = navigation.messageId,
-                        mimeType = navigation.mimeType,
-                    )
-                }
+            ) { navKey ->
+                onNavigate(navKey)
             }
         }
 

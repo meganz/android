@@ -8,8 +8,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
@@ -27,7 +25,7 @@ import java.io.File
  * @param typedFileNode [TypedFileNode]
  * @param showSnackbar callback to show snackbar messages
  * @param onActionHandled callback after file clicked
- * @param onOpenFileContent callback with content and isPDFViewerEnabled (text editor uses FeatureFlagGate at destination)
+ * @param onOpenFileContent callback with the resolved content to open
  * @param onDownloadEvent callback for download event
  */
 @Composable
@@ -35,7 +33,7 @@ fun BaseHandleNodeAction(
     typedFileNode: TypedFileNode,
     showSnackbar: (String) -> Unit,
     onActionHandled: () -> Unit,
-    onOpenFileContent: (FileNodeContent, Boolean) -> Unit,
+    onOpenFileContent: (FileNodeContent) -> Unit,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     isLinkNode: Boolean = false,
 ) {
@@ -55,20 +53,6 @@ fun BaseHandleNodeAction(
         }.onSuccess { content ->
             runCatching {
                 when (content) {
-                    is FileNodeContent.TextContent -> {
-                        onOpenFileContent(content, false)
-                    }
-
-                    is FileNodeContent.Pdf -> {
-                        val isPDFViewerEnabled = runCatching {
-                            nodeActionsViewModel.state
-                                .map { it.isPDFViewerEnabled }
-                                .first { it != null }
-                        }.getOrDefault(false)
-
-                        onOpenFileContent(content, isPDFViewerEnabled ?: false)
-                    }
-
                     is FileNodeContent.Other -> {
                         content.localFile.let { localFile ->
                             if (localFile == null) {
@@ -91,7 +75,7 @@ fun BaseHandleNodeAction(
                                     applyNodeContentUri = nodeActionsViewModel::applyNodeContentUri
                                 )
                             } else {
-                                onOpenFileContent(FileNodeContent.LocalZipFile(localFile), false)
+                                onOpenFileContent(FileNodeContent.LocalZipFile(localFile))
                             }
                         }
                     }
@@ -101,7 +85,7 @@ fun BaseHandleNodeAction(
                     }
 
                     else -> {
-                        onOpenFileContent(content, false)
+                        onOpenFileContent(content)
                     }
                 }
             }.onFailure {

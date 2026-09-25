@@ -130,11 +130,6 @@ class NavKeyToStringTest {
             title = SENSITIVE,
         ),
         AlbumImportPreviewNavKey(photoId = 1L, albumLink = SENSITIVE),
-        LegacyPdfViewerNavKey(
-            nodeHandle = 1L,
-            nodeContentUri = NodeContentUri.RemoteContentUri(SENSITIVE, false),
-            mimeType = "application/pdf",
-        ),
         LegacyImageViewerNavKey(
             nodeHandle = 1L,
             parentNodeHandle = 2L,

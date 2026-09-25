@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessages
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatPdfNavigation
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
@@ -1562,53 +1561,48 @@ internal class ChatViewModelTest {
     }
 
     @Test
-    fun `test that onOpenPdfMessage triggers InPlace navigation with local content when compose pdf viewer flag is enabled`() =
+    fun `test that onOpenPdfMessage triggers PdfViewerNavKey with local content`() =
         runTest {
             val message = stubPdfMessage()
             val content = NodeContentUri.LocalContentUri(File("/local/path/document.pdf"))
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)) doReturn true
             initTestClass()
 
             underTest.onOpenPdfMessage(message, content)
 
             underTest.state.test {
-                val navigation =
+                val navKey =
                     (awaitItem().openPdfEvent as StateEventWithContentTriggered).content
-                assertThat(navigation).isEqualTo(
-                    ChatPdfNavigation.InPlace(
-                        PdfViewerNavKey(
-                            nodeHandle = 123L,
-                            contentUri = "/local/path/document.pdf",
-                            isLocalContent = true,
-                            shouldStopHttpServer = false,
-                            nodeSourceType = NodeSourceType.CHAT,
-                            mimeType = PdfFileTypeInfo.mimeType,
-                            chatId = 10L,
-                            messageId = 20L,
-                            title = "document.pdf",
-                        )
+                assertThat(navKey).isEqualTo(
+                    PdfViewerNavKey(
+                        nodeHandle = 123L,
+                        contentUri = "/local/path/document.pdf",
+                        isLocalContent = true,
+                        shouldStopHttpServer = false,
+                        nodeSourceType = NodeSourceType.CHAT,
+                        mimeType = PdfFileTypeInfo.mimeType,
+                        chatId = 10L,
+                        messageId = 20L,
+                        title = "document.pdf",
                     )
                 )
             }
         }
 
     @Test
-    fun `test that onOpenPdfMessage triggers InPlace navigation with remote content when compose pdf viewer flag is enabled`() =
+    fun `test that onOpenPdfMessage triggers PdfViewerNavKey with remote content`() =
         runTest {
             val message = stubPdfMessage()
             val content = NodeContentUri.RemoteContentUri(
                 url = "https://mega.nz/document.pdf",
                 shouldStopHttpSever = true,
             )
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)) doReturn true
             initTestClass()
 
             underTest.onOpenPdfMessage(message, content)
 
             underTest.state.test {
-                val navigation =
+                val navKey =
                     (awaitItem().openPdfEvent as StateEventWithContentTriggered).content
-                val navKey = (navigation as ChatPdfNavigation.InPlace).navKey
                 assertThat(navKey.contentUri).isEqualTo("https://mega.nz/document.pdf")
                 assertThat(navKey.isLocalContent).isFalse()
                 assertThat(navKey.shouldStopHttpServer).isTrue()

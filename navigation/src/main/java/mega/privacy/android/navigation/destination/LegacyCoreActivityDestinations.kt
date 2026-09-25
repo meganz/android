@@ -394,18 +394,6 @@ data class AlbumGetLinkNavKey(val albumId: Long) : NavKey
 data class AlbumGetMultipleLinksNavKey(val albumIds: Set<Long>) : NavKey
 
 @Serializable
-data class LegacyPdfViewerNavKey(
-    val nodeHandle: Long,
-    val nodeContentUri: NodeContentUri,
-    val nodeSourceType: Int? = null,
-    val mimeType: String,
-) : NoSessionNavKey.Optional {
-    override fun toString() = "LegacyPdfViewerNavKey(nodeHandle=$nodeHandle, " +
-            "contentType=${nodeContentUri::class.simpleName}, nodeSourceType=$nodeSourceType, " +
-            "mimeType=$mimeType)"
-}
-
-@Serializable
 data class LegacyImageViewerNavKey(
     val nodeHandle: Long,
     val parentNodeHandle: Long,

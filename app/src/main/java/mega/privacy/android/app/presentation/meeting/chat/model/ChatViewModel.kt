@@ -1662,51 +1662,33 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * Handle a click on a PDF attachment. Decides between the Compose PDF viewer (in-place
-     * navigation handled by the host) and the legacy activity, then exposes the result as an event
-     * so the view can route it without the business layer touching the NavigationHandler.
+     * Handle a click on a PDF attachment. Builds the [PdfViewerNavKey] and exposes it as an event
+     * so the view can navigate in place without the business layer touching the NavigationHandler.
      *
      * @param message the PDF [NodeAttachmentMessage] being opened.
      * @param content the resolved [NodeContentUri] of the PDF.
      */
     fun onOpenPdfMessage(message: NodeAttachmentMessage, content: NodeContentUri) {
-        viewModelScope.launch {
-            val isComposePdfViewerEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
-            }.getOrDefault(false)
-            val navigation = if (isComposePdfViewerEnabled) {
-                val (contentUri, isLocal, shouldStop) = when (content) {
-                    is NodeContentUri.LocalContentUri -> Triple(content.file.path, true, false)
-                    is NodeContentUri.RemoteContentUri -> Triple(
-                        content.url,
-                        false,
-                        content.shouldStopHttpSever
-                    )
-                }
-                ChatPdfNavigation.InPlace(
-                    PdfViewerNavKey(
-                        nodeHandle = message.fileNode.id.longValue,
-                        contentUri = contentUri,
-                        isLocalContent = isLocal,
-                        shouldStopHttpServer = shouldStop,
-                        nodeSourceType = NodeSourceType.CHAT,
-                        mimeType = PdfFileTypeInfo.mimeType,
-                        chatId = message.chatId,
-                        messageId = message.msgId,
-                        title = message.fileNode.name,
-                    )
-                )
-            } else {
-                ChatPdfNavigation.Legacy(
-                    content = content,
-                    nodeHandle = message.fileNode.id.longValue,
-                    chatId = message.chatId,
-                    messageId = message.msgId,
-                    mimeType = PdfFileTypeInfo.mimeType,
-                )
-            }
-            _state.update { state -> state.copy(openPdfEvent = triggered(navigation)) }
+        val (contentUri, isLocal, shouldStop) = when (content) {
+            is NodeContentUri.LocalContentUri -> Triple(content.file.path, true, false)
+            is NodeContentUri.RemoteContentUri -> Triple(
+                content.url,
+                false,
+                content.shouldStopHttpSever
+            )
         }
+        val navKey = PdfViewerNavKey(
+            nodeHandle = message.fileNode.id.longValue,
+            contentUri = contentUri,
+            isLocalContent = isLocal,
+            shouldStopHttpServer = shouldStop,
+            nodeSourceType = NodeSourceType.CHAT,
+            mimeType = PdfFileTypeInfo.mimeType,
+            chatId = message.chatId,
+            messageId = message.msgId,
+            title = message.fileNode.name,
+        )
+        _state.update { state -> state.copy(openPdfEvent = triggered(navKey)) }
     }
 
     fun onOpenPdfEventConsumed() {
