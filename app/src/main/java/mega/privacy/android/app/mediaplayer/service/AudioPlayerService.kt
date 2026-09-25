@@ -60,7 +60,6 @@ import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueu
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.mediaplayer.AudioPlayQueueBuilder
 import mega.privacy.android.app.mediaplayer.AudioPlayQueueFilterDiff
-import mega.privacy.android.app.mediaplayer.PlayedPastThresholdTracker
 import mega.privacy.android.app.mediaplayer.isStreamingOverQuotaError
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
@@ -81,6 +80,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.PlayedPastThresholdTracker
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioResumePositionUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioContinuousPlaybackEnabledUseCase

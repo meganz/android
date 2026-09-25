@@ -1,4 +1,4 @@
-package mega.privacy.android.app.mediaplayer
+package mega.privacy.android.domain.usecase.mediaplayer
 
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
  * deliberately not shared. Not thread-safe: meant to be fed from the player callbacks of a single
  * session.
  */
-internal class PlayedPastThresholdTracker {
+class PlayedPastThresholdTracker {
 
     private var playedPastThresholdHandle: Long? = null
 
