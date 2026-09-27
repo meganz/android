@@ -11,8 +11,6 @@ import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
-import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
-import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.contact.DefaultReloadContactDatabase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetContactItem
@@ -32,8 +30,6 @@ import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 @InstallIn(SingletonComponent::class)
 internal abstract class ContactsModule {
 
-    @Binds
-    abstract fun bindUpdateCurrentUserName(implementation: DefaultUpdateCurrentUserName): UpdateCurrentUserName
 
     @Binds
     abstract fun bindResetContactDatabase(implementation: DefaultReloadContactDatabase): ReloadContactDatabase
