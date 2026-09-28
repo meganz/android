@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
@@ -444,6 +445,32 @@ class VideosTabViewModelTest {
 
                     verify(getAllVideosUseCase, times(1))
                         .invoke(anyOrNull(), anyOrNull(), anyOrNull())
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getAllVideosUseCase is invoked without waiting for the refresh debounce when the sort order changes`() =
+        runTest {
+            stubInitialValues()
+            val sortCloudOrderFlow = MutableStateFlow<SortOrder?>(SortOrder.ORDER_MODIFICATION_DESC)
+
+            monitorSortCloudOrderUseCase.stub {
+                on { invoke() }.thenReturn(sortCloudOrderFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.allVideoEntities).isNotEmpty()
+                    advanceUntilIdle()
+                    clearInvocations(getAllVideosUseCase)
+
+                    sortCloudOrderFlow.emit(SortOrder.ORDER_FAV_ASC)
+                    runCurrent()
+
+                    verify(getAllVideosUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull())
                     cancelAndIgnoreRemainingEvents()
                 }
         }

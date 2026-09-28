@@ -109,30 +109,31 @@ class VideosTabViewModel @Inject constructor(
     }
 
     private fun combinedTriggerFlow(): Flow<Unit> = merge(
-        monitorNodeUpdatesUseCase().filter {
-            it.changes.keys.any { node ->
-                node is FileNode && node.type is VideoFileTypeInfo
-            }
-        }.mapLatest { }
-            .catch { Timber.e(it) },
-        monitorOfflineNodeUpdatesUseCase()
-            .map { offlineNodes ->
-                offlineNodes
-                    .filter { getFileTypeInfoByNameUseCase(it.name) is VideoFileTypeInfo }
-                    .toSet()
-            }
-            .distinctUntilChanged()
-            .drop(1)
-            .mapLatest { }
-            .catch { Timber.e(it) },
+        merge(
+            monitorNodeUpdatesUseCase().filter {
+                it.changes.keys.any { node ->
+                    node is FileNode && node.type is VideoFileTypeInfo
+                }
+            }.mapLatest { }
+                .catch { Timber.e(it) },
+            monitorOfflineNodeUpdatesUseCase()
+                .map { offlineNodes ->
+                    offlineNodes
+                        .filter { getFileTypeInfoByNameUseCase(it.name) is VideoFileTypeInfo }
+                        .toSet()
+                }
+                .distinctUntilChanged()
+                .drop(1)
+                .mapLatest { }
+                .catch { Timber.e(it) }
+        ).debounce(REFRESH_DEBOUNCE_MS.milliseconds),
         monitorSortCloudOrderUseCase()
             .filterNotNull()
             .distinctUntilChanged()
             .drop(1)
             .mapLatest { }
             .catch { Timber.d(it) }
-    ).debounce(REFRESH_DEBOUNCE_MS.milliseconds)
-        .onStart { emit(Unit) }
+    ).onStart { emit(Unit) }
 
     private fun getVideoListFlow(): Flow<Pair<List<TypedVideoNode>, String?>> =
         combinedTriggerFlow().flatMapLatest {
