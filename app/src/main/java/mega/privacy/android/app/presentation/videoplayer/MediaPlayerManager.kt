@@ -4,7 +4,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import mega.privacy.android.app.di.mediaplayer.VideoPlayer
+import mega.privacy.android.app.di.mediaplayer.ComposeVideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
@@ -22,7 +22,7 @@ import javax.inject.Inject
  * ViewModel supplies, and delegates the remaining player operations straight to the gateway.
  */
 class MediaPlayerManager @Inject constructor(
-    @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
+    @ComposeVideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
 ) {
     /**
      * Create the [ExoPlayer], forwarding player events to the supplied callbacks.

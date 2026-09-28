@@ -13,6 +13,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.feature.mediaplayer.data.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.feature.mediaplayer.data.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.mediaplayer.usecase.DefaultStopAudioService
@@ -92,6 +93,35 @@ class MediaPlayerModule {
         exoPlayerRepeatModeMapper: ExoPlayerRepeatModeMapper,
         simpleCache: SimpleCache?,
     ): MediaPlayerFacade =
+        MediaPlayerFacade(
+            context,
+            crashReporter,
+            repeatToggleModeMapper,
+            exoPlayerRepeatModeMapper,
+            simpleCache
+        )
+
+    /**
+     * Provide the MediaPlayerGateway implementation for the Compose video player.
+     *
+     * Unscoped on purpose: every [mega.privacy.android.app.presentation.videoplayer.ComposeVideoPlayerViewModel]
+     * owns its own player and releases it in `onCleared`. Sharing the [VideoPlayer] singleton with
+     * the live player would let one implementation pause, seek and release the other's ExoPlayer.
+     * The [SimpleCache] singleton is still shared, which is safe — Media3 only forbids two
+     * SimpleCache instances over the same directory, not two players over one instance.
+     *
+     * Returns the gateway interface directly, so no separate `@Binds` is needed. The [VideoPlayer]
+     * and [AudioPlayer] providers keep the two-step route on purpose — see [ComposeVideoPlayer].
+     */
+    @ComposeVideoPlayer
+    @Provides
+    fun provideComposeVideoPlayerGateway(
+        @ApplicationContext context: Context,
+        crashReporter: CrashReporter,
+        repeatToggleModeMapper: RepeatToggleModeByExoPlayerMapper,
+        exoPlayerRepeatModeMapper: ExoPlayerRepeatModeMapper,
+        simpleCache: SimpleCache?,
+    ): MediaPlayerGateway =
         MediaPlayerFacade(
             context,
             crashReporter,
