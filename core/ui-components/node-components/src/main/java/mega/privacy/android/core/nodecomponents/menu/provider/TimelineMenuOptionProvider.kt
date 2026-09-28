@@ -5,7 +5,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.qualifier.features.Timeline
+import mega.privacy.android.core.nodecomponents.qualifier.Timeline
 import javax.inject.Inject
 
 class TimelineMenuOptionProvider @Inject constructor(

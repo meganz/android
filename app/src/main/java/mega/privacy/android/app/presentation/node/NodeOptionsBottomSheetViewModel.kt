@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.qualifier.features.Backups
-import mega.privacy.android.domain.qualifier.features.CloudDrive
-import mega.privacy.android.domain.qualifier.features.IncomingShares
-import mega.privacy.android.domain.qualifier.features.Links
-import mega.privacy.android.domain.qualifier.features.OutgoingShares
-import mega.privacy.android.domain.qualifier.features.RubbishBin
+import mega.privacy.android.core.nodecomponents.qualifier.Backups
+import mega.privacy.android.core.nodecomponents.qualifier.CloudDrive
+import mega.privacy.android.core.nodecomponents.qualifier.IncomingShares
+import mega.privacy.android.core.nodecomponents.qualifier.Links
+import mega.privacy.android.core.nodecomponents.qualifier.OutgoingShares
+import mega.privacy.android.core.nodecomponents.qualifier.RubbishBin
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
 import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermissionIconMapper
@@ -38,7 +38,7 @@ import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInSha
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.domain.qualifier.features.Videos
+import mega.privacy.android.core.nodecomponents.qualifier.Videos
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -33,17 +33,17 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Shar
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.UnhideSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
-import mega.privacy.android.domain.qualifier.features.Chat
-import mega.privacy.android.domain.qualifier.features.CloudDrive
-import mega.privacy.android.domain.qualifier.features.FileLink
-import mega.privacy.android.domain.qualifier.features.FolderLink
-import mega.privacy.android.domain.qualifier.features.IncomingShares
-import mega.privacy.android.domain.qualifier.features.Links
-import mega.privacy.android.domain.qualifier.features.Offline
-import mega.privacy.android.domain.qualifier.features.OutgoingShares
-import mega.privacy.android.domain.qualifier.features.RubbishBin
-import mega.privacy.android.domain.qualifier.features.Timeline
-import mega.privacy.android.domain.qualifier.features.Versions
+import mega.privacy.android.core.nodecomponents.qualifier.Chat
+import mega.privacy.android.core.nodecomponents.qualifier.CloudDrive
+import mega.privacy.android.core.nodecomponents.qualifier.FileLink
+import mega.privacy.android.core.nodecomponents.qualifier.FolderLink
+import mega.privacy.android.core.nodecomponents.qualifier.IncomingShares
+import mega.privacy.android.core.nodecomponents.qualifier.Links
+import mega.privacy.android.core.nodecomponents.qualifier.Offline
+import mega.privacy.android.core.nodecomponents.qualifier.OutgoingShares
+import mega.privacy.android.core.nodecomponents.qualifier.RubbishBin
+import mega.privacy.android.core.nodecomponents.qualifier.Timeline
+import mega.privacy.android.core.nodecomponents.qualifier.Versions
 import javax.inject.Singleton
 
 @Module

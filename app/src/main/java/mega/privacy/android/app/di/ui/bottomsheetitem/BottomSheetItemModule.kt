@@ -5,12 +5,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import mega.privacy.android.domain.qualifier.features.Backups
-import mega.privacy.android.domain.qualifier.features.CloudDrive
-import mega.privacy.android.domain.qualifier.features.IncomingShares
-import mega.privacy.android.domain.qualifier.features.Links
-import mega.privacy.android.domain.qualifier.features.OutgoingShares
-import mega.privacy.android.domain.qualifier.features.RubbishBin
+import mega.privacy.android.core.nodecomponents.qualifier.Backups
+import mega.privacy.android.core.nodecomponents.qualifier.CloudDrive
+import mega.privacy.android.core.nodecomponents.qualifier.IncomingShares
+import mega.privacy.android.core.nodecomponents.qualifier.Links
+import mega.privacy.android.core.nodecomponents.qualifier.OutgoingShares
+import mega.privacy.android.core.nodecomponents.qualifier.RubbishBin
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.AvailableOfflineBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.CopyBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.DeletePermanentlyBottomSheetMenuItem
@@ -45,7 +45,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Vers
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.ViewInFolderBottomSheetMenuItem
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.AddToPlaylistBottomSheetMenuItem
-import mega.privacy.android.domain.qualifier.features.Videos
+import mega.privacy.android.core.nodecomponents.qualifier.Videos
 import javax.inject.Singleton
 
 /**
