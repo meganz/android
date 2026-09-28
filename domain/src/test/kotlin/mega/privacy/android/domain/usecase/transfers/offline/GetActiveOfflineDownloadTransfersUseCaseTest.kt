@@ -162,7 +162,7 @@ class GetActiveOfflineDownloadTransfersUseCaseTest {
      */
     private fun rootTransfer(
         nodeId: NodeId,
-        appData: List<TransferAppData> = listOf(TransferAppData.OfflineDownload),
+        appData: List<TransferAppData> = listOf(TransferAppData.OfflineDownload()),
         isFinished: Boolean = false,
         isCancelled: Boolean = false,
         isAlreadyTransferred: Boolean = false,

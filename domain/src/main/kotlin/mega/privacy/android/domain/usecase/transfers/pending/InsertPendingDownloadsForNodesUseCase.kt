@@ -63,7 +63,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
                     transferType = TransferType.DOWNLOAD,
                     nodeIdentifier = getPendingTransferNodeIdentifierUseCase(node),
                     uriPath = UriPath(destination.value.ensureEndsWithFileSeparator()),
-                    appData = appDataList,
+                    appData = appDataList.map { it.forNode(node) },
                     isHighPriority = isHighPriority,
                     fileName = node.name,
                     pitagTrigger = PitagTrigger.NotApplicable,
@@ -71,6 +71,13 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
             }
         )
     }
+
+    /**
+     * The SDK copies the app data of a batch item into every file the item brings along, so the
+     * chosen node is recorded in it to tell it apart from the content of a chosen folder.
+     */
+    private fun TransferAppData.forNode(node: TypedNode) =
+        if (this is TransferAppData.OfflineDownload) copy(nodeHandle = node.id.longValue) else this
 
     private fun String.ensureEndsWithFileSeparator() =
         if (this.endsWith(File.separator)) {

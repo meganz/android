@@ -384,7 +384,7 @@ class HandleTransferEventUseCaseTest {
 
     private fun provideRecursiveTransferAppData() = listOf(
         TransferAppData.TransferGroup(245),
-        TransferAppData.OfflineDownload
+        TransferAppData.OfflineDownload()
     )
 
 

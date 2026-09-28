@@ -153,6 +153,7 @@ class TransferAppDataMapperTest {
         private const val LAT = 41.60
         private const val LON = 2.28
         private const val GROUP_ID = 4567L
+        private const val NODE_HANDLE = 8912L
         private val wrongParameters = listOf(
             "",
             "something wrong",
@@ -187,7 +188,9 @@ class TransferAppDataMapperTest {
             generateAppDataString(PreviewDownload)
                     to listOf(TransferAppData.PreviewDownload),
             generateAppDataString(OfflineDownload)
-                    to listOf(TransferAppData.OfflineDownload),
+                    to listOf(TransferAppData.OfflineDownload()),
+            generateAppDataString(OfflineDownload, NODE_HANDLE.toString())
+                    to listOf(TransferAppData.OfflineDownload(NODE_HANDLE)),
             generateAppDataString(SafDownload)
                     to listOf(TransferAppData.SafDownload),
         )

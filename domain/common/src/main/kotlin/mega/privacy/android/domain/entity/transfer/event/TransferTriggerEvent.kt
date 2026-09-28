@@ -139,7 +139,7 @@ sealed interface TransferTriggerEvent {
         override val withStartMessage: Boolean,
         override val nodes: List<TypedNode>,
     ) : DownloadTriggerEvent {
-        override val appData = TransferAppData.OfflineDownload
+        override val appData = TransferAppData.OfflineDownload()
 
         /**
          * Event to start downloading a single node for offline use

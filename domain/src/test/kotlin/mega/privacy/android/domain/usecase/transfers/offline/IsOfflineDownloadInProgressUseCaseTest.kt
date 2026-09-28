@@ -109,7 +109,7 @@ class IsOfflineDownloadInProgressUseCaseTest {
 
     private fun pendingTransfer(
         nodeId: NodeId,
-        appData: List<TransferAppData> = listOf(TransferAppData.OfflineDownload),
+        appData: List<TransferAppData> = listOf(TransferAppData.OfflineDownload()),
         state: PendingTransferState = PendingTransferState.SdkScanning,
     ) = PendingTransfer(
         pendingTransferId = nodeId.longValue,

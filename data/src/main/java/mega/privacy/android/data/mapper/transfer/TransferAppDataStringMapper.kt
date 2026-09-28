@@ -41,6 +41,7 @@ class TransferAppDataStringMapper @Inject constructor() {
                 )
 
                 is TransferAppData.TransferGroup -> listOf(groupId.toString())
+                is TransferAppData.OfflineDownload -> listOfNotNull(nodeHandle?.toString())
 
                 else -> emptyList()
             }

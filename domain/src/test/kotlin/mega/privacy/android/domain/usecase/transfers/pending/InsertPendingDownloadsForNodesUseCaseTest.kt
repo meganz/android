@@ -75,10 +75,10 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         val nodes = (0..5).map { index ->
             mock<DefaultTypedFileNode> {
                 on { it.name } doReturn "fileName$index"
+                on { it.id } doReturn NodeId(index.toLong())
             }
         }
-        val appData = TransferAppData.OfflineDownload
-        val expectedAppData = listOf(appData, TransferAppData.TransferGroup(GROUP_ID))
+        val appData = TransferAppData.OfflineDownload()
         val uriPath = UriPath(PATH_STRING)
         val expected = nodes.mapIndexed { index, node ->
             val nodeIdentifier =
@@ -91,7 +91,10 @@ class InsertPendingDownloadsForNodesUseCaseTest {
                 transferType = TransferType.DOWNLOAD,
                 nodeIdentifier = nodeIdentifier,
                 uriPath = uriPath,
-                appData = expectedAppData,
+                appData = listOf(
+                    TransferAppData.OfflineDownload(nodeHandle = index.toLong()),
+                    TransferAppData.TransferGroup(GROUP_ID),
+                ),
                 isHighPriority = isHighPriority,
                 fileName = "fileName$index",
                 pitagTrigger = PitagTrigger.NotApplicable,

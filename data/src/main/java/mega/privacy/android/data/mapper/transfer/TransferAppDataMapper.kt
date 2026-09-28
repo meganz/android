@@ -78,7 +78,9 @@ class TransferAppDataMapper @Inject constructor() {
 
                     PreviewDownload -> TransferAppData.PreviewDownload
 
-                    OfflineDownload -> TransferAppData.OfflineDownload
+                    OfflineDownload -> TransferAppData.OfflineDownload(
+                        nodeHandle = values.firstIfNotBlank()?.toLongOrNull()
+                    )
 
                     SafDownload -> TransferAppData.SafDownload
 

@@ -73,8 +73,13 @@ sealed interface TransferAppData {
 
     /**
      * Identify a transfer that is a download to make it available offline
+     *
+     * @property nodeHandle handle of the node the user chose to make available offline, or null
+     * when the transfer was started by a version that did not record it. A batch download copies
+     * the app data of an item into every file it brings along, so this is what tells the chosen
+     * node apart from the content of a chosen folder.
      */
-    data object OfflineDownload : TransferAppData
+    data class OfflineDownload(val nodeHandle: Long? = null) : TransferAppData
 
     /**
      * Identify a transfer that is a download initiated by the Storage Access Framework

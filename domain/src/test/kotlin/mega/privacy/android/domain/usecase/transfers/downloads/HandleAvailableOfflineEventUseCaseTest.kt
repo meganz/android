@@ -53,7 +53,7 @@ class HandleAvailableOfflineEventUseCaseTest {
     @Test
     fun `test that offline node information is saved when a finish event for an offline download root transfer is received`() =
         runTest {
-            val transfer = mockTransfer(TransferAppData.OfflineDownload)
+            val transfer = mockTransfer(TransferAppData.OfflineDownload())
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
             }
@@ -103,7 +103,7 @@ class HandleAvailableOfflineEventUseCaseTest {
     @Test
     fun `test that offline node information is not invoked when a finish event with error is received`() =
         runTest {
-            val transfer = mockTransfer(TransferAppData.OfflineDownload)
+            val transfer = mockTransfer(TransferAppData.OfflineDownload())
             val error = mock<MegaException>()
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
@@ -132,7 +132,7 @@ class HandleAvailableOfflineEventUseCaseTest {
     @Test
     fun `test that broadcastOfflineFileAvailabilityUseCase is invoked when a finish event for an offline download transfer is received`() =
         runTest {
-            val transfer = mockTransfer(TransferAppData.OfflineDownload)
+            val transfer = mockTransfer(TransferAppData.OfflineDownload())
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
             }
@@ -144,7 +144,7 @@ class HandleAvailableOfflineEventUseCaseTest {
 
     private fun provideNotFinishOfflineEvents(): List<TransferEvent> {
 
-        val transfer = mockTransfer(TransferAppData.OfflineDownload)
+        val transfer = mockTransfer(TransferAppData.OfflineDownload())
         return listOf(
             mock<TransferEvent.TransferStartEvent> {
                 on { it.transfer } doReturn transfer

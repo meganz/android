@@ -83,7 +83,13 @@ fun AppDataOwner.isPreviewDownload(): Boolean =
  * @return True if the transfer is an offline download, false otherwise.
  */
 fun AppDataOwner.isOfflineDownload(): Boolean =
-    appData.contains(TransferAppData.OfflineDownload)
+    appData.any { it is TransferAppData.OfflineDownload }
+
+/**
+ * Gets the offline download app data if the transfer is an offline download. Null otherwise.
+ */
+fun AppDataOwner.getOfflineDownloadAppData() =
+    appData.filterIsInstance<TransferAppData.OfflineDownload>().firstOrNull()
 
 /**
  * Is SAF download
