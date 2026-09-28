@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -331,6 +332,31 @@ class VideoPlaylistDetailViewModelTest {
                     sortOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
                     advanceUntilIdle()
                     awaitItem()
+                    verify(getVideoPlaylistByIdUseCase).invoke(any(), any())
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getVideoPlaylistByIdUseCase is invoked without waiting for the refresh debounce when the sort order changes`() =
+        runTest {
+            stubInitialValues()
+            val sortCloudOrderFlow = MutableStateFlow<SortOrder?>(SortOrder.ORDER_DEFAULT_ASC)
+
+            monitorSortCloudOrderUseCase.stub {
+                on { invoke() }.thenReturn(sortCloudOrderFlow)
+            }
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.playlistDetail).isNotNull()
+                    advanceUntilIdle()
+                    clearInvocations(getVideoPlaylistByIdUseCase)
+
+                    sortCloudOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
+                    runCurrent()
+
                     verify(getVideoPlaylistByIdUseCase).invoke(any(), any())
                     cancelAndIgnoreRemainingEvents()
                 }
