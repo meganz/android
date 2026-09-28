@@ -7,9 +7,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.FolderConflictResult
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -17,7 +15,6 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase,
     private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     private companion object {
@@ -25,20 +22,11 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
     }
 
     operator fun invoke(): Flow<FolderConflictResult?> = flow {
-        if (!isFeatureEnabled()) {
-            emit(null)
-            return@flow
-        }
-
         while (true) {
             val conflict = findConflict()
             emit(conflict)
             delay(POLL_INTERVAL)
         }
-    }
-
-    private suspend fun isFeatureEnabled(): Boolean {
-        return getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
     }
 
     /**

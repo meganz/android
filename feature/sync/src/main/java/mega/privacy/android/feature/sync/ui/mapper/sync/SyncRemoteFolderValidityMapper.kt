@@ -4,9 +4,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.SyncRemoteFolderConflictEvent
@@ -20,7 +18,6 @@ import javax.inject.Inject
  * selected for Camera/Media Uploads on any device.
  */
 class SyncRemoteFolderValidityMapper @Inject constructor(
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
     private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
 ) {
@@ -33,20 +30,6 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
         nodeId: NodeId,
         remoteFolderDisplayName: String,
     ): SyncValidityResult {
-        val isFeatureEnabled = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
-        }.getOrElse {
-            Timber.e(it, "Error checking feature flag")
-            false
-        }
-
-        if (!isFeatureEnabled) {
-            return SyncValidityResult.ValidFolderSelected(
-                localFolderUri = UriPath(""),
-                folderName = ""
-            )
-        }
-
         return runCatching {
             val result = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = nodeId,

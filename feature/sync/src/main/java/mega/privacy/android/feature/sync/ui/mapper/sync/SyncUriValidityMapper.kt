@@ -4,12 +4,10 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileStorageTypeNameUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -35,7 +33,6 @@ class SyncUriValidityMapper @Inject constructor(
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
     private val getFileStorageTypeNameUseCase: GetFileStorageTypeNameUseCase,
 ) {
@@ -131,11 +128,6 @@ class SyncUriValidityMapper @Inject constructor(
         primaryFolderPath: String,
         mediaUploadPath: String,
     ): SyncValidityResult {
-        val isNewDCIMLogicEnabled =
-            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
-
-        Timber.d("checkIfPathIsAlreadyUsedByCameraUploads, isNewDCIMLogicEnabled: $isNewDCIMLogicEnabled")
-
         val isCameraMatch = isCameraUploadsEnabledUseCase() &&
                 primaryFolderPath.isNotEmpty() &&
                 determinePathRelationship(primaryFolderPath, path) != PathRelationship.NO_MATCH

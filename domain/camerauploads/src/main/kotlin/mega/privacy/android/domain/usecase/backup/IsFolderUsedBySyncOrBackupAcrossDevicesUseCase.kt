@@ -31,16 +31,6 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
         shouldExcludeCurrentDevice: Boolean,
         useCache: Boolean,
     ): FolderUsageResult {
-        // Check if DCIMSelectionAsSyncBackup feature flag is enabled
-        val isDCIMFeatureEnabled = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
-        }.getOrElse {
-            false
-        }
-        if (isDCIMFeatureEnabled.not()) {
-            return FolderUsageResult.NotUsed
-        }
-
         // Check if RestrictSyncAcrossDevices feature flag is enabled
         // When disabled (default), Sync folder selection will exclude Sync/Backup from other devices,
         // allowing the same folder to be synced across different devices
