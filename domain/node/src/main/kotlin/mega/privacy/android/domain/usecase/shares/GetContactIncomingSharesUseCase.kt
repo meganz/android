@@ -47,12 +47,13 @@ class GetContactIncomingSharesUseCase @Inject constructor(
             .mapNotNull { shareData ->
                 getNodeByIdUseCase(NodeId(shareData.nodeHandle))?.let { node ->
                     runCatching {
+                        val user = shareData.user
                         mapNodeToShareUseCase(
                             node,
-                            if (isContactVerificationOn && shareData.user != null) {
+                            if (isContactVerificationOn && user != null) {
                                 shareData.copy(
                                     isContactCredentialsVerified = areCredentialsVerifiedUseCase(
-                                        shareData.user
+                                        user
                                     )
                                 )
                             } else {

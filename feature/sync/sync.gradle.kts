@@ -34,6 +34,7 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
 
     implementation(project(":domain"))
+    implementation(project(":domain:node"))
     implementation(project(":domain:account"))
     implementation(project(":domain:camerauploads"))
     implementation(project(":data"))

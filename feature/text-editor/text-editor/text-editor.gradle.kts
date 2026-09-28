@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
+    implementation(project(":domain:node"))
     implementation(project(":domain:chat"))
     implementation(project(":domain:texteditor"))
     implementation(project(":navigation"))

@@ -51,10 +51,11 @@ class GetIncomingSharesChildrenNodeUseCase @Inject constructor(
                     getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
                         runCatching {
                             mapNodeToShareUseCase(node, shareData.let {
-                                if (isContactVerificationOn && it.user != null)
+                                val user = it.user
+                                if (isContactVerificationOn && user != null)
                                     it.copy(
                                         isContactCredentialsVerified = areCredentialsVerifiedUseCase(
-                                            it.user
+                                            user
                                         )
                                     )
                                 else it

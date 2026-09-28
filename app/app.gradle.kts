@@ -227,6 +227,7 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))
+    implementation(project(":domain:node"))
     implementation(project(":domain:account"))
     implementation(project(":domain:contact"))
     implementation(project(":domain:chat"))

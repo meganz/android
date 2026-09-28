@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":core:transfers"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":domain:node"))
     implementation(project(":domain:account"))
     implementation(project(":domain:setting"))
     implementation(project(":domain:photos"))

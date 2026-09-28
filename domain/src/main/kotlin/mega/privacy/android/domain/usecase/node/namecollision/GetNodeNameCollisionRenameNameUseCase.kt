@@ -43,7 +43,7 @@ class GetNodeNameCollisionRenameNameUseCase @Inject constructor(
  * False if it is a folder, so the suffix is appended to the whole name.
  * @return The rename name.
  */
-internal fun String.getPossibleRenameName(isFile: Boolean): String {
+fun String.getPossibleRenameName(isFile: Boolean): String {
     var extension = if (isFile) substringAfterLast('.', "") else ""
     val pointIndex = if (extension.isEmpty())
         length

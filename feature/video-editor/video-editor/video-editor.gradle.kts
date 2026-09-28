@@ -26,6 +26,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":domain"))
+    implementation(project(":domain:node"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
 

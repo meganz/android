@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
     implementation(project(":domain"))
+    implementation(project(":domain:node"))
     implementation(project(":domain:account"))
     implementation(project(":domain:setting"))
     implementation(project(":domain:camerauploads"))
