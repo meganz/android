@@ -113,6 +113,20 @@ class WeblateChatListSnackbarsScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
+    fun NotificationsAlreadyMutedSnackbar() {
+        AndroidThemeForPreviews {
+            WeblateSnackbarScreenshot(
+                snackbarText = stringResource(sharedR.string.chat_list_notifications_muted_message),
+                actionLabel = stringResource(sharedR.string.general_unmute),
+            ) {
+                ChatListForPreview()
+            }
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
     fun UnarchiveChatSuccessSnackbar() {
         AndroidThemeForPreviews {
             WeblateSnackbarScreenshot(
@@ -177,6 +191,7 @@ class WeblateChatListSnackbarsScreenshotTest {
                 hasArchivedChats = true,
                 isSearchAvailable = true,
                 chatStatus = ChatStatus.Online,
+                isDoNotDisturbEnabled = false,
                 meetingTooltip = MeetingTooltipItem.NONE,
             ),
             showMeetingTab = false,

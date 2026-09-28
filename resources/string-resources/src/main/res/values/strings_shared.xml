@@ -3917,6 +3917,8 @@
     <string name="audio_player_resumed_snackbar_message">Resumed from %1$s</string>
     <!-- Accessibility content description for the icon shown on a chat list row when that chat has a call in progress -->
     <string name="chat_list_ongoing_call_content_description">Ongoing call</string>
+    <!-- Chat list: snackbar shown when the Do not disturb action is picked while chat notifications are already muted; its Unmute action turns Do not disturb off -->
+    <string name="chat_list_notifications_muted_message">Chat notifications are muted</string>
     <!-- Account usage screen: label under the storage quota meter -->
     <string name="account_usage_storage_label">Storage</string>
     <!-- Account usage screen: label under the transfer quota meter -->

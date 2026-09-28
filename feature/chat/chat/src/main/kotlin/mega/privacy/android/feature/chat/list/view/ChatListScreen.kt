@@ -77,6 +77,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onChatStatusSelected Callback with the presence the user picked.
  * @param doNotDisturbOptions Mute periods offered by the do-not-disturb action.
  * @param onDoNotDisturbOptionSelected Callback with the mute period the user picked.
+ * @param onDoNotDisturbEnabledClick Callback when the do-not-disturb action is picked while every
+ * chat is already silenced, so the caller can offer to unmute instead of a mute period.
  * @param onMeetingTooltipShown Callback with the tooltip to offer after the current one was seen.
  */
 @Composable
@@ -97,6 +99,7 @@ internal fun ChatListScreen(
     onChatStatusSelected: (UserChatStatus) -> Unit = {},
     doNotDisturbOptions: () -> List<ChatPushNotificationMuteOption> = { emptyList() },
     onDoNotDisturbOptionSelected: (ChatPushNotificationMuteOption) -> Unit = {},
+    onDoNotDisturbEnabledClick: () -> Unit = {},
     onMeetingTooltipShown: (MeetingTooltipItem) -> Unit = {},
 ) {
     var searchMode by rememberSaveable { mutableStateOf(false) }
@@ -167,7 +170,13 @@ internal fun ChatListScreen(
             actionsState = ChatListBulkActionsUiState.ShowingActions(selectionState.selectedChatIds)
         },
         onPresenceClick = { showStatusDialog = true },
-        onDoNotDisturbClick = { showDoNotDisturbDialog = true },
+        onDoNotDisturbClick = {
+            if ((uiState as? ChatListUiState.Data)?.isDoNotDisturbEnabled == true) {
+                onDoNotDisturbEnabledClick()
+            } else {
+                showDoNotDisturbDialog = true
+            }
+        },
         onMeetingTooltipShown = onMeetingTooltipShown,
     )
 
@@ -561,6 +570,7 @@ private fun previewState(
     hasArchivedChats = hasArchivedChats,
     isSearchAvailable = isSearchAvailable,
     chatStatus = ChatStatus.Online,
+    isDoNotDisturbEnabled = false,
     meetingTooltip = MeetingTooltipItem.NONE,
 )
 

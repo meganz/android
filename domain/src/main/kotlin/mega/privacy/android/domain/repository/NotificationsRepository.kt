@@ -146,6 +146,13 @@ interface NotificationsRepository {
     suspend fun setChatsDoNotDisturb(timestamp: Long)
 
     /**
+     * Returns whether Do-Not-Disturb mode for all chats is enabled or not
+     *
+     * @return true if enabled, false otherwise
+     */
+    suspend fun isChatsDoNotDisturbEnabled(): Boolean
+
+    /**
      *  Retrieve the push notification settings from the server and update the data in memory
      */
     suspend fun updatePushNotificationSettings()

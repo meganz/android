@@ -511,6 +511,28 @@ class DefaultNotificationsRepositoryTest {
         }
 
         @Test
+        fun `test that isChatsDoNotDisturbEnabled returns the global chats do not disturb state`() =
+            runTest {
+                val settings = mock<MegaPushNotificationSettings> {
+                    on { isGlobalChatsDndEnabled }.thenReturn(true)
+                }
+
+                whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
+                    (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock { on { megaPushNotificationSettings }.thenReturn(settings) },
+                        mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                    )
+                }
+                whenever(megaApiGateway.copyMegaPushNotificationsSettings(settings))
+                    .thenReturn(settings)
+
+                underTest.updatePushNotificationSettings()
+
+                assertThat(underTest.isChatsDoNotDisturbEnabled()).isTrue()
+            }
+
+        @Test
         fun `test that getChatDoNotDisturbTime returns correct value`() = runTest {
             val chatId = 123L
             val timestamp = 1234567890L

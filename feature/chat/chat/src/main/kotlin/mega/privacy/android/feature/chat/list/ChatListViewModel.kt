@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatsDoNotDisturbEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatPushNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.SetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
@@ -79,6 +80,7 @@ internal class ChatListViewModel @Inject constructor(
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase,
     private val getChatMuteOptionListUseCase: GetChatMuteOptionListUseCase,
     private val muteChatPushNotificationUseCase: MuteChatPushNotificationUseCase,
+    private val monitorChatsDoNotDisturbEnabledUseCase: MonitorChatsDoNotDisturbEnabledUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val chatRoomActions: ChatRoomActions,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -113,9 +115,9 @@ internal class ChatListViewModel @Inject constructor(
             chatRoomsFlow(),
             queryChannel.receiveAsFlow().onStart { emit(null) },
             hasAnyContactFlow(),
-            chatStatusFlow(),
+            toolbarFlow(),
             meetingTooltipFlow(),
-        ) { rooms, query, hasAnyContact, chatStatus, tooltip ->
+        ) { rooms, query, hasAnyContact, (chatStatus, isDoNotDisturbEnabled), tooltip ->
             ChatListUiState.Data(
                 chats = tabState(rooms.chats, query),
                 meetings = tabState(rooms.meetings, query),
@@ -125,6 +127,7 @@ internal class ChatListViewModel @Inject constructor(
                 hasArchivedChats = rooms.hasArchived,
                 isSearchAvailable = rooms.isSearchable,
                 chatStatus = chatStatus,
+                isDoNotDisturbEnabled = isDoNotDisturbEnabled,
                 meetingTooltip = tooltip,
             )
         }.catch { e ->
@@ -288,14 +291,15 @@ internal class ChatListViewModel @Inject constructor(
             }
 
     /**
-     * Silence every chat for the period the user picked from the do-not-disturb toolbar action.
+     * Apply the option the user picked from the do-not-disturb toolbar action to every chat: a
+     * mute period, or [ChatPushNotificationMuteOption.Unmute] when they were already silenced.
      *
-     * @param option Mute period the user picked.
+     * @param option Mute option the user picked.
      */
     fun onDoNotDisturbOptionSelected(option: ChatPushNotificationMuteOption) {
         viewModelScope.launch {
             runCatchingCancellable { muteChatPushNotificationUseCase(null, option) }.onFailure { e ->
-                Timber.e(e, "Failed to mute all chat notifications with $option")
+                Timber.e(e, "Failed to apply $option to all chat notifications")
                 queueMessage(sharedR.string.general_request_failed_message)
             }
         }
@@ -349,6 +353,15 @@ internal class ChatListViewModel @Inject constructor(
     private fun hasAnyContactFlow(): Flow<Boolean> = monitorHasAnyContactUseCase()
         .catch { e ->
             Timber.e(e, "Failed to monitor whether the user has any contact")
+            emit(false)
+        }
+
+    private fun toolbarFlow(): Flow<Pair<ChatStatus?, Boolean>> =
+        combine(chatStatusFlow(), doNotDisturbFlow(), ::Pair)
+
+    private fun doNotDisturbFlow(): Flow<Boolean> = monitorChatsDoNotDisturbEnabledUseCase()
+        .catch { e ->
+            Timber.e(e, "Failed to monitor whether every chat is silenced")
             emit(false)
         }
 

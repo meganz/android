@@ -11,6 +11,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -335,6 +336,8 @@ class ChatListScreenTest {
         isSearchAvailable: Boolean = true,
         onChatStatusSelected: (UserChatStatus) -> Unit = {},
         doNotDisturbOptions: () -> List<ChatPushNotificationMuteOption> = { emptyList() },
+        isDoNotDisturbEnabled: Boolean = false,
+        onDoNotDisturbEnabledClick: () -> Unit = {},
         onOpenLinkClick: () -> Unit = {},
     ) {
         composeRule.setContent {
@@ -344,6 +347,7 @@ class ChatListScreenTest {
                         uiState = populatedState(
                             hasArchivedChats = hasArchivedChats,
                             isSearchAvailable = isSearchAvailable,
+                            isDoNotDisturbEnabled = isDoNotDisturbEnabled,
                         ),
                         showMeetingTab = showMeetingTab,
                         onBackClick = onBackClick,
@@ -356,6 +360,7 @@ class ChatListScreenTest {
                         onSearchQueryChange = {},
                         onChatStatusSelected = onChatStatusSelected,
                         doNotDisturbOptions = doNotDisturbOptions,
+                        onDoNotDisturbEnabledClick = onDoNotDisturbEnabledClick,
                     )
                 }
             }
@@ -382,6 +387,7 @@ class ChatListScreenTest {
                             hasArchivedChats = true,
                             isSearchAvailable = true,
                             chatStatus = ChatStatus.Online,
+                            isDoNotDisturbEnabled = false,
                             meetingTooltip = MeetingTooltipItem.NONE,
                         ),
                         showMeetingTab = showMeetingTab,
@@ -402,6 +408,7 @@ class ChatListScreenTest {
     private fun populatedState(
         hasArchivedChats: Boolean = true,
         isSearchAvailable: Boolean = true,
+        isDoNotDisturbEnabled: Boolean = false,
     ) = ChatListUiState.Data(
         chats = ChatListTabState.Results(persistentListOf(chatRoomUiItem(1L, "Chat"))),
         meetings = ChatListTabState.Results(persistentListOf(chatRoomUiItem(2L, "Meeting"))),
@@ -411,6 +418,7 @@ class ChatListScreenTest {
         hasArchivedChats = hasArchivedChats,
         isSearchAvailable = isSearchAvailable,
         chatStatus = ChatStatus.Online,
+        isDoNotDisturbEnabled = isDoNotDisturbEnabled,
         meetingTooltip = MeetingTooltipItem.NONE,
     )
 
@@ -582,6 +590,26 @@ class ChatListScreenTest {
         composeRule.onAllNodesWithTag(CHAT_DO_NOT_DISTURB_DIALOG_TAG)[0].assertIsDisplayed()
     }
 
+    @Test
+    fun `test that the do not disturb action offers to unmute when every chat is already silenced`() {
+        var offered = false
+        setupPopulatedScreen(
+            showMeetingTab = false,
+            doNotDisturbOptions = { listOf(ChatPushNotificationMuteOption.Mute1Hour) },
+            isDoNotDisturbEnabled = true,
+            onDoNotDisturbEnabledClick = { offered = true },
+        )
+
+        composeRule.onNodeWithTag(TAG_TOP_APP_BAR_ACTIONS_SHOW_MORE, useUnmergedTree = true)
+            .performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(CHAT_LIST_DO_NOT_DISTURB_TAG).performClick()
+        composeRule.waitForIdle()
+
+        assertThat(offered).isTrue()
+        composeRule.onAllNodesWithTag(CHAT_DO_NOT_DISTURB_DIALOG_TAG).assertCountEquals(0)
+    }
+
     private fun pressBack() {
         composeRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
@@ -636,6 +664,7 @@ class ChatListScreenTest {
                             hasArchivedChats = true,
                             isSearchAvailable = true,
                             chatStatus = ChatStatus.Online,
+                            isDoNotDisturbEnabled = false,
                             meetingTooltip = MeetingTooltipItem.NONE,
                         ),
                         showMeetingTab = true,
