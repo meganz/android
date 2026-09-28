@@ -5,39 +5,41 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
+import java.io.File
 import javax.inject.Inject
 
 /**
- * Use case to get the active transfers of the offline download of a node.
+ * Use case to get the active transfers downloading a node for offline.
  *
- * Only the download the user started for this node is returned: its root transfer, matched by node
- * handle as the only one carrying the offline app data, and the transfers the SDK already started
- * for the files inside it, matched by the tag of that root transfer.
- *
- * A node downloaded as part of the folder download of one of its ancestors is not included. Those
- * transfers belong to the download of the ancestor, which is the only one that can be cancelled,
- * and the SDK keeps starting more of them until it is.
+ * The transfer the SDK creates for a folder is an empty container with no app data, handle or
+ * path, so a folder is recognised by the files being downloaded into its offline folder. Those
+ * count whether the user chose the node or an ancestor; only the download of the node itself can
+ * be cancelled, see [CancelAndDeleteOfflineDownloadUseCase].
  */
 class GetActiveOfflineDownloadTransfersUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
+    private val getOfflineNodeInformationUseCase: GetOfflineNodeInformationUseCase,
+    private val getOfflineFileUseCase: GetOfflineFileUseCase,
 ) {
     suspend operator fun invoke(node: TypedNode): List<Transfer> {
-        val ownTransfers = mutableListOf<Transfer>()
-        val childTransfers = mutableListOf<Transfer>()
-        transferRepository.getActiveTransfersByType(TransferType.DOWNLOAD)
-            .forEach { activeTransfer ->
-                val transfer = activeTransfer as? Transfer ?: return@forEach
-                if (transfer.isCancelled || transfer.finishedWithErrors()) return@forEach
-                when {
-                    !transfer.isRootTransfer -> childTransfers.add(transfer)
-                    transfer.isOfflineDownload() && transfer.nodeHandle == node.id.longValue ->
-                        ownTransfers.add(transfer)
-                }
-            }
-        if (ownTransfers.isEmpty()) return emptyList()
+        val transfers = transferRepository.getActiveTransfersByType(TransferType.DOWNLOAD)
+            .filterIsInstance<Transfer>()
+            .filter { !it.isCancelled && !it.finishedWithErrors() }
+        if (transfers.isEmpty()) return emptyList()
 
-        val ownTags = ownTransfers.mapTo(mutableSetOf()) { it.tag }
-        return ownTransfers + childTransfers.filter { it.folderTransferTag in ownTags }
+        val ownTransfers = transfers.filter {
+            it.isRootTransfer && it.isOfflineDownload() && it.nodeHandle == node.id.longValue
+        }
+        val fileTransfers = transfers.filterNot { it.isRootTransfer }
+        if (fileTransfers.isEmpty()) return ownTransfers
+
+        val offlinePath = runCatching {
+            getOfflineFileUseCase(getOfflineNodeInformationUseCase(node)).path
+        }.getOrNull() ?: return ownTransfers
+
+        return ownTransfers + fileTransfers.filter { it.localPath.isInside(offlinePath) }
     }
 
     /**
@@ -46,4 +48,10 @@ class GetActiveOfflineDownloadTransfersUseCase @Inject constructor(
      */
     private fun Transfer.finishedWithErrors() =
         isFinished && !isAlreadyTransferred && !isFolderTransfer && transferredBytes != totalBytes
+
+    private fun String.isInside(path: String) =
+        this == path || startsWith(path.ensureEndsWithFileSeparator())
+
+    private fun String.ensureEndsWithFileSeparator() =
+        if (endsWith(File.separator)) this else plus(File.separator)
 }

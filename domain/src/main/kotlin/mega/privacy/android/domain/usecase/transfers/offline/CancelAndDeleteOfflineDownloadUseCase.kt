@@ -5,12 +5,15 @@ import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.getTransferGroup
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflinePathUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.offline.CancelAndDeleteOfflineDownloadUseCase.Companion.CANCELLATION_TIMEOUT
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -18,12 +21,9 @@ import kotlin.time.Duration.Companion.seconds
  * Use case to cancel the offline download of a node and delete what it already downloaded, so the
  * node can be removed from offline while its download is still in flight.
  *
- * Cancelling the root transfer of a folder makes the SDK drop the files it has not started yet, the
- * ones it already started are cancelled here as well. Nothing is cancelled for a node downloaded as
- * part of the folder download of an ancestor, see [GetActiveOfflineDownloadTransfersUseCase].
- *
- * The SDK deletes the temporary file of each cancelled transfer, but not the folders it created for
- * a folder download nor the files that already finished.
+ * Only the download the user started for this node is cancelled, so a download of an ancestor is
+ * left running. The SDK deletes the temporary file of each cancelled transfer, but not the folders
+ * it created for a folder download nor the files that already finished.
  */
 class CancelAndDeleteOfflineDownloadUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
@@ -31,6 +31,7 @@ class CancelAndDeleteOfflineDownloadUseCase @Inject constructor(
     private val getActiveOfflineDownloadTransfersUseCase: GetActiveOfflineDownloadTransfersUseCase,
     private val getOfflineNodeInformationUseCase: GetOfflineNodeInformationUseCase,
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
+    private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val isOfflinePathUseCase: IsOfflinePathUseCase,
 ) {
@@ -43,13 +44,44 @@ class CancelAndDeleteOfflineDownloadUseCase @Inject constructor(
         val transfers = getActiveOfflineDownloadTransfersUseCase(node).filterNot { it.isFinished }
         if (transfers.isEmpty()) return
 
-        transfers.forEach { runCatching { cancelTransferByTagUseCase(it.tag) } }
-        awaitTransfersStopped(transfers)
+        val ownTransfers = node.getTransfersStartedForNode(transfers)
+        if (ownTransfers.isEmpty()) return
+
+        cancelTransfers(ownTransfers)
+        awaitTransfersStopped(ownTransfers)
         deleteDownloadedFiles(node)
     }
 
+    private suspend fun cancelTransfers(transfers: List<Transfer>) {
+        transfers
+            .flatMap { listOfNotNull(it.folderTransferTag, it.tag) }
+            .distinct()
+            .forEach { tag ->
+                runCatching { cancelTransferByTagUseCase(tag) }
+            }
+    }
+
     /**
-     * Waits until the cancelled transfers have actually stopped, so their files are not deleted
+     * Transfers can belong to several groups while a download of an ancestor runs at the same time.
+     */
+    private suspend fun TypedNode.getTransfersStartedForNode(transfers: List<Transfer>): List<Transfer> {
+        transfers.filter { it.isRootTransfer && it.nodeHandle == this.id.longValue }
+            .takeIf { it.isNotEmpty() }
+            ?.let { return it }
+
+        val offlinePath = getOfflinePathForNodeUseCase(this) ?: return emptyList()
+        val ownGroupIds = transfers
+            .mapNotNull { it.getTransferGroup()?.groupId }
+            .distinct()
+            .filter {
+                transferRepository.getActiveTransferGroupById(it.toInt())?.destination == offlinePath
+            }
+
+        return transfers.filter { it.getTransferGroup()?.groupId in ownGroupIds }
+    }
+
+    /**
+     * Waits until the canceled transfers have actually stopped, so their files are not deleted
      * while they are still being written, giving up after [CANCELLATION_TIMEOUT].
      */
     private suspend fun awaitTransfersStopped(cancelledTransfers: List<Transfer>) {

@@ -218,10 +218,14 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that shimmer is not shown for MediaGrid when error state`() {
         setContent(
-            data = ThumbnailUriRequest(UriPath("https://example.com/image.jpg")),
+            data = ThumbnailUriRequest(UriPath("invalid://url")),
             layoutType = ThumbnailLayoutType.MediaGrid
         )
 
+        composeTestRule.waitUntil {
+            composeTestRule.onAllNodesWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
+                .fetchSemanticsNodes().size == 1
+        }
         composeTestRule.onNodeWithTag(NODE_THUMBNAIL_SHIMMER_TAG)
             .assertDoesNotExist()
     }

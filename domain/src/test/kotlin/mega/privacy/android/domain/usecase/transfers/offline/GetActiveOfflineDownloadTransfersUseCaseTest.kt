@@ -4,10 +4,13 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,26 +19,45 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetActiveOfflineDownloadTransfersUseCaseTest {
     private lateinit var underTest: GetActiveOfflineDownloadTransfersUseCase
 
     private val transferRepository = mock<TransferRepository>()
+    private val getOfflineNodeInformationUseCase = mock<GetOfflineNodeInformationUseCase>()
+    private val getOfflineFileUseCase = mock<GetOfflineFileUseCase>()
 
     private val node = mock<TypedFolderNode> { on { id } doReturn NodeId(1L) }
 
     @BeforeAll
     fun setup() {
-        underTest = GetActiveOfflineDownloadTransfersUseCase(transferRepository)
+        underTest = GetActiveOfflineDownloadTransfersUseCase(
+            transferRepository = transferRepository,
+            getOfflineNodeInformationUseCase = getOfflineNodeInformationUseCase,
+            getOfflineFileUseCase = getOfflineFileUseCase,
+        )
     }
 
     @BeforeEach
     fun cleanup() = runTest {
-        reset(transferRepository)
+        reset(transferRepository, getOfflineNodeInformationUseCase, getOfflineFileUseCase)
         whenever(transferRepository.getActiveTransfersByType(TransferType.DOWNLOAD))
             .thenReturn(emptyList())
+        val offlineNodeInformation = OtherOfflineNodeInformation(
+            id = 1,
+            path = "MyFolder",
+            name = "MyFolder",
+            handle = node.id.longValue.toString(),
+            isFolder = true,
+            lastModifiedTime = null,
+            parentId = -1,
+        )
+        whenever(getOfflineNodeInformationUseCase(node)).thenReturn(offlineNodeInformation)
+        whenever(getOfflineFileUseCase(offlineNodeInformation)).thenReturn(File(OFFLINE_PATH))
     }
 
     @Test
@@ -44,16 +66,16 @@ class GetActiveOfflineDownloadTransfersUseCaseTest {
     }
 
     @Test
-    fun `test that invoke returns the offline transfer of the node`() = runTest {
-        val transfer = rootTransfer(node.id)
+    fun `test that invoke returns the transfer downloading the node`() = runTest {
+        val transfer = ownTransfer(node.id)
         stubActiveTransfers(listOf(transfer))
 
         assertThat(underTest(node)).containsExactly(transfer)
     }
 
     @Test
-    fun `test that invoke does not return the offline transfer of another node`() = runTest {
-        stubActiveTransfers(listOf(rootTransfer(NodeId(2L))))
+    fun `test that invoke does not return the transfer downloading another node`() = runTest {
+        stubActiveTransfers(listOf(ownTransfer(NodeId(2L))))
 
         assertThat(underTest(node)).isEmpty()
     }
@@ -61,77 +83,36 @@ class GetActiveOfflineDownloadTransfersUseCaseTest {
     @Test
     fun `test that invoke does not return the transfer of the node when it is not an offline download`() =
         runTest {
-            stubActiveTransfers(listOf(rootTransfer(node.id, appData = emptyList())))
+            stubActiveTransfers(listOf(ownTransfer(node.id, appData = emptyList())))
 
             assertThat(underTest(node)).isEmpty()
         }
 
     @Test
-    fun `test that invoke returns the transfers the SDK started for the files of the folder`() =
+    fun `test that invoke returns the files being downloaded into the offline folder of the node`() =
         runTest {
-            val folderTransfer = rootTransfer(node.id, tag = FOLDER_TAG)
-            val childTransfer = childTransfer(folderTransferTag = FOLDER_TAG)
-            stubActiveTransfers(listOf(folderTransfer, childTransfer))
+            val file = fileOfFolderTransfer("$OFFLINE_PATH${File.separator}photo.jpg")
+            stubActiveTransfers(listOf(folderTransfer(), file))
 
-            assertThat(underTest(node)).containsExactly(folderTransfer, childTransfer)
+            assertThat(underTest(node)).containsExactly(file)
         }
 
     @Test
-    fun `test that invoke does not return the transfers of the folder download of another node`() =
+    fun `test that invoke returns the files being downloaded into a nested offline folder of the node`() =
         runTest {
-            val folderTransfer = rootTransfer(node.id, tag = FOLDER_TAG)
-            stubActiveTransfers(
-                listOf(folderTransfer, childTransfer(folderTransferTag = FOLDER_TAG + 1))
+            val file = fileOfFolderTransfer(
+                "$OFFLINE_PATH${File.separator}nested${File.separator}photo.jpg"
             )
+            stubActiveTransfers(listOf(folderTransfer(), file))
 
-            assertThat(underTest(node)).containsExactly(folderTransfer)
+            assertThat(underTest(node)).containsExactly(file)
         }
 
     @Test
-    fun `test that invoke returns an empty list when the node is downloaded as part of the folder download of an ancestor`() =
+    fun `test that invoke does not return the files being downloaded into another offline folder`() =
         runTest {
-            stubActiveTransfers(listOf(childTransfer(folderTransferTag = FOLDER_TAG)))
-
-            assertThat(underTest(node)).isEmpty()
-        }
-
-    @Test
-    fun `test that invoke returns the transfer of the node when it finished successfully`() =
-        runTest {
-            val transfer = rootTransfer(node.id, isFinished = true, transferredBytes = 100L)
-            stubActiveTransfers(listOf(transfer))
-
-            assertThat(underTest(node)).containsExactly(transfer)
-        }
-
-    @Test
-    fun `test that invoke returns the transfer of the node when it was already transferred`() =
-        runTest {
-            val transfer = rootTransfer(node.id, isFinished = true, isAlreadyTransferred = true)
-            stubActiveTransfers(listOf(transfer))
-
-            assertThat(underTest(node)).containsExactly(transfer)
-        }
-
-    @Test
-    fun `test that invoke returns the folder transfer of the node when it finished`() = runTest {
-        val transfer = rootTransfer(
-            nodeId = node.id,
-            isFinished = true,
-            isFolderTransfer = true,
-            transferredBytes = 0L,
-        )
-        stubActiveTransfers(listOf(transfer))
-
-        assertThat(underTest(node)).containsExactly(transfer)
-    }
-
-    @Test
-    fun `test that invoke does not return the transfer of the node when it finished with errors`() =
-        runTest {
-            stubActiveTransfers(
-                listOf(rootTransfer(node.id, isFinished = true, transferredBytes = 50L))
-            )
+            val file = fileOfFolderTransfer("${OFFLINE_PATH}Other${File.separator}photo.jpg")
+            stubActiveTransfers(listOf(folderTransfer(), file))
 
             assertThat(underTest(node)).isEmpty()
         }
@@ -139,9 +120,38 @@ class GetActiveOfflineDownloadTransfersUseCaseTest {
     @Test
     fun `test that invoke does not return the transfer of the node when it was cancelled`() =
         runTest {
-            stubActiveTransfers(listOf(rootTransfer(node.id, isCancelled = true)))
+            stubActiveTransfers(listOf(ownTransfer(node.id, isCancelled = true)))
 
             assertThat(underTest(node)).isEmpty()
+        }
+
+    @Test
+    fun `test that invoke does not return the transfer of the node when it finished with errors`() =
+        runTest {
+            stubActiveTransfers(
+                listOf(ownTransfer(node.id, isFinished = true, transferredBytes = 50L))
+            )
+
+            assertThat(underTest(node)).isEmpty()
+        }
+
+    @Test
+    fun `test that invoke returns the transfer of the node when it finished successfully`() =
+        runTest {
+            val transfer = ownTransfer(node.id, isFinished = true, transferredBytes = 100L)
+            stubActiveTransfers(listOf(transfer))
+
+            assertThat(underTest(node)).containsExactly(transfer)
+        }
+
+    @Test
+    fun `test that invoke does not get the offline path when no file is being downloaded`() =
+        runTest {
+            stubActiveTransfers(listOf(ownTransfer(node.id)))
+
+            underTest(node)
+
+            verifyNoInteractions(getOfflineNodeInformationUseCase, getOfflineFileUseCase)
         }
 
     @Test
@@ -157,49 +167,69 @@ class GetActiveOfflineDownloadTransfersUseCaseTest {
     }
 
     /**
-     * A transfer started by the user action, the only one carrying the offline app data and the
-     * handle of the node the user selected.
+     * The transfer downloading a file the user selected: it carries the offline app data and the
+     * handle of its node.
      */
-    private fun rootTransfer(
+    private fun ownTransfer(
         nodeId: NodeId,
         appData: List<TransferAppData> = listOf(TransferAppData.OfflineDownload()),
         isFinished: Boolean = false,
         isCancelled: Boolean = false,
-        isAlreadyTransferred: Boolean = false,
-        isFolderTransfer: Boolean = false,
         transferredBytes: Long = 0L,
-        tag: Int = FOLDER_TAG,
     ) = mock<Transfer> {
         on { it.nodeHandle } doReturn nodeId.longValue
         on { it.appData } doReturn appData
         on { it.isRootTransfer } doReturn true
         on { it.folderTransferTag } doReturn null
-        on { it.tag } doReturn tag
+        on { it.tag } doReturn FOLDER_TAG
         on { it.isFinished } doReturn isFinished
         on { it.isCancelled } doReturn isCancelled
-        on { it.isAlreadyTransferred } doReturn isAlreadyTransferred
-        on { it.isFolderTransfer } doReturn isFolderTransfer
+        on { it.isAlreadyTransferred } doReturn false
+        on { it.isFolderTransfer } doReturn false
         on { it.transferredBytes } doReturn transferredBytes
         on { it.totalBytes } doReturn 100L
+        on { it.localPath } doReturn OFFLINE_PATH
     }
 
     /**
-     * A file the SDK transfers in the context of the folder transfer of [folderTransferTag]. It
-     * carries neither the offline app data nor the handle of the folder.
+     * The transfer the SDK creates for a folder: it carries no app data, no node handle and no
+     * path, only its tag.
      */
-    private fun childTransfer(folderTransferTag: Int) = mock<Transfer> {
-        on { it.nodeHandle } doReturn 99L
+    private fun folderTransfer() = mock<Transfer> {
+        on { it.nodeHandle } doReturn -1L
         on { it.appData } doReturn emptyList()
-        on { it.isRootTransfer } doReturn false
-        on { it.folderTransferTag } doReturn folderTransferTag
+        on { it.isRootTransfer } doReturn true
+        on { it.folderTransferTag } doReturn null
+        on { it.tag } doReturn FOLDER_TAG
         on { it.isFinished } doReturn false
         on { it.isCancelled } doReturn false
         on { it.isAlreadyTransferred } doReturn false
+        on { it.isFolderTransfer } doReturn true
         on { it.transferredBytes } doReturn 0L
         on { it.totalBytes } doReturn 100L
+        on { it.localPath } doReturn ""
+    }
+
+    /**
+     * A file the SDK transfers in the context of a folder transfer. These carry the offline app
+     * data, the handle of their own node and the path they are downloaded to.
+     */
+    private fun fileOfFolderTransfer(localPath: String) = mock<Transfer> {
+        on { it.nodeHandle } doReturn 99L
+        on { it.appData } doReturn listOf(TransferAppData.OfflineDownload())
+        on { it.isRootTransfer } doReturn false
+        on { it.folderTransferTag } doReturn FOLDER_TAG
+        on { it.isFinished } doReturn false
+        on { it.isCancelled } doReturn false
+        on { it.isAlreadyTransferred } doReturn false
+        on { it.isFolderTransfer } doReturn false
+        on { it.transferredBytes } doReturn 0L
+        on { it.totalBytes } doReturn 100L
+        on { it.localPath } doReturn localPath
     }
 
     private companion object {
-        const val FOLDER_TAG = 10
+        const val FOLDER_TAG = 59
+        const val OFFLINE_PATH = "/offline/MyFolder"
     }
 }
