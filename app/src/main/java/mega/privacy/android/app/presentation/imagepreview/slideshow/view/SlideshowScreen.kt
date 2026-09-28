@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +55,7 @@ import coil3.request.ImageRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
@@ -420,11 +422,10 @@ private fun SlideShowContent(
             val imageState = rememberZoomableImageState(zoomableState)
             onCacheImageState(imageNode, imageState.zoomableState)
 
-            LaunchedEffect(zoomableState.zoomFraction) {
-                val fraction = zoomableState.zoomFraction
-                if (fraction != null && fraction > 0.0f) {
-                    onImageZooming(zoomableState)
-                }
+            LaunchedEffect(zoomableState) {
+                snapshotFlow { zoomableState.contentTransformation.scaleMetadata.userZoom }
+                    .filter { it > 1f }
+                    .collect { onImageZooming(zoomableState) }
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
