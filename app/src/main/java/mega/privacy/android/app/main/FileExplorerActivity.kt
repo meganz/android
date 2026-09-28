@@ -146,6 +146,7 @@ import mega.privacy.android.navigation.destination.CopyResult
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.ImportNavKey
+import mega.privacy.android.navigation.destination.ImportResult
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
@@ -916,7 +917,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         ACTION_CHOOSE_MEGA_FOLDER_SYNC -> SelectCUFolderNavKey
 
-        ACTION_PICK_IMPORT_FOLDER -> ImportNavKey
+        // Legacy callers keep the source handles themselves; only the target is returned.
+        ACTION_PICK_IMPORT_FOLDER -> ImportNavKey(nodeIds = emptyList())
 
         ACTION_MULTISELECT_FILE ->
             ShareFilesToChatNavKey(chatId = MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
@@ -999,9 +1001,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             })
             finishAndRemoveTask()
         }
-        collectCloudExplorerResult<NodeId>(ImportNavKey.RESULT) { nodeId ->
+        collectCloudExplorerResult<ImportResult>(ImportNavKey.RESULT) { result ->
             setResult(RESULT_OK, Intent().apply {
-                putExtra(INTENT_EXTRA_KEY_IMPORT_TO, nodeId.longValue)
+                putExtra(INTENT_EXTRA_KEY_IMPORT_TO, result.target.longValue)
                 intent.getLongArrayExtra(INTENT_EXTRA_KEY_IMPORT_CHAT)?.let {
                     putExtra(INTENT_EXTRA_KEY_IMPORT_CHAT, it)
                 }

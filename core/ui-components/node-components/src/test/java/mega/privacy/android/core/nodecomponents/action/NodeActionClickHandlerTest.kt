@@ -124,6 +124,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
+import mega.privacy.android.navigation.destination.ImportNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.ShareLinkNavKey
@@ -510,6 +511,37 @@ class NodeActionClickHandlerTest {
     }
 
     // SaveToMegaAction Tests
+    @Test
+    fun `test SaveToMegaAction single node navigates to ImportNavKey when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = true, isCloudExplorerAvailable = true))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockNavigationHandler).navigate(ImportNavKey(nodeIds = listOf(NodeId(123L))))
+        verify(mockCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test SaveToMegaAction multiple nodes navigates to ImportNavKey when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = true, isCloudExplorerAvailable = true))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockNavigationHandler).navigate(
+            ImportNavKey(nodeIds = listOf(NodeId(123L), NodeId(456L)))
+        )
+        verify(mockCopyLauncher, never()).launch(any())
+    }
+
     @Test
     fun `test SaveToMegaAction canHandle returns true for SaveToMegaMenuAction`() {
         val action = SaveToMegaActionClickHandler()

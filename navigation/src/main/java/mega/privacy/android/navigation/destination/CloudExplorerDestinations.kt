@@ -41,8 +41,10 @@ data object SelectCUFolderNavKey : ExplorerNavKey {
 }
 
 @Serializable
-data object ImportNavKey : ExplorerNavKey {
-    const val RESULT = "ImportNavKey::result"
+data class ImportNavKey(val nodeIds: List<NodeId>) : ExplorerNavKey {
+    companion object {
+        const val RESULT = "ImportNavKey::result"
+    }
 }
 
 @Serializable
@@ -96,6 +98,9 @@ data class CopyResult(val nodeIds: List<NodeId>, val target: NodeId)
 
 @Serializable
 data class MoveResult(val nodeIds: List<NodeId>, val target: NodeId)
+
+@Serializable
+data class ImportResult(val nodeIds: List<NodeId>, val target: NodeId)
 
 @Serializable
 data class NodesExplorerNavKey(

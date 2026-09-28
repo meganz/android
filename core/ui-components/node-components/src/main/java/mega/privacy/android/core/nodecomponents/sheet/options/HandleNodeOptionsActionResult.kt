@@ -15,7 +15,6 @@ import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
@@ -24,6 +23,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.CopyResult
 import mega.privacy.android.navigation.destination.ImportNavKey
+import mega.privacy.android.navigation.destination.ImportResult
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -117,12 +117,15 @@ fun HandleNodeOptionsActionResult(
     // Monitor the import destination-folder picker result (single-activity public-link import flow,
     // for both file and folder links).
     val importResult by navigationHandler
-        .monitorResult<NodeId?>(ImportNavKey.RESULT)
+        .monitorResult<ImportResult?>(ImportNavKey.RESULT)
         .collectAsStateWithLifecycle(null)
 
     LaunchedEffect(importResult) {
-        importResult?.let { target ->
-            nodeOptionsActionViewModel.checkImportNameCollision(target.longValue)
+        importResult?.let { result ->
+            nodeOptionsActionViewModel.checkImportNameCollision(
+                nodeIds = result.nodeIds,
+                target = result.target,
+            )
             navigationHandler.clearResult(ImportNavKey.RESULT)
         }
     }

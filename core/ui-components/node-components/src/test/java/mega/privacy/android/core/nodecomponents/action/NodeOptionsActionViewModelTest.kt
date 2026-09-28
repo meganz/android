@@ -531,7 +531,7 @@ class NodeOptionsActionViewModelTest {
             initViewModel()
             viewModel.updateSelectedNodes(listOf(chatFile))
 
-            viewModel.checkImportNameCollision(targetHandle)
+            viewModel.checkImportNameCollision(listOf(chatFile.id), NodeId(targetHandle))
 
             verify(checkChatNodesNameCollisionAndCopyUseCase).invoke(
                 chatId = 100L,
@@ -637,7 +637,7 @@ class NodeOptionsActionViewModelTest {
             initViewModel()
             viewModel.updateSelectedNodes(listOf(chatFile))
 
-            viewModel.checkImportNameCollision(targetHandle)
+            viewModel.checkImportNameCollision(listOf(chatFile.id), NodeId(targetHandle))
 
             viewModel.uiState.test {
                 val state = awaitItem()
@@ -674,7 +674,7 @@ class NodeOptionsActionViewModelTest {
             initViewModel()
             viewModel.updateSelectedNodes(listOf(chatFile))
 
-            viewModel.checkImportNameCollision(targetHandle)
+            viewModel.checkImportNameCollision(listOf(chatFile.id), NodeId(targetHandle))
 
             viewModel.uiState.test {
                 val state = awaitItem()
@@ -978,7 +978,7 @@ class NodeOptionsActionViewModelTest {
             initViewModel()
             viewModel.updateSelectedNodes(listOf(publicNode))
 
-            viewModel.checkImportNameCollision(targetHandle)
+            viewModel.checkImportNameCollision(listOf(publicNode.id), NodeId(targetHandle))
 
             verify(checkPublicNodesNameCollisionUseCase).invoke(
                 listOf(publicNode),
@@ -1007,12 +1007,51 @@ class NodeOptionsActionViewModelTest {
             initViewModel()
             viewModel.updateSelectedNodes(listOf(sampleNode))
 
-            viewModel.checkImportNameCollision(targetHandle)
+            viewModel.checkImportNameCollision(listOf(sampleNode.id), NodeId(targetHandle))
 
             verify(checkNodesNameCollisionUseCase).invoke(
                 nodes = mapOf(sampleNode.id.longValue to targetHandle),
                 type = NodeNameCollisionType.COPY,
             )
+            verify(checkPublicNodesNameCollisionUseCase, never()).invoke(any(), any(), any())
+        }
+
+    @Test
+    fun `test that checkImportNameCollision copies the requested nodes when the selection no longer holds them`() =
+        runTest {
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(emptyList())
+
+            viewModel.checkImportNameCollision(listOf(sampleNode.id), NodeId(targetHandle))
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                type = NodeNameCollisionType.COPY,
+            )
+        }
+
+    @Test
+    fun `test that checkImportNameCollision does nothing when no node ids are given`() =
+        runTest {
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(sampleNode))
+
+            viewModel.checkImportNameCollision(emptyList(), NodeId(999L))
+
+            verify(checkNodesNameCollisionUseCase, never()).invoke(any(), any())
             verify(checkPublicNodesNameCollisionUseCase, never()).invoke(any(), any(), any())
         }
 
@@ -1037,7 +1076,7 @@ class NodeOptionsActionViewModelTest {
             initViewModel()
             viewModel.updateSelectedNodes(listOf(first, second))
 
-            viewModel.checkImportNameCollision(targetHandle)
+            viewModel.checkImportNameCollision(listOf(first.id, second.id), NodeId(targetHandle))
 
             verify(checkNodesNameCollisionUseCase).invoke(
                 nodes = mapOf(101L to targetHandle, 202L to targetHandle),

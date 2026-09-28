@@ -24,7 +24,7 @@ class SaveToMegaActionClickHandler @Inject constructor() : SingleNodeAction, Mul
 
         val navigationHandler = provider.navigationHandler
         if (navigationHandler != null && provider.viewModel.uiState.value.isCloudExplorerAvailable) {
-            navigationHandler.navigate(ImportNavKey)
+            navigationHandler.navigate(ImportNavKey(nodeIds = listOf(node.id)))
         } else if (node is PublicLinkFile) {
             provider.publicCopyLauncher.launch(longArrayOf(node.id.longValue))
         } else {
@@ -43,7 +43,7 @@ class SaveToMegaActionClickHandler @Inject constructor() : SingleNodeAction, Mul
         }
         val navigationHandler = provider.navigationHandler
         if (navigationHandler != null && provider.viewModel.uiState.value.isCloudExplorerAvailable) {
-            navigationHandler.navigate(ImportNavKey)
+            navigationHandler.navigate(ImportNavKey(nodeIds = nodes.map { it.id }))
         } else {
             provider.copyLauncher.launch(nodes.map { it.id.longValue }.toLongArray())
         }

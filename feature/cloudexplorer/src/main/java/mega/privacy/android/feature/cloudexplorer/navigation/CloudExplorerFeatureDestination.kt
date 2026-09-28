@@ -37,6 +37,7 @@ import mega.privacy.android.navigation.destination.CopyResult
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.ImportAlbumNavKey
 import mega.privacy.android.navigation.destination.ImportNavKey
+import mega.privacy.android.navigation.destination.ImportResult
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
@@ -78,16 +79,18 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 explorerMode = ExplorerMode.SelectCUFolder,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onFolderPicked = onSelectCUFolder,
+                onFolderPicked = { _, nodeId -> onSelectCUFolder(nodeId) },
             )
-            val onImportFolder: (NodeId) -> Unit = { nodeId ->
-                navigationHandler.returnResult(ImportNavKey.RESULT, nodeId)
+            val onImportResult: (ImportResult) -> Unit = { result ->
+                navigationHandler.returnResult(ImportNavKey.RESULT, result)
             }
             nodePickerDestination<ImportNavKey>(
                 explorerMode = ExplorerMode.Import,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onFolderPicked = onImportFolder,
+                onFolderPicked = { key, target ->
+                    onImportResult(ImportResult(nodeIds = key.nodeIds, target = target))
+                },
             )
             val onImportAlbumFolder: (NodeId) -> Unit = { nodeId ->
                 navigationHandler.returnResult(ImportAlbumNavKey.RESULT, nodeId)
@@ -96,7 +99,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 explorerMode = ExplorerMode.AlbumImport,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onFolderPicked = onImportAlbumFolder,
+                onFolderPicked = { _, nodeId -> onImportAlbumFolder(nodeId) },
             )
             val onCopyResult: (CopyResult) -> Unit = { result ->
                 navigationHandler.returnResult(CopyNavKey.RESULT, result)
@@ -167,7 +170,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = navigationHandler::navigate,
                 onStartUpload = transferHandler::setTransferEvent,
                 onSelectCUFolder = onSelectCUFolder,
-                onImportFolder = onImportFolder,
+                onImportResult = onImportResult,
                 onImportAlbumFolder = onImportAlbumFolder,
                 onCopyResult = onCopyResult,
                 onMoveResult = onMoveResult,
@@ -233,7 +236,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         noinline onNavigateBack: (NavKey) -> Unit,
         noinline onNavigate: (NavKey) -> Unit,
         crossinline disabledNodeIds: (K) -> Set<NodeId> = { emptySet() },
-        noinline onFolderPicked: (NodeId) -> Unit = {},
+        crossinline onFolderPicked: (K, NodeId) -> Unit = { _, _ -> },
         crossinline onFilesPicked: (K, List<NodeId>) -> Unit = { _, _ -> },
     ) {
         entry<K> { key ->
@@ -247,7 +250,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 disabledNodeIds = disabledNodeIds(key),
-                onFolderPicked = onFolderPicked,
+                onFolderPicked = { onFolderPicked(key, it) },
                 onFilesPicked = { onFilesPicked(key, it) },
             )
         }
@@ -341,7 +344,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         onNavigate: (NavKey) -> Unit,
         onStartUpload: (TransferTriggerEvent) -> Unit,
         onSelectCUFolder: (NodeId) -> Unit,
-        onImportFolder: (NodeId) -> Unit,
+        onImportResult: (ImportResult) -> Unit,
         onImportAlbumFolder: (NodeId) -> Unit,
         onCopyResult: (CopyResult) -> Unit,
         onMoveResult: (MoveResult) -> Unit,
@@ -360,7 +363,9 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                     onMoveResult(MoveResult(nodeIds = nav.nodeIds, target = target))
                 }
 
-                is ImportNavKey -> onImportFolder
+                is ImportNavKey -> { target ->
+                    onImportResult(ImportResult(nodeIds = nav.nodeIds, target = target))
+                }
 
                 is ImportAlbumNavKey -> onImportAlbumFolder
 

@@ -365,14 +365,20 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         uiState.update { it.copy(publicCopyCollisionsResult = consumed()) }
     }
 
-    fun checkImportNameCollision(targetHandle: Long) {
-        val chatFile = selectedChatFile()
-        when {
-            selectedPublicLinkFile() != null -> checkPublicCopyCollision(targetHandle)
-            chatFile != null -> copyChatNode(chatFile, targetHandle)
-            else -> checkNodesNameCollision(
-                uiState.value.selectedNodes.map { it.id.longValue },
-                targetHandle,
+    /**
+     * Import counterpart of [checkCopyNameCollision]. A public link file is not in the
+     * account, so it cannot be resolved by handle and is taken from the selection that
+     * requested the import instead.
+     */
+    fun checkImportNameCollision(nodeIds: List<NodeId>, target: NodeId) {
+        if (nodeIds.isEmpty()) return
+        val publicNode = selectedPublicLinkFile()?.takeIf { it.id == nodeIds.singleOrNull() }
+        if (publicNode != null) {
+            checkPublicCopyCollision(target.longValue)
+        } else {
+            checkNodesNameCollision(
+                nodeIds.map { it.longValue },
+                target.longValue,
                 NodeNameCollisionType.COPY,
             )
         }
