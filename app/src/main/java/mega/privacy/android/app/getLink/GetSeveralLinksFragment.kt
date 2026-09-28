@@ -48,6 +48,12 @@ class GetSeveralLinksFragment : Fragment() {
 
     private val viewModel: GetSeveralLinksViewModel by activityViewModels()
 
+    /**
+     * Shared with [CopyrightFragment], which is where the terms are accepted. Both view models are
+     * scoped to [GetLinkActivity], so this is the same instance the copyright screen writes to.
+     */
+    private val linkViewModel: GetLinkViewModel by activityViewModels()
+
     private lateinit var binding: FragmentGetSeveralLinksBinding
     private val chatLauncher = registerForActivityResult(SendToChatActivityContract()) {
         if (it != null) {
@@ -156,7 +162,13 @@ class GetSeveralLinksFragment : Fragment() {
         }
 
         if (viewModel.isInitialized()) return
-        viewModel.initNodes(handles, context)
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Initialising exports every node that has no link yet, so it has to wait for the
+            // copyright terms the same way the single node screen does.
+            linkViewModel.awaitCopyrightConsent()
+            if (viewModel.isInitialized()) return@launch
+            viewModel.initNodes(handles, context)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

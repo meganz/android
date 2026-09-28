@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -176,6 +177,7 @@ class GetLinkViewModel @Inject constructor(
      */
     fun export(isFirstTime: Boolean = false) {
         viewModelScope.launch {
+            awaitCopyrightConsent()
             node?.let {
                 runCatching {
                     exportNodeUseCase(
@@ -476,6 +478,21 @@ class GetLinkViewModel @Inject constructor(
 
     fun agreeCopyrightTerms() {
         _copyrightAgreed.value = true
+    }
+
+    /**
+     * Suspends until the copyright terms have been accepted, so that nothing exports a link the
+     * user has not agreed to publish yet.
+     *
+     * The warning is shown on top of the screen that starts the export, and declining it finishes
+     * the activity: the caller's scope is cancelled while this is still suspended, so the export
+     * never runs and there is nothing to undo. Accounts that accepted the terms earlier are not
+     * asked again and continue without waiting.
+     */
+    suspend fun awaitCopyrightConsent() {
+        if (!shouldShowCopyright()) return
+        Timber.d("Holding the link creation until the copyright terms are answered")
+        copyrightAgreed.first { agreed -> agreed }
     }
 
     fun checkSensitiveItem(handle: Long) = viewModelScope.launch {

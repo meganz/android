@@ -2,9 +2,12 @@ package mega.privacy.android.app.getLink
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
@@ -21,6 +24,9 @@ import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,9 +37,11 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@ExtendWith(CoroutineMainDispatcherExtension::class)
+@ExtendWith(CoroutineMainDispatcherExtension::class, InstantExecutorExtension::class)
 class GetLinkViewModelTest {
     private lateinit var underTest: GetLinkViewModel
 
@@ -42,6 +50,8 @@ class GetLinkViewModelTest {
     private val hasSensitiveInheritedUseCase = mock<HasSensitiveInheritedUseCase>()
     private val hasSensitiveDescendantUseCase = mock<HasSensitiveDescendantUseCase>()
     private val shouldShowCopyrightUseCase = mock<ShouldShowCopyrightUseCase>()
+    private val exportNodeUseCase = mock<ExportNodeUseCase>()
+    private val megaApi = mock<MegaApiAndroid>()
 
     @BeforeEach
     fun setUp() {
@@ -51,10 +61,10 @@ class GetLinkViewModelTest {
 
     private fun initUnderTest() {
         underTest = GetLinkViewModel(
-            megaApi = mock(),
+            megaApi = megaApi,
             dbH = mock(),
             encryptLinkWithPasswordUseCase = mock(),
-            exportNodeUseCase = mock(),
+            exportNodeUseCase = exportNodeUseCase,
             context = mock(),
             hasSensitiveDescendantUseCase = hasSensitiveDescendantUseCase,
             hasSensitiveInheritedUseCase = hasSensitiveInheritedUseCase,
@@ -75,6 +85,8 @@ class GetLinkViewModelTest {
             hasSensitiveDescendantUseCase,
             hasSensitiveInheritedUseCase,
             shouldShowCopyrightUseCase,
+            exportNodeUseCase,
+            megaApi,
         )
     }
 
@@ -164,6 +176,62 @@ class GetLinkViewModelTest {
             val result = underTest.shouldShowCopyright()
 
             assertThat(result).isEqualTo(shouldShow)
+        }
+
+    @Test
+    fun `test that awaitCopyrightConsent returns immediately when the terms were already accepted`() =
+        runTest {
+            whenever(shouldShowCopyrightUseCase()) doReturn false
+
+            underTest.awaitCopyrightConsent()
+        }
+
+    @Test
+    fun `test that awaitCopyrightConsent waits until the terms are agreed`() = runTest {
+        whenever(shouldShowCopyrightUseCase()) doReturn true
+
+        val consent = async { underTest.awaitCopyrightConsent() }
+        advanceUntilIdle()
+        assertThat(consent.isCompleted).isFalse()
+
+        underTest.agreeCopyrightTerms()
+        advanceUntilIdle()
+
+        assertThat(consent.isCompleted).isTrue()
+        consent.await()
+    }
+
+    @Test
+    fun `test that awaitCopyrightConsent keeps waiting while the terms are not agreed`() = runTest {
+        whenever(shouldShowCopyrightUseCase()) doReturn true
+
+        val consent = async { underTest.awaitCopyrightConsent() }
+        advanceUntilIdle()
+
+        assertThat(consent.isCompleted).isFalse()
+        consent.cancel()
+    }
+
+    @Test
+    fun `test that export does not call exportNodeUseCase until the copyright terms are agreed`() =
+        runTest {
+            val nodeHandle = 12345L
+            val megaNode = mock<MegaNode> { on { handle } doReturn nodeHandle }
+            whenever(shouldShowCopyrightUseCase()) doReturn true
+            whenever(megaApi.getNodeByHandle(nodeHandle)) doReturn megaNode
+            underTest.initNode(nodeHandle)
+
+            underTest.export()
+            advanceUntilIdle()
+            verifyNoInteractions(exportNodeUseCase)
+
+            underTest.agreeCopyrightTerms()
+            advanceUntilIdle()
+
+            verify(exportNodeUseCase)(
+                nodeToExport = NodeId(nodeHandle),
+                callerName = "GetLinkViewModel",
+            )
         }
 
     @ParameterizedTest
