@@ -10,12 +10,15 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
@@ -24,6 +27,9 @@ import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
@@ -36,6 +42,7 @@ import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
+import mega.privacy.android.shared.nodes.selection.NodeSelection
 import mega.privacy.android.shared.resources.R as SharedR
 
 
@@ -48,6 +55,7 @@ fun LinksContent(
     onTransfer: (TransferTriggerEvent) -> Unit,
     onShowNodeOptions: (NodeId) -> Unit,
     onSortOrderClick: () -> Unit,
+    selection: NodeSelection<TypedNode>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     isActive: Boolean = true,
@@ -58,6 +66,7 @@ fun LinksContent(
     val coroutineScope = rememberCoroutineScope()
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
+    var selectedFile: TypedFileNode? by remember { mutableStateOf(null) }
 
     Column(
         modifier = modifier
@@ -99,43 +108,40 @@ fun LinksContent(
                     spanCount = spanCount,
                     items = uiState.items,
                     isNextPageLoading = false,
-                    isHiddenNodesEnabled = false,
-                    showHiddenNodes = true,
                     onMenuClicked = { onShowNodeOptions(it.id) },
-                    onItemClicked = { onAction(LinksAction.ItemClicked(it)) },
-                    onLongClicked = { onAction(LinksAction.ItemLongClicked(it)) },
+                    onItemClicked = { node ->
+                        if (selection.isInSelectionMode) {
+                            selection.toggle(node.id)
+                        } else if (node is TypedFileNode) {
+                            selectedFile = node
+                        } else if (node is TypedFolderNode) {
+                            navigationHandler.navigate(
+                                CloudDriveNavKey(
+                                    nodeHandle = node.id.longValue,
+                                    nodeName = node.name,
+                                    nodeSourceType = NodeSourceType.LINKS
+                                )
+                            )
+                        }
+                    },
+                    onLongClicked = { selection.toggle(it.id) },
                     sortConfiguration = uiState.selectedSortConfiguration,
                     isListView = isListView,
                     showSortOrder = false,
                     showChangeViewType = false,
-                    inSelectionMode = uiState.isInSelectionMode,
+                    nodeSelectionState = selection.state,
                 )
             }
         }
     }
 
-    EventEffect(
-        event = uiState.navigateToFolderEvent,
-        onConsumed = { onAction(LinksAction.NavigateToFolderEventConsumed) }
-    ) { node ->
-        navigationHandler.navigate(
-            CloudDriveNavKey(
-                nodeHandle = node.id.longValue,
-                nodeName = node.name,
-                nodeSourceType = NodeSourceType.LINKS
-            )
-        )
-    }
-
-    uiState.openedFileNode?.let { fileNode ->
+    selectedFile?.let { fileNode ->
         HandleNodeAction3(
             typedFileNode = fileNode,
             nodeSourceData = NodeSourceData.Default(NodeSourceType.LINKS),
             sortOrder = uiState.selectedSortOrder,
             snackBarHostState = snackbarHostState,
-            onActionHandled = {
-                onAction(LinksAction.OpenedFileNodeHandled)
-            },
+            onActionHandled = { selectedFile = null },
             onDownloadEvent = onTransfer,
             coroutineScope = coroutineScope,
             onNavigate = navigationHandler::navigate,

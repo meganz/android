@@ -3,8 +3,6 @@ package mega.privacy.android.feature.clouddrive.presentation.shares.links
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,9 +15,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
@@ -35,9 +30,8 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -51,7 +45,7 @@ class LinksViewModel @Inject constructor(
     private val setFolderViewTypeUseCase: SetFolderViewTypeUseCase,
     private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase,
     private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase,
-    private val nodeUiItemMapper: NodeUiItemMapper,
+    private val nodeViewItemMapper: NodeViewItemMapper,
     private val monitorLinksSortOrderUseCase: MonitorLinksSortOrderUseCase,
     private val setCloudSortOrder: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
@@ -71,14 +65,7 @@ class LinksViewModel @Inject constructor(
      */
     fun processAction(action: LinksAction) {
         when (action) {
-            is LinksAction.ItemClicked -> onItemClicked(action.nodeUiItem)
-            is LinksAction.ItemLongClicked -> onItemLongClicked(action.nodeUiItem)
             is LinksAction.ChangeViewTypeClicked -> onChangeViewTypeClicked()
-            is LinksAction.SelectAllItems -> selectAllItems()
-            is LinksAction.DeselectAllItems -> deselectAllItems()
-            is LinksAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
-            is LinksAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
-            is LinksAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
         }
     }
 
@@ -115,105 +102,23 @@ class LinksViewModel @Inject constructor(
 
     private suspend fun loadNodes(sortOrder: SortOrder) {
         runCatching {
-            val nodeUiItems = nodeUiItemMapper(
+            val nodeItems = nodeViewItemMapper(
                 nodeList = getPublicLinksUseCase(sortOrder),
-                existingItems = uiState.value.items,
-                nodeSourceType = NodeSourceType.LINKS
+                nodeSourceType = NodeSourceType.LINKS,
+                isContactVerificationOn = false,
+                highlightedNodeId = null,
+                highlightedNames = null,
+                isHiddenNodesEnabled = false,
             )
             _uiState.update { state ->
                 state.copy(
-                    items = nodeUiItems,
+                    items = nodeItems,
                     isLoading = false,
                 )
             }
         }.onFailure {
             if (it is CancellationException) throw it
             Timber.e(it)
-        }
-    }
-
-    /**
-     * Handle item click - open file or navigate to folder
-     */
-    private fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
-        if (uiState.value.isInSelectionMode) {
-            toggleItemSelection(nodeUiItem)
-            return
-        }
-        when (val item = nodeUiItem.node) {
-            is TypedFileNode -> {
-                _uiState.update { state ->
-                    state.copy(
-                        openedFileNode = item
-                    )
-                }
-            }
-
-            is TypedFolderNode -> {
-                _uiState.update { state ->
-                    state.copy(
-                        navigateToFolderEvent = triggered(item)
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Consume navigation event
-     */
-    private fun onNavigateToFolderEventConsumed() {
-        _uiState.update { state ->
-            state.copy(navigateToFolderEvent = consumed())
-        }
-    }
-
-    /**
-     * Consume navigate back event
-     */
-    private fun onNavigateBackEventConsumed() {
-        _uiState.update { state ->
-            state.copy(navigateBack = consumed)
-        }
-    }
-
-    /**
-     * Handle item long click - toggle selection state
-     */
-    private fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
-        toggleItemSelection(nodeUiItem)
-    }
-
-    private fun toggleItemSelection(nodeUiItem: NodeUiItem<TypedNode>) {
-        val updatedItems = uiState.value.items.map { item ->
-            if (item.node.id == nodeUiItem.node.id) {
-                item.copy(isSelected = !item.isSelected)
-            } else {
-                item
-            }
-        }
-        _uiState.update { state ->
-            state.copy(items = updatedItems)
-        }
-    }
-
-    /**
-     * Deselect all items and reset selection state
-     */
-    private fun deselectAllItems() {
-        val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
-        _uiState.update { state ->
-            state.copy(items = updatedItems)
-        }
-    }
-
-    /**
-     * Select all items
-     */
-    private fun selectAllItems() {
-        val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
-        _uiState.update { state ->
-            state.copy(items = updatedItems)
         }
     }
 
@@ -271,12 +176,4 @@ class LinksViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Handle the event when a file node is opened
-     */
-    private fun onOpenedFileNodeHandled() {
-        _uiState.update { state ->
-            state.copy(openedFileNode = null)
-        }
-    }
 }

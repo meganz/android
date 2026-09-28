@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,7 +18,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -31,6 +29,7 @@ import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionActionsEffect
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
@@ -41,7 +40,6 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.LinksContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.LinksViewModel
-import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -90,6 +88,7 @@ internal fun SharesScreen(
     val linksUiState by linksViewModel.uiState.collectAsStateWithLifecycle()
     val incomingSelection = rememberNodeSelection(items = incomingSharesUiState.items)
     val outgoingSelection = rememberNodeSelection(items = outgoingSharesUiState.items)
+    val linksSelection = rememberNodeSelection(items = linksUiState.items)
 
     // Sort modal
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -98,20 +97,26 @@ internal fun SharesScreen(
     val (isInSelectionMode, selectedItemsCount) = when (selectedTab) {
         SharesTab.IncomingShares -> incomingSelection.isInSelectionMode to incomingSelection.selectedCount
         SharesTab.OutgoingShares -> outgoingSelection.isInSelectionMode to outgoingSelection.selectedCount
-        SharesTab.Links -> linksUiState.isInSelectionMode to linksUiState.selectedItemsCount
+        SharesTab.Links -> linksSelection.isInSelectionMode to linksSelection.selectedCount
+    }
+
+    val activeSelection = when (selectedTab) {
+        SharesTab.IncomingShares -> incomingSelection
+        SharesTab.OutgoingShares -> outgoingSelection
+        SharesTab.Links -> linksSelection
     }
 
     val isAllItemsSelected = when (selectedTab) {
         SharesTab.IncomingShares -> incomingSelection.isAllSelected
         SharesTab.OutgoingShares -> outgoingSelection.isAllSelected
-        SharesTab.Links -> linksUiState.isAllSelected
+        SharesTab.Links -> linksSelection.isAllSelected
     }
 
     fun deselectAllItems() {
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSelection.deselectAll()
             SharesTab.OutgoingShares -> outgoingSelection.deselectAll()
-            SharesTab.Links -> linksViewModel.processAction(LinksAction.DeselectAllItems)
+            SharesTab.Links -> linksSelection.deselectAll()
         }
     }
 
@@ -119,8 +124,7 @@ internal fun SharesScreen(
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSelection.selectAll()
             SharesTab.OutgoingShares -> outgoingSelection.selectAll()
-            SharesTab.Links -> linksViewModel.processAction(LinksAction.SelectAllItems)
-
+            SharesTab.Links -> linksSelection.selectAll()
         }
     }
 
@@ -128,8 +132,7 @@ internal fun SharesScreen(
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSelection.selectedNodes
             SharesTab.OutgoingShares -> outgoingSelection.selectedNodes
-            SharesTab.Links -> linksUiState.selectedNodes
-
+            SharesTab.Links -> linksSelection.selectedNodes
         }
     } else {
         emptyList()
@@ -289,6 +292,7 @@ internal fun SharesScreen(
                             )
                         },
                         onSortOrderClick = { showSortBottomSheet = true },
+                        selection = linksSelection,
                         isActive = isActive,
                         onTransfer = onTransfer,
                         contentPadding = PaddingValues(
@@ -305,19 +309,12 @@ internal fun SharesScreen(
         )
     }
 
-    EventEffect(
-        nodeActionState.actionTriggeredEvent,
-        nodeOptionsActionViewModel::resetActionTriggered
-    ) {
-        deselectAllItems()
-    }
-
-    LaunchedEffect(selectedItemsCount) {
-        nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-            selectedNodes = getSelectedNodes().toSet(),
-            nodeSourceType = selectedTab.toNodeSourceType()
-        )
-    }
+    NodeSelectionActionsEffect(
+        selection = activeSelection,
+        nodeSourceType = selectedTab.toNodeSourceType(),
+        uiState = nodeActionState,
+        onIntent = nodeOptionsActionViewModel::processIntent,
+    )
 
     if (showSortBottomSheet) {
         val selectedSortConfiguration = when (selectedTab) {
