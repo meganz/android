@@ -1414,6 +1414,10 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                     setUserCredentialsUseCase(credentials)
                 }
                 setContentView(R.layout.activity_file_provider)
+                consumeInsetsWithToolbar(customToolbar = requireViewById(R.id.app_bar_layout_provider))
+                // The download that backs "Attach" is driven by the start transfers view, so it
+                // has to be attached here too, not only on the path that skips logging in.
+                addStartTransfersView(findViewById(R.id.provider_container))
                 tabShown = CLOUD_TAB
                 runCatching { loginMutex.unlock() }
                     .onFailure { Timber.w("Exception unlocking login mutex", it) }
