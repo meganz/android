@@ -203,7 +203,8 @@ internal fun FolderLinkView(
                 } else {
                     FolderLinkTopAppBar(
                         title = title,
-                        showMenuActions = state.showContentActions,
+                        showShareAction = state.showShareAction,
+                        showMoreAction = state.showDecryptedActions,
                         elevation = !firstItemVisible,
                         onBackPressed = onBackPressed,
                         onShareClicked = onShareClicked,
@@ -216,7 +217,7 @@ internal fun FolderLinkView(
             },
             bottomBar = {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    if (state.showContentActions && state.parentNode?.isNodeKeyDecrypted == true) {
+                    if (state.showDecryptedActions) {
                         ImportDownloadView(
                             Modifier
                                 .fillMaxWidth()
@@ -355,7 +356,8 @@ internal fun FolderLinkView(
 @Composable
 internal fun FolderLinkTopAppBar(
     title: String,
-    showMenuActions: Boolean,
+    showShareAction: Boolean,
+    showMoreAction: Boolean,
     elevation: Boolean,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
@@ -379,7 +381,7 @@ internal fun FolderLinkTopAppBar(
             }
         },
         actions = {
-            if (showMenuActions) {
+            if (showShareAction) {
                 IconButton(onClick = onShareClicked) {
                     Image(
                         painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork),
@@ -387,7 +389,9 @@ internal fun FolderLinkTopAppBar(
                         colorFilter = ColorFilter.tint(if (MaterialTheme.colors.isLight) Color.Black else Color.White)
                     )
                 }
+            }
 
+            if (showMoreAction) {
                 IconButton(
                     modifier = Modifier.testTag(APPBAR_MORE_OPTION_TAG),
                     onClick = onMoreClicked
@@ -547,7 +551,8 @@ private fun FolderLinkTopAppBarPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkTopAppBar(
             title = "Folder Name",
-            showMenuActions = false,
+            showShareAction = false,
+            showMoreAction = false,
             elevation = false,
             onBackPressed = {},
             onShareClicked = {},

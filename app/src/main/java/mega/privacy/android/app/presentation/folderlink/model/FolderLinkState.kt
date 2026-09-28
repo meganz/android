@@ -89,4 +89,30 @@ data class FolderLinkState(
      */
     val showContentActions: Boolean
         get() = errorState == LinkErrorState.NoError && isNodesFetched
+
+    /**
+     * Whether the folder currently shown is the one the link points at.
+     */
+    val isRootFolder: Boolean
+        get() = rootNode?.id != null && parentNode?.id == rootNode?.id
+
+    /**
+     * Whether to show the actions that operate on the folder being shown.
+     *
+     * A folder whose key could not be decrypted has nothing to offer: downloading and importing
+     * are refused and the options sheet opens empty, so the controls are hidden rather than left
+     * inert.
+     */
+    val showDecryptedActions: Boolean
+        get() = showContentActions && parentNode?.isNodeKeyDecrypted == true
+
+    /**
+     * Whether to show the toolbar share action.
+     *
+     * Sharing always sends the folder link itself, never the folder currently open, so the action
+     * only makes sense at the root. Deeper in the tree it would silently share something other
+     * than what the user is looking at.
+     */
+    val showShareAction: Boolean
+        get() = showDecryptedActions && isRootFolder
 }

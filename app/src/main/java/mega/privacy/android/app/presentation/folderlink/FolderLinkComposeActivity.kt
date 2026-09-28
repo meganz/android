@@ -489,9 +489,6 @@ class FolderLinkComposeActivity : BaseActivity(),
     }
 
     private fun onShareClicked() {
-        if (viewModel.state.value.parentNode?.isNodeKeyDecrypted == false) {
-            return
-        }
         MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
     }
 
