@@ -43,12 +43,13 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
+import mega.privacy.android.domain.exception.DataTooLargeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.usecase.file.GetBoundedDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
@@ -84,7 +85,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val pdfSearchEngineFactory: PdfSearchEngineFactory,
     private val getLastPageViewedInPdfUseCase: GetLastPageViewedInPdfUseCase,
     private val setOrUpdateLastPageViewedInPdfUseCase: SetOrUpdateLastPageViewedInPdfUseCase,
-    private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
+    private val getBoundedDataBytesFromUrlUseCase: GetBoundedDataBytesFromUrlUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
@@ -216,7 +217,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private fun loadPdfBytes(url: String) {
         viewModelScope.launch {
             runCatching {
-                getDataBytesFromUrlUseCase(URL(url))
+                getBoundedDataBytesFromUrlUseCase(URL(url), maxRemotePdfBytes)
             }.onSuccess { bytes ->
                 if (bytes != null) {
                     _state.update { it.copy(pdfBytes = PdfBytes(bytes)) }
@@ -234,7 +235,11 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 }
             }.onFailure { error ->
                 if (error is CancellationException) throw error
-                Timber.e(error, "Exception loading PDF bytes from URL")
+                if (error is DataTooLargeException) {
+                    Timber.e("PDF exceeds the ${error.maxBytes} byte in-memory limit")
+                } else {
+                    Timber.e(error, "Exception loading PDF bytes from URL")
+                }
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -864,6 +869,13 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     }
 
     private companion object {
+        // A remote PDF is kept as one contiguous byte array; the other half of the heap is left
+        // for the rest of the app, so the limit itself can always be allocated.
+        const val REMOTE_PDF_HEAP_FRACTION = 2
+        val maxRemotePdfBytes: Int
+            get() = (Runtime.getRuntime().maxMemory() / REMOTE_PDF_HEAP_FRACTION)
+                .coerceAtMost(Int.MAX_VALUE.toLong())
+                .toInt()
         /** Number of pages to prefetch on each side of the current page. */
         const val PREFETCH_RADIUS = 1
 

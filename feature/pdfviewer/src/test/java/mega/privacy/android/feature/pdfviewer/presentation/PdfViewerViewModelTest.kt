@@ -35,10 +35,11 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.exception.DataTooLargeException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.usecase.file.GetBoundedDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
@@ -61,7 +62,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -70,6 +73,7 @@ import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import java.net.URL
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -92,7 +96,7 @@ class PdfViewerViewModelTest {
     private val getLastPageViewedInPdfUseCase = mock<GetLastPageViewedInPdfUseCase>()
     private val setOrUpdateLastPageViewedInPdfUseCase =
         mock<SetOrUpdateLastPageViewedInPdfUseCase>()
-    private val getDataBytesFromUrlUseCase = mock<GetDataBytesFromUrlUseCase>()
+    private val getBoundedDataBytesFromUrlUseCase = mock<GetBoundedDataBytesFromUrlUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val saveRecentlyUsedItemIfQualifiesUseCase =
         mock<SaveRecentlyUsedItemIfQualifiesUseCase>()
@@ -126,7 +130,7 @@ class PdfViewerViewModelTest {
         reset(
             getLastPageViewedInPdfUseCase,
             setOrUpdateLastPageViewedInPdfUseCase,
-            getDataBytesFromUrlUseCase,
+            getBoundedDataBytesFromUrlUseCase,
             monitorConnectivityUseCase,
             saveRecentlyUsedItemIfQualifiesUseCase,
             monitorOfflineNodeUpdatesUseCase,
@@ -167,7 +171,7 @@ class PdfViewerViewModelTest {
             pdfSearchEngineFactory = pdfSearchEngineFactory,
             getLastPageViewedInPdfUseCase = getLastPageViewedInPdfUseCase,
             setOrUpdateLastPageViewedInPdfUseCase = setOrUpdateLastPageViewedInPdfUseCase,
-            getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
+            getBoundedDataBytesFromUrlUseCase = getBoundedDataBytesFromUrlUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
@@ -601,7 +605,7 @@ class PdfViewerViewModelTest {
 
     @Test
     fun `test that retryLoad triggers loadPdfBytes for remote https URL`() = runTest {
-        whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+        whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
 
         underTest = initViewModel(
             args = defaultArgs.copy(
@@ -617,8 +621,8 @@ class PdfViewerViewModelTest {
         underTest.retryLoad()
         advanceUntilIdle()
 
-        // getDataBytesFromUrlUseCase should have been called at least once (initial load + retry)
-        verify(getDataBytesFromUrlUseCase, atLeast(2)).invoke(any())
+        // the bounded fetch should have been called at least once (initial load + retry)
+        verify(getBoundedDataBytesFromUrlUseCase, atLeast(2)).invoke(any(), any())
     }
 
     @Test
@@ -636,7 +640,7 @@ class PdfViewerViewModelTest {
             underTest.retryLoad()
             advanceUntilIdle()
 
-            verifyNoInteractions(getDataBytesFromUrlUseCase)
+            verifyNoInteractions(getBoundedDataBytesFromUrlUseCase)
         }
     }
 
@@ -646,7 +650,7 @@ class PdfViewerViewModelTest {
             val fakeEngine = FakePdfSearchEngine()
             fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
 
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
 
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
@@ -679,7 +683,7 @@ class PdfViewerViewModelTest {
             val fakeEngine = FakePdfSearchEngine()
             fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
 
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
 
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
@@ -707,7 +711,7 @@ class PdfViewerViewModelTest {
             val fakeEngine = FakePdfSearchEngine()
             fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
 
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
 
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
@@ -746,7 +750,7 @@ class PdfViewerViewModelTest {
             val fakeEngine = FakePdfSearchEngine()
             fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
 
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
 
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
@@ -777,7 +781,7 @@ class PdfViewerViewModelTest {
             val fakeEngine = FakePdfSearchEngine()
             fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
 
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
 
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
@@ -808,7 +812,7 @@ class PdfViewerViewModelTest {
             val fakeEngine = FakePdfSearchEngine()
             fakeEngine.searchResults = emptyList()
 
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
 
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
@@ -835,7 +839,7 @@ class PdfViewerViewModelTest {
             val fakeEngine = FakePdfSearchEngine()
             fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
 
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
 
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
@@ -863,9 +867,9 @@ class PdfViewerViewModelTest {
         }
 
     @Test
-    fun `test that state has StreamingError and isLoading false when getDataBytesFromUrlUseCase returns null`() =
+    fun `test that state has StreamingError and isLoading false when the bounded fetch returns null`() =
         runTest {
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(null)
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(null)
             underTest = initViewModel()
             advanceUntilIdle()
 
@@ -877,9 +881,9 @@ class PdfViewerViewModelTest {
         }
 
     @Test
-    fun `test that state has StreamingError and isLoading false when getDataBytesFromUrlUseCase throws`() =
+    fun `test that state has StreamingError and isLoading false when the bounded fetch throws`() =
         runTest {
-            whenever(getDataBytesFromUrlUseCase(any())).thenThrow(RuntimeException("network failure"))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenThrow(RuntimeException("network failure"))
             underTest = initViewModel()
             advanceUntilIdle()
 
@@ -1094,7 +1098,7 @@ class PdfViewerViewModelTest {
                 searchResults = listOf(PdfTextMatch(2, 0, 1, emptyList()))
                 getPdfRectsResult = expectedRects
             }
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
                     override fun create(context: Context) = fakeEngine
@@ -1120,7 +1124,7 @@ class PdfViewerViewModelTest {
                 searchResults = listOf(PdfTextMatch(5, 0, 1, emptyList()))
                 getPdfRectsResult = expectedRects
             }
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
                     override fun create(context: Context) = fakeEngine
@@ -1171,7 +1175,7 @@ class PdfViewerViewModelTest {
                 searchResults = (0 until totalPages).map { page -> PdfTextMatch(page, 0, 1, emptyList()) }
                 getPdfRectsResult = listOf(RectF(0f, 0f, 100f, 20f))
             }
-            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
             underTest = initViewModel(
                 pdfSearchEngineFactory = object : PdfSearchEngineFactory {
                     override fun create(context: Context) = fakeEngine
@@ -1640,4 +1644,35 @@ class PdfViewerViewModelTest {
 
         verifyNoInteractions(monitorNodeUpdatesUseCase)
     }
+
+    @Test
+    fun `test that init fetches a remote PDF with a positive in-memory size limit`() = runTest {
+        whenever(getBoundedDataBytesFromUrlUseCase(any(), any())).thenReturn(ByteArray(1))
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        verify(getBoundedDataBytesFromUrlUseCase).invoke(
+            eq(URL("https://example.com/test/document.pdf")),
+            argThat { this > 0 },
+        )
+    }
+
+    @Test
+    fun `test that state has StreamingError when the remote PDF exceeds the size limit`() =
+        runTest {
+            whenever(getBoundedDataBytesFromUrlUseCase(any(), any()))
+                .thenThrow(DataTooLargeException(1))
+
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.error).isInstanceOf(PdfViewerError.StreamingError::class.java)
+                assertThat(state.pdfBytes).isNull()
+            }
+        }
+
 }
