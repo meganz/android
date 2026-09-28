@@ -7,7 +7,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.mapper.StorageStateIntMapper
-import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
@@ -18,7 +17,6 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class LegacyDatabaseMigrationImpl @Inject constructor(
-    private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
 ) : LegacyDatabaseMigration {
     override fun onCreate(db: SupportSQLiteDatabase) {
@@ -746,20 +744,8 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
         }
         val values = ContentValues()
         values.put(
-            SqliteDatabaseHandler.KEY_ATTR_ONLINE,
-            SqliteDatabaseHandler.encrypt(attr.online)
-        )
-        values.put(
-            SqliteDatabaseHandler.KEY_ATTR_INTENTS,
-            SqliteDatabaseHandler.encrypt(Integer.toString(attr.attempts))
-        )
-        values.put(
             SqliteDatabaseHandler.KEY_ATTR_ASK_SIZE_DOWNLOAD,
             SqliteDatabaseHandler.encrypt(attr.askSizeDownload)
-        )
-        values.put(
-            SqliteDatabaseHandler.KEY_ATTR_ASK_NOAPP_DOWNLOAD,
-            SqliteDatabaseHandler.encrypt(attr.askNoAppDownload)
         )
         values.put(
             SqliteDatabaseHandler.KEY_ACCOUNT_DETAILS_TIMESTAMP,
@@ -770,24 +756,8 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             SqliteDatabaseHandler.encrypt(attr.extendedAccountDetailsTimeStamp)
         )
         values.put(
-            SqliteDatabaseHandler.KEY_INVALIDATE_SDK_CACHE,
-            SqliteDatabaseHandler.encrypt(attr.invalidateSdkCache)
-        )
-        values.put(
-            SqliteDatabaseHandler.KEY_USE_HTTPS_ONLY,
-            SqliteDatabaseHandler.encrypt(attr.useHttpsOnly)
-        )
-        values.put(
-            SqliteDatabaseHandler.KEY_USE_HTTPS_ONLY,
-            SqliteDatabaseHandler.encrypt(attr.useHttpsOnly)
-        )
-        values.put(
             SqliteDatabaseHandler.KEY_SHOW_COPYRIGHT,
             SqliteDatabaseHandler.encrypt(attr.showCopyright)
-        )
-        values.put(
-            SqliteDatabaseHandler.KEY_SHOW_NOTIF_OFF,
-            SqliteDatabaseHandler.encrypt(attr.showNotifOff)
         )
         values.put(
             SqliteDatabaseHandler.KEY_LAST_PUBLIC_HANDLE,
@@ -796,10 +766,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
         values.put(
             SqliteDatabaseHandler.KEY_LAST_PUBLIC_HANDLE_TIMESTAMP,
             SqliteDatabaseHandler.encrypt(attr.lastPublicHandleTimeStamp.toString())
-        )
-        values.put(
-            SqliteDatabaseHandler.KEY_STORAGE_STATE,
-            SqliteDatabaseHandler.encrypt(storageStateIntMapper(attr.storageState).toString())
         )
         values.put(
             SqliteDatabaseHandler.KEY_LAST_PUBLIC_HANDLE_TYPE,
@@ -828,36 +794,11 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
         try {
             db.query(selectQuery)?.use { cursor ->
                 if (cursor.moveToFirst()) {
-                    val online = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_ATTR_ONLINE
-                            )
-                        )
-                    )
-                    val intents =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_ATTR_INTENTS
-                                )
-                            )
-                        )
                     val askSizeDownload = SqliteDatabaseHandler.decrypt(
                         cursor.getString(
                             getColumnIndex(
                                 cursor,
                                 SqliteDatabaseHandler.KEY_ATTR_ASK_SIZE_DOWNLOAD
-                            )
-                        )
-                    )
-                    val askNoAppDownload = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_ATTR_ASK_NOAPP_DOWNLOAD
                             )
                         )
                     )
@@ -877,39 +818,12 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                             )
                         )
                     )
-                    val invalidateSdkCache =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_INVALIDATE_SDK_CACHE
-                                )
-                            )
-                        )
-                    val useHttpsOnly =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_USE_HTTPS_ONLY
-                                )
-                            )
-                        )
                     val showCopyright =
                         SqliteDatabaseHandler.decrypt(
                             cursor.getString(
                                 getColumnIndex(
                                     cursor,
                                     SqliteDatabaseHandler.KEY_SHOW_COPYRIGHT
-                                )
-                            )
-                        )
-                    val showNotifOff =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_SHOW_NOTIF_OFF
                                 )
                             )
                         )
@@ -930,15 +844,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                             )
                         )
                     )
-                    val storageState =
-                        SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_STORAGE_STATE
-                                )
-                            )
-                        )
                     val lastPublicHandleType = SqliteDatabaseHandler.decrypt(
                         cursor.getString(
                             getColumnIndex(
@@ -965,21 +870,13 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                             )
                         )
                     attr = MegaAttributes(
-                        online,
-                        intents?.toIntOrNull() ?: 0,
                         askSizeDownload,
-                        askNoAppDownload,
                         accountDetailsTimeStamp,
                         extendedAccountDetailsTimeStamp,
-                        invalidateSdkCache,
-                        useHttpsOnly,
                         showCopyright,
-                        showNotifOff,
                         lastPublicHandle,
                         lastPublicHandleTimeStamp,
                         lastPublicHandleType?.toIntOrNull() ?: MegaApiJava.AFFILIATE_TYPE_INVALID,
-                        storageState?.toIntOrNull()?.let { storageStateMapper(it) }
-                            ?: StorageState.Unknown,
                         myChatFilesFolderHandle,
                         transferQueueStatus
                     )

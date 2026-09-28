@@ -16,13 +16,10 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_OFFLINE
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
-import mega.privacy.android.data.mapper.StorageStateIntMapper
-import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -39,8 +36,6 @@ import javax.inject.Inject
  */
 class SqliteDatabaseHandler @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val storageStateMapper: StorageStateMapper,
-    private val storageStateIntMapper: StorageStateIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val sqLiteOpenHelper: Lazy<SupportSQLiteOpenHelper>,
     private val legacyDatabaseMigration: LegacyDatabaseMigration,
@@ -303,28 +298,17 @@ class SqliteDatabaseHandler @Inject constructor(
             return
         }
         val values = ContentValues()
-        values.put(KEY_ATTR_ONLINE, encrypt(attr.online))
-        values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.attempts)))
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.askSizeDownload))
-        values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.askNoAppDownload))
         values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.accountDetailsTimeStamp))
         values.put(
             KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
             encrypt(attr.extendedAccountDetailsTimeStamp)
         )
-        values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(attr.invalidateSdkCache))
-        values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.useHttpsOnly))
-        values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.useHttpsOnly))
         values.put(KEY_SHOW_COPYRIGHT, encrypt(attr.showCopyright))
-        values.put(KEY_SHOW_NOTIF_OFF, encrypt(attr.showNotifOff))
         values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(attr.lastPublicHandle.toString()))
         values.put(
             KEY_LAST_PUBLIC_HANDLE_TIMESTAMP,
             encrypt(attr.lastPublicHandleTimeStamp.toString())
-        )
-        values.put(
-            KEY_STORAGE_STATE,
-            encrypt(storageStateIntMapper(attr.storageState).toString())
         )
         values.put(
             KEY_LAST_PUBLIC_HANDLE_TYPE,
@@ -350,22 +334,11 @@ class SqliteDatabaseHandler @Inject constructor(
         try {
             db.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
-                    val online = decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_ONLINE)))
-                    val intents =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_INTENTS)))
                     val askSizeDownload = decrypt(
                         cursor.getString(
                             getColumnIndex(
                                 cursor,
                                 KEY_ATTR_ASK_SIZE_DOWNLOAD
-                            )
-                        )
-                    )
-                    val askNoAppDownload = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_ATTR_ASK_NOAPP_DOWNLOAD
                             )
                         )
                     )
@@ -385,14 +358,8 @@ class SqliteDatabaseHandler @Inject constructor(
                             )
                         )
                     )
-                    val invalidateSdkCache =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_INVALIDATE_SDK_CACHE)))
-                    val useHttpsOnly =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_USE_HTTPS_ONLY)))
                     val showCopyright =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SHOW_COPYRIGHT)))
-                    val showNotifOff =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_SHOW_NOTIF_OFF)))
                     val lastPublicHandle =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_PUBLIC_HANDLE)))
                     val lastPublicHandleTimeStamp = decrypt(
@@ -403,8 +370,6 @@ class SqliteDatabaseHandler @Inject constructor(
                             )
                         )
                     )
-                    val storageState =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_STATE)))
                     val lastPublicHandleType = decrypt(
                         cursor.getString(
                             getColumnIndex(
@@ -424,21 +389,13 @@ class SqliteDatabaseHandler @Inject constructor(
                     val transferQueueStatus =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_TRANSFER_QUEUE_STATUS)))
                     attr = MegaAttributes(
-                        online,
-                        intents?.toIntOrNull() ?: 0,
                         askSizeDownload,
-                        askNoAppDownload,
                         accountDetailsTimeStamp,
                         extendedAccountDetailsTimeStamp,
-                        invalidateSdkCache,
-                        useHttpsOnly,
                         showCopyright,
-                        showNotifOff,
                         lastPublicHandle,
                         lastPublicHandleTimeStamp,
                         lastPublicHandleType?.toIntOrNull() ?: MegaApiJava.AFFILIATE_TYPE_INVALID,
-                        storageState?.toIntOrNull()?.let { storageStateMapper(it) }
-                            ?: StorageState.Unknown,
                         myChatFilesFolderHandle,
                         transferQueueStatus
                     )
@@ -1063,31 +1020,6 @@ class SqliteDatabaseHandler @Inject constructor(
                 transferQueueStatus.toString()
             )
         }
-
-    override fun setInvalidateSdkCache(invalidateSdkCache: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTES_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_INVALIDATE_SDK_CACHE='" + encrypt(
-                            invalidateSdkCache.toString()
-                        ) + "' WHERE " + KEY_ID + " ='1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
-                    Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
-                } else {
-                    values.put(
-                        KEY_INVALIDATE_SDK_CACHE,
-                        encrypt(invalidateSdkCache.toString())
-                    )
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
 
     override fun clearCredentials() {
         Timber.w("Clear local credentials!")
