@@ -288,6 +288,10 @@ internal class DefaultNotificationsRepository @Inject constructor(
         setPushNotificationSettings(updatedSettings)
     }
 
+    override suspend fun isChatsDoNotDisturbEnabled(): Boolean = withContext(dispatcher) {
+        _pushNotificationSettings.value.isGlobalChatsDndEnabled
+    }
+
     override suspend fun updatePushNotificationSettings() = withContext(dispatcher) {
         val pushNotificationSettings = suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("getPushNotificationSettings") {

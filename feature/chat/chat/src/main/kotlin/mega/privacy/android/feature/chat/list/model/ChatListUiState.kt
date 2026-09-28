@@ -32,6 +32,8 @@ sealed interface ChatListUiState {
      * toolbar action. Independent of the active search query.
      * @property chatStatus Presence the user is currently publishing, shown as the toolbar
      * subtitle; null while it is still being resolved.
+     * @property isDoNotDisturbEnabled Whether every chat is currently silenced, driving whether the
+     * do-not-disturb toolbar action offers to unmute instead of a mute period.
      * @property meetingTooltip Onboarding tooltip still owed to the user on the Meetings tab.
      */
     data class Data(
@@ -43,6 +45,7 @@ sealed interface ChatListUiState {
         val hasArchivedChats: Boolean,
         val isSearchAvailable: Boolean,
         val chatStatus: ChatStatus?,
+        val isDoNotDisturbEnabled: Boolean,
         val meetingTooltip: MeetingTooltipItem,
     ) : ChatListUiState
 }

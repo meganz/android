@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatsDoNotDisturbEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatPushNotificationUseCase
@@ -122,6 +123,8 @@ class ChatListViewModelTest {
     private val setNextMeetingTooltipUseCase = mock<SetNextMeetingTooltipUseCase>()
     private val getChatMuteOptionListUseCase = mock<GetChatMuteOptionListUseCase>()
     private val muteChatPushNotificationUseCase = mock<MuteChatPushNotificationUseCase>()
+    private val monitorChatsDoNotDisturbEnabledUseCase =
+        mock<MonitorChatsDoNotDisturbEnabledUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val chatRoomTitleMapper = mock<ChatRoomTitleMapper>()
 
@@ -165,6 +168,7 @@ class ChatListViewModelTest {
         stubHasAnyContact(hasAnyContact = false)
         applicationScope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher())
         stubChatStatus(ChatStatus.Online)
+        stubDoNotDisturbEnabled(false)
         stubMeetingTooltip(MeetingTooltipItem.NONE)
         underTest = ChatListViewModel(
             getChatsUseCase = getChatsUseCase,
@@ -184,6 +188,7 @@ class ChatListViewModelTest {
             setNextMeetingTooltipUseCase = setNextMeetingTooltipUseCase,
             getChatMuteOptionListUseCase = getChatMuteOptionListUseCase,
             muteChatPushNotificationUseCase = muteChatPushNotificationUseCase,
+            monitorChatsDoNotDisturbEnabledUseCase = monitorChatsDoNotDisturbEnabledUseCase,
             snackbarEventQueue = snackbarEventQueue,
             chatRoomActions = chatRoomActions,
             applicationScope = applicationScope,
@@ -220,6 +225,7 @@ class ChatListViewModelTest {
             setNextMeetingTooltipUseCase,
             getChatMuteOptionListUseCase,
             muteChatPushNotificationUseCase,
+            monitorChatsDoNotDisturbEnabledUseCase,
             snackbarEventQueue,
             chatRoomTitleMapper,
             chatRoomActionPluralMapper,
@@ -803,6 +809,12 @@ class ChatListViewModelTest {
         }
     }
 
+    private fun stubDoNotDisturbEnabled(vararg enabled: Boolean) {
+        monitorChatsDoNotDisturbEnabledUseCase.stub {
+            on { invoke() } doReturn flowOf(*enabled.toTypedArray())
+        }
+    }
+
     private fun stubMeetingTooltip(tooltip: MeetingTooltipItem) {
         getMeetingTooltipsUseCase.stub {
             onBlocking { invoke() } doReturn tooltip
@@ -1123,6 +1135,30 @@ class ChatListViewModelTest {
 
             verify(snackbarEventQueue).queueMessage(sharedR.string.changing_status_error)
         }
+
+    @Test
+    fun `test that uiState exposes whether every chat is silenced`() = runTest {
+        stubChatRooms()
+        stubDoNotDisturbEnabled(true)
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().isDoNotDisturbEnabled).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that uiState updates when the chats stop being silenced`() = runTest {
+        stubChatRooms()
+        stubDoNotDisturbEnabled(true, false)
+
+        underTest.uiState.test {
+            var state = awaitDataState()
+            while (state.isDoNotDisturbEnabled) {
+                state = awaitDataState()
+            }
+            assertThat(state.isDoNotDisturbEnabled).isFalse()
+        }
+    }
 
     @Test
     fun `test that doNotDisturbOptions returns the global mute options`() = runTest {

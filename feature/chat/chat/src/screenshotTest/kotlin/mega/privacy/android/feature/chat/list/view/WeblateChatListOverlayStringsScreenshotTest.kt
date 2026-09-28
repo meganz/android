@@ -88,6 +88,7 @@ class WeblateChatListOverlayStringsScreenshotTest {
                         hasArchivedChats = true,
                         isSearchAvailable = true,
                         chatStatus = ChatStatus.Online,
+                        isDoNotDisturbEnabled = false,
                         meetingTooltip = MeetingTooltipItem.NONE,
                     ),
                     showMeetingTab = true,

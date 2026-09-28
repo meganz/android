@@ -11,16 +11,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
+import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.feature.chat.list.ChatListViewModel
 import mega.privacy.android.feature.chat.list.model.MeetingAction
 import mega.privacy.android.feature.chat.list.model.MeetingActionEvent
@@ -28,6 +33,7 @@ import mega.privacy.android.feature.chat.list.view.BluetoothPermissionRequiredDi
 import mega.privacy.android.feature.chat.list.view.ChatListScreen
 import mega.privacy.android.feature.chat.list.view.MeetingBlockedByCallDialog
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.CreateMeetingNavKey
 import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
@@ -61,6 +67,11 @@ fun ChatListEntry(
     val viewModel = hiltViewModel<ChatListViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarEventQueue = rememberSnackBarQueue()
+    val notificationsMutedMessage =
+        stringResource(sharedR.string.chat_list_notifications_muted_message)
+    val unmuteLabel = stringResource(sharedR.string.general_unmute)
     var blockedMessage by rememberSaveable { mutableStateOf<Int?>(null) }
     var showBluetoothWarning by rememberSaveable { mutableStateOf(false) }
 
@@ -152,6 +163,21 @@ fun ChatListEntry(
         onChatStatusSelected = viewModel::onChatStatusSelected,
         doNotDisturbOptions = viewModel::doNotDisturbOptions,
         onDoNotDisturbOptionSelected = viewModel::onDoNotDisturbOptionSelected,
+        onDoNotDisturbEnabledClick = {
+            coroutineScope.launch {
+                snackbarEventQueue.queueMessage(
+                    SnackbarAttributes(
+                        message = notificationsMutedMessage,
+                        action = unmuteLabel,
+                        actionClick = {
+                            viewModel.onDoNotDisturbOptionSelected(
+                                ChatPushNotificationMuteOption.Unmute
+                            )
+                        },
+                    )
+                )
+            }
+        },
         onMeetingTooltipShown = viewModel::onMeetingTooltipShown,
     )
 
