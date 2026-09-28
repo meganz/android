@@ -1,6 +1,7 @@
 package mega.privacy.android.data.preferences.security
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -18,6 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import timber.log.Timber
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,6 +31,7 @@ class PasscodeDataStoreTest {
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var underTest: PasscodeDataStore
     private lateinit var fileName: String
+    private var plantedTree: Timber.Tree? = null
 
     @Before
     fun setUp() {
@@ -42,6 +45,7 @@ class PasscodeDataStoreTest {
 
     @After
     fun tearDown() {
+        plantedTree?.let { Timber.uproot(it) }
         context.preferencesDataStoreFile(fileName).delete()
     }
 
@@ -164,5 +168,45 @@ class PasscodeDataStoreTest {
         underTest.monitorConfigurationChangedStatus().test {
             assertThat(awaitItem()).isFalse()
         }
+    }
+
+    @Test
+    fun `test that disabling an enabled passcode is logged`() = runTest {
+        val logged = recordWarnings()
+        underTest.setPasscodeEnabledState(true)
+
+        underTest.setPasscodeEnabledState(false)
+
+        assertThat(logged).isNotEmpty()
+    }
+
+    @Test
+    fun `test that enabling the passcode is not logged`() = runTest {
+        val logged = recordWarnings()
+
+        underTest.setPasscodeEnabledState(true)
+
+        assertThat(logged).isEmpty()
+    }
+
+    @Test
+    fun `test that disabling an already disabled passcode is not logged`() = runTest {
+        underTest.setPasscodeEnabledState(false)
+        val logged = recordWarnings()
+
+        underTest.setPasscodeEnabledState(false)
+
+        assertThat(logged).isEmpty()
+    }
+
+    private fun recordWarnings(): List<String> {
+        val messages = mutableListOf<String>()
+        plantedTree = object : Timber.Tree() {
+            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                if (priority == Log.WARN) messages += message
+            }
+        }
+        Timber.plant(plantedTree!!)
+        return messages
     }
 }

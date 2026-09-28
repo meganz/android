@@ -141,7 +141,8 @@ class CredentialsPreferencesDataStoreTest {
             scope = scope,
             context = context,
             fileName = credentialDataStoreName,
-            streamingAead = streamingAead
+            streamingAead = streamingAead,
+            crashReporter = RecordingCrashReporter(),
         )
     }
 }

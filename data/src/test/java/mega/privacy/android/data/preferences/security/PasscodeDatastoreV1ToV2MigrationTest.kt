@@ -1,7 +1,9 @@
 package mega.privacy.android.data.preferences.security
 
 import android.content.Context
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.mutablePreferencesOf
 import androidx.datastore.preferences.core.preferencesOf
@@ -10,11 +12,17 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.preferences.base.PreferencesSerializer
+import mega.privacy.android.data.preferences.base.createEncrypted
+import mega.privacy.android.data.preferences.base.unencryptedFallbackFileName
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -23,6 +31,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.robolectric.annotation.Config
+import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -32,10 +41,14 @@ class PasscodeDatastoreV1ToV2MigrationTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val decryptData = mock<DecryptData>()
     private lateinit var underTest: PasscodeDatastoreV1ToV2Migration
+    private lateinit var v2FileName: String
+    private lateinit var scope: CoroutineScope
 
     @Before
     fun setUp() {
         context.preferencesDataStoreFile(passcodeDatastoreV1Name).delete()
+        v2FileName = "passcodeDataStoreV2-${UUID.randomUUID()}"
+        scope = CoroutineScope(UnconfinedTestDispatcher())
         underTest = PasscodeDatastoreV1ToV2Migration(
             context = context,
             decryptData = decryptData,
@@ -44,7 +57,10 @@ class PasscodeDatastoreV1ToV2MigrationTest {
 
     @After
     fun tearDown() {
+        scope.cancel()
         context.preferencesDataStoreFile(passcodeDatastoreV1Name).delete()
+        context.preferencesDataStoreFile(v2FileName).delete()
+        context.preferencesDataStoreFile(unencryptedFallbackFileName(v2FileName)).delete()
     }
 
     private fun seedV1File(build: MutablePreferences.() -> Unit) {
@@ -131,6 +147,63 @@ class PasscodeDatastoreV1ToV2MigrationTest {
     }
 
     @Test
+    fun `test that migrate does not disable the passcode when the V1 store is unreadable`() =
+        runTest {
+            val v1File = context.preferencesDataStoreFile(passcodeDatastoreV1Name)
+            v1File.parentFile?.mkdirs()
+            v1File.writeBytes(zeroProtobufTag)
+
+            val result = underTest.migrate(mutablePreferencesOf())
+
+            assertThat(result[PasscodeDataStore.passcodeEnabledKey]).isNull()
+        }
+
+    @Test
+    fun `test that an enabled passcode survives store creation when no StreamingAead is available`() =
+        runTest {
+            seedEnabledV1Passcode()
+
+            val store = createV2Store()
+
+            assertThat(store.data.first()[PasscodeDataStore.passcodeEnabledKey]).isTrue()
+        }
+
+    @Test
+    fun `test that an enabled passcode survives when the encrypted file is read as plaintext`() =
+        runTest {
+            seedEnabledV1Passcode()
+            val encryptedFile = context.preferencesDataStoreFile(v2FileName)
+            encryptedFile.parentFile?.mkdirs()
+            encryptedFile.writeBytes(zeroProtobufTag)
+
+            val store = createV2Store()
+
+            assertThat(store.data.first()[PasscodeDataStore.passcodeEnabledKey]).isTrue()
+            assertThat(encryptedFile.readBytes()).isEqualTo(zeroProtobufTag)
+        }
+
+    private fun seedEnabledV1Passcode() {
+        seedV1File {
+            this[stringPreferencesKey("passcodeEnabled")] = "ENC_enabled"
+            this[stringPreferencesKey("passcode")] = "ENC_passcode"
+        }
+        decryptData.stub {
+            on { invoke("ENC_enabled") }.thenReturn("true")
+            on { invoke("ENC_passcode") }.thenReturn("1234")
+        }
+    }
+
+    private fun createV2Store(): DataStore<Preferences> =
+        PreferenceDataStoreFactory.createEncrypted(
+            context = context,
+            migrations = listOf(underTest),
+            scope = scope,
+            streamingAead = null,
+            fileName = v2FileName,
+            crashReporter = mock(),
+        )
+
+    @Test
     fun `test that cleanUp leaves the V1 file in place`() = runTest {
         val v1File = context.preferencesDataStoreFile(passcodeDatastoreV1Name)
         v1File.parentFile?.mkdirs()
@@ -139,5 +212,13 @@ class PasscodeDatastoreV1ToV2MigrationTest {
         underTest.cleanUp()
 
         assertThat(v1File.exists()).isTrue()
+    }
+
+    private companion object {
+        /**
+         * A zero protobuf tag, which no preferences file can hold: it stands in for the bytes of
+         * an encrypted file handed to the plaintext reader.
+         */
+        val zeroProtobufTag = byteArrayOf(0, 0, 0, 0)
     }
 }

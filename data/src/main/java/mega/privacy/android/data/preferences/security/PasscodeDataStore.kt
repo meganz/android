@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -40,8 +41,18 @@ internal class PasscodeDataStore @Inject constructor(
 
     override fun monitorLockState() = dataStore.monitor(lockedStateKey)
 
+    /**
+     * A passcode that turns itself off is the symptom users report, and the store cannot see who
+     * asked for it, so every transition out of the enabled state is recorded. A line with no user
+     * action around it is the evidence that something else disabled the passcode.
+     */
     override suspend fun setPasscodeEnabledState(enabled: Boolean) {
-        dataStore.edit { it[passcodeEnabledKey] = enabled }
+        dataStore.edit {
+            if (!enabled && it[passcodeEnabledKey] == true) {
+                Timber.w("Passcode is being disabled")
+            }
+            it[passcodeEnabledKey] = enabled
+        }
     }
 
     override fun monitorPasscodeEnabledState() = dataStore.monitor(passcodeEnabledKey)

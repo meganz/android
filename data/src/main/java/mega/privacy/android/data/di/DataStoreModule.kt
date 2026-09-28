@@ -40,6 +40,7 @@ import mega.privacy.android.data.qualifier.PushesPreference
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
 import mega.privacy.android.data.qualifier.PinnedItemsSortPreference
 import mega.privacy.android.data.qualifier.ViewedLinksSortPreference
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Named
 import javax.inject.Singleton
@@ -109,15 +110,14 @@ internal object DataStoreModule {
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         streamingAead: StreamingAead?,
         v1ToV2Migration: PasscodeDatastoreV1ToV2Migration,
+        crashReporter: CrashReporter,
     ): DataStore<Preferences> = PreferenceDataStoreFactory.createEncrypted(
-        corruptionHandler = ReplaceFileCorruptionHandler(
-            produceNewData = { emptyPreferences() }
-        ),
         migrations = listOf(v1ToV2Migration),
         scope = CoroutineScope(ioDispatcher),
         streamingAead = streamingAead,
         context = context,
-        fileName = passcodeDatastoreName
+        fileName = passcodeDatastoreName,
+        crashReporter = crashReporter,
     )
 
     @Singleton
@@ -174,18 +174,17 @@ internal object DataStoreModule {
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         migration: CredentialsPreferencesMigration,
         streamingAead: StreamingAead?,
+        crashReporter: CrashReporter,
     ): DataStore<Preferences> {
         return PreferenceDataStoreFactory.createEncrypted(
-            corruptionHandler = ReplaceFileCorruptionHandler(
-                produceNewData = { emptyPreferences() }
-            ),
             migrations = listOf(
                 migration
             ),
             scope = CoroutineScope(ioDispatcher),
             streamingAead = streamingAead,
             context = context,
-            fileName = credentialDataStoreName
+            fileName = credentialDataStoreName,
+            crashReporter = crashReporter,
         )
     }
 
@@ -196,15 +195,14 @@ internal object DataStoreModule {
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         streamingAead: StreamingAead?,
+        crashReporter: CrashReporter,
     ): DataStore<Preferences> {
         return PreferenceDataStoreFactory.createEncrypted(
-            corruptionHandler = ReplaceFileCorruptionHandler(
-                produceNewData = { emptyPreferences() }
-            ),
             scope = CoroutineScope(ioDispatcher),
             streamingAead = streamingAead,
             context = context,
-            fileName = qaAccountCacheDataStoreName
+            fileName = qaAccountCacheDataStoreName,
+            crashReporter = crashReporter,
         )
     }
 

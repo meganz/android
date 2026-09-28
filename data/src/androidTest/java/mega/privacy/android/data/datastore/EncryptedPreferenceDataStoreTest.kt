@@ -55,7 +55,8 @@ internal class EncryptedPreferenceDataStoreTest {
             scope = scope,
             context = context,
             fileName = "test",
-            streamingAead = streamingAead
+            streamingAead = streamingAead,
+            crashReporter = RecordingCrashReporter(),
         )
     }
 }
