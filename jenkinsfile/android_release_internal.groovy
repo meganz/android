@@ -5,12 +5,6 @@
 BUILD_STEP = ''
 
 /**
- * Flag to decide whether we do clean before build SDK.
- * Possible values: yes|no
- */
-REBUILD_SDK = "no"
-
-/**
  * Flag to decide whether do clean up for SDK and Android code
  */
 DO_CLEANUP = true
@@ -105,8 +99,6 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
-
-                    REBUILD_SDK = common.getValueInMRDescriptionBy("REBUILD_SDK")
 
                     sh("rm -frv ${WORKSPACE}/$ARCHIVE_FOLDER")
                     sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")

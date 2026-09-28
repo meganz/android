@@ -629,27 +629,6 @@ boolean isDefined(String value) {
     return value != null && !value.isEmpty()
 }
 
-/**
- * Get the value from GitLab MR description by key
- * @param key the key to check and read
- * @return actual value of key if key is specified. null otherwise.
- */
-String getValueInMRDescriptionBy(String key) {
-    if (key == null || key.isEmpty()) return null
-    def description = env.gitlabMergeRequestDescription
-    if (description == null) return null
-    String[] lines = description.split('\n')
-    for (String line : lines) {
-        line = line.trim()
-        if (line.startsWith(key)) {
-            String value = line.substring(key.length() + 1)
-            print("getValueInMRDescriptionBy(): " + key + " ==> " + value)
-            return value
-        }
-    }
-    return null
-}
-
 void downloadAndExtractNativeSymbols() {
     String nativeSymbolLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/native-symbol/${readPrebuiltSdkVersion()}.zip"
     String targetObjLocalLocation = "sdk/src/main/obj/local"
