@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.nodes.R as NodesR
@@ -275,6 +276,40 @@ class NodeViewItemMapperTest {
         assertThat(nodeUiItem.showBlurEffect).isFalse()
         assertThat(nodeUiItem.duration).isNull()
         assertThat(nodeUiItem.thumbnailData).isNotNull()
+    }
+
+    @Test
+    fun `test that invoke requests the thumbnail from the folder link API when nodes are public`() =
+        runTest {
+            val mockFileNode = createMockFileNode()
+
+            val result = underTest(
+                nodeList = listOf(mockFileNode),
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
+                isPublicNodes = true,
+            )
+
+            assertThat(result.single().thumbnailData)
+                .isEqualTo(ThumbnailRequest(id = mockFileNode.id, isPublicNode = true))
+        }
+
+    @Test
+    fun `test that invoke requests the thumbnail from the account API by default`() = runTest {
+        val mockFileNode = createMockFileNode()
+
+        val result = underTest(
+            nodeList = listOf(mockFileNode),
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
+        )
+
+        assertThat(result.single().thumbnailData)
+            .isEqualTo(ThumbnailRequest(id = mockFileNode.id, isPublicNode = false))
     }
 
     @Test

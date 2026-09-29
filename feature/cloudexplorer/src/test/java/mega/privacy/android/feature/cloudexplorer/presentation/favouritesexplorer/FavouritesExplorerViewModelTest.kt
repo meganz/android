@@ -74,7 +74,7 @@ class FavouritesExplorerViewModelTest {
         whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())) doReturn emptyFlow()
         whenever(getAllFavoritesUseCase()) doReturn flowOf(emptyList())
         whenever {
-            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any(), any())
         } doReturn emptyList()
     }
 

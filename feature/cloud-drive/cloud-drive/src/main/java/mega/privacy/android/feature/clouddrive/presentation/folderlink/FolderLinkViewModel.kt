@@ -59,9 +59,8 @@ import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.Fol
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
 import mega.privacy.mobile.analytics.event.ViewModeListMenuItemEvent
 import timber.log.Timber
@@ -75,7 +74,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
-    private val nodeUiItemMapper: NodeUiItemMapper,
+    private val nodeViewItemMapper: NodeViewItemMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
@@ -154,10 +153,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
         when (action) {
             is FolderLinkAction.DecryptionKeyEntered -> onDecryptionKeyEntered(action.key)
             FolderLinkAction.DecryptionKeyDialogDismissed -> onDecryptionKeyDialogDismissed()
-            is FolderLinkAction.ItemClicked -> onItemClicked(action)
-            is FolderLinkAction.ItemLongClicked -> onItemLongClicked(action.nodeUiItem)
-            FolderLinkAction.SelectAllItems -> selectAllItems()
-            FolderLinkAction.DeselectAllItems -> deselectAllItems()
+            is FolderLinkAction.ItemClicked -> onItemClicked(action.node)
             FolderLinkAction.BackPressed -> handleBackPress()
             FolderLinkAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
             FolderLinkAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
@@ -289,7 +285,14 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                 order = _uiState.value.selectedSortOrder,
             )
             val hasMediaItems = containsMediaItemUseCase(children)
-            val items = nodeUiItemMapper(nodeList = children, isPublicNodes = true)
+            val items = nodeViewItemMapper(
+                nodeList = children,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
+                isPublicNodes = true,
+            )
             _uiState.update {
                 it.copy(
                     contentState = FolderLinkContentState.Loaded,
@@ -403,15 +406,19 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             runCatching {
                 val result =
                     fetchFolderNodesUseCase(folderSubHandle, _uiState.value.selectedSortOrder)
-                val nodeUiItems = nodeUiItemMapper(
+                val nodeItems = nodeViewItemMapper(
                     nodeList = result.childrenNodes,
-                    isPublicNodes = true
+                    highlightedNodeId = null,
+                    isHiddenNodesEnabled = false,
+                    highlightedNames = null,
+                    isContactVerificationOn = false,
+                    isPublicNodes = true,
                 )
                 val hasMediaItems = containsMediaItemUseCase(result.childrenNodes)
                 _uiState.update {
                     it.copy(
                         contentState = FolderLinkContentState.Loaded,
-                        items = nodeUiItems,
+                        items = nodeItems,
                         rootNode = result.rootNode,
                         currentFolderNode = result.parentNode,
                         hasMediaItems = hasMediaItems,
@@ -472,45 +479,11 @@ internal class FolderLinkViewModel @AssistedInject constructor(
         }
     }
 
-    private fun onItemClicked(action: FolderLinkAction.ItemClicked) {
-        if (_uiState.value.isInSelectionMode) {
-            toggleItemSelection(action.nodeUiItem)
-            return
-        }
-        when (val node = action.nodeUiItem.node) {
+    private fun onItemClicked(node: TypedNode) {
+        when (node) {
             is TypedFolderNode -> openFolder(node)
             is TypedFileNode -> onFileClicked(node)
             else -> Unit
-        }
-    }
-
-    private fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
-        toggleItemSelection(nodeUiItem)
-    }
-
-    private fun toggleItemSelection(nodeUiItem: NodeUiItem<TypedNode>) {
-        _uiState.update { state ->
-            state.copy(
-                items = state.items.map { item ->
-                    if (item.node.id == nodeUiItem.node.id) {
-                        item.copy(isSelected = !item.isSelected)
-                    } else {
-                        item
-                    }
-                }
-            )
-        }
-    }
-
-    private fun selectAllItems() {
-        _uiState.update { state ->
-            state.copy(items = state.items.map { it.copy(isSelected = true) })
-        }
-    }
-
-    private fun deselectAllItems() {
-        _uiState.update { state ->
-            state.copy(items = state.items.map { it.copy(isSelected = false) })
         }
     }
 
@@ -536,10 +509,6 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     }
 
     private fun handleBackPress() {
-        if (_uiState.value.isInSelectionMode) {
-            deselectAllItems()
-            return
-        }
         browseFolderJob?.cancel()
         browseFolderJob = viewModelScope.launch {
             val currentFolderNode = _uiState.value.currentFolderNode

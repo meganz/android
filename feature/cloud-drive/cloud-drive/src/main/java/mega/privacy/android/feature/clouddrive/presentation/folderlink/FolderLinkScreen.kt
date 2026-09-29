@@ -44,6 +44,7 @@ import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionActionsEffect
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SaveToMegaMenuAction
@@ -52,6 +53,7 @@ import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveEmptyView
@@ -85,6 +87,8 @@ import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.selection.NodeSelection
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelection
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,19 +116,13 @@ internal fun FolderLinkScreen(
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val isLoaded = uiState.contentState is FolderLinkContentState.Loaded
 
-    LaunchedEffect(uiState.selectedItemsCount) {
-        nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-            uiState.selectedNodes.toSet(),
-            NodeSourceType.FOLDER_LINK,
-        )
-    }
+    val selection = rememberNodeSelection(items = uiState.items)
 
-    EventEffect(
-        event = nodeOptionsActionUiState.actionTriggeredEvent,
-        onConsumed = nodeOptionsActionViewModel::resetActionTriggered,
-        action = {
-            onProcessAction(FolderLinkAction.DeselectAllItems)
-        }
+    NodeSelectionActionsEffect(
+        selection = selection,
+        nodeSourceType = NodeSourceType.FOLDER_LINK,
+        uiState = nodeOptionsActionUiState,
+        onIntent = nodeOptionsActionViewModel::processIntent,
     )
 
     val scrollToHideBehavior = rememberScrollToHideBehavior()
@@ -137,13 +135,13 @@ internal fun FolderLinkScreen(
     MegaScaffoldWithTopAppBarScrollBehavior(
         scrollToHideBehavior = scrollToHideBehavior,
         topBar = {
-            if (uiState.isInSelectionMode) {
+            if (selection.isInSelectionMode) {
                 NodeSelectionModeAppBar(
-                    count = uiState.selectedItemsCount,
-                    isAllSelected = uiState.isAllSelected,
+                    count = selection.selectedCount,
+                    isAllSelected = selection.isAllSelected,
                     isSelecting = false,
-                    onSelectAllClicked = { onProcessAction(FolderLinkAction.SelectAllItems) },
-                    onCancelSelectionClicked = { onProcessAction(FolderLinkAction.DeselectAllItems) },
+                    onSelectAllClicked = selection::selectAll,
+                    onCancelSelectionClicked = selection::deselectAll,
                 )
             } else {
                 MegaTopAppBar(
@@ -191,7 +189,7 @@ internal fun FolderLinkScreen(
         },
         bottomBar = {
             BoxSurface(
-                surfaceColor = if (uiState.isInSelectionMode) {
+                surfaceColor = if (selection.isInSelectionMode) {
                     SurfaceColor.None
                 } else {
                     SurfaceColor.Surface1
@@ -209,19 +207,19 @@ internal fun FolderLinkScreen(
                     // without them the mini player is the last thing above the ad slot.
                     val miniPlayerAppliesNavigationBarsPadding = !showsFolderActions
                     Column(modifier = modifier.fillMaxWidth()) {
-                        if (!uiState.isInSelectionMode) {
+                        if (!selection.isInSelectionMode) {
                             LocalMiniAudioPlayer.current(
                                 Modifier.fillMaxWidth(),
                                 miniPlayerAppliesNavigationBarsPadding,
                             )
                         }
-                        if (uiState.isInSelectionMode) {
+                        if (selection.isInSelectionMode) {
                             NodeSelectionModeBottomBar(
                                 availableActions = nodeOptionsActionUiState.availableActions,
                                 visibleActions = nodeOptionsActionUiState.visibleActions,
                                 visible = nodeOptionsActionUiState.visibleActions.isNotEmpty(),
                                 multiNodeActionHandler = selectionModeActionHandler,
-                                selectedNodes = uiState.selectedNodes,
+                                selectedNodes = selection.selectedNodes,
                                 isSelecting = false,
                             )
                         } else if (showsFolderActions && folderNode != null) {
@@ -246,15 +244,13 @@ internal fun FolderLinkScreen(
     ) { contentPadding ->
         FolderLinkContent(
             uiState = uiState,
+            selection = selection,
             isListView = isListView,
             spanCount = spanCount,
             onNavigate = onNavigate,
             onAction = { action ->
                 // Intercept file clicks
-                if (action is FolderLinkAction.ItemClicked
-                    && action.nodeUiItem.node is TypedFileNode
-                    && !uiState.isInSelectionMode
-                ) {
+                if (action is FolderLinkAction.ItemClicked && action.node is TypedFileNode) {
                     rewardedAdGate.requestAction { onProcessAction(action) }
                 } else {
                     onProcessAction(action)
@@ -266,7 +262,7 @@ internal fun FolderLinkScreen(
             bottomPadding = contentPadding.calculateBottomPadding(),
             onShowSortBottomSheet = { showSortBottomSheet = true },
             onMediaDiscoveryClicked = {
-                onProcessAction(FolderLinkAction.DeselectAllItems)
+                selection.deselectAll()
                 val mediaHandle = uiState.currentFolderNode?.id?.longValue ?: -1
                 megaNavigator.openMediaDiscoveryActivity(
                     context = context,
@@ -322,6 +318,7 @@ internal fun FolderLinkScreen(
     }
 
     BackHandler { onProcessAction(FolderLinkAction.BackPressed) }
+    BackHandler(enabled = selection.isInSelectionMode) { selection.deselectAll() }
 
     EventEffect(
         event = uiState.navigateBackEvent,
@@ -333,6 +330,7 @@ internal fun FolderLinkScreen(
 @Composable
 internal fun FolderLinkContent(
     uiState: FolderLinkUiState,
+    selection: NodeSelection<TypedNode>,
     isListView: Boolean,
     spanCount: Int,
     onNavigate: (NavKey) -> Unit,
@@ -443,8 +441,6 @@ internal fun FolderLinkContent(
                                 spanCount = spanCount,
                                 items = uiState.items,
                                 isNextPageLoading = false,
-                                isHiddenNodesEnabled = false,
-                                showHiddenNodes = true,
                                 onMenuClicked = {
                                     onNavigate(
                                         NodeOptionsBottomSheetNavKey(
@@ -454,13 +450,19 @@ internal fun FolderLinkContent(
                                         )
                                     )
                                 },
-                                onItemClicked = { onAction(FolderLinkAction.ItemClicked(it)) },
-                                onLongClicked = { onAction(FolderLinkAction.ItemLongClicked(it)) },
+                                onItemClicked = { node ->
+                                    if (selection.isInSelectionMode) {
+                                        selection.toggle(node.id)
+                                    } else {
+                                        onAction(FolderLinkAction.ItemClicked(node))
+                                    }
+                                },
+                                onLongClicked = { selection.toggle(it.id) },
                                 sortConfiguration = uiState.selectedSortConfiguration,
                                 isListView = isListView,
                                 showSortOrder = false,
                                 showChangeViewType = false,
-                                inSelectionMode = uiState.isInSelectionMode,
+                                nodeSelectionState = selection.state,
                             )
                         }
                     }

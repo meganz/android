@@ -10,14 +10,14 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Immutable
 data class FolderLinkUiState(
     val url: String? = null,
     val contentState: FolderLinkContentState = FolderLinkContentState.Loading,
-    val items: List<NodeUiItem<TypedNode>> = emptyList(),
+    val items: List<NodeViewItem<TypedNode>> = emptyList(),
     val isFolderLoggedIn: Boolean = false,
     val hasCredentials: Boolean = false,
     val currentViewType: ViewType = ViewType.LIST,
@@ -68,25 +68,4 @@ data class FolderLinkUiState(
         isRootFolder -> LocalizedText.StringRes(sharedR.string.folder_link_subtitle)
         else -> null
     }
-
-    /**
-     * Count of selected items
-     */
-    val selectedItemsCount: Int = items.count { it.isSelected }
-
-    /**
-     * True if all items are selected
-     */
-    val isAllSelected: Boolean = items.isNotEmpty() && items.size == selectedItemsCount
-
-    /**
-     * True if any item is selected
-     */
-    val isInSelectionMode: Boolean = selectedItemsCount > 0
-
-    /**
-     * Returns a list of selected nodes
-     */
-    val selectedNodes: List<TypedNode>
-        get() = items.mapNotNull { if (it.isSelected) it.node else null }
 }

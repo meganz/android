@@ -51,10 +51,10 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -83,7 +83,7 @@ internal class FolderLinkViewModelTest {
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
-    private val nodeUiItemMapper: NodeUiItemMapper = mock()
+    private val nodeViewItemMapper: NodeViewItemMapper = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper =
@@ -115,7 +115,7 @@ internal class FolderLinkViewModelTest {
             getFolderParentNodeUseCase = getFolderParentNodeUseCase,
             getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
             containsMediaItemUseCase = containsMediaItemUseCase,
-            nodeUiItemMapper = nodeUiItemMapper,
+            nodeViewItemMapper = nodeViewItemMapper,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
@@ -145,7 +145,7 @@ internal class FolderLinkViewModelTest {
             getFolderParentNodeUseCase,
             getPublicChildNodeFromIdUseCase,
             containsMediaItemUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             monitorSortCloudOrderUseCase,
             setCloudSortOrderUseCase,
             monitorViewTypeUseCase,
@@ -174,30 +174,21 @@ internal class FolderLinkViewModelTest {
         on { this.name } doReturn name
     }
 
-    private fun mockFolderNodeUiItem(folder: TypedFolderNode): NodeUiItem<TypedNode> = mock {
-        on { node } doReturn folder
-    }
-
     private fun mockFileNode(id: Long = 2L, name: String = "file.txt"): TypedFileNode = mock {
         on { this.id } doReturn NodeId(id)
         on { this.name } doReturn name
     }
 
-    private fun mockFileNodeUiItem(file: TypedFileNode): NodeUiItem<TypedNode> = mock {
-        on { node } doReturn file
-    }
-
-    private suspend fun stubNodeUiItemMapper(result: List<NodeUiItem<TypedNode>> = emptyList()) {
+    private suspend fun stubNodeViewItemMapper(result: List<NodeViewItem<TypedNode>> = emptyList()) {
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
+                any(),
+                any(),
+                anyOrNull(),
                 any(),
                 anyOrNull(),
                 any(),
                 any(),
-                any(),
-                anyOrNull(),
-                anyOrNull(),
-                any()
             )
         ).thenReturn(result)
     }
@@ -210,7 +201,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -243,7 +234,7 @@ internal class FolderLinkViewModelTest {
             whenever(getPublicChildNodeFromIdUseCase(NodeId(entryFolderHandle))).thenReturn(childFolder)
             whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(emptyList())
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(
                 FolderLinkViewModel.Args(
                     uriString = "https://mega.nz/folder/abc",
@@ -270,7 +261,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url, entryFolderHandle = 456L))
             advanceUntilIdle()
 
@@ -285,7 +276,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -308,7 +299,7 @@ internal class FolderLinkViewModelTest {
                 FetchFolderNodesResult(currentNodeId = NodeId(publicHandle), rootNode = rootNode)
             )
             whenever(queryAdsUseCase(publicHandle)).thenReturn(true)
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -328,7 +319,7 @@ internal class FolderLinkViewModelTest {
             FetchFolderNodesResult(currentNodeId = NodeId(publicHandle), rootNode = rootNode)
         )
         whenever(queryAdsUseCase(publicHandle)).thenReturn(false)
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -356,7 +347,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -525,7 +516,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(eq(subHandle), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -542,7 +533,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(eq(subHandle), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -557,7 +548,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -589,7 +580,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -612,7 +603,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -631,7 +622,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -646,29 +637,28 @@ internal class FolderLinkViewModelTest {
         val url = "https://mega.nz/folder/abc"
         val folder = mockFolderNode(id = 42L, name = "SubFolder")
         val children = listOf<TypedNode>(mock())
-        val childUiItems = listOf<NodeUiItem<TypedNode>>(mock())
+        val childUiItems = listOf<NodeViewItem<TypedNode>>(mock())
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
+                any(),
+                any(),
+                anyOrNull(),
                 any(),
                 anyOrNull(),
                 any(),
                 any(),
-                any(),
-                anyOrNull(),
-                anyOrNull(),
-                any()
             )
         ).thenReturn(emptyList()).thenReturn(childUiItems)
         whenever(getFolderLinkChildrenNodesUseCase(eq(42L), anyOrNull())).thenReturn(children)
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
-        underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(folder)))
+        underTest.processAction(FolderLinkAction.ItemClicked(folder))
         advanceUntilIdle()
 
         underTest.uiState.test {
@@ -690,14 +680,14 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             whenever(getFolderLinkChildrenNodesUseCase(eq(42L), anyOrNull())).thenThrow(
                 RuntimeException()
             )
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
-            underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(folder)))
+            underTest.processAction(FolderLinkAction.ItemClicked(folder))
             advanceUntilIdle()
 
             underTest.uiState.test {
@@ -727,7 +717,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         ) // parentNode = null
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -749,14 +739,14 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult(rootNode = parentFolder)
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         whenever(getFolderLinkChildrenNodesUseCase(eq(10L), anyOrNull())).thenReturn(emptyList())
         whenever(getFolderParentNodeUseCase(NodeId(10L))).thenReturn(parentFolder)
         whenever(getFolderLinkChildrenNodesUseCase(eq(1L), anyOrNull())).thenReturn(emptyList())
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
-        underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(subFolder)))
+        underTest.processAction(FolderLinkAction.ItemClicked(subFolder))
         advanceUntilIdle()
         underTest.processAction(FolderLinkAction.BackPressed)
         advanceUntilIdle()
@@ -781,7 +771,7 @@ internal class FolderLinkViewModelTest {
             whenever(getPublicChildNodeFromIdUseCase(NodeId(entryFolderHandle))).thenReturn(childFolder)
             whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(emptyList())
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(
                 FolderLinkViewModel.Args(
                     uriString = "https://mega.nz/folder/abc",
@@ -813,7 +803,7 @@ internal class FolderLinkViewModelTest {
             whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(emptyList())
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
             whenever(getFolderParentNodeUseCase(NodeId(10L))).thenReturn(childFolder)
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(
                 FolderLinkViewModel.Args(
                     uriString = "https://mega.nz/folder/abc",
@@ -822,7 +812,7 @@ internal class FolderLinkViewModelTest {
             )
             advanceUntilIdle()
 
-            underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(subFolder)))
+            underTest.processAction(FolderLinkAction.ItemClicked(subFolder))
             advanceUntilIdle()
             underTest.processAction(FolderLinkAction.BackPressed)
             advanceUntilIdle()
@@ -851,7 +841,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             whenever(
                 getFolderLinkChildrenNodesUseCase(
                     eq(10L),
@@ -862,7 +852,7 @@ internal class FolderLinkViewModelTest {
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
-            underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(subFolder)))
+            underTest.processAction(FolderLinkAction.ItemClicked(subFolder))
             advanceUntilIdle()
             underTest.processAction(FolderLinkAction.BackPressed)
             advanceUntilIdle()
@@ -883,7 +873,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             whenever(
                 getFolderLinkChildrenNodesUseCase(
                     eq(10L),
@@ -897,7 +887,7 @@ internal class FolderLinkViewModelTest {
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
-            underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(subFolder)))
+            underTest.processAction(FolderLinkAction.ItemClicked(subFolder))
             advanceUntilIdle()
             underTest.processAction(FolderLinkAction.BackPressed)
             advanceUntilIdle()
@@ -932,7 +922,7 @@ internal class FolderLinkViewModelTest {
         initViewModel(FolderLinkViewModel.Args(uriString = null))
         advanceUntilIdle()
 
-        underTest.processAction(FolderLinkAction.ItemClicked(mockFileNodeUiItem(file)))
+        underTest.processAction(FolderLinkAction.ItemClicked(file))
 
         underTest.uiState.test {
             assertThat(awaitItem().openedFileNode).isEqualTo(file)
@@ -949,7 +939,7 @@ internal class FolderLinkViewModelTest {
         underTest.uiState.test {
             awaitItem() // consume initial state
 
-            underTest.processAction(FolderLinkAction.ItemClicked(mockFileNodeUiItem(file)))
+            underTest.processAction(FolderLinkAction.ItemClicked(file))
             assertThat(awaitItem().openedFileNode).isEqualTo(file)
 
             underTest.processAction(FolderLinkAction.OpenedFileNodeHandled)
@@ -966,12 +956,12 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         whenever(getFolderLinkChildrenNodesUseCase(eq(42L), anyOrNull())).thenReturn(emptyList())
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
-        underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(folder)))
+        underTest.processAction(FolderLinkAction.ItemClicked(folder))
         advanceUntilIdle()
 
         underTest.uiState.test {
@@ -1004,7 +994,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -1081,11 +1071,11 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         whenever(getFolderLinkChildrenNodesUseCase(eq(folderId), anyOrNull())).thenReturn(emptyList())
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
-        underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(folder)))
+        underTest.processAction(FolderLinkAction.ItemClicked(folder))
         advanceUntilIdle()
         return folder
     }
@@ -1149,202 +1139,31 @@ internal class FolderLinkViewModelTest {
         }
     }
 
-    private fun createNodeUiItem(node: TypedNode): NodeUiItem<TypedNode> =
-        NodeUiItem(node = node, isSelected = false)
+    private fun createNodeViewItem(node: TypedNode): NodeViewItem<TypedNode> =
+        NodeViewItem(node = node)
 
     private suspend fun initLoadedViewModelWithItems(
         url: String = "https://mega.nz/folder/abc",
         nodes: List<TypedNode>,
-    ): List<NodeUiItem<TypedNode>> {
-        val items = nodes.map { createNodeUiItem(it) }
+    ): List<NodeViewItem<TypedNode>> {
+        val items = nodes.map { createNodeViewItem(it) }
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull()))
             .thenReturn(FetchFolderNodesResult())
         whenever(
-            nodeUiItemMapper(
-                any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), any()
+            nodeViewItemMapper(
+                any(),
+                any(),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+                any(),
+                any(),
             )
         ).thenReturn(items)
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         return items
-    }
-
-    @Test
-    fun `test that ItemLongClicked toggles item selection`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val node2 = mockFolderNode(id = 2L)
-        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
-        advanceUntilIdle()
-
-        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
-        advanceUntilIdle()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.isInSelectionMode).isTrue()
-            assertThat(state.items[0].isSelected).isTrue()
-            assertThat(state.items[1].isSelected).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that ItemClicked in selection mode toggles item selection`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val node2 = mockFolderNode(id = 2L)
-        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
-        advanceUntilIdle()
-
-        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
-        advanceUntilIdle()
-        underTest.processAction(FolderLinkAction.ItemClicked(items[1]))
-        advanceUntilIdle()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.isInSelectionMode).isTrue()
-            assertThat(state.items[0].isSelected).isTrue()
-            assertThat(state.items[1].isSelected).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that SelectAllItems selects all items`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val node2 = mockFolderNode(id = 2L)
-        initLoadedViewModelWithItems(nodes = listOf(node1, node2))
-        advanceUntilIdle()
-
-        underTest.processAction(FolderLinkAction.SelectAllItems)
-        advanceUntilIdle()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.isInSelectionMode).isTrue()
-            assertThat(state.isAllSelected).isTrue()
-            assertThat(state.items[0].isSelected).isTrue()
-            assertThat(state.items[1].isSelected).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that DeselectAllItems deselects all items`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val node2 = mockFolderNode(id = 2L)
-        initLoadedViewModelWithItems(nodes = listOf(node1, node2))
-        advanceUntilIdle()
-
-        underTest.processAction(FolderLinkAction.SelectAllItems)
-        advanceUntilIdle()
-        underTest.processAction(FolderLinkAction.DeselectAllItems)
-        advanceUntilIdle()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.isInSelectionMode).isFalse()
-            assertThat(state.items[0].isSelected).isFalse()
-            assertThat(state.items[1].isSelected).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that toggling selection twice deselects item`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val items = initLoadedViewModelWithItems(nodes = listOf(node1))
-        advanceUntilIdle()
-
-        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
-        advanceUntilIdle()
-        val selectedItem = underTest.uiState.value.items[0]
-        underTest.processAction(FolderLinkAction.ItemLongClicked(selectedItem))
-        advanceUntilIdle()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.isInSelectionMode).isFalse()
-            assertThat(state.items[0].isSelected).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that BackPressed deselects all when in selection mode`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val items = initLoadedViewModelWithItems(nodes = listOf(node1))
-        advanceUntilIdle()
-
-        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
-        advanceUntilIdle()
-        assertThat(underTest.uiState.value.isInSelectionMode).isTrue()
-
-        underTest.processAction(FolderLinkAction.BackPressed)
-        advanceUntilIdle()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.isInSelectionMode).isFalse()
-            assertThat(state.items[0].isSelected).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that selectedItemsCount returns correct count`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val node2 = mockFolderNode(id = 2L)
-        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
-        advanceUntilIdle()
-
-        assertThat(underTest.uiState.value.selectedItemsCount).isEqualTo(0)
-
-        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
-        advanceUntilIdle()
-        assertThat(underTest.uiState.value.selectedItemsCount).isEqualTo(1)
-
-        underTest.processAction(FolderLinkAction.ItemLongClicked(items[1]))
-        advanceUntilIdle()
-        assertThat(underTest.uiState.value.selectedItemsCount).isEqualTo(2)
-    }
-
-    @Test
-    fun `test that selectedNodes returns correct nodes`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val node2 = mockFolderNode(id = 2L)
-        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
-        advanceUntilIdle()
-
-        assertThat(underTest.uiState.value.selectedNodes).isEmpty()
-
-        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
-        advanceUntilIdle()
-
-        val selectedNodes = underTest.uiState.value.selectedNodes
-        assertThat(selectedNodes).hasSize(1)
-        assertThat(selectedNodes[0].id).isEqualTo(NodeId(1L))
-    }
-
-    @Test
-    fun `test that isAllSelected returns true when all items are selected`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val node2 = mockFolderNode(id = 2L)
-        initLoadedViewModelWithItems(nodes = listOf(node1, node2))
-        advanceUntilIdle()
-
-        underTest.processAction(FolderLinkAction.SelectAllItems)
-        advanceUntilIdle()
-
-        assertThat(underTest.uiState.value.isAllSelected).isTrue()
-    }
-
-    @Test
-    fun `test that isAllSelected returns false when not all items are selected`() = runTest {
-        val node1 = mockFolderNode(id = 1L)
-        val node2 = mockFolderNode(id = 2L)
-        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
-        advanceUntilIdle()
-
-        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
-        advanceUntilIdle()
-
-        assertThat(underTest.uiState.value.isAllSelected).isFalse()
     }
 
     @Test
@@ -1358,7 +1177,7 @@ internal class FolderLinkViewModelTest {
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull()))
                 .thenReturn(FetchFolderNodesResult(parentNode = parentFolder))
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             whenever(getFolderLinkChildrenNodesUseCase(eq(5L), anyOrNull())).thenReturn(emptyList())
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -1382,7 +1201,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             whenever(containsMediaItemUseCase(any())).thenReturn(true)
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -1401,7 +1220,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -1450,7 +1269,7 @@ internal class FolderLinkViewModelTest {
                     this.parentNode = rootNode
                 }
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
 
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -1491,7 +1310,7 @@ internal class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 FetchFolderNodesResult()
             )
-            stubNodeUiItemMapper()
+            stubNodeViewItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -1508,7 +1327,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
 
@@ -1536,7 +1355,7 @@ internal class FolderLinkViewModelTest {
         whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
             FetchFolderNodesResult()
         )
-        stubNodeUiItemMapper()
+        stubNodeViewItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
         assertThat(underTest.uiState.value.showGuestBanner).isTrue()

@@ -71,7 +71,7 @@ class IncomingSharesExplorerViewModelTest {
         whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())) doReturn emptyFlow()
         whenever { getIncomingSharesChildrenNodeUseCase(any(), anyOrNull()) } doReturn emptyList()
         whenever {
-            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any(), any())
         } doReturn emptyList()
     }
 

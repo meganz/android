@@ -87,7 +87,7 @@ class NodeExplorerSharedViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
         whenever {
-            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any(), any())
         } doReturn emptyList()
 
         initViewModel()
@@ -162,7 +162,7 @@ class NodeExplorerSharedViewModelTest {
             whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
             whenever { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
             whenever {
-                nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+                nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any(), any())
             } doReturn emptyList()
 
             viewModel.uiState.test {

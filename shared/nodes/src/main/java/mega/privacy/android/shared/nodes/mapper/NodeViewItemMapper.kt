@@ -47,6 +47,8 @@ class NodeViewItemMapper @Inject constructor(
      * @param isHiddenNodesEnabled
      * @param highlightedNames
      * @param isContactVerificationOn
+     * @param isPublicNodes true when the nodes belong to a folder link, so thumbnails are
+     * requested from the folder link API
      * @return List of mapped NodeViewItem
      */
     suspend operator fun invoke(
@@ -56,6 +58,7 @@ class NodeViewItemMapper @Inject constructor(
         isHiddenNodesEnabled: Boolean,
         highlightedNames: List<String>?,
         isContactVerificationOn: Boolean,
+        isPublicNodes: Boolean = false,
     ): List<NodeViewItem<TypedNode>> = withContext(ioDispatcher) {
         val highlightedNamesSet = highlightedNames?.toSet()
 
@@ -91,6 +94,7 @@ class NodeViewItemMapper @Inject constructor(
                 iconRes = node.getIcon(fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(
                     id = node.id,
+                    isPublicNode = isPublicNodes,
                 ).takeIf { !isFolder && !node.isTakenDown }, // folders and taken-down nodes use iconRes
                 accessPermissionIcon = (node as? ShareFolderNode)
                     .getSharesIcon(isContactVerificationOn),
