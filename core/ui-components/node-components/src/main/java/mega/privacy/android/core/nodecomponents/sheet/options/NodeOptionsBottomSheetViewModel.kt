@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
@@ -32,8 +36,11 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -47,6 +54,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicL
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.transfers.offline.MonitorOfflineDownloadInProgressUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import mega.privacy.android.shared.nodes.model.NodeUiItem
@@ -79,6 +87,9 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val monitorOfflineDownloadInProgressUseCase: MonitorOfflineDownloadInProgressUseCase,
+    private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
@@ -101,7 +112,18 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
         val isChatNodeFromOthers: Boolean = false,
     )
 
+    /**
+     * These sources have no offline action, so their offline downloads are not monitored.
+     */
+    private val monitorsOfflineDownloads = publicLinkUrl.isNullOrBlank()
+            && nodeSourceType != NodeSourceType.FOLDER_LINK
+            && nodeSourceType != NodeSourceType.FILE_LINK
+            && nodeSourceType != NodeSourceType.MEDIA_PLAYER_ZIP_FILE
+
     private var offlineMonitorJob: Job? = null
+    private var offlineDownloadMonitorJob: Job? = null
+    private var monitoredOfflineDownloadNodeId: NodeId? = null
+    private var bottomSheetOptionsJob: Job? = null
 
     internal val uiState: StateFlow<NodeBottomSheetState>
         field = MutableStateFlow(
@@ -124,11 +146,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
         if (nodeSourceType == NodeSourceType.OFFLINE) {
             monitorOfflineNodeAvailability(nodeId)
         }
-        if (publicLinkUrl.isNullOrBlank()
-            && nodeSourceType != NodeSourceType.FOLDER_LINK
-            && nodeSourceType != NodeSourceType.FILE_LINK
-            && nodeSourceType != NodeSourceType.MEDIA_PLAYER_ZIP_FILE
-        ) {
+        if (monitorsOfflineDownloads) {
             viewModelScope.launch {
                 monitorNodeUpdatesById(NodeId(nodeId))
                     .catch { Timber.e(it) }
@@ -141,7 +159,8 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
         snackbarEventQueue.queueMessage(attributes)
 
     private fun getBottomSheetOptions() {
-        viewModelScope.launch {
+        bottomSheetOptionsJob?.cancel()
+        bottomSheetOptionsJob = viewModelScope.launch {
             val nodeId = NodeId(nodeId)
             val options = nodeMenuProviderRegistry.getBottomSheetOptions(nodeSourceType)
             val deferredNode = async { loadPrimaryNode(nodeId) }
@@ -157,6 +176,10 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             if (effectiveNode == null) {
                 uiState.update { it.copy(error = triggered(Exception("Node is null"))) }
                 return@launch
+            }
+
+            if (monitorsOfflineDownloads) {
+                monitorOfflineDownloadProgress(effectiveNode)
             }
 
             val bottomSheetItems = buildBottomSheetItems(
@@ -323,6 +346,33 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
                         }
                     }
                 }
+        }
+    }
+
+    /**
+     * Rebuilds the options when the offline download of the node starts or stops, and when its
+     * offline information is finally saved, so the offline action reflects the actual state while
+     * the bottom sheet stays open. It needs the node itself, so it can only be started once the
+     * node is loaded.
+     */
+    private fun monitorOfflineDownloadProgress(node: TypedNode) {
+        if (monitoredOfflineDownloadNodeId == node.id) return
+        monitoredOfflineDownloadNodeId = node.id
+        offlineDownloadMonitorJob?.cancel()
+        offlineDownloadMonitorJob = viewModelScope.launch {
+            if (!getFeatureFlagValueUseCase(ApiFeatures.OfflineDownloadInProgressState)) {
+                return@launch
+            }
+            merge(
+                monitorOfflineDownloadInProgressUseCase(node)
+                    .drop(1) // the options were already built with the current value
+                    .map { },
+                monitorOfflineFileAvailabilityUseCase()
+                    .filter { it == nodeId }
+                    .map { },
+            )
+                .catch { Timber.e(it) }
+                .collect { getBottomSheetOptions() }
         }
     }
 

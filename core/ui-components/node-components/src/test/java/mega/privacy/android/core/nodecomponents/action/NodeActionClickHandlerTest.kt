@@ -101,6 +101,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
@@ -118,6 +119,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.offline.CancelAndDeleteOfflineDownloadUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.navigation.MegaNavigator
@@ -143,11 +145,13 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -162,13 +166,16 @@ class NodeActionClickHandlerTest {
     private val mockCheckNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
     private val mockIsHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val mockRemoveOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
+    private val mockCancelAndDeleteOfflineDownloadUseCase = mock<CancelAndDeleteOfflineDownloadUseCase>()
     private val mockGetNodeToAttachUseCase = mock<GetNodeToAttachUseCase>()
     private val mockGetFileUriUseCase = mock<GetFileUriUseCase>()
     private val mockGetNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
     private val mockHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
     private val mockHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
     private val mockGetStreamingUriStringForNode = mock<GetStreamingUriStringForNode>()
-    private val mockGetFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val mockGetFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
+        onBlocking { invoke(ApiFeatures.OfflineDownloadInProgressState) } doReturn true
+    }
     private val mockGetLocalFilePathUseCase = mock<GetLocalFilePathUseCase>()
     private val mockExportNodeUseCase = mock<ExportNodeUseCase>()
     private val mockGetNodeShareDataUseCase = mock<GetNodeShareDataUseCase>()
@@ -909,9 +916,27 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
+    fun `test that RemoveOfflineAction cancels the offline download of the node before removing it`() =
+        runTest {
+            val action = removeOfflineActionClickHandler()
+            val menuAction = mock<AvailableOfflineMenuAction>()
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(123L)
+                on { isAvailableOffline } doReturn false
+            }
+
+            action.handle(menuAction, node, mockSingleNodeActionProvider)
+
+            inOrder(mockCancelAndDeleteOfflineDownloadUseCase, mockRemoveOfflineNodeUseCase) {
+                verify(mockCancelAndDeleteOfflineDownloadUseCase).invoke(node)
+                verify(mockRemoveOfflineNodeUseCase).invoke(node.id)
+            }
+        }
+
+    @Test
     fun `test RemoveOfflineAction single node handle calls removeOfflineNodeUseCase when node is available offline`() =
         runTest {
-            val action = RemoveOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
+            val action = removeOfflineActionClickHandler()
             val menuAction = mock<AvailableOfflineMenuAction>()
             val nodeOffline = mock<TypedFileNode> {
                 on { id } doReturn NodeId(123L)
@@ -926,7 +951,7 @@ class NodeActionClickHandlerTest {
     @Test
     fun `test RemoveOfflineAction multiple node handle calls removeOfflineNodeUseCase for all the nodes`() =
         runTest {
-            val action = RemoveOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
+            val action = removeOfflineActionClickHandler()
             val menuAction = mock<AvailableOfflineMenuAction>()
             val node1 = mock<TypedFileNode> {
                 on { id } doReturn NodeId(123L)
@@ -1245,6 +1270,30 @@ class NodeActionClickHandlerTest {
 
         verify(mockMegaNavigator).openFileInfoActivity(mockContext, 123L)
     }
+
+    @Test
+    fun `test that RemoveOfflineAction does not cancel the offline download when the feature flag is disabled`() =
+        runTest {
+            whenever(mockGetFeatureFlagValueUseCase(ApiFeatures.OfflineDownloadInProgressState))
+                .thenReturn(false)
+            val action = removeOfflineActionClickHandler()
+            val menuAction = mock<AvailableOfflineMenuAction>()
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(123L)
+                on { isAvailableOffline } doReturn false
+            }
+
+            action.handle(menuAction, node, mockSingleNodeActionProvider)
+
+            verifyNoInteractions(mockCancelAndDeleteOfflineDownloadUseCase)
+            verify(mockRemoveOfflineNodeUseCase).invoke(node.id)
+        }
+
+    private fun removeOfflineActionClickHandler() = RemoveOfflineActionClickHandler(
+        mockRemoveOfflineNodeUseCase,
+        mockCancelAndDeleteOfflineDownloadUseCase,
+        mockGetFeatureFlagValueUseCase,
+    )
 
     // EditAction Tests
     @Test

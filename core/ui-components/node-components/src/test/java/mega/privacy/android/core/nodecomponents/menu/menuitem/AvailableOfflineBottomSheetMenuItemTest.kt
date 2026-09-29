@@ -7,9 +7,14 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.offline.IsNodeUnderOfflineRootUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
+import mega.privacy.android.domain.usecase.transfers.offline.IsOfflineDownloadInProgressUseCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -25,11 +30,21 @@ class AvailableOfflineBottomSheetMenuItemTest {
      */
     private val isNodeUnderOfflineRootUseCase = mock<IsNodeUnderOfflineRootUseCase>()
 
+    private val isOfflineDownloadInProgressUseCase = mock<IsOfflineDownloadInProgressUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val underTest = AvailableOfflineBottomSheetMenuItem(
         menuAction = mock<AvailableOfflineMenuAction>(),
         isFolderEmptyUseCase = isFolderEmptyUseCase,
         isNodeUnderOfflineRootUseCase = isNodeUnderOfflineRootUseCase,
+        isOfflineDownloadInProgressUseCase = isOfflineDownloadInProgressUseCase,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
     )
+
+    @BeforeEach
+    fun commonStubs() = runTest {
+        whenever(isOfflineDownloadInProgressUseCase(any())).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.OfflineDownloadInProgressState)).thenReturn(true)
+    }
 
     @Test
     fun `test that shouldDisplay returns true when node is not available offline and folder is not empty`() =
@@ -165,5 +180,47 @@ class AvailableOfflineBottomSheetMenuItemTest {
         )
         assertThat(result).isFalse()
     }
-}
 
+    @Test
+    fun `test that shouldDisplay returns false when an offline download is in progress for the node`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { isAvailableOffline } doReturn false
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            }
+            whenever(isFolderEmptyUseCase(node)).thenReturn(false)
+            whenever(isOfflineDownloadInProgressUseCase(node)).thenReturn(true)
+            val result = underTest.shouldDisplay(
+                isNodeInRubbish = false,
+                accessPermission = null,
+                isInBackups = false,
+                node = node,
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that shouldDisplay returns true when an offline download is in progress and the feature flag is disabled`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { isAvailableOffline } doReturn false
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            }
+            whenever(isFolderEmptyUseCase(node)).thenReturn(false)
+            whenever(isOfflineDownloadInProgressUseCase(node)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.OfflineDownloadInProgressState)).thenReturn(false)
+            val result = underTest.shouldDisplay(
+                isNodeInRubbish = false,
+                accessPermission = null,
+                isInBackups = false,
+                node = node,
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+            assertThat(result).isTrue()
+        }
+}

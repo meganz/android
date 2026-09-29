@@ -23,8 +23,11 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -38,6 +41,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicL
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.transfers.offline.MonitorOfflineDownloadInProgressUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import mega.privacy.android.shared.nodes.model.NodeUiItem
@@ -52,6 +56,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -75,6 +80,13 @@ class NodeOptionsBottomSheetViewModelTest {
     private val getOfflineFileInformationByIdUseCase = mock<GetOfflineFileInformationByIdUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val monitorNodeUpdatesById = mock<MonitorNodeUpdatesById>()
+    private val monitorOfflineDownloadInProgressUseCase =
+        mock<MonitorOfflineDownloadInProgressUseCase>()
+    private val monitorOfflineFileAvailabilityUseCase =
+        mock<MonitorOfflineFileAvailabilityUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
+        onBlocking { invoke(ApiFeatures.OfflineDownloadInProgressState) } doReturn true
+    }
     private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
     private val zipFileTypedNodeMapper = mock<ZipFileTypedNodeMapper>()
     private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
@@ -97,6 +109,8 @@ class NodeOptionsBottomSheetViewModelTest {
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
+        whenever(monitorOfflineDownloadInProgressUseCase(any())).thenReturn(flowOf(false))
+        whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(emptyFlow())
         whenever(nodeMenuProviderRegistry.getBottomSheetOptions(any())).thenReturn(emptySet())
     }
 
@@ -126,6 +140,9 @@ class NodeOptionsBottomSheetViewModelTest {
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             monitorNodeUpdatesById = monitorNodeUpdatesById,
+            monitorOfflineDownloadInProgressUseCase = monitorOfflineDownloadInProgressUseCase,
+            monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             snackbarEventQueue = snackbarEventQueue,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
@@ -901,4 +918,145 @@ class NodeOptionsBottomSheetViewModelTest {
                 any(),
             )
         }
+
+    @Test
+    fun `test that options are refreshed when an offline download starts for the node`() = runTest {
+        val inProgressFlow = MutableSharedFlow<Boolean>()
+        whenever(monitorOfflineDownloadInProgressUseCase(any())).thenReturn(inProgressFlow)
+        val initialNode = mock<TypedFileNode>().stub {
+            on { id } doReturn NodeId(123)
+            on { name } doReturn "test_file.txt"
+            on { isIncomingShare } doReturn false
+        }
+        val updatedNode = mock<TypedFileNode>().stub {
+            on { id } doReturn NodeId(123)
+            on { name } doReturn "test_file.txt"
+            on { isIncomingShare } doReturn false
+        }
+        val initialNodeUi = mock<NodeUiItem<TypedNode>>()
+        val updatedNodeUi = mock<NodeUiItem<TypedNode>>()
+        whenever(getNodeByIdUseCase(any()))
+            .thenReturn(initialNode)
+            .thenReturn(updatedNode)
+        whenever(nodeUiItemMapper(listOf(initialNode))).thenReturn(listOf(initialNodeUi))
+        whenever(nodeUiItemMapper(listOf(updatedNode))).thenReturn(listOf(updatedNodeUi))
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            .thenReturn(emptyList())
+
+        initViewModel(nodeId = sampleFileNode.id.longValue)
+
+        viewModel.uiState.test {
+            var state = awaitItem()
+            while (state.node == null) state = awaitItem()
+            assertThat(state.node).isEqualTo(initialNodeUi)
+            inProgressFlow.emit(false)
+            inProgressFlow.emit(true)
+            var updatedState = awaitItem()
+            while (updatedState.node != updatedNodeUi) updatedState = awaitItem()
+            assertThat(updatedState.node).isEqualTo(updatedNodeUi)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that options are refreshed when offline file availability is broadcast for the node`() =
+        runTest {
+            val availabilityFlow = MutableSharedFlow<Long>()
+            whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(availabilityFlow)
+            val initialNode = mock<TypedFileNode>().stub {
+                on { id } doReturn NodeId(123)
+                on { name } doReturn "test_file.txt"
+                on { isIncomingShare } doReturn false
+            }
+            val updatedNode = mock<TypedFileNode>().stub {
+                on { id } doReturn NodeId(123)
+                on { name } doReturn "test_file.txt"
+                on { isIncomingShare } doReturn false
+            }
+            val initialNodeUi = mock<NodeUiItem<TypedNode>>()
+            val updatedNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(getNodeByIdUseCase(any()))
+                .thenReturn(initialNode)
+                .thenReturn(updatedNode)
+            whenever(nodeUiItemMapper(listOf(initialNode))).thenReturn(listOf(initialNodeUi))
+            whenever(nodeUiItemMapper(listOf(updatedNode))).thenReturn(listOf(updatedNodeUi))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+
+            initViewModel(nodeId = sampleFileNode.id.longValue)
+
+            viewModel.uiState.test {
+                var state = awaitItem()
+                while (state.node == null) state = awaitItem()
+                availabilityFlow.emit(sampleFileNode.id.longValue)
+                var updatedState = awaitItem()
+                while (updatedState.node != updatedNodeUi) updatedState = awaitItem()
+                assertThat(updatedState.node).isEqualTo(updatedNodeUi)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that offline downloads in progress are not monitored when the feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.OfflineDownloadInProgressState))
+                .thenReturn(false)
+            whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            whenever(nodeUiItemMapper(listOf(sampleFileNode)))
+                .thenReturn(listOf(mock<NodeUiItem<TypedNode>>()))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+
+            initViewModel(nodeId = sampleFileNode.id.longValue)
+
+            viewModel.uiState.test {
+                var state = awaitItem()
+                while (state.node == null) state = awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+            verifyNoInteractions(monitorOfflineDownloadInProgressUseCase)
+        }
+
+    @Test
+    fun `test that offline downloads in progress are not monitored for a file link`() = runTest {
+        val publicLink = "https://mega.nz/file/abc#xyz"
+        val publicFileNode = mock<TypedFileNode>().stub {
+            on { id } doReturn NodeId(456)
+            on { name } doReturn "public_file.txt"
+            on { isIncomingShare } doReturn false
+            on { previewPath } doReturn null
+        }
+        val wrappedPublicNode = mock<PublicLinkFile>().stub {
+            on { id } doReturn NodeId(456)
+            on { name } doReturn "public_file.txt"
+            on { isIncomingShare } doReturn false
+            on { previewPath } doReturn null
+        }
+        whenever(getPublicNodeUseCase(publicLink)).thenReturn(publicFileNode)
+        whenever(mapTypedNodeToPublicLinkUseCase(publicFileNode)).thenReturn(wrappedPublicNode)
+        whenever(nodeUiItemMapper(listOf(wrappedPublicNode)))
+            .thenReturn(listOf(mock<NodeUiItem<TypedNode>>()))
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+        whenever(nodeBottomSheetActionMapper(any(), any(), any(), anyOrNull(), any(), any(), any()))
+            .thenReturn(emptyList())
+
+        initViewModel(
+            nodeId = publicFileNode.id.longValue,
+            nodeSourceType = NodeSourceType.FILE_LINK,
+            publicLinkUrl = publicLink,
+        )
+
+        verifyNoInteractions(monitorOfflineDownloadInProgressUseCase)
+    }
 }

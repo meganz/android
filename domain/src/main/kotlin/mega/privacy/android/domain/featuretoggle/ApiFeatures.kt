@@ -22,6 +22,16 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Reflects the state of an offline download while it is still running: the node is shown as
+     * already available offline, and removing it from offline cancels its download.
+     */
+    OfflineDownloadInProgressState(
+        "odip",
+        "Show a node being downloaded for offline as already available offline and cancel its download when removing it",
+        false,
+    ),
+
+    /**
      * Makes a sync's `.megaignore` editable from the app: exclusions staged while a sync is being
      * set up, and managed on an existing one.
      */

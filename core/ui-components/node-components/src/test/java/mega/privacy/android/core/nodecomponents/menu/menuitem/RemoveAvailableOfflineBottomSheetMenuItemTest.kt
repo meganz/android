@@ -11,10 +11,15 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import mega.privacy.android.domain.usecase.offline.IsNodeUnderOfflineRootUseCase
+import mega.privacy.android.domain.usecase.transfers.offline.IsOfflineDownloadInProgressUseCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -29,12 +34,21 @@ class RemoveAvailableOfflineBottomSheetMenuItemTest {
      * these tests exercise files, which answer from the node itself.
      */
     private val isNodeUnderOfflineRootUseCase = mock<IsNodeUnderOfflineRootUseCase>()
-
+    private val isOfflineDownloadInProgressUseCase = mock<IsOfflineDownloadInProgressUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val underTest = RemoveAvailableOfflineBottomSheetMenuItem(
         menuAction = mock<RemoveOfflineMenuAction>(),
         isFolderEmptyUseCase = isFolderEmptyUseCase,
         isNodeUnderOfflineRootUseCase = isNodeUnderOfflineRootUseCase,
+        isOfflineDownloadInProgressUseCase = isOfflineDownloadInProgressUseCase,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
     )
+
+    @BeforeEach
+    fun commonStubs() = runTest {
+        whenever(isOfflineDownloadInProgressUseCase(any())).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.OfflineDownloadInProgressState)).thenReturn(true)
+    }
 
     @Test
     fun `test that shouldDisplay returns true when node is available offline and not in rubbish`() =
@@ -221,5 +235,46 @@ class RemoveAvailableOfflineBottomSheetMenuItemTest {
                 nodeSourceType = NodeSourceType.OFFLINE
             )
             assertThat(result).isTrue()
+        }
+
+    @Test
+    fun `test that shouldDisplay returns true when the offline download of the node is still in progress`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { isAvailableOffline } doReturn false
+                on { isTakenDown } doReturn false
+            }
+            whenever(isFolderEmptyUseCase(node)).thenReturn(false)
+            whenever(isOfflineDownloadInProgressUseCase(node)).thenReturn(true)
+            val result = underTest.shouldDisplay(
+                isNodeInRubbish = false,
+                accessPermission = null,
+                isInBackups = false,
+                node = node,
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+            assertThat(result).isTrue()
+        }
+
+    @Test
+    fun `test that shouldDisplay returns false when the offline download is in progress and the feature flag is disabled`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { isAvailableOffline } doReturn false
+                on { isTakenDown } doReturn false
+            }
+            whenever(isFolderEmptyUseCase(node)).thenReturn(false)
+            whenever(isOfflineDownloadInProgressUseCase(node)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.OfflineDownloadInProgressState)).thenReturn(false)
+            val result = underTest.shouldDisplay(
+                isNodeInRubbish = false,
+                accessPermission = null,
+                isInBackups = false,
+                node = node,
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+            assertThat(result).isFalse()
         }
 }
