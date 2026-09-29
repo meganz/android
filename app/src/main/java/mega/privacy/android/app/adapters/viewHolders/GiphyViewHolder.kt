@@ -6,24 +6,24 @@ import androidx.recyclerview.widget.RecyclerView
 import coil3.load
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.GiphyInterface
-import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
+import mega.privacy.android.domain.entity.chat.Giphy
 
 class GiphyViewHolder(val view: View, private val giphyInterface: GiphyInterface) :
     RecyclerView.ViewHolder(view) {
     private val gifImage: AppCompatImageView = view.findViewById(R.id.gif_image)
     var gifData: GifData? = null
 
-    fun bind(gif: Data?) {
-        val imageAttributes = gif?.images?.fixedHeight ?: return
-        val gifWidth = imageAttributes.width
-        val gifHeight = imageAttributes.height
+    fun bind(gif: Giphy?) {
+        if (gif == null || (gif.mp4Src == null && gif.webpSrc == null)) return
+        val gifWidth = gif.width
+        val gifHeight = gif.height
 
         gifData = GifData(
-            imageAttributes.mp4,
-            imageAttributes.webp,
-            imageAttributes.mp4Size,
-            imageAttributes.webpSize,
+            gif.mp4Src,
+            gif.webpSrc,
+            gif.mp4Size.toLong(),
+            gif.webpSize.toLong(),
             gifWidth,
             gifHeight,
             gif.title
@@ -32,7 +32,7 @@ class GiphyViewHolder(val view: View, private val giphyInterface: GiphyInterface
         updateLayoutParams(gifWidth, gifHeight)
         view.tag = this@GiphyViewHolder
 
-        val webpUri = imageAttributes.webp ?: return
+        val webpUri = gif.webpSrc ?: return
         gifImage.load(webpUri) {
             size(
                 giphyInterface.getScreenGifWidth(),

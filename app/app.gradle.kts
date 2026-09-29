@@ -394,10 +394,6 @@ dependencies {
         kspTest(google.hilt.android.compiler)
     }
 
-    // Retrofit
-    implementation(lib.retrofit)
-    implementation(lib.retrofit.gson)
-
     // Logging
     implementation(lib.bundles.logging)
 

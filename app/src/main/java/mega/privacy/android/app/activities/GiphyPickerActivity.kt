@@ -17,34 +17,37 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ViewGifActivityContract
 import mega.privacy.android.app.adapters.GiphyAdapter
 import mega.privacy.android.app.databinding.ActivityGiphyBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
-import mega.privacy.android.app.interfaces.GiphyEndPointsInterface
 import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_DOWN_SERVER
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_SEARCH
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.NON_EMPTY
-import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.app.objects.GiphyResponse
-import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboard
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import mega.privacy.android.domain.entity.chat.Giphy
+import mega.privacy.android.domain.usecase.chat.giphy.GetTrendingGiphysUseCase
+import mega.privacy.android.domain.usecase.chat.giphy.SearchGiphysUseCase
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Activity for the Giphy picker
  */
+@AndroidEntryPoint
 class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
     companion object {
@@ -68,15 +71,19 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
     private var giphyAdapter: GiphyAdapter? = null
     private var staggeredGridLayoutManager: StaggeredGridLayoutManager? = null
 
-    private var giphyService: GiphyEndPointsInterface? = null
+    @Inject
+    lateinit var getTrendingGiphysUseCase: GetTrendingGiphysUseCase
+
+    @Inject
+    lateinit var searchGiphysUseCase: SearchGiphysUseCase
 
     private var screenOrientation = 0
     private var numColumns = 0
     private var screenGifWidth = 0
 
-    private var previousRequest: Call<GiphyResponse>? = null
-    private var trendingData: ArrayList<Data> = ArrayList()
-    private var searchData = hashMapOf<String, ArrayList<Data>>()
+    private var previousRequest: Job? = null
+    private var trendingData: ArrayList<Giphy> = ArrayList()
+    private var searchData = hashMapOf<String, ArrayList<Giphy>>()
 
     private var searchMenuItem: MenuItem? = null
 
@@ -157,7 +164,6 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         binding.giphyEndList.visibility = GONE
         emptyText = HtmlCompat.fromHtml(emptyTextSearch, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
-        giphyService = GiphyService.buildService()
         requestTrendingData(false)
     }
 
@@ -268,7 +274,8 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         if (trendingData.isEmpty() || scrolling) {
             if (trendingData.isEmpty()) resetQueryValues()
 
-            getAndSetData(giphyService?.getGiphyTrending(DEFAULT_LIMIT, queryOffset), null)
+            val offset = queryOffset
+            getAndSetData(null) { getTrendingGiphysUseCase(DEFAULT_LIMIT, offset) }
         } else {
             cancelPreviousRequests()
             queryOffset = trendingData.size
@@ -291,7 +298,8 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         if (searchValue == null || scrolling) {
             if (searchValue == null) resetQueryValues()
 
-            getAndSetData(giphyService?.getGiphySearch(query, DEFAULT_LIMIT, queryOffset), query)
+            val offset = queryOffset
+            getAndSetData(query) { searchGiphysUseCase(query, DEFAULT_LIMIT, offset) }
         } else {
             cancelPreviousRequests()
             queryOffset = searchValue.size
@@ -310,59 +318,50 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
      *  showing the result on screen if everything was correct.
      *  If there is already a request in progress, cancels it to launch the new one.
      *
-     * @param call  Indicates the type of the request. It can be Trending or Search.
-     * @param query Search query if is a search request, null otherwise.
+     * @param query   Search query if is a search request, null otherwise.
+     * @param request The request to launch. It can be Trending or Search.
      */
-    private fun getAndSetData(call: Call<GiphyResponse>?, query: String?) {
+    private fun getAndSetData(query: String?, request: suspend () -> List<Giphy>) {
         cancelPreviousRequests()
 
-        call?.enqueue(object : Callback<GiphyResponse> {
-            override fun onResponse(call: Call<GiphyResponse>, response: Response<GiphyResponse>) {
-                if (response.isSuccessful) {
-                    isEndOfList = false
-
-                    val gifData = response.body()?.data
-                    if (gifData == null || gifData.isEmpty()) {
-                        if (query == null || (searchData[query] != null && searchData[query]?.isNotEmpty() == true)) {
-                            isEndOfList = true
-                        } else {
-                            searchData[query] = ArrayList()
-                            updateAdapter(searchData[query], false)
-                        }
-
-                        return
-                    }
-
-                    if (gifData.size < DEFAULT_LIMIT) isEndOfList = true
-                    else queryOffset += DEFAULT_LIMIT
-
-                    if (query == null) {
-                        trendingData.addAll(gifData)
-                        updateAdapter(trendingData, false)
-                    } else {
-                        var searchDataValue = searchData[query]
-
-                        if (searchDataValue == null) searchDataValue = gifData
-                        else searchDataValue.addAll(gifData)
-
-                        searchData[query] = searchDataValue
-                        updateAdapter(searchData[query], false)
-                    }
-                } else {
-                    Timber.e("GiphyResponse failed.")
-                    checkIfShouldShowDownServerState()
-                }
-            }
-
-            override fun onFailure(call: Call<GiphyResponse>, t: Throwable) {
-                if (call.isCanceled) return
-
-                Timber.e("GiphyResponse failed: ${t.message}")
+        previousRequest = lifecycleScope.launch {
+            val gifData = try {
+                request()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Giphy request failed")
                 checkIfShouldShowDownServerState()
+                return@launch
             }
-        })
 
-        previousRequest = call
+            isEndOfList = false
+
+            if (gifData.isEmpty()) {
+                if (query == null || (searchData[query] != null && searchData[query]?.isNotEmpty() == true)) {
+                    isEndOfList = true
+                } else {
+                    searchData[query] = ArrayList()
+                    updateAdapter(searchData[query], false)
+                }
+
+                return@launch
+            }
+
+            if (gifData.size < DEFAULT_LIMIT) isEndOfList = true
+            else queryOffset += DEFAULT_LIMIT
+
+            if (query == null) {
+                trendingData.addAll(gifData)
+                updateAdapter(trendingData, false)
+            } else {
+                val searchDataValue = searchData[query]?.apply { addAll(gifData) }
+                    ?: ArrayList(gifData)
+
+                searchData[query] = searchDataValue
+                updateAdapter(searchData[query], false)
+            }
+        }
     }
 
     /**
@@ -378,9 +377,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
      * Cancels the previous request if exist and is in progress.
      */
     private fun cancelPreviousRequests() {
-        if (previousRequest?.isCanceled == false) {
-            previousRequest?.cancel()
-        }
+        previousRequest?.cancel()
     }
 
     /**
@@ -390,7 +387,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
      * @param isChangeOfType    True if the adapter has to change from trending to search data
      *                          or vice versa, false otherwise
      */
-    private fun updateAdapter(gifsData: ArrayList<Data>?, isChangeOfType: Boolean) {
+    private fun updateAdapter(gifsData: ArrayList<Giphy>?, isChangeOfType: Boolean) {
         when {
             giphyAdapter == null -> {
                 giphyAdapter = GiphyAdapter(gifsData, this@GiphyPickerActivity)

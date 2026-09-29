@@ -9,9 +9,9 @@ import mega.privacy.android.app.adapters.viewHolders.GiphyViewHolder
 import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_SEARCH
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.NON_EMPTY
-import mega.privacy.android.app.objects.Data
+import mega.privacy.android.domain.entity.chat.Giphy
 
-class GiphyAdapter(private var gifs: List<Data>?, private val giphyInterface: GiphyInterface) :
+class GiphyAdapter(private var gifs: List<Giphy>?, private val giphyInterface: GiphyInterface) :
     RecyclerView.Adapter<GiphyViewHolder>(), View.OnClickListener {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GiphyViewHolder {
@@ -28,13 +28,13 @@ class GiphyAdapter(private var gifs: List<Data>?, private val giphyInterface: Gi
         holder.itemView.setOnClickListener(this@GiphyAdapter)
     }
 
-    fun setGifs(newGifs: ArrayList<Data>?) {
+    fun setGifs(newGifs: ArrayList<Giphy>?) {
         gifs = newGifs
         giphyInterface.setEmptyState(if (gifs?.isEmpty() == true) EMPTY_SEARCH else NON_EMPTY)
         notifyDataSetChanged()
     }
 
-    fun addGifs(newGifs: ArrayList<Data>?) {
+    fun addGifs(newGifs: ArrayList<Giphy>?) {
         val oldLatestPosition = itemCount
         gifs = newGifs
         giphyInterface.setEmptyState(if (gifs?.isEmpty() == true) EMPTY_SEARCH else NON_EMPTY)

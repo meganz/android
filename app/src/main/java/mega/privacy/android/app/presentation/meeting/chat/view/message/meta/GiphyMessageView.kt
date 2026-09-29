@@ -24,7 +24,6 @@ import coil3.compose.AsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.privacy.android.app.R
-import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.GiphyMessagePlaceHolder
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
@@ -128,10 +127,10 @@ internal fun calculateGiphyDisplaySize(width: Int, height: Int): Pair<Int, Int> 
  */
 fun String.toGiphyUri(): Uri? {
     val url = when {
-        startsWith(GiphyService.GIPHY_URL) ->
-            GiphyService.BASE_URL + removePrefix(GiphyService.GIPHY_URL)
+        startsWith(GIPHY_URL) ->
+            BASE_URL + removePrefix(GIPHY_URL)
 
-        startsWith(GiphyService.BASE_URL) -> this
+        startsWith(BASE_URL) -> this
         else -> null
     }
     val uri = url?.let { Uri.parse(it) }
@@ -145,6 +144,8 @@ private const val GIPHY_MAX_WIDTH = 256
 // Guards against a sender-supplied height turning one message into a huge bubble. Giphy sends
 // fixed-height renditions of about 200px, so real GIFs never reach this cap.
 private const val GIPHY_MAX_HEIGHT = 1024
+private const val BASE_URL = "https://giphy.mega.nz/"
+private const val GIPHY_URL = "giphy://"
 private const val GIPHY_SCHEME = "https"
 private const val GIPHY_HOST = "giphy.mega.nz"
 
