@@ -27,9 +27,7 @@ import mega.privacy.android.app.presentation.psa.PsaFeatureDestinations
 import mega.privacy.android.app.presentation.settings.SettingsCameraUploadsFeatureDestination
 import mega.privacy.android.app.presentation.settings.customisenavigation.CustomiseNavigationFeatureDestination
 import mega.privacy.android.app.mediaplayer.Nav3AudioPlayerRouteLauncher
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerLaunchSourceHolder
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
-import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerFeatureDestination
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
@@ -73,12 +71,6 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideFileContactFeatureDestination(): FeatureDestination = FileContactFeatureDestination()
-
-    @Provides
-    @IntoSet
-    fun provideVideoPlayerFeatureDestination(
-        launchSourceHolder: VideoPlayerLaunchSourceHolder,
-    ): FeatureDestination = VideoPlayerFeatureDestination(launchSourceHolder)
 
     @Provides
     @IntoSet

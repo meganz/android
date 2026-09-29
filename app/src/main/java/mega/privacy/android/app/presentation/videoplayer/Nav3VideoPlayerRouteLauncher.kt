@@ -2,10 +2,8 @@ package mega.privacy.android.app.presentation.videoplayer
 
 import android.content.Intent
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.app.presentation.videoplayer.navigation.ComposeVideoPlayerScreenNavKey
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import java.util.UUID
 import javax.inject.Inject
 
 /**
@@ -20,24 +18,13 @@ class Nav3VideoPlayerRouteLauncher @Inject constructor(
     private val launchSourceHolder: VideoPlayerLaunchSourceHolder,
 ) {
     /**
-     * Returns a [ComposeVideoPlayerScreenNavKey] (after stashing the launch payload in
-     * [VideoPlayerLaunchSourceHolder]) when [AppFeatures.VideoPlayerActivityRefactor] is on and
-     * [intent] targets the revamped [VideoPlayerActivity]; otherwise null, meaning the caller should
-     * `startActivity(intent)` as before.
+     * Always null while the revamped video player is being rebuilt: its Compose route has been
+     * removed, so there is no destination to return and every caller starts [VideoPlayerActivity]
+     * as before, whatever [AppFeatures.VideoPlayerActivityRefactor] is set to.
+     *
+     * The dependencies above are kept because the rebuilt route needs exactly the same ones: the
+     * flag decides whether to take the route, and the launch payload is stashed in
+     * [VideoPlayerLaunchSourceHolder] so the navigation key stays small enough for the back stack.
      */
-    suspend fun routeOrNull(intent: Intent): NavKey? {
-        val refactorEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.VideoPlayerActivityRefactor)
-        }.getOrDefault(false)
-
-        if (!refactorEnabled ||
-            intent.component?.className != VideoPlayerActivity::class.java.name
-        ) {
-            return null
-        }
-
-        val launchId = UUID.randomUUID().toString()
-        launchSourceHolder.put(launchId, intent.toVideoPlayerLaunchSource())
-        return ComposeVideoPlayerScreenNavKey(launchId)
-    }
+    suspend fun routeOrNull(intent: Intent): NavKey? = null
 }

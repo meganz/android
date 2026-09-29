@@ -29,9 +29,9 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 /**
  * Builds a [VideoPlayerLaunchSource] from a legacy launch [Intent].
  *
- * Transitional bridge that lets the decoupled [ComposeVideoPlayerViewModel] (and its tests) be fed
- * from an existing launch Intent. Once the navigator builds the source directly for the Compose
- * route, this mapper can be removed.
+ * Nothing calls it at present. The route launcher was what bridged an Intent into a launch source,
+ * and it stands down while the revamped player is rebuilt. Kept because the rebuilt route needs
+ * the same bridge, until the navigator builds the source directly and this mapper can go.
  */
 internal fun Intent.toVideoPlayerLaunchSource(): VideoPlayerLaunchSource =
     VideoPlayerLaunchSource(

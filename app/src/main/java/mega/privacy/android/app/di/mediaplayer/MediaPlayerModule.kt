@@ -104,9 +104,9 @@ class MediaPlayerModule {
     /**
      * Provide the MediaPlayerGateway implementation for the Compose video player.
      *
-     * Unscoped on purpose: every [mega.privacy.android.app.presentation.videoplayer.ComposeVideoPlayerViewModel]
-     * owns its own player and releases it in `onCleared`. Sharing the [VideoPlayer] singleton with
-     * the live player would let one implementation pause, seek and release the other's ExoPlayer.
+     * Unscoped on purpose: each revamped video player owns its own player and releases it itself.
+     * Sharing the [VideoPlayer] singleton with the live player would let one implementation pause,
+     * seek and release the other's ExoPlayer.
      * The [SimpleCache] singleton is still shared, which is safe — Media3 only forbids two
      * SimpleCache instances over the same directory, not two players over one instance.
      *

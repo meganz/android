@@ -1091,7 +1091,11 @@ private fun updateControllerViewPadding(
     controllerView.layoutParams = layoutParams
 }
 
-/** Shared by [VideoPlayerScreen] and [ComposeVideoPlayerScreen]. */
+/**
+ * Used only by [VideoPlayerScreen] at the moment. Left `internal` rather than made private
+ * because the revamped player, which shared it before its screen was removed for the
+ * rebuild, needs it again for the brightness and volume gestures.
+ */
 internal fun applyScreenBrightness(context: Context, brightness: Float) {
     runCatching {
         val window = (context as? Activity)?.window ?: return
@@ -1100,7 +1104,11 @@ internal fun applyScreenBrightness(context: Context, brightness: Float) {
     }.onFailure { Timber.e(it, "Failed to set screen brightness") }
 }
 
-/** Shared by [VideoPlayerScreen] and [ComposeVideoPlayerScreen]. */
+/**
+ * Used only by [VideoPlayerScreen] at the moment. Left `internal` rather than made private
+ * because the revamped player, which shared it before its screen was removed for the
+ * rebuild, needs it again for the brightness and volume gestures.
+ */
 internal fun applyStreamVolume(context: Context, volume: Float) {
     runCatching {
         val am = context.getSystemService(AudioManager::class.java) ?: return

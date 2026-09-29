@@ -10,10 +10,12 @@ import javax.inject.Singleton
  * navigation key (a content URI plus serialized node data and handle arrays would risk
  * `TransactionTooLargeException` on back-stack save).
  *
- * The launcher [put]s a source keyed by a short id (carried on
- * [mega.privacy.android.app.presentation.videoplayer.navigation.ComposeVideoPlayerScreenNavKey]),
- * and the route entry [consume]s it by that id to create the
- * [ComposeVideoPlayerViewModel].
+ * The launcher [put]s a source keyed by a short id, which the revamped video player's navigation
+ * key carries, and the route entry [consume]s it by that id when it creates its ViewModel.
+ *
+ * Nothing consumes it at the moment: the revamped player's route was removed while it is rebuilt,
+ * so the launcher never emits a key. The holder stays because the rebuilt route needs the same
+ * handoff.
  *
  * The launcher always [put]s the source BEFORE emitting the nav key, so the route is never reached
  * through a raw parcelable deep link with no entry here. The holder is in-memory only: on process
