@@ -2,9 +2,11 @@ package mega.privacy.android.feature.passcode.presentation.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,6 +25,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -81,6 +85,8 @@ fun SetupPasscodeScreen(
     // Retained rather than saved: the entry round and the selected type live in the ViewModel, so a
     // flag that outlived it would reopen the sheet over a screen that had reset underneath it.
     var showTypeChooser by retain { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
 
     MegaScaffold(
         modifier = modifier
@@ -139,12 +145,19 @@ fun SetupPasscodeScreen(
                 TextOnlyButton(
                     modifier = Modifier.testTag(SETUP_PASSCODE_OPTIONS_BUTTON_TAG),
                     text = stringResource(id = R.string.settings_passcode_option),
-                    onClick = { showTypeChooser = true },
+                    onClick = {
+                        keyboardController?.hide()
+                        showTypeChooser = true
+                    },
                 )
             }
         }
 
-        if (showTypeChooser) {
+        // The chooser is a modal sheet in its own window, which lays itself out around the
+        // keyboard insets it is created with. Opened over the entry field's keyboard while that
+        // keyboard is being dismissed, the sheet can settle hidden, so it waits for the keyboard
+        // to be fully gone.
+        if (showTypeChooser && imeBottom == 0) {
             PasscodeTypeChooserBottomSheet(
                 selectedOption = state.passcodeType.toOption(),
                 onOptionSelected = {
