@@ -1134,12 +1134,12 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     }
 
     private fun updateSelectionModeActions(
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         nodeSourceType: NodeSourceType,
     ) {
         updateSelectionJob?.cancel()
         updateSelectionJob = viewModelScope.launch {
-            updateSelectedNodes(selectedNodes.toList())
+            updateSelectedNodes(selectedNodes)
 
             Timber.d("Update state called with ${selectedNodes.size} nodes")
             val options = nodeMenuProviderRegistry.getSelectionModeOptions(nodeSourceType)
@@ -1167,7 +1167,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
             val availableActions = nodeSelectionModeActionMapper(
                 options = options,
                 hasNodeAccessPermission = hasAccessPermission,
-                selectedNodes = selectedNodes.toList(),
+                selectedNodes = selectedNodes,
                 allNodeCanBeMovedToTarget = canBeMovedToTarget,
                 noNodeInBackups = !anyNodeInBackups,
                 nodeSourceType = nodeSourceType
@@ -1208,7 +1208,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     }
 
     private suspend fun canSelectedNodesBeMovedToRubbishBin(
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
     ) = rubbishBinNode?.let { rubbishBinNode ->
         runCatching {
             selectedNodes.any { node ->
@@ -1217,13 +1217,13 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }.getOrDefault(true)
     } ?: true
 
-    private suspend fun hasFullAccessPermission(selectedNodes: Set<TypedNode>): Boolean {
+    private suspend fun hasFullAccessPermission(selectedNodes: List<TypedNode>): Boolean {
         return runCatching {
             selectedNodes.all { getNodeAccessPermission(it.id) == AccessPermission.FULL }
         }.getOrDefault(false)
     }
 
-    private suspend fun anyNodesInBackups(selectedNodes: Set<TypedNode>): Boolean =
+    private suspend fun anyNodesInBackups(selectedNodes: List<TypedNode>): Boolean =
         selectedNodes.any {
             runCatching {
                 isNodeInBackupsUseCase(handle = it.id.longValue)
@@ -1354,7 +1354,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         selectedNodes: Set<TypedNode>,
         nodeSourceType: NodeSourceType,
     ) = processIntent(
-        NodeOptionsActionIntent.SelectedNodesChanged(selectedNodes, nodeSourceType)
+        NodeOptionsActionIntent.SelectedNodesChanged(selectedNodes.toList(), nodeSourceType)
     )
 
     @Deprecated(

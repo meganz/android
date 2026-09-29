@@ -31,7 +31,7 @@ fun NodeSelectionActionsEffect(
     LaunchedEffect(selectedNodeIds, nodeSourceType) {
         onIntent(
             NodeOptionsActionIntent.SelectedNodesChanged(
-                nodes = selection.selectedNodes.toSet(),
+                nodes = selection.selectedNodes,
                 nodeSourceType = nodeSourceType,
             )
         )

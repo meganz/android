@@ -72,6 +72,46 @@ class NodeSelectionTest {
     }
 
     @Test
+    fun `test that isAllSelected is false while an id outside items is selected`() {
+        val selection = underTest(
+            NodeSelectionState(initialSelectedIds = (1L..4L).mapTo(HashSet()) { NodeId(it) } + NodeId(99L))
+        )
+
+        assertThat(selection.isAllSelected).isFalse()
+    }
+
+    @Test
+    fun `test that isAllSelected is false when a stale id keeps the counts equal`() {
+        val selection = underTest(
+            NodeSelectionState(initialSelectedIds = setOf(NodeId(1L), NodeId(2L), NodeId(3L)))
+        )
+
+        items.value = items.value.filterNot { it.id == NodeId(3L) }
+
+        assertThat(selection.isAllSelected).isFalse()
+    }
+
+    @Test
+    fun `test that selectedNodes returns every item in item order when all are selected`() {
+        val selection = underTest()
+
+        selection.selectAll()
+
+        assertThat(selection.selectedNodes).isEqualTo(items.value.map { it.node })
+    }
+
+    @Test
+    fun `test that selectedNodes excludes an unselected item when a stale id keeps the counts equal`() {
+        val selection = underTest(
+            NodeSelectionState(initialSelectedIds = setOf(NodeId(1L), NodeId(2L), NodeId(3L)))
+        )
+
+        items.value = items.value.filterNot { it.id == NodeId(3L) }
+
+        assertThat(selection.selectedNodes.map { it.id }).containsExactly(NodeId(1L), NodeId(2L)).inOrder()
+    }
+
+    @Test
     fun `test that selectAll selects every item and completes when fully loaded`() {
         val selection = underTest()
 

@@ -2171,7 +2171,7 @@ class NodeOptionsActionViewModelTest {
 
             initViewModel()
 
-            val selectedNodes = setOf(mockFileNode)
+            val selectedNodes = listOf(mockFileNode)
 
             viewModel.processIntent(
                 NodeOptionsActionIntent.SelectedNodesChanged(

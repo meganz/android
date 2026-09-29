@@ -52,7 +52,7 @@ class NodeSelectionActionsEffectTest {
 
         assertThat(intents.last()).isEqualTo(
             NodeOptionsActionIntent.SelectedNodesChanged(
-                nodes = setOf(items[1].node),
+                nodes = listOf(items[1].node),
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             )
         )

@@ -15,7 +15,7 @@ sealed interface NodeOptionsActionIntent {
      * @property nodeSourceType the source the nodes belong to
      */
     data class SelectedNodesChanged(
-        val nodes: Set<TypedNode>,
+        val nodes: List<TypedNode>,
         val nodeSourceType: NodeSourceType,
     ) : NodeOptionsActionIntent
 

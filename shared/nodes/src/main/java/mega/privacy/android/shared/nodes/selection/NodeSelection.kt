@@ -19,7 +19,8 @@ import mega.privacy.android.shared.nodes.model.TypedNodeItem
  * Owns the derivations every multi-select screen needs so they are not re-implemented per screen:
  * which of the visible items are selected, whether all of them are, and a select-all that knows
  * about partially loaded lists. Once [items] is fully loaded, ids that no longer match an item are
- * dropped from [state], so a node removed while selected stops counting towards the selection.
+ * dropped from [state], so a node removed while selected stops counting towards the selection and
+ * the selected ids are a subset of [items].
  *
  * @param T type of node
  * @property state the underlying selection, exposed for [mega.privacy.android.shared.nodes.components.NodesView]
@@ -49,8 +50,19 @@ class NodeSelection<T : TypedNode> internal constructor(
     val isSelecting: Boolean
         get() = state.selectAllAwaitingMoreItems
 
+    /**
+     * Equal counts are not enough: until the list is fully loaded, the selection can still hold an
+     * id that is no longer in [items], so the ids are checked whenever the counts match.
+     */
+    val isAllSelected: Boolean by derivedStateOf {
+        val current = items.value
+        val selected = state.selectedNodeIds
+        current.isNotEmpty() && selected.size == current.size && current.all { it.id in selected }
+    }
+
     val selectedNodes: List<T> by derivedStateOf {
         val current = items.value
+        if (isAllSelected) return@derivedStateOf current.map { it.node }
         val index = indexById
         state.selectedNodeIds
             .mapNotNull { index[it] }
@@ -61,16 +73,12 @@ class NodeSelection<T : TypedNode> internal constructor(
     val selectedCount: Int
         get() = state.selectedItemsCount
 
-    val isAllSelected: Boolean by derivedStateOf {
-        items.value.isNotEmpty() && selectedNodes.size == items.value.size
-    }
-
     /**
      * Replaces the selection with every current item. While the list is still loading, the
      * selection is completed automatically as further pages arrive.
      */
     fun selectAll() {
-        state.selectAll(items.value.mapTo(HashSet()) { it.id }, loadingState.value)
+        state.selectAll(selectableIds, loadingState.value)
     }
 
     fun deselectAll() = state.deselectAll()
