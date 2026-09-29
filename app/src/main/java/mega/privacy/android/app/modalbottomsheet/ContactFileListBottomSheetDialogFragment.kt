@@ -28,7 +28,6 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
@@ -238,12 +237,7 @@ class ContactFileListBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
                 contactInfoActivity?.downloadFile(listOfNotNull(node))
             }
         } else if (id == R.id.properties_option) {
-            val i = Intent(requireContext(), FileInfoActivity::class.java)
-            i.putExtra(Constants.HANDLE, node.handle)
-            i.putExtra("from", Constants.FROM_INCOMING_SHARES)
-            i.putExtra(Constants.INTENT_EXTRA_KEY_FIRST_LEVEL, node.isInShare)
-            i.putExtra(Constants.NAME, node.name)
-            startActivity(i)
+            megaNavigator.openFileInfoActivity(requireContext(), node.handle)
         } else if (id == R.id.leave_option) {
             if (requireActivity() is OnSharedFolderUpdatedCallBack) {
                 (requireActivity() as OnSharedFolderUpdatedCallBack).showLeaveFolderDialog(

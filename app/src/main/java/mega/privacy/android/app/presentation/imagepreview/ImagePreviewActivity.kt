@@ -60,7 +60,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
@@ -108,6 +107,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.transition.opaqueFadeBackwardTransition
@@ -137,6 +137,9 @@ import javax.inject.Inject
 class ImagePreviewActivity : BaseActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     @Inject
     lateinit var navigationResultManager: NavigationResultManager
@@ -439,12 +442,7 @@ class ImagePreviewActivity : BaseActivity() {
                 startActivity(this)
             }
         } else {
-            Intent(this, FileInfoActivity::class.java).apply {
-                putExtra(Constants.HANDLE, imageNode.id.longValue)
-                putExtra(Constants.NAME, imageNode.name)
-            }.apply {
-                startActivity(this)
-            }
+            megaNavigator.openFileInfoActivity(this, imageNode.id.longValue)
         }
     }
 

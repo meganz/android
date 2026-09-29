@@ -1,12 +1,10 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import android.content.Intent
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.app.presentation.node.model.menuaction.InfoMenuAction
 import mega.privacy.android.app.presentation.view.extension.isNotS4Container
-import mega.privacy.android.app.utils.Constants
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -20,6 +18,7 @@ import javax.inject.Inject
  */
 class InfoBottomSheetMenuItem @Inject constructor(
     override val menuAction: InfoMenuAction,
+    private val megaNavigator: MegaNavigator,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -37,12 +36,7 @@ class InfoBottomSheetMenuItem @Inject constructor(
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
-        navController.context.apply {
-            val fileInfoIntent = Intent(this, FileInfoActivity::class.java).apply {
-                putExtra(Constants.HANDLE, node.id.longValue)
-            }
-            this.startActivity(fileInfoIntent)
-        }
+        megaNavigator.openFileInfoActivity(navController.context, node.id.longValue)
     }
 
     override val groupId: Int
