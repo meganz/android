@@ -706,7 +706,6 @@ class NameCollisionViewModel @AssistedInject constructor(
             NameCollisionOutcome.ActionCompleted(
                 NameCollisionActionResult(
                     message = nodeMoveRequestMessageMapper(movementResult),
-                    shouldFinish = true,
                 )
             )
         )
@@ -757,7 +756,6 @@ class NameCollisionViewModel @AssistedInject constructor(
             NameCollisionOutcome.ActionCompleted(
                 NameCollisionActionResult(
                     message = copyRequestMessageMapper(copyResult),
-                    shouldFinish = true,
                 )
             )
         )

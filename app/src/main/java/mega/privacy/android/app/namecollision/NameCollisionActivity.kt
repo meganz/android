@@ -117,11 +117,10 @@ class NameCollisionActivity : PasscodeActivity() {
                     when (outcome) {
                         is NameCollisionOutcome.ActionCompleted -> {
                             val result = outcome.result
-                            when {
-                                result.isForeignNode ->
-                                    showForeignStorageOverQuotaWarningDialog(this@NameCollisionActivity)
-
-                                result.shouldFinish -> finishWithMessage(result.message)
+                            if (result.isForeignNode) {
+                                showForeignStorageOverQuotaWarningDialog(this@NameCollisionActivity)
+                            } else {
+                                finishWithMessage(result.message)
                             }
                         }
 
