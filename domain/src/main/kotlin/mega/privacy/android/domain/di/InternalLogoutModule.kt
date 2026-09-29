@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.logout.ClearPlaybackDataLogoutTask
 import mega.privacy.android.domain.usecase.logout.ClearViewedLinksLogoutTask
 import mega.privacy.android.domain.usecase.logout.LogoutTask
 import mega.privacy.android.domain.usecase.logout.ResetHomeWidgetConfigurationsLogoutTask
+import mega.privacy.android.domain.usecase.logout.StopAudioPlayerLogoutTask
 
 @Module
 @DisableInstallInCheck
@@ -50,6 +51,11 @@ internal abstract class InternalLogoutModule {
         @Provides
         @IntoSet
         fun provideClearPersistedFeatureFlagsLogoutTask(task: ClearPersistedFeatureFlagsLogoutTask): LogoutTask =
+            task
+
+        @Provides
+        @IntoSet
+        fun provideStopAudioPlayerLogoutTask(task: StopAudioPlayerLogoutTask): LogoutTask =
             task
     }
 }
