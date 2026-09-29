@@ -14,10 +14,17 @@ import org.gradle.kotlin.dsl.withType
 /**
  * Make sure unit tests are run in parallel. taking full use of all multiple CPU cores
  *
+ * Each fork needs a heap of its own, sized with headroom. A fork runs many classes back to back
+ * and Robolectric holds a sandbox per class, so without this the app's suite exhausts Gradle's
+ * 512 MB default. Which fork receives which classes depends on the fork count and on how many
+ * test classes there are, so that failure moves between branches and build agents instead of
+ * pointing at whatever change exposed it. The agents that run tests do nothing else, so the
+ * memory costs nothing.
  */
 fun Project.enableParallelTest() = tasks.withType<Test> {
     maxParallelForks =
         (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+    maxHeapSize = "2g"
     failOnNoDiscoveredTests.set(false)
 }
 
