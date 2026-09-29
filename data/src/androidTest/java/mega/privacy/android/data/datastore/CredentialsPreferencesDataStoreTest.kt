@@ -28,7 +28,7 @@ class CredentialsPreferencesDataStoreTest {
         val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
         val userCredentials = UserCredentials(
             email = "email",
-            session = "session",
+            session = USABLE_SESSION,
             firstName = "firstName",
             lastName = "lastName",
             myHandle = "myHandle"
@@ -43,7 +43,7 @@ class CredentialsPreferencesDataStoreTest {
         val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
         val userCredentials = UserCredentials(
             email = "email",
-            session = "session",
+            session = USABLE_SESSION,
             firstName = "firstName",
             lastName = "lastName",
             myHandle = "myHandle"
@@ -59,7 +59,7 @@ class CredentialsPreferencesDataStoreTest {
         val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
         val userCredentials = UserCredentials(
             email = "email",
-            session = "session",
+            session = USABLE_SESSION,
             firstName = "firstName",
             lastName = "lastName",
             myHandle = "myHandle"
@@ -78,7 +78,7 @@ class CredentialsPreferencesDataStoreTest {
         val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
         val userCredentials = UserCredentials(
             email = "email",
-            session = "session",
+            session = USABLE_SESSION,
             firstName = "firstName",
             lastName = "lastName",
             myHandle = "myHandle"
@@ -97,15 +97,15 @@ class CredentialsPreferencesDataStoreTest {
         val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
         val userCredentials = UserCredentials(
             email = "email",
-            session = "oldSession",
+            session = USABLE_SESSION,
             firstName = "firstName",
             lastName = "lastName",
             myHandle = "myHandle"
         )
         credentialsPreferencesGateway.save(userCredentials)
         assertThat(credentialsPreferencesGateway.monitorCredentials().first()?.session)
-            .isEqualTo("oldSession")
-        val newSession = "newSession"
+            .isEqualTo(USABLE_SESSION)
+        val newSession = NEW_USABLE_SESSION
         credentialsPreferencesGateway.saveSession(newSession)
         assertThat(credentialsPreferencesGateway.monitorCredentials().first()?.session)
             .isEqualTo(newSession)
@@ -116,7 +116,7 @@ class CredentialsPreferencesDataStoreTest {
         val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
         val userCredentials = UserCredentials(
             email = "email",
-            session = "session",
+            session = USABLE_SESSION,
             firstName = "firstName",
             lastName = "lastName",
             myHandle = "oldHandle"
@@ -128,6 +128,21 @@ class CredentialsPreferencesDataStoreTest {
         credentialsPreferencesGateway.saveMyHandle(newMyHandle)
         assertThat(credentialsPreferencesGateway.monitorCredentials().first()?.myHandle)
             .isEqualTo(newMyHandle)
+    }
+
+    @Test
+    fun test_that_data_store_reports_no_credentials_when_the_session_is_too_short() = runTest {
+        val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
+        val userCredentials = UserCredentials(
+            email = "email",
+            session = "fake-session",
+            firstName = "firstName",
+            lastName = "lastName",
+            myHandle = "myHandle"
+        )
+        credentialsPreferencesGateway.save(userCredentials)
+        val credentials = credentialsPreferencesGateway.monitorCredentials().first()
+        assertThat(credentials).isNull()
     }
 
     @After
@@ -144,5 +159,16 @@ class CredentialsPreferencesDataStoreTest {
             streamingAead = streamingAead,
             crashReporter = RecordingCrashReporter(),
         )
+    }
+
+    private companion object {
+        /**
+         * Sessions shorter than the chat SDK can derive its cache path from are discarded by the
+         * store, so these mirror the length of a real one.
+         */
+        const val USABLE_SESSION =
+            "AWJvT_pS9tYQKhFqYw3nRxUeLdMzXcVbNmAsDfGhJkLpOiUyTrEwQ1234567890ab"
+        const val NEW_USABLE_SESSION =
+            "BXKwU_qT0uZRLiGrZx4oSyVfMeNaYdWcOnBtEgHiKlMqPjVzUsFxR0987654321cd"
     }
 }
