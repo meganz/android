@@ -77,6 +77,7 @@ import mega.privacy.android.data.repository.agesignal.AgeSignalRepositoryImpl
 import mega.privacy.android.data.repository.apiserver.ApiServerRepositoryImpl
 import mega.privacy.android.data.repository.banner.BannerRepositoryImpl
 import mega.privacy.android.data.repository.chat.ChatMessageRepositoryImpl
+import mega.privacy.android.data.repository.chat.DefaultGiphyRepository
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
 import mega.privacy.android.data.repository.files.FingerprintRepositoryImpl
 import mega.privacy.android.data.repository.files.PdfRepositoryImpl
@@ -150,6 +151,7 @@ import mega.privacy.android.domain.repository.ZipBrowserRepository
 import mega.privacy.android.domain.repository.agesignal.AgeSignalRepository
 import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
+import mega.privacy.android.domain.repository.chat.GiphyRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
 import mega.privacy.android.domain.repository.files.FingerprintRepository
 import mega.privacy.android.domain.repository.files.PdfRepository
@@ -407,6 +409,9 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindChatMessageRepository(implementation: ChatMessageRepositoryImpl): ChatMessageRepository
+
+    @Binds
+    abstract fun bindGiphyRepository(implementation: DefaultGiphyRepository): GiphyRepository
 
     @Binds
     @Singleton
