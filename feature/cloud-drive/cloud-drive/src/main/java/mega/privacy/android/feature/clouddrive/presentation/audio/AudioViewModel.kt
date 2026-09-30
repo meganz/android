@@ -6,11 +6,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.audio.model.AudioAction
 import mega.privacy.android.feature.clouddrive.presentation.audio.model.AudioUiState
-import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -74,9 +73,8 @@ class AudioViewModel @Inject constructor(
 
     private fun audioItemsFlow() = combine(
         monitorSortCloudOrderUseCase()
-            .catch { Timber.e(it) }
-            .filterNotNull()
-            .onStart { emit(SortOrder.ORDER_DEFAULT_ASC) },
+            .map { it ?: SortOrder.ORDER_DEFAULT_ASC }
+            .catch { Timber.e(it); emit(SortOrder.ORDER_DEFAULT_ASC) },
         hiddenNodesFlow(),
         nodeUpdatesTriggerFlow(),
     ) { sortOrder, (hiddenNodesEnabled, showHiddenNodes), _ ->

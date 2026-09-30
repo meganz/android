@@ -8,9 +8,11 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -165,7 +167,7 @@ fun <T : TypedNode> NodesView(
  * @param onMenuClicked three dots click
  * @param onItemClicked callback for item click
  * @param onLongClicked callback for long item click
- * @param sortConfiguration the sort order of the list
+ * @param sortConfiguration the sort order of the list, the list and grid scroll back to the top once the re-sorted items arrive
  * @param isListView whether the current view is list view
  * @param onSortOrderClick callback for sort order click
  * @param onChangeViewTypeClicked callback for change view type click
@@ -192,10 +194,10 @@ fun <T : TypedNode> NodesView(
     onLongClicked: (T) -> Unit,
     sortConfiguration: NodeSortConfiguration,
     isListView: Boolean,
-    onSortOrderClick: () -> Unit = {},
-    onChangeViewTypeClicked: () -> Unit = {},
     nodeSelectionState: NodeSelectionState,
     modifier: Modifier = Modifier,
+    onSortOrderClick: () -> Unit = {},
+    onChangeViewTypeClicked: () -> Unit = {},
     isNextPageLoading: Boolean = false,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
@@ -217,6 +219,13 @@ fun <T : TypedNode> NodesView(
             onItemClicked(node)
         }
     }
+
+    ScrollToTopOnSortChangeEffect(
+        sortConfiguration = sortConfiguration,
+        items = items,
+        listState = listState,
+        gridState = gridState,
+    )
 
     val highlightedIndex = remember(items) {
         items.indexOfFirst { it.isHighlighted }
@@ -293,6 +302,65 @@ fun <T : TypedNode> NodesView(
                 showTakenDownDialog = false
             }
         )
+    }
+}
+
+/**
+ * Scrolls [listState] and [gridState] back to the top when [sortConfiguration] changes.
+ *
+ * The reset waits for the next [items] instance after the sort change: the lazy layouts anchor the
+ * scroll position to the first visible item's key, so a reset issued while the old items are still
+ * shown is dragged to that item's new index once the re-sorted items land, and resetting early
+ * also makes the list jump twice. The applied sort is saved so a sort changed while the screen was
+ * off the back stack top still resets the restored position.
+ */
+@Composable
+private fun ScrollToTopOnSortChangeEffect(
+    sortConfiguration: NodeSortConfiguration,
+    items: List<*>,
+    listState: LazyListState,
+    gridState: LazyGridState,
+) {
+    val state = rememberSaveable(saver = SortChangeScrollResetState.Saver) {
+        SortChangeScrollResetState(sortConfiguration, items)
+    }
+    SideEffect {
+        if (state.shouldResetScroll(sortConfiguration, items)) {
+            listState.requestScrollToItem(0)
+            gridState.requestScrollToItem(0)
+        }
+    }
+}
+
+private class SortChangeScrollResetState private constructor(
+    private var sortKey: String,
+    private var items: List<*>?,
+) {
+    constructor(sortConfiguration: NodeSortConfiguration, items: List<*>) :
+            this(sortConfiguration.key, items)
+
+    private var awaitingSortedItems = false
+
+    fun shouldResetScroll(sortConfiguration: NodeSortConfiguration, items: List<*>): Boolean {
+        val sortChanged = sortKey != sortConfiguration.key
+        val previousItems = this.items
+        sortKey = sortConfiguration.key
+        this.items = items
+
+        if (previousItems == null) return sortChanged
+        if (sortChanged) awaitingSortedItems = true
+        if (previousItems === items) return false
+        return awaitingSortedItems.also { awaitingSortedItems = false }
+    }
+
+    companion object {
+        val Saver = Saver<SortChangeScrollResetState, String>(
+            save = { it.sortKey },
+            restore = { SortChangeScrollResetState(sortKey = it, items = null) },
+        )
+
+        private val NodeSortConfiguration.key
+            get() = "${sortOption.name}/${sortDirection.name}"
     }
 }
 

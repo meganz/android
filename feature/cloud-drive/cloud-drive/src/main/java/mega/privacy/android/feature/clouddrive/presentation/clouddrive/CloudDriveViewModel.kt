@@ -38,6 +38,8 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.core.coroutine.takeWhileInclusive
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -75,8 +77,6 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
-import mega.privacy.android.core.coroutine.asUiStateFlow
-import mega.privacy.android.core.coroutine.takeWhileInclusive
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -271,8 +271,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                 monitorSortOrderFlow
                     .map { sortOrder ->
                         sortOrder to nodeSortConfigurationUiMapper(sortOrder)
-                    }
-                    .onStart { emit(SortOrder.ORDER_DEFAULT_ASC to NodeSortConfiguration.default) },
+                    },
                 deletedFlow
             ) { viewType, shouldShowContactNotVerifiedBanner, (sortOrder, sortConfiguration), navigateBackEvent ->
                 StateUpdates(

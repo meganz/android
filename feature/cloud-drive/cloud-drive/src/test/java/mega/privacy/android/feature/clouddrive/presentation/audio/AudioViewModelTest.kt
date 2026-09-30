@@ -181,6 +181,32 @@ class AudioViewModelTest {
         }
 
     @Test
+    fun `test that uiState falls back to the default sort order when the sort order is null`() =
+        runTest {
+            setupStubs()
+            whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf<SortOrder?>(null))
+
+            underTest.uiState
+                .filterIsInstance<AudioUiState.Data>()
+                .test {
+                    assertThat(awaitItem().selectedSortOrder).isEqualTo(SortOrder.ORDER_DEFAULT_ASC)
+                }
+        }
+
+    @Test
+    fun `test that uiState falls back to the default sort order when the sort order flow fails`() =
+        runTest {
+            setupStubs()
+            whenever(monitorSortCloudOrderUseCase()).thenReturn(flow { throw RuntimeException() })
+
+            underTest.uiState
+                .filterIsInstance<AudioUiState.Data>()
+                .test {
+                    assertThat(awaitItem().selectedSortOrder).isEqualTo(SortOrder.ORDER_DEFAULT_ASC)
+                }
+        }
+
+    @Test
     fun `test that uiState maps search results into items`() = runTest {
         val fileNode = mock<TypedFileNode> {
             on { id } doReturn NodeId(42L)

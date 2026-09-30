@@ -3,6 +3,10 @@ package mega.privacy.android.shared.nodes.components
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsNotSelected
@@ -12,8 +16,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import org.junit.Rule
 import org.junit.Test
@@ -150,5 +156,160 @@ class NodesViewTest {
         composeTestRule.waitForIdle()
 
         assertThat(gridState.firstVisibleItemIndex).isGreaterThan(0)
+    }
+
+    private var sortConfiguration by mutableStateOf(NodeSortConfiguration.default)
+    private var sortableItems by mutableStateOf((1L..60L).map { previewFolderNodeUiItem(id = it) })
+    private val sizeDescending =
+        NodeSortConfiguration(NodeSortOption.Size, SortDirection.Descending)
+
+    private fun setSortableContent(
+        isListView: Boolean,
+        listState: LazyListState,
+        gridState: LazyGridState,
+    ) {
+        composeTestRule.setContent {
+            NodesView(
+                modifier = Modifier.fillMaxSize(),
+                items = sortableItems,
+                onMenuClicked = {},
+                onItemClicked = {},
+                onLongClicked = {},
+                sortConfiguration = sortConfiguration,
+                isListView = isListView,
+                onSortOrderClick = {},
+                onChangeViewTypeClicked = {},
+                nodeSelectionState = NodeSelectionState(),
+                listState = listState,
+                gridState = gridState,
+                showSortOrder = false,
+                showChangeViewType = false,
+            )
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun `test that NodesView keeps the list position when sort configuration is unchanged`() {
+        val listState = LazyListState(firstVisibleItemIndex = 30)
+        setSortableContent(isListView = true, listState = listState, gridState = LazyGridState())
+
+        assertThat(listState.firstVisibleItemIndex).isEqualTo(30)
+    }
+
+    @Test
+    fun `test that NodesView keeps the list position when items update without a sort change`() {
+        val listState = LazyListState(firstVisibleItemIndex = 30)
+        setSortableContent(isListView = true, listState = listState, gridState = LazyGridState())
+
+        sortableItems = sortableItems.toList()
+        composeTestRule.waitForIdle()
+
+        assertThat(listState.firstVisibleItemIndex).isEqualTo(30)
+    }
+
+    @Test
+    fun `test that NodesView keeps the list position until the re-sorted items arrive`() {
+        val listState = LazyListState(firstVisibleItemIndex = 30)
+        setSortableContent(isListView = true, listState = listState, gridState = LazyGridState())
+
+        sortConfiguration = sizeDescending
+        composeTestRule.waitForIdle()
+
+        assertThat(listState.firstVisibleItemIndex).isEqualTo(30)
+    }
+
+    @Test
+    fun `test that NodesView scrolls the list to the top when re-sorted items arrive after the sort change`() {
+        val listState = LazyListState(firstVisibleItemIndex = 30)
+        setSortableContent(isListView = true, listState = listState, gridState = LazyGridState())
+
+        sortConfiguration = sizeDescending
+        composeTestRule.waitForIdle()
+        sortableItems = sortableItems.reversed()
+        composeTestRule.waitForIdle()
+
+        assertThat(listState.firstVisibleItemIndex).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that NodesView scrolls the list to the top when sort and items change together`() {
+        val listState = LazyListState(firstVisibleItemIndex = 30)
+        setSortableContent(isListView = true, listState = listState, gridState = LazyGridState())
+
+        composeTestRule.runOnIdle {
+            sortConfiguration = sizeDescending
+            sortableItems = sortableItems.reversed()
+        }
+        composeTestRule.waitForIdle()
+
+        assertThat(listState.firstVisibleItemIndex).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that NodesView scrolls the grid to the top when re-sorted grid items arrive after the sort change`() {
+        val gridState = LazyGridState(firstVisibleItemIndex = 30)
+        setSortableContent(isListView = false, listState = LazyListState(), gridState = gridState)
+
+        sortConfiguration = sizeDescending
+        composeTestRule.waitForIdle()
+        sortableItems = sortableItems.reversed()
+        composeTestRule.waitForIdle()
+
+        assertThat(gridState.firstVisibleItemIndex).isEqualTo(0)
+    }
+
+    private var showContent by mutableStateOf(true)
+
+    private fun setRestorableContent(listState: LazyListState) {
+        composeTestRule.setContent {
+            val holder = rememberSaveableStateHolder()
+            if (showContent) {
+                holder.SaveableStateProvider("nodes") {
+                    NodesView(
+                        modifier = Modifier.fillMaxSize(),
+                        items = sortableItems,
+                        onMenuClicked = {},
+                        onItemClicked = {},
+                        onLongClicked = {},
+                        sortConfiguration = sortConfiguration,
+                        isListView = true,
+                        nodeSelectionState = NodeSelectionState(),
+                        listState = listState,
+                        showSortOrder = false,
+                        showChangeViewType = false,
+                    )
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun `test that NodesView keeps the list position when restored without a sort change`() {
+        val listState = LazyListState(firstVisibleItemIndex = 30)
+        setRestorableContent(listState)
+
+        showContent = false
+        composeTestRule.waitForIdle()
+        showContent = true
+        composeTestRule.waitForIdle()
+
+        assertThat(listState.firstVisibleItemIndex).isEqualTo(30)
+    }
+
+    @Test
+    fun `test that NodesView scrolls the list to the top when restored after the sort changed while hidden`() {
+        val listState = LazyListState(firstVisibleItemIndex = 30)
+        setRestorableContent(listState)
+
+        showContent = false
+        composeTestRule.waitForIdle()
+        sortConfiguration = sizeDescending
+        sortableItems = sortableItems.reversed()
+        showContent = true
+        composeTestRule.waitForIdle()
+
+        assertThat(listState.firstVisibleItemIndex).isEqualTo(0)
     }
 }
