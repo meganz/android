@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
     implementation(project(":domain"))
+    implementation(project(":domain:transfers"))
     implementation(project(":domain:account"))
     implementation(project(":domain:contact"))
     implementation(project(":data"))

@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
+    implementation(project(":domain:transfers"))
     implementation(project(":domain:account"))
     implementation(project(":navigation"))
     implementation(project(":core:analytics:analytics-tracker"))

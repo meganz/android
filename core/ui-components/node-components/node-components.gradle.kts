@@ -16,6 +16,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":domain:transfers"))
     implementation(project(":domain:node"))
     implementation(project(":domain:account"))
     implementation(project(":domain:chat"))

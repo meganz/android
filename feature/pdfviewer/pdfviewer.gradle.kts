@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":domain:transfers"))
     implementation(project(":domain:node"))
 
     // PDF search engine uses PdfiumCore directly
