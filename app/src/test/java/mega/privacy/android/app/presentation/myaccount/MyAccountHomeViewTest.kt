@@ -23,8 +23,8 @@ import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.fromPluralId
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.fromPluralId
 import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.app.presentation.myaccount.view.AccountTypeSection

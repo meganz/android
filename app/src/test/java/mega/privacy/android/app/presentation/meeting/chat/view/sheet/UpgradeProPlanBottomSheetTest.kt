@@ -15,7 +15,7 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class UpgradeProPlanBottomSheetTest {

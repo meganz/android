@@ -11,7 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.components.contact.state.ContactItemStatus
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.contact.model.AvatarData

@@ -5,8 +5,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.fromPluralId
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.fromPluralId
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderState
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderViewModel
 import mega.privacy.android.domain.entity.node.NodeId

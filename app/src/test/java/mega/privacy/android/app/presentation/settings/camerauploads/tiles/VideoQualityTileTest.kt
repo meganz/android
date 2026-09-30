@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQ
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithText
 
 /**
  * Test class for [VideoQualityTile]

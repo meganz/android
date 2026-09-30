@@ -21,7 +21,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fromId
+import mega.privacy.android.core.ui.test.fromId
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test

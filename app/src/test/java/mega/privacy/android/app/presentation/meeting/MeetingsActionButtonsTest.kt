@@ -12,7 +12,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.domain.entity.call.AudioDevice
 
 

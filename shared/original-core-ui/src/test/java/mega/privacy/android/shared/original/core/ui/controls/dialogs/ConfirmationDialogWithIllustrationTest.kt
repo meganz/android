@@ -1,6 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.dialogs
 
-import androidx.compose.ui.test.SemanticsMatcher
+import mega.privacy.android.core.ui.test.hasDrawable
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -61,11 +61,9 @@ internal class ConfirmationDialogWithIllustrationTest {
     @Test
     fun `test that the illustration is set`() {
         createConfirmationDialog()
-        val hasDrawable =
-            SemanticsMatcher.expectValue(DrawableResId, illustrationId)
         composeTestRule.onNodeWithTag(CONFIRMATION_DIALOG_WITH_ILLUSTRATION_IMAGE)
             .assertIsDisplayed()
-        composeTestRule.onNode(hasDrawable).assertIsDisplayed()
+        composeTestRule.onNode(hasDrawable(illustrationId)).assertIsDisplayed()
     }
 
     @Test

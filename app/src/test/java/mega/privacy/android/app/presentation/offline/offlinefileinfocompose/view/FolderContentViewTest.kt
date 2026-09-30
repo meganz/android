@@ -3,9 +3,9 @@ package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.vie
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.fromPluralId
-import mega.privacy.android.app.onNodeWithPlural
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.fromPluralId
+import mega.privacy.android.core.ui.test.onNodeWithPlural
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.Rule
 import org.junit.Test

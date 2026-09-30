@@ -41,7 +41,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.shadow.api.Shadow
 import org.robolectric.shadows.ShadowActivity
-import mega.privacy.android.app.fromId
+import mega.privacy.android.core.ui.test.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

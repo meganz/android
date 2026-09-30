@@ -182,8 +182,16 @@ alwaysApply: true
 
 ### Test Modules
 - **Core Test**: Shared test utilities and extensions
-- **Core UI Test**: UI testing utilities and components
+- **Core UI Test** (`:core-ui-test`): the single home for Compose test helpers — `fromId`,
+  `fromPluralId`, the `@StringRes` / `@PluralsRes` overloads of `onNodeWithText` and
+  `onNodeWithPlural`, and the `hasDrawable` / `hasBackgroundColor` / `hasTextColor` matchers.
+  **Do not redeclare these per module.** Add `testImplementation(project(":core-ui-test"))` and
+  import them.
 - **Test App Module**: Hilt test modules for dependency injection
+
+Composables that need a drawable asserted publish it with `drawableId` from
+`:core:ui-components:shared-components`; that key is production code because production composables
+write it, while the `hasDrawable` matcher that reads it lives in `:core-ui-test`.
 
 ## Data Layer Patterns
 

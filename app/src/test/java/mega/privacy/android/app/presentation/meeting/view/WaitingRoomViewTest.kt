@@ -12,7 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.performClickOnAllNodes
+import mega.privacy.android.core.ui.test.performClickOnAllNodes
 
 @RunWith(AndroidJUnit4::class)
 class WaitingRoomViewTest {

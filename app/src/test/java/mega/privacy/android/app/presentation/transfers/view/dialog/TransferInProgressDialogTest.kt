@@ -21,8 +21,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.fromPluralId
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.fromPluralId
+import mega.privacy.android.core.ui.test.onNodeWithText
 import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)

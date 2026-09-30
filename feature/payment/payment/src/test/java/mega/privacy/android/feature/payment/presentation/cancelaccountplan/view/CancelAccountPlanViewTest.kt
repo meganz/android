@@ -10,7 +10,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.feature.payment.fromId
+import mega.privacy.android.core.ui.test.fromId
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.model.CancelAccountPlanUiState
 import mega.privacy.android.shared.resources.R

@@ -28,9 +28,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.fromPluralId
-import mega.privacy.android.app.hasTextColor
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.fromPluralId
+import mega.privacy.android.core.ui.test.hasTextColor
 import kotlin.random.Random
 
 @HiltAndroidTest

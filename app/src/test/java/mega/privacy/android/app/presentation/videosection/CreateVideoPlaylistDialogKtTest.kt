@@ -10,8 +10,8 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.app.presentation.videosection.view.playlist.CreateVideoPlaylistDialog
 import mega.privacy.android.app.presentation.videosection.view.playlist.ERROR_MESSAGE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.POSITIVE_BUTTON_TEST_TAG

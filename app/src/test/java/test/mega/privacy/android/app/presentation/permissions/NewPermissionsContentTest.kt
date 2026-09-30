@@ -7,7 +7,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.app.presentation.permissions.NEW_PERMISSIONS_SCREEN_CAMERA_BACKUP_PERMISSION
 import mega.privacy.android.app.presentation.permissions.NEW_PERMISSIONS_SCREEN_LOADING
 import mega.privacy.android.app.presentation.permissions.NEW_PERMISSIONS_SCREEN_NOTIFICATION_PERMISSION

@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
 import mega.privacy.android.shared.resources.R as sharedR

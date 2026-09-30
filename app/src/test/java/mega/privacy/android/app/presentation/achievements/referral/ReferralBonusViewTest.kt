@@ -13,7 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fromId
+import mega.privacy.android.core.ui.test.fromId
 import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
 import mega.privacy.android.app.presentation.achievements.referral.view.ReferralBonusView
 import mega.privacy.android.app.presentation.achievements.referral.view.TestTags

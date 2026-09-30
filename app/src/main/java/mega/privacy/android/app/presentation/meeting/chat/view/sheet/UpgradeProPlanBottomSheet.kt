@@ -27,7 +27,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
+import mega.privacy.android.core.sharedcomponents.semantics.drawableId
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.mobile.analytics.event.MaxCallDurationReachedModalEvent
 import mega.privacy.mobile.analytics.event.UpgradeToProToGetUnlimitedCallsDialogEvent

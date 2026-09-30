@@ -31,8 +31,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import mega.privacy.android.app.onNodeWithPlural
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithPlural
+import mega.privacy.android.core.ui.test.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ChatAppBarTest {

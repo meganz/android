@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithText
 
 @OptIn(ExperimentalFoundationApi::class)
 @HiltAndroidTest

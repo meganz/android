@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.fromId
+import mega.privacy.android.core.ui.test.fromId
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import org.junit.Rule

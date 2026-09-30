@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.node.dialogs.sharefolder.access
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.fromId
+import mega.privacy.android.core.ui.test.fromId
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogViewModel
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule

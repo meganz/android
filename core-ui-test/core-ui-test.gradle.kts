@@ -12,9 +12,17 @@ android {
 }
 
 dependencies {
+    // Exposed: the helpers below take and return Compose test types, so consuming test source sets
+    // compile against them.
+    api(platform(androidx.compose.bom))
+    api(testlib.androidx.compose.ui.test)
+    api(testlib.compose.junit)
+    api(testlib.test.monitor)
+    api(androidx.compose.foundation)
+
+    implementation(project(":core:ui-components:shared-components"))
     implementation(testlib.bundles.ui.test)
     implementation(testlib.bundles.unit.test)
-    implementation(testlib.compose.junit)
 
     // Compose testing dependencies
     androidTestImplementation(platform(androidx.compose.bom))

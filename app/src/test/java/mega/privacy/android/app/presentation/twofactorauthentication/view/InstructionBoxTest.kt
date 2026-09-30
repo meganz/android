@@ -8,8 +8,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.hasDrawable
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.hasDrawable
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.INSTRUCTION_MESSAGE_TEST_TAG
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.InstructionBox
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.QUESTION_MARK_ICON_TEST_TAG

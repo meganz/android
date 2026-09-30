@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.extensions
 
-import androidx.compose.ui.semantics.SemanticsPropertyKey
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.core.text.isDigitsOnly
 
 internal fun String.toSeedArray(): ArrayList<String> {
@@ -17,6 +15,4 @@ internal fun String.toSeedArray(): ArrayList<String> {
 
 internal fun String.isValid2FA() = length == NUMBER_PINS && isDigitsOnly()
 
-val DrawableResId = SemanticsPropertyKey<Int>("DrawableResId")
-var SemanticsPropertyReceiver.drawableId by DrawableResId
 internal const val NUMBER_PINS = 6

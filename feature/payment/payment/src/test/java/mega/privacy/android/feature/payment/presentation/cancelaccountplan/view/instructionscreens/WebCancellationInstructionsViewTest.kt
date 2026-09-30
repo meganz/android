@@ -7,8 +7,8 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.feature.payment.fromId
-import mega.privacy.android.feature.payment.onNodeWithText
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.view.INSTRUCTIONS_STEP_WITH_BOLD_TEXT_TEST_TAG
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule

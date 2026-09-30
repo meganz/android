@@ -21,7 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.fromId
+import mega.privacy.android.core.ui.test.fromId
 
 @RunWith(AndroidJUnit4::class)
 class ReportIssueViewTest {

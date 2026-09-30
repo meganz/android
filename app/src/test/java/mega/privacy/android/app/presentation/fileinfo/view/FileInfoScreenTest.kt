@@ -11,8 +11,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.fromPluralId
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.fromPluralId
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.TEST_TAG_FILE_INFO_HEADER
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.TEST_TAG_ICON

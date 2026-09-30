@@ -1,16 +1,16 @@
 package mega.privacy.android.core.nodecomponents.sheet.home
 
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.onNodeWithText
 import androidx.activity.ComponentActivity
 import androidx.annotation.StringRes
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.semantics.SemanticsActions
-import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -193,12 +193,5 @@ class HomeFabOptionsBottomSheetTest {
             )
         }
     }
-
-    internal fun SemanticsNodeInteractionsProvider.onNodeWithText(
-        @StringRes id: Int,
-    ) = onNodeWithText(fromId(id = id))
-
-    internal fun fromId(@StringRes id: Int) =
-        InstrumentationRegistry.getInstrumentation().targetContext.getString(id)
 }
 

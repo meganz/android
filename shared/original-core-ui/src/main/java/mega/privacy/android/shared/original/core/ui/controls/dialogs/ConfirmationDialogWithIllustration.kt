@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.dialogs
 
+import mega.privacy.android.core.sharedcomponents.semantics.drawableId
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.semantics.SemanticsPropertyKey
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -40,8 +39,6 @@ internal const val CONFIRMATION_DIALOG_WITH_ILLUSTRATION_IMAGE =
 internal const val CONFIRMATION_DIALOG_WITH_ILLUSTRATION_BODY =
     "confirmation_dialog_with_illustration:text_dialog_body"
 
-internal val DrawableResId = SemanticsPropertyKey<Int>("DrawableResId")
-internal var SemanticsPropertyReceiver.drawableId by DrawableResId
 
 /**
  * A Composable variation of the [AlertDialog] that displays an [Image] between the Title and Body

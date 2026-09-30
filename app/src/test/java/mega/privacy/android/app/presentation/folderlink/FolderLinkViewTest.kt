@@ -12,8 +12,8 @@ import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG

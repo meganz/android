@@ -4,7 +4,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.feature.payment.fromId
+import mega.privacy.android.core.ui.test.fromId
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test

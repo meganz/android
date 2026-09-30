@@ -21,6 +21,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":core:passcode"))
+    implementation(project(":core:ui-components:shared-components"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     testImplementation(project(":core-ui-test"))

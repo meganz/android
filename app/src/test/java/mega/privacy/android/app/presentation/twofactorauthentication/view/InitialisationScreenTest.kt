@@ -14,8 +14,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.hasDrawable
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.hasDrawable
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

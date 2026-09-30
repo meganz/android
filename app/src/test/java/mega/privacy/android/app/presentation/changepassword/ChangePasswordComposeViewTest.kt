@@ -19,9 +19,9 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.hasBackgroundColor
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.fromId
+import mega.privacy.android.core.ui.test.hasBackgroundColor
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.app.presentation.changepassword.extensions.toStrengthAttribute
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView

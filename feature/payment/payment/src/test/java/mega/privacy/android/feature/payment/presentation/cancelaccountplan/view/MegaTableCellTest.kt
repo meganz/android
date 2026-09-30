@@ -6,7 +6,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.feature.payment.hasDrawable
+import mega.privacy.android.core.ui.test.hasDrawable
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

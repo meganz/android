@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.payment.presentation.cancelaccountplan.view
 
+import mega.privacy.android.core.sharedcomponents.semantics.drawableId
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -10,8 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.SemanticsPropertyKey
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
@@ -125,6 +124,3 @@ private fun CellPreview() {
 
 internal const val TABLE_ICON_CELL_TEST_TAG = "mega_table:icon_cell_image"
 internal const val TABLE_TEXT_CELL_TEST_TAG = "mega_table:text_cell_text"
-
-internal val DrawableResId = SemanticsPropertyKey<Int>("DrawableResId")
-internal var SemanticsPropertyReceiver.drawableId by DrawableResId

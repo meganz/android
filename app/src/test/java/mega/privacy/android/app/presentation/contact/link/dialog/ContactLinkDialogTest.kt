@@ -8,7 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.R
-import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.core.ui.test.onNodeWithText
 import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule

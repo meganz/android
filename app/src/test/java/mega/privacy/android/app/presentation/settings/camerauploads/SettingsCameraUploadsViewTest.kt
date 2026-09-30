@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fromId
+import mega.privacy.android.core.ui.test.fromId
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FILE_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HOW_TO_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.RELATED_NEW_LOCAL_FOLDER_WARNING_DIALOG
