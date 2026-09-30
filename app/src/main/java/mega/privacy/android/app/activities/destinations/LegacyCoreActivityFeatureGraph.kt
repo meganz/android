@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.fileexplorer.fileExplorer
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScreen
 import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryLegacyDestination
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.offlineFileInfoScreen
 import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.mediaDiscoveryLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
@@ -156,6 +157,7 @@ class LegacyCoreActivityFeatureGraph(
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
             cameraBackupPermissionsScreen(navigationHandler)
             fileInfoScreen(navigationHandler::back)
+            offlineFileInfoScreen(navigationHandler::back)
             tagsScreen(navigationHandler::back)
             versionsFileScreen(navigationHandler::back)
             mediaDiscoveryLegacyDestination(navigationHandler::back)

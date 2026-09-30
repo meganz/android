@@ -1,13 +1,17 @@
 package mega.privacy.android.app.presentation.offline.offlinefileinfocompose
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import org.junit.jupiter.api.AfterEach
@@ -29,9 +33,9 @@ import java.io.File
 internal class OfflineFileInfoComposeViewModelTest {
 
     private lateinit var underTest: OfflineFileInfoComposeViewModel
-    private val savedStateHandle = mock<SavedStateHandle>()
     private val getOfflineFileInformationByIdUseCase = mock<GetOfflineFileInformationByIdUseCase>()
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
+    private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
 
     @TempDir
     lateinit var temporaryFolder: File
@@ -46,14 +50,16 @@ internal class OfflineFileInfoComposeViewModelTest {
     private fun stubCommon() {
         val offlineFile = File(temporaryFolder, "OfflineFile.jpg")
         offlineFile.createNewFile()
-        whenever(savedStateHandle.get<Long>(OfflineFileInfoComposeViewModel.NODE_HANDLE)) doReturn (1)
+        whenever(monitorThemeModeUseCase()) doReturn flowOf(ThemeMode.System)
     }
 
-    private fun initUnderTest() {
+    private fun TestScope.initUnderTest() {
         underTest = OfflineFileInfoComposeViewModel(
-            savedStateHandle = savedStateHandle,
+            nodeHandle = 1L,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
-            removeOfflineNodeUseCase = removeOfflineNodeUseCase
+            removeOfflineNodeUseCase = removeOfflineNodeUseCase,
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
+            applicationScope = this,
         )
     }
 
@@ -72,6 +78,7 @@ internal class OfflineFileInfoComposeViewModelTest {
         runTest {
             initUnderTest()
             underTest.removeFromOffline()
+            advanceUntilIdle()
 
             verify(removeOfflineNodeUseCase).invoke(NodeId(1))
         }
@@ -87,12 +94,23 @@ internal class OfflineFileInfoComposeViewModelTest {
         assertThat(content).isTrue()
     }
 
+    @Test
+    fun `test that theme mode is updated when monitorThemeModeUseCase emits`() = runTest {
+        whenever(monitorThemeModeUseCase()) doReturn flowOf(ThemeMode.Dark)
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().themeMode).isEqualTo(ThemeMode.Dark)
+        }
+    }
+
     @AfterEach
     fun resetMocks() {
         reset(
-            savedStateHandle,
             getOfflineFileInformationByIdUseCase,
-            removeOfflineNodeUseCase
+            removeOfflineNodeUseCase,
+            monitorThemeModeUseCase,
         )
     }
 }

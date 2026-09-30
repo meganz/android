@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.mod
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 
 /**
@@ -10,9 +11,11 @@ import mega.privacy.android.domain.entity.offline.OfflineFileInformation
  * @property offlineFileInformation OfflineFileInformation
  * @property isLoading true if the node information is loading
  * @property errorEvent event to show an error message
+ * @property themeMode the theme mode chosen in the app settings
  */
 data class OfflineFileInfoUiState(
     val offlineFileInformation: OfflineFileInformation? = null,
     val isLoading: Boolean = true,
     val errorEvent: StateEventWithContent<Boolean> = consumed(),
+    val themeMode: ThemeMode = ThemeMode.System,
 )

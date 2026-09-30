@@ -48,7 +48,6 @@ import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
@@ -112,6 +111,7 @@ import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.transition.opaqueFadeBackwardTransition
 import mega.privacy.android.navigation.contract.transition.opaqueFadeForwardTransition
+import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.ShareLinkNavKey
 import mega.privacy.android.navigation.destination.VideoEditorScreenNavKey
 import mega.privacy.android.shared.nodes.dialog.removelink.RemoveNodeLinkDialogNavKey
@@ -261,6 +261,11 @@ class ImagePreviewActivity : BaseActivity() {
                                 ChangeLabelBottomSheet(nodeId = imageNode.id.longValue)
                             )
                         },
+                        onOpenOfflineInfo = { imageNode ->
+                            navigationHandler.navigate(
+                                OfflineInfoNavKey(handle = imageNode.id.longValue.toString())
+                            )
+                        },
                     )
                 }
             }
@@ -274,6 +279,7 @@ class ImagePreviewActivity : BaseActivity() {
         onRemoveLink: (ImageNode) -> Unit,
         onGetLink: (ImageNode) -> Unit,
         onChangeLabel: (ImageNode) -> Unit,
+        onOpenOfflineInfo: (ImageNode) -> Unit,
     ) {
         val themeMode by monitorThemeModeUseCase()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -304,7 +310,7 @@ class ImagePreviewActivity : BaseActivity() {
                 },
                 onClickVideoPlay = ::playVideo,
                 onClickSlideshow = ::playSlideshow,
-                onClickInfo = ::checkInfo,
+                onClickInfo = { checkInfo(it, onOpenOfflineInfo) },
                 onClickFavourite = ::favouriteNode,
                 onClickLabel = onChangeLabel,
                 onClickOpenWith = ::handleOpenWith,
@@ -434,13 +440,9 @@ class ImagePreviewActivity : BaseActivity() {
         }
     }
 
-    private fun checkInfo(imageNode: ImageNode) {
+    private fun checkInfo(imageNode: ImageNode, onOpenOfflineInfo: (ImageNode) -> Unit) {
         if (viewModel.isInOfflineMode()) {
-            Intent(this, OfflineFileInfoActivity::class.java).apply {
-                putExtra(Constants.HANDLE, imageNode.id.longValue.toString())
-            }.apply {
-                startActivity(this)
-            }
+            onOpenOfflineInfo(imageNode)
         } else {
             megaNavigator.openFileInfoActivity(this, imageNode.id.longValue)
         }
