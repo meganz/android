@@ -61,8 +61,10 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -93,9 +95,10 @@ internal class BillingFacade @Inject constructor(
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
     private val mutex = Mutex()
     private val proceedPurchaseMutex = Mutex()
-    private val submittedPurchaseTokens = mutableSetOf<String>()
+    private val submittedPurchaseTokens = ConcurrentHashMap.newKeySet<String>()
     private val billingEvent = MutableSharedFlow<BillingEvent>()
     private var disconnectJob: Job? = null
+    private val billingClientRef: AtomicReference<BillingClient?> = AtomicReference(null)
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable)
@@ -108,7 +111,11 @@ internal class BillingFacade @Inject constructor(
         applicationScope.launch(exceptionHandler) {
             appEventGateway.monitorFetchNodesFinish().collect {
                 if (it) {
-                    queryPurchase()
+                    runCatching { queryPurchase() }
+                        .onFailure { error ->
+                            if (error is CancellationException) throw error
+                            Timber.e(error, "Failed to query purchases after fetch nodes")
+                        }
                 }
             }
         }
@@ -126,13 +133,11 @@ internal class BillingFacade @Inject constructor(
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        disconnectJob = applicationScope.launch {
+        disconnectJob = applicationScope.launch(exceptionHandler) {
             delay(5.seconds) // same approach of the SharingStarted.WhileSubscribed(5000)
             disconnect()
         }
     }
-
-    private val billingClientRef: AtomicReference<BillingClient?> = AtomicReference(null)
 
     private val obfuscatedAccountId: String?
         get() = verifyPurchaseGateway.generateObfuscatedAccountId()
@@ -142,11 +147,7 @@ internal class BillingFacade @Inject constructor(
 
     private suspend fun disconnect() {
         mutex.withLock {
-            val client = billingClientRef.get()
-            if (client?.isReady == true) {
-                client.endConnection()
-            }
-            billingClientRef.set(null)
+            billingClientRef.getAndSet(null)?.endConnection()
         }
     }
 
@@ -236,8 +237,15 @@ internal class BillingFacade @Inject constructor(
                 activity.intent = Intent()
             }
             val client = ensureConnect()
-            client.launchBillingFlow(activity, purchaseParamsBuilder.build())
-        }
+            val result = client.launchBillingFlow(activity, purchaseParamsBuilder.build())
+            if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                Timber.w(
+                    "launchBillingFlow failed, with result code: %s, debugMessage: %s",
+                    result.responseCode,
+                    result.debugMessage
+                )
+            }
+        } ?: Timber.w("No subscription offer details for product: %s", productId)
     }
 
     /**
@@ -356,21 +364,25 @@ internal class BillingFacade @Inject constructor(
             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP)
                 .build()
         )
+        if (inAppPurchaseResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+            Timber.w("Query of in-app purchases failed, result code is ${inAppPurchaseResult.billingResult.responseCode}")
+            return@withContext emptyList()
+        }
         val purchases = if (areSubscriptionsSupported(client)) {
             val subscriptionPurchaseResult = client.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS)
                     .build()
             )
+            // Processing a partial list would clear the cached active subscription.
+            if (subscriptionPurchaseResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                Timber.w("Query of subscription purchases failed, result code is ${subscriptionPurchaseResult.billingResult.responseCode}")
+                return@withContext emptyList()
+            }
             inAppPurchaseResult.purchasesList + subscriptionPurchaseResult.purchasesList
         } else {
             inAppPurchaseResult.purchasesList
         }
-        if (inAppPurchaseResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-            Timber.w("Query of purchases failed, result code is ${inAppPurchaseResult.billingResult.responseCode}")
-            return@withContext emptyList()
-        } else {
-            Timber.w("Query of purchases success, purchase size ${purchases.size}")
-        }
+        Timber.d("Query of purchases success, purchase size ${purchases.size}")
         return@withContext processPurchase(client, purchases)
     }
 
@@ -387,7 +399,7 @@ internal class BillingFacade @Inject constructor(
             printPurchaseList += "purchase $index has "
             printPurchaseList += "purchase obfuscated id ${purchase.accountIdentifiers?.obfuscatedAccountId}, "
             printPurchaseList += "purchase original json ${purchase.originalJson}, "
-            printPurchaseList += "purchase signature ${purchase.signature} /n"
+            printPurchaseList += "purchase signature ${purchase.signature}\n"
             (purchase.accountIdentifiers?.obfuscatedAccountId.isNullOrEmpty() ||
                     purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId ||
                     purchase.accountIdentifiers?.obfuscatedAccountId == newObfuscatedAccountId)
@@ -434,6 +446,8 @@ internal class BillingFacade @Inject constructor(
         return mutex.withLock {
             val oldClient = billingClientRef.get()
             if (oldClient?.isReady == true) return@withLock oldClient
+            // Release the previous client before replacing it, even when it is disconnected.
+            billingClientRef.getAndSet(null)?.endConnection()
             val newClient = BillingClient.newBuilder(context)
                 .enablePendingPurchases(
                     PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
@@ -442,19 +456,19 @@ internal class BillingFacade @Inject constructor(
                 .enableAutoServiceReconnection()
                 .setListener(this)
                 .build()
-            return@withLock suspendCancellableCoroutine { continuation ->
-                val listener = object : BillingClientStateListener {
-                    override fun onBillingServiceDisconnected() {
-                    }
+            try {
+                suspendCancellableCoroutine { continuation ->
+                    val listener = object : BillingClientStateListener {
+                        override fun onBillingServiceDisconnected() {
+                            // Handled by enableAutoServiceReconnection().
+                        }
 
-                    override fun onBillingSetupFinished(result: BillingResult) {
-                        Timber.d("Response code is: %s", result.responseCode)
-                        if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                            if (continuation.isActive)
-                                continuation.resumeWith(Result.success(newClient))
-                                    .also { billingClientRef.set(newClient) }
-                        } else {
-                            if (continuation.isActive)
+                        override fun onBillingSetupFinished(result: BillingResult) {
+                            Timber.d("Response code is: %s", result.responseCode)
+                            if (!continuation.isActive) return
+                            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                                continuation.resumeWith(Result.success(Unit))
+                            } else {
                                 continuation.resumeWith(
                                     Result.failure(
                                         ConnectBillingServiceException(
@@ -463,10 +477,16 @@ internal class BillingFacade @Inject constructor(
                                         )
                                     )
                                 )
+                            }
                         }
                     }
+                    newClient.startConnection(listener)
                 }
-                newClient.startConnection(listener)
+                billingClientRef.set(newClient)
+                newClient
+            } catch (error: Throwable) {
+                newClient.endConnection()
+                throw error
             }
         }
     }
@@ -516,6 +536,7 @@ internal class BillingFacade @Inject constructor(
         }.onSuccess {
             token?.let { submittedPurchaseTokens.add(it) }
         }.onFailure { error ->
+            if (error is CancellationException) throw error
             Timber.e("PURCHASE WRONG: ${error.message}")
         }
     }

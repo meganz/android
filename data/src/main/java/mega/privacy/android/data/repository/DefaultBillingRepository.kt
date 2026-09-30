@@ -130,10 +130,10 @@ internal class DefaultBillingRepository @Inject constructor(
         billingGateway.launchPurchaseFlow(activity, productId, offerId, currentAccountType)
     }
 
-    override suspend fun getCurrentPaymentMethod(): PaymentMethod? {
+    override suspend fun getCurrentPaymentMethod(): PaymentMethod? = withContext(ioDispatcher) {
         val subscriptionMethodId = accountRepository.monitorAccountDetail().first()
             .levelDetail?.subscriptionMethodId ?: 0
-        return PaymentMethod.entries.firstOrNull {
+        PaymentMethod.entries.firstOrNull {
             it.methodId == paymentMethodTypeMapper(subscriptionMethodId)
         }
     }
@@ -164,7 +164,7 @@ internal class DefaultBillingRepository @Inject constructor(
         reason: String,
         subscriptionId: String,
         canContact: Int,
-    ) {
+    ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("cancelSubscriptionWithSurveyAnswers") {}
             megaApiGateway.creditCardCancelSubscriptions(
