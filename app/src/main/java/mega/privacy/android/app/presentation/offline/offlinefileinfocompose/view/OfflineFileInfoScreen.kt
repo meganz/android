@@ -17,10 +17,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
-import mega.privacy.android.app.presentation.fileinfo.view.MENU_ACTIONS_TO_SHOW
-import mega.privacy.android.app.presentation.fileinfo.view.PreviewWithShadow
-import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_TOP_APPBAR
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo

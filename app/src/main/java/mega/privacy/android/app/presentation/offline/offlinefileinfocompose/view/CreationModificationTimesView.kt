@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.fileinfo.view
+package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -26,13 +26,13 @@ internal fun CreationModificationTimesView(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        FileInfoTitledText(
+        OfflineFileInfoTitledText(
             title = stringResource(R.string.file_properties_info_added),
             text = TimeUtils.formatLongDateTime(creationTimeInSeconds),
             modifier = Modifier.testTag(TEST_TAG_CREATION_TIME),
         )
         modificationTimeInSeconds?.let {
-            FileInfoTitledText(
+            OfflineFileInfoTitledText(
                 title = stringResource(R.string.file_properties_info_last_modified),
                 text = TimeUtils.formatLongDateTime(it),
                 modifier = Modifier.testTag(TEST_TAG_MODIFICATION_TIME),
@@ -54,3 +54,6 @@ private fun CreationModificationTimesPreview() {
         )
     }
 }
+
+internal const val TEST_TAG_CREATION_TIME = "creationTime"
+internal const val TEST_TAG_MODIFICATION_TIME = "modificationTime"

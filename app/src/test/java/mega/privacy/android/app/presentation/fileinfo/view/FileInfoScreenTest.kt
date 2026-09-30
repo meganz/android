@@ -14,6 +14,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.fromPluralId
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.TEST_TAG_FILE_INFO_HEADER
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.TEST_TAG_ICON
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.TEST_TAG_PREVIEW
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import org.junit.Assert.assertFalse

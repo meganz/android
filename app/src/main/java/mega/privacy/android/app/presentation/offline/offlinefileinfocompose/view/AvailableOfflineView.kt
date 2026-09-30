@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.fileinfo.view
+package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -70,3 +70,5 @@ private fun AvailableOfflinePreview(
         enabled = true, available = available, onCheckChanged = { available = !available },
     )
 }
+
+internal const val TEST_TAG_AVAILABLE_OFFLINE_SWITCH = "switch"

@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
 import mega.privacy.android.app.presentation.view.NodeGridView
@@ -57,7 +56,7 @@ internal fun VideoSelectedView(
     onChangeViewTypeClick: () -> Unit,
     onVideoSelected: (List<Long>) -> Unit,
     onBackPressed: () -> Unit,
-    onMenuActionClick: (FileInfoMenuAction) -> Unit,
+    onMenuActionClick: (VideoSelectedMenuAction) -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {

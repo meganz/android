@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.fileinfo.view
+package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText

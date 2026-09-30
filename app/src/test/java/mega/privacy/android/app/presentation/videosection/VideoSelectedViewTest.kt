@@ -9,7 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
+import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
 import mega.privacy.android.app.presentation.videosection.view.VIDEO_SECTION_LOADING_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_EMPTY_VIEW_TEST_TAG
@@ -43,7 +43,7 @@ class VideoSelectedViewTest {
         onChangeViewTypeClick: () -> Unit = {},
         onVideoSelected: (List<Long>) -> Unit = {},
         onBackPressed: () -> Unit = {},
-        onMenuActionClick: (FileInfoMenuAction) -> Unit = {},
+        onMenuActionClick: (VideoSelectedMenuAction) -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoSelectedView(

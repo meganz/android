@@ -8,12 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.fileinfo.view.AvailableOfflineView
-import mega.privacy.android.app.presentation.fileinfo.view.CreationModificationTimesView
-import mega.privacy.android.app.presentation.fileinfo.view.FileInfoContentDivider
-import mega.privacy.android.app.presentation.fileinfo.view.FolderContentView
-import mega.privacy.android.app.presentation.fileinfo.view.NodeSizeView
-import mega.privacy.android.app.presentation.fileinfo.view.paddingStartDefault
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 

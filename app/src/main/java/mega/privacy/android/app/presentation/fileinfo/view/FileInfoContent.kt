@@ -31,6 +31,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.account.business.AccountSuspendedDialog
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.AvailableOfflineView
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.CreationModificationTimesView
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.FileInfoContentDivider
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.FolderContentView
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.NodeSizeView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -293,21 +298,6 @@ internal fun FileInfoContent(
     }
 }
 
-/**
- * Add a border divider
- */
-@Composable
-fun FileInfoContentDivider(
-    paddingStart: Dp = paddingStartDefault.dp,
-    paddingTop: Dp = 0.dp,
-    paddingBottom: Dp = 0.dp,
-) {
-    Divider(
-        modifier = Modifier.padding(start = paddingStart, top = paddingTop, bottom = paddingBottom),
-        color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-        thickness = 1.dp
-    )
-}
 
 /**
  * Preview for [FileInfoContent] for a file

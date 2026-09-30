@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
@@ -27,7 +26,7 @@ internal fun VideoSelectedTopBar(
     searchState: SearchWidgetState,
     query: String?,
     isEmpty: Boolean,
-    onMenuActionClick: (FileInfoMenuAction) -> Unit,
+    onMenuActionClick: (VideoSelectedMenuAction) -> Unit,
     onSearchTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
     onSearchClicked: () -> Unit,
@@ -45,11 +44,11 @@ internal fun VideoSelectedTopBar(
             SelectModeAppBar(
                 title = selectedSize.toString(),
                 actions = listOf(
-                    FileInfoMenuAction.SelectionModeAction.SelectAll,
-                    FileInfoMenuAction.SelectionModeAction.ClearSelection
+                    VideoSelectedMenuAction.SelectAll,
+                    VideoSelectedMenuAction.ClearSelection
                 ),
                 onActionPressed = {
-                    onMenuActionClick(it as FileInfoMenuAction)
+                    onMenuActionClick(it as VideoSelectedMenuAction)
                 },
                 modifier = Modifier.fillMaxWidth().testTag(SELECTED_MODE_TOP_BAR_TEST_TAG),
                 elevation = AppBarDefaults.TopAppBarElevation,

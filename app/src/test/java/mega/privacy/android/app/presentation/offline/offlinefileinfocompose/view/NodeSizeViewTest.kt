@@ -1,9 +1,8 @@
-package mega.privacy.android.app.presentation.fileinfo.view
+package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.fileinfo.view.NodeSizeView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

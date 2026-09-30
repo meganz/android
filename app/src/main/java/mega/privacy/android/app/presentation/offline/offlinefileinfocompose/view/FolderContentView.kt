@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.fileinfo.view
+package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +19,7 @@ internal fun FolderContentView(
     numberOfFolders: Int,
     numberOfFiles: Int,
     modifier: Modifier = Modifier,
-) = FileInfoTitledText(
+) = OfflineFileInfoTitledText(
     title = stringResource(R.string.file_properties_info_content),
     text = when {
         numberOfFolders <= 0 && numberOfFiles <= 0 -> stringResource(SharedR.string.empty_file_browser_folder)

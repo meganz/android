@@ -1,6 +1,5 @@
-package mega.privacy.android.app.presentation.fileinfo.view
+package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
@@ -10,17 +9,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.Dimension
-import mega.privacy.android.app.presentation.extensions.description
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.layouts.CollapsibleHeaderWithTitle
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 @Composable
 internal fun FileInfoHeader(
@@ -69,17 +66,14 @@ internal fun FileInfoHeader(
     }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @CombinedTextAndThemePreviews
 @Composable
-private fun FileInfoHeaderPreview(
-    @PreviewParameter(FileInfoViewStatePreviewsProvider::class) viewState: FileInfoViewState,
-) {
+private fun FileInfoHeaderPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileInfoHeader(
-            title = viewState.title,
-            iconResource = viewState.iconResource,
-            accessPermissionDescription = viewState.accessPermission.description(),
+            title = "Example file.txt",
+            iconResource = iconPackR.drawable.ic_text_medium_solid,
+            accessPermissionDescription = null,
         )
     }
 }

@@ -5,7 +5,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
+import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedMenuAction
 import mega.privacy.android.app.presentation.videosection.view.videoselected.EMPTY_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.SEARCH_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.SELECTED_MODE_TOP_BAR_TEST_TAG
@@ -26,7 +26,7 @@ class VideoSelectedTopBarTest {
         searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
         query: String? = null,
         isEmpty: Boolean = false,
-        onMenuActionClick: (FileInfoMenuAction) -> Unit = {},
+        onMenuActionClick: (VideoSelectedMenuAction) -> Unit = {},
         onSearchTextChange: (String) -> Unit = {},
         onCloseClicked: () -> Unit = {},
         onSearchClicked: () -> Unit = {},

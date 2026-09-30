@@ -29,12 +29,16 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.consumed
+import java.time.Instant
+import kotlin.time.Duration.Companion.days
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.FileInfoHeader
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.PreviewWithShadow
 import mega.privacy.android.app.presentation.preview.contactItemForPreviews
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -52,8 +56,6 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import java.time.Instant
-import kotlin.time.Duration.Companion.days
 
 /**
  * File info screen

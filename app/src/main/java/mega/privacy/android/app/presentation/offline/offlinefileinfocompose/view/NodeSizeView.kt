@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.fileinfo.view
+package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -16,7 +16,7 @@ internal fun NodeSizeView(
     forFolder: Boolean,
     sizeString: String,
     modifier: Modifier = Modifier,
-) = FileInfoTitledText(
+) = OfflineFileInfoTitledText(
     title = stringResource(id = if (forFolder) R.string.file_properties_info_size else R.string.file_properties_info_size_file),
     text = sizeString,
     modifier = modifier

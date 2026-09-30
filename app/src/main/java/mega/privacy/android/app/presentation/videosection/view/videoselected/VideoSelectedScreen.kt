@@ -7,7 +7,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.videosection.VideoSelectedViewModel
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 
@@ -64,13 +63,11 @@ internal fun VideoSelectedNavHost(
                 onItemClicked = viewModel::itemClicked,
                 onMenuActionClick = { action ->
                     when (action) {
-                        is FileInfoMenuAction.SelectionModeAction.SelectAll ->
+                        VideoSelectedMenuAction.SelectAll ->
                             viewModel.selectAllVideos()
 
-                        is FileInfoMenuAction.SelectionModeAction.ClearSelection ->
+                        VideoSelectedMenuAction.ClearSelection ->
                             viewModel.clearAllSelectedVideos()
-
-                        else -> {}
                     }
                 },
                 fileTypeIconMapper = fileTypeIconMapper,

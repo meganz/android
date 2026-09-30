@@ -10,7 +10,6 @@ import androidx.compose.ui.res.stringResource
 import com.google.common.io.Files
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.ChatAttachmentUiEntity
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.NodeAttachmentBottomSheetUiState
-import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_AVAILABLE_OFFLINE_SWITCH
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.icon.pack.IconPack
@@ -115,3 +114,6 @@ private fun NodeAttachmentBottomSheetContentPreview() {
         )
     }
 }
+
+internal const val TEST_TAG_AVAILABLE_OFFLINE_SWITCH =
+    "node_attachment_bottom_sheet:available_offline_switch"
