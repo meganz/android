@@ -558,6 +558,8 @@ private fun NameCollisionScreenPreview() {
                 isCopyToOrigin = false,
                 pendingFileCollisions = 0,
                 pendingFolderCollisions = 0,
+                currentCollisionIndex = 1,
+                currentTypeCollisionCount = 1,
                 hasPendingCollisions = false,
                 uploadedFilesCount = 0,
                 uploadEvent = consumed(),

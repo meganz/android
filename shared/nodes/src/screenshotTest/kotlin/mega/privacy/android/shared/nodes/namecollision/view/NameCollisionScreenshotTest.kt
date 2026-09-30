@@ -139,6 +139,8 @@ class NameCollisionScreenshotTest {
         fileVersioningInfo: FileVersioningInfo,
         pendingFileCollisions: Int = 0,
         pendingFolderCollisions: Int = 0,
+        currentCollisionIndex: Int = 1,
+        currentTypeCollisionCount: Int = pendingFileCollisions + pendingFolderCollisions + 1,
         hasPendingCollisions: Boolean,
     ) = NameCollisionUiState(
         currentCollision = currentCollision,
@@ -146,6 +148,8 @@ class NameCollisionScreenshotTest {
         isCopyToOrigin = false,
         pendingFileCollisions = pendingFileCollisions,
         pendingFolderCollisions = pendingFolderCollisions,
+        currentCollisionIndex = currentCollisionIndex,
+        currentTypeCollisionCount = currentTypeCollisionCount,
         hasPendingCollisions = hasPendingCollisions,
         uploadedFilesCount = 0,
         uploadEvent = consumed(),

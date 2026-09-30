@@ -1107,6 +1107,115 @@ internal class NameCollisionViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the counter is 1 of 2 when a batch of two files and two folders is loaded`() =
+        runTest {
+            val (file1, file2) = List(2) { copyCollision(isFile = true) }
+            val (folder1, folder2) = List(2) { copyCollision(isFile = false) }
+            stubQueue(listOf(file1, file2, folder1, folder2))
+
+            initUnderTest(multipleArgs(listOf(file1, folder1, file2, folder2)))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.currentCollision?.nameCollision).isEqualTo(file1)
+                assertThat(state.currentCollisionIndex).isEqualTo(1)
+                assertThat(state.currentTypeCollisionCount).isEqualTo(2)
+            }
+        }
+
+    @Test
+    fun `test that the counter advances when the current file is skipped`() = runTest {
+        val file1 = uploadCollision(path = "path1", name = "name1")
+        val file2 = uploadCollision(path = "path2", name = "name2")
+        stubQueue(listOf(file1, file2))
+
+        initUnderTest(multipleArgs(listOf(file1, file2)))
+        advanceUntilIdle()
+        underTest.cancel(applyOnNext = false)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = expectMostRecentItem()
+            assertThat(state.currentCollision?.nameCollision).isEqualTo(file2)
+            assertThat(state.currentCollisionIndex).isEqualTo(2)
+            assertThat(state.currentTypeCollisionCount).isEqualTo(2)
+        }
+    }
+
+    @Test
+    fun `test that the counter restarts at 1 of 2 when the batched files leave two folders pending`() =
+        runTest {
+            val (file1, file2) = List(2) { copyCollision(isFile = true) }
+            val (folder1, folder2) = List(2) { copyCollision(isFile = false) }
+            stubQueue(listOf(file1, file2, folder1, folder2))
+            whenever(copyCollidedNodesUseCase(listOf(file1, file2), false)) doReturn
+                    MoveRequestResult.Copy(2, 0)
+
+            initUnderTest(multipleArgs(listOf(file1, folder1, file2, folder2)))
+            advanceUntilIdle()
+            underTest.replaceUpdateOrMerge(applyOnNext = true)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.currentCollision?.nameCollision).isEqualTo(folder1)
+                assertThat(state.currentCollisionIndex).isEqualTo(1)
+                assertThat(state.currentTypeCollisionCount).isEqualTo(2)
+            }
+        }
+
+    @Test
+    fun `test that the counter is 1 of 1 when a single collision is loaded`() = runTest {
+        val nameCollision = copyCollision(isFile = true)
+        whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn
+                NodeNameCollisionResult(nameCollision = nameCollision)
+
+        initUnderTest(singleArgs(nameCollision))
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = expectMostRecentItem()
+            assertThat(state.currentCollisionIndex).isEqualTo(1)
+            assertThat(state.currentTypeCollisionCount).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that the counter is 0 of 0 when the launch source is missing`() = runTest {
+        initUnderTest(NameCollisionArgs.MissingLaunch)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = expectMostRecentItem()
+            assertThat(state.currentCollision).isNull()
+            assertThat(state.currentCollisionIndex).isEqualTo(0)
+            assertThat(state.currentTypeCollisionCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `test that the counter is unchanged when the pending collisions are renamed`() = runTest {
+        val file1 = uploadCollision(path = "path1", name = "name1", renameName = "name1 (1)")
+        val file2 = uploadCollision(path = "path2", name = "name2", renameName = "name2 (1)")
+        stubQueue(listOf(file1, file2))
+        whenever(updateNodeNameCollisionsResultUseCase(any(), any(), any())) doReturn
+                (listOf(NodeNameCollisionResult(nameCollision = file2)) to listOf("name1 (1)"))
+
+        initUnderTest(multipleArgs(listOf(file1, file2)))
+        advanceUntilIdle()
+        underTest.rename(applyOnNext = false)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = expectMostRecentItem()
+            assertThat(state.currentCollision?.nameCollision).isEqualTo(file1)
+            assertThat(state.currentCollisionIndex).isEqualTo(1)
+            assertThat(state.currentTypeCollisionCount).isEqualTo(2)
+        }
+    }
+
     companion object {
         private const val COLLISION_HANDLE = 123L
         private const val PARENT_HANDLE = 456L

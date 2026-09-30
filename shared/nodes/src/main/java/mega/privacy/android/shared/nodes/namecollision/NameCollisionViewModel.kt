@@ -95,6 +95,8 @@ class NameCollisionViewModel @AssistedInject constructor(
         is NameCollisionArgs.Multiple -> args.collisions
         NameCollisionArgs.MissingLaunch -> emptyList()
     }
+    private val fileCount = collisions.count { it.isFile }
+    private val folderCount = collisions.size - fileCount
     private val isFolderUploadContext = args.isFolderUploadContext
     private val pitagTrigger =
         collisions.firstOrNull()?.pitagTrigger ?: PitagTrigger.NotApplicable
@@ -148,12 +150,25 @@ class NameCollisionViewModel @AssistedInject constructor(
     val uiState: StateFlow<NameCollisionUiState> by lazy {
         loadCollisions()
         combine(progress, fileVersioningInfoFlow()) { resolution, fileVersioningInfo ->
+            val isCurrentFile = resolution.currentCollision?.nameCollision?.isFile
+            val currentTypeCollisionCount = when (isCurrentFile) {
+                true -> fileCount
+                false -> folderCount
+                null -> 0
+            }
+            val pendingForType = when (isCurrentFile) {
+                true -> resolution.pendingFileCollisions
+                false -> resolution.pendingFolderCollisions
+                null -> 0
+            }
             NameCollisionUiState(
                 currentCollision = resolution.currentCollision,
                 fileVersioningInfo = fileVersioningInfo,
                 isCopyToOrigin = resolution.isCopyToOrigin,
                 pendingFileCollisions = resolution.pendingFileCollisions,
                 pendingFolderCollisions = resolution.pendingFolderCollisions,
+                currentCollisionIndex = currentTypeCollisionCount - pendingForType,
+                currentTypeCollisionCount = currentTypeCollisionCount,
                 hasPendingCollisions = resolution.pendingCollisions.isNotEmpty(),
                 uploadedFilesCount = resolution.uploadedFilesCount,
                 uploadEvent = resolution.uploadEvent,
@@ -169,6 +184,8 @@ class NameCollisionViewModel @AssistedInject constructor(
                     isCopyToOrigin = false,
                     pendingFileCollisions = 0,
                     pendingFolderCollisions = 0,
+                    currentCollisionIndex = 0,
+                    currentTypeCollisionCount = 0,
                     hasPendingCollisions = false,
                     uploadedFilesCount = 0,
                     uploadEvent = consumed(),

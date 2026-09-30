@@ -16,6 +16,11 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  *                                  to, in which case it is duplicated without presenting any option.
  * @property pendingFileCollisions  Number of file collisions left to resolve after the current one.
  * @property pendingFolderCollisions Number of folder collisions left to resolve after the current one.
+ * @property currentCollisionIndex  1-based position of the current collision among the collisions of
+ *                                  its own type, files and folders being counted separately; 0 while
+ *                                  nothing is presented.
+ * @property currentTypeCollisionCount Number of collisions of the current collision's type in the
+ *                                  batch; 0 while nothing is presented.
  * @property hasPendingCollisions   True while collisions are still queued behind the current one; false
  *                                  once an action has taken them all.
  * @property uploadedFilesCount     Number of files the user has chosen to upload so far, for the
@@ -33,6 +38,8 @@ data class NameCollisionUiState(
     val isCopyToOrigin: Boolean,
     val pendingFileCollisions: Int,
     val pendingFolderCollisions: Int,
+    val currentCollisionIndex: Int,
+    val currentTypeCollisionCount: Int,
     val hasPendingCollisions: Boolean,
     val uploadedFilesCount: Int,
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload.CollidedFiles>,

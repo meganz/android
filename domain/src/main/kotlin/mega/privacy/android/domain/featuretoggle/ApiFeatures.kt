@@ -353,6 +353,15 @@ enum class ApiFeatures(
         experimentName = "atptz",
         description = "Enable pinch-to-zoom on the media timeline",
         defaultValue = false,
+    ),
+
+    /**
+     * Redesigned duplicate items (name collision) screen, DSN-3304.
+     */
+    NameCollisionRedesign(
+        "dupit",
+        "Enable the redesigned duplicate items (name collision) screen",
+        false,
     );
 
     companion object : FeatureFlagValueProvider {
