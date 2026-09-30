@@ -12,12 +12,14 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.transfer.TransferQuotaStateMapper
 import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -35,6 +37,7 @@ class FullImageFromServerMapperTest {
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val megaNodeFromChatMessageMapper = mock<MegaNodeFromChatMessageMapper>()
     private val appEventGateway = mock<AppEventGateway>()
+    private val cancelToken = mock<MegaCancelToken>()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
@@ -52,7 +55,14 @@ class FullImageFromServerMapperTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(megaApiGateway, megaChatApiGateway, megaNodeFromChatMessageMapper, appEventGateway)
+        reset(
+            megaApiGateway,
+            megaChatApiGateway,
+            megaNodeFromChatMessageMapper,
+            appEventGateway,
+            cancelToken,
+        )
+        whenever(megaApiGateway.createCancelToken()).thenReturn(cancelToken)
     }
 
     @Test
@@ -97,12 +107,43 @@ class FullImageFromServerMapperTest {
             awaitError()
         }
 
-        verify(megaApiGateway, never()).getFullImage(any(), any(), any(), any())
+        verify(megaApiGateway, never()).getFullImage(any(), any(), any(), any(), any())
         verifyNoInteractions(appEventGateway)
     }
 
+    @Test
+    fun `test that the download is started with its own cancel token`() = runTest {
+        underTest(mock<MegaNode>())(PATH, false) {}.test {
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(megaApiGateway).getFullImage(any(), any(), any(), eq(cancelToken), any())
+    }
+
+    @Test
+    fun `test that the download is cancelled only once the flow closes`() = runTest {
+        underTest(mock<MegaNode>())(PATH, false) {}.test {
+            verify(cancelToken, never()).cancel()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(cancelToken).cancel()
+    }
+
+    @Test
+    fun `test that the chat image download is cancelled once the flow closes`() = runTest {
+        whenever(megaNodeFromChatMessageMapper(any(), any(), any())).thenReturn(mock())
+
+        underTest(CHAT_ID, MESSAGE_ID)(PATH, false) {}.test {
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(megaApiGateway).getFullImage(any(), any(), any(), eq(cancelToken), any())
+        verify(cancelToken).cancel()
+    }
+
     private fun stubQuotaState(state: Int) {
-        whenever(megaApiGateway.getFullImage(any(), any(), any(), any())).thenAnswer {
+        whenever(megaApiGateway.getFullImage(any(), any(), any(), any(), any())).thenAnswer {
             (it.arguments.last() as OptionalMegaTransferListenerInterface)
                 .onTransferQuotaState(mock(), mock(), state)
         }

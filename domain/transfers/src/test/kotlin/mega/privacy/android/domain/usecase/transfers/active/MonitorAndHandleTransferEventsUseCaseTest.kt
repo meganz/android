@@ -129,5 +129,9 @@ class MonitorAndHandleTransferEventsUseCaseTest {
         mock {
             on { appData } doReturn listOf(TransferAppData.SafDownload)
         },
+        mock {
+            on { isFolderTransfer } doReturn true
+            on { nodeHandle } doReturn -1L
+        },
     )
 }

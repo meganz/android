@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.filterNot
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isDownloadBatch
 import mega.privacy.android.domain.entity.transfer.isSafDownload
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.extension.collectChunked
@@ -42,6 +43,7 @@ class MonitorAndHandleTransferEventsUseCase @Inject constructor(
                             || event.transfer.isSyncTransfer
                             || event.transfer.transferType == TransferType.CU_UPLOAD
                             || event.transfer.isSafDownload()
+                            || event.transfer.isDownloadBatch()
                 }
                 .collectChunked(
                     chunkDuration = eventsChunkDuration,

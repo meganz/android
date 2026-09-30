@@ -80,6 +80,27 @@ class TransferTest {
         assertThat(underTest.progress).isEqualTo(Progress(transferredBytes, totalBytes))
     }
 
+    @Test
+    fun `test that isDownloadBatch returns true for a folder transfer without a node`() {
+        underTest = createEmptyTransfer().copy(isFolderTransfer = true, nodeHandle = -1L)
+
+        assertThat(underTest.isDownloadBatch()).isTrue()
+    }
+
+    @Test
+    fun `test that isDownloadBatch returns false for a folder transfer started for a node`() {
+        underTest = createEmptyTransfer().copy(isFolderTransfer = true, nodeHandle = 1L)
+
+        assertThat(underTest.isDownloadBatch()).isFalse()
+    }
+
+    @Test
+    fun `test that isDownloadBatch returns false for a file transfer without a node`() {
+        underTest = createEmptyTransfer().copy(isFolderTransfer = false, nodeHandle = -1L)
+
+        assertThat(underTest.isDownloadBatch()).isFalse()
+    }
+
     private fun notIsAlreadyDownloaded() = listOf(
         createAlreadyDownloadedTransfer().copy(state = TransferState.STATE_FAILED),
         createAlreadyDownloadedTransfer().copy(state = TransferState.STATE_CANCELLED),
