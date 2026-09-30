@@ -233,10 +233,6 @@
     <string name="dialog_select_permissions">أذونات المشاركة</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">تغيير  الإذونات</string>
-    <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">مشاركة مع</string>
-    <!-- shows the owner of an incoming shared folder -->
-    <string name="file_properties_owner">المالك</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">دعوة</string>
     <!-- option to reinvite a contact -->
@@ -295,8 +291,6 @@
     <string name="context_copying">جاري النسخ</string>
     <!-- menu item -->
     <string name="context_move_to_trash">نقل إلى سلة المحذوفات</string>
-    <!-- menu item -->
-    <string name="context_delete_from_mega">إزالة من ميغا MEGA</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">إنشاء مجلد</string>
     <!-- Menu option title -->
@@ -353,12 +347,8 @@
     <string name="context_no_moved">خطأ. لم يتم النقل</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">مشاركة</string>
-    <!-- error message -->
-    <string name="context_no_removed_shared">خطأ. فشل في إزالة المشاركة</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">تم حذف العنصر</string>
-    <!-- error message -->
-    <string name="context_no_removed">خطأ. لم يتم إزالتها من MEGA</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">تم نسخ %d ملف</string>
     <!-- error message when sending multiple files -->
@@ -783,8 +773,6 @@
         <item quantity="many">%d جهة اتصال ستتم إزالتهم من المجلد المشارك.</item>
         <item quantity="other">%d جهة اتصال ستتم إزالتهم من المجلد المشارك.</item>
     </plurals>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_incorrectly_changed_from_shared">أخفق تحديث الأذونات لجهات الاتصال %d</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">جار تحميل جهات الاتصال من الهاتف&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
@@ -1269,16 +1257,8 @@
     <string name="title_properties_chat_notifications_contact">إشعارات المحادثة</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] مسح سجلات المحادثة[/B]</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">تغيير الأذونات</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_removing_contact_folder">جار إزالة جهة الاتصال من مجلد المشاركة</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">نقل إلى سلة المحذوفات؟</string>
-    <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">هل تريد نقل هذا المجلد إلى سلة المحذوفات؟ سيتم إنشاء مجلد جديد تلقائيًا لترفيعات الكاميرا.</string>
-    <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">هل تريد نقل هذا المجلد إلى سلة المحذوفات؟ سيتم إنشاء مجلد جديد تلقائيًا لترفيعات الوسائط.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">نقل إلى سلة المحذوفات؟</string>
     <!-- confirmation message before removing a file -->
@@ -1513,15 +1493,6 @@
     <string name="label_file_speed_tera_byte">%s&#160;تيرا بايت بالثانية</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">ميغابايت</string>
-    <!-- Number of versions of a file shown on the screen info of the file, version items -->
-    <plurals name="number_of_versions">
-        <item quantity="zero">%1$d نسخة</item>
-        <item quantity="one">%1$d نسخة</item>
-        <item quantity="two">%1$d نسختان</item>
-        <item quantity="few">%1$d نسخ</item>
-        <item quantity="many">%1$d نسخة</item>
-        <item quantity="other">%1$d نسخة</item>
-    </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">النسخ</string>
     <!-- Header of the item to show the current version of a file in a list -->
@@ -1568,19 +1539,8 @@
     <string name="missed_call_notification_title">مكالمة فائتة</string>
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">الموقع</string>
-    <!-- Title of the label to show the size of the current files inside a folder -->
-    <string name="file_properties_folder_current_versions">النسخ الحالية</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
     <string name="file_properties_folder_previous_versions">النسخ السابقة</string>
-    <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
-    <plurals name="number_of_versions_inside_folder">
-        <item quantity="zero">%1$d ملف مع نسخ</item>
-        <item quantity="one">%1$d ملف مع نسخ</item>
-        <item quantity="two">%1$d ملفان مع نسخ</item>
-        <item quantity="few">%1$d ملفات مع نسخ</item>
-        <item quantity="many">%1$d ملف مع نسخ</item>
-        <item quantity="other">%1$d ملف مع نسخ</item>
-    </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="zero">خطأ. لم يتم إعادة توجيه %1$d رسالة</item>
@@ -2550,8 +2510,6 @@
     <string name="alert_not_enough_permissions_revert">ليس لديك الأذونات الصحيحة لتعديل هذا الملف. هل ترغب في إنشاء ملف جديد؟</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">تم إنشاء النسخة كملف جديد.</string>
-    <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
-    <string name="general_date_label">في %1$s</string>
     <!-- Download location label -->
     <string name="download_location">موقع التنزيل</string>
     <!-- Action to show any file in its location -->
@@ -4514,10 +4472,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">لا يمكنك التحقق من %s لأنه ليس في قائمة جهات الاتصال الخاصة بك. انتظر حتى يقبل دعوتك أولاً.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">بدء</string>
-    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">تمت إزالة هذا الملف وفقًا [A]لسياسة إرشادات الإزالة[/A] الخاصة بنا.</string>
-    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">تمت إزالة هذا المجلد وفقًا [A]لسياسة إرشادات الإزالة[/A] الخاصة بنا.</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">الانضمام</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -5602,10 +5556,6 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">هناك عناصر مخفية في هذا الألبوم. تعني مشاركة الألبوم أن العناصر المخفية مرئية لأولئك الذين تشاركهم معهم. ستظل العناصر مخفية في السواقة السحابية الخاص بك.</string>
-    <!-- Image or Video map location title-->
-    <string name="file_properties_info_map_location">الموقع</string>
-    <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">لا توجد معلومات عن الموقع</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
     <string name="logout_warning_dialog_title">تسجيل الخروج الآن سيؤدي إلى فقدان البيانات</string>
     <!-- Logout warning dialog positive button text -->

@@ -218,10 +218,6 @@
     <string name="dialog_select_permissions">共享权限</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">更改权限</string>
-    <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">共享者</string>
-    <!-- shows the owner of an incoming shared folder -->
-    <string name="file_properties_owner">所有者</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">邀请</string>
     <!-- option to reinvite a contact -->
@@ -280,8 +276,6 @@
     <string name="context_copying">正在复制</string>
     <!-- menu item -->
     <string name="context_move_to_trash">移至回收站</string>
-    <!-- menu item -->
-    <string name="context_delete_from_mega">从MEGA中移除</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">正在创建文件夹</string>
     <!-- Menu option title -->
@@ -338,12 +332,8 @@
     <string name="context_no_moved">错误。未移动</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">共享</string>
-    <!-- error message -->
-    <string name="context_no_removed_shared">发生错误。移除共享失败</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">已删除项目</string>
-    <!-- error message -->
-    <string name="context_no_removed">错误。删除失败</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">已复制%d个项目</string>
     <!-- error message when sending multiple files -->
@@ -748,8 +738,6 @@
     <plurals name="remove_multiple_contacts_shared_folder">
         <item quantity="other">将从共享文件夹中移除%d位联系人。</item>
     </plurals>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_incorrectly_changed_from_shared">无法更新%d个联系人的权限</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">正在从手机加载联系人&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
@@ -1154,16 +1142,8 @@
     <string name="title_properties_chat_notifications_contact">聊天通知</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B]清除了聊天记录[/B]</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">正在更改权限</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_removing_contact_folder">正在从共享文件夹中移除联系人</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">要移至回收站吗？</string>
-    <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">您想要把这个文件夹移到回收站吗？将自动为相机上传创建一个新文件夹。</string>
-    <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">您想要把这个文件夹移到回收站吗？将自动为媒体上传创建一个新文件夹。</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">要移至回收站吗？</string>
     <!-- confirmation message before removing a file -->
@@ -1390,10 +1370,6 @@
     <string name="label_file_speed_tera_byte">%s&#160;TB/秒</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
-    <!-- Number of versions of a file shown on the screen info of the file, version items -->
-    <plurals name="number_of_versions">
-        <item quantity="other">%1$d个版本</item>
-    </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">文件版本</string>
     <!-- Header of the item to show the current version of a file in a list -->
@@ -1430,14 +1406,8 @@
     <string name="missed_call_notification_title">未接来电</string>
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">位置</string>
-    <!-- Title of the label to show the size of the current files inside a folder -->
-    <string name="file_properties_folder_current_versions">当前版本</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
     <string name="file_properties_folder_previous_versions">以前的版本</string>
-    <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
-    <plurals name="number_of_versions_inside_folder">
-        <item quantity="other">%1$d个版本文件</item>
-    </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">发生错误。%1$d条消息未被转发</item>
@@ -2282,8 +2252,6 @@
     <string name="alert_not_enough_permissions_revert">您没有修改此文件的权限。是否要创建一个新文件？</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">该版本已被创建为新文件</string>
-    <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
-    <string name="general_date_label">于%1$s</string>
     <!-- Download location label -->
     <string name="download_location">下载位置</string>
     <!-- Action to show any file in its location -->
@@ -3716,10 +3684,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">您无法验证%s，因为他们不在您的联系人列表中。请先等待他们接受您的邀请。</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">开始</string>
-    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">根据我们的[A]删除指导政策[/A]，此文件已被删除。</string>
-    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">根据我们的[A]删除指导政策[/A]，此文件夹已被删除。</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">加入</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4548,10 +4512,6 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">此相册包含隐藏的项目。共享相册意味着与您共享的人可以看到隐藏的项目。这些项目仍将隐藏在您的云盘中。</string>
-    <!-- Image or Video map location title-->
-    <string name="file_properties_info_map_location">位置</string>
-    <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">没有位置信息</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
     <string name="logout_warning_dialog_title">现在登出将导致数据丢失</string>
     <!-- Logout warning dialog positive button text -->

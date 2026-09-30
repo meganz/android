@@ -4,7 +4,6 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import dagger.Lazy
 import leftMeetingDestination
-import mega.privacy.android.app.activities.navigation.fileInfoScreen
 import mega.privacy.android.app.businessExpiredAlertLegacyDestination
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
@@ -156,7 +155,6 @@ class LegacyCoreActivityFeatureGraph(
             )
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
             cameraBackupPermissionsScreen(navigationHandler)
-            fileInfoScreen(navigationHandler::back)
             offlineFileInfoScreen(navigationHandler::back)
             tagsScreen(navigationHandler::back)
             versionsFileScreen(navigationHandler::back)

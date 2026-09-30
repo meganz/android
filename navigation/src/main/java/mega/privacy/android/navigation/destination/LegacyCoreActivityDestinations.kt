@@ -222,9 +222,6 @@ data class TagsNavKey(val nodeHandle: Long) : NavKey
 data class VersionsFileNavKey(val nodeHandle: Long) : NavKey
 
 @Serializable
-data class LegacyFileInfoNavKey(val handle: Long) : NavKey
-
-@Serializable
 data class AuthenticityCredentialsNavKey(
     val email: String,
     val isIncomingShares: Boolean,

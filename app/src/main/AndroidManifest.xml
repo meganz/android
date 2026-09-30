@@ -397,7 +397,6 @@
         <activity
             android:name=".presentation.contactinfo.ContactInfoComposeActivity"
             android:windowSoftInputMode="adjustNothing" />
-        <activity android:name=".presentation.fileinfo.FileInfoActivity" />
         <activity android:name=".main.VersionsFileActivity" />
         <activity android:name=".main.megachat.GroupChatInfoActivity" />
         <activity

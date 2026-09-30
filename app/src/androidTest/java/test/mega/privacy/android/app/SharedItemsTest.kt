@@ -16,11 +16,9 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
-import mega.privacy.android.app.di.FakeFeatureFlagValueProvider
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
 import mega.privacy.android.data.test.stub.StubMegaNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import nz.mega.sdk.MegaApiJava
@@ -59,9 +57,8 @@ import javax.inject.Inject
  *
  * Ported: tc01 (incoming owner + list/grid), tc02 (outgoing recipient + list/grid), tc03 (links
  * tab lists folder+file links), tc04/tc05/tc06 (incoming folder info at read-only / read-write /
- * full access, against the revamped Compose file info screen — the legacy FileInfoActivity talks
- * to the SDK directly and cannot run on the fakes, so `FileInfoRevamp` is forced on), tc07 (leave
- * incoming share), tc08 (remove outgoing share), tc09 (remove folder+file links), tc11 (rename
+ * full access), tc07 (leave incoming share), tc08 (remove outgoing share),
+ * tc09 (remove folder+file links), tc11 (rename
  * outgoing folder), tc12 (outgoing folder info: shared-with contact + permission), tc15 (change
  * share permission — carries the demo-recording camera holds).
  *
@@ -76,9 +73,6 @@ class SharedItemsTest {
 
     @Inject
     lateinit var fakeMegaApi: FakeMegaApiGateway
-
-    @Inject
-    lateinit var fakeFlags: FakeFeatureFlagValueProvider
 
     @Inject
     lateinit var saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase
@@ -113,10 +107,6 @@ class SharedItemsTest {
 
         // Boot the test process through the production initialiser units. See CloudDriveUploadTest.
         TestAppBoot.runCoreInitializers()
-
-        // The Info action must open the revamped Compose file info screen; the legacy
-        // FileInfoActivity accesses the SDK directly and cannot run on the fake gateways.
-        fakeFlags.set(ApiFeatures.FileInfoRevamp, true)
 
         // Production registers this in MegaApplication.onCreate; under the Hilt test application
         // nothing does, and SnackBarHandlerImpl silently drops messages when it cannot resolve a

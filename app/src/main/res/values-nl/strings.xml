@@ -221,10 +221,6 @@
     <string name="dialog_select_permissions">Machtigingen delen</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Machtigingen wijzigen</string>
-    <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">Gedeeld met</string>
-    <!-- shows the owner of an incoming shared folder -->
-    <string name="file_properties_owner">Eigenaar</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">Uitnodigen</string>
     <!-- option to reinvite a contact -->
@@ -283,8 +279,6 @@
     <string name="context_copying">Aan het kopiëren</string>
     <!-- menu item -->
     <string name="context_move_to_trash">Verplaatsen naar Prullenbak</string>
-    <!-- menu item -->
-    <string name="context_delete_from_mega">Verwijderen van MEGA</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Map creëren</string>
     <!-- Menu option title -->
@@ -341,12 +335,8 @@
     <string name="context_no_moved">Foutmelding. Niet verplaatst</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Gedeeld</string>
-    <!-- error message -->
-    <string name="context_no_removed_shared">Fout. Deling is mislukt te verwijderen</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Item verwijderd</string>
-    <!-- error message -->
-    <string name="context_no_removed">Foutmelding. Verwijdering mislukt</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d items gekopieerd</string>
     <!-- error message when sending multiple files -->
@@ -755,8 +745,6 @@
         <item quantity="one">%d contact worden verwijderd van de gedeelde map.</item>
         <item quantity="other">%d contacten worden verwijderd van de gedeelde map.</item>
     </plurals>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_incorrectly_changed_from_shared">Bijwerken van %d contacten mislukt</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Contacten laden van de telefoon&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
@@ -1177,16 +1165,8 @@
     <string name="title_properties_chat_notifications_contact">Gespreksmeldingen</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B]heeft de chatgeschiedenis gewist[/B]</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">Machtigingen wijzigen</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_removing_contact_folder">Verwijderen van gedeelde map</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Verplaatsen naar Prullenbak?</string>
-    <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Wilt u deze map naar de Prullenbak verplaatsen? Er wordt automatisch een nieuwe map gemaakt voor camera-uploads.</string>
-    <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Wilt u deze map naar de Prullenbak verplaatsen? Er wordt automatisch een nieuwe map gemaakt voor Media-uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Verplaatsen naar Prullenbak?</string>
     <!-- confirmation message before removing a file -->
@@ -1415,11 +1395,6 @@
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
-    <!-- Number of versions of a file shown on the screen info of the file, version items -->
-    <plurals name="number_of_versions">
-        <item quantity="one">%1$d versie</item>
-        <item quantity="other">%1$d versies</item>
-    </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">Versies</string>
     <!-- Header of the item to show the current version of a file in a list -->
@@ -1458,15 +1433,8 @@
     <string name="missed_call_notification_title">Gemiste oproep</string>
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">Lokatie</string>
-    <!-- Title of the label to show the size of the current files inside a folder -->
-    <string name="file_properties_folder_current_versions">Huidige versies</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
     <string name="file_properties_folder_previous_versions">Vorige Versies</string>
-    <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
-    <plurals name="number_of_versions_inside_folder">
-        <item quantity="one">%1$d versiebestand</item>
-        <item quantity="other">%1$d versie bestanden</item>
-    </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Fout. %1$d bericht niet doorverstuurd</item>
@@ -2336,8 +2304,6 @@
     <string name="alert_not_enough_permissions_revert">U heeft niet de juiste toestemmingen om dit bestand te wijzigen. Wilt u een nieuw bestand creëren?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Versie was gecreëerd als nieuw bestand</string>
-    <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
-    <string name="general_date_label">op %1$s</string>
     <!-- Download location label -->
     <string name="download_location">Download locatie</string>
     <!-- Action to show any file in its location -->
@@ -3876,10 +3842,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">U kunt %s niet verifiëren omdat ze niet in u contactenlijst staan. Wacht tot ze eerst uw uitnodiging accepteren.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Starten</string>
-    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">Dit bestand is verwijderd in overeenstemming met ons [A]Verwijderingsbeleid[/A].</string>
-    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">Deze map is verwijderd in overeenstemming met ons [A]Verwijderingsbeleid[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Aansluiten</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4756,10 +4718,6 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">Er zijn verborgen items in dit album. Als u het album deelt, zijn de verborgen items zichtbaar voor degenen met wie u deelt. De items blijven verborgen op uw Cloud-schijf.</string>
-    <!-- Image or Video map location title-->
-    <string name="file_properties_info_map_location">Locatie</string>
-    <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">Geen lokatie informatie</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
     <string name="logout_warning_dialog_title">Als u zich nu afmeldt, gaan er gegevens verloren</string>
     <!-- Logout warning dialog positive button text -->

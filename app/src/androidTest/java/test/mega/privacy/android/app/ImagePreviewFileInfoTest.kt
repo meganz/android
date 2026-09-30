@@ -12,13 +12,10 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
-import mega.privacy.android.app.di.FakeFeatureFlagValueProvider
 import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
 import mega.privacy.android.data.test.stub.StubMegaNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,10 +29,8 @@ import javax.inject.Inject
  * only the SDK gateways faked, the UI is driven with UiAutomator, and Compose test tags are matched
  * as resource ids because both screens set `testTagsAsResourceId = true`.
  *
- * Image preview must reach File info through `MegaNavigator` so that the `FileInfoRevamp` gate on
- * `FileInfoNavKey` decides which screen is served. The assertions are on the revamped screen's
- * tags, which a direct `Intent(FileInfoActivity)` would fail: it bypasses the gate and serves the
- * legacy screen whatever the flag says.
+ * Image preview must reach File info through `MegaNavigator` so that it lands on `FileInfoNavKey`
+ * in the single-activity graph, which is what the assertions here are written against.
  */
 @HiltAndroidTest
 class ImagePreviewFileInfoTest {
@@ -45,9 +40,6 @@ class ImagePreviewFileInfoTest {
 
     @Inject
     lateinit var fakeMegaApi: FakeMegaApiGateway
-
-    @Inject
-    lateinit var fakeFlags: FakeFeatureFlagValueProvider
 
     @Inject
     lateinit var saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase
@@ -81,18 +73,12 @@ class ImagePreviewFileInfoTest {
         }
     }
 
-    @After
-    fun tearDown() {
-        fakeFlags.clear()
-    }
-
     /**
      * Opening an image from Cloud Drive and choosing Info from its overflow sheet lands on the
      * revamped File info screen showing the image's name.
      */
     @Test
     fun imagePreviewInfoOpensTheRevampedFileInfoScreen() {
-        fakeFlags.set(ApiFeatures.FileInfoRevamp, true)
         seedImage()
 
         launchCloudDrive()

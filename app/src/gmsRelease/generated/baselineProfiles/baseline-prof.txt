@@ -61316,13 +61316,6 @@ SPLmega/privacy/android/app/presentation/fileexplorer/FileExplorerDestinationKt$
 SPLmega/privacy/android/app/presentation/fileexplorer/FileExplorerDestinationKt$fileExplorer$$inlined$entry$default$1;-><init>()V
 Lmega/privacy/android/app/presentation/fileexplorer/FileExplorerDestinationKt$fileExplorer$$inlined$entry$default$2;
 SPLmega/privacy/android/app/presentation/fileexplorer/FileExplorerDestinationKt$fileExplorer$$inlined$entry$default$2;-><init>(Ljava/util/Map;)V
-Lmega/privacy/android/app/presentation/fileinfo/FileInfoActivity_GeneratedInjector;
-Lmega/privacy/android/app/presentation/fileinfo/FileInfoViewModel_HiltModules$KeyModule;
-SPLmega/privacy/android/app/presentation/fileinfo/FileInfoViewModel_HiltModules$KeyModule;->provide()Z
-Lmega/privacy/android/app/presentation/fileinfo/FileInfoViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
-SPLmega/privacy/android/app/presentation/fileinfo/FileInfoViewModel_HiltModules_BindsModule_Binds_LazyMapKey;-><clinit>()V
-Lmega/privacy/android/app/presentation/fileinfo/FileInfoViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
-SPLmega/privacy/android/app/presentation/fileinfo/FileInfoViewModel_HiltModules_KeyModule_Provide_LazyMapKey;-><clinit>()V
 Lmega/privacy/android/app/presentation/filelink/FileLinkComposeActivity_GeneratedInjector;
 Lmega/privacy/android/app/presentation/filelink/LegacyFileLinkNavigationDestinationKt;
 SPLmega/privacy/android/app/presentation/filelink/LegacyFileLinkNavigationDestinationKt;->legacyFileLinkScreen(Landroidx/navigation3/runtime/EntryProviderScope;Lkotlin/jvm/functions/Function0;)V
@@ -78721,7 +78714,6 @@ Lmega/privacy/android/navigation/destination/InviteContactNavKey;
 Lmega/privacy/android/navigation/destination/LeftMeetingNavKey;
 Lmega/privacy/android/navigation/destination/LegacyAddToAlbumActivityNavKey;
 Lmega/privacy/android/navigation/destination/LegacyExportRecoveryKeyNavKey;
-Lmega/privacy/android/navigation/destination/LegacyFileInfoNavKey;
 Lmega/privacy/android/navigation/destination/LegacyFileLinkNavKey;
 Lmega/privacy/android/navigation/destination/LegacyFolderLinkNavKey;
 Lmega/privacy/android/navigation/destination/LegacyImageViewerNavKey;

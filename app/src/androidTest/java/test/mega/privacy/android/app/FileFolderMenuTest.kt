@@ -89,9 +89,8 @@ import javax.inject.Inject
  *   ([ChatExplorerActivity]) are legacy activities that talk to the SDK directly, so — like the
  *   pickers in [CloudDriveUploadTest] and [ChatRoomTest] — they are stubbed with Espresso-Intents
  *   to immediately return the selection; everything around the picker runs the production flow.
- * - tc01/tc02 open the revamped File info screen (`FileInfoRevamp` forced on); the get-link /
- *   remove-link round trip inside the info screen is covered by tc11/tc12 on the Share link
- *   screen instead.
+ * - tc01/tc02 open the File info screen; the get-link / remove-link round trip inside the info
+ *   screen is covered by tc11/tc12 on the Share link screen instead.
  */
 @HiltAndroidTest
 class FileFolderMenuTest {
@@ -394,7 +393,6 @@ class FileFolderMenuTest {
     /** tc01 — the file info screen shows the file's name and its type/size subtitle. */
     @Test
     fun fileInfoShowsNameAndSize() {
-        fakeFlags.set(ApiFeatures.FileInfoRevamp, true)
         seedFile()
 
         launchCloudDrive()
@@ -408,7 +406,6 @@ class FileFolderMenuTest {
     /** tc02 — the folder info screen shows the folder's name and its contents ("1 file"). */
     @Test
     fun folderInfoShowsNameAndContents() {
-        fakeFlags.set(ApiFeatures.FileInfoRevamp, true)
         seedFolder()
         seedNode(CHILD_FILE_HANDLE, CHILD_FILE_NAME, isFolder = false, parentHandle = FOLDER_HANDLE)
         fakeMegaApi.stubRequest(

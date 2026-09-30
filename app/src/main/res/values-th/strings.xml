@@ -218,10 +218,6 @@
     <string name="dialog_select_permissions">แชร์สิทธิ์</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">เปลี่ยนสิทธิ์</string>
-    <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">แชร์กับ</string>
-    <!-- shows the owner of an incoming shared folder -->
-    <string name="file_properties_owner">เจ้าของ</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">เชิญ</string>
     <!-- option to reinvite a contact -->
@@ -280,8 +276,6 @@
     <string name="context_copying">กำลังคัดลอก</string>
     <!-- menu item -->
     <string name="context_move_to_trash">ย้ายไปที่ถังขยะ</string>
-    <!-- menu item -->
-    <string name="context_delete_from_mega">นำออกจาก MEGA</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">กำลังสร้างโฟลเดอร์</string>
     <!-- Menu option title -->
@@ -338,12 +332,8 @@
     <string name="context_no_moved">ผิดพลาด ยังไม่ได้ย้าย</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">แชร์เรียบร้อยแล้ว</string>
-    <!-- error message -->
-    <string name="context_no_removed_shared">ผิดพลาด ลบการแชร์ไม่สำเร็จ</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">ลบรายการออกแล้ว</string>
-    <!-- error message -->
-    <string name="context_no_removed">ข้อผิดพลาด ลบไม่สำเร็จ</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">คัดลอก %d รายการแล้ว</string>
     <!-- error message when sending multiple files -->
@@ -748,8 +738,6 @@
     <plurals name="remove_multiple_contacts_shared_folder">
         <item quantity="other">ผู้ติดต่อ %d รายจะถูกลบออกจากโฟลเดอร์ที่แชร์</item>
     </plurals>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_incorrectly_changed_from_shared">ไม่สามารถอัปเดตการอนุญาตสำหรับ %d ผู้ติดต่อได้</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">กำลังโหลดรายชื่อจากโทรศัพท์&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
@@ -1154,16 +1142,8 @@
     <string name="title_properties_chat_notifications_contact">การแจ้งเตือนแชท</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] ได้ล้างประวัติการสนทนา[/B]</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">เปลี่ยนสิทธิ์</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_removing_contact_folder">นำที่อยู่ติดต่อออกจากโฟลเดอร์แชร์</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">ย้ายไปถังขยะหรือไม่</string>
-    <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">ย้ายโฟลเดอร์นี้ไปที่ถังขยะหรือไม่ ระบบจะสร้างโฟลเดอร์อัปโหลดจากกล้องให้ใหม่โดยอัตโนมัติ</string>
-    <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">ย้ายโฟลเดอร์นี้ไปที่ถังขยะหรือไม่ ระบบจะสร้างโฟลเดอร์อัปโหลดสื่อให้ใหม่โดยอัตโนมัติ</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">ย้ายไปถังขยะหรือไม่</string>
     <!-- confirmation message before removing a file -->
@@ -1388,10 +1368,6 @@
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
-    <!-- Number of versions of a file shown on the screen info of the file, version items -->
-    <plurals name="number_of_versions">
-        <item quantity="other">%1$d เวอร์ชัน</item>
-    </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">เวอร์ชัน</string>
     <!-- Header of the item to show the current version of a file in a list -->
@@ -1428,14 +1404,8 @@
     <string name="missed_call_notification_title">สายที่ไม่ได้รับ</string>
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">ตำแหน่งที่ตั้ง</string>
-    <!-- Title of the label to show the size of the current files inside a folder -->
-    <string name="file_properties_folder_current_versions">เวอร์ชันปัจจุบัน</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
     <string name="file_properties_folder_previous_versions">เวอร์ชันก่อนหน้า</string>
-    <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
-    <plurals name="number_of_versions_inside_folder">
-        <item quantity="other">%1$d เวอร์ชันไฟล์</item>
-    </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">พบข้อผิดพลาด มีข้อความ %1$d รายการที่ไม่สามารถส่งต่อได้</item>
@@ -2280,8 +2250,6 @@
     <string name="alert_not_enough_permissions_revert">คุณไม่มีสิทธิ์ในการแก้ไขไฟล์นี้ คุณต้องการสร้างไฟล์ใหม่หรือไม่</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">สร้างเวอร์ชันเป็นไฟล์ใหม่แล้ว</string>
-    <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
-    <string name="general_date_label">เมื่อ %1$s</string>
     <!-- Download location label -->
     <string name="download_location">ที่ตั้งดาวน์โหลด</string>
     <!-- Action to show any file in its location -->
@@ -3714,10 +3682,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">คุณไม่สามารถตรวจสอบ %s ได้เนื่องจากไม่ได้อยู่ในรายชื่อผู้ติดต่อของคุณ รอให้พวกเขาตอบรับคำเชิญของคุณก่อน</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">เริ่ม</string>
-    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">ไฟล์นี้ถูกลบออกตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา</string>
-    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">โฟลเดอร์นี้ถูกลบออกตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">เข้าร่วม</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4542,10 +4506,6 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">อัลบั้มนี้มีรายการบางอย่างที่ซ่อนไว้ การแชร์อัลบั้มนี้จะทำให้ผู้ที่คุณแชร์ด้วยสามารถเห็นเนื้อหาที่ซ่อนอยู่ได้ แต่เนื้อหาเหล่านี้จะยังคงซ่อนอยู่ในคลาวด์ไดร์ฟของคุณ</string>
-    <!-- Image or Video map location title-->
-    <string name="file_properties_info_map_location">ตำแหน่งที่ตั้ง</string>
-    <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">ไม่มีข้อมูลเกี่ยวกับตำแหน่งที่ตั้ง</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
     <string name="logout_warning_dialog_title">หากออกจากระบบตอนนี้ ข้อมูลบางส่วนอาจสูญหาย</string>
     <!-- Logout warning dialog positive button text -->

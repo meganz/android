@@ -224,10 +224,6 @@
     <string name="dialog_select_permissions">Permissões de compartilhamento</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Alterar permissões</string>
-    <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">Compartilhado com</string>
-    <!-- shows the owner of an incoming shared folder -->
-    <string name="file_properties_owner">Proprietário</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">Convidar</string>
     <!-- option to reinvite a contact -->
@@ -286,8 +282,6 @@
     <string name="context_copying">Copiando</string>
     <!-- menu item -->
     <string name="context_move_to_trash">Mover para a Lixeira</string>
-    <!-- menu item -->
-    <string name="context_delete_from_mega">Remover do MEGA</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Criando pasta</string>
     <!-- Menu option title -->
@@ -344,12 +338,8 @@
     <string name="context_no_moved">Erro. Não foi movido</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Compartilhar</string>
-    <!-- error message -->
-    <string name="context_no_removed_shared">Erro. Não foi possível remover o compartilhamento</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Item deletado</string>
-    <!-- error message -->
-    <string name="context_no_removed">Erro. Não foi possível deletar</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d itens foram copiados</string>
     <!-- error message when sending multiple files -->
@@ -762,8 +752,6 @@
         <item quantity="many">O acesso dos %d de contatos à pasta compartilhada será removido.</item>
         <item quantity="other">O acesso dos %d contatos à pasta compartilhada será removido.</item>
     </plurals>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_incorrectly_changed_from_shared">Não foi possível atualizar as permissões de %d contatos</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Carregando contatos do celular&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
@@ -1200,16 +1188,8 @@
     <string name="title_properties_chat_notifications_contact">Notificações de chat</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] deletou o histórico do chat[/B]</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">Alterando as permissões</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_removing_contact_folder">Removendo o contato da pasta compartilhada</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Mover para a Lixeira?</string>
-    <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Você quer mover esta pasta para a Lixeira? Será gerada automaticamente uma nova pasta para os Uploads da câmera.</string>
-    <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Você quer mover esta pasta para a Lixeira? Será gerada automaticamente uma nova pasta para os Uploads de mídia.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Mover para a Lixeira?</string>
     <!-- confirmation message before removing a file -->
@@ -1438,12 +1418,6 @@
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
-    <!-- Number of versions of a file shown on the screen info of the file, version items -->
-    <plurals name="number_of_versions">
-        <item quantity="one">%1$d versão</item>
-        <item quantity="many">%1$d versões</item>
-        <item quantity="other">%1$d versões</item>
-    </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">Versões</string>
     <!-- Header of the item to show the current version of a file in a list -->
@@ -1484,16 +1458,8 @@
     <string name="missed_call_notification_title">Chamada perdida</string>
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">Localização</string>
-    <!-- Title of the label to show the size of the current files inside a folder -->
-    <string name="file_properties_folder_current_versions">Versões atuais</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
     <string name="file_properties_folder_previous_versions">Versões anteriores</string>
-    <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
-    <plurals name="number_of_versions_inside_folder">
-        <item quantity="one">%1$d arquivo com versões</item>
-        <item quantity="many">%1$d arquivos com versões</item>
-        <item quantity="other">%1$d arquivos com versões</item>
-    </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Erro. Não foi possível encaminhar %1$d mensagem</item>
@@ -2388,8 +2354,6 @@
     <string name="alert_not_enough_permissions_revert">Você não tem a permissão necessária para corrigir este arquivo. Você quer criar um novo arquivo?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">A versão foi criada como um novo arquivo</string>
-    <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
-    <string name="general_date_label">em %1$s</string>
     <!-- Download location label -->
     <string name="download_location">Destino do download</string>
     <!-- Action to show any file in its location -->
@@ -4034,10 +3998,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Você não pode verificar %s porque ele não está na sua lista de contatos. Espere até ele aceitar o seu convite.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Começar</string>
-    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">Este arquivo foi removido de acordo com a nossa [A]Política do guia de remoção[/A].</string>
-    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">Esta pasta foi removida de acordo com a nossa [A]Política do guia de remoção[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Entrar</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4970,10 +4930,6 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">Há itens ocultos neste álbum. Ao compartilhar o álbum, os itens ocultos ficarão visíveis para as pessoas com as quais você o compartilhar, mas vão permanecer ocultos na sua Nuvem de arquivos.</string>
-    <!-- Image or Video map location title-->
-    <string name="file_properties_info_map_location">Localização</string>
-    <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">Não há informação de localização</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
     <string name="logout_warning_dialog_title">Fazer logout agora vai causar a perda de dados</string>
     <!-- Logout warning dialog positive button text -->

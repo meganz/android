@@ -221,10 +221,6 @@
     <string name="dialog_select_permissions">Share permissions</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Change permissions</string>
-    <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">Shared with</string>
-    <!-- shows the owner of an incoming shared folder -->
-    <string name="file_properties_owner">Owner</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">Invite</string>
     <!-- option to reinvite a contact -->
@@ -283,8 +279,6 @@
     <string name="context_copying">Copying</string>
     <!-- menu item -->
     <string name="context_move_to_trash">Move to Rubbish bin</string>
-    <!-- menu item -->
-    <string name="context_delete_from_mega">Remove from MEGA</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creating folder</string>
     <!-- Menu option title -->
@@ -341,12 +335,8 @@
     <string name="context_no_moved">Error. Not moved</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Shared</string>
-    <!-- error message -->
-    <string name="context_no_removed_shared">Error. Share failed to remove</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Item deleted</string>
-    <!-- error message -->
-    <string name="context_no_removed">Error. Deletion failed</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d items copied</string>
     <!-- error message when sending multiple files -->
@@ -755,8 +745,6 @@
         <item quantity="one">%d contact will be removed from the shared folder.</item>
         <item quantity="other">%d contacts will be removed from the shared folder.</item>
     </plurals>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_incorrectly_changed_from_shared">Failed to update permissions for %d contacts</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Loading contacts from the phone&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
@@ -1177,16 +1165,8 @@
     <string name="title_properties_chat_notifications_contact">Chat notifications</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] cleared the chat history[/B]</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">Changing permissions</string>
-    <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_removing_contact_folder">Removing contact from shared folder</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Move to the Rubbish bin?</string>
-    <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
-    <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Move to Rubbish bin?</string>
     <!-- confirmation message before removing a file -->
@@ -1415,11 +1395,6 @@
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
-    <!-- Number of versions of a file shown on the screen info of the file, version items -->
-    <plurals name="number_of_versions">
-        <item quantity="one">%1$d version</item>
-        <item quantity="other">%1$d versions</item>
-    </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">Versions</string>
     <!-- Header of the item to show the current version of a file in a list -->
@@ -1458,15 +1433,8 @@
     <string name="missed_call_notification_title">Missed call</string>
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">Location</string>
-    <!-- Title of the label to show the size of the current files inside a folder -->
-    <string name="file_properties_folder_current_versions">Current versions</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
     <string name="file_properties_folder_previous_versions">Previous versions</string>
-    <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
-    <plurals name="number_of_versions_inside_folder">
-        <item quantity="one">%1$d versioned file</item>
-        <item quantity="other">%1$d versioned files</item>
-    </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Error. %1$d message not forwarded</item>
@@ -2336,8 +2304,6 @@
     <string name="alert_not_enough_permissions_revert">You do not have the correct permissions to amend this file. Would you like to create a new file?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Version was created as a new file</string>
-    <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
-    <string name="general_date_label">on %1$s</string>
     <!-- Download location label -->
     <string name="download_location">Download location</string>
     <!-- Action to show any file in its location -->
@@ -3876,10 +3842,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Start</string>
-    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
-    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Join</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4760,10 +4722,6 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
-    <!-- Image or Video map location title-->
-    <string name="file_properties_info_map_location">Location</string>
-    <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
     <string name="logout_warning_dialog_title">Logging out now will result in lost data</string>
     <!-- Logout warning dialog positive button text -->
