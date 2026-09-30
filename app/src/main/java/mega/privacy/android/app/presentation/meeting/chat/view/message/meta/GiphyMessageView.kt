@@ -51,11 +51,9 @@ fun GiphyMessageView(
     onError: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    val maxWidth = 256
 
     with(gifInfo) {
-        val actualWidth = minOf(maxWidth, width)
-        val actualHeight: Int = actualWidth * height / width
+        val (actualWidth, actualHeight) = calculateGiphyDisplaySize(width, height)
 
         var showPlaceHolder by remember { mutableStateOf(false) }
 
@@ -102,6 +100,26 @@ fun GiphyMessageView(
 }
 
 /**
+ * Calculates the size in dp at which a giphy is shown in the chat.
+ *
+ * The dimensions come from the sender's message meta and cannot be trusted, so non-positive
+ * values fall back to a square and the height is capped.
+ *
+ * @param width Width of the giphy.
+ * @param height Height of the giphy.
+ * @return The display width and height.
+ */
+internal fun calculateGiphyDisplaySize(width: Int, height: Int): Pair<Int, Int> {
+    if (width <= 0 || height <= 0) return GIPHY_MAX_WIDTH to GIPHY_MAX_WIDTH
+
+    val displayWidth = minOf(GIPHY_MAX_WIDTH, width)
+    val displayHeight = (displayWidth.toLong() * height / width)
+        .coerceIn(1L, GIPHY_MAX_HEIGHT.toLong())
+        .toInt()
+    return displayWidth to displayHeight
+}
+
+/**
  * Gets the original src of a Giphy by replacing GIPHY_URL to the endpoint.
  *
  * Only sources served by the MEGA Giphy endpoint are accepted.
@@ -122,6 +140,11 @@ fun String.toGiphyUri(): Uri? {
     return uri
 }
 
+private const val GIPHY_MAX_WIDTH = 256
+
+// Guards against a sender-supplied height turning one message into a huge bubble. Giphy sends
+// fixed-height renditions of about 200px, so real GIFs never reach this cap.
+private const val GIPHY_MAX_HEIGHT = 1024
 private const val GIPHY_SCHEME = "https"
 private const val GIPHY_HOST = "giphy.mega.nz"
 

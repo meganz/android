@@ -60,7 +60,7 @@ class GiphyViewerActivity : PasscodeActivity() {
         val (width, height) = updateGifDimensionsView()
         gifData?.webpUrl?.toGiphyUri()?.let {
             binding.gifImage.load(it) {
-                size(width, height)
+                if (width > 0 && height > 0) size(width, height)
                 listener(
                     onStart = { binding.gifProgressBar.visibility = View.VISIBLE },
                     onSuccess = { _, _ -> binding.gifProgressBar.visibility = View.GONE },
@@ -76,8 +76,8 @@ class GiphyViewerActivity : PasscodeActivity() {
      */
     private fun updateGifDimensionsView(): Pair<Int, Int> {
         val params = binding.gifImage.layoutParams ?: return 0 to 0
-        val gifWidth = gifData?.width
-        val gifHeight = gifData?.height
+        val gifWidth = gifData?.width?.takeIf { it > 0 } ?: return 0 to 0
+        val gifHeight = gifData?.height?.takeIf { it > 0 } ?: return 0 to 0
         val gifScreenWidth: Int
         val gifScreenHeight: Int
 
@@ -87,8 +87,8 @@ class GiphyViewerActivity : PasscodeActivity() {
             gifScreenHeight = if (gifWidth == gifHeight) {
                 gifScreenWidth
             } else {
-                val factor = gifScreenWidth.toFloat() / (gifWidth ?: 0).toFloat()
-                ((gifHeight ?: 0) * factor).toInt()
+                val factor = gifScreenWidth.toFloat() / gifWidth.toFloat()
+                (gifHeight * factor).toInt()
             }
 
             if (gifScreenHeight > 0) {
@@ -100,8 +100,8 @@ class GiphyViewerActivity : PasscodeActivity() {
             gifScreenWidth = if (gifWidth == gifHeight) {
                 gifScreenHeight
             } else {
-                val factor = gifScreenHeight.toFloat() / (gifHeight ?: 0).toFloat()
-                ((gifWidth ?: 0) * factor).toInt()
+                val factor = gifScreenHeight.toFloat() / gifHeight.toFloat()
+                (gifWidth * factor).toInt()
             }
 
             if (gifScreenWidth > 0) {
