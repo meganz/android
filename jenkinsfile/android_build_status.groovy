@@ -823,12 +823,12 @@ def detectFailedTestModules(List<String> moduleList) {
         String module = moduleList[i]
         // Check if failure can be found in XML test reports under "build/unittest/junit"
         if (fileExists("${module}/build/unittest/junit")) {
-            def testResultFiles = sh(
+            String failures = sh(
                     script: "grep -irE \"failures=\\\"[1-9][0-9]*\\\"\" ${module}/build/unittest/junit/* 2>/dev/null || true",
                     returnStdout: true
-            ).trim().split("\\r?\\n").findAll { it }
+            ).trim()
 
-            if (testResultFiles) {
+            if (failures) {
                 failedModules.add(module)
                 println("Detected failed tests in module: ${module}")
             }
