@@ -24,10 +24,9 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.list.MegaReorderableLazyColumn
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollForLazyColumn
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.conditional
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
-import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
@@ -68,10 +67,7 @@ internal fun ActiveTransfersView(
 ) {
     val selectMode = remember(selectedActiveTransfersIds) { selectedActiveTransfersIds != null }
     var draggedTransfer by remember { mutableStateOf<InProgressTransfer?>(null) }
-    val localSnackbarHostState = LocalSnackBarHostState.current
-    val snackBarHostState = LocalSnackBarHostState.current?.let {
-        SnackbarHostStateWrapper(it)
-    }
+    val snackBarHostState = LocalSnackBarHostState.current
     val resources = LocalResources.current
 
     if (activeTransfers.isEmpty()) {
@@ -125,8 +121,9 @@ internal fun ActiveTransfersView(
                             onSetActiveTransferToCancel(item)
 
                             coroutineScope.launch {
-                                localSnackbarHostState?.currentSnackbarData?.dismiss()
-                                val result = snackBarHostState.showAutoDurationSnackbar(
+                                val hostState = snackBarHostState ?: return@launch
+                                hostState.currentSnackbarData?.dismiss()
+                                val result = hostState.showAutoDurationSnackbar(
                                     resources.getString(sharedR.string.transfers_transfer_cancelled),
                                     resources.getString(sharedR.string.general_undo),
                                 )

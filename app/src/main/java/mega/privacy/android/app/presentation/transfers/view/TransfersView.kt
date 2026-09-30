@@ -36,14 +36,13 @@ import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
-import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
@@ -151,9 +150,7 @@ internal fun TransfersView(
             .semantics { testTagsAsResourceId = true }
             .testTag(TEST_TAG_TRANSFERS_VIEW),
         topBar = {
-            val snackbarHostState = LocalSnackBarHostState.current?.let {
-                SnackbarHostStateWrapper(it)
-            }
+            val snackbarHostState = LocalSnackBarHostState.current
 
             if (!isInSelectTransfersMode) {
                 TransfersTopBar(onBackPress, getTransferActions(uiState, selectedTab)) { action ->

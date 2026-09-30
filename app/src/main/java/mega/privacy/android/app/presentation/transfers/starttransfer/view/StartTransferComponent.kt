@@ -11,11 +11,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.SnackbarDuration as SnackbarDurationM2
 import androidx.compose.material.SnackbarHostState as SnackbarHostStateM2
-import androidx.compose.material.SnackbarResult
+import androidx.compose.material.SnackbarResult as SnackbarResultM2
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -25,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
@@ -43,8 +46,10 @@ import de.palm.composestateevents.consumed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
@@ -55,8 +60,6 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.node.action.HandleFileAction
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
-import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
-import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity
 import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity.Companion.EXTRA_ERROR
 import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity.Companion.EXTRA_FILE_PATH
@@ -85,7 +88,6 @@ import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -97,7 +99,7 @@ import java.io.File
 /**
  * Helper compose view to show UI related to starting a download transfer
  * (scanning in progress dialog, not enough space snackbar, start download snackbar, quota exceeded, etc.)
- * @param snackBarHostState optional Material3 snackbar host to show messages, typically null because it should be injected via LocalSnackBarHostState (Material3) or LocalSnackBarHostStateOriginal (Material2)
+ * @param snackBarHostState optional Material3 snackbar host to show messages, typically null because it is taken from [LocalSnackBarHostState]
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -236,7 +238,7 @@ internal fun StartTransferComponent(
 /**
  * Material2 seam for [StartTransferComponent]. Legacy screens that still drive their whole UI from a
  * Material2 [SnackbarHostStateM2] (shared with Material2 scaffolds/views elsewhere in the screen) can
- * keep passing that host here; it is forwarded to the Material3 component via [LocalSnackBarHostStateOriginal].
+ * keep passing that host here; the messages the Material3 component raises are replayed on it.
  * Prefer the Material3 overload for new callers. This seam can be removed once the remaining Material2
  * screens are migrated to Material3.
  */
@@ -251,16 +253,50 @@ internal fun StartTransferComponent(
     onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
     isPasscodeLocked: Boolean = false,
 ) {
-    CompositionLocalProvider(LocalSnackBarHostStateOriginal provides snackBarHostState) {
-        StartTransferComponent(
-            event = event,
-            onConsumeEvent = onConsumeEvent,
-            areTransferOverQuotaWarningsAllowed = areTransferOverQuotaWarningsAllowed,
-            onScanningFinished = onScanningFinished,
-            viewModel = viewModel,
-            onCancelNotEnoughSpaceForUploadDialog = onCancelNotEnoughSpaceForUploadDialog,
-            isPasscodeLocked = isPasscodeLocked,
-        )
+    val material3HostState = remember { SnackbarHostState() }
+    if (snackBarHostState != null) {
+        ReplayOnMaterial2Host(source = material3HostState, target = snackBarHostState)
+    }
+    StartTransferComponent(
+        event = event,
+        onConsumeEvent = onConsumeEvent,
+        areTransferOverQuotaWarningsAllowed = areTransferOverQuotaWarningsAllowed,
+        snackBarHostState = if (snackBarHostState == null) null else material3HostState,
+        onScanningFinished = onScanningFinished,
+        viewModel = viewModel,
+        onCancelNotEnoughSpaceForUploadDialog = onCancelNotEnoughSpaceForUploadDialog,
+        isPasscodeLocked = isPasscodeLocked,
+    )
+}
+
+/**
+ * Shows every snackbar queued on [source] through the Material2 [target] instead, so that a Material2
+ * screen keeps rendering and timing the message while the component raising it is Material3.
+ */
+@Composable
+private fun ReplayOnMaterial2Host(
+    source: SnackbarHostState,
+    target: SnackbarHostStateM2,
+) {
+    LaunchedEffect(source, target) {
+        snapshotFlow { source.currentSnackbarData }
+            .filterNotNull()
+            .collect { snackbarData ->
+                val result = target.showSnackbar(
+                    message = snackbarData.visuals.message,
+                    actionLabel = snackbarData.visuals.actionLabel,
+                    duration = when (snackbarData.visuals.duration) {
+                        SnackbarDuration.Short -> SnackbarDurationM2.Short
+                        SnackbarDuration.Long -> SnackbarDurationM2.Long
+                        SnackbarDuration.Indefinite -> SnackbarDurationM2.Indefinite
+                    },
+                )
+                if (result == SnackbarResultM2.ActionPerformed) {
+                    snackbarData.performAction()
+                } else {
+                    snackbarData.dismiss()
+                }
+            }
     }
 }
 
@@ -312,7 +348,7 @@ private fun StartTransferComponent(
     onAlwaysAskForDestination: () -> Unit,
     onResumeTransfers: () -> Unit,
     onAskedResumeTransfers: () -> Unit,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    snackBarHostState: SnackbarHostState?,
     onPreviewFile: (File) -> Unit,
     onPreviewOpened: () -> Unit,
     onCancelTransferConfirmed: () -> Unit,
@@ -381,7 +417,7 @@ private fun StartTransferComponent(
 
                 is StartTransferEvent.FinishUploadProcessing -> {
                     (event.triggerEvent as? StartUpload.Files)?.specificStartMessage?.let {
-                        snackBarHostState.showAutoDurationSnackbar(it)
+                        snackBarHostState?.showAutoDurationSnackbar(it)
                     }
                     onScanningFinished(event)
                 }
@@ -416,7 +452,7 @@ private fun StartTransferComponent(
                 }
 
                 is StartTransferEvent.FinishCopyOffline -> {
-                    snackBarHostState.showAutoDurationSnackbar(
+                    snackBarHostState?.showAutoDurationSnackbar(
                         resources.getQuantityString(
                             R.plurals.download_complete,
                             event.totalFiles,
@@ -532,7 +568,7 @@ private fun StartTransferComponent(
                 folderPicker.launch(null)
             }.onFailure {
                 coroutineScope.launch {
-                    snackBarHostState.showAutoDurationSnackbar(resources.getString(R.string.general_warning_no_picker))
+                    snackBarHostState?.showAutoDurationSnackbar(resources.getString(R.string.general_warning_no_picker))
                 }
             }
         }
@@ -595,14 +631,14 @@ private fun StartTransferComponent(
         event = uiState.cancelTransferFailure,
         onConsumed = onConsumeCancelTransferResult,
         action = {
-            snackBarHostState.showAutoDurationSnackbar(
+            snackBarHostState?.showAutoDurationSnackbar(
                 resources.getString(sharedR.string.transfers_error_cancelling_preview_download)
             )
         }
     )
     LaunchedEffect(showErrorMessage) {
         showErrorMessage?.let {
-            snackBarHostState.showAutoDurationSnackbar(it)
+            snackBarHostState?.showAutoDurationSnackbar(it)
             showErrorMessage = null
         }
     }
@@ -615,7 +651,7 @@ private val storageStateSaver = Saver<StorageState?, Int>(
 
 private suspend fun onFinishProcessing(
     event: StartTransferEvent.FinishDownloadProcessing,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    snackBarHostState: SnackbarHostState?,
     showQuotaExceededDialog: MutableState<StorageState?>,
     context: Context,
 ) {
@@ -631,12 +667,12 @@ private suspend fun onFinishProcessing(
 
             else -> {
                 Timber.e(exception)
-                snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_error))
+                snackBarHostState?.showAutoDurationSnackbar(context.getString(R.string.general_error))
             }
         }
     } ?: run {
         if (event.triggerEvent is TransferTriggerEvent.DownloadTriggerEvent && event.triggerEvent.withStartMessage) {
-            snackBarHostState.showAutoDurationSnackbar(
+            snackBarHostState?.showAutoDurationSnackbar(
                 context.getString(sharedR.string.transfers_download_started_snackbar)
             )
         }
@@ -646,16 +682,16 @@ private suspend fun onFinishProcessing(
 
 private suspend fun consumeMessage(
     event: StartTransferEvent.Message,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    snackBarHostState: SnackbarHostState?,
     context: Context,
     retryTransfers: (TransferTriggerEvent.RetryTransfers) -> Unit = {},
 ) {
     //show snack bar with an optional action
-    val result = snackBarHostState.showAutoDurationSnackbar(
+    val result = snackBarHostState?.showAutoDurationSnackbar(
         event.getMessage(context),
         event.action?.let { context.getString(it) }
     )
-    if (result == SnackbarResult.ActionPerformed || result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+    if (result == SnackbarResult.ActionPerformed) {
         event.actionEvent?.let { actionEvent ->
             when (actionEvent) {
                 is StartTransferEvent.Message.ActionEvent.ReRetry -> {
@@ -668,7 +704,4 @@ private suspend fun consumeMessage(
 }
 
 @Composable
-private fun SnackbarHostState?.orProvided() =
-    this?.let { SnackbarHostStateWrapper(it) }
-        ?: LocalSnackBarHostStateOriginal.current?.let { SnackbarHostStateWrapper(it) }
-        ?: LocalSnackBarHostState.current?.let { SnackbarHostStateWrapper(it) }
+private fun SnackbarHostState?.orProvided() = this ?: LocalSnackBarHostState.current
