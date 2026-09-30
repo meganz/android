@@ -9,6 +9,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.test.stub.StubMegaCancelToken
 import mega.privacy.android.data.test.stub.StubMegaError
 import mega.privacy.android.data.test.stub.StubMegaNode
 import mega.privacy.android.data.test.stub.StubMegaTransfer
@@ -108,7 +109,7 @@ class FakeMegaApiGatewayTransferTest {
             g.startDownload(StubMegaNode(handle = 1L), "/local/", "file.txt", null, false, null, 0, 0, l)
         },
         transferCase("getFullImage") { g, l ->
-            g.getFullImage(StubMegaNode(handle = 1L), File("/local/full.jpg"), false, l)
+            g.getFullImage(StubMegaNode(handle = 1L), File("/local/full.jpg"), false, StubMegaCancelToken(), l)
         },
     )
 

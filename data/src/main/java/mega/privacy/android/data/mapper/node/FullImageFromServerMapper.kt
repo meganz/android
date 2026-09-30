@@ -46,15 +46,15 @@ internal class FullImageFromServerMapper @Inject constructor(
         megaNode: MegaNode,
     ) = { path: String, highPriority: Boolean, resetDownloads: () -> Unit ->
         callbackFlow {
+            val cancelToken = megaApiGateway.createCancelToken()
             val listener = fullImageListener(path, resetDownloads)
-
             megaApiGateway.getFullImage(
                 megaNode,
                 File(path),
-                highPriority, listener
+                highPriority, cancelToken, listener
             )
 
-            awaitClose()
+            awaitClose { cancelToken.cancel() }
         }.flowOn(ioDispatcher)
     }
 
@@ -71,8 +71,6 @@ internal class FullImageFromServerMapper @Inject constructor(
         messageId: Long,
     ) = { path: String, highPriority: Boolean, resetDownloads: () -> Unit ->
         callbackFlow {
-            val listener = fullImageListener(path, resetDownloads)
-
             // Re-fetch the MegaNode when download is actually needed
             val megaNode = megaNodeFromChatMessageMapper(chatId, messageId)
                 ?: run {
@@ -85,13 +83,15 @@ internal class FullImageFromServerMapper @Inject constructor(
                     return@callbackFlow
                 }
 
+            val cancelToken = megaApiGateway.createCancelToken()
+            val listener = fullImageListener(path, resetDownloads)
             megaApiGateway.getFullImage(
                 megaNode,
                 File(path),
-                highPriority, listener
+                highPriority, cancelToken, listener
             )
 
-            awaitClose()
+            awaitClose { cancelToken.cancel() }
         }.flowOn(ioDispatcher)
     }
 

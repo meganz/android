@@ -96,3 +96,14 @@ data class Transfer(
      */
     override val progress = Progress(transferredBytes, totalBytes)
 }
+
+/**
+ * True for the parent transfer the SDK creates for a batch download.
+ *
+ * It only aggregates its sub-transfers, which the SDK reports to the global listeners on their
+ * own, so anything it reports, errors included, is already covered by them. A folder transfer
+ * started for one node keeps that node's handle, which is what tells them apart.
+ */
+fun Transfer.isDownloadBatch(): Boolean = isFolderTransfer && nodeHandle == INVALID_HANDLE
+
+private const val INVALID_HANDLE = -1L

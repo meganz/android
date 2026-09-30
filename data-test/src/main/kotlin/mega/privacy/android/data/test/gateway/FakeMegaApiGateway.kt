@@ -1014,11 +1014,12 @@ class FakeMegaApiGateway(
         node: MegaNode,
         fullFile: File,
         highPriority: Boolean,
+        cancelToken: MegaCancelToken,
         listener: MegaTransferListenerInterface,
     ) {
         completeTransfer(
             MegaApiGateway::getFullImage,
-            listOf(node, fullFile, highPriority, listener),
+            listOf(node, fullFile, highPriority, cancelToken, listener),
             listener,
         )
     }

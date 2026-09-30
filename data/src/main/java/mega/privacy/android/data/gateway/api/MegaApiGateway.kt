@@ -1030,12 +1030,14 @@ interface MegaApiGateway {
      * @param node
      * @param fullFile
      * @param highPriority
+     * @param cancelToken cancels the download, even before it starts
      * @param listener
      */
     fun getFullImage(
         node: MegaNode,
         fullFile: File,
         highPriority: Boolean,
+        cancelToken: MegaCancelToken,
         listener: MegaTransferListenerInterface,
     )
 

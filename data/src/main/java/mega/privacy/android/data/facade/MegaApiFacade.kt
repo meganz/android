@@ -646,6 +646,7 @@ internal class MegaApiFacade @Inject constructor(
         node: MegaNode,
         fullFile: File,
         highPriority: Boolean,
+        cancelToken: MegaCancelToken,
         listener: MegaTransferListenerInterface,
     ) {
         val items = MegaDownloadItemList.createInstance().apply {
@@ -660,7 +661,7 @@ internal class MegaApiFacade @Inject constructor(
         }
         megaApi.startDownloadBatch(
             items,
-            null,
+            cancelToken,
             MegaTransfer.COLLISION_CHECK_FINGERPRINT,
             MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N,
             listener
