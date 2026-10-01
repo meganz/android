@@ -708,6 +708,64 @@ class VideosTabViewModelTest {
             }
         }
 
+    @Test
+    fun `test that areAllSelected returns to true when the deselected item is selected again`() =
+        runTest {
+            val video1 = createVideoUiEntity(handle = 1L)
+            val video2 = createVideoUiEntity(handle = 2L)
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createTypedVideoNode(video1) to video1,
+                    createTypedVideoNode(video2) to video2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.selectAllVideos()
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isTrue()
+                underTest.onItemLongClicked(video1)
+                assertThat(awaitItem().areAllSelected).isFalse()
+                underTest.onItemLongClicked(video1)
+                assertThat(awaitItem().areAllSelected).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that areAllSelected is true when every item is selected one by one`() =
+        runTest {
+            val video1 = createVideoUiEntity(handle = 1L)
+            val video2 = createVideoUiEntity(handle = 2L)
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createTypedVideoNode(video1) to video1,
+                    createTypedVideoNode(video2) to video2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.onItemLongClicked(video1)
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isFalse()
+                underTest.onItemLongClicked(video2)
+                assertThat(awaitItem().areAllSelected).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     @ParameterizedTest(name = "when the showHiddenItems is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that uiState is updated correctly`(

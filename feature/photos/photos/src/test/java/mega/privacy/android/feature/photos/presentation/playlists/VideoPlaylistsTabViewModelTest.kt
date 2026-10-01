@@ -518,6 +518,214 @@ class VideoPlaylistsTabViewModelTest {
         }
 
     @Test
+    fun `test that areAllSelected is true after selectAllVideos is invoked`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(playlist1) to playlist1,
+                    createVideoPlaylist(playlist2) to playlist2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.selectAllVideos()
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that areAllSelected resets to false after clearSelection`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(playlist1) to playlist1,
+                    createVideoPlaylist(playlist2) to playlist2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.selectAllVideos()
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isTrue()
+                underTest.clearSelection()
+                assertThat(awaitItem().areAllSelected).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that areAllSelected resets to false when item is deselected`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(playlist1) to playlist1,
+                    createVideoPlaylist(playlist2) to playlist2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.selectAllVideos()
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isTrue()
+                underTest.onItemLongClicked(playlist1)
+                assertThat(awaitItem().areAllSelected).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that areAllSelected is true when every playlist is selected one by one`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(playlist1) to playlist1,
+                    createVideoPlaylist(playlist2) to playlist2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.onItemLongClicked(playlist1)
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isFalse()
+                underTest.onItemLongClicked(playlist2)
+                assertThat(awaitItem().areAllSelected).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that areAllSelected is true when every selectable playlist is selected one by one and a system playlist is present`() =
+        runTest {
+            val systemPlaylist =
+                createVideoPlaylistUiEntity(handle = 1L, isSystemVideoPlayer = true)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+            val playlist3 = createVideoPlaylistUiEntity(handle = 3L)
+
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(systemPlaylist) to systemPlaylist,
+                    createVideoPlaylist(playlist2) to playlist2,
+                    createVideoPlaylist(playlist3) to playlist3
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.onItemLongClicked(playlist2)
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isFalse()
+                underTest.onItemLongClicked(playlist3)
+                assertThat(awaitItem().areAllSelected).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that selectAllVideos leaves out the system playlist`() =
+        runTest {
+            val systemPlaylist =
+                createVideoPlaylistUiEntity(handle = 1L, isSystemVideoPlayer = true)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(systemPlaylist) to systemPlaylist,
+                    createVideoPlaylist(playlist2) to playlist2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.selectAllVideos()
+                    val actual = awaitItem()
+                    assertThat(actual.selectedPlaylists.map { it.id })
+                        .containsExactly(playlist2.id)
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that areAllSelected returns to true when the deselected item is selected again`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(playlist1) to playlist1,
+                    createVideoPlaylist(playlist2) to playlist2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.selectAllVideos()
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isTrue()
+                underTest.onItemLongClicked(playlist1)
+                assertThat(awaitItem().areAllSelected).isFalse()
+                underTest.onItemLongClicked(playlist1)
+                assertThat(awaitItem().areAllSelected).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that playlistsRemovedEvent is updated correctly`() =
         runTest {
             val playlist1 = createVideoPlaylistUiEntity(handle = 1L)

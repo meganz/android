@@ -74,7 +74,7 @@ class VideoPlaylistsTabViewModel @Inject constructor(
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
     private val queryFlow = MutableStateFlow<String?>(null)
     private val optimisticallyRemovedIds = MutableStateFlow<Set<NodeId>>(emptySet())
-    private var areAllSelected: Boolean = false
+    private val playlistCountFlow = MutableStateFlow<Int?>(null)
 
     /**
      * The selection slice of [uiState], for the Media screen's top bar and selection mode.
@@ -84,10 +84,16 @@ class VideoPlaylistsTabViewModel @Inject constructor(
      * Media screen open, whichever tab is showing.
      */
     internal val selectionUiState: StateFlow<VideoPlaylistsTabUiState.Selection> =
-        combine(selectedVideoPlaylistsFlow, queryFlow) { selectedPlaylists, query ->
+        combine(
+            selectedVideoPlaylistsFlow,
+            queryFlow,
+            playlistCountFlow,
+        ) { selectedPlaylists, query, playlistCount ->
             VideoPlaylistsTabUiState.Selection(
                 count = selectedPlaylists.size,
-                areAllSelected = areAllSelected,
+                areAllSelected = playlistCount != null
+                        && selectedPlaylists.isNotEmpty()
+                        && selectedPlaylists.size == playlistCount,
                 query = query,
             )
         }.asUiStateFlow(viewModelScope, VideoPlaylistsTabUiState.Selection())
@@ -203,29 +209,43 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     }
 
     private fun toggleItemSelection(item: VideoPlaylistUiEntity) {
-        val updatedSelectedPlaylists =
-            selectedVideoPlaylistsFlow.value.toMutableSet()
-        val existingItem = updatedSelectedPlaylists.firstOrNull { it.id == item.id }
-        if (existingItem == null) {
-            updatedSelectedPlaylists += item
-        } else {
-            updatedSelectedPlaylists -= existingItem
-            areAllSelected = false
+        syncPlaylistCount()
+        selectedVideoPlaylistsFlow.update { playlists ->
+            val existingItem = playlists.firstOrNull { it.id == item.id }
+            if (existingItem == null) playlists + item else playlists - existingItem
         }
-        selectedVideoPlaylistsFlow.update { updatedSelectedPlaylists }
     }
 
     internal fun selectAllVideos() {
-        areAllSelected = false
         val state = uiState.value as? VideoPlaylistsTabUiState.Data ?: return
-        areAllSelected = true
-        val allPlaylists = state.videoPlaylistEntities.toSet()
-        selectedVideoPlaylistsFlow.update { allPlaylists }
+        val selectablePlaylists = state.videoPlaylistEntities.filterNot { it.isSystemVideoPlayer }
+        playlistCountFlow.value = selectablePlaylists.size
+        selectedVideoPlaylistsFlow.update { selectablePlaylists.toSet() }
     }
 
     internal fun clearSelection() {
-        areAllSelected = false
         selectedVideoPlaylistsFlow.update { emptySet() }
+    }
+
+    /**
+     * Keeps the total that [selectionUiState] compares the selection against up to date.
+     *
+     * The total is a value of its own so that a selection change emits once: were it folded into
+     * the selection, the two writes would let [selectionUiState] observe the state between them.
+     *
+     * The system playlist is left out of the total because it has no checkbox and taps skip it,
+     * so it can never be part of a selection the user can see.
+     *
+     * Selection mode can only be entered from a loaded list, so reading [uiState] here cannot start
+     * the playlist load; it is read inside this function alone to keep [selectionUiState]
+     * independent of [uiState]. The previous total is kept when the read finds no loaded list,
+     * which happens once nothing collects [uiState] any more.
+     */
+    private fun syncPlaylistCount() {
+        playlistCountFlow.update { current ->
+            (uiState.value as? VideoPlaylistsTabUiState.Data)
+                ?.videoPlaylistEntities?.count { !it.isSystemVideoPlayer } ?: current
+        }
     }
 
     internal fun removeVideoPlaylists(deletedItems: Set<VideoPlaylistUiEntity>) =

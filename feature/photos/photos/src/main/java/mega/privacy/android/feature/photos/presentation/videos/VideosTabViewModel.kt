@@ -73,23 +73,21 @@ class VideosTabViewModel @Inject constructor(
 ) : ViewModel() {
     private val queryFlow = MutableStateFlow<String?>(null)
     private val selectedVideoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
-    private var areAllSelected: Boolean = false
+    private val videoCountFlow = MutableStateFlow<Int?>(null)
 
     internal val selectionUiState: StateFlow<VideosTabUiState.Selection> =
-        selectedVideoIdsFlow
-            .map { ids ->
-                VideosTabUiState.Selection(
-                    count = ids.size,
-                    areAllSelected = areAllSelected
-                )
-            }
-            .asUiStateFlow(
-                viewModelScope,
-                VideosTabUiState.Selection(
-                    count = 0,
-                    areAllSelected = false
-                )
+        combine(selectedVideoIdsFlow, videoCountFlow) { ids, videoCount ->
+            VideosTabUiState.Selection(
+                count = ids.size,
+                areAllSelected = videoCount != null && ids.isNotEmpty() && ids.size == videoCount
             )
+        }.asUiStateFlow(
+            viewModelScope,
+            VideosTabUiState.Selection(
+                count = 0,
+                areAllSelected = false
+            )
+        )
 
     private val navigateToVideoPlayerFlow =
         MutableStateFlow<StateEventWithContent<NavKey>>(consumed())
@@ -262,27 +260,38 @@ class VideosTabViewModel @Inject constructor(
     }
 
     private fun toggleItemSelection(item: VideoUiEntity) {
-        val updatedSelectedIds = selectedVideoIdsFlow.value.toMutableList()
-        if (item.id.longValue in updatedSelectedIds) {
-            updatedSelectedIds -= item.id.longValue
-            areAllSelected = false
-        } else {
-            updatedSelectedIds += item.id.longValue
+        syncVideoCount()
+        selectedVideoIdsFlow.update { ids ->
+            if (item.id.longValue in ids) ids - item.id.longValue else ids + item.id.longValue
         }
-        selectedVideoIdsFlow.update { updatedSelectedIds }
     }
 
     internal fun selectAllVideos() {
-        areAllSelected = false
         val state = uiState.value as? VideosTabUiState.Data ?: return
-        areAllSelected = true
         val allIds = state.allVideoEntities.map { it.id.longValue }
+        videoCountFlow.value = state.allVideoEntities.size
         selectedVideoIdsFlow.update { allIds }
     }
 
     internal fun clearSelection() {
-        areAllSelected = false
         selectedVideoIdsFlow.update { emptyList() }
+    }
+
+    /**
+     * Keeps the total that [selectionUiState] compares the selection against up to date.
+     *
+     * The total is a value of its own so that a selection change emits once: were it folded into
+     * the selection, the two writes would let [selectionUiState] observe the state between them.
+     *
+     * Selection mode can only be entered from a loaded list, so reading [uiState] here cannot start
+     * the video load; it is read inside this function alone to keep [selectionUiState] independent
+     * of [uiState]. The previous total is kept when the read finds no loaded list, which happens
+     * once nothing collects [uiState] any more.
+     */
+    private fun syncVideoCount() {
+        videoCountFlow.update { current ->
+            (uiState.value as? VideosTabUiState.Data)?.allVideoEntities?.size ?: current
+        }
     }
 
     private companion object {
