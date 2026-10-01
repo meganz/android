@@ -435,6 +435,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getNumChildFiles(node: MegaNode): Int = megaApi.getNumChildFiles(node)
 
+    override suspend fun getNumChildren(node: MegaNode): Int = megaApi.getNumChildren(node)
+
     override fun setContactLinksOption(enable: Boolean, listener: MegaRequestListenerInterface) =
         megaApi.setContactLinksOption(enable, listener)
 

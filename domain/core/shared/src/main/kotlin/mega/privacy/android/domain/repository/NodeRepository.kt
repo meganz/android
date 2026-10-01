@@ -14,7 +14,9 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
+import mega.privacy.android.domain.entity.node.NodePage
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.PageRequest
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -176,6 +178,47 @@ interface NodeRepository {
         folderTypeData: FolderTypeData? = null,
         sensitivityFilter: SensitivityFilterOption? = null,
     ): List<TypedNode>
+
+    /**
+     * Get one page of a folder's direct children, typed.
+     *
+     * The SDK sorts the whole child set in [order] and slices [page] out of it, so successive
+     * pages continue the same order.
+     *
+     * @param nodeId the parent folder
+     * @param order the sort order applied before slicing
+     * @param page the offset and size of the page
+     * @param folderTypeData pre-fetched data for folder type determination
+     * @param sensitivityFilter optional filter to exclude sensitive (hidden) nodes via the SDK
+     *   search filter
+     */
+    suspend fun getTypedChildrenPage(
+        nodeId: NodeId,
+        order: SortOrder,
+        page: PageRequest,
+        folderTypeData: FolderTypeData?,
+        sensitivityFilter: SensitivityFilterOption?,
+    ): NodePage<TypedNode>
+
+    /**
+     * Whether a folder has at least one image or video among its direct children, answered by
+     * the SDK with a single-row query instead of inspecting the children.
+     *
+     * @param nodeId the parent folder
+     * @param sensitivityFilter optional filter so sensitive (hidden) media does not count
+     */
+    suspend fun hasMediaChildren(
+        nodeId: NodeId,
+        sensitivityFilter: SensitivityFilterOption?,
+    ): Boolean
+
+    /**
+     * Number of direct children of a folder, files and folders together. The SDK count ignores
+     * any sensitivity filter.
+     *
+     * @return the count, or 0 when the node does not exist or is a file
+     */
+    suspend fun getChildrenCount(nodeId: NodeId): Int
 
     /**
      * Determine the folder type of a folder using pre-fetched [FolderTypeData]

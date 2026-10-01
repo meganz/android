@@ -545,6 +545,13 @@ interface MegaApiGateway {
     suspend fun getNumChildFiles(node: MegaNode): Int
 
     /**
+     * Get the number of direct children of a folder, files and folders together
+     * @param node current folder node
+     * @return child count, 0 for a file
+     */
+    suspend fun getNumChildren(node: MegaNode): Int
+
+    /**
      * Enable or disable the automatic approval of incoming contact requests using a
      * contact link
      *

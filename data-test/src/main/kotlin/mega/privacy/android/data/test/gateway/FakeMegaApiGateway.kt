@@ -680,6 +680,11 @@ class FakeMegaApiGateway(
             nodeTree.childrenOf(node.handle).count { child -> !child.isFolder }
         }
 
+    override suspend fun getNumChildren(node: MegaNode): Int =
+        engine.dispatch(MegaApiGateway::getNumChildren, listOf(node)) {
+            nodeTree.childrenOf(node.handle).size
+        }
+
     override fun setContactLinksOption(enable: Boolean, listener: MegaRequestListenerInterface) {
         completeRequest(
             MegaApiGateway::setContactLinksOption,

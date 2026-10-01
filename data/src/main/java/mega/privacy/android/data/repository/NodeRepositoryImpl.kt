@@ -52,6 +52,7 @@ import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.data.mapper.search.MegaSearchPageMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -70,13 +71,16 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
+import mega.privacy.android.domain.entity.node.NodePage
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.PageRequest
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
@@ -145,6 +149,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val megaNodeMapper: MegaNodeMapper,
     private val nodeLabelIntMapper: NodeLabelIntMapper,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val megaSearchPageMapper: MegaSearchPageMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val workManagerGateway: WorkManagerGateway,
     private val stringListMapper: StringListMapper,
@@ -1424,6 +1429,68 @@ internal class NodeRepositoryImpl @Inject constructor(
                 offline = offlineItems[megaNode.handle.toString()]
             )
         }.filterNotNull()
+    }
+
+    override suspend fun getTypedChildrenPage(
+        nodeId: NodeId,
+        order: SortOrder,
+        page: PageRequest,
+        folderTypeData: FolderTypeData?,
+        sensitivityFilter: SensitivityFilterOption?,
+    ): NodePage<TypedNode> = withContext(ioDispatcher) {
+        val filter = megaSearchFilterMapper(
+            parentHandle = nodeId,
+            sensitivityFilter = sensitivityFilter,
+        )
+        val offlineItemsDiffer = async { getAllOfflineNodeHandle() }
+        // The SDK cannot count a filtered query, so one extra row tells whether more follow
+        val fetched = megaApiGateway.getChildren(
+            filter = filter,
+            order = sortOrderIntMapper(order),
+            megaCancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            megaSearchPage = megaSearchPageMapper(
+                offset = page.offset.toLong(),
+                limit = page.limit.toLong() + 1,
+            ),
+        )
+        val pageNodes = fetched.take(page.limit)
+        val offlineItems = offlineItemsDiffer.await()
+        val typedNodes = pageNodes.mapAsync(ConcurrencyStrategy.Parallel) { megaNode ->
+            typedNodeMapper(
+                megaNode = megaNode,
+                folderTypeData = folderTypeData,
+                offline = offlineItems[megaNode.handle.toString()],
+            )
+        }.filterNotNull()
+        NodePage(
+            nodes = typedNodes,
+            nextOffset = page.offset + pageNodes.size,
+            hasMore = fetched.size > page.limit,
+        )
+    }
+
+    override suspend fun hasMediaChildren(
+        nodeId: NodeId,
+        sensitivityFilter: SensitivityFilterOption?,
+    ): Boolean = withContext(ioDispatcher) {
+        val filter = megaSearchFilterMapper(
+            parentHandle = nodeId,
+            searchCategory = SearchCategory.ALL_MEDIA,
+            sensitivityFilter = sensitivityFilter,
+        )
+        // Unsorted: the answer does not depend on order, and sorting is the costly part
+        megaApiGateway.getChildren(
+            filter = filter,
+            order = sortOrderIntMapper(SortOrder.ORDER_NONE),
+            megaCancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            megaSearchPage = megaSearchPageMapper(offset = 0, limit = 1),
+        ).isNotEmpty()
+    }
+
+    override suspend fun getChildrenCount(nodeId: NodeId): Int = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+            ?.let { megaApiGateway.getNumChildren(it) }
+            ?: 0
     }
 
     override suspend fun getFolderType(

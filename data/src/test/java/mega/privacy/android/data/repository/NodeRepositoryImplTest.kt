@@ -44,6 +44,7 @@ import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.data.mapper.search.MegaSearchPageMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -61,12 +62,15 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
+import mega.privacy.android.domain.entity.node.PageRequest
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedImageNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
-import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SensitivityFilterOption
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -79,6 +83,7 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSearchPage
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -103,6 +108,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -152,6 +158,7 @@ internal class NodeRepositoryImplTest {
     private val megaNodeMapper = mock<MegaNodeMapper>()
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
+    private val megaSearchPageMapper = mock<MegaSearchPageMapper>()
     private val stringListMapper = mock<StringListMapper>()
     private val workManagerGateway = mock<WorkManagerGateway>()
     private val nodeLabelMapper = mock<NodeLabelMapper>()
@@ -201,6 +208,7 @@ internal class NodeRepositoryImplTest {
             nodeLabelIntMapper = nodeLabelIntMapper,
             cancelTokenProvider = cancelTokenProvider,
             megaSearchFilterMapper = megaSearchFilterMapper,
+            megaSearchPageMapper = megaSearchPageMapper,
             workManagerGateway = workManagerGateway,
             stringListMapper = stringListMapper,
             nodeLabelMapper = nodeLabelMapper,
@@ -241,6 +249,7 @@ internal class NodeRepositoryImplTest {
             workManagerGateway,
             nodePathMapper,
             folderTypeMapper,
+            megaSearchPageMapper,
         )
     }
 
@@ -2313,6 +2322,7 @@ internal class NodeRepositoryImplTest {
                 nodeLabelIntMapper = nodeLabelIntMapper,
                 cancelTokenProvider = cancelTokenProvider,
                 megaSearchFilterMapper = megaSearchFilterMapper,
+                megaSearchPageMapper = megaSearchPageMapper,
                 workManagerGateway = workManagerGateway,
                 stringListMapper = stringListMapper,
                 nodeLabelMapper = nodeLabelMapper,
@@ -2339,5 +2349,194 @@ internal class NodeRepositoryImplTest {
             numberOfFolders = 2,
             totalCurrentSizeInBytes = 2000L,
         )
+    }
+
+    @Test
+    fun `test that getTypedChildrenPage requests one row beyond the page and reports more when it is returned`() =
+        runTest {
+            val page = PageRequest(offset = 10, limit = 2)
+            stubChildrenPage(megaNodes = (1L..3L).map { mockMegaNode(it) })
+
+            val actual = underTest.getTypedChildrenPage(
+                nodeId = NodeId(1L),
+                order = SortOrder.ORDER_DEFAULT_ASC,
+                page = page,
+                folderTypeData = null,
+                sensitivityFilter = null,
+            )
+
+            verify(megaSearchPageMapper).invoke(offset = 10L, limit = 3L)
+            assertThat(actual.hasMore).isTrue()
+            assertThat(actual.nodes).hasSize(2)
+            assertThat(actual.nextOffset).isEqualTo(12)
+        }
+
+    @Test
+    fun `test that getTypedChildrenPage reports no more rows when the SDK returns fewer than requested`() =
+        runTest {
+            val page = PageRequest(offset = 10, limit = 5)
+            stubChildrenPage(megaNodes = listOf(mockMegaNode(1L)))
+
+            val actual = underTest.getTypedChildrenPage(
+                nodeId = NodeId(1L),
+                order = SortOrder.ORDER_DEFAULT_ASC,
+                page = page,
+                folderTypeData = null,
+                sensitivityFilter = null,
+            )
+
+            assertThat(actual.hasMore).isFalse()
+            assertThat(actual.nodes).hasSize(1)
+            assertThat(actual.nextOffset).isEqualTo(11)
+        }
+
+    @Test
+    fun `test that getTypedChildrenPage passes the sensitivity filter to the search filter`() =
+        runTest {
+            stubChildrenPage(megaNodes = emptyList())
+
+            underTest.getTypedChildrenPage(
+                nodeId = NodeId(1L),
+                order = SortOrder.ORDER_DEFAULT_ASC,
+                page = PageRequest(offset = 0, limit = 5),
+                folderTypeData = null,
+                sensitivityFilter = SensitivityFilterOption.NonSensitiveOnly,
+            )
+
+            verify(megaSearchFilterMapper).invoke(
+                parentHandle = eq(NodeId(1L)),
+                searchQuery = any(),
+                searchTarget = any(),
+                searchCategory = anyOrNull(),
+                modificationDate = anyOrNull(),
+                creationDate = anyOrNull(),
+                description = anyOrNull(),
+                tag = anyOrNull(),
+                useAndForTextQuery = any(),
+                sensitivityFilter = eq(SensitivityFilterOption.NonSensitiveOnly),
+            )
+        }
+
+    @Test
+    fun `test that getTypedChildrenPage returns an empty page without a mapping context when the folder is empty`() =
+        runTest {
+            stubChildrenPage(megaNodes = emptyList())
+
+            val actual = underTest.getTypedChildrenPage(
+                nodeId = NodeId(1L),
+                order = SortOrder.ORDER_DEFAULT_ASC,
+                page = PageRequest(offset = 20, limit = 5),
+                folderTypeData = null,
+                sensitivityFilter = null,
+            )
+
+            assertThat(actual.nodes).isEmpty()
+            assertThat(actual.hasMore).isFalse()
+            assertThat(actual.nextOffset).isEqualTo(20)
+        }
+
+    @Test
+    fun `test that hasMediaChildren asks the SDK for one unsorted media row`() = runTest {
+        stubChildrenPage(megaNodes = listOf(mockMegaNode(1L)))
+
+        val actual = underTest.hasMediaChildren(
+            nodeId = NodeId(1L),
+            sensitivityFilter = SensitivityFilterOption.NonSensitiveOnly,
+        )
+
+        assertThat(actual).isTrue()
+        verify(megaSearchPageMapper).invoke(offset = 0L, limit = 1L)
+        verify(megaSearchFilterMapper).invoke(
+            parentHandle = eq(NodeId(1L)),
+            searchQuery = any(),
+            searchTarget = any(),
+            searchCategory = eq(SearchCategory.ALL_MEDIA),
+            modificationDate = anyOrNull(),
+            creationDate = anyOrNull(),
+            description = anyOrNull(),
+            tag = anyOrNull(),
+            useAndForTextQuery = any(),
+            sensitivityFilter = eq(SensitivityFilterOption.NonSensitiveOnly),
+        )
+        verify(typedNodeMapper, never()).invoke(
+            megaNode = any(),
+            folderTypeData = anyOrNull(),
+            offline = anyOrNull(),
+            fromFolderLink = any(),
+            requireSerializedData = any(),
+        )
+    }
+
+    @Test
+    fun `test that hasMediaChildren is false when the SDK returns no media row`() = runTest {
+        stubChildrenPage(megaNodes = emptyList())
+
+        val actual = underTest.hasMediaChildren(nodeId = NodeId(1L), sensitivityFilter = null)
+
+        assertThat(actual).isFalse()
+    }
+
+    @Test
+    fun `test that getChildrenCount returns the SDK count of direct children`() = runTest {
+        val megaNode = mockMegaNode(1L)
+        whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(megaNode)
+        whenever(megaApiGateway.getNumChildren(megaNode)).thenReturn(213_456)
+
+        val actual = underTest.getChildrenCount(NodeId(1L))
+
+        assertThat(actual).isEqualTo(213_456)
+    }
+
+    @Test
+    fun `test that getChildrenCount returns 0 when the node does not exist`() = runTest {
+        whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(null)
+
+        val actual = underTest.getChildrenCount(NodeId(1L))
+
+        assertThat(actual).isEqualTo(0)
+    }
+
+    private fun mockMegaNode(handle: Long) = mock<MegaNode> { on { this.handle } doReturn handle }
+
+    private suspend fun stubChildrenPage(megaNodes: List<MegaNode>) {
+        val filter = mock<MegaSearchFilter>()
+        val searchPage = mock<MegaSearchPage>()
+        val token = mock<MegaCancelToken>()
+        clearInvocations(megaSearchFilterMapper, typedNodeMapper)
+        whenever(
+            megaSearchFilterMapper(
+                parentHandle = anyOrNull(),
+                searchQuery = any(),
+                searchTarget = any(),
+                searchCategory = anyOrNull(),
+                modificationDate = anyOrNull(),
+                creationDate = anyOrNull(),
+                description = anyOrNull(),
+                tag = anyOrNull(),
+                useAndForTextQuery = any(),
+                sensitivityFilter = anyOrNull(),
+            )
+        ).thenReturn(filter)
+        whenever(megaSearchPageMapper(any(), any())).thenReturn(searchPage)
+        whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(
+            megaApiGateway.getChildren(
+                filter = eq(filter),
+                order = any(),
+                megaCancelToken = eq(token),
+                megaSearchPage = eq(searchPage),
+            )
+        ).thenReturn(megaNodes)
+        whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
+        whenever(
+            typedNodeMapper(
+                megaNode = any(),
+                folderTypeData = anyOrNull(),
+                offline = anyOrNull(),
+                fromFolderLink = any(),
+                requireSerializedData = any(),
+            )
+        ).thenReturn(mock<TypedNode>())
     }
 }
