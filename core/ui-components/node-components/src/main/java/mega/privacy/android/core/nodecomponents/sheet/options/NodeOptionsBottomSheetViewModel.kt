@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -135,14 +136,20 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
         )
 
     init {
+        // Some items (Send to chat, Sync) are only offered while online, so the actions are built
+        // once the connectivity state is known and rebuilt whenever it changes.
         viewModelScope.launch {
-            monitorConnectivityUseCase().collect { isConnected ->
-                uiState.update {
-                    it.copy(isOnline = isConnected)
+            monitorConnectivityUseCase()
+                .catch {
+                    Timber.e(it)
+                    emit(uiState.value.isOnline)
                 }
-            }
+                .distinctUntilChanged()
+                .collect { isConnected ->
+                    uiState.update { it.copy(isOnline = isConnected) }
+                    getBottomSheetOptions()
+                }
         }
-        getBottomSheetOptions()
         if (nodeSourceType == NodeSourceType.OFFLINE) {
             monitorOfflineNodeAvailability(nodeId)
         }

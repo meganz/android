@@ -125,6 +125,9 @@ class RenameNodeTest {
         device.findObject(By.res(MORE_ICON_TAG)).click()
 
         // Node options bottom sheet → Rename, which sits below the sheet's initially visible area.
+        // The sheet's list is only composed once its actions are resolved, so wait for it before
+        // scrolling; a scroll attempt against a missing container is silently skipped.
+        awaitObject(By.res(SHEET_LIST_TAG), LOAD_TIMEOUT, "node-options-sheet")
         scrollUntilObject(By.res(RENAME_ACTION_TAG), SHEET_LIST_TAG, "rename-action")
         device.findObject(By.res(RENAME_ACTION_TAG)).click()
 

@@ -132,10 +132,10 @@ class ChatAttachmentDownloadSnackbarTest {
         )
 
         awaitObject(By.text(CONTACT_NAME), LAUNCH_TIMEOUT, "chat-room-loaded")
-        awaitObject(By.text(FILE_NAME), LOAD_TIMEOUT, "attachment-message-row")
+        awaitObject(By.res(FILE_MESSAGE_ROOT), LOAD_TIMEOUT, "attachment-message-row")
         hold()
 
-        device.findObject(By.text(FILE_NAME)).longClick()
+        device.findObject(By.res(FILE_MESSAGE_ROOT)).longClick()
         awaitObject(By.res(SAVE_TO_DEVICE_SHEET_ITEM), LOAD_TIMEOUT, "message-options-sheet")
         hold()
 
@@ -214,6 +214,13 @@ class ChatAttachmentDownloadSnackbarTest {
         const val FILE_HANDLE = 100L
         const val FILE_NAME = "and25085-attachment.txt"
         const val FILE_SIZE = 1_024L
+
+        /**
+         * Mirrors FileContainerMessageView's FILE_MESSAGE_VIEW_ROOT_TEST_TAG. The row is matched by
+         * tag rather than by [FILE_NAME] because the name is rendered with a middle ellipsis whose
+         * cut point depends on the device's text width.
+         */
+        const val FILE_MESSAGE_ROOT = "chat_file_message_view:root_view"
 
         /** Mirrors MessageAction's bottomSheetItemTestTag for SaveToDeviceMessageAction. */
         const val SAVE_TO_DEVICE_SHEET_ITEM = "chat_message_options_sheet:save_to_device"

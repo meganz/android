@@ -8,7 +8,10 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
+import mega.privacy.android.domain.usecase.setting.BroadcastMiscStateUseCase
 import mega.privacy.android.navigation.contract.initialisation.AppCreateInitialiser
 
 /**
@@ -31,6 +34,7 @@ object TestAppBoot {
     internal interface TestAppBootEntryPoint {
         fun globalInitialiser(): GlobalInitialiser
         fun hiltWorkerFactory(): HiltWorkerFactory
+        fun broadcastMiscStateUseCase(): BroadcastMiscStateUseCase
     }
 
     /**
@@ -45,10 +49,16 @@ object TestAppBoot {
      * @param includeAppStart when true (the default) also runs the app-start tier
      * ([GlobalInitialiser.onAppStart]), which launches into the application scope and drives units
      * such as the transfer-events monitor that persists upload progress.
+     * @param miscFlagsReady when true (the default) the process is marked as having the SDK's misc
+     * flags loaded, as a logged-in session has shortly after start. The real SDK signals this with
+     * `EVENT_MISC_FLAGS_READY` through the `MegaApiAndroid` global listener, which the fake gateways
+     * never drive; without the mark every API feature-flag check waits out the provider's 2 s
+     * timeout. Pass false for a test that sequences the flags-ready state itself.
      */
     fun runCoreInitializers(
         exclude: Set<String> = emptySet(),
         includeAppStart: Boolean = true,
+        miscFlagsReady: Boolean = true,
     ) {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -66,6 +76,9 @@ object TestAppBoot {
         globalInitialiser.onAppCreate { it.name !in exclude }
         if (includeAppStart) {
             globalInitialiser.onAppStart()
+        }
+        if (miscFlagsReady) {
+            runBlocking { entryPoint.broadcastMiscStateUseCase()(MiscLoadedState.FlagsReady) }
         }
     }
 }

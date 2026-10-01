@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.SnackbarAttributes
@@ -53,6 +54,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -1058,5 +1060,82 @@ class NodeOptionsBottomSheetViewModelTest {
         )
 
         verifyNoInteractions(monitorOfflineDownloadInProgressUseCase)
+    }
+
+    @Test
+    fun `test that init builds the actions with the current connectivity state`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
+        stubLoadedFileNode()
+
+        initViewModel(nodeId = sampleFileNode.id.longValue)
+
+        assertThat(viewModel.uiState.value.isOnline).isFalse()
+        verify(nodeBottomSheetActionMapper)
+            .invoke(any(), any(), any(), anyOrNull(), any(), eq(false), any())
+    }
+
+    @Test
+    fun `test that init does not build the actions until the connectivity state is known`() =
+        runTest {
+            whenever(monitorConnectivityUseCase()).thenReturn(MutableSharedFlow())
+            stubLoadedFileNode()
+
+            initViewModel(nodeId = sampleFileNode.id.longValue)
+
+            verifyNoInteractions(nodeBottomSheetActionMapper)
+        }
+
+    @Test
+    fun `test that actions are rebuilt when connectivity changes`() = runTest {
+        val connectivityFlow = MutableSharedFlow<Boolean>()
+        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+        stubLoadedFileNode()
+
+        initViewModel(nodeId = sampleFileNode.id.longValue)
+        connectivityFlow.emit(false)
+        connectivityFlow.emit(true)
+
+        assertThat(viewModel.uiState.value.isOnline).isTrue()
+        verify(nodeBottomSheetActionMapper)
+            .invoke(any(), any(), any(), anyOrNull(), any(), eq(false), any())
+        verify(nodeBottomSheetActionMapper)
+            .invoke(any(), any(), any(), anyOrNull(), any(), eq(true), any())
+    }
+
+    @Test
+    fun `test that actions are not rebuilt when connectivity is re-emitted unchanged`() = runTest {
+        val connectivityFlow = MutableSharedFlow<Boolean>()
+        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+        stubLoadedFileNode()
+
+        initViewModel(nodeId = sampleFileNode.id.longValue)
+        connectivityFlow.emit(true)
+        connectivityFlow.emit(true)
+
+        verify(nodeBottomSheetActionMapper, times(1))
+            .invoke(any(), any(), any(), anyOrNull(), any(), any(), any())
+    }
+
+    @Test
+    fun `test that actions are built with the current state when connectivity cannot be monitored`() =
+        runTest {
+            whenever(monitorConnectivityUseCase()).thenReturn(flow { throw RuntimeException() })
+            stubLoadedFileNode()
+
+            initViewModel(nodeId = sampleFileNode.id.longValue)
+
+            verify(nodeBottomSheetActionMapper)
+                .invoke(any(), any(), any(), anyOrNull(), any(), eq(false), any())
+        }
+
+    private suspend fun stubLoadedFileNode() {
+        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+        whenever(nodeUiItemMapper(listOf(sampleFileNode)))
+            .thenReturn(listOf(mock<NodeUiItem<TypedNode>>()))
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+        whenever(nodeBottomSheetActionMapper(any(), any(), any(), anyOrNull(), any(), any(), any()))
+            .thenReturn(emptyList())
     }
 }

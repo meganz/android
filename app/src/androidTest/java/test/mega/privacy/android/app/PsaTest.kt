@@ -128,7 +128,9 @@ class PsaTest {
         )
 
         // Boot the test process through the production initialiser units. See CloudDriveUploadTest.
-        TestAppBoot.runCoreInitializers()
+        // The flags-ready state is broadcast by the scenarios themselves, after the PSA initialiser
+        // is running, so the boot must not pre-mark it.
+        TestAppBoot.runCoreInitializers(miscFlagsReady = false)
 
         // Cloud Drive children may be resolved on start; answer through the fake node tree.
         fakeMegaApi.stub(MegaApiGateway::getChildren) {
