@@ -12,12 +12,16 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -185,6 +189,10 @@ fun <T : TypedNode> NodesView(
  * @param inSelectionMode whether to show selection mode
  * @param nodeSelectionState the state of the selection
  * @param highlightText the text to highlight in the title and description
+ * @param onVisibleRangeChanged called with the indices into [items] currently on screen whenever
+ * they change; not called while nothing is laid out, as for a tab kept composed at zero size
+ * @param onScrollingChanged called when the list starts or stops scrolling, and with false once
+ * more when this view leaves the composition
  */
 @Composable
 fun <T : TypedNode> NodesView(
@@ -210,6 +218,8 @@ fun <T : TypedNode> NodesView(
     inSelectionMode: Boolean = nodeSelectionState.isInSelectionMode,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
+    onVisibleRangeChanged: ((IntRange) -> Unit)? = null,
+    onScrollingChanged: ((Boolean) -> Unit)? = null,
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val onNodeClicked: (T) -> Unit = { node ->
@@ -226,6 +236,25 @@ fun <T : TypedNode> NodesView(
         listState = listState,
         gridState = gridState,
     )
+
+    if (onVisibleRangeChanged != null) {
+        VisibleRangeEffect(
+            isListView = isListView,
+            listState = listState,
+            gridState = gridState,
+            hasHeader = showSortOrder || showChangeViewType,
+            onVisibleRangeChanged = onVisibleRangeChanged,
+        )
+    }
+
+    if (onScrollingChanged != null) {
+        ScrollingEffect(
+            isListView = isListView,
+            listState = listState,
+            gridState = gridState,
+            onScrollingChanged = onScrollingChanged,
+        )
+    }
 
     val highlightedIndex = remember(items) {
         items.indexOfFirst { it.isHighlighted }
@@ -302,6 +331,62 @@ fun <T : TypedNode> NodesView(
                 showTakenDownDialog = false
             }
         )
+    }
+}
+
+/**
+ * Reports the range of item indices on screen. The header row, when shown, is not an item, so the
+ * indices are shifted past it; trailing skeleton rows report indices beyond the last item, which
+ * is what a pager needs to know it is being scrolled into.
+ */
+@Composable
+private fun VisibleRangeEffect(
+    isListView: Boolean,
+    listState: LazyListState,
+    gridState: LazyGridState,
+    hasHeader: Boolean,
+    onVisibleRangeChanged: (IntRange) -> Unit,
+) {
+    val currentCallback by rememberUpdatedState(onVisibleRangeChanged)
+    LaunchedEffect(isListView, listState, gridState, hasHeader) {
+        val headerCount = if (hasHeader) 1 else 0
+        snapshotFlow {
+            val indices = if (isListView) {
+                listState.layoutInfo.visibleItemsInfo.map { it.index }
+            } else {
+                gridState.layoutInfo.visibleItemsInfo.map { it.index }
+            }
+            val itemIndices = indices.map { it - headerCount }.filter { it >= 0 }
+            itemIndices.minOrNull()?.let { first -> first..itemIndices.max() }
+        }
+            .filterNotNull()
+            .distinctUntilChanged()
+            .collect { currentCallback(it) }
+    }
+}
+
+/**
+ * Reports whether the list is scrolling, and reports false on dispose so a caller that holds work
+ * back while scrolling is never left waiting for a stop that cannot come.
+ */
+@Composable
+private fun ScrollingEffect(
+    isListView: Boolean,
+    listState: LazyListState,
+    gridState: LazyGridState,
+    onScrollingChanged: (Boolean) -> Unit,
+) {
+    val currentCallback by rememberUpdatedState(onScrollingChanged)
+    LaunchedEffect(isListView, listState, gridState) {
+        try {
+            snapshotFlow {
+                if (isListView) listState.isScrollInProgress else gridState.isScrollInProgress
+            }
+                .distinctUntilChanged()
+                .collect { currentCallback(it) }
+        } finally {
+            currentCallback(false)
+        }
     }
 }
 

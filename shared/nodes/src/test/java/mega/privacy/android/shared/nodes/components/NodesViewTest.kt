@@ -1,6 +1,8 @@
 package mega.privacy.android.shared.nodes.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.getValue
@@ -8,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
@@ -311,5 +315,82 @@ class NodesViewTest {
         composeTestRule.waitForIdle()
 
         assertThat(listState.firstVisibleItemIndex).isEqualTo(0)
+    }
+
+    private fun setPagingContent(
+        listState: LazyListState,
+        viewportSize: Dp? = null,
+        onVisibleRangeChanged: ((IntRange) -> Unit)? = null,
+        onScrollingChanged: ((Boolean) -> Unit)? = null,
+        show: () -> Boolean = { true },
+    ) {
+        val manyItems = (1L..60L).map { previewFolderNodeUiItem(id = it) }
+        composeTestRule.setContent {
+            if (show()) {
+                Box(modifier = viewportSize?.let { Modifier.size(it) } ?: Modifier.fillMaxSize()) {
+                    NodesView(
+                        modifier = Modifier.fillMaxSize(),
+                        items = manyItems,
+                        onMenuClicked = {},
+                        onItemClicked = {},
+                        onLongClicked = {},
+                        sortConfiguration = NodeSortConfiguration.default,
+                        isListView = true,
+                        nodeSelectionState = NodeSelectionState(),
+                        listState = listState,
+                        onVisibleRangeChanged = onVisibleRangeChanged,
+                        onScrollingChanged = onScrollingChanged,
+                    )
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun `test that NodesView reports the visible item range once per change without the header`() {
+        val listState = LazyListState()
+        val ranges = mutableListOf<IntRange>()
+        setPagingContent(listState = listState, onVisibleRangeChanged = { ranges += it })
+
+        assertThat(ranges).hasSize(1)
+        assertThat(ranges.single().first).isEqualTo(0)
+
+        composeTestRule.runOnIdle { listState.requestScrollToItem(20) }
+        composeTestRule.waitForIdle()
+
+        // Lazy index 20 is the 20th item because index 0 is the sort header
+        assertThat(ranges).hasSize(2)
+        assertThat(ranges[1].first).isEqualTo(19)
+    }
+
+    @Test
+    fun `test that NodesView does not report a visible range for an empty viewport`() {
+        val ranges = mutableListOf<IntRange>()
+        setPagingContent(
+            listState = LazyListState(),
+            viewportSize = 0.dp,
+            onVisibleRangeChanged = { ranges += it },
+        )
+
+        assertThat(ranges).isEmpty()
+    }
+
+    @Test
+    fun `test that NodesView reports scrolling false when it leaves the composition`() {
+        var show by mutableStateOf(true)
+        val scrolling = mutableListOf<Boolean>()
+        setPagingContent(
+            listState = LazyListState(),
+            onScrollingChanged = { scrolling += it },
+            show = { show },
+        )
+
+        assertThat(scrolling).containsExactly(false)
+
+        show = false
+        composeTestRule.waitForIdle()
+
+        assertThat(scrolling).containsExactly(false, false).inOrder()
     }
 }
