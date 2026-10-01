@@ -191,6 +191,33 @@ class VideoPlaylistsTabViewModelTest {
     }
 
     @Test
+    fun `test that collecting selectionUiState does not load the playlists`() = runTest {
+        stubInitialValues()
+
+        underTest.selectionUiState.test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        advanceUntilIdle()
+
+        verifyNoInteractions(getVideoPlaylistsUseCase)
+    }
+
+    @Test
+    fun `test that selectionUiState reflects the selection and the search query`() = runTest {
+        stubInitialValues()
+
+        underTest.selectionUiState.test {
+            assertThat(awaitItem().count).isEqualTo(0)
+
+            underTest.searchQuery("holiday")
+            assertThat(awaitItem().query).isEqualTo("holiday")
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test that Data state is returned if values found`() = runTest {
         stubInitialValues()
         underTest.uiState

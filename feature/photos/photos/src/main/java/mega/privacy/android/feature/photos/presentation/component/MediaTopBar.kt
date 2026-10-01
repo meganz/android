@@ -51,7 +51,7 @@ internal fun MediaTopBar(
     timelineFilterUiState: TimelineFilterUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     videosSelectionUiState: VideosTabUiState.Selection,
-    playlistsTabUiState: VideoPlaylistsTabUiState,
+    playlistsSelectionUiState: VideoPlaylistsTabUiState.Selection,
     timelineItemCount: Int,
     timelineSelectedCount: Int,
     selectedTimePeriod: MediaTimePeriod,
@@ -91,12 +91,8 @@ internal fun MediaTopBar(
             timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
         }
     }
-    val areAllPlaylistsSelected by remember(playlistsTabUiState) {
-        derivedStateOf {
-            if (playlistsTabUiState is VideoPlaylistsTabUiState.Data) {
-                playlistsTabUiState.selectedPlaylists.size == playlistsTabUiState.videoPlaylistEntities.size
-            } else false
-        }
+    val areAllPlaylistsSelected by remember(playlistsSelectionUiState) {
+        derivedStateOf { playlistsSelectionUiState.areAllSelected }
     }
     var isVideosTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
     var isPlaylistsTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
@@ -153,7 +149,7 @@ internal fun MediaTopBar(
 
         isPlaylistsTabSearchBarVisible || selectionModeType == MediaSelectionModeType.Playlists -> {
             VideoPlaylistsTabAppBar(
-                count = if (playlistsTabUiState is VideoPlaylistsTabUiState.Data) playlistsTabUiState.selectedPlaylists.size else 0,
+                count = playlistsSelectionUiState.count,
                 isAllSelected = areAllPlaylistsSelected,
                 onSelectAllClicked = onAllPlaylistsSelected,
                 onCancelSelectionClicked = onClearPlaylistsSelection,

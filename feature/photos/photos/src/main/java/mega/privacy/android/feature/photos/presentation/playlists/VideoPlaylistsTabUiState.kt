@@ -28,4 +28,22 @@ sealed interface VideoPlaylistsTabUiState {
          */
         val isSelectionMode get() = selectedPlaylists.isNotEmpty()
     }
+
+    /**
+     * The slice of playlist state the Media screen's chrome needs: the selection count, whether
+     * everything is selected, and the search query.
+     *
+     * Kept apart from [Data] so the chrome can observe it without subscribing to [Data] itself,
+     * which would load every playlist as soon as the Media screen opens — including when the
+     * Playlists tab is not showing.
+     *
+     * @property count the number of selected playlists
+     * @property areAllSelected whether every playlist is selected
+     * @property query the search query
+     */
+    data class Selection(
+        val count: Int = 0,
+        val areAllSelected: Boolean = false,
+        val query: String? = null,
+    ) : VideoPlaylistsTabUiState
 }

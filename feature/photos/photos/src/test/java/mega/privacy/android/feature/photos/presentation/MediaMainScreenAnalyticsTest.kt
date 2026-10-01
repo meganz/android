@@ -158,7 +158,7 @@ class MediaMainScreenAnalyticsTest {
                     timelineRevampActionUiState = timelineTabActionUiState,
                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                     videosSelectionUiState = videosSelectionUiState,
-                    playlistsTabUiState = VideoPlaylistsTabUiState.Loading,
+                    playlistsSelectionUiState = VideoPlaylistsTabUiState.Selection(),
                     nodeActionUiState = nodeActionUiState,
                     selectionModeType = selectionModeType,
                     selectedPhotoIds = setOf(),

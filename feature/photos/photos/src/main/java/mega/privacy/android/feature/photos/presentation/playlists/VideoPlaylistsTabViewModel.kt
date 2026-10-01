@@ -74,6 +74,23 @@ class VideoPlaylistsTabViewModel @Inject constructor(
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
     private val queryFlow = MutableStateFlow<String?>(null)
     private val optimisticallyRemovedIds = MutableStateFlow<Set<NodeId>>(emptySet())
+    private var areAllSelected: Boolean = false
+
+    /**
+     * The selection slice of [uiState], for the Media screen's top bar and selection mode.
+     *
+     * Derived only from [selectedVideoPlaylistsFlow] and [queryFlow], so observing it never starts
+     * the playlist load. Collecting [uiState] instead would run a full-account video search on every
+     * Media screen open, whichever tab is showing.
+     */
+    internal val selectionUiState: StateFlow<VideoPlaylistsTabUiState.Selection> =
+        combine(selectedVideoPlaylistsFlow, queryFlow) { selectedPlaylists, query ->
+            VideoPlaylistsTabUiState.Selection(
+                count = selectedPlaylists.size,
+                areAllSelected = areAllSelected,
+                query = query,
+            )
+        }.asUiStateFlow(viewModelScope, VideoPlaylistsTabUiState.Selection())
 
     internal val videoPlaylistEditState: StateFlow<VideoPlaylistEditState>
         field: MutableStateFlow<VideoPlaylistEditState> = MutableStateFlow(VideoPlaylistEditState())
@@ -193,17 +210,21 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             updatedSelectedPlaylists += item
         } else {
             updatedSelectedPlaylists -= existingItem
+            areAllSelected = false
         }
         selectedVideoPlaylistsFlow.update { updatedSelectedPlaylists }
     }
 
     internal fun selectAllVideos() {
+        areAllSelected = false
         val state = uiState.value as? VideoPlaylistsTabUiState.Data ?: return
+        areAllSelected = true
         val allPlaylists = state.videoPlaylistEntities.toSet()
         selectedVideoPlaylistsFlow.update { allPlaylists }
     }
 
     internal fun clearSelection() {
+        areAllSelected = false
         selectedVideoPlaylistsFlow.update { emptySet() }
     }
 

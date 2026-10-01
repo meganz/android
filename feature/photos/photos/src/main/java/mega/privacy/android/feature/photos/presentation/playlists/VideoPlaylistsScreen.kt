@@ -376,6 +376,8 @@ internal fun VideoPlaylistsTabScreen(
                 }
             }
         }
+
+        is VideoPlaylistsTabUiState.Selection -> Unit
     }
 }
 

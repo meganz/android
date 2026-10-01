@@ -132,6 +132,17 @@ class VideosTabViewModelTest {
     }
 
     @Test
+    fun `test that collecting selectionUiState does not load the videos`() = runTest {
+        underTest.selectionUiState.test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        advanceUntilIdle()
+
+        verifyNoInteractions(getAllVideosUseCase)
+    }
+
+    @Test
     fun `test that the initial state is loading`() = runTest {
         monitorNodeUpdatesUseCase.stub {
             on { invoke() } doReturn flow { awaitCancellation() }

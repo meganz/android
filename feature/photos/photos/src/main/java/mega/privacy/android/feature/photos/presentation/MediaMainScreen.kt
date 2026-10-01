@@ -148,7 +148,7 @@ fun MediaMainRoute(
     val timelineRevampSelectedTimePeriod by timelineRevampViewModel.selectedTimePeriod.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
     val videosSelectionUiState by videosTabViewModel.selectionUiState.collectAsStateWithLifecycle()
-    val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
+    val playlistsSelectionUiState by videoPlaylistsTabViewModel.selectionUiState.collectAsStateWithLifecycle()
     val nodeActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     // The legacy tab's selection. The revamp ViewModel owns its own (see TimelineSelection), so a
     // selection of thousands is neither parceled nor re-resolved on a configuration change.
@@ -170,7 +170,7 @@ fun MediaMainRoute(
         timelineSelectedPhotoIds,
         albumsTabUiState.selectedUserAlbums,
         videosSelectionUiState,
-        playlistsTabUiState
+        playlistsSelectionUiState
     ) {
         derivedStateOf {
             getSelectionModeType(
@@ -181,7 +181,7 @@ fun MediaMainRoute(
                 },
                 albumsSelectedUserAlbumsCount = albumsTabUiState.selectedUserAlbums.size,
                 videosSelectionUiState = videosSelectionUiState,
-                playlistsTabUiState = playlistsTabUiState
+                playlistsSelectionUiState = playlistsSelectionUiState
             )
         }
     }
@@ -371,7 +371,7 @@ fun MediaMainRoute(
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         timelineFilterUiState = timelineFilterUiState,
         videosSelectionUiState = videosSelectionUiState,
-        playlistsTabUiState = playlistsTabUiState,
+        playlistsSelectionUiState = playlistsSelectionUiState,
         nodeActionUiState = nodeActionUiState,
         selectedPhotoIds = timelineSelectedPhotoIds,
         selectionModeType = selectionModeType,
@@ -465,7 +465,7 @@ fun MediaMainScreen(
     timelineRevampActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     videosSelectionUiState: VideosTabUiState.Selection,
-    playlistsTabUiState: VideoPlaylistsTabUiState,
+    playlistsSelectionUiState: VideoPlaylistsTabUiState.Selection,
     nodeActionUiState: NodeActionState,
     selectedPhotoIds: Set<Long>,
     selectionModeType: MediaSelectionModeType,
@@ -582,14 +582,12 @@ fun MediaMainScreen(
         if (currentTabIndex == MediaScreen.Albums.ordinal) albumsTabViewModel.initialize()
     }
 
-    LaunchedEffect(playlistsTabUiState) {
-        if (playlistsTabUiState is VideoPlaylistsTabUiState.Data) {
-            if (playlistsTabQuery != playlistsTabUiState.query) {
-                playlistsTabQuery = playlistsTabUiState.query
-            }
-            if (selectedPlaylistCount != playlistsTabUiState.selectedPlaylists.size) {
-                selectedPlaylistCount = playlistsTabUiState.selectedPlaylists.size
-            }
+    LaunchedEffect(playlistsSelectionUiState) {
+        if (playlistsTabQuery != playlistsSelectionUiState.query) {
+            playlistsTabQuery = playlistsSelectionUiState.query
+        }
+        if (selectedPlaylistCount != playlistsSelectionUiState.count) {
+            selectedPlaylistCount = playlistsSelectionUiState.count
         }
     }
 
@@ -625,7 +623,7 @@ fun MediaMainScreen(
                 timelineFilterUiState = effectiveTimelineFilterUiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 videosSelectionUiState = videosSelectionUiState,
-                playlistsTabUiState = playlistsTabUiState,
+                playlistsSelectionUiState = playlistsSelectionUiState,
                 timelineItemCount = effectiveTimelineItemCount,
                 timelineSelectedCount = timelineSelectedCount,
                 selectedTimePeriod = effectiveSelectedTimePeriod,
@@ -1099,12 +1097,12 @@ private fun getSelectionModeType(
     timelineSelectedPhotoCount: Int,
     albumsSelectedUserAlbumsCount: Int,
     videosSelectionUiState: VideosTabUiState.Selection,
-    playlistsTabUiState: VideoPlaylistsTabUiState,
+    playlistsSelectionUiState: VideoPlaylistsTabUiState.Selection,
 ): MediaSelectionModeType = when {
     timelineSelectedPhotoCount > 0 -> MediaSelectionModeType.Timeline
     albumsSelectedUserAlbumsCount > 0 -> MediaSelectionModeType.Albums
     videosSelectionUiState.count > 0 -> MediaSelectionModeType.Videos
-    playlistsTabUiState is VideoPlaylistsTabUiState.Data && playlistsTabUiState.selectedPlaylists.isNotEmpty() -> MediaSelectionModeType.Playlists
+    playlistsSelectionUiState.count > 0 -> MediaSelectionModeType.Playlists
     else -> MediaSelectionModeType.None
 }
 
@@ -1190,7 +1188,7 @@ private fun PhotosMainScreenPreview() {
             onNavigateToCameraUploadsProgressScreen = {},
             albumsTabUiState = AlbumsTabUiState(),
             videosSelectionUiState = VideosTabUiState.Selection(),
-            playlistsTabUiState = VideoPlaylistsTabUiState.Data(),
+            playlistsSelectionUiState = VideoPlaylistsTabUiState.Selection(),
             nodeActionUiState = NodeActionState(),
             selectionModeType = MediaSelectionModeType.None,
             onUpdateVideosSearchQuery = {},
