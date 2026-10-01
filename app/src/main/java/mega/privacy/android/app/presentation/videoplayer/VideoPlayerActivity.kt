@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videoplayer
 
 import android.content.BroadcastReceiver
+import android.content.ComponentCallbacks
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -18,8 +19,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -445,15 +449,32 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
  * also makes `isSystemInDarkTheme()` report dark for everything composed in this activity.
  * Resolve [ThemeMode.System] against the application configuration instead, so the screens opened
  * on top of the player, such as the quota-warning upsell, follow the app theme.
+ *
+ * The manifest handles `uiMode` changes, so the activity is not recreated when the system theme
+ * changes; listen on the application context to pick up those changes.
  */
 @Composable
 private fun ThemeMode.ignoringForcedNightMode(): ThemeMode {
     if (this != ThemeMode.System) return this
-    val context = LocalContext.current
-    val isDark = remember(context) {
-        (context.applicationContext.resources.configuration.uiMode
-                and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    val appContext = LocalContext.current.applicationContext
+    var isDark by remember(appContext) {
+        mutableStateOf(appContext.resources.configuration.isNightMode())
+    }
+    DisposableEffect(appContext) {
+        val callbacks = object : ComponentCallbacks {
+            override fun onConfigurationChanged(newConfig: Configuration) {
+                isDark = newConfig.isNightMode()
+            }
+
+            @Deprecated("Deprecated in Java")
+            override fun onLowMemory() = Unit
+        }
+        appContext.registerComponentCallbacks(callbacks)
+        onDispose { appContext.unregisterComponentCallbacks(callbacks) }
     }
     return if (isDark) ThemeMode.Dark else ThemeMode.Light
 }
+
+private fun Configuration.isNightMode() =
+    (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
