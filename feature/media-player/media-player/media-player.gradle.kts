@@ -31,8 +31,8 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":shared:nodes"))
     implementation(project(":shared:original-core-ui"))
-    implementation(project(":domain"))
-    implementation(project(":domain:mediaplayer"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:mediaplayer"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)

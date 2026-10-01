@@ -24,7 +24,7 @@ dependencies {
     implementation(project(":resources:resources"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":core:navigation-contract"))
-    implementation(project(":domain"))
+    implementation(project(":domain:core:shared"))
     implementation(project(":navigation"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)

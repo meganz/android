@@ -16,7 +16,7 @@ android {
     }
 }
 dependencies {
-    implementation(project(":domain:common"))
+    implementation(project(":domain:core:common"))
     implementation(project(":resources:string-resources"))
 
     testImplementation(testlib.junit)

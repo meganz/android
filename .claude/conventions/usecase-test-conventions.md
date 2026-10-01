@@ -269,9 +269,11 @@ import org.mockito.kotlin.never
 
 ## File Placement
 
-Test files mirror the production package structure in the domain module:
+Test files mirror the production package structure, in the same module as the use case:
 
 ```
-domain/src/test/kotlin/mega/privacy/android/domain/usecase/{package}/
+domain/feature/{area}/src/test/kotlin/mega/privacy/android/domain/usecase/{package}/
+    {Name}UseCaseTest.kt
+domain/core/shared/src/test/kotlin/mega/privacy/android/domain/usecase/{package}/
     {Name}UseCaseTest.kt
 ```

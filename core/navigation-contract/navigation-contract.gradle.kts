@@ -11,7 +11,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain:common"))
+    implementation(project(":domain:core:common"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))
 

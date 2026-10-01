@@ -22,9 +22,9 @@ android {
 dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
-    implementation(project(":domain"))
-    implementation(project(":domain:contact"))
-    implementation(project(":domain:chat"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:contact"))
+    implementation(project(":domain:feature:chat"))
     implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))

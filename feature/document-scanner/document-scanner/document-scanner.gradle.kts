@@ -9,7 +9,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
+    implementation(project(":domain:core:shared"))
     implementation(project(":navigation"))
     implementation(project(":feature:document-scanner:document-scanner-snowflake-components"))
     implementation(project(":resources:icon-pack"))

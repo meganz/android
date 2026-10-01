@@ -23,8 +23,8 @@ dependencies {
 
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:analytics:analytics-tracker"))
-    implementation(project(":domain"))
-    implementation(project(":domain:camerauploads"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:camerauploads"))
     implementation(project(":navigation"))
     implementation(project(":data"))
     implementation(project(":shared:original-core-ui"))

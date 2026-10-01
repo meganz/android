@@ -18,7 +18,7 @@ android {
 dependencies {
     lintChecks(project(":lint"))
 
-    implementation(project(":domain"))
+    implementation(project(":domain:core:shared"))
     implementation(project(":feature:passcode:passcode-snowflake-components"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))

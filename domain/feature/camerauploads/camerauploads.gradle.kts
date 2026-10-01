@@ -1,9 +1,7 @@
 plugins {
-    // `id` rather than `alias`: :domain already applies these, so the child project sees them
-    // on the classpath with an unknown version and version-bearing aliases fail to resolve.
-    id("mega.jvm.library")
-    id("mega.jvm.hilt")
-    id("org.jetbrains.kotlin.plugin.serialization")
+    alias(convention.plugins.mega.jvm.library)
+    alias(convention.plugins.mega.jvm.hilt)
+    alias(plugin.plugins.kotlin.serialisation)
 }
 
 lint {
@@ -13,8 +11,8 @@ lint {
 
 dependencies {
     lintChecks(project(":lint"))
-    implementation(project(":domain"))
-    implementation(project(":domain:common"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:core:common"))
     implementation(lib.coroutines.core)
     implementation(lib.javax.inject)
 

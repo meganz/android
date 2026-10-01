@@ -11,7 +11,7 @@ android {
 dependencies {
     preBuiltSdkDependency(rootProject.extra)
     implementation(project(":data"))
-    implementation(project(":domain:common"))
+    implementation(project(":domain:core:common"))
     implementation(lib.coroutines.core)
 
     testImplementation(testlib.bundles.unit.test)

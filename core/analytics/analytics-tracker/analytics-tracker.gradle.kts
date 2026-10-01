@@ -10,7 +10,7 @@ android {
 
 dependencies {
     lintChecks(project(":lint"))
-    implementation(project(":domain:common"))
+    implementation(project(":domain:core:common"))
     implementation(project(":core:navigation-contract"))
 
     // Analytics

@@ -1,11 +1,11 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working in the `:domain` module.
+This file provides guidance to Claude Code when working in the `:domain:core:shared` module.
 
-> Module path: `:domain` · Build file: `domain/domain.gradle.kts` · Namespace: n/a (pure Kotlin JVM library — no Android namespace)
+> Module path: `:domain:core:shared` · Build file: `domain/core/shared/shared.gradle.kts` · Namespace: n/a (pure Kotlin JVM library — no Android namespace)
 
 ## Overview
-`:domain` is the innermost layer of the project's clean architecture. It holds the business logic of the entire app: use cases, repository interfaces, domain entities, and domain-specific exceptions. It is a pure Kotlin/JVM library (uses the `mega.jvm.library` convention plugin, not the Android library plugin) and intentionally has no Android framework dependencies.
+`:domain:core:shared` is the residue of the original `:domain` module — the innermost layer of the project's clean architecture. It holds the business logic of the entire app: use cases, repository interfaces, domain entities, and domain-specific exceptions. It is a pure Kotlin/JVM library (uses the `mega.jvm.library` convention plugin, not the Android library plugin) and intentionally has no Android framework dependencies.
 
 It is the dependency hub of the codebase: `:data` implements the repository interfaces declared here, and effectively every feature module depends on `:domain` for use cases and entities. It is very large (~3400 Kotlin files), so explore by package rather than reading exhaustively.
 
@@ -25,7 +25,7 @@ Source root: `src/main/kotlin/mega/privacy/android/domain/`
 - **Entities**: Plain domain models, often data/sealed classes and enums. Examples: `AccountBlockedType`, `AccountStorageDetail`, `AccountPlanDetail`.
 
 ## Module Dependencies
-From `domain.gradle.kts`:
+From `shared.gradle.kts`:
 - Plugins: `mega.jvm.library`, `mega.jvm.hilt`, Kotlin serialization.
 - `lib.coroutines.core`, `lib.javax.inject`, `lib.kotlin.serialisation`, `androidx.paging.core`.
 - `lintChecks(project(":lint"))`; lint runs with `abortOnError` and `warningsAsErrors`.
@@ -40,7 +40,7 @@ JUnit 5 + Mockito + Turbine + Truth via the `unit.test` / `junit5` test bundles.
 ```
 
 ## Notes & Gotchas
-- Dependency direction: nothing flows inward. `:data` and all feature modules depend on `:domain`; `:domain` depends on none of them.
+- Dependency direction: nothing flows inward. `:data` and all feature modules depend on `:domain:core:shared`; it depends only on `:domain:core:common`. Area-owned use cases live in `:domain:feature:<area>`, which may depend on `:domain:core:*` but never on another feature module (enforced by `DomainModuleGraphTest` in build-logic).
 - Do not introduce Android SDK dependencies here — that would break the layer boundary and the JVM library plugin.
 - Very large module — use cases and entities are organized by feature area; navigate by subpackage and use `grep`/`find`, do not read whole trees.
 - Global conventions (use case / repository / naming patterns) live in the root `.claude/CLAUDE.md` and the `usecase` skill; follow those.

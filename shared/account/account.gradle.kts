@@ -22,9 +22,9 @@ android {
 dependencies {
     lintChecks(project(":lint"))
 
-    implementation(project(":domain"))
-    implementation(project(":domain:account"))
-    implementation(project(":domain:chat"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:account"))
+    implementation(project(":domain:feature:chat"))
     implementation(project(":data"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))

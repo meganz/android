@@ -17,7 +17,7 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
     lintChecks(project(":lint"))
 
-    implementation(project(":domain"))
+    implementation(project(":domain:core:shared"))
     implementation(project(":data"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:formatter"))

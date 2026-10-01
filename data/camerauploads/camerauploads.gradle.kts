@@ -16,8 +16,8 @@ android {
 dependencies {
     lintChecks(project(":lint"))
     implementation(project(":data"))
-    implementation(project(":domain"))
-    implementation(project(":domain:camerauploads"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:camerauploads"))
 
     implementation(lib.coroutines.core)
     implementation(androidx.hilt.work)

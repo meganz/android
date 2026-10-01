@@ -21,8 +21,8 @@ dependencies {
 
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
-    implementation(project(":domain"))
-    implementation(project(":domain:node"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:node"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))

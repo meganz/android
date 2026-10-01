@@ -15,12 +15,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
-    implementation(project(":domain:transfers"))
-    implementation(project(":domain:node"))
-    implementation(project(":domain:account"))
-    implementation(project(":domain:chat"))
-    implementation(project(":domain:camerauploads"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:transfers"))
+    implementation(project(":domain:feature:node"))
+    implementation(project(":domain:feature:account"))
+    implementation(project(":domain:feature:chat"))
+    implementation(project(":domain:feature:camerauploads"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":core:formatter"))

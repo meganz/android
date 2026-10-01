@@ -165,11 +165,16 @@ class ExportChatNodesUseCase @Inject constructor(
 
 ## File Placement
 
-All use cases live in the `domain` module under feature subpackages:
+Use cases live in the `:domain` tree, under feature subpackages. An area that has its own module
+(`:domain:feature:<area>`) owns its use cases; anything used by more than one area stays in
+`:domain:core:shared`. A feature module may depend on `:domain:core:*` but never on another
+`:domain:feature:*` module.
 
 ```
-domain/src/main/kotlin/mega/privacy/android/domain/usecase/{package}/
-    {Name}UseCase.kt
+domain/feature/{area}/src/main/kotlin/mega/privacy/android/domain/usecase/{package}/
+    {Name}UseCase.kt                      # area-owned
+domain/core/shared/src/main/kotlin/mega/privacy/android/domain/usecase/{package}/
+    {Name}UseCase.kt                      # shared by several areas
 ```
 
 **Never place new use cases in the root `usecase/` directory.** The ~250 files currently at the root are legacy — all new use cases must go into a feature subpackage (e.g., `usecase/billing/`, `usecase/node/`, `usecase/chat/`).

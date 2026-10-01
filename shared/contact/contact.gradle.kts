@@ -16,7 +16,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
+    implementation(project(":domain:core:shared"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":third-party-lib:twemoji"))

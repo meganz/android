@@ -34,9 +34,9 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
-    implementation(project(":domain"))
-    implementation(project(":domain:transfers"))
-    implementation(project(":domain:node"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:transfers"))
+    implementation(project(":domain:feature:node"))
 
     // PDF search engine uses PdfiumCore directly
     implementation(project(":third-party-lib:pdfiumAndroid"))

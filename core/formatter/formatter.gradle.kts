@@ -9,7 +9,7 @@ android {
 
 dependencies {
     implementation(project(":resources:string-resources"))
-    implementation(project(":domain:common"))
+    implementation(project(":domain:core:common"))
     implementation(project(":third-party-lib:twemoji"))
     implementation(lib.mega.core.ui)
     //test

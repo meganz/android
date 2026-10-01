@@ -14,7 +14,7 @@ android {
 dependencies {
     lintChecks(project(":lint"))
 
-    implementation(project(":domain"))
+    implementation(project(":domain:core:shared"))
     implementation(lib.logging.timber)
     implementation(androidx.appcompat)
     implementation(androidx.lifecycle.runtime)
