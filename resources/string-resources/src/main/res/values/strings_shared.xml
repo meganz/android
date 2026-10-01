@@ -3913,8 +3913,6 @@
     <string name="audio_player_resumed_snackbar_message">Resumed from %1$s</string>
     <!-- Accessibility content description for the icon shown on a chat list row when that chat has a call in progress -->
     <string name="chat_list_ongoing_call_content_description">Ongoing call</string>
-    <!-- Chat list: snackbar shown when the Do not disturb action is picked while chat notifications are already muted; its Unmute action turns Do not disturb off -->
-    <string name="chat_list_notifications_muted_message">Chat notifications are muted</string>
     <!-- Account usage screen: label under the storage quota meter -->
     <string name="account_usage_storage_label">Storage</string>
     <!-- Account usage screen: label under the transfer quota meter -->
@@ -4294,8 +4292,6 @@
     </plurals>
     <!-- Sync exclusions Manage screen: screen title. The screen lists everything a sync leaves out, and is where rules are added, edited and removed. -->
     <string name="sync_exclusions_manage_title">Manage exclusions</string>
-    <!-- Sync folder setup screen: subtitle of the row that opens the Manage exclusions screen before the folder pair exists, letting the user choose exclusions ahead of the first sync. -->
-    <string name="sync_exclusions_setup_subtitle">Choose what not to sync</string>
     <!-- Sync exclusions Manage screen: heading over the file extensions the sync leaves out, shown as chips. -->
     <string name="sync_exclusions_manage_section_extensions">File extensions</string>
     <!-- Sync exclusions Manage screen: heading over the rules that match a file or folder by its name. -->
@@ -4326,8 +4322,6 @@
     <string name="sync_exclusions_manage_size_between">Files between %1$s and %2$s</string>
     <!-- Sync exclusions Manage screen: confirmation shown briefly after a new exclusion is added. -->
     <string name="sync_exclusions_manage_snackbar_added">Exclusion added</string>
-    <!-- Sync exclusions Manage screen: confirmation shown briefly after the user changes an existing exclusion and returns to the list. The counterpart of “Exclusion added”; it is not shown when an exclusion is removed. -->
-    <string name="sync_exclusions_manage_snackbar_updated">Exclusion updated</string>
     <!-- Sync exclusions Manage screen: spoken label for the control that stops excluding a file extension. Not shown on screen; it describes the small dismiss control on an extension chip. %1$s is the extension, for example “tmp”. -->
     <string name="sync_exclusions_manage_remove_extension">Stop excluding %1$s</string>
     <!-- Sync exclusions Manage screen: heading shown when the folder’s exclusions could not be read. Deliberately distinct from the empty state, because presenting a failed read as “no exclusions” would invite saving that over rules that do exist. -->
@@ -4386,6 +4380,8 @@
     <string name="text_editor_link_dialog_text_label">Text</string>
     <!-- Button in the rich text editor's add link dialog that turns an existing link back into ordinary text, keeping the words but dropping the web address -->
     <string name="text_editor_link_dialog_remove">Remove link</string>
+    <!-- Sync folder setup screen: subtitle of the row that opens the Manage exclusions screen before the folder pair exists, letting the user choose exclusions ahead of the first sync. -->
+    <string name="sync_exclusions_setup_subtitle">Choose what not to sync</string>
     <!-- Title of the name collision screen shown when the item being uploaded, copied or moved has the same name as an existing one. -->
     <string name="title_duplicated_items">Duplicated items</string>
     <!-- Message informing that a file with the same name (%1$s) already exists at the destination. -->
@@ -4451,25 +4447,66 @@
         <item quantity="one">Apply to the duplicate</item>
         <item quantity="other">Apply to all %1$d duplicates</item>
     </plurals>
+    <!-- Sync exclusions Manage screen: confirmation shown briefly after the user changes an existing exclusion and returns to the list. The counterpart of “Exclusion added”; it is not shown when an exclusion is removed. -->
+    <string name="sync_exclusions_manage_snackbar_updated">Exclusion updated</string>
     <!-- Chat message notification: label of the inline reply action button and hint of its text field. -->
     <string name="chat_notification_reply_action">Reply</string>
-    <!-- Body of the Over Disk Quota Paywall screen, shown when the account is over its storage quota and has been locked. This version is used when the dates MEGA emailed the user on are not available, so no date is mentioned. %1$d is the number of files in the account and also drives the plural form, %2$s is the storage those files take up including its unit (for example “26.12 GB”), and %3$s is the name of the PRO plan the user needs (for example “Pro I”). The text between [A] and [/A] becomes a link to the storage-limits help page. -->
-    <plurals name="account_over_disk_quota_paywall_body_no_warning_dates">
-        <item quantity="one">Although we have contacted you by email, your storage is still full. You have %1$d file taking up %2$s in your Cloud drive, and your account has been locked. Upgrade to a %3$s plan to increase your storage and unlock your account. If you don’t take action soon, your data will be deleted. Upgrade now to protect your file. [A]Learn more about your storage limits[/A].</item>
-        <item quantity="other">Although we have contacted you by email, your storage is still full. You have %1$d files taking up %2$s in your Cloud drive, and your account has been locked. Upgrade to a %3$s plan to increase your storage and unlock your account. If you don’t take action soon, your data will be deleted. Upgrade now to protect your files. [A]Learn more about your storage limits[/A].</item>
-    </plurals>
-    <!-- Body of the Over Disk Quota Paywall screen, shown when the account is over its storage quota and has been locked. This version is used when MEGA emailed the user once. %1$s is the date that email was sent, %2$d is the number of files in the account and also drives the plural form, %3$s is the storage those files take up including its unit (for example “26.12 GB”), and %4$s is the name of the PRO plan the user needs (for example “Pro I”). The text between [A] and [/A] becomes a link to the storage-limits help page. -->
-    <plurals name="account_over_disk_quota_paywall_body_single_warning_date">
-        <item quantity="one">Although we have contacted you by email on %1$s, your storage is still full. You have %2$d file taking up %3$s in your Cloud drive, and your account has been locked. Upgrade to a %4$s plan to increase your storage and unlock your account. If you don’t take action soon, your data will be deleted. Upgrade now to protect your file. [A]Learn more about your storage limits[/A].</item>
-        <item quantity="other">Although we have contacted you by email on %1$s, your storage is still full. You have %2$d files taking up %3$s in your Cloud drive, and your account has been locked. Upgrade to a %4$s plan to increase your storage and unlock your account. If you don’t take action soon, your data will be deleted. Upgrade now to protect your files. [A]Learn more about your storage limits[/A].</item>
-    </plurals>
-    <!-- Body of the Over Disk Quota Paywall screen, shown when the account is over its storage quota and has been locked. This version is used when MEGA emailed the user more than once; the individual dates are not listed. %1$d is the number of files in the account and also drives the plural form, %2$s is the storage those files take up including its unit (for example “26.12 GB”), and %3$s is the name of the PRO plan the user needs (for example “Pro I”). The text between [A] and [/A] becomes a link to the storage-limits help page. -->
-    <plurals name="account_over_disk_quota_paywall_body_multiple_warning_dates">
-        <item quantity="one">Although we have contacted you multiple times by email, your storage is still full. You have %1$d file taking up %2$s in your Cloud drive, and your account has been locked. Upgrade to a %3$s plan to increase your storage and unlock your account. If you don’t take action soon, your data will be deleted. Upgrade now to protect your file. [A]Learn more about your storage limits[/A].</item>
-        <item quantity="other">Although we have contacted you multiple times by email, your storage is still full. You have %1$d files taking up %2$s in your Cloud drive, and your account has been locked. Upgrade to a %3$s plan to increase your storage and unlock your account. If you don’t take action soon, your data will be deleted. Upgrade now to protect your files. [A]Learn more about your storage limits[/A].</item>
-    </plurals>
+    <!-- Chat list: snackbar shown when the Do not disturb action is picked while chat notifications are already muted; its Unmute action turns Do not disturb off -->
+    <string name="chat_list_notifications_muted_message">Chat notifications are muted</string>
     <!-- Title of the Over Disk Quota Paywall screen, shown above the body. The account is over its storage quota and has been locked, so the user can no longer add to or free up their storage. -->
     <string name="account_over_disk_quota_paywall_title">Account locked</string>
     <!-- Primary button on the Over Disk Quota Paywall screen. Opens the plan upgrade flow. -->
     <string name="account_over_disk_quota_paywall_upgrade_now_button">Upgrade now</string>
+    <!-- Body of the Over Disk Quota Paywall screen, shown when the account is over its storage quota and has been locked. This version is used when the dates MEGA emailed the user on are not available, so no date is mentioned. %1$d is the number of files in the account and also drives the plural form, %2$s is the storage those files take up including its unit (for example “26.12 GB”), and %3$s is the name of the PRO plan the user needs (for example “Pro I”). The text between [A] and [/A] becomes a link to the storage-limits help page. -->
+    <plurals name="account_over_disk_quota_paywall_body_no_warning_dates">
+        <item quantity="one">We contacted you by email about your storage. You have %1$d file taking up %2$s, and your account is locked. Upgrade to %3$s to increase your storage and unlock your account. If you don’t take action soon, your data may be deleted. [A]Learn more about your storage limits[/A]</item>
+        <item quantity="other">We contacted you by email about your storage. You have %1$d files taking up %2$s, and your account is locked. Upgrade to %3$s to increase your storage and unlock your account. If you don’t take action soon, your data may be deleted. [A]Learn more about your storage limits[/A]</item>
+    </plurals>
+    <!-- Body of the Over Disk Quota Paywall screen, shown when the account is over its storage quota and has been locked. This version is used when MEGA emailed the user once. %1$s is the date that email was sent, %2$d is the number of files in the account and also drives the plural form, %3$s is the storage those files take up including its unit (for example “26.12 GB”), and %4$s is the name of the PRO plan the user needs (for example “Pro I”). The text between [A] and [/A] becomes a link to the storage-limits help page. -->
+    <plurals name="account_over_disk_quota_paywall_body_single_warning_date">
+        <item quantity="one">We emailed you on %1$s about your storage, but it’s still full. You have %2$d file taking up %3$s, and your account is locked. Upgrade to %4$s to increase your storage and unlock your account. If you don’t take action soon, your data may be deleted. [A]Learn more about your storage limits[/A]</item>
+        <item quantity="other">We emailed you on %1$s about your storage, but it’s still full. You have %2$d files taking up %3$s, and your account is locked. Upgrade to %4$s to increase your storage and unlock your account. If you don’t take action soon, your data may be deleted. [A]Learn more about your storage limits[/A]</item>
+    </plurals>
+    <!-- Body of the Over Disk Quota Paywall screen, shown when the account is over its storage quota and has been locked. This version is used when MEGA emailed the user more than once; the individual dates are not listed. %1$d is the number of files in the account and also drives the plural form, %2$s is the storage those files take up including its unit (for example “26.12 GB”), and %3$s is the name of the PRO plan the user needs (for example “Pro I”). The text between [A] and [/A] becomes a link to the storage-limits help page. -->
+    <plurals name="account_over_disk_quota_paywall_body_multiple_warning_dates">
+        <item quantity="one">Your storage is still full, and your account is locked. We’ve emailed you about this more than once. You have %1$d file taking up %2$s. Upgrade to %3$s to increase your storage and unlock your account. If you don’t take action soon, your data may be deleted. [A]Learn more about your storage limits[/A]</item>
+        <item quantity="other">Your storage is still full, and your account is locked. We’ve emailed you about this more than once. You have %1$d files taking up %2$s. Upgrade to %3$s to increase your storage and unlock your account. If you don’t take action soon, your data may be deleted. [A]Learn more about your storage limits[/A]</item>
+    </plurals>
+    <!-- Title of the redesigned duplicate items screen, shown when the file being uploaded, copied, moved or imported has the same name as a file already at the destination. -->
+    <string name="name_collision_file_exists_title">File already exists</string>
+    <!-- Title of the redesigned duplicate items screen, shown when the folder being uploaded, copied or moved has the same name as a folder already at the destination. -->
+    <string name="name_collision_folder_exists_title">Folder already exists</string>
+    <!-- Subtitle under the title of the duplicate items screen, shown when there are several duplicates of the same kind (files or folders) to resolve. %1$d is the position of the duplicate being shown, %2$d is the number of duplicates of that kind. -->
+    <string name="name_collision_duplicate_counter">Duplicate %1$d of %2$d</string>
+    <!-- Body of the duplicate items screen, telling the user which item already exists at the destination. %1$s is the name of the file or folder, shown between quotation marks. -->
+    <string name="name_collision_already_exists_body">“%1$s” already exists in this location.</string>
+    <!-- Title of the option, in the duplicate items screen, to replace the existing file with the one being uploaded, copied or moved. -->
+    <string name="name_collision_option_replace_file">Replace existing file</string>
+    <!-- Description under the “Replace existing file” option of the duplicate items screen, when file versioning is disabled and the existing file is overwritten. -->
+    <string name="name_collision_option_replace_file_subtitle">Existing file is overwritten</string>
+    <!-- Description under the “Replace existing file” option of the duplicate items screen, when file versioning is enabled and the existing file is kept as a previous version. -->
+    <string name="name_collision_option_replace_file_versioning_subtitle">Existing file is saved as a previous version</string>
+    <!-- Title of the option, in the duplicate items screen, to keep the existing file and add the new one under a different name. -->
+    <string name="name_collision_option_keep_both_files">Keep both files</string>
+    <!-- Description under the “Keep both files” option of the duplicate items screen, when the file is being uploaded, copied or imported. %1$s is the new name the file will be given, shown between quotation marks. -->
+    <string name="name_collision_option_keep_both_files_subtitle">New file is renamed “%1$s”</string>
+    <!-- Description under the “Keep both files” option of the duplicate items screen, when the file is being moved. %1$s is the new name the moved file will be given, shown between quotation marks. -->
+    <string name="name_collision_option_keep_both_files_move_subtitle">Moved file is renamed “%1$s”</string>
+    <!-- Title of the option, in the duplicate items screen, to leave the existing file as it is and not upload, copy or move the new one. -->
+    <string name="name_collision_option_skip_file">Skip this file</string>
+    <!-- Title of the option, in the duplicate items screen, to merge the folder being uploaded, copied or moved into the existing folder. -->
+    <string name="name_collision_option_merge_folders">Merge folders</string>
+    <!-- Description under the “Merge folders” option of the duplicate items screen. -->
+    <string name="name_collision_option_merge_folders_subtitle">Items from both folders are combined into one</string>
+    <!-- Title of the option, in the duplicate items screen, to keep the existing folder and upload the new one under a different name. -->
+    <string name="name_collision_option_keep_both_folders">Keep both folders</string>
+    <!-- Description under the “Keep both folders” option of the duplicate items screen. %1$s is the new name the folder will be given, shown between quotation marks. -->
+    <string name="name_collision_option_keep_both_folders_subtitle">New folder is renamed “%1$s”</string>
+    <!-- Main button of the duplicate items screen when the file is being imported from a chat message or a file link, confirming the chosen option. -->
+    <string name="name_collision_import_button">Import</string>
+    <!-- Checkbox row at the bottom of the duplicate items screen, applying the chosen option to every remaining duplicate of the same kind (files or folders). %1$d is the number of duplicates the choice will apply to, including the one being shown, and also drives the plural form. -->
+    <plurals name="name_collision_apply_to_all">
+        <item quantity="one">Apply to all %1$d duplicate</item>
+        <item quantity="other">Apply to all %1$d duplicates</item>
+    </plurals>
 </resources>

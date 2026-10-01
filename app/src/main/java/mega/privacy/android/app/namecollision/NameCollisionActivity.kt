@@ -5,9 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -15,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.indicators.LargeSpinnerIndicator
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.largebundle.largeBundleHolder
@@ -33,13 +38,16 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionArgs
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionOutcome
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionViewModel
 import mega.privacy.android.shared.nodes.namecollision.toDomainEntity
 import mega.privacy.android.shared.nodes.namecollision.toUiEntity
+import mega.privacy.android.shared.nodes.namecollision.view.DuplicateItemsScreen
 import mega.privacy.android.shared.nodes.namecollision.view.NameCollisionScreen
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -84,13 +92,35 @@ class NameCollisionActivity : PasscodeActivity() {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
-                    NameCollisionScreen(
-                        uiState = uiState,
-                        onReplaceUpdateMerge = viewModel::replaceUpdateOrMerge,
-                        onCancel = viewModel::cancel,
-                        onRename = viewModel::rename,
-                        onLearnMore = { launchUrl(LEARN_MORE_URI) },
-                        onBack = { onBackPressedDispatcher.onBackPressed() },
+                    FeatureFlagGate(
+                        feature = ApiFeatures.NameCollisionRedesign,
+                        loading = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                LargeSpinnerIndicator()
+                            }
+                        },
+                        disabled = {
+                            NameCollisionScreen(
+                                uiState = uiState,
+                                onReplaceUpdateMerge = viewModel::replaceUpdateOrMerge,
+                                onCancel = viewModel::cancel,
+                                onRename = viewModel::rename,
+                                onLearnMore = { launchUrl(LEARN_MORE_URI) },
+                                onBack = { onBackPressedDispatcher.onBackPressed() },
+                            )
+                        },
+                        enabled = {
+                            DuplicateItemsScreen(
+                                uiState = uiState,
+                                onReplaceUpdateMerge = viewModel::replaceUpdateOrMerge,
+                                onCancel = viewModel::cancel,
+                                onRename = viewModel::rename,
+                                onBack = { onBackPressedDispatcher.onBackPressed() },
+                            )
+                        },
                     )
                 }
 

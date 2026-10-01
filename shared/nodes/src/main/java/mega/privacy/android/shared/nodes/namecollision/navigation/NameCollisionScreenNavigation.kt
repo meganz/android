@@ -1,18 +1,26 @@
 package mega.privacy.android.shared.nodes.namecollision.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.indicators.LargeSpinnerIndicator
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.NameCollisionNavKey
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionArgs
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionLaunchSourceHolder
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionViewModel
+import mega.privacy.android.shared.nodes.namecollision.view.DuplicateItemsScreen
 import mega.privacy.android.shared.nodes.namecollision.view.NameCollisionScreen
 
 /**
@@ -61,13 +69,32 @@ fun EntryProviderScope<NavKey>.nameCollisionScreen(
             navigationHandler.back()
         }
 
-        NameCollisionScreen(
-            uiState = uiState,
-            onReplaceUpdateMerge = viewModel::replaceUpdateOrMerge,
-            onCancel = viewModel::cancel,
-            onRename = viewModel::rename,
-            onLearnMore = { uriHandler.openUri(FILE_VERSIONING_HELP_URL) },
-            onBack = navigationHandler::back,
+        FeatureFlagGate(
+            feature = ApiFeatures.NameCollisionRedesign,
+            loading = {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    LargeSpinnerIndicator()
+                }
+            },
+            disabled = {
+                NameCollisionScreen(
+                    uiState = uiState,
+                    onReplaceUpdateMerge = viewModel::replaceUpdateOrMerge,
+                    onCancel = viewModel::cancel,
+                    onRename = viewModel::rename,
+                    onLearnMore = { uriHandler.openUri(FILE_VERSIONING_HELP_URL) },
+                    onBack = navigationHandler::back,
+                )
+            },
+            enabled = {
+                DuplicateItemsScreen(
+                    uiState = uiState,
+                    onReplaceUpdateMerge = viewModel::replaceUpdateOrMerge,
+                    onCancel = viewModel::cancel,
+                    onRename = viewModel::rename,
+                    onBack = navigationHandler::back,
+                )
+            },
         )
     }
 }

@@ -51,9 +51,6 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.FileNameCollision
-import mega.privacy.android.domain.entity.node.NameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
@@ -434,14 +431,6 @@ private fun folderInfo(numFolders: Int, numFiles: Int): String = when {
     ) + pluralStringResource(
         sharedR.plurals.num_of_files_with_parameter, numFiles, numFiles
     )
-}
-
-private fun NameCollision.toNameCollisionType(): NameCollisionType = when (this) {
-    is FileNameCollision -> NameCollisionType.UPLOAD
-    is NodeNameCollision.Default ->
-        if (type == NodeNameCollisionType.MOVE) NameCollisionType.MOVE else NameCollisionType.COPY
-
-    is NodeNameCollision.Chat, is NodeNameCollision.FileLink -> NameCollisionType.COPY
 }
 
 private fun replaceUpdateMergeInfo(
