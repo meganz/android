@@ -453,6 +453,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             ).apply {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 putExtra(MegaActivityInternalLauncher.LAUNCH_INTENT, targetIntent)
+                clipData = intent.clipData
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
             needLogin = false

@@ -2,8 +2,10 @@ package mega.privacy.android.app.appstate
 
 import android.app.Activity
 import android.content.ClipData
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
@@ -39,6 +41,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import mega.privacy.android.shared.resources.R as sharedR
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MegaActivityIntentActionHandlerTest {
@@ -60,6 +63,8 @@ class MegaActivityIntentActionHandlerTest {
         @JvmField
         @RegisterExtension
         val analyticsExtension = AnalyticsTestExtension()
+
+        private const val PACKAGE_NAME = "mega.privacy.android.app"
     }
 
     @BeforeAll
@@ -658,4 +663,88 @@ class MegaActivityIntentActionHandlerTest {
             )
         }
 
+    private fun stubLaunchIntent(stored: Intent?): Intent {
+        val extras = mock<Bundle>()
+        val component = mock<ComponentName>()
+        val intent = mock<Intent>()
+        whenever(extras.containsKey(MegaActivityInternalLauncher.LAUNCH_INTENT)).thenReturn(true)
+        whenever(component.className)
+            .thenReturn(MegaActivityInternalLauncher.INTERNAL_ENTRY_COMPONENT)
+        whenever(intent.extras).thenReturn(extras)
+        whenever(intent.component).thenReturn(component)
+        whenever(intent.getParcelableExtra<Intent>(MegaActivityInternalLauncher.LAUNCH_INTENT))
+            .thenReturn(stored)
+        whenever(activity.intent).thenReturn(intent)
+        whenever(activity.packageName).thenReturn(PACKAGE_NAME)
+        return intent
+    }
+
+    private fun storedIntentTargeting(packageName: String): Intent {
+        val component = mock<ComponentName>()
+        val intent = mock<Intent>()
+        whenever(component.packageName).thenReturn(packageName)
+        whenever(intent.component).thenReturn(component)
+        return intent
+    }
+
+    @Test
+    fun `test that launchLastActivityIfNeeded does not start anything when root node does not exist`() =
+        runTest {
+            stubLaunchIntent(storedIntentTargeting(PACKAGE_NAME))
+
+            underTest.launchLastActivityIfNeeded(rootNodeExists = false)
+
+            verify(activity, never()).startActivity(any())
+            verify(activity, never()).finish()
+        }
+
+    @Test
+    fun `test that launchLastActivityIfNeeded replays the stored intent when root node exists`() =
+        runTest {
+            val stored = storedIntentTargeting(PACKAGE_NAME)
+            stubLaunchIntent(stored)
+
+            underTest.launchLastActivityIfNeeded(rootNodeExists = true)
+
+            verify(activity).startActivity(stored)
+            verify(activity).finish()
+        }
+
+    @Test
+    fun `test that launchLastActivityIfNeeded does not replay an intent targeting another package`() =
+        runTest {
+            stubLaunchIntent(storedIntentTargeting("com.example.other"))
+
+            underTest.launchLastActivityIfNeeded(rootNodeExists = true)
+
+            verify(activity, never()).startActivity(any())
+            verify(activity).finish()
+        }
+
+    @Test
+    fun `test that launchLastActivityIfNeeded does not crash when the stored intent no longer has uri permission`() =
+        runTest {
+            val stored = storedIntentTargeting(PACKAGE_NAME)
+            stubLaunchIntent(stored)
+            whenever(activity.startActivity(stored))
+                .thenThrow(SecurityException("UID 10318 does not have permission to content://media/external/images/media/25"))
+
+            underTest.launchLastActivityIfNeeded(rootNodeExists = true)
+
+            verify(snackbarEventQueue)
+                .queueMessage(sharedR.string.general_request_failed_message)
+        }
+
+    @Test
+    fun `test that launchLastActivityIfNeeded keeps the activity open when the replay fails`() =
+        runTest {
+            val stored = storedIntentTargeting(PACKAGE_NAME)
+            stubLaunchIntent(stored)
+            whenever(activity.startActivity(stored))
+                .thenThrow(SecurityException("no permission"))
+
+            underTest.launchLastActivityIfNeeded(rootNodeExists = true)
+
+            verify(activity, never()).finish()
+        }
 }

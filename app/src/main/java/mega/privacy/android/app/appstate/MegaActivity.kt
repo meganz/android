@@ -1,6 +1,5 @@
 package mega.privacy.android.app.appstate
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -41,8 +40,6 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.INTERNAL_ENTRY_COMPONENT
-import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.LAUNCH_INTENT
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
@@ -75,7 +72,6 @@ import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
 import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
-import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
 import mega.privacy.android.navigation.contract.NavOptions
@@ -182,24 +178,6 @@ class MegaActivity : FragmentActivity() {
             navigationEventQueue.emit(navKeys, navOptions = navOptions)
             intent.removeExtra(EXTRA_NAV_KEYS)
             intent.removeExtra(EXTRA_NAV_DROP_IF_SHOWN)
-        }
-    }
-
-    @SuppressLint("UnsafeIntentLaunch")
-    private fun launchLastActivityIfNeeded(rootNodeState: RootNodeState) {
-        if (rootNodeState.exists && intent.extras?.containsKey(LAUNCH_INTENT) == true) {
-            if (intent.component?.className != INTERNAL_ENTRY_COMPONENT) {
-                Timber.w("Rejected LAUNCH_INTENT from non-internal entry point")
-                finish()
-            } else {
-                intent.parcelable<Intent>(LAUNCH_INTENT)?.let { originalIntent ->
-                    if (originalIntent.component?.packageName == packageName) {
-                        startActivity(originalIntent)
-                    }
-                    finish()
-                }
-                intent.removeExtra(LAUNCH_INTENT)
-            }
         }
     }
 
@@ -336,7 +314,7 @@ class MegaActivity : FragmentActivity() {
 
                 LaunchedEffect(rootNodeState) {
                     navigationHandler.onRootNodeChange(rootNodeState)
-                    launchLastActivityIfNeeded(rootNodeState)
+                    intentActionHandler.launchLastActivityIfNeeded(rootNodeState.exists)
                     handlePendingDeepLinks(rootNodeState)
                 }
 
