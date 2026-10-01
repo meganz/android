@@ -13,9 +13,9 @@ import javax.inject.Singleton
  * The launcher [put]s a source keyed by a short id, which the revamped video player's navigation
  * key carries, and the route entry [consume]s it by that id when it creates its ViewModel.
  *
- * Nothing consumes it at the moment: the revamped player's route was removed while it is rebuilt,
- * so the launcher never emits a key. The holder stays because the rebuilt route needs the same
- * handoff.
+ * Nothing consumes it yet: the rebuilt route ignores the id it is given until the work that loads
+ * a queue from a launch source lands. The launcher already stores the source, so that work only
+ * has to read it.
  *
  * The launcher always [put]s the source BEFORE emitting the nav key, so the route is never reached
  * through a raw parcelable deep link with no entry here. The holder is in-memory only: on process
