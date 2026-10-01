@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -58,7 +57,6 @@ class GlobalRequestListenerTest {
     private val setLogoutFlagWrapper = mock<SetLogoutFlagWrapper>()
     private val userAttributeDatabaseUpdater = mock<UserAttributeDatabaseUpdater>()
     private val setupMegaChatApiWrapper = mock<SetupMegaChatApiWrapper>()
-    private val accountInfoWrapper = mock<AccountInfoWrapper>()
     private val megaChatApi = mock<MegaChatApiAndroid>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val megaApi = mock<MegaApiAndroid>()
@@ -99,7 +97,6 @@ class GlobalRequestListenerTest {
             setLogoutFlagWrapper = setLogoutFlagWrapper,
             userAttributeDatabaseUpdater = userAttributeDatabaseUpdater,
             setupMegaChatApiWrapper = setupMegaChatApiWrapper,
-            accountInfoWrapper = accountInfoWrapper,
             megaChatApi = megaChatApi,
             localStorageGateway = localStorageGateway,
             megaApi = megaApi,
@@ -127,7 +124,7 @@ class GlobalRequestListenerTest {
         Dispatchers.resetMain()
         reset(
             appEventGateway, setLogoutFlagWrapper, userAttributeDatabaseUpdater,
-            setupMegaChatApiWrapper, accountInfoWrapper, megaChatApi,
+            setupMegaChatApiWrapper, megaChatApi,
             localStorageGateway, megaApi, getFullAccountInfoUseCase,
             broadcastFetchNodesFinishUseCase, localLogoutAppUseCase,
             setupDeviceNameUseCase, broadcastBusinessAccountExpiredUseCase,
@@ -242,7 +239,7 @@ class GlobalRequestListenerTest {
         }
 
     @Test
-    fun `test onRequestFinish with LOGOUT request and API_ESID resets account and logs out`() =
+    fun `test onRequestFinish with LOGOUT request and API_ESID logs out`() =
         runTest {
             val request = mock<MegaRequest> {
                 on { type } doReturn MegaRequest.TYPE_LOGOUT
@@ -256,7 +253,6 @@ class GlobalRequestListenerTest {
             underTest.onRequestFinish(api, request, error)
             advanceUntilIdle()
 
-            verify(accountInfoWrapper).resetAccountInfo()
             verify(setLoggedOutFromAnotherLocationUseCase).invoke(true)
             verify(localLogoutAppUseCase).invoke()
         }
@@ -551,7 +547,7 @@ class GlobalRequestListenerTest {
         verifyNoInteractions(
             appEventGateway, setIsUnverifiedBusinessAccountUseCase,
             broadcastBusinessAccountExpiredUseCase, broadcastSslVerificationFailedUseCase,
-            accountInfoWrapper, setLoggedOutFromAnotherLocationUseCase,
+            setLoggedOutFromAnotherLocationUseCase,
             localLogoutAppUseCase, loginMutex, broadcastFetchNodesFinishUseCase,
             getFullAccountInfoUseCase, shouldShowRichLinkWarningUseCase,
             isRichPreviewsEnabledUseCase, setupDeviceNameUseCase,

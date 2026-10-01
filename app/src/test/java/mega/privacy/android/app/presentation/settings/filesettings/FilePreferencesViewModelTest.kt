@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
@@ -96,6 +97,7 @@ internal class FilePreferencesViewModelTest {
 
     @AfterEach
     fun reset() {
+        accountDetailFlow.value = AccountDetail()
         reset(
             getFolderVersionInfo,
             monitorConnectivityUseCase,
@@ -375,6 +377,64 @@ internal class FilePreferencesViewModelTest {
             assertThat(awaitItem().accountType).isEqualTo(AccountType.PRO_I)
         }
     }
+
+    @Test
+    fun `test that usedRubbishInBytes is updated when monitor account detail emits storage details`() =
+        runTest {
+            accountDetailFlow.emit(AccountDetail(storageDetail = storageDetail(usedRubbish = 2048L)))
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().usedRubbishInBytes).isEqualTo(2048L)
+            }
+        }
+
+    @Test
+    fun `test that usedRubbishInBytes is null when monitor account detail emits without storage details`() =
+        runTest {
+            accountDetailFlow.emit(AccountDetail())
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().usedRubbishInBytes).isNull()
+            }
+        }
+
+    @Test
+    fun `test that clearRubbishBin sets usedRubbishInBytes to zero when the use case succeeds`() =
+        runTest {
+            accountDetailFlow.emit(AccountDetail(storageDetail = storageDetail(usedRubbish = 2048L)))
+            whenever(cleanRubbishBinUseCase()).thenReturn(Unit)
+            advanceUntilIdle()
+
+            underTest.clearRubbishBin()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().usedRubbishInBytes).isEqualTo(0L)
+            }
+        }
+
+    @Test
+    fun `test that clearRubbishBin keeps usedRubbishInBytes when the use case fails`() =
+        runTest {
+            accountDetailFlow.emit(AccountDetail(storageDetail = storageDetail(usedRubbish = 2048L)))
+            whenever(cleanRubbishBinUseCase()).thenThrow(RuntimeException())
+            advanceUntilIdle()
+
+            underTest.clearRubbishBin()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().usedRubbishInBytes).isEqualTo(2048L)
+            }
+        }
+
+    private fun storageDetail(usedRubbish: Long) = AccountStorageDetail(
+        usedCloudDrive = 0L,
+        usedRubbish = usedRubbish,
+        usedIncoming = 0L,
+        totalStorage = 0L,
+        usedStorage = 0L,
+    )
 
     companion object {
         @JvmField

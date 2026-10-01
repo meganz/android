@@ -37,7 +37,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_FILE_VERSIONS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_OFFLINE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RUBBISH
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
@@ -49,7 +48,6 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
-import javax.inject.Inject
 import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
@@ -58,12 +56,6 @@ import mega.privacy.android.shared.resources.R as sharedResR
 @AndroidEntryPoint
 class SettingsFileManagementFragment : SettingsBaseFragment(),
     Preference.OnPreferenceClickListener {
-
-    /**
-     * [MyAccountInfo] injection
-     */
-    @Inject
-    lateinit var myAccountInfo: MyAccountInfo
 
     private val viewModel by activityViewModels<FilePreferencesViewModel>()
 
@@ -103,10 +95,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
         mobileDataHighResolution?.onPreferenceClickListener = this
         cacheAdvancedOptions?.summary = getString(R.string.settings_advanced_features_calculating)
         offlineFileManagement?.summary = getString(R.string.settings_advanced_features_calculating)
-        rubbishFileManagement?.summary = getString(
-            R.string.settings_advanced_features_size,
-            myAccountInfo.formattedUsedRubbish
-        )
         viewModel.getCacheSize()
         taskGetSizeOffline()
         if (savedInstanceState != null
@@ -129,7 +117,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
         }
         viewLifecycleOwner.collectFlow(viewModel.monitorMyAccountUpdateEvent) {
             if (it.action == MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS) {
-                setRubbishInfo()
                 viewModel.getRubbishBinAutopurgeInfo()
             }
         }
@@ -190,6 +177,13 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             viewModel.resetDeleteAllVersionsEvent()
         }
 
+        rubbishFileManagement?.summary = filePreferencesState.usedRubbishInBytes?.let {
+            getString(
+                R.string.settings_advanced_features_size,
+                Util.getSizeString(it, requireContext())
+            )
+        } ?: getString(R.string.settings_advanced_features_calculating)
+
         if (filePreferencesState.emptyRubbishBinEvent is StateEventWithContentTriggered) {
             val exception = filePreferencesState.emptyRubbishBinEvent.content
             if (exception == null) {
@@ -197,7 +191,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                     requireActivity(),
                     getString(sharedR.string.empty_rubbish_bin_success_message)
                 )
-                resetRubbishInfo()
             } else {
                 Util.showSnackbar(
                     requireActivity(),
@@ -310,14 +303,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
     }
 
     /**
-     * Method for updating rubbish information.
-     */
-    fun setRubbishInfo() {
-        rubbishFileManagement?.summary =
-            getString(R.string.settings_advanced_features_size, myAccountInfo.formattedUsedRubbish)
-    }
-
-    /**
      * The task for get offline size
      *
      * @return offline size
@@ -366,17 +351,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                 )
             }
         }
-    }
-
-    /**
-     * Method for reset the rubbish bin Scheduler.
-     */
-    fun resetRubbishInfo() {
-        Timber.i("Updating size after clean the Rubbish Bin")
-        val emptyString = getString(sharedR.string.label_file_size_bytes, INITIAL_VALUE)
-        rubbishFileManagement?.summary =
-            getString(R.string.settings_advanced_features_size, emptyString)
-        myAccountInfo.formattedUsedRubbish = emptyString
     }
 
     /**

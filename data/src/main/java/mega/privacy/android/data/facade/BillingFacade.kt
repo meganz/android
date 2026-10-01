@@ -425,7 +425,6 @@ internal class BillingFacade @Inject constructor(
             }
         }
         val validMegaPurchases = validPurchases.map { megaPurchaseMapper(it) }
-        // legacy support, we still need to save into MyAccountInfo, will remove after refactoring
         updateAccountInfo(validMegaPurchases)
         Timber.d("total purchased are: %d", validMegaPurchases.size)
         return validMegaPurchases

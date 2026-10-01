@@ -14,9 +14,4 @@ interface AccountInfoWrapper {
      * @param request
      */
     suspend fun handleAccountDetail(request: MegaRequest)
-
-    /**
-     * Resets account info.
-     */
-    suspend fun resetAccountInfo()
 }

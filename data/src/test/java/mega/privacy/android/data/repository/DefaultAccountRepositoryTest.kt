@@ -1190,13 +1190,6 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that AccountInfoWrapper is invoked when resetting account info`() =
-        runTest {
-            underTest.resetAccountInfo()
-            verify(accountInfoWrapper).resetAccountInfo()
-        }
-
-    @Test
     fun `test that getLatestTargetCopyPreference is not invoked whenever latestTargetTimeStamp is over 60 minutes old`() =
         runTest {
             val latestTargetTimestamp = System.currentTimeMillis().minus(3700000)

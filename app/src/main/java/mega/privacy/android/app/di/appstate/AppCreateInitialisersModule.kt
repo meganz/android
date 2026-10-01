@@ -4,7 +4,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.appstate.global.initialisation.appcreate.AccountDefaultsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.AnalyticsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.ApiServerInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.CallObserverInitialiser
@@ -68,7 +67,6 @@ internal class AppCreateInitialisersModule {
     fun provideAppCreateInitialisers(
         miscFlagsInitialiser: MiscFlagsInitialiser,
         apiServerInitialiser: ApiServerInitialiser,
-        accountDefaultsInitialiser: AccountDefaultsInitialiser,
         greeterInitialiser: GreeterInitialiser,
         networkStateInitialiser: NetworkStateInitialiser,
         fcmTopicInitialiser: FcmTopicInitialiser,
@@ -81,7 +79,6 @@ internal class AppCreateInitialisersModule {
     ): Set<@JvmSuppressWildcards AsyncAppCreateInitialiser> = setOf(
         miscFlagsInitialiser,
         apiServerInitialiser,
-        accountDefaultsInitialiser,
         greeterInitialiser,
         fcmTopicInitialiser,
         networkStateInitialiser,

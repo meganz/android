@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.AccountType
  * @property rubbishBinAutopurgePeriod Period of the rubbish bin autopurge in days.
  * @property errorMessageId Id of the error message.
  * @property accountType Type of the current account.
+ * @property usedRubbishInBytes Storage used by the rubbish bin in bytes, null until the storage details are known.
  */
 data class FilePreferencesState(
     val numberOfPreviousVersions: Int? = null,
@@ -30,4 +31,5 @@ data class FilePreferencesState(
     val rubbishBinAutopurgePeriod: Int = 0,
     val errorMessageId: Int = 0,
     val accountType: AccountType? = null,
+    val usedRubbishInBytes: Long? = null,
 )

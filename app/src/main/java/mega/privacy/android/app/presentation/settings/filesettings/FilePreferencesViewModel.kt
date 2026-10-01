@@ -102,7 +102,12 @@ class FilePreferencesViewModel @Inject constructor(
             monitorAccountDetailUseCase()
                 .catch { Timber.w("Exception monitoring account details: $it") }
                 .collect { accountDetail ->
-                    _state.update { it.copy(accountType = accountDetail.levelDetail?.accountType) }
+                    _state.update {
+                        it.copy(
+                            accountType = accountDetail.levelDetail?.accountType,
+                            usedRubbishInBytes = accountDetail.storageDetail?.usedRubbish,
+                        )
+                    }
                 }
         }
         getFileVersionOption()
@@ -250,7 +255,12 @@ class FilePreferencesViewModel @Inject constructor(
             runCatching {
                 cleanRubbishBinUseCase()
             }.onSuccess {
-                _state.update { it.copy(emptyRubbishBinEvent = triggered<Throwable?>(null)) }
+                _state.update {
+                    it.copy(
+                        emptyRubbishBinEvent = triggered<Throwable?>(null),
+                        usedRubbishInBytes = 0L,
+                    )
+                }
             }.onFailure { e ->
                 _state.update { it.copy(emptyRubbishBinEvent = triggered<Throwable?>(e)) }
             }

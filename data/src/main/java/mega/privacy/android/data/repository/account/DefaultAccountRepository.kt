@@ -920,10 +920,7 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
-    override suspend fun resetAccountInfo() {
-        myAccountInfoFacade.resetAccountInfo()
-        onLogoutSuccess()
-    }
+    override suspend fun resetAccountInfo() = onLogoutSuccess()
 
     override suspend fun update2FADialogPreference(show2FA: Boolean) =
         withContext(ioDispatcher) { accountPreferencesGateway.setDisplay2FADialog(show2FA) }

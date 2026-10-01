@@ -20,7 +20,6 @@ import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.SmsVerificationState
 import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
 import mega.privacy.android.data.gateway.LogFlushGateway
@@ -33,7 +32,6 @@ import javax.inject.Inject
  * Mega application
  *
  * @property _dbH
- * @property myAccountInfo
  * @property activityLifecycleHandler
  * @property pushNotificationSettingManagement
  * @property chatManagement
@@ -57,12 +55,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         get() {
             return _dbH.get()
         }
-
-    @Inject
-    lateinit var _myAccountInfo: Lazy<MyAccountInfo>
-
-    val myAccountInfo: MyAccountInfo
-        get() = _myAccountInfo.get()
 
     @ApplicationScope
     @Inject
@@ -173,12 +165,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
             }
         }
     }
-
-    /**
-     * Reset my account info
-     *
-     */
-    fun resetMyAccountInfo() = myAccountInfo.resetDefaults()
 
     /**
      * WorkManager resolves this on-demand, which can happen before Hilt has injected this

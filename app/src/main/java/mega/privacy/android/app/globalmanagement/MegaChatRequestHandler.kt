@@ -23,7 +23,6 @@ import javax.inject.Singleton
  * @property sharingScope
  * @property autoJoinPublicChatHandler
  * @property chatLogoutHandler
- * @property myAccountInfo
  * @property chatApiListenerCoordinator
  */
 @Singleton
@@ -36,7 +35,6 @@ class MegaChatRequestHandler @Inject constructor(
     private val sharingScope: CoroutineScope,
     private val autoJoinPublicChatHandler: AutoJoinPublicChatHandler,
     private val chatLogoutHandler: ChatLogoutHandler,
-    private val myAccountInfo: MyAccountInfo,
     private val chatApiListenerCoordinator: Lazy<ChatApiListenerCoordinator>,
 ) : MegaChatRequestListenerInterface {
     private var isLoginRunning = false
@@ -91,7 +89,6 @@ class MegaChatRequestHandler @Inject constructor(
 
     private fun onChatLogout(e: MegaChatError) {
         Timber.d("CHAT_TYPE_LOGOUT: %d__%s", e.errorCode, e.errorString)
-        resetDefaults()
         chatApiListenerCoordinator.get().unregister()
         val loggedState: Int = megaApi.isLoggedIn
         Timber.d("Login status on %s", loggedState)
@@ -144,12 +141,5 @@ class MegaChatRequestHandler @Inject constructor(
      */
     fun setIsLoginRunning(isLoginRunning: Boolean) {
         this.isLoginRunning = isLoginRunning
-    }
-
-    /**
-     * Resets all SingleObjects to their default values.
-     */
-    private fun resetDefaults() {
-        myAccountInfo.resetDefaults()
     }
 }

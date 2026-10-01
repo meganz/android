@@ -140,15 +140,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         generalDialog?.show()
     }
 
-    /**
-     * Method required to reset the rubbish bin info.
-     */
-    fun resetRubbishInfo() {
-        if (sttFileManagement != null) {
-            sttFileManagement?.resetRubbishInfo()
-        }
-    }
-
     companion object {
         private const val CLEAR_OFFLINE_SHOWN = "CLEAR_OFFLINE_SHOWN"
     }

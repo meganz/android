@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -44,7 +43,6 @@ import javax.inject.Inject
  * @property setLogoutFlagWrapper
  * @property userAttributeDatabaseUpdater
  * @property setupMegaChatApiWrapper
- * @property accountInfoWrapper
  * @property megaChatApi
  * @property localStorageGateway
  * @property megaApi
@@ -69,7 +67,6 @@ internal class GlobalRequestListener @Inject constructor(
     private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
     private val userAttributeDatabaseUpdater: UserAttributeDatabaseUpdater,
     private val setupMegaChatApiWrapper: SetupMegaChatApiWrapper,
-    private val accountInfoWrapper: AccountInfoWrapper,
     private val megaChatApi: MegaChatApiAndroid,
     private val localStorageGateway: MegaLocalStorageGateway,
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -245,7 +242,6 @@ internal class GlobalRequestListener @Inject constructor(
         } else if (e.errorCode == MegaError.API_ESID || request.paramType == MegaError.API_ESID) {
             Timber.w("TYPE_LOGOUT:API_ESID")
             applicationScope.launch {
-                accountInfoWrapper.resetAccountInfo()
                 setLoggedOutFromAnotherLocationUseCase(true)
                 runCatching { localLogoutAppUseCase() }
                     .onFailure { Timber.d(it) }
