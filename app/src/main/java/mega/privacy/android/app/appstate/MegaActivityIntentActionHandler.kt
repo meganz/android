@@ -1,5 +1,6 @@
 package mega.privacy.android.app.appstate
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -28,6 +29,7 @@ import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.mobile.analytics.event.ShortcutActionChatButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ShortcutActionScanDocumentButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ShortcutActionUploadButtonPressedEvent
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -216,6 +218,45 @@ class MegaActivityIntentActionHandler @Inject constructor(
                 Timber.e(it, "Error granting uri permission")
             }
         }
+    }
+
+    /**
+     * Replays the intent parked in [MegaActivityInternalLauncher.LAUNCH_INTENT] once the root
+     * node is available, then closes this entry point.
+     *
+     * The parked intent is built while another screen is still alive, so by the time it is
+     * replayed the content uris it carries may no longer be readable: a uri grant belongs to
+     * the activity that received it and dies with it. Starting an activity with a stale grant
+     * throws, so the replay is best-effort and the user is asked to retry instead.
+     *
+     * @param rootNodeExists whether the root node is ready; nothing is replayed before that.
+     */
+    @SuppressLint("UnsafeIntentLaunch")
+    suspend fun launchLastActivityIfNeeded(rootNodeExists: Boolean) {
+        val intent = activity.intent
+        val hasParkedIntent =
+            intent.extras?.containsKey(MegaActivityInternalLauncher.LAUNCH_INTENT) == true
+        if (!rootNodeExists || !hasParkedIntent) return
+
+        if (intent.component?.className != MegaActivityInternalLauncher.INTERNAL_ENTRY_COMPONENT) {
+            Timber.w("Rejected LAUNCH_INTENT from non-internal entry point")
+            activity.finish()
+            return
+        }
+
+        intent.parcelable<Intent>(MegaActivityInternalLauncher.LAUNCH_INTENT)
+            ?.let { originalIntent ->
+                runCatching {
+                    if (originalIntent.component?.packageName == activity.packageName) {
+                        activity.startActivity(originalIntent)
+                    }
+                    activity.finish()
+                }.onFailure { error ->
+                    Timber.e(error, "Failed to replay the parked launch intent")
+                    snackbarEventQueue.queueMessage(sharedR.string.general_request_failed_message)
+                }
+            }
+        intent.removeExtra(MegaActivityInternalLauncher.LAUNCH_INTENT)
     }
 
     private suspend fun handleIfConnected(action: suspend () -> Unit) {
