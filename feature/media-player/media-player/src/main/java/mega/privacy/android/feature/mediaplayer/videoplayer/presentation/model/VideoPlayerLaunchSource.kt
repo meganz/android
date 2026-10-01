@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videoplayer.model
+package mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model
 
 import android.net.Uri
 import mega.privacy.android.domain.entity.SortOrder

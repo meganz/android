@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videoplayer.model
+package mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model
 
 /**
  * Where the video player was launched from.

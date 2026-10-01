@@ -12,5 +12,5 @@ import mega.privacy.android.navigation.contract.TransferHandler
  */
 class VideoPlayerFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
-        { _, _ -> videoPlayerScreen() }
+        { navigationHandler, _ -> videoPlayerScreen(navigationHandler) }
 }

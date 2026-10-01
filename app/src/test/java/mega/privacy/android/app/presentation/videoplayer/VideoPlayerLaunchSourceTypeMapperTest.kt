@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.videoplayer
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSourceType
+import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSourceType
 import mega.privacy.android.app.presentation.videoplayer.model.toVideoPlayerLaunchSourceType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt

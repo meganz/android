@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.videoplayer
 
 import android.content.Intent
 import android.os.Build
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSource
+import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSource
 import mega.privacy.android.app.presentation.videoplayer.model.toVideoPlayerLaunchSourceType
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL

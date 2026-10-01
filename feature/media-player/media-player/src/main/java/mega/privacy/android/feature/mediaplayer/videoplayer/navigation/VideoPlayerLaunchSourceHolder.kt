@@ -1,6 +1,6 @@
-package mega.privacy.android.app.presentation.videoplayer
+package mega.privacy.android.feature.mediaplayer.videoplayer.navigation
 
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSource
+import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSource
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton

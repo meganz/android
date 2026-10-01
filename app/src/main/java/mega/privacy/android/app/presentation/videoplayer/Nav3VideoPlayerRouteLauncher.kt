@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videoplayer
 
 import android.content.Intent
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.feature.mediaplayer.videoplayer.navigation.VideoPlayerLaunchSourceHolder
 import mega.privacy.android.feature.mediaplayer.videoplayer.navigation.VideoPlayerScreenNavKey
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
