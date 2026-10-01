@@ -491,14 +491,10 @@ internal class DefaultAccountRepository @Inject constructor(
         }
 
     override suspend fun getAccountDetailsTimeStampInSeconds(): String? =
-        withContext(ioDispatcher) {
-            localStorageGateway.getAttributes()?.accountDetailsTimeStamp
-        }
+        accountPreferencesGateway.getAccountDetailsTimeStamp()?.toString()
 
     override suspend fun getExtendedAccountDetailsTimeStampInSeconds(): String? =
-        withContext(ioDispatcher) {
-            localStorageGateway.getAttributes()?.extendedAccountDetailsTimeStamp
-        }
+        accountPreferencesGateway.getExtendedAccountDetailsTimeStamp()?.toString()
 
     override suspend fun getSpecificAccountDetail(
         storage: Boolean,
@@ -546,13 +542,11 @@ internal class DefaultAccountRepository @Inject constructor(
         myAccountCredentialsMapper(megaApiGateway.myCredentials)
     }
 
-    override suspend fun resetAccountDetailsTimeStamp() = withContext(ioDispatcher) {
-        localStorageGateway.resetAccountDetailsTimeStamp()
-    }
+    override suspend fun resetAccountDetailsTimeStamp() =
+        accountPreferencesGateway.clearAccountDetailsTimeStamp()
 
-    override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(ioDispatcher) {
-        localStorageGateway.resetExtendedAccountDetailsTimestamp()
-    }
+    override suspend fun resetExtendedAccountDetailsTimestamp() =
+        accountPreferencesGateway.clearExtendedAccountDetailsTimeStamp()
 
     override suspend fun createContactLink(renew: Boolean): String = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->

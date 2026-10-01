@@ -36,6 +36,8 @@ private const val LATEST_TARGET_TIMESTAMP_MOVE = "LATEST_TARGET_PATH_TIMESTAMP_M
 private const val LAST_REGISTERED_EMAIL = "LAST_REGISTERED_EMAIL"
 private const val STORAGE_QUOTA_WARNING_SHOWN_DAY = "STORAGE_QUOTA_WARNING_SHOWN_DAY"
 private const val TRANSFER_QUOTA_WARNING_SHOWN_DAY = "TRANSFER_QUOTA_WARNING_SHOWN_DAY"
+private const val ACCOUNT_DETAILS_TIMESTAMP = "ACCOUNT_DETAILS_TIMESTAMP"
+private const val EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "EXTENDED_ACCOUNT_DETAILS_TIMESTAMP"
 
 private val Context.accountPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
     name = accountPreferenceFileName,
@@ -64,6 +66,9 @@ class AccountPreferencesDataStore @Inject constructor(
         longPreferencesKey(LATEST_TARGET_TIMESTAMP_MOVE)
     private val lastRegisteredEmailPreferenceKey =
         stringPreferencesKey(LAST_REGISTERED_EMAIL)
+    private val accountDetailsTimeStampKey = longPreferencesKey(ACCOUNT_DETAILS_TIMESTAMP)
+    private val extendedAccountDetailsTimeStampKey =
+        longPreferencesKey(EXTENDED_ACCOUNT_DETAILS_TIMESTAMP)
 
     override suspend fun setDisplay2FADialog(show2FA: Boolean) {
         context.accountPreferencesDataStore.edit {
@@ -143,6 +148,50 @@ class AccountPreferencesDataStore @Inject constructor(
         withContext(ioDispatcher) {
             context.accountPreferencesDataStore.edit {
                 it[transferQuotaWarningShownDayKey(trigger)] = epochDay
+            }
+        }
+    }
+
+    override suspend fun getAccountDetailsTimeStamp(): Long? =
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore.monitor(accountDetailsTimeStampKey).firstOrNull()
+        }
+
+    override suspend fun setAccountDetailsTimeStamp(timestamp: Long) {
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore.edit {
+                it[accountDetailsTimeStampKey] = timestamp
+            }
+        }
+    }
+
+    override suspend fun clearAccountDetailsTimeStamp() {
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore.edit {
+                it.remove(accountDetailsTimeStampKey)
+            }
+        }
+    }
+
+    override suspend fun getExtendedAccountDetailsTimeStamp(): Long? =
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore
+                .monitor(extendedAccountDetailsTimeStampKey)
+                .firstOrNull()
+        }
+
+    override suspend fun setExtendedAccountDetailsTimeStamp(timestamp: Long) {
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore.edit {
+                it[extendedAccountDetailsTimeStampKey] = timestamp
+            }
+        }
+    }
+
+    override suspend fun clearExtendedAccountDetailsTimeStamp() {
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore.edit {
+                it.remove(extendedAccountDetailsTimeStampKey)
             }
         }
     }

@@ -299,11 +299,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         val values = ContentValues()
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.askSizeDownload))
-        values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.accountDetailsTimeStamp))
-        values.put(
-            KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
-            encrypt(attr.extendedAccountDetailsTimeStamp)
-        )
         values.put(KEY_SHOW_COPYRIGHT, encrypt(attr.showCopyright))
         values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(attr.lastPublicHandle.toString()))
         values.put(
@@ -342,22 +337,6 @@ class SqliteDatabaseHandler @Inject constructor(
                             )
                         )
                     )
-                    val accountDetailsTimeStamp = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_ACCOUNT_DETAILS_TIMESTAMP
-                            )
-                        )
-                    )
-                    val extendedAccountDetailsTimeStamp = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP
-                            )
-                        )
-                    )
                     val showCopyright =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SHOW_COPYRIGHT)))
                     val lastPublicHandle =
@@ -390,8 +369,6 @@ class SqliteDatabaseHandler @Inject constructor(
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_TRANSFER_QUEUE_STATUS)))
                     attr = MegaAttributes(
                         askSizeDownload,
-                        accountDetailsTimeStamp,
-                        extendedAccountDetailsTimeStamp,
                         showCopyright,
                         lastPublicHandle,
                         lastPublicHandleTimeStamp,
@@ -575,91 +552,6 @@ class SqliteDatabaseHandler @Inject constructor(
                 } else {
                     values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(order))
                     writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setAccountDetailsTimeStamp() {
-        setAccountDetailsTimeStamp(System.currentTimeMillis() / 1000)
-    }
-
-    override fun resetAccountDetailsTimeStamp() {
-        setAccountDetailsTimeStamp(-1)
-    }
-
-    private fun setAccountDetailsTimeStamp(accountDetailsTimeStamp: Long) {
-        Timber.d("setAccountDetailsTimeStamp")
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTE_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_ACCOUNT_DETAILS_TIMESTAMP= '${
-                            encrypt(accountDetailsTimeStamp.toString())
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTE_TABLE)
-                } else {
-                    values.put(
-                        KEY_ACCOUNT_DETAILS_TIMESTAMP,
-                        encrypt(accountDetailsTimeStamp.toString())
-                    )
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setExtendedAccountDetailsTimestamp() {
-        Timber.d("setExtendedAccountDetailsTimestamp")
-        val extendedAccountDetailsTimestamp = System.currentTimeMillis() / 1000
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTE_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP= '${
-                            encrypt(extendedAccountDetailsTimestamp.toString())
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTE_TABLE)
-                } else {
-                    values.put(
-                        KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
-                        encrypt(extendedAccountDetailsTimestamp.toString())
-                    )
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun resetExtendedAccountDetailsTimestamp() {
-        Timber.d("resetExtendedAccountDetailsTimestamp")
-        val extendedAccountDetailsTimestamp: Long = -1
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTE_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP= '${
-                            encrypt(extendedAccountDetailsTimestamp.toString())
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTE_TABLE)
-                } else {
-                    values.put(
-                        KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
-                        encrypt(extendedAccountDetailsTimestamp.toString())
-                    )
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
                 }
             }
         } catch (e: Exception) {

@@ -3,7 +3,6 @@ package mega.privacy.android.app.main.listeners;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_SEND_RUBBISH;
-import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 import android.content.Context;
@@ -134,8 +133,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     } else {
                         message = context.getString(R.string.number_correctly_copied, max_items);
                     }
-
-                    resetAccountDetailsTimeStamp(context);
                     break;
                 }
                 case MegaRequest.TYPE_INVITE_CONTACT: {

@@ -748,14 +748,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             SqliteDatabaseHandler.encrypt(attr.askSizeDownload)
         )
         values.put(
-            SqliteDatabaseHandler.KEY_ACCOUNT_DETAILS_TIMESTAMP,
-            SqliteDatabaseHandler.encrypt(attr.accountDetailsTimeStamp)
-        )
-        values.put(
-            SqliteDatabaseHandler.KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
-            SqliteDatabaseHandler.encrypt(attr.extendedAccountDetailsTimeStamp)
-        )
-        values.put(
             SqliteDatabaseHandler.KEY_SHOW_COPYRIGHT,
             SqliteDatabaseHandler.encrypt(attr.showCopyright)
         )
@@ -799,22 +791,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                             getColumnIndex(
                                 cursor,
                                 SqliteDatabaseHandler.KEY_ATTR_ASK_SIZE_DOWNLOAD
-                            )
-                        )
-                    )
-                    val accountDetailsTimeStamp = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_ACCOUNT_DETAILS_TIMESTAMP
-                            )
-                        )
-                    )
-                    val extendedAccountDetailsTimeStamp = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP
                             )
                         )
                     )
@@ -871,8 +847,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                         )
                     attr = MegaAttributes(
                         askSizeDownload,
-                        accountDetailsTimeStamp,
-                        extendedAccountDetailsTimeStamp,
                         showCopyright,
                         lastPublicHandle,
                         lastPublicHandleTimeStamp,

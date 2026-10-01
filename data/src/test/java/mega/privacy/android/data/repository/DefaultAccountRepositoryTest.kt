@@ -738,16 +738,48 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test resetAccountDetailsTimeStamp invoke correct method`() = runTest {
-        underTest.resetAccountDetailsTimeStamp()
-        verify(localStorageGateway).resetAccountDetailsTimeStamp()
-    }
+    fun `test that resetAccountDetailsTimeStamp clears the timestamp in account preferences`() =
+        runTest {
+            underTest.resetAccountDetailsTimeStamp()
+            verify(accountPreferencesGateway).clearAccountDetailsTimeStamp()
+        }
 
     @Test
-    fun `test resetExtendedAccountDetailsTimestamp invoke correct method`() = runTest {
-        underTest.resetExtendedAccountDetailsTimestamp()
-        verify(localStorageGateway).resetExtendedAccountDetailsTimestamp()
-    }
+    fun `test that resetExtendedAccountDetailsTimestamp clears the timestamp in account preferences`() =
+        runTest {
+            underTest.resetExtendedAccountDetailsTimestamp()
+            verify(accountPreferencesGateway).clearExtendedAccountDetailsTimeStamp()
+        }
+
+    @Test
+    fun `test that getAccountDetailsTimeStampInSeconds returns the stored timestamp`() =
+        runTest {
+            whenever(accountPreferencesGateway.getAccountDetailsTimeStamp()).thenReturn(1234L)
+            assertThat(underTest.getAccountDetailsTimeStampInSeconds()).isEqualTo("1234")
+        }
+
+    @Test
+    fun `test that getAccountDetailsTimeStampInSeconds returns null when no timestamp is stored`() =
+        runTest {
+            whenever(accountPreferencesGateway.getAccountDetailsTimeStamp()).thenReturn(null)
+            assertThat(underTest.getAccountDetailsTimeStampInSeconds()).isNull()
+        }
+
+    @Test
+    fun `test that getExtendedAccountDetailsTimeStampInSeconds returns the stored timestamp`() =
+        runTest {
+            whenever(accountPreferencesGateway.getExtendedAccountDetailsTimeStamp())
+                .thenReturn(5678L)
+            assertThat(underTest.getExtendedAccountDetailsTimeStampInSeconds()).isEqualTo("5678")
+        }
+
+    @Test
+    fun `test that getExtendedAccountDetailsTimeStampInSeconds returns null when no timestamp is stored`() =
+        runTest {
+            whenever(accountPreferencesGateway.getExtendedAccountDetailsTimeStamp())
+                .thenReturn(null)
+            assertThat(underTest.getExtendedAccountDetailsTimeStampInSeconds()).isNull()
+        }
 
     @Test
     fun `test that deleteContactLink throws MegaException when error happens`() = runTest {

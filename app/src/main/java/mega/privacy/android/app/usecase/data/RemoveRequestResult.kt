@@ -1,7 +1,6 @@
 package mega.privacy.android.app.usecase.data
 
 import android.content.Context
-import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.shared.resources.R as SharedR
 
 /**
@@ -50,17 +49,6 @@ data class RemoveRequestResult(
                     SharedR.plurals.rubbish_remove_items_snackbar_concat_fail, errorCount, errorCount
                 )
             }"
-        }
-    }
-
-
-    /**
-     * Resets the account details timestamp if some request finished with success.
-     * @param context [Context]
-     */
-    fun resetAccountDetailsIfNeeded(context: Context) {
-        if (successCount > 0) {
-            DBUtil.resetAccountDetailsTimeStamp(context)
         }
     }
 }

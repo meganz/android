@@ -176,16 +176,6 @@ interface MegaLocalStorageGateway {
     suspend fun getAttributes(): MegaAttributes?
 
     /**
-     * Reset account details time stamp
-     */
-    suspend fun resetAccountDetailsTimeStamp()
-
-    /**
-     * Reset extended account details time stamp
-     */
-    suspend fun resetExtendedAccountDetailsTimestamp()
-
-    /**
      * Get chat files folder handle
      */
     suspend fun getChatFilesFolderHandle(): Long?

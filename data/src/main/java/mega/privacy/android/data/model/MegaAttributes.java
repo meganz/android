@@ -6,8 +6,6 @@ import timber.log.Timber;
 public class MegaAttributes {
 
     private String askSizeDownload;
-    private String accountDetailsTimeStamp;
-    private String extendedAccountDetailsTimeStamp;
     private String showCopyright;
     private String lastPublicHandle;
     private String lastPublicHandleTimeStamp;
@@ -15,14 +13,11 @@ public class MegaAttributes {
     private String myChatFilesFolderHandle;
     private String transferQueueStatus;
 
-    public MegaAttributes(String askSizeDownload, String accountDetailsTimeStamp,
-                          String extendedAccountDetailsTimeStamp, String showCopyright,
+    public MegaAttributes(String askSizeDownload, String showCopyright,
                           String lastPublicHandle, String lastPublicHandleTimeStamp,
                           int lastPublicHandleType, String myChatFilesFolderHandle,
                           String transferQueueStatus) {
         this.askSizeDownload = askSizeDownload;
-        this.accountDetailsTimeStamp = accountDetailsTimeStamp;
-        this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
         this.showCopyright = showCopyright;
         this.lastPublicHandle = lastPublicHandle;
         this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
@@ -37,22 +32,6 @@ public class MegaAttributes {
 
     public void setAskSizeDownload(String askSizeDownload) {
         this.askSizeDownload = askSizeDownload;
-    }
-
-    public String getAccountDetailsTimeStamp() {
-        return accountDetailsTimeStamp;
-    }
-
-    public void setAccountDetailsTimeStamp(String accountDetailsTimeStamp) {
-        this.accountDetailsTimeStamp = accountDetailsTimeStamp;
-    }
-
-    public String getExtendedAccountDetailsTimeStamp() {
-        return extendedAccountDetailsTimeStamp;
-    }
-
-    public void setExtendedAccountDetailsTimeStamp(String extendedAccountDetailsTimeStamp) {
-        this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
     }
 
     public String getShowCopyright() {

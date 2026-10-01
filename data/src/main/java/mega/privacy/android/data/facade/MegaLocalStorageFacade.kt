@@ -157,14 +157,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().attributes
     }
 
-    override suspend fun resetAccountDetailsTimeStamp() = withContext(databaseDispatcher) {
-        dbHandler.get().resetAccountDetailsTimeStamp()
-    }
-
-    override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(databaseDispatcher) {
-        dbHandler.get().resetExtendedAccountDetailsTimestamp()
-    }
-
     override suspend fun getChatFilesFolderHandle() = withContext(databaseDispatcher) {
         dbHandler.get().myChatFilesFolderHandle
     }

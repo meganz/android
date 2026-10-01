@@ -94,6 +94,45 @@ interface AccountPreferencesGateway {
     suspend fun setTransferQuotaWarningShownDay(trigger: String, epochDay: Long)
 
     /**
+     * Get the time the account details were last fetched
+     *
+     * @return the timestamp in seconds, or null if they have not been fetched since the last reset
+     */
+    suspend fun getAccountDetailsTimeStamp(): Long?
+
+    /**
+     * Set the time the account details were last fetched
+     *
+     * @param timestamp the timestamp in seconds
+     */
+    suspend fun setAccountDetailsTimeStamp(timestamp: Long)
+
+    /**
+     * Clear the account details timestamp, so the account details are treated as stale
+     */
+    suspend fun clearAccountDetailsTimeStamp()
+
+    /**
+     * Get the time the extended account details were last fetched
+     *
+     * @return the timestamp in seconds, or null if they have not been fetched since the last reset
+     */
+    suspend fun getExtendedAccountDetailsTimeStamp(): Long?
+
+    /**
+     * Set the time the extended account details were last fetched
+     *
+     * @param timestamp the timestamp in seconds
+     */
+    suspend fun setExtendedAccountDetailsTimeStamp(timestamp: Long)
+
+    /**
+     * Clear the extended account details timestamp, so the extended account details are treated
+     * as stale
+     */
+    suspend fun clearExtendedAccountDetailsTimeStamp()
+
+    /**
      * Clears account preferences except last registered email
      */
     suspend fun clearPreferences()
