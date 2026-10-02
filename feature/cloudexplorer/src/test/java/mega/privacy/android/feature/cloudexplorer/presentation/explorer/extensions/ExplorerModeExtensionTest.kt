@@ -18,6 +18,7 @@ internal class ExplorerModeExtensionTest {
             assertThat(mode.titleStringId).isAnyOf(
                 sharedR.string.video_section_video_selected_top_bar_title,
                 sharedR.string.cloud_explorer_select_destination_title,
+                sharedR.string.cloud_explorer_choose_folder_title,
                 sharedR.string.home_pinned_choose_files_and_folders,
             )
         }
@@ -61,6 +62,30 @@ internal class ExplorerModeExtensionTest {
                 sharedR.string.cloud_explorer_select_destination_title,
             ),
             Arguments.of(
+                ExplorerMode.Import,
+                sharedR.string.cloud_explorer_select_destination_title,
+            ),
+            Arguments.of(
+                ExplorerMode.AlbumImport,
+                sharedR.string.cloud_explorer_select_destination_title,
+            ),
+            Arguments.of(
+                ExplorerMode.ShareFilesToMega,
+                sharedR.string.cloud_explorer_select_destination_title,
+            ),
+            Arguments.of(
+                ExplorerMode.SelectCUFolder,
+                sharedR.string.cloud_explorer_choose_folder_title,
+            ),
+            Arguments.of(
+                ExplorerMode.SelectSyncFolder,
+                sharedR.string.cloud_explorer_choose_folder_title,
+            ),
+            Arguments.of(
+                ExplorerMode.SelectStopBackupDestination,
+                sharedR.string.cloud_explorer_choose_folder_title,
+            ),
+            Arguments.of(
                 ExplorerMode.PinToHome,
                 sharedR.string.home_pinned_choose_files_and_folders,
             ),
@@ -83,10 +108,7 @@ internal class ExplorerModeExtensionTest {
                 ExplorerMode.SelectSyncFolder,
                 sharedR.string.cloud_explorer_use_this_folder_button,
             ),
-            Arguments.of(
-                ExplorerMode.SelectStopBackupDestination,
-                sharedR.string.cloud_explorer_use_this_folder_button,
-            ),
+            Arguments.of(ExplorerMode.SelectStopBackupDestination, sharedR.string.general_move),
             Arguments.of(ExplorerMode.Import, sharedR.string.general_action_save),
             Arguments.of(ExplorerMode.AlbumImport, sharedR.string.general_action_save),
             Arguments.of(

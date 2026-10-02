@@ -14,8 +14,9 @@ import mega.privacy.android.shared.resources.R as sharedR
 /**
  * The string resource ID for the top app bar title.
  *
- * File-picker modes (e.g., [ExplorerMode.ShareFilesToChat]) show a "selected" title,
- * while folder-picker modes show a "select destination" title.
+ * File-picker modes (e.g., [ExplorerMode.ShareFilesToChat]) show a "selected" title.
+ * Folder-picker modes that place content show a "select destination" title, while those
+ * that configure a folder (Camera Uploads, Sync, Stop backup) show a "choose folder" title.
  */
 @get:StringRes
 val ExplorerMode.titleStringId: Int
@@ -25,6 +26,11 @@ val ExplorerMode.titleStringId: Int
             -> sharedR.string.video_section_video_selected_top_bar_title
 
         ExplorerMode.PinToHome -> sharedR.string.home_pinned_choose_files_and_folders
+
+        ExplorerMode.SelectCUFolder,
+        ExplorerMode.SelectSyncFolder,
+        ExplorerMode.SelectStopBackupDestination,
+            -> sharedR.string.cloud_explorer_choose_folder_title
 
         else -> sharedR.string.cloud_explorer_select_destination_title
     }
@@ -45,9 +51,9 @@ val ExplorerMode.actionStringId: Int
             -> sharedR.string.general_upload_label
 
         ExplorerMode.ShareFilesToChat -> sharedR.string.context_send
-        ExplorerMode.Move -> sharedR.string.general_move
+        ExplorerMode.Move, ExplorerMode.SelectStopBackupDestination -> sharedR.string.general_move
         ExplorerMode.Copy -> sharedR.string.general_copy
-        ExplorerMode.SelectCUFolder, ExplorerMode.SelectSyncFolder, ExplorerMode.SelectStopBackupDestination -> sharedR.string.cloud_explorer_use_this_folder_button
+        ExplorerMode.SelectCUFolder, ExplorerMode.SelectSyncFolder -> sharedR.string.cloud_explorer_use_this_folder_button
 
         ExplorerMode.Import,
         ExplorerMode.AlbumImport,
