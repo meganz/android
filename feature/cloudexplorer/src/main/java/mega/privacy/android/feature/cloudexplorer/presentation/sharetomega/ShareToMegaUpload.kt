@@ -1,20 +1,13 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.compose.ui.platform.LocalResources
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.rememberOnSharedToChats
-import mega.privacy.android.navigation.extensions.rememberMegaResultContract
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.nodes.namecollision.rememberNameCollisionLauncher
 import mega.privacy.android.shared.transfers.components.UploadUrisEventState
 import mega.privacy.android.shared.transfers.components.UploadingFiles
 import mega.privacy.android.shared.transfers.model.UploadFileViewModel
@@ -23,6 +16,9 @@ import mega.privacy.android.shared.transfers.model.UploadFileViewModel
  * Drives the upload flow for the Share-to-MEGA screens: handles name collisions,
  * over-quota and upload errors, and forks between a cloud upload and a chat upload
  * depending on whether [chatIds] is non-empty.
+ *
+ * Colliding files are handed to the name-collision screen and the explorer is closed first, so
+ * the user lands where the explorer would have returned once the collisions are resolved.
  *
  * @param parentNodeId Destination folder for the cloud-upload branch.
  * @param chatIds When non-empty, switches to the chat-upload branch and the files are
@@ -44,37 +40,17 @@ internal fun ShareToMegaUpload(
     chatIds: List<Long>? = null,
     viewModel: UploadFileViewModel = hiltViewModel(),
 ) {
-    val snackbarHostState = LocalSnackBarHostState.current
-    val resources = LocalResources.current
-    val coroutineScope = rememberCoroutineScope()
-    val megaResultContract = rememberMegaResultContract()
+    val nameCollisionLauncher = rememberNameCollisionLauncher(navigate = onNavigate)
     val onSharedToChats = rememberOnSharedToChats(
         onNavigate = onNavigate,
         onCloseExplorerScreen = onCloseExplorerScreen,
     )
 
-    val showMessageAndClose: (String?) -> Unit = { message ->
-        coroutineScope.launch {
-            message?.let {
-                snackbarHostState?.showAutoDurationSnackbar(it)
-            } ?: snackbarHostState?.showAutoDurationSnackbar(
-                resources.getString(sharedR.string.transfers_upload_started_snackbar)
-            )
-            onCloseExplorerScreen()
-        }
-    }
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (message.isNullOrEmpty()) {
-            onCloseExplorerScreen()
-        } else {
-            showMessageAndClose(message)
-        }
-    }
-
     UploadingFiles(
-        nameCollisionLauncher = nameCollisionLauncher,
+        onNameCollisions = { collisions ->
+            onCloseExplorerScreen()
+            nameCollisionLauncher.launch(collisions)
+        },
         parentNodeId = parentNodeId,
         chatIds = chatIds,
         viewModel = viewModel,
@@ -85,7 +61,7 @@ internal fun ShareToMegaUpload(
             onStartUpload(transferTriggerEvent)
 
             if (chatIds.isNullOrEmpty()) {
-                showMessageAndClose(null)
+                onCloseExplorerScreen()
             } else {
                 onSharedToChats(chatIds)
             }

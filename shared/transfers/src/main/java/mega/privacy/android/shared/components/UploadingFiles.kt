@@ -1,7 +1,6 @@
 package mega.privacy.android.shared.transfers.components
 
 import android.net.Uri
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -34,10 +33,13 @@ import java.io.IOException
  * processed should pass their own [viewModel] instance and observe `isProcessing`
  * from its ui state; it resets to false when processing fails, so the upload can
  * be retried.
+ *
+ * @param onNameCollisions Invoked with the files that collide with existing nodes so the host can
+ * open the name-collision resolution; the non-colliding files are started through [onStartUpload].
  */
 @Composable
 fun UploadingFiles(
-    nameCollisionLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
+    onNameCollisions: (List<NameCollision>) -> Unit,
     parentNodeId: NodeId,
     urisEvent: StateEventWithContent<List<Uri>>,
     onUrisConsumed: () -> Unit,
@@ -56,7 +58,7 @@ fun UploadingFiles(
         uiState.nameCollisionEvent,
         onConsumed = viewModel::onConsumeNameCollisionEvent
     ) {
-        nameCollisionLauncher.launch(ArrayList(it))
+        onNameCollisions(it)
     }
 
     EventEffect(

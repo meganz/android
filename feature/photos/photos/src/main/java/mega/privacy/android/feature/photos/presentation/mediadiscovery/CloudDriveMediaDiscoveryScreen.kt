@@ -4,7 +4,6 @@ import MediaGridViewItem
 import android.annotation.SuppressLint
 import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +25,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,8 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.dropdown.DropDownItem
@@ -52,7 +48,6 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVertic
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
@@ -108,6 +103,7 @@ import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderResultEffect
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.namecollision.rememberNameCollisionLauncher
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.UploadingFiles
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
@@ -142,8 +138,6 @@ fun CloudDriveMediaDiscoveryRoute(
     val actionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val megaNavigator = rememberMegaNavigator()
     val megaResultContract = rememberMegaResultContract()
-    val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackBarHostState.current
 
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
@@ -180,15 +174,7 @@ fun CloudDriveMediaDiscoveryRoute(
         megaResultContract = megaResultContract
     )
 
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(message)
-            }
-        }
-    }
+    val nameCollisionLauncher = rememberNameCollisionLauncher(navigate = navigationHandler::navigate)
 
     LaunchedEffect(uiState.selectedPhotosCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
@@ -269,7 +255,7 @@ fun CloudDriveMediaDiscoveryRoute(
     }
 
     UploadingFiles(
-        nameCollisionLauncher = nameCollisionLauncher,
+        onNameCollisions = nameCollisionLauncher::launch,
         parentNodeId = parentId,
         urisEvent = uploadUrisEventState.event,
         onUrisConsumed = uploadUrisEventState::consume,

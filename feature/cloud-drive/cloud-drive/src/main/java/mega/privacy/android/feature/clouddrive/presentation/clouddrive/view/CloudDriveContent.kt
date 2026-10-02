@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.view
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,11 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.banner.InlineErrorBanner
 import mega.android.core.ui.components.text.SpannableText
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
@@ -80,6 +77,7 @@ import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderResultEffect
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.namecollision.rememberNameCollisionLauncher
 import mega.privacy.android.shared.nodes.selection.NodeSelection
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.UploadingFiles
@@ -135,15 +133,7 @@ internal fun CloudDriveContent(
         megaResultContract = megaResultContract
     )
 
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(message)
-            }
-        }
-    }
+    val nameCollisionLauncher = rememberNameCollisionLauncher(navigate = navigationHandler::navigate)
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -333,7 +323,7 @@ internal fun CloudDriveContent(
                 }
 
                 UploadingFiles(
-                    nameCollisionLauncher = nameCollisionLauncher,
+                    onNameCollisions = nameCollisionLauncher::launch,
                     parentNodeId = uiState.currentFolderId,
                     urisEvent = uploadUrisEventState.event,
                     onUrisConsumed = uploadUrisEventState::consume,

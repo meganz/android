@@ -1,6 +1,5 @@
 package mega.privacy.mobile.home.presentation.home
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,13 +27,10 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
@@ -63,6 +58,7 @@ import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.nodes.namecollision.rememberNameCollisionLauncher
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.UploadingFiles
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
@@ -87,8 +83,6 @@ internal fun HomeScreen(
     val rootFolderId = NodeId(-1L)
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     val uploadUrisEventState = rememberUploadUrisEventState()
-    val snackbarHostState = LocalSnackBarHostState.current
-    val coroutineScope = rememberCoroutineScope()
     val uploadHandler = rememberUploadHandler(
         parentId = rootFolderId,
         onFilesSelected = { uris ->
@@ -107,15 +101,7 @@ internal fun HomeScreen(
         megaResultContract = megaResultContract
     )
 
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(message)
-            }
-        }
-    }
+    val nameCollisionLauncher = rememberNameCollisionLauncher(navigate = navigationHandler::navigate)
 
     val fabOption by
     navigationHandler.monitorResult<HomeFabOption>(HomeFabOptionsBottomSheetNavKey.KEY)
@@ -286,7 +272,7 @@ internal fun HomeScreen(
     )
 
     UploadingFiles(
-        nameCollisionLauncher = nameCollisionLauncher,
+        onNameCollisions = nameCollisionLauncher::launch,
         parentNodeId = rootFolderId,
         urisEvent = uploadUrisEventState.event,
         onUrisConsumed = uploadUrisEventState::consume,
