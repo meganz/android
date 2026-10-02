@@ -7,12 +7,13 @@ This file provides guidance to Claude Code when working in the `:shared:account`
 ## Overview
 `:shared:account` holds account-related presentation logic and Compose UI helpers that are reused across feature modules rather than living in a single feature. It is a presentation-layer Android library (no data layer): ViewModels here consume domain use cases directly and expose state to host screens.
 
-Current scope covers two concerns: surfacing storage/transfer over-quota status (with a reusable banner), and gating UI until an in-progress login/fetch-nodes flow completes.
+Current scope covers three concerns: surfacing storage/transfer over-quota status (with a reusable banner), the account inactivity purge banner, and gating UI until an in-progress login/fetch-nodes flow completes.
 
 ## Architecture & Layout
 Source root: `src/main/java/mega/privacy/android/shared/account/`
 
 - `login/` — `LoginInProgress*` ViewModel, state, and a Compose container used to defer content rendering while login is in progress.
+- `inactivity/` — `InactivityBannerViewModel` + `InactivityBannerUiState` (account inactivity purge banner: monitors `MonitorAccountInactivityUseCase`, tracks the displayed event once, `dismiss()` suppresses and acknowledges the purge) and `inactivity/view/AccountInactivityBanner` (self-contained Compose banner with its own `hiltViewModel()`, like `OverQuotaBanner`; `enabled` hides it without dismissing, `onLearnMoreClicked(url)` opens the help article).
 - `overquota/` — over-quota ViewModel plus three sub-packages:
   - `overquota/model/` — UI/state models and enums (`OverQuotaStatus`, `OverQuotaIssue`, `OverQuotaStatusUiState`, `StorageOverQuotaCapacity`).
   - `overquota/mapper/` — Hilt-injected mappers from domain entities (`OverQuotaStatusMapper`, `StorageCapacityMapper`).
