@@ -84,14 +84,6 @@ fun rememberSingleNodeActionHandler(
         }
     }
 
-    val restoreLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            viewModel.postMessage(message)
-        }
-    }
-
     val sendToChatLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.sendToChatActivityResultContract
     ) { result ->
@@ -133,7 +125,6 @@ fun rememberSingleNodeActionHandler(
         moveLauncher,
         copyLauncher,
         publicCopyLauncher,
-        restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
         addToAlbumLauncher,
@@ -156,7 +147,6 @@ fun rememberSingleNodeActionHandler(
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
                 publicCopyLauncher = publicCopyLauncher,
-                restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
                 hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
                 addToAlbumLauncher = addToAlbumLauncher,
@@ -247,14 +237,6 @@ fun rememberMultiNodeActionHandler(
         }
     }
 
-    val restoreLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            viewModel.postMessage(message)
-        }
-    }
-
     val sendToChatLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.sendToChatActivityResultContract
     ) { result ->
@@ -287,7 +269,6 @@ fun rememberMultiNodeActionHandler(
         moveLauncher,
         copyLauncher,
         publicCopyLauncher,
-        restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
         addToAlbumLauncher,
@@ -308,7 +289,6 @@ fun rememberMultiNodeActionHandler(
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
                 publicCopyLauncher = publicCopyLauncher,
-                restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
                 hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
                 addToAlbumLauncher = addToAlbumLauncher

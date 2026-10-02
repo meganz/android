@@ -26,6 +26,7 @@ import mega.privacy.android.navigation.destination.ImportNavKey
 import mega.privacy.android.navigation.destination.ImportResult
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.MoveResult
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionResultEffect
 import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
@@ -129,6 +130,12 @@ fun HandleNodeOptionsActionResult(
             navigationHandler.clearResult(ImportNavKey.RESULT)
         }
     }
+
+    NameCollisionResultEffect(
+        monitorResult = navigationHandler::monitorResult,
+        clearResult = navigationHandler::clearResult,
+        onOutcome = nodeOptionsActionViewModel::onNameCollisionOutcome,
+    )
 
     HandleNodeOptionsActionEvent(
         nodeActionState = nodeActionState,

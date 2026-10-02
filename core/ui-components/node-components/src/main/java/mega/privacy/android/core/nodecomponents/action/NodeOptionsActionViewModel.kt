@@ -70,6 +70,8 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionOutcome
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -560,6 +562,35 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
      */
     fun markHandleNodeNameCollisionResult() {
         uiState.update { it.copy(nodeNameCollisionsResult = consumed()) }
+    }
+
+    /**
+     * Surfaces what the name-collision screen reported for the copy, move or restore this ViewModel
+     * sent there, the same way [copyNodes] and [moveNodes] surface their own results.
+     */
+    fun onNameCollisionOutcome(outcome: NameCollisionOutcome) {
+        when (outcome) {
+            is NameCollisionOutcome.ActionCompleted -> if (outcome.result.isForeignNode) {
+                uiState.update { it.copy(showForeignNodeDialog = triggered) }
+            } else {
+                outcome.result.message?.let { message ->
+                    uiState.update {
+                        it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
+                    }
+                }
+            }
+
+            is NameCollisionOutcome.Failed -> if (!manageCopyMoveError(outcome.throwable)) {
+                (outcome.throwable as? MegaException)?.message?.let { message ->
+                    uiState.update {
+                        it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
+                    }
+                }
+            }
+
+            // Folder uploads never start from here, so a resolved batch has nothing to upload.
+            is NameCollisionOutcome.Resolved -> Unit
+        }
     }
 
     /**

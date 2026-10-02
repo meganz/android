@@ -1,13 +1,10 @@
 package mega.privacy.android.core.nodecomponents.action
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -16,7 +13,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
@@ -26,7 +22,6 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.RestoreData
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionResult
@@ -39,10 +34,11 @@ import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQ
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
-import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionLauncher
+import mega.privacy.android.shared.nodes.namecollision.rememberNameCollisionLauncher
 import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
@@ -89,21 +85,11 @@ internal fun HandleNodeOptionsActionEvent(
 ) {
     val snackbarQueue = rememberSnackBarQueue()
     val megaNavigator = rememberMegaNavigator()
-    val megaResultContract = rememberMegaResultContract()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     var isShowForeignDialog by rememberSaveable { mutableStateOf(false) }
     var isOverQuota by rememberSaveable { mutableStateOf<Boolean?>(null) }
     var shareHiddenNodeWarning by remember { mutableStateOf<Pair<List<Long>, Boolean>?>(null) }
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarQueue.queueMessage(message)
-            }
-        }
-    }
+    val nameCollisionLauncher = rememberNameCollisionLauncher { onNavigate(it, null) }
     val nodeHandlesToJsonMapper = remember { NodeHandlesToJsonMapper() }
 
     EventEffect(
@@ -112,7 +98,7 @@ internal fun HandleNodeOptionsActionEvent(
         action = {
             onActionTriggered()
             handleNodesNameCollisionResult(
-                nameCollisionActivityLauncher = nameCollisionLauncher,
+                nameCollisionLauncher = nameCollisionLauncher,
                 result = it,
                 onHandleNodesWithoutConflict = { collisionType, nodes ->
                     when (collisionType) {
@@ -131,7 +117,7 @@ internal fun HandleNodeOptionsActionEvent(
         action = { resultWithTarget ->
             onActionTriggered()
             handlePublicCopyCollisionResult(
-                nameCollisionActivityLauncher = nameCollisionLauncher,
+                nameCollisionLauncher = nameCollisionLauncher,
                 result = resultWithTarget,
                 onHandleNodesWithoutConflict = onCopyPublicLinkFiles,
             )
@@ -320,18 +306,17 @@ internal fun HandleNodeOptionsActionEvent(
 /**
  * Helper function to handle node name collision results
  *
- * @param nameCollisionActivityLauncher Launcher for handling name collision resolution
+ * @param nameCollisionLauncher Launcher for handling name collision resolution
  * @param result The collision result containing conflict and no-conflict nodes
  * @param onHandleNodesWithoutConflict Callback to handle nodes without conflicts, receives collision type and node map
  */
 fun handleNodesNameCollisionResult(
-    nameCollisionActivityLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
+    nameCollisionLauncher: NameCollisionLauncher,
     result: NodeNameCollisionsResult,
     onHandleNodesWithoutConflict: (NodeNameCollisionType, Map<Long, Long>) -> Unit,
 ) {
     if (result.conflictNodes.isNotEmpty()) {
-        nameCollisionActivityLauncher
-            .launch(result.conflictNodes.values.toCollection(ArrayList()))
+        nameCollisionLauncher.launch(result.conflictNodes.values.toList())
     }
     if (result.noConflictNodes.isNotEmpty()) {
         onHandleNodesWithoutConflict(result.type, result.noConflictNodes)
@@ -340,18 +325,17 @@ fun handleNodesNameCollisionResult(
 
 /**
  * Public-link counterpart of [handleNodesNameCollisionResult]. Sends conflicts
- * to `NameCollisionActivity` and forwards no-conflict resumption (with the
+ * to the name-collision screen and forwards no-conflict resumption (with the
  * picked target handle) to [onHandleNodesWithoutConflict]. Public-link
  * operations are always copy.
  */
 fun handlePublicCopyCollisionResult(
-    nameCollisionActivityLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
+    nameCollisionLauncher: NameCollisionLauncher,
     result: PublicCopyCollisionResult,
     onHandleNodesWithoutConflict: (targetHandle: Long) -> Unit,
 ) {
     if (result.result.conflictNodes.isNotEmpty()) {
-        nameCollisionActivityLauncher
-            .launch(result.result.conflictNodes.toCollection(ArrayList()))
+        nameCollisionLauncher.launch(result.result.conflictNodes)
     }
     if (result.result.noConflictNodes.isNotEmpty()) {
         onHandleNodesWithoutConflict(result.targetHandle)

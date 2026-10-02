@@ -3,7 +3,6 @@ package mega.privacy.android.core.nodecomponents.action
 import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 
@@ -20,7 +19,6 @@ data class SingleNodeActionProvider(
     override val moveLauncher: ActivityResultLauncher<LongArray>,
     override val copyLauncher: ActivityResultLauncher<LongArray>,
     override val publicCopyLauncher: ActivityResultLauncher<LongArray>,
-    override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
     override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
@@ -36,7 +34,6 @@ data class SingleNodeActionProvider(
     moveLauncher = moveLauncher,
     copyLauncher = copyLauncher,
     publicCopyLauncher = publicCopyLauncher,
-    restoreLauncher = restoreLauncher,
     sendToChatLauncher = sendToChatLauncher,
     hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
     addToAlbumLauncher = addToAlbumLauncher,
@@ -56,7 +53,6 @@ data class MultipleNodesActionProvider(
     override val moveLauncher: ActivityResultLauncher<LongArray>,
     override val copyLauncher: ActivityResultLauncher<LongArray>,
     override val publicCopyLauncher: ActivityResultLauncher<LongArray>,
-    override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
     override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
@@ -71,7 +67,6 @@ data class MultipleNodesActionProvider(
     moveLauncher = moveLauncher,
     copyLauncher = copyLauncher,
     publicCopyLauncher = publicCopyLauncher,
-    restoreLauncher = restoreLauncher,
     sendToChatLauncher = sendToChatLauncher,
     hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
     addToAlbumLauncher = addToAlbumLauncher,
@@ -88,7 +83,6 @@ open class NodeActionProvider(
     open val moveLauncher: ActivityResultLauncher<LongArray>,
     open val copyLauncher: ActivityResultLauncher<LongArray>,
     open val publicCopyLauncher: ActivityResultLauncher<LongArray>,
-    open val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     open val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     open val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
     open val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
@@ -27,6 +28,8 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.shared.nodes.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionActionResult
+import mega.privacy.android.shared.nodes.namecollision.NameCollisionOutcome
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
@@ -75,6 +78,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisio
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
@@ -2850,6 +2854,91 @@ class NodeOptionsActionViewModelTest {
             viewModel.uiState.test {
                 val state = awaitItem()
                 assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that onNameCollisionOutcome shows the completed action message`() = runTest {
+        initViewModel()
+
+        viewModel.onNameCollisionOutcome(
+            NameCollisionOutcome.ActionCompleted(NameCollisionActionResult(message = "Moved"))
+        )
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat((state.infoToShowEvent as StateEventWithContentTriggered).content)
+                .isEqualTo(LocalizedText.Literal("Moved"))
+            assertThat(state.showForeignNodeDialog).isEqualTo(StateEvent.Consumed)
+        }
+    }
+
+    @Test
+    fun `test that onNameCollisionOutcome shows the foreign node dialog when the action completed on a foreign node`() =
+        runTest {
+            initViewModel()
+
+            viewModel.onNameCollisionOutcome(
+                NameCollisionOutcome.ActionCompleted(
+                    NameCollisionActionResult(message = "Moved", isForeignNode = true)
+                )
+            )
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showForeignNodeDialog).isEqualTo(StateEvent.Triggered)
+                assertThat(state.infoToShowEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that onNameCollisionOutcome shows the quota dialog when the action failed with quota exceeded`() =
+        runTest {
+            initViewModel()
+
+            viewModel.onNameCollisionOutcome(
+                NameCollisionOutcome.Failed(QuotaExceededMegaException(1, "quota"))
+            )
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat((state.showQuotaDialog as StateEventWithContentTriggered).content)
+                    .isTrue()
+                assertThat(state.infoToShowEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that onNameCollisionOutcome shows the error message when the action failed with another mega exception`() =
+        runTest {
+            initViewModel()
+            val error = MegaException(errorCode = -1, errorString = "boom")
+
+            viewModel.onNameCollisionOutcome(NameCollisionOutcome.Failed(error))
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat((state.infoToShowEvent as StateEventWithContentTriggered).content)
+                    .isEqualTo(LocalizedText.Literal(error.message.orEmpty()))
+            }
+        }
+
+    @Test
+    fun `test that onNameCollisionOutcome does not update the state when the action failed with a plain throwable`() =
+        runTest {
+            initViewModel()
+
+            viewModel.onNameCollisionOutcome(NameCollisionOutcome.Failed(RuntimeException("boom")))
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.infoToShowEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(state.showQuotaDialog)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(state.showForeignNodeDialog).isEqualTo(StateEvent.Consumed)
             }
         }
 } 

@@ -92,7 +92,6 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.domain.entity.ShareData
-import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
@@ -203,7 +202,6 @@ class NodeActionClickHandlerTest {
     private val mockMoveLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockPublicCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
-    private val mockRestoreLauncher = mock<ActivityResultLauncher<ArrayList<NameCollision>>>()
     private val mockSendToChatLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockHiddenNodesOnboardingLauncher = mock<ActivityResultLauncher<Boolean>>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
@@ -220,7 +218,6 @@ class NodeActionClickHandlerTest {
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
         publicCopyLauncher = mockPublicCopyLauncher,
-        restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
         versionsLauncher = mockVersionsLauncher,
@@ -238,7 +235,6 @@ class NodeActionClickHandlerTest {
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
         publicCopyLauncher = mockPublicCopyLauncher,
-        restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
         versionsLauncher = mockVersionsLauncher,
@@ -256,7 +252,6 @@ class NodeActionClickHandlerTest {
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
         publicCopyLauncher = mockPublicCopyLauncher,
-        restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
         addToAlbumLauncher = mockAddToAlbumLauncher
@@ -272,7 +267,6 @@ class NodeActionClickHandlerTest {
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
         publicCopyLauncher = mockPublicCopyLauncher,
-        restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
         addToAlbumLauncher = mockAddToAlbumLauncher
@@ -328,7 +322,6 @@ class NodeActionClickHandlerTest {
             mockMoveLauncher,
             mockCopyLauncher,
             mockPublicCopyLauncher,
-            mockRestoreLauncher,
             mockSendToChatLauncher,
             mockHiddenNodesOnboardingLauncher,
             mockGetNodeShareDataUseCase,
