@@ -24,11 +24,11 @@ interface DatabaseHandler {
     val preferences: MegaPreferences?
 
     /**
-     * Save chat settings in the current DB.
+     * Gets chat settings.
      *
-     * @param chatSettings Chat settings to save.
+     * @return Chat settings.
      */
-    var chatSettings: ChatSettings?
+    val chatSettings: ChatSettings?
 
     /**
      * Sets the flag to indicate if should ask the user about set the current path as default download location.

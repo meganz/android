@@ -220,16 +220,8 @@ class SqliteDatabaseHandler @Inject constructor(
      *
      * @return Chat settings.
      */
-    /**
-     * Save chat settings in the current DB.
-     *
-     * @param chatSettings Chat settings to save.
-     */
-    override var chatSettings: ChatSettings?
+    override val chatSettings: ChatSettings?
         get() = getChatSettings(writableDatabase)
-        set(chatSettings) {
-            setChatSettings(writableDatabase, chatSettings)
-        }
 
     /**
      * Get chat settings from the current DB.
@@ -261,31 +253,6 @@ class SqliteDatabaseHandler @Inject constructor(
         return chatSettings
     }
 
-    /**
-     * Save chat settings in the DB.
-     *
-     * @param db           DB object to save the settings.
-     * @param chatSettings Chat settings to save.
-     */
-    private fun setChatSettings(db: SupportSQLiteDatabase, chatSettings: ChatSettings?) {
-        if (chatSettings == null) {
-            Timber.e("Error: Chat settings are null")
-            return
-        }
-        try {
-            db.execSQL("DELETE FROM $TABLE_CHAT_SETTINGS")
-        } catch (_: SQLiteException) {
-            legacyDatabaseMigration.onCreate(writableDatabase)
-        }
-        val values = ContentValues().apply {
-            put(KEY_CHAT_NOTIFICATIONS_ENABLED, "")
-            put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.notificationsSound))
-            put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.vibrationEnabled))
-            put(KEY_CHAT_VIDEO_QUALITY, encrypt(chatSettings.videoQuality))
-        }
-
-        db.insert(TABLE_CHAT_SETTINGS, SQLiteDatabase.CONFLICT_NONE, values)
-    }
     /**
      * Saves attributes in DB.
      *
