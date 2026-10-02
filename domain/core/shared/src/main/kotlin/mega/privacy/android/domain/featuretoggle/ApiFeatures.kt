@@ -353,6 +353,28 @@ enum class ApiFeatures(
         "dupit",
         "Enable the redesigned duplicate items (name collision) screen",
         false,
+    ),
+
+    /**
+     * Zip browser revamp.
+     * When enabled, every zip browser entry point opens the revamped feature module destination
+     * instead of ZipBrowserComposeActivity.
+     */
+    ZipBrowserRevamp(
+        experimentName = "zipbr",
+        description = "Open archives in the revamped zip browser",
+        defaultValue = false,
+    ),
+
+    /**
+     * Zip browser streaming. Needs [ZipBrowserRevamp].
+     * When enabled, a cloud zip opens by reading only its directory and the entries that are
+     * opened, instead of downloading the whole archive first.
+     */
+    ZipBrowserStreaming(
+        experimentName = "zipst",
+        description = "Browse cloud archives by reading only the parts that are opened",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {
