@@ -27,7 +27,6 @@ import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isType
 import mega.privacy.android.data.extensions.toException
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
@@ -47,6 +46,8 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
+import mega.privacy.android.data.mapper.AccountDetailMapper.Companion.HAS_SESSIONS_DETAILS
+import mega.privacy.android.data.mapper.AccountDetailMapper.Companion.HAS_STORAGE_DETAILS
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
@@ -117,12 +118,12 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Default implementation of [AccountRepository]
  *
  * @property context                      [Context]
- * @property myAccountInfoFacade          [AccountInfoWrapper]
  * @property megaApiGateway               [MegaApiGateway]
  * @property megaChatApiGateway           [MegaChatApiGateway]
  * @property megaApiFolderGateway         [MegaApiFolderGateway]
@@ -153,7 +154,6 @@ import kotlin.coroutines.suspendCoroutine
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val myAccountInfoFacade: AccountInfoWrapper,
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
@@ -221,8 +221,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 )
                 megaApiGateway.getAccountDetails(listener)
             }
-            // Legacy support, will remove completely once refactor to flow done
-            myAccountInfoFacade.handleAccountDetail(request)
             handleAccountDetail(request)
         }
     }
@@ -513,7 +511,6 @@ internal class DefaultAccountRepository @Inject constructor(
             )
             megaApiGateway.getSpecificAccountDetails(storage, transfer, pro, listener)
         }
-        myAccountInfoFacade.handleAccountDetail(request)
         handleAccountDetail(request)
     }
 
@@ -534,7 +531,6 @@ internal class DefaultAccountRepository @Inject constructor(
             )
             megaApiGateway.getExtendedAccountDetails(sessions, purchases, transactions, listener)
         }
-        myAccountInfoFacade.handleAccountDetail(request)
         handleAccountDetail(request)
     }
 
@@ -667,10 +663,12 @@ internal class DefaultAccountRepository @Inject constructor(
     ) = accountPreferencesGateway.setTransferQuotaWarningShownDay(trigger.name, epochDay)
 
     private suspend fun handleAccountDetail(request: MegaRequest): AccountDetail {
+        val rootNode = megaApiGateway.getRootNode()
+        saveAccountDetailsTimestamps(request, hasRootNode = rootNode != null)
         val newDetail = accountDetailMapper(
             request.megaAccountDetails,
             request.numDetails,
-            megaApiGateway.getRootNode(),
+            rootNode,
             megaApiGateway.getRubbishBinNode(),
             megaApiGateway.getIncomingSharesNode(null),
         )
@@ -692,6 +690,20 @@ internal class DefaultAccountRepository @Inject constructor(
             )
         )
         return newDetail
+    }
+
+    private suspend fun saveAccountDetailsTimestamps(request: MegaRequest, hasRootNode: Boolean) {
+        val now = System.currentTimeMillis().milliseconds.inWholeSeconds
+        if (request.numDetails and HAS_STORAGE_DETAILS != 0 && hasRootNode) {
+            runCatching { accountPreferencesGateway.setAccountDetailsTimeStamp(now) }
+                .onFailure { Timber.e(it, "Failed to save the account details timestamp") }
+        }
+        if (request.numDetails and HAS_SESSIONS_DETAILS != 0 &&
+            request.megaAccountDetails?.getSession(0) != null
+        ) {
+            runCatching { accountPreferencesGateway.setExtendedAccountDetailsTimeStamp(now) }
+                .onFailure { Timber.e(it, "Failed to save the extended account details timestamp") }
+        }
     }
 
     override fun monitorAccountDetail(): Flow<AccountDetail> = accountDetail.asStateFlow()

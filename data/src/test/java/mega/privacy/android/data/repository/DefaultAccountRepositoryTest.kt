@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
@@ -27,6 +26,8 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
+import mega.privacy.android.data.mapper.AccountDetailMapper.Companion.HAS_SESSIONS_DETAILS
+import mega.privacy.android.data.mapper.AccountDetailMapper.Companion.HAS_STORAGE_DETAILS
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -74,6 +75,8 @@ import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
+import nz.mega.sdk.MegaAccountDetails
+import nz.mega.sdk.MegaAccountSession
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
@@ -100,6 +103,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -109,6 +113,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.io.IOException
 import java.util.stream.Stream
 import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertEquals
@@ -119,8 +124,6 @@ import kotlin.test.assertEquals
 class DefaultAccountRepositoryTest {
     private lateinit var underTest: AccountRepository
 
-    private val accountInfoWrapper =
-        mock<AccountInfoWrapper>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
@@ -198,7 +201,6 @@ class DefaultAccountRepositoryTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            accountInfoWrapper,
             megaApiGateway,
             megaChatApiGateway,
             megaApiFolderGateway,
@@ -240,7 +242,6 @@ class DefaultAccountRepositoryTest {
         userMapper = UserMapper(UserChangeMapper(), UserVisibilityMapper())
         underTest = DefaultAccountRepository(
             context = mock(),
-            myAccountInfoFacade = accountInfoWrapper,
             megaApiGateway = megaApiGateway,
             megaChatApiGateway = megaChatApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
@@ -537,36 +538,53 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that getSpecificAccountDetail returns success when MegaApi returns ERROR_OK`() =
+    fun `test that getSpecificAccountDetail saves the account details timestamp in seconds when storage details are returned`() =
         runTest {
-
-            val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
-            }
-
-            val megaRequest = mock<MegaRequest> {
-                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
-                on { megaAccountDetails }.thenReturn(mock())
-            }
-
-            whenever(
-                megaApiGateway.getSpecificAccountDetails(
-                    storage = any(),
-                    transfer = any(),
-                    pro = any(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError,
-                )
-            }
-
+            whenever(megaApiGateway.getRootNode()).thenReturn(mock())
+            stubSpecificAccountDetails(accountDetailsRequest(numDetails = HAS_STORAGE_DETAILS))
+            val before = System.currentTimeMillis() / 1000
 
             underTest.getSpecificAccountDetail(storage = true, transfer = false, pro = false)
-            verify(accountInfoWrapper).handleAccountDetail(megaRequest)
+
+            val after = System.currentTimeMillis() / 1000
+            val captor = argumentCaptor<Long>()
+            verify(accountPreferencesGateway).setAccountDetailsTimeStamp(captor.capture())
+            assertThat(captor.firstValue).isIn(before..after)
+        }
+
+    @Test
+    fun `test that getSpecificAccountDetail does not save the account details timestamp when the root node is missing`() =
+        runTest {
+            whenever(megaApiGateway.getRootNode()).thenReturn(null)
+            stubSpecificAccountDetails(accountDetailsRequest(numDetails = HAS_STORAGE_DETAILS))
+
+            underTest.getSpecificAccountDetail(storage = true, transfer = false, pro = false)
+
+            verify(accountPreferencesGateway, never()).setAccountDetailsTimeStamp(any())
+        }
+
+    @Test
+    fun `test that getSpecificAccountDetail does not save the account details timestamp when storage details are missing`() =
+        runTest {
+            whenever(megaApiGateway.getRootNode()).thenReturn(mock())
+            stubSpecificAccountDetails(accountDetailsRequest(numDetails = 0))
+
+            underTest.getSpecificAccountDetail(storage = false, transfer = true, pro = false)
+
+            verify(accountPreferencesGateway, never()).setAccountDetailsTimeStamp(any())
+        }
+
+    @Test
+    fun `test that getSpecificAccountDetail updates the account detail when saving the timestamp fails`() =
+        runTest {
+            whenever(megaApiGateway.getRootNode()).thenReturn(mock())
+            whenever(accountPreferencesGateway.setAccountDetailsTimeStamp(any()))
+                .thenAnswer { throw IOException() }
+            stubSpecificAccountDetails(accountDetailsRequest(numDetails = HAS_STORAGE_DETAILS))
+
+            underTest.getSpecificAccountDetail(storage = true, transfer = false, pro = false)
+
+            verify(appEventGateway).broadcastMyAccountUpdate(any())
         }
 
     @Test
@@ -619,39 +637,66 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that getExtendedAccountDetails returns success when MegaApi returns ERROR_OK`() =
+    fun `test that getExtendedAccountDetails saves the extended account details timestamp when a session is returned`() =
         runTest {
-
-            val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            val accountDetails = mock<MegaAccountDetails> {
+                on { getSession(0) }.thenReturn(mock<MegaAccountSession>())
             }
-
-            val megaRequest = mock<MegaRequest> {
-                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
-                on { megaAccountDetails }.thenReturn(mock())
-            }
-
-            whenever(
-                megaApiGateway.getExtendedAccountDetails(
-                    sessions = any(),
-                    purchases = any(),
-                    transactions = any(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError,
-                )
-            }
+            stubExtendedAccountDetails(
+                accountDetailsRequest(numDetails = HAS_SESSIONS_DETAILS, accountDetails = accountDetails)
+            )
 
             underTest.getExtendedAccountDetails(
                 sessions = true,
                 purchases = false,
                 transactions = false
             )
-            verify(accountInfoWrapper).handleAccountDetail(megaRequest)
+
+            verify(accountPreferencesGateway).setExtendedAccountDetailsTimeStamp(any())
+        }
+
+    @Test
+    fun `test that getExtendedAccountDetails does not save the extended account details timestamp when there is no session`() =
+        runTest {
+            val accountDetails = mock<MegaAccountDetails> {
+                on { getSession(0) }.thenReturn(null)
+            }
+            stubExtendedAccountDetails(
+                accountDetailsRequest(numDetails = HAS_SESSIONS_DETAILS, accountDetails = accountDetails)
+            )
+
+            underTest.getExtendedAccountDetails(
+                sessions = true,
+                purchases = false,
+                transactions = false
+            )
+
+            verify(accountPreferencesGateway, never()).setExtendedAccountDetailsTimeStamp(any())
+        }
+
+    @Test
+    fun `test that getExtendedAccountDetails saves the extended account details timestamp when saving the account details timestamp fails`() =
+        runTest {
+            val accountDetails = mock<MegaAccountDetails> {
+                on { getSession(0) }.thenReturn(mock<MegaAccountSession>())
+            }
+            whenever(megaApiGateway.getRootNode()).thenReturn(mock())
+            whenever(accountPreferencesGateway.setAccountDetailsTimeStamp(any()))
+                .thenAnswer { throw IOException() }
+            stubExtendedAccountDetails(
+                accountDetailsRequest(
+                    numDetails = HAS_STORAGE_DETAILS or HAS_SESSIONS_DETAILS,
+                    accountDetails = accountDetails,
+                )
+            )
+
+            underTest.getExtendedAccountDetails(
+                sessions = true,
+                purchases = false,
+                transactions = false
+            )
+
+            verify(accountPreferencesGateway).setExtendedAccountDetailsTimeStamp(any())
         }
 
     @Test
@@ -690,17 +735,13 @@ class DefaultAccountRepositoryTest {
 
 
     @Test
-    fun `test that requestAccount returns success when MegaApi returns ERROR_OK`() =
+    fun `test that requestAccount saves the account details timestamp when MegaApi returns ERROR_OK`() =
         runTest {
             val megaError = mock<MegaError> {
                 on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
             }
-
-            val megaRequest = mock<MegaRequest> {
-                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
-                on { megaAccountDetails }.thenReturn(mock())
-            }
-
+            val megaRequest = accountDetailsRequest(numDetails = HAS_STORAGE_DETAILS)
+            whenever(megaApiGateway.getRootNode()).thenReturn(mock())
             whenever(megaApiGateway.getAccountDetails(listener = any())).thenAnswer {
                 ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     mock(),
@@ -710,8 +751,56 @@ class DefaultAccountRepositoryTest {
             }
 
             underTest.requestAccount()
-            verify(accountInfoWrapper).handleAccountDetail(megaRequest)
+
+            verify(accountPreferencesGateway).setAccountDetailsTimeStamp(any())
         }
+
+    private fun accountDetailsRequest(
+        numDetails: Int,
+        accountDetails: MegaAccountDetails = mock(),
+    ) = mock<MegaRequest> {
+        on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+        on { this.numDetails }.thenReturn(numDetails)
+        on { megaAccountDetails }.thenReturn(accountDetails)
+    }
+
+    private fun stubSpecificAccountDetails(request: MegaRequest) {
+        whenever(
+            megaApiGateway.getSpecificAccountDetails(
+                storage = any(),
+                transfer = any(),
+                pro = any(),
+                listener = any()
+            )
+        ).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                request,
+                okError(),
+            )
+        }
+    }
+
+    private fun stubExtendedAccountDetails(request: MegaRequest) {
+        whenever(
+            megaApiGateway.getExtendedAccountDetails(
+                sessions = any(),
+                purchases = any(),
+                transactions = any(),
+                listener = any()
+            )
+        ).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                request,
+                okError(),
+            )
+        }
+    }
+
+    private fun okError() = mock<MegaError> {
+        on { errorCode }.thenReturn(MegaError.API_OK)
+    }
 
     @Test
     fun `test that requestAccount finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =

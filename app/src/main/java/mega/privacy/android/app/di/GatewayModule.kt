@@ -4,7 +4,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.data.facade.AlbumStringResourceFacade
 import mega.privacy.android.app.data.facade.ContactFacade
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
@@ -17,7 +16,6 @@ import mega.privacy.android.app.meeting.facade.CameraInUseFacade
 import mega.privacy.android.app.meeting.facade.RTCAudioManagerFacade
 import mega.privacy.android.app.meeting.gateway.CameraInUseGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.wrapper.ContactWrapper
 import javax.inject.Singleton
@@ -34,9 +32,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class GatewayModule {
-
-    @Binds
-    abstract fun bindAccountInfoWrapper(implementation: AccountInfoFacade): AccountInfoWrapper
 
     @Binds
     abstract fun bindContactWrapper(implementation: ContactFacade): ContactWrapper
