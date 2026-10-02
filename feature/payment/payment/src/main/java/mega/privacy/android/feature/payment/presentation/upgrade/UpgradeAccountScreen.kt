@@ -105,9 +105,11 @@ fun UpgradeAccountScreen(
     onSubscriptionUnavailableLearnMoreClick: () -> Unit = {},
     onPricingPageClick: () -> Unit = {},
     onOfferExpired: () -> Unit = {},
+    initialChosenPlan: AccountType? = null,
+    initialIsMonthly: Boolean = false,
 ) {
-    var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
-    var isMonthly by rememberSaveable { mutableStateOf(false) }
+    var chosenPlan by rememberSaveable { mutableStateOf(initialChosenPlan) }
+    var isMonthly by rememberSaveable { mutableStateOf(initialIsMonthly) }
     var showOfferExpiredDialog by rememberSaveable { mutableStateOf(false) }
     val events = remember(uiState.currentSubscriptionPlan) {
         upgradeAccountEvents(uiState.currentSubscriptionPlan)
