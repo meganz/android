@@ -10,8 +10,10 @@ import mega.privacy.android.app.utils.Constants
  *
  * The exported [MegaActivity] ignores [LAUNCH_INTENT] to prevent other apps from using
  * it as a trampoline into non-exported MEGA activities while the passcode is locked.
- * Internal code that needs to set [LAUNCH_INTENT] must build intents through this
- * helper so they reach the non-exported alias instead.
+ * It also ignores the navigation destinations added by
+ * [MegaActivity.getIntentWithExtraDestinations], so other apps cannot drive in-app
+ * navigation. Internal code that needs either extra must build intents that reach
+ * the non-exported alias instead.
  */
 object MegaActivityInternalLauncher {
 
@@ -28,6 +30,11 @@ object MegaActivityInternalLauncher {
      * [INTERNAL_ENTRY_COMPONENT]; the exported [MegaActivity] ignores it.
      */
     const val LAUNCH_INTENT: String = "LAUNCH_INTENT"
+
+    /**
+     * Whether this intent targets [INTERNAL_ENTRY_COMPONENT], i.e. it was sent from within this app.
+     */
+    fun Intent.isInternalEntry(): Boolean = component?.className == INTERNAL_ENTRY_COMPONENT
 
     /**
      * Build an intent targeting the non-exported [MegaActivity] alias.

@@ -9,6 +9,7 @@ import android.os.Parcelable
 import dagger.hilt.android.scopes.ActivityScoped
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.isInternalEntry
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.deeplinks.ExternalPdfDeepLinkHandler
 import mega.privacy.android.app.utils.Constants
@@ -238,7 +239,7 @@ class MegaActivityIntentActionHandler @Inject constructor(
             intent.extras?.containsKey(MegaActivityInternalLauncher.LAUNCH_INTENT) == true
         if (!rootNodeExists || !hasParkedIntent) return
 
-        if (intent.component?.className != MegaActivityInternalLauncher.INTERNAL_ENTRY_COMPONENT) {
+        if (!intent.isInternalEntry()) {
             Timber.w("Rejected LAUNCH_INTENT from non-internal entry point")
             activity.finish()
             return

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.appstate
 
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -40,6 +41,8 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.INTERNAL_ENTRY_COMPONENT
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.isInternalEntry
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
@@ -167,6 +170,12 @@ class MegaActivity : FragmentActivity() {
 
     private suspend fun consumeIntentDestinations() {
         intent.getDestinations()?.let { navKeys ->
+            if (!intent.isInternalEntry()) {
+                Timber.w("Rejected navKeys from non-internal entry point")
+                intent.removeExtra(EXTRA_NAV_KEYS)
+                intent.removeExtra(EXTRA_NAV_DROP_IF_SHOWN)
+                return
+            }
             //Add nav keys to navigation queue
             navKeys.forEach {
                 Timber.d("NavKey from intent: ${it.logTypeName()}")
@@ -548,6 +557,7 @@ class MegaActivity : FragmentActivity() {
             navKeys: List<T>,
             dropIfAlreadyShown: Boolean = false,
         ) where T : NavKey, T : Parcelable = getIntent(context).apply {
+            component = ComponentName(context, INTERNAL_ENTRY_COMPONENT)
             putParcelableArrayListExtra(EXTRA_NAV_KEYS, ArrayList(navKeys))
             if (dropIfAlreadyShown) putExtra(EXTRA_NAV_DROP_IF_SHOWN, true)
         }
