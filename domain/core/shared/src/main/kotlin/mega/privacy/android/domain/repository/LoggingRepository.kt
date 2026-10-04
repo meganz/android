@@ -29,4 +29,11 @@ interface LoggingRepository {
      * @return the file for the newly created archive
      */
     suspend fun compressLogs(): File
+
+    /**
+     * Force buffered log data to be written out, reducing the amount lost if the
+     * process is killed. Call at lifecycle boundaries such as the app entering the
+     * background.
+     */
+    suspend fun flush()
 }

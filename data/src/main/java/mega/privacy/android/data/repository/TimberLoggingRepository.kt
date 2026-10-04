@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.LogConfigurationGateway
+import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.logging.LineNumberDebugTree
 import mega.privacy.android.data.logging.LogFileTree
@@ -33,6 +34,7 @@ internal class TimberLoggingRepository @Inject constructor(
     private val logFileTree: Lazy<LogFileTree>,
     private val loggingConfig: LogConfigurationGateway,
     private val fileCompressionGateway: FileCompressionGateway,
+    private val logFlushGateway: LogFlushGateway,
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @LogFileDirectory private val logFileDirectory: Lazy<File>,
@@ -72,6 +74,10 @@ internal class TimberLoggingRepository @Inject constructor(
                 this
             )
         }
+    }
+
+    override suspend fun flush() = withContext(ioDispatcher) {
+        logFlushGateway.flush()
     }
 
     private fun createEmptyFile() =

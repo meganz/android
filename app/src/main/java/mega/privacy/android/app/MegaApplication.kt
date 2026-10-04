@@ -22,7 +22,6 @@ import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.SmsVerificationState
 import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
-import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaChatApiAndroid
 import timber.log.Timber
@@ -31,7 +30,6 @@ import javax.inject.Inject
 /**
  * Mega application
  *
- * @property _dbH
  * @property activityLifecycleHandler
  * @property pushNotificationSettingManagement
  * @property chatManagement
@@ -44,17 +42,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
 
     private val megaChatApi: MegaChatApiAndroid
         get() = _megaChatApi.get()
-
-    @Inject
-    lateinit var _dbH: Lazy<LegacyDatabaseHandler>
-
-    /**
-     * Database handler
-     */
-    val dbH: LegacyDatabaseHandler
-        get() {
-            return _dbH.get()
-        }
 
     @ApplicationScope
     @Inject
@@ -79,9 +66,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
 
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser
-
-    @Inject
-    lateinit var logFlushGateway: LogFlushGateway
 
     @Inject
     lateinit var smsVerificationState: SmsVerificationState
@@ -127,14 +111,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
             if (backgroundStatus != -1 && backgroundStatus != 1) {
                 megaChatApi.setBackgroundStatus(true)
             }
-        }
-        applicationScope.launch { logFlushGateway.flush() }
-    }
-
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-        if (level >= TRIM_MEMORY_UI_HIDDEN) {
-            applicationScope.launch { logFlushGateway.flush() }
         }
     }
 

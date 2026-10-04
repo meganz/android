@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.LogConfigurationGateway
+import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.logging.LogFileTree
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import timber.log.Timber
 import java.io.File
 
@@ -38,6 +40,8 @@ class TimberLoggingRepositoryTest {
     // Only its identity matters here: the repository plants it and must not plant it twice.
     private val logFileTree = mock<LogFileTree>()
 
+    private val logFlushGateway = mock<LogFlushGateway>()
+
     @BeforeEach
     fun setUp() {
         Timber.uprootAll()
@@ -47,6 +51,7 @@ class TimberLoggingRepositoryTest {
             logFileTree = Lazy { logFileTree },
             loggingConfig = logConfigurationGateway,
             fileCompressionGateway = mock<FileCompressionGateway>(),
+            logFlushGateway = logFlushGateway,
             megaApiGateway = mock<MegaApiGateway>(),
             ioDispatcher = testDispatcher,
             logFileDirectory = Lazy { logDirectory },
@@ -85,6 +90,7 @@ class TimberLoggingRepositoryTest {
                 loggingConfig = logConfigurationGateway,
                 fileCompressionGateway = mock<FileCompressionGateway>(),
                 megaApiGateway = mock<MegaApiGateway>(),
+                logFlushGateway = logFlushGateway,
                 ioDispatcher = testDispatcher,
                 logFileDirectory = Lazy { missingDirectory },
                 logZipFileDirectory = Lazy { logDirectory },
@@ -94,4 +100,11 @@ class TimberLoggingRepositoryTest {
 
             assertThat(Timber.forest()).contains(logFileTree)
         }
+
+    @Test
+    fun `test that flush delegates to the log flush gateway`() = runTest(testDispatcher) {
+        underTest.flush()
+
+        verify(logFlushGateway).flush()
+    }
 }

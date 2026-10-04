@@ -29,6 +29,7 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.Session
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.StaticContextInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SyncMonitorInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.ThemeInitialiser
+import mega.privacy.android.app.appstate.global.lifecycle.AppLifecycleInitialiser
 import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
 import mega.privacy.android.navigation.contract.initialisation.CriticalAsyncAppCreateInitialiser
 import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
@@ -105,6 +106,7 @@ internal class AppCreateInitialisersModule {
         analyticsInitialiser: AnalyticsInitialiser,
         passcodeInitialiser: PasscodeInitialiser,
         notificationChannelsInitialiser: NotificationChannelsInitialiser,
+        appLifecycleInitialiser: AppLifecycleInitialiser,
     ): List<@JvmSuppressWildcards SynchronousAppCreateInitialiser> = listOf(
         loggingInitialiser,
         crashReportingInitialiser,
@@ -114,5 +116,6 @@ internal class AppCreateInitialisersModule {
         analyticsInitialiser,
         passcodeInitialiser,
         notificationChannelsInitialiser,
+        appLifecycleInitialiser,
     )
 }
