@@ -1,0 +1,24 @@
+plugins {
+    alias(convention.plugins.mega.jvm.library)
+    alias(convention.plugins.mega.jvm.hilt)
+}
+
+lint {
+    abortOnError = true
+    warningsAsErrors = true
+}
+
+dependencies {
+    lintChecks(project(":lint"))
+    implementation(project(":domain:core:shared"))
+    implementation(project(":domain:core:common"))
+    implementation(lib.coroutines.core)
+    implementation(lib.javax.inject)
+
+    // Testing dependencies
+    testImplementation(testlib.bundles.unit.test)
+    testImplementation(lib.bundles.unit.test)
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
+}

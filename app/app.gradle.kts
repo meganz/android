@@ -229,6 +229,7 @@ dependencies {
     implementation(project(":domain:core:shared"))
     implementation(project(":domain:feature:transfers"))
     implementation(project(":domain:feature:node"))
+    implementation(project(":domain:feature:zipbrowser"))
     implementation(project(":domain:feature:account"))
     implementation(project(":domain:feature:contact"))
     implementation(project(":domain:feature:chat"))
