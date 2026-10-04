@@ -1,0 +1,44 @@
+To suppress this warning, add android.generateSyncIssueWhenLibraryConstraintsAreEnabled=false to gradle.properties
+Add android.sync.suppressAgpWarnings=LIBRARY_CONSTRAINTS_SHOULD_BE_DISABLED to the gradle.properties file to suppress this warning.
+WARNING: androidTestImplementation dependencies are ignored because androidTest is disabled.
+Add android.sync.suppressAgpWarnings=GENERIC to the gradle.properties file to suppress this warning.
+WARNING: androidTestImplementation dependencies are ignored because androidTest is disabled.
+Add android.sync.suppressAgpWarnings=GENERIC to the gradle.properties file to suppress this warning.
+Publication name = aar, project = sdk
+
+> Task :checkSubmoduleChanges FAILED
+Guarding submodule pointers: sdk/src/main/jni/megachat/sdk, sdk/src/main/jni/mega/sdk
+==> Running command in /private/var/lib/jenkins/workspace/Android-MR-Status_MR-17551: git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+==> Running command in /private/var/lib/jenkins/workspace/Android-MR-Status_MR-17551: git fetch
+failed to store: -25308
+
+==> Running command in /private/var/lib/jenkins/workspace/Android-MR-Status_MR-17551: git diff --name-only origin/develop...origin/do/AND-25114-wire-submodule-guard
+gradle/catalogs/plugin.versions.toml
+jenkinsfile/android_build_status.groovy
+sdk/src/main/jni/mega/sdk
+
+
+[Incubating] Problems report is available at: file:///private/var/lib/jenkins/workspace/Android-MR-Status_MR-17551/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':checkSubmoduleChanges' (registered by plugin 'mega.android.cicd').
+> This merge request moves an SDK submodule pointer:
+    sdk/src/main/jni/mega/sdk
+  
+  Only the release flow may do that. A merge request qualifies when:
+    - it targets 'release/v*' (an SDK or MEGAChat patch), or
+    - its branch is 'task/pre-release/v*', or
+    - its title contains 'Pre-release'.
+  
+  Branch 'do/AND-25114-wire-submodule-guard' targeting 'develop' matches none of them, so this is almost certainly an unintended pointer move - it rolls the SDK to whatever revision the committing checkout happened to have.
+  Restore the pointer, or move the change onto a release-flow branch.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.

@@ -1017,6 +1017,40 @@ String firstLineOf(String message) {
 }
 
 /**
+ * The explanation Gradle prints under "What went wrong", without Gradle's own framing: the
+ * "Execution failed for task" line and the "> " quoting. A task that fails with a message written
+ * for people can then be quoted to them as it was written.
+ *
+ * Empty when the output has no such block, so a caller can tell a failure Gradle explained from
+ * one it did not, and say so instead of posting nothing.
+ */
+String gradleFailureReason(String output) {
+    List<String> lines = (output ?: "").readLines()
+    int start = -1
+    for (int i = 0; i < lines.size(); i++) {
+        if (lines[i].trim() == "* What went wrong:") {
+            start = i
+            break
+        }
+    }
+    if (start < 0) {
+        return ""
+    }
+    List<String> reason = []
+    for (int i = start + 1; i < lines.size(); i++) {
+        String line = lines[i]
+        if (line.startsWith("* ")) {
+            break
+        }
+        if (line.startsWith("Execution failed for task")) {
+            continue
+        }
+        reason.add(line.replaceFirst(/^(> |  )/, ""))
+    }
+    return reason.join("\n").trim()
+}
+
+/**
  * Parses the marker lines printAffectedModules writes to stdout. Kept free of any Jenkins step so
  * the part most likely to break silently — recognising the markers — can be tested directly.
  *

@@ -54,6 +54,7 @@ CODE_REVIEW_SUMMARY_FILE = "code_review_summary.md"
 CODE_REVIEW_ERROR_REPORT_FILE = "code_review_error_report.txt"
 
 WEBLATE_GATE_REPORT_FILE = "weblate_gate_report.txt"
+SUBMODULE_GUARD_LOG_FILE = "submodule_guard.log"
 
 WEBLATE_CHECK_CMD = "weblate_check"
 /**
@@ -261,11 +262,34 @@ pipeline {
                                 }
 
                                 util.useGitLab() {
+                                    // The GITLAB_OA_* values only arrive with a webhook build; a
+                                    // branch-indexing build has none, and interpolating them
+                                    // would hand the checks the literal branch 'null'.
+                                    String targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET ?: env.gitlabTargetBranch ?: 'develop'
+                                    String mrTitle = env.GITLAB_OA_TITLE ?: env.CHANGE_TITLE ?: ''
                                     String htmlOutput = "mr-file-changes.html"
                                     try {
-                                        sh "${GRADLE_CI} checkMergeRequestFileChanges --html-output $htmlOutput --current-branch=\"${env.GIT_BRANCH}\" --target-branch=\"${env.GITLAB_OA_TARGET_BRANCH}\""
+                                        sh "${GRADLE_CI} checkMergeRequestFileChanges --html-output $htmlOutput --current-branch=\"${env.GIT_BRANCH}\" --target-branch=\"${targetBranch}\""
                                     } finally {
                                         MERGE_REQUEST_FILE_CHANGES_MESSAGE = getHtmlReport(htmlOutput, "")
+                                    }
+
+                                    // Unlike the check above, this one fails the build: an SDK
+                                    // submodule pointer moving outside the release flow rolls the
+                                    // SDK backwards for everyone, and a warning is what let it
+                                    // through last time. It posts its own comment because the
+                                    // generic failure message only names this stage, and an APK
+                                    // that built fine looks nothing like a pointer move.
+                                    int guardStatus = sh(
+                                            script: "set -o pipefail && ${GRADLE_CI} checkSubmoduleChanges --current-branch=\"${env.GIT_BRANCH}\" --target-branch=\"${targetBranch}\" --mr-title=\"${mrTitle}\" 2>&1 | tee ${SUBMODULE_GUARD_LOG_FILE}",
+                                            returnStatus: true
+                                    )
+                                    if (guardStatus != 0) {
+                                        String guardLog = fileExists(SUBMODULE_GUARD_LOG_FILE) ? readFile(SUBMODULE_GUARD_LOG_FILE) : ""
+                                        String reason = common.gradleFailureReason(guardLog)
+                                                ?: "The check did not reach a verdict, so the pointers could not be verified. See the build log."
+                                        common.sendToMR(":x: **SDK submodule pointer check failed**\n\n```\n${reason}\n```")
+                                        util.failPipeline("SDK submodule pointer check failed:\n${reason}")
                                     }
                                 }
                             }
