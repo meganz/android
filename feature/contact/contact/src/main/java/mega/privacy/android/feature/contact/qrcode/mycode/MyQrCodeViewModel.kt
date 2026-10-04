@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * ViewModel driving the personal "My QR code" flow: creating, resetting and deleting the
  * current user's contact link, exposing their avatar, copying the link and saving the QR
- * image to the device.
+ * image to the device or handing it over for upload to the Cloud drive.
  */
 @HiltViewModel
 class MyQrCodeViewModel @Inject constructor(
@@ -70,6 +70,7 @@ class MyQrCodeViewModel @Inject constructor(
      */
     private var lastQrData: QrData = QrData.Loading
     private val messageChannel = Channel<StateEventWithContent<MyQrCodeMessage>>(Channel.BUFFERED)
+    private val uploadQrCodeChannel = Channel<StateEventWithContent<UriPath>>(Channel.BUFFERED)
 
     /**
      * UI state for the personal QR code screen.
@@ -78,9 +79,15 @@ class MyQrCodeViewModel @Inject constructor(
         combine(
             qrCodeChannel.receiveAsFlow().onStart { createQRCode() },
             messageChannel.receiveAsFlow().onStart { emit(consumed()) },
-        ) { qrData, message ->
+            uploadQrCodeChannel.receiveAsFlow().onStart { emit(consumed()) },
+        ) { qrData, message, uploadQrCodeEvent ->
             when (qrData) {
-                is QrData.Data -> MyQrCodeUiState.QRCodeAvailable(qrData.qrCode, message)
+                is QrData.Data -> MyQrCodeUiState.QRCodeAvailable(
+                    qrCode = qrData.qrCode,
+                    message = message,
+                    uploadQrCodeEvent = uploadQrCodeEvent,
+                )
+
                 QrData.Empty -> MyQrCodeUiState.QRCodeUnavailable(message)
                 QrData.Loading -> MyQrCodeUiState.CreatingQRCode
             }
@@ -222,10 +229,37 @@ class MyQrCodeViewModel @Inject constructor(
     }
 
     /**
+     * Hand the QR code image over for upload to the Cloud drive. Only the file is resolved here;
+     * everything from that point on (quota, name collisions, progress) belongs to the upload flow.
+     */
+    fun saveToCloudDrive() {
+        viewModelScope.launch {
+            val qrFile = runCatching { getQRCodeFileUseCase() }
+                .onFailure { Timber.e(it) }
+                .getOrNull()
+                ?.takeIf { it.exists() }
+
+            if (qrFile == null) {
+                messageChannel.send(triggered(MyQrCodeMessage.SaveError))
+            } else {
+                uploadQrCodeChannel.send(triggered(UriPath(qrFile.absolutePath)))
+            }
+        }
+    }
+
+    /**
      * Notify that the current [MyQrCodeUiState.message] has been consumed.
      */
     fun onMessageConsumed() {
         messageChannel.trySend(consumed())
+    }
+
+    /**
+     * Notify that the current [MyQrCodeUiState.QRCodeAvailable.uploadQrCodeEvent] has been
+     * consumed.
+     */
+    fun onUploadQrCodeEventConsumed() {
+        uploadQrCodeChannel.trySend(consumed())
     }
 
     private suspend fun getQrCodeData(contactLink: String): QrCode {

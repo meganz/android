@@ -91,6 +91,7 @@ private val ContentAreaHeight =
  * @param onCreateQRCode the on create qr code
  * @param onCopyContactLink the on copy contact link
  * @param onSaveToFile the on save to file
+ * @param onSaveToCloudDrive the on save to cloud drive
  * @param onResetQRCode the on reset qr code
  * @param onDeleteQRCode the on delete qr code
  * @param onScanClick the on scan click
@@ -105,6 +106,7 @@ internal fun MyQrCodeScreen(
     onCreateQRCode: () -> Unit,
     onCopyContactLink: (String) -> Unit,
     onSaveToFile: (UriPath) -> Unit,
+    onSaveToCloudDrive: () -> Unit,
     onResetQRCode: () -> Unit,
     onDeleteQRCode: (String) -> Unit,
     onScanClick: () -> Unit,
@@ -128,6 +130,7 @@ internal fun MyQrCodeScreen(
                 navigationType = AppBarNavigationType.Back(onBackClick),
                 actions = if (uiState is MyQrCodeUiState.QRCodeAvailable) {
                     listOf(
+                        MenuActionWithClick(SaveToCloudDriveMenuAction, onSaveToCloudDrive),
                         MenuActionWithClick(SaveQrCodeMenuAction) { folderPicker.launch(null) },
                         MenuActionWithClick(ResetQrCodeMenuAction, onResetQRCode),
                         MenuActionWithClick(
@@ -368,6 +371,14 @@ private fun MyQrCodeMessage.toText(context: Context): String = when (this) {
 }
 
 /**
+ * Overflow action that uploads the QR code image to the root of the Cloud drive.
+ */
+internal data object SaveToCloudDriveMenuAction : MenuActionWithoutIcon(
+    descriptionRes = sharedR.string.general_save_to_cloud_drive,
+    testTag = MY_QR_CODE_SAVE_TO_CLOUD_DRIVE_ACTION_TAG,
+)
+
+/**
  * Overflow action that saves the QR code image to the device.
  */
 internal data object SaveQrCodeMenuAction : MenuActionWithoutIcon(
@@ -398,6 +409,8 @@ internal const val MY_QR_CODE_COPY_ICON_TAG = "my_qr_code_screen:icon_copy_conta
 internal const val MY_QR_CODE_CREATE_TAG = "my_qr_code_screen:button_create"
 internal const val MY_QR_CODE_SCAN_TAG = "my_qr_code_screen:button_scan"
 internal const val MY_QR_CODE_LOADING_TAG = "my_qr_code_screen:progress_generating"
+internal const val MY_QR_CODE_SAVE_TO_CLOUD_DRIVE_ACTION_TAG =
+    "my_qr_code_screen:action_save_to_cloud_drive"
 internal const val MY_QR_CODE_SAVE_ACTION_TAG = "my_qr_code_screen:action_save"
 internal const val MY_QR_CODE_RESET_ACTION_TAG = "my_qr_code_screen:action_reset"
 internal const val MY_QR_CODE_DELETE_ACTION_TAG = "my_qr_code_screen:action_delete"
@@ -414,6 +427,7 @@ private fun MyQrCodeScreenPreview(
             onCreateQRCode = {},
             onCopyContactLink = {},
             onSaveToFile = {},
+            onSaveToCloudDrive = {},
             onResetQRCode = {},
             onDeleteQRCode = {},
             onScanClick = {},
@@ -436,7 +450,8 @@ private class MyQrCodeContentStateProvider : PreviewParameterProvider<MyQrCodeUi
                 avatarBgColor = 0xFFF30C14.toInt(),
                 qrCodeFilePath = null,
             ),
-            message = consumed()
+            message = consumed(),
+            uploadQrCodeEvent = consumed(),
         ),
         MyQrCodeUiState.QRCodeUnavailable(
             message = consumed()

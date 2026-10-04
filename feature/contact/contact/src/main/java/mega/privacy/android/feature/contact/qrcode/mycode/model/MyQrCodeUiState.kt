@@ -3,6 +3,7 @@ package mega.privacy.android.feature.contact.qrcode.mycode.model
 import androidx.compose.runtime.Stable
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeUiState.CreatingQRCode.message
 
 /**
@@ -34,10 +35,12 @@ sealed interface MyQrCodeUiState {
      * @constructor Creates a new QRCodeAvailable
      * @property qrCode the qr code
      * @property message
+     * @property uploadQrCodeEvent the QR code image to hand over to the Cloud drive upload flow
      */
     data class QRCodeAvailable(
         val qrCode: QrCode,
         override val message: StateEventWithContent<MyQrCodeMessage>,
+        val uploadQrCodeEvent: StateEventWithContent<UriPath>,
     ) : MyQrCodeUiState
 
     /**

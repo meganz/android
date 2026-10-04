@@ -46,6 +46,8 @@ dependencies {
     implementation(project(":resources:string-resources"))
     implementation(project(":shared:contact"))
     implementation(project(":shared:account"))
+    implementation(project(":shared:nodes"))
+    implementation(project(":shared:transfers"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))
 

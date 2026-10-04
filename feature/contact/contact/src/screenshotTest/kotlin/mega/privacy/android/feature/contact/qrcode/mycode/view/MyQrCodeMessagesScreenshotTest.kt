@@ -26,7 +26,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * - R.string.contacts_qr_reset_error → [MyQrCodeResetErrorSnackbar].
  * - R.string.contacts_qr_delete_error → [MyQrCodeDeleteErrorSnackbar].
  * - R.string.contacts_qr_save_success → [MyQrCodeSaveSuccessSnackbar].
- * - R.string.contacts_qr_reset_action, R.string.contacts_qr_delete_action → [MyQrCodeMenuActions].
+ * - R.string.general_save_to_cloud_drive, R.string.contacts_qr_reset_action,
+ *   R.string.contacts_qr_delete_action → [MyQrCodeMenuActions].
  */
 class MyQrCodeMessagesScreenshotTest {
 
@@ -88,6 +89,10 @@ class MyQrCodeMessagesScreenshotTest {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                MegaText(
+                    text = stringResource(sharedR.string.general_save_to_cloud_drive),
+                    textColor = TextColor.Primary,
+                )
                 MegaText(
                     text = stringResource(sharedR.string.contacts_qr_reset_action),
                     textColor = TextColor.Primary,

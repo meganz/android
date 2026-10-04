@@ -12,7 +12,7 @@ sealed interface MyQrCodeMessage {
     data object ContactLinkCopied : MyQrCodeMessage
 
     /**
-     * The QR code could not be saved to the device.
+     * The QR code could not be saved to the device or to the Cloud drive.
      */
     data object SaveError : MyQrCodeMessage
 

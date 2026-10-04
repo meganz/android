@@ -65,6 +65,7 @@ class MyQrCodeViewModelTest {
     private val myQrCodeErrorMapper = mock<MyQrCodeErrorMapper>()
 
     private val initialContactLink = "https://contact_link1"
+    private val qrFilePath = "/test/qr.png"
 
     @BeforeEach
     fun setUp() {
@@ -413,6 +414,72 @@ class MyQrCodeViewModelTest {
     }
 
     @Test
+    fun `test that saveToCloudDrive emits the upload event with the QR file path when the QR file exists`() =
+        runTest {
+            stubQRCodeCreation()
+
+            underTest.uiState.test {
+                awaitAvailableState()
+                underTest.saveToCloudDrive()
+                assertThat(awaitUploadQrCodeEvent()).isEqualTo(UriPath(qrFilePath))
+            }
+        }
+
+    @Test
+    fun `test that saveToCloudDrive emits SaveError when the QR file is null`() = runTest {
+        stubQRCodeCreation()
+        whenever(getQRCodeFileUseCase()).thenReturn(null)
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.saveToCloudDrive()
+            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+        }
+    }
+
+    @Test
+    fun `test that saveToCloudDrive emits SaveError when the QR file does not exist`() = runTest {
+        stubQRCodeCreation()
+        val missingFile = mock<File> { on { exists() } doReturn false }
+        whenever(getQRCodeFileUseCase()).thenReturn(missingFile)
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.saveToCloudDrive()
+            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+        }
+    }
+
+    @Test
+    fun `test that saveToCloudDrive emits SaveError when resolving the QR file fails`() = runTest {
+        stubQRCodeCreation()
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            whenever(getQRCodeFileUseCase()).thenAnswer { throw RuntimeException() }
+            underTest.saveToCloudDrive()
+            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+        }
+    }
+
+    @Test
+    fun `test that onUploadQrCodeEventConsumed clears the event`() = runTest {
+        stubQRCodeCreation()
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.saveToCloudDrive()
+            awaitUploadQrCodeEvent()
+            underTest.onUploadQrCodeEventConsumed()
+            val state = awaitState {
+                it is MyQrCodeUiState.QRCodeAvailable &&
+                        it.uploadQrCodeEvent !is StateEventWithContentTriggered
+            } as MyQrCodeUiState.QRCodeAvailable
+            assertThat(state.uploadQrCodeEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
     fun `test that onMessageConsumed clears the message`() = runTest {
         stubQRCodeCreation()
 
@@ -431,7 +498,10 @@ class MyQrCodeViewModelTest {
             on { exists() } doReturn true
             on { length() } doReturn 100L
         }
-        val qrFile = mock<File> { on { absolutePath } doReturn "/test/qr.png" }
+        val qrFile = mock<File> {
+            on { exists() } doReturn true
+            on { absolutePath } doReturn qrFilePath
+        }
 
         whenever(createContactLinkUseCase(renew = false)).thenReturn(initialContactLink)
         whenever(getUserFullNameUseCase(any())).thenReturn("FullName")
@@ -488,6 +558,13 @@ class MyQrCodeViewModelTest {
     private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitMessage(): MyQrCodeMessage =
         (awaitState { it.message is StateEventWithContentTriggered }
             .message as StateEventWithContentTriggered).content
+
+    private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitUploadQrCodeEvent(): UriPath =
+        ((awaitState {
+            it is MyQrCodeUiState.QRCodeAvailable &&
+                    it.uploadQrCodeEvent is StateEventWithContentTriggered
+        } as MyQrCodeUiState.QRCodeAvailable).uploadQrCodeEvent as StateEventWithContentTriggered)
+            .content
 
     private suspend fun ReceiveTurbine<MyQrCodeUiState>.awaitState(
         predicate: (MyQrCodeUiState) -> Boolean,

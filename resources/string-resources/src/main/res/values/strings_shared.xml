@@ -1263,6 +1263,8 @@
     <string name="audio_playback_position_dialog_restart_button">Restart</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
     <string name="general_save_to_device">Download</string>
+    <!-- General button text to save selected items to cloud drive -->
+    <string name="general_save_to_cloud_drive">Save to Cloud drive</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Hide</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
