@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +24,7 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.tabs.MegaFixedTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
-import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -36,11 +38,12 @@ import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Stateless contact requests screen: a top bar, two tabs (Received / Sent), a list of request rows
- * per tab, empty states, and a per-request actions bottom sheet. All behaviour is hoisted; the
- * screen performs no domain work.
+ * Stateless contact requests screen: a searchable top bar, two tabs (Received / Sent), a list of
+ * request rows per tab, empty states, and a per-request actions bottom sheet. All behaviour is
+ * hoisted; the screen performs no domain work.
  *
  * @param state UI state to render.
+ * @param onSearchQueryChange Invoked with the search text, or null once search is cleared.
  * @param onTabSelected Invoked when the user selects a tab.
  * @param onItemAction Invoked when a bottom-sheet action is picked for a request.
  * @param onBack Invoked when the user navigates back.
@@ -50,21 +53,44 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 fun ContactRequestsScreen(
     state: ContactRequestsUiState,
+    onSearchQueryChange: (String?) -> Unit,
     onTabSelected: (ContactRequestTab) -> Unit,
     onItemAction: (ContactRequestUiItem, ContactRequestAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var searchActive by rememberSaveable { mutableStateOf(false) }
+    var searchText by rememberSaveable { mutableStateOf("") }
     var selectedRequestForSheet by remember { mutableStateOf<ContactRequestUiItem?>(null) }
+
+    // The saved search text outlives the ViewModel across process death, so hand it back.
+    LaunchedEffect(Unit) {
+        if (searchActive && searchText.isNotBlank()) onSearchQueryChange(searchText)
+    }
+
+    LaunchedEffect(searchActive) {
+        if (!searchActive && searchText.isNotEmpty()) {
+            searchText = ""
+            onSearchQueryChange(null)
+        }
+    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
             .fillMaxSize()
             .testTag(CONTACT_REQUESTS_SCREEN_TAG),
         topBar = {
-            MegaTopAppBar(
+            MegaSearchTopAppBar(
                 title = stringResource(sharedR.string.contacts_section_requests),
                 navigationType = AppBarNavigationType.Back(onBack),
+                query = searchText,
+                isSearchingMode = searchActive,
+                onQueryChanged = {
+                    searchText = it
+                    onSearchQueryChange(it.ifBlank { null })
+                },
+                onSearchingModeChanged = { searchActive = it },
+                searchPlaceholder = stringResource(sharedR.string.contacts_search_hint),
             )
         },
     ) { padding ->
@@ -96,6 +122,7 @@ fun ContactRequestsScreen(
                     ContactRequestsListContent(
                         tab = tab,
                         requests = requests,
+                        isSearching = state.query != null,
                         contentPadding = PaddingValues(),
                         onItemClick = { selectedRequestForSheet = it },
                     )
@@ -125,6 +152,7 @@ private fun ContactRequestsScreenPreview(
     AndroidThemeForPreviews {
         ContactRequestsScreen(
             state = state,
+            onSearchQueryChange = {},
             onTabSelected = {},
             onItemAction = { _, _ -> },
             onBack = {},
@@ -140,11 +168,13 @@ private class ContactRequestsUiStateProvider :
             received = previewRequests(isOutgoing = false),
             sent = previewRequests(isOutgoing = true),
             selectedTab = ContactRequestTab.Received,
+            query = null,
         ),
         ContactRequestsUiState.Data(
             received = persistentListOf(),
             sent = persistentListOf(),
             selectedTab = ContactRequestTab.Sent,
+            query = null,
         ),
     )
 }

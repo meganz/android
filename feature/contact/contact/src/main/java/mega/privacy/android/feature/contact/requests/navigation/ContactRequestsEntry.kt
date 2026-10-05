@@ -37,6 +37,7 @@ fun ContactRequestsEntry(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     ContactRequestsScreen(
         state = state,
+        onSearchQueryChange = viewModel::setQuery,
         onTabSelected = viewModel::selectTab,
         onItemAction = viewModel::handleAction,
         onBack = { navigationHandler.back() },

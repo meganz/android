@@ -18,6 +18,8 @@ import mega.privacy.android.shared.contact.components.ContactItemView
  *
  * @param tab The tab whose content is being rendered; drives the empty-state variant.
  * @param requests The requests to render for this tab.
+ * @param isSearching Whether a search query is filtering [requests]; the tab's empty state
+ * describes having no requests at all, so it is suppressed while a filter is active.
  * @param contentPadding Padding applied to the list content.
  * @param onItemClick Invoked when a request row is tapped.
  * @param modifier
@@ -26,17 +28,20 @@ import mega.privacy.android.shared.contact.components.ContactItemView
 internal fun ContactRequestsListContent(
     tab: ContactRequestTab,
     requests: ImmutableList<ContactRequestUiItem>,
+    isSearching: Boolean,
     contentPadding: PaddingValues,
     onItemClick: (ContactRequestUiItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (requests.isEmpty()) {
-        ContactRequestsEmptyView(
-            tab = tab,
-            modifier = modifier
-                .fillMaxSize()
-                .testTag(CONTACT_REQUESTS_EMPTY_TAG),
-        )
+        if (!isSearching) {
+            ContactRequestsEmptyView(
+                tab = tab,
+                modifier = modifier
+                    .fillMaxSize()
+                    .testTag(CONTACT_REQUESTS_EMPTY_TAG),
+            )
+        }
         return
     }
 

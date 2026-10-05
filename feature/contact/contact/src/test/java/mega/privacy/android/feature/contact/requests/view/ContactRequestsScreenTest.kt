@@ -2,14 +2,22 @@ package mega.privacy.android.feature.contact.requests.view
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.ImmutableList
@@ -157,8 +165,70 @@ class ContactRequestsScreenTest {
         assertThat(action).isEqualTo(ContactRequestAction.Delete)
     }
 
+    @Test
+    fun `test that search action toggles into search mode`() {
+        setScreen(dataState())
+        composeTestRule.onNode(searchActionMatcher).performClick()
+        composeTestRule.onNodeWithContentDescription("Navigation Icon").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that typing in search input fires onSearchQueryChange with text`() {
+        var lastQuery: String? = null
+        setScreen(dataState(), onSearchQueryChange = { lastQuery = it })
+
+        composeTestRule.onNode(searchActionMatcher).performClick()
+        composeTestRule.onNode(hasSetTextAction()).performTextInput("ali")
+
+        assertThat(lastQuery).isEqualTo("ali")
+    }
+
+    @Test
+    fun `test that state restoration re-sends the saved search text to onSearchQueryChange`() {
+        val queries = mutableListOf<String?>()
+        val restorationTester = StateRestorationTester(composeTestRule)
+        restorationTester.setContent {
+            ContactRequestsScreen(
+                state = dataState(),
+                onSearchQueryChange = { queries += it },
+                onTabSelected = {},
+                onItemAction = { _, _ -> },
+                onBack = {},
+            )
+        }
+        composeTestRule.onNode(searchActionMatcher).performClick()
+        composeTestRule.onNode(hasSetTextAction()).performTextInput("ali")
+        queries.clear()
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        assertThat(queries).containsExactly("ali")
+    }
+
+    @Test
+    fun `test that empty state is hidden when a query filters out every request`() {
+        setScreen(
+            dataState(
+                received = persistentListOf(),
+                selectedTab = ContactRequestTab.Received,
+                query = "nobody",
+            )
+        )
+        composeTestRule.onNodeWithTag(CONTACT_REQUESTS_EMPTY_TAG).assertDoesNotExist()
+    }
+
+    /**
+     * Matches the search action icon button in [mega.android.core.ui.components.toolbar.MegaSearchTopAppBar].
+     * Both the action button and the search field's leading icon carry the "Search" content
+     * description, so the [Role.Button] is used to single out the clickable action.
+     */
+    private val searchActionMatcher =
+        hasContentDescription("Search") and
+                SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button)
+
     private fun setScreen(
         state: ContactRequestsUiState,
+        onSearchQueryChange: (String?) -> Unit = {},
         onTabSelected: (ContactRequestTab) -> Unit = {},
         onItemAction: (ContactRequestUiItem, ContactRequestAction) -> Unit = { _, _ -> },
         onBack: () -> Unit = {},
@@ -166,6 +236,7 @@ class ContactRequestsScreenTest {
         composeTestRule.setContent {
             ContactRequestsScreen(
                 state = state,
+                onSearchQueryChange = onSearchQueryChange,
                 onTabSelected = onTabSelected,
                 onItemAction = onItemAction,
                 onBack = onBack,
@@ -177,10 +248,12 @@ class ContactRequestsScreenTest {
         received: ImmutableList<ContactRequestUiItem> = persistentListOf(),
         sent: ImmutableList<ContactRequestUiItem> = persistentListOf(),
         selectedTab: ContactRequestTab = ContactRequestTab.Received,
+        query: String? = null,
     ) = ContactRequestsUiState.Data(
         received = received,
         sent = sent,
         selectedTab = selectedTab,
+        query = query,
     )
 
     private fun requests(
