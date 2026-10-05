@@ -107,16 +107,34 @@ class ChatLastMessageFormatterTest {
         }
 
     @Test
-    fun `test that invoke returns the no history preview when a normal message has blank content`() =
+    fun `test that invoke returns only the sender prefix when the current user's normal message is blank`() =
         runTest {
             whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
                 chatId = CHAT_ID,
                 lastMessage = "   ",
                 lastMessageType = ChatRoomLastMessage.Normal,
+                lastMessageSender = MY_HANDLE,
             )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMyFullNameUseCase()) doReturn "My Name"
 
-            assertThat(underTest(CHAT_ID))
-                .isEqualTo(context.getString(sharedR.string.chat_last_message_no_history))
+            assertThat(underTest(CHAT_ID)).isEqualTo("My Name:")
+        }
+
+    @Test
+    fun `test that invoke returns only the sender prefix when another participant's normal message is blank`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "",
+                lastMessageType = ChatRoomLastMessage.Normal,
+                lastMessageSender = SENDER_HANDLE,
+                isGroup = true,
+            )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+
+            assertThat(underTest(CHAT_ID)).isEqualTo("Alice:")
         }
 
     @Test
@@ -667,6 +685,34 @@ class ChatLastMessageFormatterTest {
             context.getString(sharedR.string.history_cleared_by, "My Name")
         )
     }
+
+    @Test
+    fun `test that invoke strips format markers from a truncate message from the current user`() =
+        runTest {
+            val markedUpContext = mock<Context> {
+                on { getString(sharedR.string.history_cleared_by, "My Name") } doReturn
+                    "[A]My Name[/A][B] cleared the chat history[/B]"
+            }
+            stubManagementMessage(
+                type = ChatRoomLastMessage.Truncate,
+                message = managementMessage(userHandle = MY_HANDLE),
+            )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMyFullNameUseCase()) doReturn "My Name"
+
+            val result = ChatLastMessageFormatter(
+                context = markedUpContext,
+                getChatListItemUseCase = getChatListItemUseCase,
+                getChatMessageUseCase = getChatMessageUseCase,
+                getMessageSenderNameUseCase = getMessageSenderNameUseCase,
+                getMyUserHandleUseCase = getMyUserHandleUseCase,
+                getMyFullNameUseCase = getMyFullNameUseCase,
+                getChatRoomUseCase = getChatRoomUseCase,
+                emojiShortcodeConverter = emojiShortcodeConverter,
+            )(CHAT_ID)
+
+            assertThat(result).isEqualTo("My Name cleared the chat history")
+        }
 
     @Test
     fun `test that invoke formats a retention time change`() = runTest {
