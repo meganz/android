@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.AccountType
 import javax.inject.Inject
 
 /**
- * Get subscription options filtered to subscription options available for purchase in the app, e.g. Pro I, Pro II or Pro III plans
+ * Get subscription options filtered to subscription options available for purchase in the app, i.e. every plan except Business, Pro Flexi and unknown plans
  */
 class GetAppSubscriptionOptionsUseCase @Inject constructor(
     private val getSubscriptionOptionsUseCase: GetSubscriptionOptionsUseCase
@@ -19,9 +19,6 @@ class GetAppSubscriptionOptionsUseCase @Inject constructor(
         getSubscriptionOptionsUseCase().filter { plan ->
             plan.accountType !== AccountType.BUSINESS &&
                     plan.accountType !== AccountType.PRO_FLEXI &&
-                    plan.accountType !== AccountType.STARTER &&
-                    plan.accountType !== AccountType.BASIC &&
-                    plan.accountType !== AccountType.ESSENTIAL &&
                     plan.accountType !== AccountType.UNKNOWN &&
                     plan.months == months
         }

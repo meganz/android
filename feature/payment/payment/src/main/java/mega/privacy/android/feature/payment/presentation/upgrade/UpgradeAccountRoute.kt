@@ -32,6 +32,7 @@ fun UpgradeAccountRoute(
     isUpgradeAccount: Boolean,
     openFromSource: UpgradeAccountSource,
     onBack: () -> Unit = {},
+    onPurchaseCompleted: () -> Unit = onBack,
     chooseAccountViewModel: UpgradeAccountViewModel = hiltViewModel<UpgradeAccountViewModel, UpgradeAccountViewModel.Factory> { factory ->
         factory.create(isUpgradeAccount = isUpgradeAccount)
     },
@@ -60,13 +61,11 @@ fun UpgradeAccountRoute(
     LaunchedEffect(Unit) {
         billingViewModel.billingUpdateEvent.collect {
             if (it is BillingEvent.OnPurchaseUpdate) {
-                activity?.let { activity ->
-                    onPurchasesUpdated(
-                        activity = activity,
-                        isUpgradeAccount = isUpgradeAccount,
-                        openFromSource = openFromSource,
-                    )
-                }
+                onPurchasesUpdated(
+                    isUpgradeAccount = isUpgradeAccount,
+                    openFromSource = openFromSource,
+                    onPurchaseCompleted = onPurchaseCompleted,
+                )
                 billingViewModel.markHandleBillingEvent()
             }
         }
@@ -176,17 +175,12 @@ private fun onFreeClick(
     }
 }
 
-private fun onPurchasesUpdated(
-    activity: Activity,
+internal fun onPurchasesUpdated(
     isUpgradeAccount: Boolean,
     openFromSource: UpgradeAccountSource,
+    onPurchaseCompleted: () -> Unit,
 ) {
-    if (isUpgradeAccount) {
-        if (openFromSource == UpgradeAccountSource.MY_ACCOUNT_SCREEN) {
-            activity.finish()
-        }
-        // other cases stay in the same activity
-    } else {
-        activity.finish()
+    if (!isUpgradeAccount || openFromSource == UpgradeAccountSource.MY_ACCOUNT_SCREEN) {
+        onPurchaseCompleted()
     }
 }

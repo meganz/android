@@ -28,6 +28,7 @@ fun EntryProviderScope<NavKey>.upgradeScreens(
             isUpgradeAccount = key.isUpgrade,
             openFromSource = key.source,
             onBack = navigationHandler::back,
+            onPurchaseCompleted = { navigationHandler.remove(key) },
         )
     }
 

@@ -115,6 +115,30 @@ class GetAppSubscriptionOptionsUseCaseTest {
         hasOffer = false,
     )
 
+    private val subscriptionPlanEssentialMonthly = SubscriptionOption(
+        sku = "essential_monthly",
+        handle = 1234567890123456789,
+        accountType = AccountType.ESSENTIAL,
+        months = 1,
+        storage = 200,
+        transfer = 2400,
+        amount = CurrencyPoint.SystemCurrencyPoint(399.toLong()),
+        currency = Currency("EUR"),
+        hasOffer = false,
+    )
+
+    private val subscriptionPlanEssentialYearly = SubscriptionOption(
+        sku = "essential_yearly",
+        handle = 1234567890123456790,
+        accountType = AccountType.ESSENTIAL,
+        months = 12,
+        storage = 200,
+        transfer = 28800,
+        amount = CurrencyPoint.SystemCurrencyPoint(3999.toLong()),
+        currency = Currency("EUR"),
+        hasOffer = false,
+    )
+
     private val subscriptionPlanBusiness = SubscriptionOption(
         sku = "business_monthly",
         handle = 7472683699866478542,
@@ -152,6 +176,8 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val fullListOfSubscriptionOptions = listOf(
+        subscriptionPlanEssentialMonthly,
+        subscriptionPlanEssentialYearly,
         subscriptionPlanProLiteMonthly,
         subscriptionPlanProLiteYearly,
         subscriptionPlanProIMonthly,
@@ -166,6 +192,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val expectedMonthlyResult = listOf(
+        subscriptionPlanEssentialMonthly,
         subscriptionPlanProLiteMonthly,
         subscriptionPlanProIMonthly,
         subscriptionPlanProIIMonthly,
@@ -173,6 +200,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val expectedYearlyResult = listOf(
+        subscriptionPlanEssentialYearly,
         subscriptionPlanProLiteYearly,
         subscriptionPlanProIYearly,
         subscriptionPlanProIIYearly,
