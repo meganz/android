@@ -141,6 +141,27 @@ class MonitorTransferEventsToStartWorkersIfNeededUseCaseTest {
         verify(type, 0)
     }
 
+    @ParameterizedTest
+    @EnumSource(TransferType::class, names = ["DOWNLOAD", "GENERAL_UPLOAD"])
+    fun `test that sync transfer events do not start workers`(
+        type: TransferType,
+    ) = runTest {
+        val transferEvent = TransferEvent.TransferUpdateEvent(
+            mock<Transfer> {
+                on { transferType } doReturn type
+                on { isSyncTransfer } doReturn true
+            }
+        )
+        whenever(monitorIsWorkerFinished(type)) doReturn flowOf(true)
+        whenever(monitorTransferEventsUseCase()).thenReturn(
+            flowOf(transferEvent)
+        )
+        underTest().test {
+            awaitComplete()
+        }
+        verify(type, 0)
+    }
+
     private fun monitorIsWorkerFinished(transferType: TransferType) = when (transferType) {
         TransferType.DOWNLOAD -> transferRepository.monitorIsDownloadsWorkerFinished()
         TransferType.GENERAL_UPLOAD -> transferRepository.monitorIsUploadsWorkerFinished()

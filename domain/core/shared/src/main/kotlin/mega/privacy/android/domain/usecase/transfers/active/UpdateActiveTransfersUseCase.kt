@@ -10,7 +10,7 @@ import javax.inject.Inject
 /**
  * Use case to update active transfers.
  * Active transfers are only stored in memory, so after app re-start they need to be synced with:
- *  - SDK for in progress transfers
+ *  - SDK for in progress transfers, except sync and backup ones, which the sync engine owns
  *  - Data base for completed transfers of active transfer groups (user actions)
  */
 class UpdateActiveTransfersUseCase @Inject constructor(
@@ -19,10 +19,11 @@ class UpdateActiveTransfersUseCase @Inject constructor(
 ) {
     /**
      * invoke
-     * @return true if transfers have been added from SDK in progress transfers
+     * @return true if non-sync, non-backup transfers have been added from SDK in progress transfers
      */
     suspend operator fun invoke(): Boolean {
         val inProgressTransfers: List<Transfer> = getInProgressTransfersFromSdkUseCase()
+            .filterNot { it.isSyncTransfer || it.isBackupTransfer }
         val completedTransfers: List<CompletedTransfer> = transferRepository.getCompletedTransfers()
         val transferGroupIds =
             transferRepository.getActiveTransferGroups().mapNotNull { it.groupId?.toLong() }

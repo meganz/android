@@ -13,9 +13,11 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -167,4 +169,54 @@ class UpdateActiveTransfersUseCaseTest {
                 }
             )
         }
+
+    @Test
+    fun `test that invoke does not put sync transfers as active transfers`() = runTest {
+        val normalTransfer = mock<Transfer> {
+            on { uniqueId } doReturn 1L
+        }
+        val syncTransfer = mock<Transfer> {
+            on { uniqueId } doReturn 0L
+            on { isSyncTransfer } doReturn true
+        }
+        whenever(getInProgressTransfersFromSdkUseCase())
+            .thenReturn(listOf(normalTransfer, syncTransfer))
+
+        underTest()
+
+        verify(transferRepository).putActiveTransfers(argThat { this == listOf(normalTransfer) })
+    }
+
+    @Test
+    fun `test that invoke does not put backup transfers as active transfers`() = runTest {
+        val normalTransfer = mock<Transfer> {
+            on { uniqueId } doReturn 1L
+        }
+        val backupTransfer = mock<Transfer> {
+            on { uniqueId } doReturn 0L
+            on { isBackupTransfer } doReturn true
+        }
+        whenever(getInProgressTransfersFromSdkUseCase())
+            .thenReturn(listOf(normalTransfer, backupTransfer))
+
+        underTest()
+
+        verify(transferRepository).putActiveTransfers(argThat { this == listOf(normalTransfer) })
+    }
+
+    @Test
+    fun `test that invoke returns false when only sync transfers are in progress`() = runTest {
+        val syncTransfers = (1..2).map {
+            mock<Transfer> {
+                on { uniqueId } doReturn 0L
+                on { isSyncTransfer } doReturn true
+            }
+        }
+        whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(syncTransfers)
+
+        val actual = underTest()
+
+        assertThat(actual).isFalse()
+        verify(transferRepository, never()).putActiveTransfers(any())
+    }
 }
