@@ -22,11 +22,17 @@ sealed interface VideoPlayerUiState {
  * rejected rather than resolved.
      * @property launchSourceType Where the player was launched from, which decides how the queue
      * around [currentPlayingHandle] is built.
+     * @property videoWidth Width of the video as the player reports it, `0` until a frame has been
+     * decoded. Together with [videoHeight] it is what the picture is laid out to.
+     * @property videoHeight Height of the video as the player reports it, `0` until a frame has
+     * been decoded.
      */
     data class Data(
         val currentPlayingHandle: Long,
         val currentPlayingItemName: String,
         val launchSourceType: VideoPlayerLaunchSourceType,
+        val videoWidth: Int,
+        val videoHeight: Int,
     ) : VideoPlayerUiState
 
     /**

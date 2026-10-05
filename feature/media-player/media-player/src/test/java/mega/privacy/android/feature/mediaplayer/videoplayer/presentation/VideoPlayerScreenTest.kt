@@ -1,0 +1,117 @@
+package mega.privacy.android.feature.mediaplayer.videoplayer.presentation
+
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSourceType
+import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerUiState
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
+
+@Config(sdk = [34])
+@RunWith(AndroidJUnit4::class)
+class VideoPlayerScreenTest {
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private fun data(videoWidth: Int, videoHeight: Int) = VideoPlayerUiState.Data(
+        currentPlayingHandle = 1L,
+        currentPlayingItemName = "video.mp4",
+        launchSourceType = VideoPlayerLaunchSourceType.VideoBrowse,
+        videoWidth = videoWidth,
+        videoHeight = videoHeight,
+    )
+
+    /**
+     * Rendered inside a fixed box rather than the whole screen, so the bounds the picture is laid
+     * out to are a known number instead of whatever the test device reports.
+     */
+    private fun setScreen(uiState: VideoPlayerUiState) {
+        composeTestRule.setContent {
+            Box(modifier = Modifier.size(CONTAINER_WIDTH, CONTAINER_HEIGHT)) {
+                VideoPlayerScreen(
+                    uiState = uiState,
+                    onSurfaceReady = {},
+                    onSurfaceReleased = {},
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `test that no picture is shown while the launch is being resolved`() {
+        setScreen(VideoPlayerUiState.Loading)
+
+        composeTestRule.onNodeWithTag(VIDEO_SURFACE_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that no picture is shown when the launch source is unusable`() {
+        setScreen(VideoPlayerUiState.InvalidLaunchSource)
+
+        composeTestRule.onNodeWithTag(VIDEO_SURFACE_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the picture fills the container before the video size is known`() {
+        setScreen(data(videoWidth = 0, videoHeight = 0))
+
+        val bounds = composeTestRule.onNodeWithTag(VIDEO_SURFACE_TEST_TAG)
+            .assertIsDisplayed()
+            .getBoundsInRoot()
+
+        assertThat((bounds.right.value - bounds.left.value)).isWithin(TOLERANCE).of(CONTAINER_WIDTH.value)
+        assertThat((bounds.bottom.value - bounds.top.value)).isWithin(TOLERANCE).of(CONTAINER_HEIGHT.value)
+    }
+
+    @Test
+    fun `test that the picture is laid out to the video aspect ratio`() {
+        // 16:9 inside a 4:3 container: the width is taken and the height derived, which is what
+        // letterboxing a landscape video looks like.
+        setScreen(data(videoWidth = 1920, videoHeight = 1080))
+
+        val bounds = composeTestRule.onNodeWithTag(VIDEO_SURFACE_TEST_TAG)
+            .assertIsDisplayed()
+            .getBoundsInRoot()
+
+        assertThat((bounds.right.value - bounds.left.value)).isWithin(TOLERANCE).of(CONTAINER_WIDTH.value)
+        assertThat((bounds.bottom.value - bounds.top.value)).isWithin(TOLERANCE).of(CONTAINER_WIDTH.value * 1080f / 1920f)
+    }
+
+    @Test
+    fun `test that a portrait video is laid out to the container height`() {
+        // 9:16 inside a 4:3 container: taking the width would overflow, so the height is taken
+        // instead and the width derived.
+        setScreen(data(videoWidth = 1080, videoHeight = 1920))
+
+        val bounds = composeTestRule.onNodeWithTag(VIDEO_SURFACE_TEST_TAG)
+            .assertIsDisplayed()
+            .getBoundsInRoot()
+
+        assertThat((bounds.bottom.value - bounds.top.value)).isWithin(TOLERANCE).of(CONTAINER_HEIGHT.value)
+        assertThat((bounds.right.value - bounds.left.value))
+            .isWithin(TOLERANCE).of(CONTAINER_HEIGHT.value * 1080f / 1920f)
+    }
+
+    private companion object {
+        /**
+         * 4:3, and small enough to fit the default Robolectric screen — a container wider than
+         * the screen is clipped by the root constraints and the measured bounds stop matching
+         * what was asked for.
+         */
+        val CONTAINER_WIDTH = 240.dp
+        val CONTAINER_HEIGHT = 180.dp
+        const val TOLERANCE = 1f
+    }
+}

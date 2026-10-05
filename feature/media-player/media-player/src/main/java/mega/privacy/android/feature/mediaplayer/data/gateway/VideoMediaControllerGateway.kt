@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.mediaplayer.data.gateway
 
+import android.net.Uri
 import android.view.TextureView
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -44,6 +45,18 @@ interface VideoMediaControllerGateway {
      * two players consume each other's events.
      */
     val events: Flow<VideoPlaybackEvent>
+
+    /**
+     * Replaces whatever the player holds with the single item at [uri], identified by [mediaId],
+     * and prepares it. Does not start playback — the caller decides that with [play].
+     *
+     * Takes one item rather than a list because nothing builds a queue yet. A `MediaController`
+     * accepts media items exactly as an `ExoPlayer` does, so this signature survives the swap.
+     *
+     * @param mediaId identifies the item in player callbacks, which is how a transition is matched
+     * back to the node it belongs to.
+     */
+    fun setPlaySource(uri: Uri, mediaId: String)
 
     /** Resumes or starts playback. */
     fun play()

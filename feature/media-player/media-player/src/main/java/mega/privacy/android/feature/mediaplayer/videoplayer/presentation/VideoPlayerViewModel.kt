@@ -1,14 +1,21 @@
 package mega.privacy.android.feature.mediaplayer.videoplayer.presentation
 
+import android.view.TextureView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
+import mega.privacy.android.feature.mediaplayer.data.gateway.VideoMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.videoplayer.navigation.VideoPlayerLaunchSourceHolder
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSource
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSourceType
@@ -27,12 +34,17 @@ import timber.log.Timber
 internal class VideoPlayerViewModel @AssistedInject constructor(
     @Assisted private val launchId: String,
     private val launchSourceHolder: VideoPlayerLaunchSourceHolder,
+    private val gateway: VideoMediaControllerGateway,
+    private val httpServerStopUseCase: HttpServerStopUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     @AssistedFactory
     interface Factory {
         fun create(launchId: String): VideoPlayerViewModel
     }
+
+    private var hasStartedPlayback = false
 
     /**
      * What the player was asked to play, read from the holder exactly once.
@@ -50,9 +62,37 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
         launchSourceHolder.consume(launchId)
     }
 
+    /**
+     * Whether the launch describes something playable, decided once.
+     *
+     * Separate from [uiState] because playback has to consult the same decision before the state
+     * flow has emitted anything: until then [uiState] still reads as [VideoPlayerUiState.Loading],
+     * and gating on that would mean the player only ever starts because the screen happens to
+     * render the surface after the first emission.
+     */
+    private val resolvedState: VideoPlayerUiState by lazy(LazyThreadSafetyMode.NONE) {
+        launchSource.toUiState()
+    }
+
+    /**
+     * The launch is resolved once; everything after it tracks the player.
+     *
+     * Only a usable launch follows the player state — a rejected one is terminal, so collecting
+     * the player would keep a flow alive for a screen that is already closing.
+     */
     val uiState: StateFlow<VideoPlayerUiState> by lazy(LazyThreadSafetyMode.NONE) {
-        flowOf(launchSource.toUiState())
-            .asUiStateFlow(viewModelScope, VideoPlayerUiState.Loading)
+        val resolved = resolvedState
+        val state = if (resolved is VideoPlayerUiState.Data) {
+            gateway.playerState.map { player ->
+                resolved.copy(
+                    videoWidth = player.videoWidth,
+                    videoHeight = player.videoHeight,
+                )
+            }
+        } else {
+            flowOf(resolved)
+        }
+        state.asUiStateFlow(viewModelScope, VideoPlayerUiState.Loading)
     }
 
     /**
@@ -83,6 +123,8 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
                 currentPlayingHandle = source.handle,
                 currentPlayingItemName = source.fileName,
                 launchSourceType = source.sourceType,
+                videoWidth = 0,
+                videoHeight = 0,
             )
         }
     }
@@ -94,5 +136,69 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
     private fun reject(reason: String): VideoPlayerUiState {
         Timber.w("Video player launch rejected: $reason")
         return VideoPlayerUiState.InvalidLaunchSource
+    }
+
+    /**
+     * Renders into [textureView], and starts playback the first time one exists.
+     *
+     * Playback starts from here rather than from construction because there is nothing to watch
+     * until the picture has somewhere to go, and because the launch source is read on first use.
+     * A surface arriving again — a configuration change recreates it — re-attaches to the player
+     * that is already running instead of loading the video a second time.
+     */
+    fun onSurfaceReady(textureView: TextureView) {
+        gateway.attachSurface(textureView)
+        if (hasStartedPlayback) return
+
+        // Gated on the resolved decision rather than on the launch source, so that whether a
+        // launch is playable is decided in exactly one place. Re-deriving it here would start
+        // playback for a launch already rejected — an invalid handle, say, still carries a
+        // content URI.
+        if (resolvedState !is VideoPlayerUiState.Data) return
+        val source = launchSource ?: return
+        val uri = source.contentUri ?: return
+
+        // Latched only once the player has accepted the item, so a failure leaves the next
+        // surface free to try again rather than stranding the screen on black for good.
+        runCatching {
+            gateway.setPlaySource(uri, source.handle.toString())
+            gateway.play()
+        }
+            .onSuccess { hasStartedPlayback = true }
+            .onFailure { Timber.e(it, "Failed to start video playback") }
+    }
+
+    /** Stops rendering into the surface that is going away; playback itself continues. */
+    fun onSurfaceReleased() {
+        gateway.clearSurface()
+    }
+
+    /**
+     * The gateway is bound without a scope, so this ViewModel owns one player of its own and is
+     * the only thing that can release it.
+     *
+     * The streaming server goes down here too when the launch handed its ownership over. Whoever
+     * resolved the content URI had to start the server to obtain it, and says so with
+     * `needStopHttpServer`; nothing else is left to stop it once the player closes.
+     */
+    override fun onCleared() {
+        // Guarded separately so that a failure to release the player cannot also leave the
+        // streaming server running for the rest of the process.
+        runCatching { gateway.release() }
+            .onFailure { Timber.e(it, "Failed to release the video player") }
+        stopStreamingServerIfOwned()
+        super.onCleared()
+    }
+
+    /**
+     * Runs on the application scope rather than [viewModelScope], which is already cancelled by
+     * the time [onCleared] is called, so the suspending stop would never run.
+     */
+    private fun stopStreamingServerIfOwned() {
+        if (launchSource?.needStopHttpServer != true) return
+        applicationScope.launch {
+            runCatching { httpServerStopUseCase() }
+                .onFailure { Timber.e(it, "Failed to stop the streaming server") }
+        }
     }
 }

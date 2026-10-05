@@ -45,6 +45,10 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             if (launchWasUnusable) navigationHandler.back()
         }
 
-        VideoPlayerScreen(uiState = uiState)
+        VideoPlayerScreen(
+            uiState = uiState,
+            onSurfaceReady = viewModel::onSurfaceReady,
+            onSurfaceReleased = viewModel::onSurfaceReleased,
+        )
     }
 }

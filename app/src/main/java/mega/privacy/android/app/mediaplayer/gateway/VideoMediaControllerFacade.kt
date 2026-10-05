@@ -1,8 +1,10 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
+import android.net.Uri
 import android.view.TextureView
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -27,7 +29,9 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.feature.mediaplayer.data.gateway.VideoMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.model.VideoControllerState
 import mega.privacy.android.feature.mediaplayer.data.model.VideoPlaybackEvent
+import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -145,6 +149,19 @@ internal class VideoMediaControllerFacade @Inject constructor(
     private fun stopPositionPolling() {
         positionPollingJob?.cancel()
         positionPollingJob = null
+    }
+
+    override fun setPlaySource(uri: Uri, mediaId: String) {
+        mediaPlayerManager.buildPlaySources(
+            MediaPlaySources(
+                mediaItems = listOf(
+                    MediaItem.Builder().setUri(uri).setMediaId(mediaId).build()
+                ),
+                newIndexForCurrentItem = INVALID_VALUE,
+                nameToDisplay = null,
+            )
+        )
+        mediaPlayerManager.playerPrepare()
     }
 
     override fun play() = mediaPlayerManager.setPlayWhenReady(true)
