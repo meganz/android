@@ -33,7 +33,7 @@ class MegaActivityNavKeyGateTest : BottomNavigationTestBase() {
     fun navKeysAimedAtExportedComponentAreIgnored() {
         val intent = Intent().apply {
             component = ComponentName(targetContext, MegaActivity::class.java.name)
-            putParcelableArrayListExtra(NAV_KEYS_EXTRA, arrayListOf(CustomiseNavigationNavKey))
+            putParcelableArrayListExtra(NAV_KEYS_EXTRA, arrayListOf(CustomiseNavigationNavKey()))
         }
 
         scenario = ActivityScenario.launch(intent)

@@ -480,7 +480,7 @@ class SettingsFragment :
                 startActivity(
                     MegaActivity.getIntentWithExtraDestinations(
                         requireContext(),
-                        listOf(CustomiseNavigationNavKey),
+                        listOf(CustomiseNavigationNavKey(returnToSettings = true)),
                     )
                 )
             }

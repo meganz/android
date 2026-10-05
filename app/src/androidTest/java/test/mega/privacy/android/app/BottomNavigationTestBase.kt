@@ -127,7 +127,9 @@ abstract class BottomNavigationTestBase {
 
     /**
      * Launches [MegaActivity] with [CustomiseNavigationNavKey] as an extra destination — the
-     * same intent the Settings screen's "Customise navigation" row fires in production.
+     * same intent the Settings screen's "Customise navigation" row fires in production, but
+     * without `returnToSettings`, so leaving the screen returns to [MegaActivity] instead of
+     * reopening the legacy Settings screen.
      *
      * The row itself cannot be driven in-process: the legacy `SettingsActivity` reads
      * `MegaApiAndroid.rootNode` directly in `BaseActivity.shouldRefreshSessionDueToSDK`
@@ -138,7 +140,7 @@ abstract class BottomNavigationTestBase {
     protected fun launchCustomiseNavigationScreen() {
         val intent = MegaActivity.getIntentWithExtraDestinations(
             targetContext,
-            listOf(CustomiseNavigationNavKey),
+            listOf(CustomiseNavigationNavKey()),
         )
         scenario = ActivityScenario.launch(intent)
         awaitObject(By.res(CUSTOMISE_SAVE_BUTTON_TAG), LAUNCH_TIMEOUT, "customise-screen")

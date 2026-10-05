@@ -222,7 +222,7 @@ class MenuHiddenSectionsTest {
         targetContext.startActivity(
             MegaActivity.getIntentWithExtraDestinations(
                 targetContext,
-                listOf(CustomiseNavigationNavKey),
+                listOf(CustomiseNavigationNavKey()),
             ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         )
 

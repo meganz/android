@@ -24,7 +24,7 @@ class MegaActivityIntentDestinationsTest {
     fun `test that getIntentWithExtraDestinations targets the internal entry component`() {
         val intent = MegaActivity.getIntentWithExtraDestinations(
             context,
-            listOf(CustomiseNavigationNavKey)
+            listOf(CustomiseNavigationNavKey())
         )
 
         assertThat(intent.component?.className).isEqualTo(INTERNAL_ENTRY_COMPONENT)
@@ -35,7 +35,7 @@ class MegaActivityIntentDestinationsTest {
     fun `test that getIntentWithExtraDestinations keeps single top and clear top flags`() {
         val intent = MegaActivity.getIntentWithExtraDestinations(
             context,
-            listOf(CustomiseNavigationNavKey)
+            listOf(CustomiseNavigationNavKey())
         )
 
         assertThat(intent.flags and Intent.FLAG_ACTIVITY_SINGLE_TOP).isNotEqualTo(0)

@@ -218,7 +218,7 @@ fun HomeScreens(
                                             currentState.initialDestination &&
                                             homeScreenStacks.backStack.size == 1,
                                     onExplore = {
-                                        outerNavigationHandler.navigate(CustomiseNavigationNavKey)
+                                        outerNavigationHandler.navigate(CustomiseNavigationNavKey())
                                     },
                                 )
                             }
