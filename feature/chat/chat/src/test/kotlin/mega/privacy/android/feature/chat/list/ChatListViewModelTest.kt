@@ -1032,6 +1032,126 @@ class ChatListViewModelTest {
         }
 
     @Test
+    fun `test that getBulkChatRoomActions labels the action unmute when the listed chat is muted only after its first emission`() =
+        runTest {
+            val unmuted = groupRoom(chatId = 1L, isMuted = false)
+            stubChatRoomsEnrichedAfterFirstEmission(listOf(unmuted))
+
+            underTest.uiState.test {
+                awaitMutedState(1L)
+
+                val actions = underTest.getBulkChatRoomActions(setOf(1L))
+
+                assertThat(actions.first { it.testTag == CHAT_ROOM_ACTIONS_MUTE_TAG }.label)
+                    .isEqualTo(sharedR.string.general_unmute)
+            }
+        }
+
+    @Test
+    fun `test that getBulkChatRoomActions labels the action unmute when every listed selected chat is muted only after its first emission`() =
+        runTest {
+            stubChatRoomsEnrichedAfterFirstEmission(
+                listOf(
+                    groupRoom(chatId = 1L, isMuted = false),
+                    groupRoom(chatId = 2L, isMuted = false),
+                ),
+            )
+
+            underTest.uiState.test {
+                awaitMutedState(1L, 2L)
+
+                val actions = underTest.getBulkChatRoomActions(setOf(1L, 2L))
+
+                assertThat(actions.first { it.testTag == CHAT_ROOM_ACTIONS_MUTE_TAG }.label)
+                    .isEqualTo(sharedR.string.general_unmute)
+            }
+        }
+
+    @Test
+    fun `test that getBulkChatRoomActions labels the action mute when only some listed selected chats are muted after their first emission`() =
+        runTest {
+            stubChatRoomsEnrichedAfterFirstEmission(
+                rooms = listOf(
+                    groupRoom(chatId = 1L, isMuted = false),
+                    groupRoom(chatId = 2L, isMuted = false),
+                ),
+                mutedChatIds = setOf(1L),
+            )
+
+            underTest.uiState.test {
+                awaitMutedState(1L)
+
+                val actions = underTest.getBulkChatRoomActions(setOf(1L, 2L))
+
+                assertThat(actions.first { it.testTag == CHAT_ROOM_ACTIONS_MUTE_TAG }.label)
+                    .isEqualTo(sharedR.string.general_mute)
+            }
+        }
+
+    @Test
+    fun `test that getBulkChatRoomActions does not request the chat rooms again when the list is loaded`() =
+        runTest {
+            stubChatRooms()
+
+            underTest.uiState.test {
+                awaitDataState()
+
+                underTest.getBulkChatRoomActions(setOf(1L))
+
+                verify(getChatsUseCase)(eq(ChatRoomType.NON_MEETINGS), any(), any(), any(), any())
+                verify(getChatsUseCase)(eq(ChatRoomType.MEETINGS), any(), any(), any(), any())
+            }
+        }
+
+    private fun groupRoom(chatId: Long, isMuted: Boolean) = ChatRoomItem.GroupChatRoomItem(
+        chatId = chatId,
+        title = "Group $chatId",
+        hasPermissions = true,
+        isActive = true,
+        isMuted = isMuted,
+    )
+
+    /**
+     * Mirrors [GetChatsUseCase], whose first emission carries the rooms before their mute state
+     * has been filled in.
+     */
+    private fun stubChatRoomsEnrichedAfterFirstEmission(
+        rooms: List<ChatRoomItem.GroupChatRoomItem>,
+        mutedChatIds: Set<Long> = rooms.map { it.chatId }.toSet(),
+    ) {
+        val enriched = rooms.map { it.copy(isMuted = it.chatId in mutedChatIds) }
+        stubHasArchivedChats(hasArchivedChats = false)
+        getChatsUseCase.stub {
+            on { invoke(eq(ChatRoomType.NON_MEETINGS), any(), any(), any(), any()) } doAnswer {
+                flow {
+                    emit(rooms)
+                    emit(enriched)
+                    awaitCancellation()
+                }
+            }
+            on { invoke(eq(ChatRoomType.MEETINGS), any(), any(), any(), any()) } doAnswer {
+                flow {
+                    emit(emptyList<ChatRoomItem>())
+                    awaitCancellation()
+                }
+            }
+        }
+        chatRoomUiItemMapper.stub {
+            (rooms + enriched).forEach { room ->
+                on { invoke(room) } doReturn chatRoomUiItem(chatId = room.chatId, title = room.title)
+                    .copy(isMuted = room.isMuted)
+            }
+        }
+    }
+
+    private suspend fun ReceiveTurbine<ChatListUiState>.awaitMutedState(vararg chatIds: Long) {
+        var state = awaitDataState()
+        while (!state.chats.items().filter { it.chatId in chatIds }.all { it.isMuted }) {
+            state = awaitDataState()
+        }
+    }
+
+    @Test
     fun `test that uiState reports archived chats when the user has some`() = runTest {
         stubChatRooms(archived = listOf(ChatRoomItem.IndividualChatRoomItem(chatId = 9L, title = "Old")))
 

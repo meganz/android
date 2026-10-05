@@ -8,6 +8,8 @@ import nz.mega.sdk.MegaPushNotificationSettings
  * Every public instance method is overridden, so no call ever reaches the native SDK
  * (which would crash the JVM given the null native pointer). Data getters are backed by
  * constructor parameters with sensible defaults; all other methods return benign constants.
+ *
+ * @param mutedChatIds Chats whose notifications start muted until they are turned back on.
  */
 class StubMegaPushNotificationSettings(
     private var globalDndEnabled: Boolean = false,
@@ -20,7 +22,10 @@ class StubMegaPushNotificationSettings(
     private var globalScheduleTimezone: String? = null,
     private var contactsEnabled: Boolean = false,
     private var sharesEnabled: Boolean = false,
+    mutedChatIds: Set<Long> = emptySet(),
 ) : MegaPushNotificationSettings(0, false) {
+
+    private val mutedChats = mutedChatIds.toMutableSet()
 
     override fun delete() = Unit
 
@@ -31,8 +36,8 @@ class StubMegaPushNotificationSettings(
     override fun getGlobalScheduleStart(): Int = globalScheduleStart
     override fun getGlobalScheduleEnd(): Int = globalScheduleEnd
     override fun getGlobalScheduleTimezone(): String? = globalScheduleTimezone
-    override fun isChatDndEnabled(p0: Long): Boolean = false
-    override fun getChatDnd(p0: Long): Long = -1L
+    override fun isChatDndEnabled(p0: Long): Boolean = p0 in mutedChats
+    override fun getChatDnd(p0: Long): Long = if (p0 in mutedChats) 0L else -1L
     override fun isChatAlwaysNotifyEnabled(p0: Long): Boolean = false
     override fun isContactsEnabled(): Boolean = contactsEnabled
     override fun isSharesEnabled(): Boolean = sharesEnabled
@@ -55,8 +60,12 @@ class StubMegaPushNotificationSettings(
     override fun disableGlobalSchedule() {
         globalScheduleEnabled = false
     }
-    override fun enableChat(p0: Long, p1: Boolean) = Unit
-    override fun setChatDnd(p0: Long, p1: Long) = Unit
+    override fun enableChat(p0: Long, p1: Boolean) {
+        if (p1) mutedChats.remove(p0) else mutedChats.add(p0)
+    }
+    override fun setChatDnd(p0: Long, p1: Long) {
+        mutedChats.add(p0)
+    }
     override fun setGlobalChatsDnd(p0: Long) {
         globalChatsDnd = p0
         globalChatsDndEnabled = true

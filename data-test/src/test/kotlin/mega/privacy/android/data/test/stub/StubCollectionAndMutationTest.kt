@@ -283,4 +283,27 @@ class StubCollectionAndMutationTest {
         assertThat(underTest.isGlobalChatsDndEnabled).isTrue()
         assertThat(underTest.globalChatsDnd).isEqualTo(50L)
     }
+
+    @Test
+    fun `test that StubMegaPushNotificationSettings reports a chat muted when it is seeded as muted`() {
+        val underTest = StubMegaPushNotificationSettings(mutedChatIds = setOf(1L))
+
+        assertThat(underTest.isChatDndEnabled(1L)).isTrue()
+        assertThat(underTest.getChatDnd(1L)).isEqualTo(0L)
+        assertThat(underTest.isChatDndEnabled(2L)).isFalse()
+        assertThat(underTest.getChatDnd(2L)).isEqualTo(-1L)
+    }
+
+    @Test
+    fun `test that StubMegaPushNotificationSettings updates chat mute state when chat methods are called`() {
+        val underTest = StubMegaPushNotificationSettings(mutedChatIds = setOf(1L))
+
+        underTest.enableChat(1L, true)
+        underTest.setChatDnd(2L, 50L)
+        underTest.enableChat(3L, false)
+
+        assertThat(underTest.isChatDndEnabled(1L)).isFalse()
+        assertThat(underTest.isChatDndEnabled(2L)).isTrue()
+        assertThat(underTest.isChatDndEnabled(3L)).isTrue()
+    }
 }
