@@ -33,6 +33,7 @@ class WebViewDeepLinkHandler @Inject constructor(
         RegexPatternType.REVERT_CHANGE_PASSWORD_LINK,
         RegexPatternType.MEGA_BLOG_LINK,
         RegexPatternType.PURCHASE_LINK,
+        RegexPatternType.AUTOPLAY_LINK,
             -> listOf(WebSiteNavKey(uri.toString()))
 
         RegexPatternType.INSTALLER_DOWNLOAD_LINK ->

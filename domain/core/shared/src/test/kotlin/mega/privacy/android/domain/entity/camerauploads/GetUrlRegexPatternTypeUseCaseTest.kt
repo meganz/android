@@ -246,6 +246,15 @@ class GetUrlRegexPatternTypeUseCaseTest {
     }
 
     @ParameterizedTest(name = "{0}: {1}")
+    @MethodSource("invalidAutoplayLinks")
+    fun `test that when url does not match autoplay link pattern, it does not return AUTOPLAY_LINK pattern type`(
+        name: String,
+        urlToCheck: String?,
+    ) {
+        assertThat(underTest(urlToCheck)).isNotEqualTo(RegexPatternType.AUTOPLAY_LINK)
+    }
+
+    @ParameterizedTest(name = "{0}: {1}")
     @MethodSource("invalidUpgradePageLinks")
     fun `test that when url does not match upgrade page link pattern, it does not return UPGRADE_PAGE_LINK pattern type`(
         name: String,
@@ -332,6 +341,46 @@ class GetUrlRegexPatternTypeUseCaseTest {
             "Folder Link",
             "https://mega.nz/folder/xMpQjZhK#Jp3KceNZRvNsqp",
             RegexPatternType.FOLDER_LINK
+        ),
+        Arguments.of(
+            "Album Link",
+            "https://mega.nz/collection/xMpQjZhK#Jp3KceNZRvNsqp",
+            RegexPatternType.ALBUM_LINK
+        ),
+        Arguments.of(
+            "Autoplay Collection Link",
+            "https://mega.nz/collection/xMpQjZhK?autoplay=random,pace=10#Jp3KceNZRvNsqp",
+            RegexPatternType.AUTOPLAY_LINK
+        ),
+        Arguments.of(
+            "Autoplay Folder Link",
+            "https://mega.nz/folder/xMpQjZhK?autoplay=parameters#Jp3KceNZRvNsqp",
+            RegexPatternType.AUTOPLAY_LINK
+        ),
+        Arguments.of(
+            "Autoplay Folder Link - Flag Among Other Parameters",
+            "https://mega.app/folder/xMpQjZhK?foo=bar&autoplay#Jp3KceNZRvNsqp",
+            RegexPatternType.AUTOPLAY_LINK
+        ),
+        Arguments.of(
+            "Autoplay Collection Link - Flag Without Value",
+            "https://mega.nz/collection/xMpQjZhK?autoplay#Jp3KceNZRvNsqp",
+            RegexPatternType.AUTOPLAY_LINK
+        ),
+        Arguments.of(
+            "Autoplay Collection Link - All Options",
+            "https://mega.nz/collection/xMpQjZhK?autoplay=random,startat=Ab-cD_fG,pace=10,caption#Jp3KceNZRvNsqp",
+            RegexPatternType.AUTOPLAY_LINK
+        ),
+        Arguments.of(
+            "Autoplay Folder Link - Sub Folder Path",
+            "https://mega.nz/folder/xMpQjZhK/folder/aBcDeFgH?autoplay=newestfirst,pace=3#Jp3KceNZRvNsqp",
+            RegexPatternType.AUTOPLAY_LINK
+        ),
+        Arguments.of(
+            "Autoplay Collection Link - Legacy Domain",
+            "https://mega.co.nz/collection/xMpQjZhK?autoplay=oldestfirst#Jp3KceNZRvNsqp",
+            RegexPatternType.AUTOPLAY_LINK
         ),
         Arguments.of(
             "Chat Link",
@@ -762,6 +811,25 @@ class GetUrlRegexPatternTypeUseCaseTest {
         Arguments.of("Invalid Album Link - Missing Parameter", "https://mega.nz/collection"),
         Arguments.of("Invalid Album Link - Wrong Format", "https://mega.nz/collection/"),
         Arguments.of("Invalid Album Link - Wrong Domain", "https://mega.co.nz/collection/abc123"),
+    )
+
+    private fun invalidAutoplayLinks(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            "Invalid Autoplay Link - No Query",
+            "https://mega.nz/collection/xMpQjZhK#Jp3KceNZRvNsqp"
+        ),
+        Arguments.of(
+            "Invalid Autoplay Link - Other Parameter",
+            "https://mega.nz/folder/xMpQjZhK?autoplaylist=1#Jp3KceNZRvNsqp"
+        ),
+        Arguments.of(
+            "Invalid Autoplay Link - File Path",
+            "https://mega.nz/file/xMpQjZhK?autoplay=1#Jp3KceNZRvNsqp"
+        ),
+        Arguments.of(
+            "Invalid Autoplay Link - Wrong Domain",
+            "https://mega.io/folder/xMpQjZhK?autoplay=1#Jp3KceNZRvNsqp"
+        ),
     )
 
     private fun invalidUpgradePageLinks(): Stream<Arguments> = Stream.of(

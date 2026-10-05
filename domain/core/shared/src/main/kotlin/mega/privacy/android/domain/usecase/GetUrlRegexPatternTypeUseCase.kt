@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.ACCOUNT_INVITATION_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.ALBUM_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.AUTOPLAY_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.BUSINESS_INVITE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.CANCEL_ACCOUNT_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.CHAT_LINK
@@ -65,6 +66,7 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, REVERT_CHANGE_PASSWORD_LINK_REGEX)
                 -> REVERT_CHANGE_PASSWORD_LINK
 
+            isUrlMatchesRegexUseCase(url, AUTOPLAY_LINK_REGEX) -> AUTOPLAY_LINK
             isUrlMatchesRegexUseCase(url, FILE_LINK_REGEX) -> FILE_LINK
             isUrlMatchesRegexUseCase(url, CONFIRMATION_LINK_REGEX) -> CONFIRMATION_LINK
             isUrlMatchesRegexUseCase(url, FOLDER_LINK_REGEX) -> FOLDER_LINK
@@ -365,6 +367,15 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
         private val ALBUM_LINK_REGEX = arrayOf(
             "^https://mega\\.nz/collection/.+$",
             "^https://mega\\.app/collection/.+$",
+        )
+
+        /**
+         * Folder or collection link carrying an `autoplay` query parameter, which the app
+         * cannot honour natively yet, so it must be checked before the folder and album patterns.
+         * Example: https://mega.nz/collection/XXXXXXXX?autoplay=random,pace=10#key
+         */
+        private val AUTOPLAY_LINK_REGEX = arrayOf(
+            "^https://mega(?:\\.co\\.nz|\\.nz|\\.app)/(?:folder|collection)/[^?#]+\\?(?:[^#]*&)?autoplay(?:[=&#].*)?$",
         )
 
         /**

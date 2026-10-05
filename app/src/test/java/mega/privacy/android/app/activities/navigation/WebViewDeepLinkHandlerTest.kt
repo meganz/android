@@ -56,7 +56,7 @@ class WebViewDeepLinkHandlerTest {
         value = RegexPatternType::class,
         names = ["EMAIL_VERIFY_LINK", "WEB_SESSION_LINK", "BUSINESS_INVITE_LINK", "MEGA_DROP_LINK",
             "MEGA_FILE_REQUEST_LINK", "REVERT_CHANGE_PASSWORD_LINK", "INSTALLER_DOWNLOAD_LINK",
-            "MEGA_BLOG_LINK", "PURCHASE_LINK"]
+            "MEGA_BLOG_LINK", "PURCHASE_LINK", "AUTOPLAY_LINK"]
     )
     fun `test that correct nav key is returned when the uri matches regex pattern type when logged in`(
         regexPatternType: RegexPatternType?,
@@ -80,7 +80,7 @@ class WebViewDeepLinkHandlerTest {
         value = RegexPatternType::class,
         names = ["EMAIL_VERIFY_LINK", "WEB_SESSION_LINK", "BUSINESS_INVITE_LINK", "MEGA_DROP_LINK",
             "MEGA_FILE_REQUEST_LINK", "REVERT_CHANGE_PASSWORD_LINK", "INSTALLER_DOWNLOAD_LINK",
-            "MEGA_BLOG_LINK", "PURCHASE_LINK"]
+            "MEGA_BLOG_LINK", "PURCHASE_LINK", "AUTOPLAY_LINK"]
     )
     fun `test that correct nav key is returned when the uri matches regex pattern type when logged out`(
         regexPatternType: RegexPatternType?,
