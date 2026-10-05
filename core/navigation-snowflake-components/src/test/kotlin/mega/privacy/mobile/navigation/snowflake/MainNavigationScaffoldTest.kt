@@ -24,8 +24,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import kotlinx.collections.immutable.ImmutableSet
-import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 import mega.privacy.android.analytics.test.AnalyticsTestRule
@@ -158,8 +158,8 @@ class MainNavigationScaffoldTest {
 
     @Test
     fun test_that_empty_navigation_items_list_is_handled() {
-        val emptyNavItems: ImmutableSet<NavigationItem> =
-            emptySet<NavigationItem>().toImmutableSet()
+        val emptyNavItems: ImmutableList<NavigationItem> =
+            emptyList<NavigationItem>().toImmutableList()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
         val expected = "contentArea"
@@ -235,7 +235,7 @@ class MainNavigationScaffoldTest {
                 Icons.Default.Menu,
                 PreferredSlot.Last
             )
-        ).toImmutableSet()
+        ).toImmutableList()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
 
@@ -276,7 +276,7 @@ class MainNavigationScaffoldTest {
                 Icons.Default.Menu,
                 PreferredSlot.Last
             )
-        ).toImmutableSet()
+        ).toImmutableList()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
 
@@ -314,7 +314,7 @@ class MainNavigationScaffoldTest {
             ),
             createMockNavItem(android.R.string.cut, Icons.Default.Person, PreferredSlot.Ordered(4)),
             createMockNavItem(android.R.string.paste, Icons.Default.Star, PreferredSlot.Ordered(5))
-        ).toImmutableSet()
+        ).toImmutableList()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
 
@@ -372,7 +372,7 @@ class MainNavigationScaffoldTest {
                 Icons.Default.Menu,
                 PreferredSlot.Last
             )
-        ).toImmutableSet()
+        ).toImmutableList()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
 
@@ -413,7 +413,7 @@ class MainNavigationScaffoldTest {
                 preferredSlot = PreferredSlot.Ordered(1),
                 navigationEventIdentifier = expected,
             ),
-        ).toImmutableSet()
+        ).toImmutableList()
 
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
@@ -451,7 +451,7 @@ class MainNavigationScaffoldTest {
             icon = Icons.Default.Search,
             preferredSlot = PreferredSlot.Last
         )
-    ).toImmutableSet()
+    ).toImmutableList()
 
     private fun createTestNavItemsWithBadge() = listOf(
         createMockNavItem(
@@ -470,7 +470,7 @@ class MainNavigationScaffoldTest {
             icon = Icons.Default.Search,
             preferredSlot = PreferredSlot.Last
         )
-    ).toImmutableSet()
+    ).toImmutableList()
 
     private fun createMockNavItem(
         label: Int,

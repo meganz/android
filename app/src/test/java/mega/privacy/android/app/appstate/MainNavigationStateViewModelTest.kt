@@ -484,6 +484,44 @@ class MainNavigationStateViewModelTest {
         }
 
     @Test
+    fun `test that main nav items emit the new order when the saved preference is reordered`() =
+        runTest {
+            stubConnectivity()
+            stubAllEnabledFlaggedItems()
+            stubEmptyStartScreenPreference()
+            val preference = MutableStateFlow<NavigationItemsPreference?>(
+                NavigationItemsPreference(listOf("home", "drive", "media"))
+            )
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(preference)
+            }
+            stubCustomisableNavigationFlag(enabled = true)
+
+            initUnderTest(setOf(mediaItem(), menuItem(), homeItem(), driveItem()))
+
+            underTest.state
+                .filterIsInstance<MainNavState.Data>()
+                .test {
+                    assertThat(awaitItem().mainNavItems.map { it.label }).containsExactly(
+                        android.R.string.ok,
+                        android.R.string.cancel,
+                        android.R.string.copy,
+                        android.R.string.paste,
+                    ).inOrder()
+
+                    preference.value = NavigationItemsPreference(listOf("home", "media", "drive"))
+
+                    assertThat(awaitItem().mainNavItems.map { it.label }).containsExactly(
+                        android.R.string.ok,
+                        android.R.string.copy,
+                        android.R.string.cancel,
+                        android.R.string.paste,
+                    ).inOrder()
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
     fun `test that initial destination is the first preferred item destination when the customisation flag is enabled`() =
         runTest {
             stubConnectivity()

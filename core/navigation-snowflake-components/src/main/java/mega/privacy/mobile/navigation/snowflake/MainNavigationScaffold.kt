@@ -39,8 +39,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirst
 import androidx.navigation3.runtime.NavKey
-import kotlinx.collections.immutable.ImmutableSet
-import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import mega.android.core.ui.extensions.composeLet
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -71,7 +71,7 @@ val DefaultNavigationAnimationConfig = NavigationAnimationConfig(
 @Composable
 fun MainNavigationScaffold(
     modifier: Modifier = Modifier,
-    mainNavItems: ImmutableSet<NavigationItem>,
+    mainNavItems: ImmutableList<NavigationItem>,
     onDestinationClick: (MainNavItemNavKey) -> Unit,
     isSelected: (NavKey) -> Boolean,
     animationConfig: NavigationAnimationConfig = DefaultNavigationAnimationConfig,
@@ -242,7 +242,7 @@ private fun MegaNavigationSuite(
  * - The [PreferredSlot.Last] item is pinned to the final slot
  */
 private fun orderNavigationItems(
-    items: ImmutableSet<NavigationItem>,
+    items: ImmutableList<NavigationItem>,
     availableSlots: Int,
 ): List<NavigationItem> {
     val (lastItems, orderedItems) = items.partition { it.preferredSlot is PreferredSlot.Last }
@@ -388,7 +388,7 @@ private fun MainNavigationScaffoldPreview(modifier: Modifier = Modifier) {
                         else -> null
                     }
                 )
-            }.toImmutableSet(), onDestinationClick = {
+            }.toImmutableList(), onDestinationClick = {
                 selectedIndex = (it as? MainNavItemNavKeyForPreview)?.index ?: 1
             }, isSelected = { selectedIndex == (it as? MainNavItemNavKeyForPreview)?.index },
             navContent = {}

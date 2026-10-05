@@ -3,6 +3,7 @@ package mega.privacy.android.app.appstate.content.navigation.model
 import androidx.compose.runtime.Stable
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
@@ -15,7 +16,7 @@ sealed interface MainNavState {
     data object Loading : MainNavState
 
     data class Data(
-        val mainNavItems: ImmutableSet<NavigationItem>,
+        val mainNavItems: ImmutableList<NavigationItem>,
         val mainNavScreens: ImmutableSet<EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, NavigationUiController, TransferHandler) -> Unit>,
         val initialDestination: MainNavItemNavKey,
         val isConnected: Boolean,
