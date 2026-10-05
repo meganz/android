@@ -14,6 +14,7 @@ android {
 dependencies {
     // Coroutines
     implementation(lib.coroutines.test)
+    implementation(lib.logging.timber)
 
     implementation(project(":core:analytics:analytics-tracker"))
     // JUnit5

@@ -249,7 +249,7 @@ class FolderLinkViewModel @Inject constructor(
     private fun removeViewedFolderLinkEntry(url: String) {
         viewModelScope.launch {
             runCatching { removeViewedLinkByUrlUseCase(url) }
-                .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
+                .onFailure { Timber.e(it, "Failed to remove viewed folder link") }
         }
     }
 

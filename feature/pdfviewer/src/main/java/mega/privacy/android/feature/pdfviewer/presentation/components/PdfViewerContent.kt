@@ -326,7 +326,10 @@ internal fun getPdfUri(source: PdfViewerSource?): Uri? {
     return when (source) {
         is PdfViewerSource.CloudNode -> {
             val uri = source.contentUri.toUri(source.isLocalContent)
-            Timber.d("CloudNode PDF URI: $uri (sourceType=${source.nodeSourceType})")
+            Timber.d(
+                "CloudNode PDF URI resolved (sourceType=${source.nodeSourceType}, " +
+                        "isLocal=${source.isLocalContent})"
+            )
             uri
         }
 
@@ -335,7 +338,7 @@ internal fun getPdfUri(source: PdfViewerSource?): Uri? {
 
         is PdfViewerSource.ChatAttachment -> {
             val uri = source.contentUri.toUri(source.isLocalContent)
-            Timber.d("Chat PDF URI: $uri")
+            Timber.d("Chat PDF URI resolved (isLocal=${source.isLocalContent})")
             uri
         }
 
@@ -344,7 +347,7 @@ internal fun getPdfUri(source: PdfViewerSource?): Uri? {
 
         is PdfViewerSource.FolderLink -> {
             val uri = source.contentUri.toUri(source.isLocalContent)
-            Timber.d("FolderLink PDF URI: $uri")
+            Timber.d("FolderLink PDF URI resolved (isLocal=${source.isLocalContent})")
             uri
         }
 

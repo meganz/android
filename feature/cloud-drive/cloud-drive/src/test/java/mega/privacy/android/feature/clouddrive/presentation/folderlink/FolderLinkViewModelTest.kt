@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.test.RecordingTimberTree
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
@@ -70,6 +71,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import timber.log.Timber
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -435,6 +437,26 @@ internal class FolderLinkViewModelTest {
             initViewModel(FolderLinkViewModel.Args(uriString = url))
 
             verify(removeViewedLinkByUrlUseCase).invoke(url)
+        }
+
+    @Test
+    fun `test that the folder link is not logged when removing the viewed link fails`() =
+        runTest {
+            val key = "SeCrEtFoLdErKeY"
+            val url = "https://mega.nz/folder/abc#$key"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.ERROR)
+            whenever(removeViewedLinkByUrlUseCase(url)).thenThrow(RuntimeException())
+            val tree = RecordingTimberTree()
+            Timber.plant(tree)
+            try {
+                initViewModel(FolderLinkViewModel.Args(uriString = url))
+            } finally {
+                Timber.uproot(tree)
+            }
+
+            assertThat(tree.messages).isNotEmpty()
+            assertThat(tree.messages.none { it.contains(key) }).isTrue()
         }
 
     @Test

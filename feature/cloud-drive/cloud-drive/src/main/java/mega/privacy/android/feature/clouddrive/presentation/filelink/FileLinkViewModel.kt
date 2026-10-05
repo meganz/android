@@ -156,7 +156,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
     private fun removeViewedFileLinkEntry(url: String) {
         viewModelScope.launch {
             runCatching { removeViewedLinkByUrlUseCase(url) }
-                .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
+                .onFailure { Timber.e(it, "Failed to remove viewed file link") }
         }
     }
 

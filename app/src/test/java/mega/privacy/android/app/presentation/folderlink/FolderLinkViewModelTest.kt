@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.test.RecordingTimberTree
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -100,6 +101,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import timber.log.Timber
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -421,6 +423,34 @@ class FolderLinkViewModelTest {
             underTest.fetchNodes(base64Handle)
 
             verify(removeViewedLinkByUrlUseCase).invoke(folderLink)
+        }
+
+    @Test
+    fun `test that fetchNodes does not log the folder link when removing the viewed link fails`() =
+        runTest {
+            val key = "SeCrEtFoLdErKeY"
+            val folderLink = "https://mega.nz/folder/abc123#$key"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.LinkRemoved()
+            )
+            whenever(removeViewedLinkByUrlUseCase(folderLink)).thenThrow(RuntimeException())
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            val tree = RecordingTimberTree()
+            Timber.plant(tree)
+            try {
+                underTest.handleIntent(intent)
+                underTest.fetchNodes(base64Handle)
+            } finally {
+                Timber.uproot(tree)
+            }
+
+            assertThat(tree.messages).isNotEmpty()
+            assertThat(tree.messages.none { it.contains(key) }).isTrue()
         }
 
     @Test

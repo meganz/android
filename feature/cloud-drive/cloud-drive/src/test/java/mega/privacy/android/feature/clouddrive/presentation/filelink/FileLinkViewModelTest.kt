@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.test.RecordingTimberTree
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
@@ -37,6 +38,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -491,6 +493,26 @@ internal class FileLinkViewModelTest {
             initViewModel(uriString = url)
 
             verify(removeViewedLinkByUrlUseCase).invoke(url)
+        }
+
+    @Test
+    fun `test that the file link is not logged when removing the viewed link fails`() =
+        runTest {
+            val key = "SeCrEtFiLeKeY"
+            val url = "https://mega.nz/file/abc#$key"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(getPublicNodeUseCase(url)).thenThrow(PublicNodeException.GenericError())
+            whenever(removeViewedLinkByUrlUseCase(url)).thenThrow(RuntimeException())
+            val tree = RecordingTimberTree()
+            Timber.plant(tree)
+            try {
+                initViewModel(uriString = url)
+            } finally {
+                Timber.uproot(tree)
+            }
+
+            assertThat(tree.messages).isNotEmpty()
+            assertThat(tree.messages.none { it.contains(key) }).isTrue()
         }
 
     @Test

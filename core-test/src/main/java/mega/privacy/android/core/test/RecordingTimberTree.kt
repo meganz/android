@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.core.test
 
 import timber.log.Timber
 

@@ -94,139 +94,7 @@ class MediaPlayerFacade @Inject constructor(
 
     private val bandwidthMeter = DefaultBandwidthMeter.Builder(context).build()
 
-    private val loggingTransferListener = object : androidx.media3.datasource.TransferListener {
-        private var totalBytesTransferred = 0L
-        private var transferStartTime = 0L
-        private var lastLogTime = 0L
-        private var lastTotalBytesTransferred = 0L
-
-        override fun onTransferInitializing(
-            source: androidx.media3.datasource.DataSource,
-            dataSpec: androidx.media3.datasource.DataSpec,
-            isNetwork: Boolean,
-        ) {
-            Timber.d("[Cache] MISS: file=${dataSpec.uri.lastPathSegment}, position=${dataSpec.position}, length=${dataSpec.length}")
-        }
-
-        override fun onTransferStart(
-            source: androidx.media3.datasource.DataSource,
-            dataSpec: androidx.media3.datasource.DataSpec,
-            isNetwork: Boolean,
-        ) {
-            transferStartTime = System.currentTimeMillis()
-            lastLogTime = transferStartTime
-            lastTotalBytesTransferred = 0L
-            Timber.d("TransferListener started: ${dataSpec.uri}, isNetwork: $isNetwork")
-        }
-
-        override fun onBytesTransferred(
-            source: androidx.media3.datasource.DataSource,
-            dataSpec: androidx.media3.datasource.DataSpec,
-            isNetwork: Boolean,
-            bytesTransferred: Int,
-        ) {
-            if (isNetwork && bytesTransferred > 0) {
-                totalBytesTransferred += bytesTransferred
-                val currentTime = System.currentTimeMillis()
-
-                // Log only if 1 second has passed since last log
-                if (currentTime - lastLogTime >= 1000) {
-                    val bitrate = bandwidthMeter.bitrateEstimate
-                    val duration = currentTime - transferStartTime
-
-                    // Calculate current bitrate for the last second
-                    val bytesInLastSecond = totalBytesTransferred - lastTotalBytesTransferred
-                    val currentBitrate = bytesInLastSecond * 8
-
-                    if (duration > 0) {
-                        val averageBitrate = (totalBytesTransferred * 8 * 1000) / duration
-                        Timber.d(
-                            """
-                                TransferListener Bandwidth:
-                                Estimated: %.2f kbps
-                                Current: %.2f kbps (last second)
-                                Average: %.2f kbps (from start)
-                                Total transferred: %.2f KB
-                                Duration: %ds
-                                Bytes in last second: %.2f KB
-                            """.trimIndent(),
-                            bitrate / 1024f,
-                            currentBitrate / 1024f,
-                            averageBitrate / 1024f,
-                            totalBytesTransferred / 1024f,
-                            duration / 1000,
-                            bytesInLastSecond / 1024f
-                        )
-                    } else {
-                        Timber.d(
-                            """
-                                TransferListener Bandwidth:
-                                Estimated: %.2f kbps
-                                Current: %.2f kbps (last second)
-                                Total transferred: %.2f KB
-                                Duration: %ds
-                                Bytes in last second: %.2f KB
-                            """.trimIndent(),
-                            bitrate / 1024f,
-                            currentBitrate / 1024f,
-                            totalBytesTransferred / 1024f,
-                            duration / 1000,
-                            bytesInLastSecond / 1024f
-                        )
-                    }
-
-                    lastLogTime = currentTime
-                    lastTotalBytesTransferred = totalBytesTransferred
-                }
-            }
-        }
-
-        override fun onTransferEnd(
-            source: androidx.media3.datasource.DataSource,
-            dataSpec: androidx.media3.datasource.DataSpec,
-            isNetwork: Boolean,
-        ) {
-            val currentTime = System.currentTimeMillis()
-            val duration = currentTime - transferStartTime
-            val bitrate = bandwidthMeter.bitrateEstimate
-
-            if (duration > 0) {
-                val averageBitrate = (totalBytesTransferred * 8 * 1000) / duration
-                Timber.d(
-                    """
-                        TransferListener Transfer ended:
-                        URI: %s
-                        Total: %.2f KB
-                        Duration: %ds
-                        Avg bitrate: %.2f kbps
-                        Estimated: %.2f kbps
-                    """.trimIndent(),
-                    dataSpec.uri,
-                    totalBytesTransferred / 1024f,
-                    duration / 1000,
-                    averageBitrate / 1024f,
-                    bitrate / 1024f
-                )
-            } else {
-                Timber.d(
-                    """
-                        TransferListener Transfer ended:
-                        URI: %s
-                        Total: %.2f KB
-                        Estimated: %.2f kbps
-                    """.trimIndent(),
-                    dataSpec.uri,
-                    totalBytesTransferred / 1024f,
-                    bitrate / 1024f
-                )
-            }
-
-            totalBytesTransferred = 0L
-            transferStartTime = 0L
-            lastLogTime = 0L
-            lastTotalBytesTransferred = 0L
-        }
-    }
+    private val loggingTransferListener = LoggingTransferListener(bandwidthMeter)
 
     private val upstreamDataSourceFactory by lazy {
         val httpFactory = DefaultHttpDataSource.Factory()
@@ -760,7 +628,7 @@ class MediaPlayerFacade @Inject constructor(
         player?.let { player ->
             val videoUri: Uri? = player.currentMediaItem?.localConfiguration?.uri
             val mediaId = player.currentMediaItem?.mediaId
-            Timber.d("SubtitleTesting, videoUri: $videoUri, mediaId: $mediaId, subtitleFileUrl: $subtitleFileUrl")
+            Timber.d("Adding subtitle: hasVideoUri=${videoUri != null}, mediaId=$mediaId")
             val uri = subtitleFileUrl.toUri()
             if (videoUri != null && mediaId != null) {
                 val subtitle = MediaItem.SubtitleConfiguration.Builder(uri)

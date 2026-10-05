@@ -6,10 +6,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.RecordingTimberTree
 import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderImpl
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
+import mega.privacy.android.core.test.RecordingTimberTree
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navOptions
