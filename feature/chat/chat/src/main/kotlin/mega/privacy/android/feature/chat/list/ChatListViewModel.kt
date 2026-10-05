@@ -8,6 +8,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
@@ -95,6 +97,26 @@ internal class ChatListViewModel @Inject constructor(
     private val meetingActionChannel = Channel<MeetingActionEvent>(Channel.BUFFERED)
 
     private var offeredActions: OfferedChatRoomActions? = null
+
+    /**
+     * The chat and meeting rooms behind both tabs, shared so the actions sheet resolves against the
+     * rooms the list is rendering. The first rooms [GetChatsUseCase] emits are not yet enriched
+     * with per-chat state such as [ChatRoomItem.isMuted], so a fresh read would disagree with the
+     * rows on screen.
+     */
+    private val chatRoomItems: Flow<Pair<List<ChatRoomItem>, List<ChatRoomItem>>> by lazy(
+        LazyThreadSafetyMode.NONE
+    ) {
+        combine(
+            formattedChatRoomsFlow(ChatRoomType.NON_MEETINGS),
+            formattedChatRoomsFlow(ChatRoomType.MEETINGS),
+            ::Pair,
+        ).shareIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            replay = 1,
+        )
+    }
 
     /**
      * Emits the chat id of a chat that has just been created through the new-chat flow and should
@@ -330,25 +352,12 @@ internal class ChatListViewModel @Inject constructor(
     }
 
     private suspend fun currentChatRooms(): Map<Long, ChatRoomItem> = runCatchingCancellable {
-        combine(
-            domainChatRoomsFlow(ChatRoomType.NON_MEETINGS),
-            domainChatRoomsFlow(ChatRoomType.MEETINGS),
-        ) { chats, meetings ->
-            (chats + meetings).associateBy(ChatRoomItem::chatId)
-        }.first()
+        val (chats, meetings) = chatRoomItems.first()
+        (chats + meetings).associateBy(ChatRoomItem::chatId)
     }.getOrElse { e ->
         Timber.e(e, "Failed to load chat rooms for actions")
         emptyMap()
     }
-
-    private fun domainChatRoomsFlow(chatRoomType: ChatRoomType): Flow<List<ChatRoomItem>> =
-        getChatsUseCase(
-            chatRoomType = chatRoomType,
-            lastMessage = { "" },
-            lastTimeMapper = { "" },
-            meetingTimeMapper = { _, _ -> "" },
-            headerTimeMapper = { _, _ -> null },
-        )
 
     private fun hasAnyContactFlow(): Flow<Boolean> = monitorHasAnyContactUseCase()
         .catch { e ->
@@ -382,10 +391,9 @@ internal class ChatListViewModel @Inject constructor(
         }
 
     private fun chatRoomsFlow(): Flow<ChatRooms> = combine(
-        formattedChatRoomsFlow(ChatRoomType.NON_MEETINGS),
-        formattedChatRoomsFlow(ChatRoomType.MEETINGS),
+        chatRoomItems,
         hasArchivedChatsFlow(),
-    ) { chats, meetings, hasArchived ->
+    ) { (chats, meetings), hasArchived ->
         ChatRooms(
             chats = chats.map(chatRoomUiItemMapper::invoke).toImmutableList(),
             meetings = meetings.map(chatRoomUiItemMapper::invoke).toImmutableList(),
