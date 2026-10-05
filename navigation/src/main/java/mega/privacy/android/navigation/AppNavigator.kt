@@ -192,12 +192,21 @@ interface AppNavigator {
     )
 
     /**
-     * Navigates to the new [InviteContactActivityV2].
+     * Navigate to the invite-contacts screen, routed through the `ContactComposeFeature` flag so
+     * it decides between the Compose
+     * [mega.privacy.android.navigation.destination.InviteContactNavKey] destination and the legacy
+     * invite-contact activity.
      *
      * @param context The context that call this method.
-     * @param isFromAchievement Whether the entry point is [InviteFriendsRoute].
+     * @param isFromAchievement Whether the entry point is the achievements "Invite friends" screen.
+     * @param onNavigated Invoked on the main thread once the navigation has been dispatched, so a
+     * caller that finishes itself afterwards does not race the asynchronous flag read.
      */
-    fun openInviteContactActivity(context: Context, isFromAchievement: Boolean)
+    fun openInviteContactActivity(
+        context: Context,
+        isFromAchievement: Boolean,
+        onNavigated: (() -> Unit)? = null,
+    )
 
     /**
      * Navigate to the contacts list, routed through the `ContactComposeFeature`-gated
@@ -205,6 +214,14 @@ interface AppNavigator {
      * decides between the Compose contacts list and the legacy ContactsActivity.
      */
     fun openContactList(context: Context)
+
+    /**
+     * Navigate to the sent contact requests, routed through the `ContactComposeFeature` flag so
+     * it decides between the Compose
+     * [mega.privacy.android.navigation.destination.ContactRequestsNavKey] destination and the
+     * legacy contact-requests activity.
+     */
+    fun openSentRequests(context: Context)
 
     /**
      * Navigate to the personal "My QR code" screen, routed through the `ContactComposeFeature` flag

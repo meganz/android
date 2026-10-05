@@ -21,7 +21,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
@@ -39,7 +38,6 @@ import javax.inject.Inject
  * Activity which allows to start a new chat conversation.
  *
  * @property monitorThemeModeUseCase   [MonitorThemeModeUseCase]
- * @property resultLauncher [ActivityResultLauncher]
  */
 @AndroidEntryPoint
 class StartConversationActivity : ComponentActivity() {
@@ -53,22 +51,10 @@ class StartConversationActivity : ComponentActivity() {
     private val viewModel by viewModels<StartConversationViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
 
-    lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private lateinit var addContactActivityLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        resultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == RESULT_OK && result.data != null) {
-                    setResult(RESULT_OK, result.data)
-                } else {
-                    setResult(RESULT_CANCELED)
-                }
-
-                finish()
-            }
 
         addContactActivityLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -171,12 +157,7 @@ class StartConversationActivity : ComponentActivity() {
 
     private fun onInviteContacts() {
         Analytics.tracker.trackEvent(InviteContactsPressedEvent)
-        resultLauncher.launch(
-            Intent(this, InviteContactActivity::class.java).putExtra(
-                Constants.INTENT_EXTRA_KEY_CONTACT_TYPE,
-                Constants.CONTACT_TYPE_DEVICE
-            )
-        )
+        navigator.openInviteContactActivity(context = this, isFromAchievement = false) { finish() }
     }
 
     companion object {

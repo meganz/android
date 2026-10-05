@@ -3,6 +3,7 @@ package mega.privacy.android.app.nav
 import android.content.Context
 import android.content.Intent
 import androidx.navigation3.runtime.NavKey
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -28,7 +29,9 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
+import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
@@ -42,6 +45,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -340,6 +344,125 @@ class MegaNavigatorImplTest {
             whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
 
             underTest.openMyQrCode(context = context)
+
+            verify(context).startActivity(any())
+            verify(navigationQueue, never()).emit(any<List<NavKey>>(), any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that openInviteContactActivity emits the InviteContactNavKey when ContactComposeFeature is enabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
+
+            underTest.openInviteContactActivity(context = context, isFromAchievement = true)
+
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 && navKeys[0] == InviteContactNavKey(isFromAchievement = true)
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+            verify(context, never()).startActivity(any())
+        }
+
+    @Test
+    fun `test that openInviteContactActivity launches MegaActivity before emitting when not in single activity and ContactComposeFeature is enabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
+
+            underTest.openInviteContactActivity(context = context, isFromAchievement = false)
+
+            val inOrder = inOrder(context, navigationQueue)
+            inOrder.verify(context).startActivity(any())
+            inOrder.verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 && navKeys[0] == InviteContactNavKey(isFromAchievement = false)
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+        }
+
+    @Test
+    fun `test that openInviteContactActivity starts the legacy activity when ContactComposeFeature is disabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
+
+            underTest.openInviteContactActivity(context = context, isFromAchievement = false)
+
+            verify(context).startActivity(any())
+            verify(navigationQueue, never()).emit(any<List<NavKey>>(), any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that openInviteContactActivity invokes onNavigated after emitting when ContactComposeFeature is enabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
+            var navigated = false
+
+            underTest.openInviteContactActivity(
+                context = context,
+                isFromAchievement = false,
+            ) { navigated = true }
+
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 && navKeys[0] == InviteContactNavKey(isFromAchievement = false)
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+            assertThat(navigated).isTrue()
+        }
+
+    @Test
+    fun `test that openInviteContactActivity invokes onNavigated after starting the legacy activity when ContactComposeFeature is disabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
+            var navigated = false
+
+            underTest.openInviteContactActivity(
+                context = context,
+                isFromAchievement = false,
+            ) { navigated = true }
+
+            verify(context).startActivity(any())
+            assertThat(navigated).isTrue()
+        }
+
+    @Test
+    fun `test that openSentRequests emits the sent ContactRequestsNavKey when ContactComposeFeature is enabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
+
+            underTest.openSentRequests(context = context)
+
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 && navKeys[0] == ContactRequestsNavKey(
+                        ContactRequestsNavKey.NavType.SentRequests
+                    )
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+            verify(context, never()).startActivity(any())
+        }
+
+    @Test
+    fun `test that openSentRequests starts the legacy activity when ContactComposeFeature is disabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
+
+            underTest.openSentRequests(context = context)
 
             verify(context).startActivity(any())
             verify(navigationQueue, never()).emit(any<List<NavKey>>(), any(), anyOrNull())

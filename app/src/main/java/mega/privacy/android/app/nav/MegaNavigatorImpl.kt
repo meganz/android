@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
@@ -106,6 +107,7 @@ import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
@@ -367,15 +369,53 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
-    override fun openInviteContactActivity(context: Context, isFromAchievement: Boolean) {
-        navigateIfInSingleActivity(
-            singleActivityDestination = InviteContactNavKey(isFromAchievement = isFromAchievement)
-        ) {
-            val intent = Intent(context, InviteContactActivity::class.java).apply {
-                putExtra(InviteContactViewModel.KEY_FROM, isFromAchievement)
+    /**
+     * Reads [ApiFeatures.ContactComposeFeature] off the main thread and then, on the main
+     * dispatcher, either emits [composeNavKeys] into the single activity or runs [legacy].
+     * [onNavigated] runs once the navigation has been dispatched, so callers that finish
+     * themselves afterwards do not race the flag read.
+     */
+    private fun navigateWithContactComposeFlag(
+        context: Context,
+        composeNavKeys: () -> List<NavKey>,
+        legacy: () -> Unit,
+        onNavigated: (() -> Unit)? = null,
+    ) {
+        applicationScope.launch {
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
+            }.getOrDefault(false)
+            withContext(mainDispatcher) {
+                if (isContactComposeFeatureEnabled) {
+                    launchMegaActivityIfNeeded(context)
+                    navigationQueue.emit(composeNavKeys())
+                } else {
+                    legacy()
+                }
+                onNavigated?.invoke()
             }
-            context.startActivity(intent)
         }
+    }
+
+    override fun openInviteContactActivity(
+        context: Context,
+        isFromAchievement: Boolean,
+        onNavigated: (() -> Unit)?,
+    ) {
+        navigateWithContactComposeFlag(
+            context = context,
+            composeNavKeys = {
+                listOf(InviteContactNavKey(isFromAchievement = isFromAchievement))
+            },
+            legacy = {
+                context.startActivity(
+                    Intent(context, InviteContactActivity::class.java).apply {
+                        putExtra(InviteContactViewModel.KEY_FROM, isFromAchievement)
+                    }
+                )
+            },
+            onNavigated = onNavigated,
+        )
     }
 
     override fun openContactList(context: Context) {
@@ -384,20 +424,22 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
+    override fun openSentRequests(context: Context) {
+        navigateWithContactComposeFlag(
+            context = context,
+            composeNavKeys = {
+                listOf(ContactRequestsNavKey(ContactRequestsNavKey.NavType.SentRequests))
+            },
+            legacy = { context.startActivity(ContactsActivity.getSentRequestsIntent(context)) },
+        )
+    }
+
     override fun openMyQrCode(context: Context) {
-        applicationScope.launch {
-            val isContactComposeFeatureEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
-            }.getOrDefault(false)
-            withContext(mainDispatcher) {
-                if (isContactComposeFeatureEnabled) {
-                    launchMegaActivityIfNeeded(context)
-                    navigationQueue.emit(listOf(QrCodeNavKey))
-                } else {
-                    context.startActivity(Intent(context, QRCodeComposeActivity::class.java))
-                }
-            }
-        }
+        navigateWithContactComposeFlag(
+            context = context,
+            composeNavKeys = { listOf(QrCodeNavKey) },
+            legacy = { context.startActivity(Intent(context, QRCodeComposeActivity::class.java)) },
+        )
     }
 
     override fun openTransfers(context: Context) {
