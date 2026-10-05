@@ -36,6 +36,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -43,12 +45,12 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
+import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
@@ -56,10 +58,13 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.ConnectBillingServiceException
 import mega.privacy.android.domain.exception.ProductNotFoundException
+import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
@@ -91,7 +96,6 @@ internal class BillingFacade @Inject constructor(
     private val productDetailsListCache: Cache<List<ProductDetails>>,
     private val activeSubscription: Cache<MegaPurchase>,
     private val source: Cache<UpgradeSource>,
-    private val appEventGateway: AppEventGateway,
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
     private val mutex = Mutex()
     private val proceedPurchaseMutex = Mutex()
@@ -108,16 +112,22 @@ internal class BillingFacade @Inject constructor(
         applicationScope.launch(mainDispatcher) {
             ProcessLifecycleOwner.get().lifecycle.addObserver(this@BillingFacade)
         }
+        // Large accounts can take a long time to fetch nodes (or never finish on weak devices),
+        // so pending purchases are processed as soon as the session is available after login.
         applicationScope.launch(exceptionHandler) {
-            appEventGateway.monitorFetchNodesFinish().collect {
-                if (it) {
+            megaApiGateway.globalRequestEvents
+                .filterIsInstance<RequestEvent.OnRequestFinish>()
+                .filter {
+                    it.request.type == MegaRequest.TYPE_LOGIN
+                            && it.error.errorCode == MegaError.API_OK
+                }
+                .collect {
                     runCatching { queryPurchase() }
                         .onFailure { error ->
                             if (error is CancellationException) throw error
-                            Timber.e(error, "Failed to query purchases after fetch nodes")
+                            Timber.e(error, "Failed to query purchases after login")
                         }
                 }
-            }
         }
     }
 
@@ -536,6 +546,11 @@ internal class BillingFacade @Inject constructor(
             token?.let { submittedPurchaseTokens.add(it) }
         }.onFailure { error ->
             if (error is CancellationException) throw error
+            if (error is ResourceAlreadyExistsMegaException) {
+                Timber.d("Purchase receipt already submitted")
+                token?.let { submittedPurchaseTokens.add(it) }
+                return
+            }
             Timber.e("PURCHASE WRONG: ${error.message}")
         }
     }
