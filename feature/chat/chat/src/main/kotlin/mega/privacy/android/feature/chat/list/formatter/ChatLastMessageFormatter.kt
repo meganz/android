@@ -116,7 +116,7 @@ internal class ChatLastMessageFormatter @Inject constructor(
     }
 
     private suspend fun plainTextPreview(item: ChatListItem): String {
-        if (item.lastMessage.isBlank()) return noHistoryPreview()
+        if (item.lastMessage.isBlank()) return "${senderPrefix(item)}:"
         val content = emojiShortcodeConverter.convert(item.lastMessage)
         if (!item.isGroup) return content
         return "${senderPrefix(item)}: $content"
@@ -190,7 +190,7 @@ internal class ChatLastMessageFormatter @Inject constructor(
     private suspend fun truncatePreview(message: ChatMessage, chatId: Long): String {
         val actorName = resolveName(message.userHandle, chatId)
         return if (message.userHandle == myHandle()) {
-            context.getString(sharedR.string.history_cleared_by, actorName)
+            stripFormatMarkers(context.getString(sharedR.string.history_cleared_by, actorName))
         } else {
             context.getString(sharedR.string.non_format_history_cleared_by, actorName)
         }
