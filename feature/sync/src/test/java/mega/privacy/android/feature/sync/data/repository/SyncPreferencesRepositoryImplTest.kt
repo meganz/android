@@ -184,4 +184,14 @@ internal class SyncPreferencesRepositoryImplTest {
 
         assertThat(result).isFalse()
     }
+
+    @Test
+    fun `test that monitorUserPausedSyncIds returns the gateway flow`() = runTest {
+        whenever(userPausedSyncGateway.monitorUserPausedSyncIds()).thenReturn(flowOf(setOf(3L)))
+
+        underTest.monitorUserPausedSyncIds().test {
+            assertThat(awaitItem()).isEqualTo(setOf(3L))
+            awaitComplete()
+        }
+    }
 }

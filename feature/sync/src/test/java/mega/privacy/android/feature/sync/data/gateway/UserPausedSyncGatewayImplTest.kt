@@ -1,7 +1,9 @@
 package mega.privacy.android.feature.sync.data.gateway
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
@@ -53,5 +55,16 @@ internal class UserPausedSyncGatewayImplTest {
         underTest.deleteUserPausedSync(syncId)
 
         verify(userPausedSyncDao).deleteUserPausedSync(syncId)
+    }
+
+    @Test
+    fun `test that monitorUserPausedSyncIds maps the dao ids to a set`() = runTest {
+        whenever(userPausedSyncDao.monitorUserPausedSyncIds())
+            .thenReturn(flowOf(listOf(1L, 2L, 2L)))
+
+        underTest.monitorUserPausedSyncIds().test {
+            Truth.assertThat(awaitItem()).isEqualTo(setOf(1L, 2L))
+            awaitComplete()
+        }
     }
 }

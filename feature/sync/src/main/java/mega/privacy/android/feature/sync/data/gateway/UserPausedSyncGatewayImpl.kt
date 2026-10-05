@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.sync.data.gateway
 
 import dagger.Lazy
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import javax.inject.Inject
@@ -19,4 +21,7 @@ internal class UserPausedSyncGatewayImpl @Inject constructor(
     override suspend fun deleteUserPausedSync(syncId: Long) {
         userPausedSyncDao.get().deleteUserPausedSync(syncId)
     }
+
+    override fun monitorUserPausedSyncIds(): Flow<Set<Long>> =
+        userPausedSyncDao.get().monitorUserPausedSyncIds().map { it.toSet() }
 }

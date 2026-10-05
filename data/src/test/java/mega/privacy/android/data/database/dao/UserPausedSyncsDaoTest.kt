@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -64,6 +65,37 @@ class UserPausedSyncsDaoTest {
         userPausedSyncsDao.deleteUserPausedSync(syncId = 3)
         val retrieved = userPausedSyncsDao.getUserPausedSync(syncId = 3)
         Truth.assertThat(retrieved).isNull()
+    }
+
+    @Test
+    fun test_that_monitorUserPausedSyncIds_emits_the_inserted_ids() = runTest {
+        insertEntity(generateEntity(syncId = 1))
+        insertEntity(generateEntity(syncId = 2))
+
+        userPausedSyncsDao.monitorUserPausedSyncIds().test {
+            Truth.assertThat(awaitItem()).containsExactly(1L, 2L)
+        }
+    }
+
+    @Test
+    fun test_that_monitorUserPausedSyncIds_emits_again_after_a_delete() = runTest {
+        insertEntity(generateEntity(syncId = 1))
+        insertEntity(generateEntity(syncId = 2))
+
+        userPausedSyncsDao.monitorUserPausedSyncIds().test {
+            Truth.assertThat(awaitItem()).containsExactly(1L, 2L)
+
+            userPausedSyncsDao.deleteUserPausedSync(syncId = 1)
+
+            Truth.assertThat(awaitItem()).containsExactly(2L)
+        }
+    }
+
+    @Test
+    fun test_that_monitorUserPausedSyncIds_emits_an_empty_list_when_no_sync_is_paused() = runTest {
+        userPausedSyncsDao.monitorUserPausedSyncIds().test {
+            Truth.assertThat(awaitItem()).isEmpty()
+        }
     }
 
     private suspend fun insertEntity(entity: UserPausedSyncEntity) {

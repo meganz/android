@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.SyncPreferencesDatastore
@@ -53,6 +54,9 @@ internal class SyncPreferencesRepositoryImpl @Inject constructor(
             userPausedSyncGateway
                 .getUserPausedSync(syncId) != null
         }
+
+    override fun monitorUserPausedSyncIds(): Flow<Set<Long>> =
+        userPausedSyncGateway.monitorUserPausedSyncIds().flowOn(ioDispatcher)
 
     override suspend fun setSyncFrequencyInMinutes(frequencyInMinutes: Int) {
         syncPreferencesDatastore.setSyncFrequencyInMinutes(frequencyInMinutes)

@@ -43,6 +43,8 @@ interface SyncPreferencesRepository {
 
     suspend fun isSyncPausedByTheUser(syncId: Long): Boolean
 
+    fun monitorUserPausedSyncIds(): Flow<Set<Long>>
+
     suspend fun setSyncFrequencyInMinutes(frequencyInMinutes: Int)
 
     suspend fun getSyncFrequencyMinutes(): Int

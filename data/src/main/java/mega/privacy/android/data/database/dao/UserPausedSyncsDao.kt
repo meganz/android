@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 
@@ -32,4 +33,10 @@ interface UserPausedSyncsDao {
      */
     @Query("DELETE FROM ${MegaDatabaseConstant.TABLE_USER_PAUSED_SYNCS} WHERE sync_id = :syncId")
     suspend fun deleteUserPausedSync(syncId: Long)
+
+    /**
+     * Monitor the ids of the syncs paused manually by the user
+     */
+    @Query("SELECT sync_id FROM ${MegaDatabaseConstant.TABLE_USER_PAUSED_SYNCS}")
+    fun monitorUserPausedSyncIds(): Flow<List<Long>>
 }
