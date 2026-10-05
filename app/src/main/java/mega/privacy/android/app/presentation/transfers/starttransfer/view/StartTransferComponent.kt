@@ -53,10 +53,7 @@ import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
-import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.node.action.HandleFileAction
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -70,19 +67,14 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
-import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelPreviewDownloadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.LargeDownloadConfirmationDialog
-import mega.privacy.android.app.presentation.transfers.view.dialog.NotEnoughSpaceForUploadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningType
@@ -106,7 +98,6 @@ import java.io.File
 internal fun StartTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
-    areTransferOverQuotaWarningsAllowed: Boolean = true,
     snackBarHostState: SnackbarHostState? = null,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
@@ -180,30 +171,15 @@ internal fun StartTransferComponent(
         })
 
     if (!isPasscodeLocked) {
-        FeatureFlagGate(
-            feature = ApiFeatures.QuotaWarningUpsellScreen,
-            disabled = {
-                if (showStorageOverQuotaWarning) {
-                    NotEnoughSpaceForUploadDialog(onCancel = {
-                        onCancelNotEnoughSpaceForUploadDialog()
-                        showStorageOverQuotaWarning = false
-                    })
-                }
-                if (areTransferOverQuotaWarningsAllowed) {
-                    TransferOverQuotaDialog()
-                }
-            },
-        ) {
-            if (showStorageOverQuotaWarning) {
-                LaunchedEffect(Unit) {
-                    showStorageOverQuotaWarning = false
-                    onCancelNotEnoughSpaceForUploadDialog()
-                    context.megaNavigator.openQuotaWarningUpsell(
-                        context = context,
-                        type = QuotaWarningType.Storage,
-                        trigger = QuotaWarningTrigger.Upload,
-                    )
-                }
+        if (showStorageOverQuotaWarning) {
+            LaunchedEffect(Unit) {
+                showStorageOverQuotaWarning = false
+                onCancelNotEnoughSpaceForUploadDialog()
+                context.megaNavigator.openQuotaWarningUpsell(
+                    context = context,
+                    type = QuotaWarningType.Storage,
+                    trigger = QuotaWarningTrigger.Upload,
+                )
             }
         }
     }
@@ -247,7 +223,6 @@ internal fun StartTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
     snackBarHostState: SnackbarHostStateM2?,
-    areTransferOverQuotaWarningsAllowed: Boolean = true,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
     onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
@@ -260,7 +235,6 @@ internal fun StartTransferComponent(
     StartTransferComponent(
         event = event,
         onConsumeEvent = onConsumeEvent,
-        areTransferOverQuotaWarningsAllowed = areTransferOverQuotaWarningsAllowed,
         snackBarHostState = if (snackBarHostState == null) null else material3HostState,
         onScanningFinished = onScanningFinished,
         viewModel = viewModel,
@@ -514,38 +488,14 @@ private fun StartTransferComponent(
                 coroutineScope = coroutineScope,
             )
         }
-        showQuotaExceededDialog.value?.let { storageState ->
-            FeatureFlagGate(
-                feature = ApiFeatures.QuotaWarningUpsellScreen,
-                disabled = {
-                    StorageStatusDialogView(
-                        storageState = storageState,
-                        preWarning = storageState != StorageState.Red,
-                        overQuotaAlert = true,
-                        onUpgradeClick = {
-                            context.megaNavigator.openUpgradeAccount(context = context)
-                        },
-                        onCustomizedPlanClick = { email, accountType ->
-                            AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
-                        },
-                        onAchievementsClick = {
-                            context.startActivity(
-                                Intent(context, MyAccountActivity::class.java)
-                                    .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
-                            )
-                        },
-                        onClose = { showQuotaExceededDialog.value = null },
-                    )
-                },
-            ) {
-                LaunchedEffect(Unit) {
-                    showQuotaExceededDialog.value = null
-                    context.megaNavigator.openQuotaWarningUpsell(
-                        context = context,
-                        type = QuotaWarningType.Transfer,
-                        trigger = QuotaWarningTrigger.Download,
-                    )
-                }
+        showQuotaExceededDialog.value?.let {
+            LaunchedEffect(Unit) {
+                showQuotaExceededDialog.value = null
+                context.megaNavigator.openQuotaWarningUpsell(
+                    context = context,
+                    type = QuotaWarningType.Transfer,
+                    trigger = QuotaWarningTrigger.Download,
+                )
             }
         }
         uiState.confirmLargeDownload?.let {

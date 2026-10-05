@@ -89,7 +89,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.math.BigInteger
-import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -1933,24 +1932,12 @@ class DefaultTransfersRepositoryTest {
         verifyNoMoreInteractions(megaApiGateway)
     }
 
-    @ParameterizedTest
-    @ValueSource(longs = [123456, 9876543])
-    fun `test that transferOverQuotaTimestamp returns value`(
-        timestamp: Long,
-    ) = runTest {
-        val value = AtomicLong(timestamp)
-
-        underTest.transferOverQuotaTimestamp = value
-
-        assertThat(underTest.transferOverQuotaTimestamp).isEqualTo(value)
-    }
-
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class OnLogoutSuccessTests {
 
         @Test
-        fun `test that onLogoutSuccess resets paused transfers asked resume over quota timestamp error status and atomic timestamp`() =
+        fun `test that onLogoutSuccess resets paused transfers asked resume over quota timestamp and error status`() =
             runTest {
                 underTest = createDefaultTransfersRepository()
                 stubPauseTransfers(true)
@@ -1970,14 +1957,11 @@ class DefaultTransfersRepositoryTest {
                 whenever(completedTransferMapper(finishEvent)).thenReturn(mock())
                 underTest.addCompletedTransfers(listOf(finishEvent))
 
-                underTest.transferOverQuotaTimestamp = AtomicLong(42L)
-
                 assertThat(underTest.monitorPausedTransfers().value).isTrue()
                 assertThat(underTest.monitorAskedResumeTransfers().value).isTrue()
                 assertThat(underTest.monitorTransferOverQuotaErrorTimestamp().value)
                     .isEqualTo(Instant.fromEpochMilliseconds(currentTime))
                 assertThat(underTest.monitorTransferInErrorStatus().value).isTrue()
-                assertThat(underTest.transferOverQuotaTimestamp.get()).isEqualTo(42L)
 
                 underTest.onLogoutSuccess()
 
@@ -1985,7 +1969,6 @@ class DefaultTransfersRepositoryTest {
                 assertThat(underTest.monitorAskedResumeTransfers().value).isFalse()
                 assertThat(underTest.monitorTransferOverQuotaErrorTimestamp().value).isNull()
                 assertThat(underTest.monitorTransferInErrorStatus().value).isFalse()
-                assertThat(underTest.transferOverQuotaTimestamp.get()).isEqualTo(0L)
 
                 verify(displayPathFromUriCache).clear()
                 verify(parentNodeCache).clear()

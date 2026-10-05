@@ -43,7 +43,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
@@ -52,7 +51,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -148,7 +146,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val getPreviewDownloadUseCase: GetPreviewDownloadUseCase,
     private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val transferOverQuotaEventQueue: TransferOverQuotaEventQueue,
     private val ratingHandler: RatingHandlerImpl,
     private val crashReporter: CrashReporter,
@@ -628,22 +625,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      *
      * @return true when the caller must warn about over quota instead of showing the screen.
      */
-    private suspend fun shouldWarnAboutTransferOverQuota(): Boolean {
-        if (!isQuotaWarningUpsellEnabled()) return false
-
-        return runCatching { isInTransferOverQuotaUseCase() }
+    private suspend fun shouldWarnAboutTransferOverQuota(): Boolean =
+        runCatching { isInTransferOverQuotaUseCase() }
             .onFailure { Timber.e(it) }
             .getOrDefault(false)
-    }
-
-    private var quotaWarningUpsellEnabled: Boolean? = null
-
-    private suspend fun isQuotaWarningUpsellEnabled(): Boolean =
-        quotaWarningUpsellEnabled ?: runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
-        }.onFailure { Timber.e(it) }
-            .getOrDefault(false)
-            .also { quotaWarningUpsellEnabled = it }
 
     /**
      * It starts downloading the node for attach with the appropriate use case

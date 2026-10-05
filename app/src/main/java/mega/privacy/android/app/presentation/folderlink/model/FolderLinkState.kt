@@ -6,7 +6,6 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -41,7 +40,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property snackbarMessageContent     State to show snackbar message
  * @property openMoreOption             State to open more option bottom sheet
  * @property moreOptionNode             Node to show more options for
- * @property storageStatusDialogState   State of StorageStatusDialog
+ * @property showStorageQuotaWarning   Whether to show the storage quota warning
  * @property snackBarMessage            String id of content for snack bar
  * @property shouldShowAdsForLink       Whether ads should be shown for the link
  * @property errorState                 Error state of the folder link
@@ -63,7 +62,7 @@ data class FolderLinkState(
     val importNode: TypedNode? = null,
     @StringRes val snackBarMessage: Int = -1,
     val moreOptionNode: NodeUIItem<TypedNode>? = null,
-    val storageStatusDialogState: StorageStatusDialogState? = null,
+    val showStorageQuotaWarning: Boolean = false,
     val finishActivityEvent: StateEvent = consumed,
     val askForDecryptionKeyDialogEvent: StateEvent = consumed,
     val selectImportLocation: StateEvent = consumed,

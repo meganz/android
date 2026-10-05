@@ -420,7 +420,6 @@ internal fun TransfersView(
         StartTransferComponent(
             event = uiState.startEvent,
             onConsumeEvent = onConsumeStartEvent,
-            areTransferOverQuotaWarningsAllowed = false,
         )
     }
 }

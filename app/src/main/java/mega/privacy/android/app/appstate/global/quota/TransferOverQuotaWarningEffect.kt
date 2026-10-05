@@ -8,17 +8,14 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.payment.QuotaWarningType
 
 /**
  * Shows the transfer quota-warning upsell screen when a download or media streaming hits bandwidth
- * over quota, for a host owning a navigation back stack. With the upsell screen disabled the legacy
- * over quota dialog shows the warning instead.
+ * over quota, for a host owning a navigation back stack.
  *
  * Transfers can be started from any activity, so each host reacts only while resumed and the
  * foreground one handles the warning in its own back stack.
@@ -38,18 +35,16 @@ fun TransferOverQuotaWarningEffect(navigationHandler: NavigationHandler) {
 
 @Composable
 private fun HandleTransferOverQuota(showWarning: (TransferOverQuotaSource) -> Unit) {
-    FeatureFlagGate(feature = ApiFeatures.QuotaWarningUpsellScreen) {
-        val viewModel = hiltViewModel<TransferOverQuotaWarningViewModel>()
-        val lifecycle = LocalLifecycleOwner.current.lifecycle
-        // Not keyed on the lambda: it captures an unstable navigation handler, so it is a new
-        // instance on every recomposition and would restart the collection each time.
-        val currentShowWarning by rememberUpdatedState(showWarning)
-        LaunchedEffect(lifecycle) {
-            viewModel.transferOverQuotaEvents
-                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-                .collect {
-                    viewModel.consumeTransferOverQuotaEvent()?.let(currentShowWarning)
-                }
-        }
+    val viewModel = hiltViewModel<TransferOverQuotaWarningViewModel>()
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    // Not keyed on the lambda: it captures an unstable navigation handler, so it is a new
+    // instance on every recomposition and would restart the collection each time.
+    val currentShowWarning by rememberUpdatedState(showWarning)
+    LaunchedEffect(lifecycle) {
+        viewModel.transferOverQuotaEvents
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .collect {
+                viewModel.consumeTransferOverQuotaEvent()?.let(currentShowWarning)
+            }
     }
 }

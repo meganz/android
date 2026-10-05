@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.shared.nodes.namecollision.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
@@ -30,9 +29,6 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
-import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningType
@@ -159,31 +155,15 @@ internal class ImportMessageAction(
                 onHandled()
             }
         }
-        storageOverQuota?.let { isOverQuota ->
-            FeatureFlagGate(
-                feature = ApiFeatures.QuotaWarningUpsellScreen,
-                disabled = {
-                    LaunchedEffect(Unit) {
-                        context.startActivity(
-                            MegaActivity.getIntentWithExtraDestinations(
-                                context,
-                                listOf(OverQuotaDialogNavKey(isOverQuota = isOverQuota)),
-                            )
-                        )
-                        storageOverQuota = null
-                        onHandled()
-                    }
-                },
-            ) {
-                LaunchedEffect(Unit) {
-                    context.megaNavigator.openQuotaWarningUpsell(
-                        context = context,
-                        type = QuotaWarningType.Storage,
-                        trigger = QuotaWarningTrigger.Upload,
-                    )
-                    storageOverQuota = null
-                    onHandled()
-                }
+        storageOverQuota?.let {
+            LaunchedEffect(Unit) {
+                context.megaNavigator.openQuotaWarningUpsell(
+                    context = context,
+                    type = QuotaWarningType.Storage,
+                    trigger = QuotaWarningTrigger.Upload,
+                )
+                storageOverQuota = null
+                onHandled()
             }
         }
     }

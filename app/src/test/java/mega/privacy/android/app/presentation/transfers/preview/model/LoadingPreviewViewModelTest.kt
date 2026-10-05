@@ -25,8 +25,6 @@ import mega.privacy.android.domain.exception.NetworkUnavailableException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.transfers.NoTransferToShowException
 import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -58,7 +56,6 @@ class LoadingPreviewViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         on { invoke() } doReturn flowOf(true)
     }
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -74,7 +71,6 @@ class LoadingPreviewViewModelTest {
             monitorTransferEventsUseCase,
             broadcastTransferTagToCancelUseCase,
             monitorConnectivityUseCase,
-            getFeatureFlagValueUseCase,
             fileTypeIconMapper,
         )
         args = LoadingPreviewViewModel.Args()
@@ -92,7 +88,6 @@ class LoadingPreviewViewModelTest {
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             args = args,
             appScope = appScope,
@@ -115,13 +110,10 @@ class LoadingPreviewViewModelTest {
         transfer: Transfer?,
         flow: Flow<TransferEvent> = emptyFlow(),
         connectivityFlow: Flow<Boolean> = flowOf(true),
-        isQuotaWarningUpsellEnabled: Boolean = false,
     ) {
         whenever(getTransferByUniqueIdUseCase(transferUniqueId)) doReturn transfer
         whenever(monitorTransferEventsUseCase()).thenReturn(flow)
         whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)) doReturn
-                isQuotaWarningUpsellEnabled
     }
 
     @Test
@@ -275,7 +267,7 @@ class LoadingPreviewViewModelTest {
         }
 
     @Test
-    fun `test that temporary error event, with quota exceeded exception, updates state with error`() =
+    fun `test that temporary error event, with quota exceeded exception, does not update state with error`() =
         runTest {
             val transfer = mock<Transfer> {
                 on { this.uniqueId } doReturn transferUniqueId
@@ -293,39 +285,12 @@ class LoadingPreviewViewModelTest {
             initTest()
 
             underTest.uiState.test {
-                assertThat(awaitItem().error).isEqualTo(error)
-            }
-        }
-
-    @Test
-    fun `test that temporary error event, with quota exceeded exception, does not update state with error when the quota warning upsell screen is enabled`() =
-        runTest {
-            val transfer = mock<Transfer> {
-                on { this.uniqueId } doReturn transferUniqueId
-                on { this.fileName } doReturn fileName
-            }
-            val error = mock<QuotaExceededMegaException>()
-            val event = mock<TransferEvent.TransferTemporaryErrorEvent> {
-                on { this.transfer } doReturn transfer
-                on { this.error } doReturn error
-            }
-
-            initArgs(transferUniqueId = transferUniqueId)
-            commonStub(
-                transfer = transfer,
-                flow = flowOf(event),
-                isQuotaWarningUpsellEnabled = true,
-            )
-
-            initTest()
-
-            underTest.uiState.test {
                 assertThat(awaitItem().error).isNull()
             }
         }
 
     @Test
-    fun `test that finish event, with quota exceeded exception, does not update state with error when the quota warning upsell screen is enabled`() =
+    fun `test that finish event, with quota exceeded exception, does not update state with error`() =
         runTest {
             val transfer = mock<Transfer> {
                 on { this.uniqueId } doReturn transferUniqueId
@@ -338,11 +303,7 @@ class LoadingPreviewViewModelTest {
             }
 
             initArgs(transferUniqueId = transferUniqueId)
-            commonStub(
-                transfer = transfer,
-                flow = flowOf(event),
-                isQuotaWarningUpsellEnabled = true,
-            )
+            commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
 

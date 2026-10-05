@@ -27,13 +27,9 @@ import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Product
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
-import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -55,13 +51,10 @@ import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
-import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
-import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
@@ -87,7 +80,6 @@ import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseC
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.feature.payment.model.AccountTypeInt
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
@@ -114,10 +106,7 @@ class FolderLinkViewModel @Inject constructor(
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val addNodeType: AddNodeType,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
-    private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase,
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
-    private val getCurrentUserEmail: GetCurrentUserEmail,
-    private val getPricing: GetPricing,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
@@ -372,50 +361,17 @@ class FolderLinkViewModel @Inject constructor(
      * Handle Storage Quota Exceed Exception
      */
     fun handleQuotaException(throwable: Throwable) = viewModelScope.launch {
-        val isAchievementsEnabled = areAchievementsEnabledUseCase()
-        val accountType = getAccountTypeUseCase()
-
-        if (accountType == AccountType.UNKNOWN) {
-            Timber.w("Do not show dialog, not info of the account received yet")
+        if (getAccountTypeUseCase() == AccountType.UNKNOWN) {
+            Timber.w("Do not show quota warning, no account info received yet")
             return@launch
         }
 
-        val product =
-            getProductAccounts().firstOrNull { it.level == AccountTypeInt.PRO_III && it.months == 1 }
-
         when (throwable) {
-            is QuotaExceededMegaException -> {
-                val storageState = StorageStatusDialogState(
-                    storageState = StorageState.Red,
-                    accountType = accountType,
-                    product = product,
-                    isAchievementsEnabled = isAchievementsEnabled,
-                    overQuotaAlert = true,
-                    preWarning = false
-                )
-                _state.update { it.copy(storageStatusDialogState = storageState) }
-            }
-
-            is NotEnoughQuotaMegaException -> {
-                val storageState = StorageStatusDialogState(
-                    storageState = StorageState.Orange,
-                    accountType = accountType,
-                    product = product,
-                    isAchievementsEnabled = isAchievementsEnabled,
-                    overQuotaAlert = true,
-                    preWarning = true
-                )
-                _state.update { it.copy(storageStatusDialogState = storageState) }
+            is QuotaExceededMegaException, is NotEnoughQuotaMegaException -> {
+                _state.update { it.copy(showStorageQuotaWarning = true) }
             }
         }
     }
-
-    /**
-     * Get product accounts
-     *
-     */
-    private suspend fun getProductAccounts(): List<Product> =
-        runCatching { getPricing(false).products }.getOrElse { Pricing(emptyList()).products }
 
     /**
      * Reset values once collision activity is launched
@@ -997,18 +953,11 @@ class FolderLinkViewModel @Inject constructor(
     }
 
     /**
-     * Reset storageStatusDialogState to dismiss the dialog
+     * Consume the storage quota warning
      */
-    fun dismissStorageStatusDialog() {
-        _state.update { it.copy(storageStatusDialogState = null) }
+    fun onStorageQuotaWarningConsumed() {
+        _state.update { it.copy(showStorageQuotaWarning = false) }
     }
-
-    /**
-     * Get current user email
-     */
-    suspend fun getEmail() = runCatching { getCurrentUserEmail() }
-        .onFailure { Timber.e(it) }
-        .getOrDefault("")
 
     /**
      * Reset finishActivityEvent when consumed

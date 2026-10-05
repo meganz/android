@@ -315,7 +315,7 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                     event = nodeActionState.showQuotaDialog,
                     onConsumed = nodeActionsViewModel::markQuotaDialogShown,
                     action = {
-                        navHostController.navigate(searchOverQuotaDialog.plus("/${it}"))
+                        navHostController.navigate(searchOverQuotaDialog)
                     }
                 )
                 EventEffect(

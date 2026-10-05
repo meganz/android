@@ -17,23 +17,18 @@ import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogViewM3
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.RestoreData
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavOptions
-import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
-import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
@@ -84,7 +79,6 @@ internal fun HandleNodeOptionsActionEvent(
     onActionTriggered: () -> Unit = {},
 ) {
     val snackbarQueue = rememberSnackBarQueue()
-    val megaNavigator = rememberMegaNavigator()
     val context = LocalContext.current
     var isShowForeignDialog by rememberSaveable { mutableStateOf(false) }
     var isOverQuota by rememberSaveable { mutableStateOf<Boolean?>(null) }
@@ -261,45 +255,17 @@ internal fun HandleNodeOptionsActionEvent(
         )
     }
 
-    isOverQuota?.let { overQuota ->
-        FeatureFlagGate(
-            feature = ApiFeatures.QuotaWarningUpsellScreen,
-            disabled = {
-                StorageStatusDialogViewM3(
-                    storageState = if (overQuota) StorageState.Red else StorageState.Orange,
-                    preWarning = !overQuota,
-                    overQuotaAlert = true,
-                    onUpgradeClick = {
-                        megaNavigator.openUpgradeAccount(context = context)
-                    },
-                    onCustomizedPlanClick = { email, accountType ->
-                        megaNavigator.openAskForCustomizedPlan(
-                            context = context,
-                            email = email,
-                            accountType = accountType
-                        )
-                    },
-                    onAchievementsClick = {
-                        megaNavigator.openAchievements(context = context)
-                    },
-                    onClose = {
-                        isOverQuota = null
-                    },
-                )
-            },
-            enabled = {
-                LaunchedEffect(Unit) {
-                    onNavigate(
-                        QuotaWarningUpgradeNavKey(
-                            type = QuotaWarningType.Storage,
-                            trigger = QuotaWarningTrigger.Upload,
-                        ),
-                        navOptions { dropIfAlreadyShown = true },
-                    )
-                    isOverQuota = null
-                }
-            }
-        )
+    isOverQuota?.let {
+        LaunchedEffect(Unit) {
+            onNavigate(
+                QuotaWarningUpgradeNavKey(
+                    type = QuotaWarningType.Storage,
+                    trigger = QuotaWarningTrigger.Upload,
+                ),
+                navOptions { dropIfAlreadyShown = true },
+            )
+            isOverQuota = null
+        }
     }
 }
 

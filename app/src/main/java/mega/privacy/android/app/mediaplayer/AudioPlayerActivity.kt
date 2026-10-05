@@ -93,7 +93,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -650,27 +649,21 @@ class AudioPlayerActivity : MediaPlayerActivity() {
      */
     private fun observeTransferOverQuotaWarning() {
         lifecycleScope.launch {
-            if (isQuotaWarningUpsellEnabled()) {
-                transferOverQuotaWarningViewModel.transferOverQuotaEvents
-                    .filter { it == TransferOverQuotaSource.Download }
-                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-                    .collect {
-                        transferOverQuotaWarningViewModel.consumeTransferOverQuotaEvent()
-                            ?.let { source ->
-                                megaNavigator.openQuotaWarningUpsell(
-                                    context = this@AudioPlayerActivity,
-                                    type = QuotaWarningType.Transfer,
-                                    trigger = source.quotaWarningTrigger,
-                                )
-                            }
-                    }
-            }
+            transferOverQuotaWarningViewModel.transferOverQuotaEvents
+                .filter { it == TransferOverQuotaSource.Download }
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collect {
+                    transferOverQuotaWarningViewModel.consumeTransferOverQuotaEvent()
+                        ?.let { source ->
+                            megaNavigator.openQuotaWarningUpsell(
+                                context = this@AudioPlayerActivity,
+                                type = QuotaWarningType.Transfer,
+                                trigger = source.quotaWarningTrigger,
+                            )
+                        }
+                }
         }
     }
-
-    private suspend fun isQuotaWarningUpsellEnabled() = runCatching {
-        getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
-    }.onFailure { Timber.e(it) }.getOrDefault(false)
 
     /**
      * Closes the player when streaming hits the bandwidth over quota: playback cannot continue

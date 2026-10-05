@@ -114,17 +114,6 @@ data class SearchNavKey(
 }
 
 /**
- * @isOverQuota whether the user is over quota (red) or near quota (orange)
- * @overQuotaAlert whether to show the over quota alert dialog or just reminder dialog
- */
-@Serializable
-@Parcelize
-data class OverQuotaDialogNavKey(
-    val isOverQuota: Boolean,
-    val overQuotaAlert: Boolean = true,
-) : DialogNavKey, Parcelable
-
-/**
  * NavKey for folder link screen
  * @param uriString the uri string of the folder link
  * @param entryFolderHandle handle of a folder inside an already opened folder link to open the

@@ -83,7 +83,6 @@ import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import timber.log.Timber
 import java.io.File
-import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
@@ -148,8 +147,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val activeTransfersFlows: Map<TransferType, MutableStateFlow<Map<Long, ActiveTransfer>>> =
         TransferType.entries.associateWith { MutableStateFlow(mapOf()) }
 
-    override var transferOverQuotaTimestamp = AtomicLong()
-
     init {
         //pause transfers if db indicates it should be paused
         scope.launch {
@@ -174,7 +171,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         activeTransfersFlows.forEach { (_, flow) ->
             flow.emit(emptyMap())
         }
-        transferOverQuotaTimestamp = AtomicLong()
         broadcastTransferOverQuota(false)
         broadcastStorageOverQuota(false)
         clearCompletedTransfersCache()

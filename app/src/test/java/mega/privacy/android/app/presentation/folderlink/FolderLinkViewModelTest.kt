@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.RecordingTimberTree
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderInfo
@@ -47,18 +48,17 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
-import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
-import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
@@ -124,10 +124,7 @@ class FolderLinkViewModelTest {
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val addNodeType: AddNodeType = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
-    private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase = mock()
     private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
-    private val getCurrentUserEmail: GetCurrentUserEmail = mock()
-    private val getPricing: GetPricing = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
     private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase = mock()
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase =
@@ -176,10 +173,7 @@ class FolderLinkViewModelTest {
             getFolderLinkChildrenNodesUseCase,
             addNodeType,
             getStringFromStringResMapper,
-            areAchievementsEnabledUseCase,
             getAccountTypeUseCase,
-            getCurrentUserEmail,
-            getPricing,
             containsMediaItemUseCase,
             getLocalFileForNodeUseCase,
             getLocalFolderLinkFromMegaApiFolderUseCase,
@@ -219,10 +213,7 @@ class FolderLinkViewModelTest {
             getFolderLinkChildrenNodesUseCase = getFolderLinkChildrenNodesUseCase,
             addNodeType = addNodeType,
             getStringFromStringResMapper = getStringFromStringResMapper,
-            areAchievementsEnabledUseCase = areAchievementsEnabledUseCase,
             getAccountTypeUseCase = getAccountTypeUseCase,
-            getCurrentUserEmail = getCurrentUserEmail,
-            getPricing = getPricing,
             containsMediaItemUseCase = containsMediaItemUseCase,
             getLocalFileForNodeUseCase = getLocalFileForNodeUseCase,
             getLocalFolderLinkFromMegaApiFolderUseCase = getLocalFolderLinkFromMegaApiFolderUseCase,
@@ -249,6 +240,37 @@ class FolderLinkViewModelTest {
             saveViewedLinkUseCase = saveViewedLinkUseCase,
             removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase
         )
+    }
+
+    @Test
+    fun `test that storage quota errors raise a warning that can be consumed`() = runTest {
+        whenever(getAccountTypeUseCase()).thenReturn(AccountType.FREE)
+
+        listOf(mock<QuotaExceededMegaException>(), mock<NotEnoughQuotaMegaException>()).forEach { error ->
+            underTest.handleQuotaException(error).join()
+            assertThat(underTest.state.value.showStorageQuotaWarning).isTrue()
+
+            underTest.onStorageQuotaWarningConsumed()
+            assertThat(underTest.state.value.showStorageQuotaWarning).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that unknown account does not show storage quota warning`() = runTest {
+        whenever(getAccountTypeUseCase()).thenReturn(AccountType.UNKNOWN)
+
+        underTest.handleQuotaException(mock<QuotaExceededMegaException>()).join()
+
+        assertThat(underTest.state.value.showStorageQuotaWarning).isFalse()
+    }
+
+    @Test
+    fun `test that other errors do not show storage quota warning`() = runTest {
+        whenever(getAccountTypeUseCase()).thenReturn(AccountType.FREE)
+
+        underTest.handleQuotaException(IllegalStateException()).join()
+
+        assertThat(underTest.state.value.showStorageQuotaWarning).isFalse()
     }
 
     @Test

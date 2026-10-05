@@ -23,7 +23,6 @@ import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
-import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -42,11 +41,6 @@ interface TransferRepository {
          */
         val MAX_TRANSFER_CONNECTIONS_RANGE = 1..8
     }
-
-    /**
-     * Timestamp of the last transfer over quota event warned
-     */
-    var transferOverQuotaTimestamp: AtomicLong
 
     /**
      * Monitor transfer events

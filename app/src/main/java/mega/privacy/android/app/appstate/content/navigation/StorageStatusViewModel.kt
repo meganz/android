@@ -16,11 +16,9 @@ import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.appstate.content.navigation.model.StorageQuotaWarning
 import mega.privacy.android.core.coroutine.logAndSwallowExceptions
 import mega.privacy.android.domain.entity.account.StorageQuotaWarningTrigger
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.SetStorageQuotaWarningShownUseCase
 import mega.privacy.android.domain.usecase.account.ShouldShowStorageQuotaWarningUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.MonitorSuccessfulUploadsUseCase
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -31,7 +29,6 @@ class StorageStatusViewModel @Inject constructor(
     private val monitorSuccessfulUploadsUseCase: MonitorSuccessfulUploadsUseCase,
     private val shouldShowStorageQuotaWarningUseCase: ShouldShowStorageQuotaWarningUseCase,
     private val setStorageQuotaWarningShownUseCase: SetStorageQuotaWarningShownUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     /**
@@ -61,7 +58,6 @@ class StorageStatusViewModel @Inject constructor(
             StorageQuotaWarning(
                 storageState = storageState,
                 trigger = trigger,
-                isUpsellEnabled = isQuotaWarningUpsellEnabled(),
             )
         }
         .logAndSwallowExceptions()
@@ -81,8 +77,4 @@ class StorageStatusViewModel @Inject constructor(
         runCatching { setStorageQuotaWarningShownUseCase(warning.storageState, warning.trigger) }
             .logAndSwallowExceptions()
     }
-
-    private suspend fun isQuotaWarningUpsellEnabled() =
-        runCatching { getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen) }
-            .getOrElse { false }
 }

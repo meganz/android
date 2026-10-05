@@ -59,7 +59,6 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ads.LegacyAdsContainer
-import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
@@ -73,10 +72,8 @@ import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningType
@@ -119,9 +116,7 @@ internal fun FolderLinkView(
     onResetSnackbarMessage: () -> Unit,
     onResetMoreOptionNode: () -> Unit,
     onResetOpenMoreOption: () -> Unit,
-    onStorageStatusDialogDismiss: () -> Unit,
-    onStorageDialogActionButtonClick: () -> Unit,
-    onStorageDialogAchievementButtonClick: () -> Unit,
+    onStorageQuotaWarningConsumed: () -> Unit,
     emptyViewString: String,
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
@@ -322,30 +317,16 @@ internal fun FolderLinkView(
                         }
                     }
 
-                    val storageStatusDialogState = state.storageStatusDialogState
-                    if (storageStatusDialogState != null) {
-                        FeatureFlagGate(
-                            feature = ApiFeatures.QuotaWarningUpsellScreen,
-                            disabled = {
-                                StorageStatusDialogView(
-                                    state = storageStatusDialogState,
-                                    dismissClickListener = onStorageStatusDialogDismiss,
-                                    actionButtonClickListener = onStorageDialogActionButtonClick,
-                                    achievementButtonClickListener = onStorageDialogAchievementButtonClick,
-                                )
-                            },
-                            enabled = {
-                                val context = LocalContext.current
-                                LaunchedEffect(Unit) {
-                                    onStorageStatusDialogDismiss()
-                                    context.megaNavigator.openQuotaWarningUpsell(
-                                        context = context,
-                                        type = QuotaWarningType.Storage,
-                                        trigger = QuotaWarningTrigger.Upload,
-                                    )
-                                }
-                            },
-                        )
+                    if (state.showStorageQuotaWarning) {
+                        val context = LocalContext.current
+                        LaunchedEffect(Unit) {
+                            onStorageQuotaWarningConsumed()
+                            context.megaNavigator.openQuotaWarningUpsell(
+                                context = context,
+                                type = QuotaWarningType.Storage,
+                                trigger = QuotaWarningTrigger.Upload,
+                            )
+                        }
                     }
                 }
             }

@@ -52,7 +52,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.Cl
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
@@ -61,7 +60,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -190,7 +188,6 @@ class StartTransfersComponentViewModelTest {
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val getPreviewDownloadUseCase = mock<GetPreviewDownloadUseCase>()
     private val isInTransferOverQuotaUseCase = mock<IsInTransferOverQuotaUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val transferOverQuotaEventQueue = TransferOverQuotaEventQueue()
     private val ratingHandlerImpl = mock<RatingHandlerImpl>()
     private val crashReporter = mock<CrashReporter>()
@@ -281,7 +278,6 @@ class StartTransfersComponentViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             getPreviewDownloadUseCase = getPreviewDownloadUseCase,
             isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             transferOverQuotaEventQueue = transferOverQuotaEventQueue,
             ratingHandler = ratingHandlerImpl,
             crashReporter = crashReporter,
@@ -337,7 +333,6 @@ class StartTransfersComponentViewModelTest {
             monitorStorageStateEventUseCase,
             getPreviewDownloadUseCase,
             isInTransferOverQuotaUseCase,
-            getFeatureFlagValueUseCase,
             crashReporter,
         )
         transferOverQuotaEventQueue.consume()
@@ -1548,8 +1543,6 @@ class StartTransfersComponentViewModelTest {
             commonStub()
             whenever(getPreviewDownloadUseCase(node)).thenReturn(previewDownload)
             whenever(getCurrentTimeInMillisUseCase()).thenReturn(10000L)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
-                .thenReturn(true)
             whenever(isInTransferOverQuotaUseCase()).thenReturn(true)
             initTest()
             underTest.consumeOneOffEvent()
@@ -1576,8 +1569,6 @@ class StartTransfersComponentViewModelTest {
             commonStub()
             whenever(getPreviewDownloadUseCase(node)).thenReturn(previewDownload)
             whenever(getCurrentTimeInMillisUseCase()).thenReturn(10000L)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
-                .thenReturn(true)
             whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
             initTest()
 
@@ -1590,35 +1581,6 @@ class StartTransfersComponentViewModelTest {
                     transferPath = previewDownload.localPath
                 )
             )
-        }
-
-    @Test
-    fun `test that no over quota warning is raised when a preview download already exists and the quota warning upsell screen is disabled`() =
-        runTest {
-            val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, false)
-            val previewDownload = mock<Transfer> {
-                on { this.startTime } doReturn 0L
-                on { this.uniqueId } doReturn 123L
-                on { localPath } doReturn DESTINATION
-            }
-
-            commonStub()
-            whenever(getPreviewDownloadUseCase(node)).thenReturn(previewDownload)
-            whenever(getCurrentTimeInMillisUseCase()).thenReturn(10000L)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
-                .thenReturn(false)
-            initTest()
-
-            underTest.startTransfer(startEvent)
-
-            assertThat(transferOverQuotaEventQueue.consume()).isNull()
-            assertCurrentEventIsEqualTo(
-                SlowDownloadPreviewInProgress(
-                    transferUniqueId = previewDownload.uniqueId,
-                    transferPath = previewDownload.localPath
-                )
-            )
-            verifyNoInteractions(isInTransferOverQuotaUseCase)
         }
 
     @Nested

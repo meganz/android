@@ -84,17 +84,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Quota-warning upsell screen (AND-24264).
-     * When enabled, the storage over-quota flow shows the new quota-warning upsell screen instead
-     * of the legacy over-quota dialog.
-     */
-    QuotaWarningUpsellScreen(
-        experimentName = "qwup",
-        description = "Show the quota-warning upsell screen instead of the over-quota dialog",
-        defaultValue = true,
-    ),
-
-    /**
      * Video playback positions read from the database.
      * When enabled, the video player resumes from the `media_playback_info` table instead of the
      * legacy DataStore record. Writes always go to both stores, so the DataStore copy stays

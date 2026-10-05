@@ -34,15 +34,12 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
@@ -51,14 +48,12 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertDialogUtil
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -274,9 +269,7 @@ class FolderLinkComposeActivity : BaseActivity(),
                 onResetSnackbarMessage = viewModel::resetSnackbarMessage,
                 onResetMoreOptionNode = viewModel::resetMoreOptionNode,
                 onResetOpenMoreOption = viewModel::resetOpenMoreOption,
-                onStorageStatusDialogDismiss = viewModel::dismissStorageStatusDialog,
-                onStorageDialogActionButtonClick = { handleActionClick(uiState) },
-                onStorageDialogAchievementButtonClick = ::navigateToAchievements,
+                onStorageQuotaWarningConsumed = viewModel::onStorageQuotaWarningConsumed,
                 emptyViewString = getEmptyViewString(),
                 onDisputeTakeDownClicked = this::launchUrl,
                 onLinkClicked = this::launchUrl,
@@ -334,26 +327,6 @@ class FolderLinkComposeActivity : BaseActivity(),
         // link is on top and the back stack handles the rest.
         BackHandler {
             viewModel.handleBackPress()
-        }
-    }
-
-    private fun handleActionClick(uiState: FolderLinkState) = lifecycleScope.launch {
-        val email = viewModel.getEmail()
-        uiState.storageStatusDialogState?.accountType?.let { accountType ->
-            viewModel.dismissStorageStatusDialog()
-            when (accountType) {
-                AccountType.PRO_III -> {
-                    AlertsAndWarnings.askForCustomizedPlan(
-                        this@FolderLinkComposeActivity,
-                        email,
-                        accountType
-                    )
-                }
-
-                else -> {
-                    megaNavigator.openUpgradeAccount(context = this@FolderLinkComposeActivity)
-                }
-            }
         }
     }
 
@@ -568,14 +541,6 @@ class FolderLinkComposeActivity : BaseActivity(),
         }
 
         return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
-    }
-
-    private fun navigateToAchievements() {
-        viewModel.dismissStorageStatusDialog()
-        AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-        val accountIntent = Intent(this, MyAccountActivity::class.java)
-            .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
-        startActivity(accountIntent)
     }
 
     companion object {

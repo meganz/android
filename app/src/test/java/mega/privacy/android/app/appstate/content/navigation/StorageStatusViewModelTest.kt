@@ -13,11 +13,9 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.StorageQuotaWarningTrigger
 import mega.privacy.android.domain.entity.transfer.Transfer
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.SetStorageQuotaWarningShownUseCase
 import mega.privacy.android.domain.usecase.account.ShouldShowStorageQuotaWarningUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.MonitorSuccessfulUploadsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -37,7 +35,6 @@ class StorageStatusViewModelTest {
     private val shouldShowStorageQuotaWarningUseCase =
         mock<ShouldShowStorageQuotaWarningUseCase>()
     private val setStorageQuotaWarningShownUseCase = mock<SetStorageQuotaWarningShownUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @AfterEach
     fun tearDown() {
@@ -46,7 +43,6 @@ class StorageStatusViewModelTest {
             monitorSuccessfulUploadsUseCase,
             shouldShowStorageQuotaWarningUseCase,
             setStorageQuotaWarningShownUseCase,
-            getFeatureFlagValueUseCase,
         )
     }
 
@@ -59,7 +55,6 @@ class StorageStatusViewModelTest {
                 StorageQuotaWarning(
                     storageState = StorageState.Red,
                     trigger = StorageQuotaWarningTrigger.LoginOrReload,
-                    isUpsellEnabled = true,
                 )
             )
         }
@@ -102,7 +97,6 @@ class StorageStatusViewModelTest {
         val warning = StorageQuotaWarning(
             storageState = StorageState.Orange,
             trigger = StorageQuotaWarningTrigger.UploadSuccess,
-            isUpsellEnabled = true,
         )
 
         buildUnderTest().onQuotaWarningShown(warning)
@@ -118,7 +112,6 @@ class StorageStatusViewModelTest {
         monitorSuccessfulUploadsUseCase = monitorSuccessfulUploadsUseCase,
         shouldShowStorageQuotaWarningUseCase = shouldShowStorageQuotaWarningUseCase,
         setStorageQuotaWarningShownUseCase = setStorageQuotaWarningShownUseCase,
-        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
     )
 
     /**
@@ -133,15 +126,11 @@ class StorageStatusViewModelTest {
     private fun stubDependencies(
         storageStates: Flow<StorageState>,
         shouldShow: Boolean = true,
-        isUpsellEnabled: Boolean = true,
     ) {
         monitorStorageStateUseCase.stub { on { invoke() }.thenReturn(storageStates) }
         monitorSuccessfulUploadsUseCase.stub { on { invoke() }.thenReturn(emptyFlow<Transfer>()) }
         shouldShowStorageQuotaWarningUseCase.stub {
             onBlocking { invoke(any(), any()) }.thenReturn(shouldShow)
-        }
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.QuotaWarningUpsellScreen) }.thenReturn(isUpsellEnabled)
         }
     }
 }

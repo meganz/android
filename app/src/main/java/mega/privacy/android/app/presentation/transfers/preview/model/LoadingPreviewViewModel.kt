@@ -20,9 +20,7 @@ import mega.privacy.android.domain.exception.NetworkUnavailableException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.transfers.NoTransferToShowException
 import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -42,7 +40,6 @@ class LoadingPreviewViewModel @AssistedInject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val broadcastTransferTagToCancelUseCase: BroadcastTransferTagToCancelUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     @Assisted private val args: Args,
     @ApplicationScope private val appScope: CoroutineScope,
@@ -153,29 +150,14 @@ class LoadingPreviewViewModel @AssistedInject constructor(
     }
 
     /**
-     * Sets the error that ends the screen, except for bandwidth over quota while the quota-warning
-     * upsell screen is enabled: the warning is then shown in this screen's own back stack, so
-     * closing the screen would take the warning down with it. With the upsell disabled the legacy
-     * over quota dialog belongs to the caller, which needs this screen to close first.
+     * Sets the error that ends the screen, except for bandwidth over quota: the quota-warning
+     * upsell screen is shown in this screen's own back stack, so closing the screen would take
+     * the warning down with it.
      */
-    private suspend fun updateTransferError(error: Throwable?) {
-        if (error is QuotaExceededMegaException && isQuotaWarningUpsellEnabled()) return
+    private fun updateTransferError(error: Throwable?) {
+        if (error is QuotaExceededMegaException) return
         _uiState.update { state -> state.copy(error = error) }
     }
-
-    /**
-     * Resolved once and kept: the value cannot change while the screen is open, and this runs
-     * inside a [collectLatest] block, where a new event would cancel a pending lookup and drop
-     * the error being handled.
-     */
-    private var quotaWarningUpsellEnabled: Boolean? = null
-
-    private suspend fun isQuotaWarningUpsellEnabled(): Boolean =
-        quotaWarningUpsellEnabled ?: runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
-        }.onFailure { Timber.e(it) }
-            .getOrDefault(false)
-            .also { quotaWarningUpsellEnabled = it }
 
     private fun monitorConnectivity() {
         viewModelScope.launch {
