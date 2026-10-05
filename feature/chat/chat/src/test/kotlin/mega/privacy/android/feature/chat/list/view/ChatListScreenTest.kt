@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.unit.width
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.performScrollToIndex
@@ -49,6 +51,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 class ChatListScreenTest {
@@ -307,6 +310,44 @@ class ChatListScreenTest {
         assertThat(pickedActions).containsExactly(MeetingAction.Schedule)
     }
 
+    @Test
+    @Config(qualifiers = "w411dp-h891dp")
+    fun `test that the create meeting tooltip is no wider than the other onboarding tooltips`() {
+        setupPopulatedScreen(showMeetingTab = true, meetingTooltip = MeetingTooltipItem.CREATE)
+
+        val tooltipWidth = composeRule.onNodeWithTag(CHAT_LIST_CREATE_MEETING_TOOLTIP_TAG)
+            .getUnclippedBoundsInRoot().width
+        assertThat(tooltipWidth).isAtMost(MEETING_TOOLTIP_MAX_WIDTH)
+    }
+
+    @Test
+    fun `test that the create meeting tooltip anchor is centred on the meeting fab`() {
+        setupPopulatedScreen(showMeetingTab = true, meetingTooltip = MeetingTooltipItem.CREATE)
+
+        val fabBounds = composeRule.onNodeWithTag(CHAT_LIST_MEETING_FAB_TAG)
+            .getUnclippedBoundsInRoot()
+        val anchorBounds = composeRule.onNodeWithTag(CHAT_LIST_MEETING_TOOLTIP_ANCHOR_TAG)
+            .getUnclippedBoundsInRoot()
+
+        assertThat(anchorBounds.width).isEqualTo(MEETING_TOOLTIP_ANCHOR_WIDTH)
+        assertThat(anchorBounds.top).isEqualTo(fabBounds.top)
+        assertThat((anchorBounds.left + anchorBounds.right) / 2)
+            .isEqualTo((fabBounds.left + fabBounds.right) / 2)
+    }
+
+    @Test
+    @Config(qualifiers = "w320dp-h640dp")
+    fun `test that the create meeting tooltip stays clear of the start edge when the screen is narrow`() {
+        setupPopulatedScreen(showMeetingTab = true, meetingTooltip = MeetingTooltipItem.CREATE)
+
+        val anchorEnd = composeRule.onNodeWithTag(CHAT_LIST_MEETING_TOOLTIP_ANCHOR_TAG)
+            .getUnclippedBoundsInRoot().right
+        val tooltipWidth = composeRule.onNodeWithTag(CHAT_LIST_CREATE_MEETING_TOOLTIP_TAG)
+            .getUnclippedBoundsInRoot().width
+
+        assertThat(tooltipWidth).isAtMost(anchorEnd - MEETING_TOOLTIP_START_MARGIN)
+    }
+
     @Composable
     private fun RestorableChatListScreen(showMeetingTab: Boolean = true) {
         CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
@@ -339,6 +380,7 @@ class ChatListScreenTest {
         isDoNotDisturbEnabled: Boolean = false,
         onDoNotDisturbEnabledClick: () -> Unit = {},
         onOpenLinkClick: () -> Unit = {},
+        meetingTooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
     ) {
         composeRule.setContent {
             CompositionLocalProvider(LocalTopLevelNavKeyClass provides ChatListNavKey::class) {
@@ -348,6 +390,7 @@ class ChatListScreenTest {
                             hasArchivedChats = hasArchivedChats,
                             isSearchAvailable = isSearchAvailable,
                             isDoNotDisturbEnabled = isDoNotDisturbEnabled,
+                            meetingTooltip = meetingTooltip,
                         ),
                         showMeetingTab = showMeetingTab,
                         onBackClick = onBackClick,
@@ -409,6 +452,7 @@ class ChatListScreenTest {
         hasArchivedChats: Boolean = true,
         isSearchAvailable: Boolean = true,
         isDoNotDisturbEnabled: Boolean = false,
+        meetingTooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
     ) = ChatListUiState.Data(
         chats = ChatListTabState.Results(persistentListOf(chatRoomUiItem(1L, "Chat"))),
         meetings = ChatListTabState.Results(persistentListOf(chatRoomUiItem(2L, "Meeting"))),
@@ -419,7 +463,7 @@ class ChatListScreenTest {
         isSearchAvailable = isSearchAvailable,
         chatStatus = ChatStatus.Online,
         isDoNotDisturbEnabled = isDoNotDisturbEnabled,
-        meetingTooltip = MeetingTooltipItem.NONE,
+        meetingTooltip = meetingTooltip,
     )
 
     private fun chatRoomUiItem(chatId: Long, title: String) = ChatRoomUiItem(

@@ -1,9 +1,12 @@
 package mega.privacy.android.feature.chat.list.view
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,10 +17,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -286,7 +292,7 @@ internal fun ChatListScreenContent(
     }
     var chatsScrollToTopToken by rememberSaveable { mutableIntStateOf(0) }
     var meetingsScrollToTopToken by rememberSaveable { mutableIntStateOf(0) }
-    var meetingFabCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    var meetingTooltipAnchorCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
     val navigationType = if (isMainNavBarRoot(ChatListNavKey::class)) {
         AppBarNavigationType.None
@@ -337,30 +343,38 @@ internal fun ChatListScreenContent(
         floatingActionButton = {
             if (uiState is ChatListUiState.Data && !searchMode) {
                 val isMeetingsTab = selectedTabIndex == MEETINGS_TAB_INDEX
-                MegaFab(
-                    modifier = Modifier
-                        .testTag(if (isMeetingsTab) CHAT_LIST_MEETING_FAB_TAG else CHAT_LIST_FAB_TAG)
-                        .onGloballyPositioned { meetingFabCoordinates = it }
-                        .applyScrollToHideFabBehavior(),
-                    onClick = if (isMeetingsTab) onMeetingFabClick else onNewChatClick,
-                    painter = rememberVectorPainter(
-                        if (isMeetingsTab) {
-                            IconPack.Medium.Thin.Outline.VideoPlus
-                        } else {
-                            IconPack.Medium.Thin.Outline.Plus
-                        }
-                    ),
-                    contentDescription = stringResource(
-                        if (isMeetingsTab) {
-                            sharedR.string.chat_meeting_actions_start_now
-                        } else {
-                            sharedR.string.new_chat_title
-                        }
-                    ),
-                )
+                Box(modifier = Modifier.applyScrollToHideFabBehavior()) {
+                    MegaFab(
+                        modifier = Modifier.testTag(
+                            if (isMeetingsTab) CHAT_LIST_MEETING_FAB_TAG else CHAT_LIST_FAB_TAG
+                        ),
+                        onClick = if (isMeetingsTab) onMeetingFabClick else onNewChatClick,
+                        painter = rememberVectorPainter(
+                            if (isMeetingsTab) {
+                                IconPack.Medium.Thin.Outline.VideoPlus
+                            } else {
+                                IconPack.Medium.Thin.Outline.Plus
+                            }
+                        ),
+                        contentDescription = stringResource(
+                            if (isMeetingsTab) {
+                                sharedR.string.chat_meeting_actions_start_now
+                            } else {
+                                sharedR.string.new_chat_title
+                            }
+                        ),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .size(width = MEETING_TOOLTIP_ANCHOR_WIDTH, height = 0.dp)
+                            .onGloballyPositioned { meetingTooltipAnchorCoordinates = it }
+                            .testTag(CHAT_LIST_MEETING_TOOLTIP_ANCHOR_TAG),
+                    )
+                }
                 if (isMeetingsTab && uiState.meetingTooltip == MeetingTooltipItem.CREATE) {
                     CreateMeetingTooltip(
-                        anchorCoordinates = meetingFabCoordinates,
+                        anchorCoordinates = meetingTooltipAnchorCoordinates,
                         onDismiss = {
                             onMeetingTooltipShown(MeetingTooltipItem.RECURRING_OR_PENDING)
                         },
@@ -469,8 +483,18 @@ private fun CreateMeetingTooltip(
     onDismiss: () -> Unit,
 ) {
     anchorCoordinates?.takeIf { it.isAttached }?.let { coordinates ->
+        val widthBeforeAnchorEnd = with(LocalDensity.current) {
+            (coordinates.positionInRoot().x + coordinates.size.width).toDp()
+        }
         InteractiveBottomDirectionTooltipPopup(
-            modifier = Modifier.testTag(CHAT_LIST_CREATE_MEETING_TOOLTIP_TAG),
+            modifier = Modifier
+                .widthIn(
+                    max = minOf(
+                        MEETING_TOOLTIP_MAX_WIDTH,
+                        widthBeforeAnchorEnd - MEETING_TOOLTIP_START_MARGIN,
+                    )
+                )
+                .testTag(CHAT_LIST_CREATE_MEETING_TOOLTIP_TAG),
             direction = TooltipDirection.Bottom.Right,
             properties = PopupProperties(
                 focusable = false,
@@ -506,6 +530,26 @@ private const val MEETINGS_TAB_INDEX = 1
 
 private val FAB_BOTTOM_CLEARANCE = 88.dp
 
+/**
+ * The core-ui tooltip expands to the full window width unless capped; this matches the cap the
+ * other core-ui onboarding tooltips use.
+ */
+internal val MEETING_TOOLTIP_MAX_WIDTH = 280.dp
+
+/**
+ * Keeps the tooltip clear of the screen's start edge on narrow screens, where the popup window
+ * would otherwise be pushed back on screen and its pointer moved off the floating action button.
+ */
+internal val MEETING_TOOLTIP_START_MARGIN = 16.dp
+
+/**
+ * A [TooltipDirection.Bottom.Right] tooltip aligns its right edge with the anchor's right edge and
+ * draws its pointer centred 17dp (corner radius 8dp + half the 18dp pointer) in from that edge, so
+ * an anchor of twice that width, centred on the floating action button, puts the pointer on the
+ * button's centre.
+ */
+internal val MEETING_TOOLTIP_ANCHOR_WIDTH = 34.dp
+
 internal const val CHAT_LIST_SCREEN_TAG = "chat_list_screen:screen"
 internal const val CHAT_LIST_SEARCH_BAR_TAG = "chat_list_screen:search_bar"
 internal const val CHAT_LIST_LOADING_TAG = "chat_list_screen:loading"
@@ -515,6 +559,7 @@ internal const val CHAT_LIST_MEETINGS_TAB_TAG = "chat_list_screen:meetings_tab"
 internal const val CHAT_LIST_FAB_TAG = "chat_list_screen:new_chat_fab"
 internal const val CHAT_LIST_MEETING_FAB_TAG = "chat_list_screen:new_meeting_fab"
 internal const val CHAT_LIST_CREATE_MEETING_TOOLTIP_TAG = "chat_list_screen:create_meeting_tooltip"
+internal const val CHAT_LIST_MEETING_TOOLTIP_ANCHOR_TAG = "chat_list_screen:meeting_tooltip_anchor"
 
 private val previewChats = persistentListOf(
     ChatRoomUiItem(
