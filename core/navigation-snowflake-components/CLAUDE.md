@@ -16,7 +16,7 @@ Source root: `src/main/java/mega/privacy/mobile/navigation/snowflake/` (note the
 - `model/` — `NavigationItem` (`@Immutable` item model) and `NavigationAnimationConfig`.
 
 ## Key Components
-- **`MainNavigationScaffold`** — the top-level composable. Takes an `ImmutableSet<NavigationItem>`, `onDestinationClick(MainNavItemNavKey)`, an `isSelected(NavKey)` predicate, an optional `NavigationAnimationConfig` and per-item icon slot, the `navContent(NavigationUiController)` body, and an `availableSlots` cap (default 5). Picks `NavigationRail` vs. `NavigationSuite` from orientation/window size and orders items by `PreferredSlot`.
+- **`MainNavigationScaffold`** — the top-level composable. Takes an `ImmutableList<NavigationItem>`, `onDestinationClick(MainNavItemNavKey)`, an `isSelected(NavKey)` predicate, an optional `NavigationAnimationConfig` and per-item icon slot, the `navContent(NavigationUiController)` body, and an `availableSlots` cap (default 5). Picks `NavigationRail` vs. `NavigationSuite` from orientation/window size and orders items by `PreferredSlot`.
 - **`NavigationItem`** (`model/`) — `@Immutable` data class: `destination: MainNavItemNavKey`, icons (default + optional selected), `@StringRes label`, `isEnabled`, optional `MainNavItemBadge`, optional analytics `NavigationEventIdentifier`, `PreferredSlot`, and a derived `testTag`. `getIcon(isSelected)` returns the selected icon when present and selected.
 - **`NavigationBadge`** — maps the `MainNavItemBadge` variants (`IconBadge` / `NumberBadge` / `TextBadge`, plus the small dot) to core-ui `NotificationBadge`.
 - **`IndicatorDot`** / **`NavigationScaffoldColors`** — small visual helpers for the selected-item indicator and scaffold theming.

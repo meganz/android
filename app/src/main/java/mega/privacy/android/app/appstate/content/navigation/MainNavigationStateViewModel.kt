@@ -3,7 +3,9 @@ package mega.privacy.android.app.appstate.content.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -106,7 +108,7 @@ class MainNavigationStateViewModel @Inject constructor(
         }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getNavigationItems(): Flow<ImmutableSet<NavigationItem>> {
+    private fun getNavigationItems(): Flow<ImmutableList<NavigationItem>> {
         return mainNavigationBarFlow.filterNotNull().flatMapLatest { bar ->
             val badgeFlowPair: List<Pair<Flow<MainNavItemBadge?>, MainNavItem>> =
                 bar.items.map { (it.badge ?: flowOf(null)) to it }
@@ -122,7 +124,7 @@ class MainNavigationStateViewModel @Inject constructor(
                     )
                 }
             }
-            combine(navigationItemFlows) { it.toList().toImmutableSet() }
+            combine(navigationItemFlows) { it.toList().toImmutableList() }
         }
     }
 

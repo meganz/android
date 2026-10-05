@@ -3,7 +3,7 @@ package mega.privacy.mobile.navigation.snowflake
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.android.tools.screenshot.PreviewTest
-import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.collections.immutable.toImmutableList
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.icon.pack.IconPack
@@ -87,7 +87,7 @@ class MainNavigationScaffoldScreenshotTest {
             preferredSlot = PreferredSlot.Last,
             isEnabled = disabledId != "menu",
         ),
-    ).toImmutableSet()
+    ).toImmutableList()
 
     private fun navigationItem(
         id: String,
