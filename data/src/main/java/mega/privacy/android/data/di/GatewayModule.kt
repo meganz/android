@@ -1,8 +1,12 @@
 package mega.privacy.android.data.di
 
+import android.content.Context
+import androidx.credentials.CredentialManager
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AdsFacade
 import mega.privacy.android.data.facade.AppEventFacade
@@ -23,6 +27,7 @@ import mega.privacy.android.data.facade.MegaLocalRoomFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.data.facade.NotificationsFacade
 import mega.privacy.android.data.facade.PermissionFacade
+import mega.privacy.android.data.facade.RestoreCredentialFacade
 import mega.privacy.android.data.facade.SDCardFacade
 import mega.privacy.android.data.facade.TelephonyFacade
 import mega.privacy.android.data.facade.VerifyPurchaseFacade
@@ -56,6 +61,7 @@ import mega.privacy.android.data.gateway.NotificationsGateway
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.gateway.QAAccountCacheGateway
 import mega.privacy.android.data.gateway.RemoteConfigGateway
+import mega.privacy.android.data.gateway.RestoreCredentialGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
@@ -351,4 +357,15 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindAgeSignalsGateway(implementation: AgeSignalsGatewayImpl): AgeSignalsGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindRestoreCredentialGateway(implementation: RestoreCredentialFacade): RestoreCredentialGateway
+
+    companion object {
+        @Provides
+        @Singleton
+        fun provideCredentialManager(@ApplicationContext context: Context): CredentialManager =
+            CredentialManager.create(context)
+    }
 }

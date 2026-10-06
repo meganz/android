@@ -385,6 +385,16 @@ enum class ApiFeatures(
         experimentName = "aomp1",
         description = "Enable Offline Mode Phase 1 on the Home screen",
         defaultValue = false,
+    ),
+
+    /**
+     * Zero-tap sign-in with the Android Restore Credentials API: the app stores a restore key
+     * after login and uses it to sign the user in again silently after a device restore.
+     */
+    RestoreCredentials(
+        experimentName = "andrc",
+        description = "Enable zero-tap sign-in after a device restore using restore credentials",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

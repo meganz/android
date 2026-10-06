@@ -65,6 +65,7 @@ dependencies {
     implementation(androidx.concurrent.futures)
     implementation(androidx.paging)
     implementation(androidx.documentfile)
+    implementation(androidx.credentials)
 
     implementation(lib.billing.client.ktx)
 

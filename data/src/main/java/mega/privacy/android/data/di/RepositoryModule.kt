@@ -45,6 +45,7 @@ import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.FileLinkRepositoryImpl
 import mega.privacy.android.data.repository.FileServiceRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
+import mega.privacy.android.data.repository.FirebaseAnalyticsRepositoryImpl
 import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
 import mega.privacy.android.data.repository.FolderPreferenceRepositoryImpl
 import mega.privacy.android.data.repository.GeocoderRepositoryImpl
@@ -60,7 +61,6 @@ import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.PermissionRepositoryImpl
 import mega.privacy.android.data.repository.RegexRepositoryImpl
-import mega.privacy.android.data.repository.FirebaseAnalyticsRepositoryImpl
 import mega.privacy.android.data.repository.RemoteConfigRepositoryImpl
 import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.SearchRepositoryImpl
@@ -85,6 +85,7 @@ import mega.privacy.android.data.repository.monitoring.PerformanceReporterReposi
 import mega.privacy.android.data.repository.photos.DefaultPhotosRepository
 import mega.privacy.android.data.repository.psa.PsaRepositoryImpl
 import mega.privacy.android.data.repository.security.PasscodeRepositoryImpl
+import mega.privacy.android.data.repository.security.RestoreCredentialRepositoryImpl
 import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AdsRepository
@@ -111,6 +112,7 @@ import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileLinkRepository
 import mega.privacy.android.domain.repository.FileServiceRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.FirebaseAnalyticsRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.FolderPreferenceRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
@@ -130,7 +132,6 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.RegexRepository
-import mega.privacy.android.domain.repository.FirebaseAnalyticsRepository
 import mega.privacy.android.domain.repository.RemoteConfigRepository
 import mega.privacy.android.domain.repository.RemotePreferencesRepository
 import mega.privacy.android.domain.repository.SearchRepository
@@ -159,6 +160,7 @@ import mega.privacy.android.domain.repository.monitoring.PerformanceReporterRepo
 import mega.privacy.android.domain.repository.psa.PsaRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
+import mega.privacy.android.domain.repository.security.RestoreCredentialRepository
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.usecase.logout.LogoutTask
 import javax.inject.Singleton
@@ -452,4 +454,10 @@ internal abstract class RepositoryModule {
     abstract fun bindContinueWhereLeftOffRepository(
         implementation: DefaultContinueWhereLeftOffRepository,
     ): ContinueWhereLeftOffRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRestoreCredentialRepository(
+        implementation: RestoreCredentialRepositoryImpl,
+    ): RestoreCredentialRepository
 }
