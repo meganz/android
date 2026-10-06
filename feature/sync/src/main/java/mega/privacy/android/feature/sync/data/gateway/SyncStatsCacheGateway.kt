@@ -7,4 +7,6 @@ internal interface SyncStatsCacheGateway {
     fun getSyncStatsById(syncId: Long): MegaSyncStats?
 
     fun setSyncStats(syncStats: MegaSyncStats)
+
+    fun getAllSyncStats(): List<MegaSyncStats>
 }

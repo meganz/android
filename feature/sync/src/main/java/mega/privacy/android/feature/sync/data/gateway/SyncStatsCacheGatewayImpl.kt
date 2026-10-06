@@ -14,4 +14,7 @@ internal class SyncStatsCacheGatewayImpl @Inject constructor() : SyncStatsCacheG
     override fun setSyncStats(syncStats: MegaSyncStats) {
         syncStatsInMemoryCache[syncStats.backupId] = syncStats
     }
+
+    override fun getAllSyncStats(): List<MegaSyncStats> =
+        syncStatsInMemoryCache.values.toList()
 }

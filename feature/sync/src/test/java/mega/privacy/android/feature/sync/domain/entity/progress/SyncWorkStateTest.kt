@@ -66,6 +66,18 @@ internal class SyncWorkStateTest {
     }
 
     @Test
+    fun `test that hasWork does not depend on hasError`() {
+        listOf(
+            workState(SyncRunState.Pending),
+            workState(SyncRunState.Running, sample(uploads = 3)),
+            workState(SyncRunState.Suspended),
+        ).forEach { state ->
+            assertThat(state.copy(hasError = true).hasWork)
+                .isEqualTo(state.copy(hasError = false).hasWork)
+        }
+    }
+
+    @Test
     fun `test that pendingItems sums uploads and downloads`() {
         assertThat(sample(uploads = 2, downloads = 3).pendingItems).isEqualTo(5)
     }

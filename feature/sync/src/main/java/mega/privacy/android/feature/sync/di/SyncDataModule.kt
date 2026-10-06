@@ -37,6 +37,7 @@ import mega.privacy.android.feature.sync.data.repository.SyncExclusionsRepositor
 import mega.privacy.android.feature.sync.data.repository.SyncNewFolderParamsRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncNotificationRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncPreferencesRepositoryImpl
+import mega.privacy.android.feature.sync.data.repository.SyncProgressRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncPromotionPreferencesRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncSolvedIssuesRepositoryImpl
@@ -45,6 +46,7 @@ import mega.privacy.android.feature.sync.domain.repository.SyncExclusionsReposit
 import mega.privacy.android.feature.sync.domain.repository.SyncNewFolderParamsRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
+import mega.privacy.android.feature.sync.domain.repository.SyncProgressRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncPromotionPreferencesRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncSolvedIssuesRepository
@@ -122,6 +124,10 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindSyncWorkManagerGateway(implementation: SyncWorkManagerGatewayImpl): SyncWorkManagerGateway
+
+    @Binds
+    @Singleton
+    fun bindSyncProgressRepository(implementation: SyncProgressRepositoryImpl): SyncProgressRepository
 
     companion object {
         @Provides
