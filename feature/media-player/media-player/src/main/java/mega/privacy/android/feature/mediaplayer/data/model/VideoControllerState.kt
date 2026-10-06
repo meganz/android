@@ -60,4 +60,19 @@ data class VideoControllerState(
      * a stored copy goes stale whenever only one of them changes.
      */
     val isPlaying: Boolean get() = isReady && playWhenReady
+
+    /**
+     * True while the player is working towards a picture: buffering, or not yet out of the idle
+     * state it starts in before the first item is prepared.
+     *
+     * Not simply `!isReady`. [isBuffering], [isEnded] and [isReady] map the one playback state,
+     * and a fourth value — idle — leaves all three false, so the negation would also hold once
+     * the item has ended and the player is deliberately showing its last frame.
+     *
+     * A failed item also lands back in idle, so this reads true after an error even though
+     * nothing is being worked towards. Error handling has not been rebuilt yet; until it is,
+     * showing progress is no worse than the frozen black the screen would show instead.
+     * Tracked under AND-23937.
+     */
+    val isLoading: Boolean get() = isBuffering || (!isReady && !isEnded)
 }

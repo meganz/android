@@ -4,9 +4,14 @@ import android.view.TextureView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+import mega.privacy.android.feature.mediaplayer.components.MediaPlayerLoadingIndicator
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerUiState
 
 /**
@@ -25,7 +30,10 @@ internal fun VideoPlayerScreen(
     onSurfaceReleased: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxSize().background(Color.Black)) {
+    Box(
+        modifier = modifier.fillMaxSize().background(Color.Black),
+        contentAlignment = Alignment.Center,
+    ) {
         if (uiState is VideoPlayerUiState.Data) {
             VideoSurface(
                 videoWidth = uiState.videoWidth,
@@ -34,5 +42,17 @@ internal fun VideoPlayerScreen(
                 onSurfaceReleased = onSurfaceReleased,
             )
         }
+        if (uiState.showsLoadingIndicator) {
+            MediaPlayerLoadingIndicator(
+                modifier = Modifier
+                    .size(LOADING_INDICATOR_SIZE)
+                    .testTag(VIDEO_PLAYER_LOADING_TEST_TAG)
+            )
+        }
     }
 }
+
+private val LOADING_INDICATOR_SIZE = 48.dp
+
+/** The spinner shown while the player works towards its first frame. */
+const val VIDEO_PLAYER_LOADING_TEST_TAG = "video_player:loading"

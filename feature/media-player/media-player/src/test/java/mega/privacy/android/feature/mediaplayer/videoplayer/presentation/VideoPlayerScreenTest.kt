@@ -25,12 +25,17 @@ class VideoPlayerScreenTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private fun data(videoWidth: Int, videoHeight: Int) = VideoPlayerUiState.Data(
+    private fun data(
+        videoWidth: Int = 1920,
+        videoHeight: Int = 1080,
+        isLoading: Boolean = false,
+    ) = VideoPlayerUiState.Data(
         currentPlayingHandle = 1L,
         currentPlayingItemName = "video.mp4",
         launchSourceType = VideoPlayerLaunchSourceType.VideoBrowse,
         videoWidth = videoWidth,
         videoHeight = videoHeight,
+        isLoading = isLoading,
     )
 
     /**
@@ -102,6 +107,35 @@ class VideoPlayerScreenTest {
         assertThat((bounds.bottom.value - bounds.top.value)).isWithin(TOLERANCE).of(CONTAINER_HEIGHT.value)
         assertThat((bounds.right.value - bounds.left.value))
             .isWithin(TOLERANCE).of(CONTAINER_HEIGHT.value * 1080f / 1920f)
+    }
+
+    @Test
+    fun `test that the loading indicator is shown while the launch is being resolved`() {
+        setScreen(VideoPlayerUiState.Loading)
+
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_LOADING_TEST_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the loading indicator is shown while the player works towards a picture`() {
+        setScreen(data(isLoading = true))
+
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_LOADING_TEST_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the loading indicator is gone once the picture is playing`() {
+        setScreen(data(isLoading = false))
+
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_LOADING_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that no loading indicator is shown when the launch source is unusable`() {
+        setScreen(VideoPlayerUiState.InvalidLaunchSource)
+
+        // The screen is closing, so a spinner would flash on the way out.
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_LOADING_TEST_TAG).assertDoesNotExist()
     }
 
     private companion object {

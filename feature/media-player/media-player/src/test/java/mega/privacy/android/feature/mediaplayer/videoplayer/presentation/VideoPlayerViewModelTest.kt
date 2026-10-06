@@ -278,6 +278,40 @@ internal class VideoPlayerViewModelTest {
     }
 
     @Test
+    fun `test that uiState is loading until the player is ready`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        underTest.uiState.test {
+            // Idle: prepared but no frame decoded yet, which is what the spinner covers.
+            assertThat((awaitItem() as VideoPlayerUiState.Data).isLoading).isTrue()
+
+            playerState.value = VideoControllerState(isReady = true)
+            assertThat((awaitItem() as VideoPlayerUiState.Data).isLoading).isFalse()
+
+            // Re-buffering mid-playback puts it back.
+            playerState.value = VideoControllerState(isBuffering = true)
+            assertThat((awaitItem() as VideoPlayerUiState.Data).isLoading).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that uiState is not loading once the item has ended`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        underTest.uiState.test {
+            awaitItem()
+
+            // Ended leaves isReady false as well, so a plain negation would spin forever on the
+            // last frame.
+            playerState.value = VideoControllerState(isEnded = true)
+
+            assertThat((awaitItem() as VideoPlayerUiState.Data).isLoading).isFalse()
+        }
+    }
+
+    @Test
     fun `test that the player is released when the ViewModel is cleared`() = runTest {
         whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
         initViewModel()

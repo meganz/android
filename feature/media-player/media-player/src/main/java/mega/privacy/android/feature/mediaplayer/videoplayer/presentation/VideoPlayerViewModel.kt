@@ -87,6 +87,7 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
                 resolved.copy(
                     videoWidth = player.videoWidth,
                     videoHeight = player.videoHeight,
+                    isLoading = player.isLoading,
                 )
             }
         } else {
@@ -125,6 +126,7 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
                 launchSourceType = source.sourceType,
                 videoWidth = 0,
                 videoHeight = 0,
+                isLoading = true,
             )
         }
     }

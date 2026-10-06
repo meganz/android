@@ -13,6 +13,14 @@ import androidx.compose.runtime.Stable
 @Stable
 sealed interface VideoPlayerUiState {
 
+    /**
+     * Whether the screen shows a spinner: the launch is still being resolved, or the player is
+     * working towards a picture. Both, so that the screen is never plain black on the way to the
+     * first frame. A rejected launch shows nothing — that screen is already closing.
+     */
+    val showsLoadingIndicator: Boolean
+        get() = this is Loading || (this is Data && isLoading)
+
     /** The launch source has not been resolved yet. */
     data object Loading : VideoPlayerUiState
 
@@ -26,6 +34,8 @@ sealed interface VideoPlayerUiState {
      * decoded. Together with [videoHeight] it is what the picture is laid out to.
      * @property videoHeight Height of the video as the player reports it, `0` until a frame has
      * been decoded.
+     * @property isLoading Whether the player is working towards a picture, so the screen shows a
+     * spinner rather than the black it would otherwise sit on.
      */
     data class Data(
         val currentPlayingHandle: Long,
@@ -33,6 +43,7 @@ sealed interface VideoPlayerUiState {
         val launchSourceType: VideoPlayerLaunchSourceType,
         val videoWidth: Int,
         val videoHeight: Int,
+        val isLoading: Boolean,
     ) : VideoPlayerUiState
 
     /**
