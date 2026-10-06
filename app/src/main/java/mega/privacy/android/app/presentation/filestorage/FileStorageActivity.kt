@@ -263,10 +263,15 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 intent.setDataAndType(uri, type)
-                if (MegaApiUtils.isIntentAvailable(this, intent)) {
-                    startActivity(intent)
-                }
                 viewModel.consumeDocumentClickedEvent()
+                if (MegaApiUtils.isIntentAvailable(this, intent)) {
+                    // The system can still cancel a resolved launch (e.g. OEM intent interceptors)
+                    runCatching { startActivity(intent) }
+                        .onFailure { e ->
+                            Timber.w(e, "Unable to open file with third party app")
+                            showSnackbar(viewContainer, getString(R.string.intent_not_available))
+                        }
+                }
             }
         }
     }
