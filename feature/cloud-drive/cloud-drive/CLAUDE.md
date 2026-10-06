@@ -12,6 +12,7 @@ This is a presentation-only module (Jetpack Compose + Navigation3). It contains 
 ## Architecture & Layout
 All code lives under `presentation/` (one package per screen), plus `di/` and `navigation/`:
 - `presentation/{clouddrive, rubbishbin, shares, offline, favourites, search, audio, folderlink, filelink, publiclink, drivesync}/` — each feature area holds its `*ViewModel`, `*Screen`, `*ScreenDestination`, and a `model/` (UI state) and sometimes `view/` subpackage.
+- `presentation/folderbrowser/` — the paged folder screen (`FolderBrowserViewModel` over `NodeListPager`, `FolderBrowserScreen`, `view/FolderBrowserContent`), shown by `CloudDriveScreenDestination` behind `FeatureFlagGate(ApiFeatures.NodeListPagination)` with `presentation/clouddrive/` as the disabled branch. The Screen and Content are deliberate copies of the Cloud Drive ones for the flag window: a fix to one must be mirrored in the other until the old stack is deleted.
 - `presentation/search/mapper/` — presentation mappers for search filters/placeholders.
 - `di/` — Hilt module.
 - `navigation/` — feature destination, deep link handler, nav item.

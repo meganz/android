@@ -191,8 +191,6 @@ fun <T : TypedNode> NodesView(
  * @param highlightText the text to highlight in the title and description
  * @param onVisibleRangeChanged called with the indices into [items] currently on screen whenever
  * they change; not called while nothing is laid out, as for a tab kept composed at zero size
- * @param onScrollingChanged called when the list starts or stops scrolling, and with false once
- * more when this view leaves the composition
  */
 @Composable
 fun <T : TypedNode> NodesView(
@@ -219,7 +217,6 @@ fun <T : TypedNode> NodesView(
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     onVisibleRangeChanged: ((IntRange) -> Unit)? = null,
-    onScrollingChanged: ((Boolean) -> Unit)? = null,
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val onNodeClicked: (T) -> Unit = { node ->
@@ -244,15 +241,6 @@ fun <T : TypedNode> NodesView(
             gridState = gridState,
             hasHeader = showSortOrder || showChangeViewType,
             onVisibleRangeChanged = onVisibleRangeChanged,
-        )
-    }
-
-    if (onScrollingChanged != null) {
-        ScrollingEffect(
-            isListView = isListView,
-            listState = listState,
-            gridState = gridState,
-            onScrollingChanged = onScrollingChanged,
         )
     }
 
@@ -362,31 +350,6 @@ private fun VisibleRangeEffect(
             .filterNotNull()
             .distinctUntilChanged()
             .collect { currentCallback(it) }
-    }
-}
-
-/**
- * Reports whether the list is scrolling, and reports false on dispose so a caller that holds work
- * back while scrolling is never left waiting for a stop that cannot come.
- */
-@Composable
-private fun ScrollingEffect(
-    isListView: Boolean,
-    listState: LazyListState,
-    gridState: LazyGridState,
-    onScrollingChanged: (Boolean) -> Unit,
-) {
-    val currentCallback by rememberUpdatedState(onScrollingChanged)
-    LaunchedEffect(isListView, listState, gridState) {
-        try {
-            snapshotFlow {
-                if (isListView) listState.isScrollInProgress else gridState.isScrollInProgress
-            }
-                .distinctUntilChanged()
-                .collect { currentCallback(it) }
-        } finally {
-            currentCallback(false)
-        }
     }
 }
 

@@ -1478,6 +1478,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             searchCategory = SearchCategory.ALL_MEDIA,
             sensitivityFilter = sensitivityFilter,
         )
+        // TODO Replace with the SDK's getMediaPresence(nodeHandle, excludeSensitives) once it ships;
+        //  it also answers "all files are media" for ShouldEnterMediaDiscoveryModeUseCase
         // Unsorted: the answer does not depend on order, and sorting is the costly part
         megaApiGateway.getChildren(
             filter = filter,

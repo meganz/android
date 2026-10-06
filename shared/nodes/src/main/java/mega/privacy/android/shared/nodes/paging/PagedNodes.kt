@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.nodes.paging
 
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.nodes.model.TypedNodeItem
 
@@ -21,3 +22,15 @@ data class PagedNodes<T : TypedNode>(
     val total: Int? = null,
     val reconcileVersion: Int = 0,
 )
+
+/**
+ * The paged load state in the terms the node list screens already read. A failed append keeps the
+ * loaded items and reads as fully loaded; a failed first page reads as failed.
+ */
+val PagedNodes<*>.nodesLoadingState: NodesLoadingState
+    get() = when (loadState) {
+        PagedLoadState.FirstPage -> NodesLoadingState.Loading
+        PagedLoadState.Idle, PagedLoadState.PageFailed -> NodesLoadingState.FullyLoaded
+        PagedLoadState.LoadingMore -> NodesLoadingState.PartiallyLoaded
+        PagedLoadState.FirstPageFailed -> NodesLoadingState.Failed
+    }

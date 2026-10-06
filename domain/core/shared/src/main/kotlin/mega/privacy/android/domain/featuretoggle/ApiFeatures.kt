@@ -22,6 +22,16 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Paged folder browsing: Cloud Drive folders open in FolderBrowserScreen, which loads
+     * children page by page instead of the whole folder
+     */
+    NodeListPagination(
+        experimentName = "acdpg",
+        description = "Browse Cloud Drive folders page by page (FolderBrowserScreen)",
+        defaultValue = false,
+    ),
+
+    /**
      * Reflects the state of an offline download while it is still running: the node is shown as
      * already available offline, and removing it from offline cancels its download.
      */

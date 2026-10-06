@@ -28,9 +28,8 @@ import org.mockito.kotlin.mock
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeListPagerTest {
 
-    private val visibleRange = MutableSharedFlow<IntRange>(extraBufferCapacity = 8)
     private val changes = MutableSharedFlow<Unit>(extraBufferCapacity = 8)
-    private val publishGate = MutableStateFlow(true)
+    private val observers = MutableStateFlow(1)
     private val requests = mutableListOf<PageRequest>()
 
     private var source: List<TypedNode> = emptyList()
@@ -65,20 +64,23 @@ class NodeListPagerTest {
         source = nodes(1L..25L)
         failNextLoad = false
         holdNextLoad = null
-        publishGate.value = true
+        observers.value = 1
+        visibleRanges = NodeListPager.visibleRanges()
     }
 
     private fun node(id: Long): TypedNode = mock<TypedFileNode> { on { this.id } doReturn NodeId(id) }
 
     private fun nodes(ids: LongRange): List<TypedNode> = ids.map { node(it) }
 
+    private lateinit var visibleRanges: MutableSharedFlow<IntRange>
+
     private fun TestScope.newPager(
         pageSize: Int = 10,
-        initialDepth: Int = 0,
+        initialCount: Int = 0,
         withCount: Boolean = false,
     ) = NodeListPager(
         pageSize = pageSize,
-        initialDepth = initialDepth,
+        initialCount = initialCount,
         load = load,
         map = map,
         count = if (withCount) ({ source.size }) else null,
@@ -91,12 +93,12 @@ class NodeListPagerTest {
      */
     private fun pagerTest(
         pageSize: Int = 10,
-        initialDepth: Int = 0,
+        initialCount: Int = 0,
         withCount: Boolean = false,
         block: suspend TestScope.(NodeListPager<TypedNode>) -> Unit,
     ) = runTest {
-        val pager = newPager(pageSize, initialDepth, withCount)
-        val job = launch { pager.run(visibleRange, changes, publishGate) }
+        val pager = newPager(pageSize, initialCount, withCount)
+        val job = launch { pager.run(changes, visibleRanges, observers) }
         runCurrent()
         block(pager)
         job.cancel()
@@ -121,8 +123,8 @@ class NodeListPagerTest {
     }
 
     @Test
-    fun `test that run widens the first page to cover initialDepth in one call`() =
-        pagerTest(initialDepth = 15) { pager ->
+    fun `test that run widens the first page to a restored count in one call`() =
+        pagerTest(initialCount = 25) { pager ->
             assertThat(requests).containsExactly(PageRequest(offset = 0, limit = 25))
             assertThat(pager.loadedIds()).hasSize(25)
         }
@@ -130,8 +132,8 @@ class NodeListPagerTest {
     @Test
     fun `test that a visible range near the end loads the next page once when reported twice`() =
         pagerTest { pager ->
-            visibleRange.emit(5..9)
-            visibleRange.emit(6..9)
+            visibleRanges.tryEmit(5..9)
+            visibleRanges.tryEmit(6..9)
             advanceUntilIdle()
 
             assertThat(requests).containsExactly(
@@ -142,8 +144,18 @@ class NodeListPagerTest {
         }
 
     @Test
-    fun `test that a visible range far from the end loads nothing`() = pagerTest { _ ->
-        visibleRange.emit(0..3)
+    fun `test that ensureLoaded loads to the index at once and is not replaced by a later visible range`() =
+        pagerTest { pager ->
+            pager.ensureLoaded(index = 17)
+            visibleRanges.tryEmit(0..3)
+            advanceUntilIdle()
+
+            assertThat(pager.loadedIds().size).isAtLeast(18)
+        }
+
+    @Test
+    fun `test that a visible range far from the end loads nothing`() = pagerTest { pager ->
+        visibleRanges.tryEmit(0..3)
         advanceUntilIdle()
 
         assertThat(requests).hasSize(1)
@@ -153,7 +165,7 @@ class NodeListPagerTest {
     fun `test that a fling over several pages is served by one request up to maxRequestSize`() {
         source = nodes(1L..100L)
         pagerTest { pager ->
-            visibleRange.emit(0..45)
+            visibleRanges.tryEmit(0..45)
             advanceUntilIdle()
 
             // 51 rows requested: 41 missing, capped at 4 pages, then the remaining page
@@ -169,13 +181,13 @@ class NodeListPagerTest {
             // A node inserted above the loaded rows shifts the SDK's offsets by one
             source = listOf(node(100L)) + source
 
-            visibleRange.emit(5..9)
+            visibleRanges.tryEmit(5..9)
             advanceUntilIdle()
 
             // The SDK's rows 10..19 are ids 10..19; id 10 is already loaded
             assertThat(pager.loadedIds()).isEqualTo((1L..19L).toList())
 
-            visibleRange.emit(15..18)
+            visibleRanges.tryEmit(15..18)
             advanceUntilIdle()
 
             assertThat(pager.loadedIds()).isEqualTo((1L..25L).toList())
@@ -186,7 +198,7 @@ class NodeListPagerTest {
     fun `test that no page is loaded once hasMore is false`() {
         source = nodes(1L..10L)
         pagerTest { pager ->
-            visibleRange.emit(5..9)
+            visibleRanges.tryEmit(5..9)
             advanceUntilIdle()
 
             assertThat(requests).hasSize(1)
@@ -197,7 +209,7 @@ class NodeListPagerTest {
     @Test
     fun `test that a change re-reads the loaded prefix in one call and replaces the items`() =
         pagerTest { pager ->
-            visibleRange.emit(5..9)
+            visibleRanges.tryEmit(5..9)
             advanceUntilIdle()
             // Node 3 deleted, node 5 renamed so it now sorts first
             source = listOf(source[4]) + source.filter { it.id.longValue !in setOf(3L, 5L) }
@@ -218,7 +230,7 @@ class NodeListPagerTest {
 
             changes.emit(Unit)
             advanceUntilIdle()
-            visibleRange.emit(5..9)
+            visibleRanges.tryEmit(5..9)
             advanceUntilIdle()
 
             assertThat(requests.map { it.offset }).containsExactly(0, 0, 10).inOrder()
@@ -229,7 +241,7 @@ class NodeListPagerTest {
     fun `test that a node appended to a fully loaded folder is loaded after the re-read`() {
         source = nodes(1L..10L)
         pagerTest { pager ->
-            visibleRange.emit(5..9)
+            visibleRanges.tryEmit(5..9)
             advanceUntilIdle()
             assertThat(pager.state.value.hasMore).isFalse()
 
@@ -242,23 +254,18 @@ class NodeListPagerTest {
     }
 
     @Test
-    fun `test that a change while the gate is closed waits and load-more still runs`() {
-        publishGate.value = false
+    fun `test that a change while nobody observes the state is re-read once someone does`() {
+        observers.value = 0
         pagerTest { pager ->
             changes.emit(Unit)
-            visibleRange.emit(5..9)
             advanceUntilIdle()
 
-            assertThat(requests).containsExactly(
-                PageRequest(offset = 0, limit = 10),
-                PageRequest(offset = 10, limit = 10),
-            )
-            assertThat(pager.state.value.reconcileVersion).isEqualTo(0)
+            assertThat(reReads()).isEmpty()
 
-            publishGate.value = true
+            observers.value = 1
             advanceUntilIdle()
 
-            assertThat(requests.last()).isEqualTo(PageRequest(offset = 0, limit = 20))
+            assertThat(reReads()).hasSize(1)
             assertThat(pager.state.value.reconcileVersion).isEqualTo(1)
         }
     }
@@ -268,7 +275,7 @@ class NodeListPagerTest {
         pagerTest { pager ->
             val hold = CompletableDeferred<Unit>()
             holdNextLoad = hold
-            visibleRange.emit(5..9)
+            visibleRanges.tryEmit(5..9)
             settle()
             assertThat(pager.state.value.loadState).isEqualTo(PagedLoadState.LoadingMore)
 
@@ -283,7 +290,7 @@ class NodeListPagerTest {
         }
 
     @Test
-    fun `test that a burst of changes collapses into one re-read`() = pagerTest { _ ->
+    fun `test that a burst of changes collapses into one re-read`() = pagerTest { pager ->
         repeat(3) { changes.emit(Unit) }
         advanceUntilIdle()
 
@@ -353,11 +360,11 @@ class NodeListPagerTest {
     @Test
     fun `test that scrolling further retries a failed page`() = pagerTest { pager ->
         failNextLoad = true
-        visibleRange.emit(5..9)
+        visibleRanges.tryEmit(5..9)
         settle()
         assertThat(pager.state.value.loadState).isEqualTo(PagedLoadState.PageFailed)
 
-        visibleRange.emit(10..14)
+        visibleRanges.tryEmit(10..14)
         settle()
 
         assertThat(requests).hasSize(3)
@@ -400,7 +407,7 @@ class NodeListPagerTest {
         pagerTest { pager ->
             failNextLoad = true
 
-            visibleRange.emit(5..9)
+            visibleRanges.tryEmit(5..9)
             advanceUntilIdle()
 
             assertThat(requests).hasSize(2)
@@ -411,10 +418,10 @@ class NodeListPagerTest {
     @Test
     fun `test that cancelling run during a page does not report a failure`() = runTest {
         val pager = newPager()
-        val job = launch { pager.run(visibleRange, changes, publishGate) }
+        val job = launch { pager.run(changes, visibleRanges, observers) }
         runCurrent()
         holdNextLoad = CompletableDeferred()
-        visibleRange.emit(5..9)
+        visibleRanges.tryEmit(5..9)
         settle()
         assertThat(pager.state.value.loadState).isEqualTo(PagedLoadState.LoadingMore)
 

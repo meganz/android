@@ -321,27 +321,22 @@ class NodesViewTest {
         listState: LazyListState,
         viewportSize: Dp? = null,
         onVisibleRangeChanged: ((IntRange) -> Unit)? = null,
-        onScrollingChanged: ((Boolean) -> Unit)? = null,
-        show: () -> Boolean = { true },
     ) {
         val manyItems = (1L..60L).map { previewFolderNodeUiItem(id = it) }
         composeTestRule.setContent {
-            if (show()) {
-                Box(modifier = viewportSize?.let { Modifier.size(it) } ?: Modifier.fillMaxSize()) {
-                    NodesView(
-                        modifier = Modifier.fillMaxSize(),
-                        items = manyItems,
-                        onMenuClicked = {},
-                        onItemClicked = {},
-                        onLongClicked = {},
-                        sortConfiguration = NodeSortConfiguration.default,
-                        isListView = true,
-                        nodeSelectionState = NodeSelectionState(),
-                        listState = listState,
-                        onVisibleRangeChanged = onVisibleRangeChanged,
-                        onScrollingChanged = onScrollingChanged,
-                    )
-                }
+            Box(modifier = viewportSize?.let { Modifier.size(it) } ?: Modifier.fillMaxSize()) {
+                NodesView(
+                    modifier = Modifier.fillMaxSize(),
+                    items = manyItems,
+                    onMenuClicked = {},
+                    onItemClicked = {},
+                    onLongClicked = {},
+                    sortConfiguration = NodeSortConfiguration.default,
+                    isListView = true,
+                    nodeSelectionState = NodeSelectionState(),
+                    listState = listState,
+                    onVisibleRangeChanged = onVisibleRangeChanged,
+                )
             }
         }
         composeTestRule.waitForIdle()
@@ -374,23 +369,5 @@ class NodesViewTest {
         )
 
         assertThat(ranges).isEmpty()
-    }
-
-    @Test
-    fun `test that NodesView reports scrolling false when it leaves the composition`() {
-        var show by mutableStateOf(true)
-        val scrolling = mutableListOf<Boolean>()
-        setPagingContent(
-            listState = LazyListState(),
-            onScrollingChanged = { scrolling += it },
-            show = { show },
-        )
-
-        assertThat(scrolling).containsExactly(false)
-
-        show = false
-        composeTestRule.waitForIdle()
-
-        assertThat(scrolling).containsExactly(false, false).inOrder()
     }
 }

@@ -2,8 +2,10 @@ package mega.privacy.android.shared.nodes.paging
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,27 +33,28 @@ import kotlin.time.Duration.Companion.milliseconds
  * can land.
  *
  * @param pageSize smallest request after the first page
- * @param initialDepth first visible index restored after process death; the first page covers it
- * @param prefetchDistance rows to keep loaded ahead of the last visible row
- * @param maxRequestSize largest request after the first page; a fling is served in one request
+ * @param initialCount rows the first request covers when more than a page, for a restored prefix
  * @param load the paged query
  * @param map page of nodes to list items; runs per page and over the prefix on a re-read
  * @param count folder child count for [PagedNodes.total], null when the query has none
  */
 class NodeListPager<T : TypedNode>(
     private val pageSize: Int,
-    private val initialDepth: Int = 0,
-    private val prefetchDistance: Int = pageSize / 2,
-    private val maxRequestSize: Int = pageSize * MAX_REQUEST_PAGES,
+    private val initialCount: Int = 0,
     private val load: suspend (PageRequest) -> NodePage<T>,
     private val map: suspend (List<T>) -> List<TypedNodeItem<T>>,
     private val count: (suspend () -> Int)? = null,
 ) {
     init {
         require(pageSize > 0) { "pageSize must be positive, was $pageSize" }
-        require(initialDepth >= 0) { "initialDepth must not be negative, was $initialDepth" }
-        require(maxRequestSize >= pageSize) { "maxRequestSize must be at least pageSize" }
+        require(initialCount >= 0) { "initialCount must not be negative, was $initialCount" }
     }
+
+    /** Rows kept loaded ahead of the last visible row */
+    private val prefetchDistance = pageSize / 2
+
+    /** Largest append request: one request serves a fling across pages, as each request re-sorts */
+    private val maxRequestSize = pageSize * MAX_REQUEST_PAGES
 
     private val _state = MutableStateFlow(PagedNodes<T>())
 
@@ -60,7 +63,9 @@ class NodeListPager<T : TypedNode>(
      */
     val state: StateFlow<PagedNodes<T>> = _state.asStateFlow()
 
-    private val requestedCount = MutableStateFlow(initialDepth + pageSize)
+    private val firstPageSize = maxOf(initialCount, pageSize)
+
+    private val requestedCount = MutableStateFlow(firstPageSize)
     private val pendingChanges = MutableStateFlow(0)
     private val retryTicks = MutableStateFlow(0)
 
@@ -79,21 +84,31 @@ class NodeListPager<T : TypedNode>(
     }
 
     /**
+     * Loads rows up to [index] right away, with no settle delay, for demand that does not come from
+     * the viewport, such as a search for a node that must be in the list.
+     */
+    fun ensureLoaded(index: Int) {
+        requestedCount.update { maxOf(it, index + 1 + prefetchDistance) }
+    }
+
+    /**
      * Runs the pager until the calling coroutine is cancelled.
      *
-     * @param visibleRange item indices currently on screen
      * @param changes signal that the source changed and the loaded prefix must be read again
-     * @param publishGate whether a re-read may start; false while scrolling or unobserved. Never
-     * holds back loading more.
+     * @param visibleRanges the item indices currently on screen, from [Companion.visibleRanges].
+     * Rows up to the last one plus the prefetch distance are loaded; only the latest range matters
+     * @param observers how many collectors watch the state. A re-read does not start while nobody
+     * does, so a burst of changes while the screen is off the back stack top collapses into one
+     * re-read when it is shown again.
      */
     @OptIn(FlowPreview::class)
     suspend fun run(
-        visibleRange: Flow<IntRange>,
         changes: Flow<Unit>,
-        publishGate: StateFlow<Boolean>,
+        visibleRanges: Flow<IntRange>,
+        observers: StateFlow<Int>,
     ): Unit = coroutineScope {
         launch {
-            visibleRange.debounce(SETTLE_DELAY).collect { range ->
+            visibleRanges.debounce(SETTLE_DELAY).collect { range ->
                 requestedCount.update { maxOf(it, range.last + 1 + prefetchDistance) }
             }
         }
@@ -101,7 +116,7 @@ class NodeListPager<T : TypedNode>(
             changes.collect { pendingChanges.update { it + 1 } }
         }
         while (true) {
-            when (awaitWork(publishGate)) {
+            when (awaitWork(observers)) {
                 Work.LoadPage -> loadPage()
                 Work.Reconcile -> reconcile()
                 Work.Reload -> reload()
@@ -109,16 +124,16 @@ class NodeListPager<T : TypedNode>(
         }
     }
 
-    private suspend fun awaitWork(publishGate: StateFlow<Boolean>): Work = combine(
+    private suspend fun awaitWork(observers: StateFlow<Int>): Work = combine(
         requestedCount,
         pendingChanges,
         retryTicks,
-        publishGate,
-    ) { requested, pending, retry, canPublish ->
+        observers,
+    ) { requested, pending, retry, observerCount ->
         when {
             // Nothing to re-read: load the first page again
             pending > 0 && loadedCount == 0 -> Work.Reload
-            pending > 0 && canPublish -> Work.Reconcile
+            pending > 0 && observerCount > 0 -> Work.Reconcile
             hasMore && loadedCount < requested && failedAt != (requested to retry) -> Work.LoadPage
             else -> null
         }
@@ -136,7 +151,7 @@ class NodeListPager<T : TypedNode>(
         val request = PageRequest(
             offset = nextOffset,
             limit = if (isFirstPage) {
-                initialDepth + pageSize
+                firstPageSize
             } else {
                 (requestedCount.value - loadedCount).coerceIn(pageSize, maxRequestSize)
             },
@@ -200,7 +215,7 @@ class NodeListPager<T : TypedNode>(
         _state.update {
             it.copy(
                 items = items,
-                loadState = if (it.loadState == PagedLoadState.PageFailed) PagedLoadState.Idle else it.loadState,
+                loadState = PagedLoadState.Idle,
                 hasMore = page.hasMore,
                 total = total,
                 reconcileVersion = it.reconcileVersion + 1,
@@ -224,8 +239,18 @@ class NodeListPager<T : TypedNode>(
         internal val SETTLE_DELAY: Duration = 150.milliseconds
 
         /**
-         * Default bound on one append request, in pages
+         * Bound on one append request, in pages
          */
         internal const val MAX_REQUEST_PAGES = 4
+
+        /**
+         * The visible-range input for [run]: keeps only the latest range and never suspends the
+         * reporter, so a fling may report as many ranges as it likes. Nothing is kept while no
+         * pager collects, so a new pager learns the viewport from the next report.
+         */
+        fun visibleRanges(): MutableSharedFlow<IntRange> = MutableSharedFlow(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
     }
 }
