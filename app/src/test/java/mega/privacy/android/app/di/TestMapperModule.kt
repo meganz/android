@@ -8,8 +8,6 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.feature.mediaplayer.data.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.feature.mediaplayer.data.mapper.RepeatToggleModeByExoPlayerMapper
-import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
-import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import org.mockito.kotlin.mock
 
@@ -30,7 +28,4 @@ object TestMapperModule {
 
     @Provides
     fun providePlaylistItemMapper(): PlaylistItemMapper = mock()
-
-    @Provides
-    fun provideHeaderMapper(): HeaderMapper = ::toHeader
 }

@@ -6,7 +6,11 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.photos.PhotosUseCases
+import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
+import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
+import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
@@ -81,4 +85,16 @@ object TestPhotosUseCases {
 
     @Provides
     fun provideIsAlbumLinkValidUseCase(): IsAlbumLinkValidUseCase = mock()
+
+    @Provides
+    fun provideFilterCameraUploadPhotos(): FilterCameraUploadPhotos = mock()
+
+    @Provides
+    fun provideFilterCloudDrivePhotos(): FilterCloudDrivePhotos = mock()
+
+    @Provides
+    fun provideSetInitialCUPreferences(): SetInitialCUPreferences = mock()
+
+    @Provides
+    fun provideGetNodeListByIds(): GetNodeListByIds = mock()
 }

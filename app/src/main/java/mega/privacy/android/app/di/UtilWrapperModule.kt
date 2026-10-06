@@ -22,14 +22,12 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
 import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
-import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.SetLogoutFlagWrapperImpl
 import mega.privacy.android.app.utils.wrapper.SetupMegaChatApiWrapperImpl
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.global.SetupMegaChatApiWrapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -75,10 +73,6 @@ abstract class UtilWrapperModule {
 
 
     companion object {
-
-        @Provides
-        fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =
-            FetchNodeWrapper(megaApiGateway::getMegaNodeByHandle)
 
         /**
          * provide Avatar Wrapper

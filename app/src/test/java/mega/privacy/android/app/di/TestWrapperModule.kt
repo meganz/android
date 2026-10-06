@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
-import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
@@ -23,14 +22,10 @@ import org.mockito.kotlin.mock
 object TestWrapperModule {
 
     val permissionUtilWrapper = mock<PermissionUtilWrapper>()
-    val fetchNodeWrapper = mock<FetchNodeWrapper>()
     val avatarWrapper = mock<AvatarWrapper>()
 
     @Provides
     fun providePermissionUtilWrapper(): PermissionUtilWrapper = permissionUtilWrapper
-
-    @Provides
-    fun provideFetchNodeWrapper(): FetchNodeWrapper = fetchNodeWrapper
 
     @Provides
     fun provideAvatarWrapper(): AvatarWrapper = avatarWrapper
