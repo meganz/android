@@ -15,22 +15,17 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.videoplayer.MediaPlayerManager
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
-import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.feature.mediaplayer.data.gateway.VideoMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.model.VideoControllerState
-import mega.privacy.android.feature.mediaplayer.data.model.VideoPlaybackEvent
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
-import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,8 +35,11 @@ import kotlin.time.Duration.Companion.milliseconds
  * [VideoMediaControllerGateway] backed by an ExoPlayer that this facade owns.
  *
  * Wraps [MediaPlayerManager], which is where the player construction and the raw Media3 callback
- * plumbing already live, and turns its nine callbacks into a single [VideoControllerState] stream
- * plus the one-shot signals on [VideoMediaControllerGateway.events].
+ * plumbing already live, and turns its callbacks into a single [VideoControllerState] stream.
+ *
+ * Several of those callbacks are deliberately empty: the gateway exposes nothing that would consume
+ * them. [MediaPlayerManager] requires all nine, so they are supplied and ignored rather than its
+ * signature narrowed for a class that goes away once the player moves into a service.
  *
  * This is the transitional implementation. A later phase replaces the ExoPlayer with a Media3
  * `MediaController` bound to a `VideoPlayerService`; because `MediaController` also implements
@@ -59,21 +57,6 @@ internal class VideoMediaControllerFacade @Inject constructor(
 
     private val _playerState = MutableStateFlow(VideoControllerState())
     override val playerState: Flow<VideoControllerState> = _playerState.asStateFlow()
-
-    /**
-     * A channel rather than a [kotlinx.coroutines.flow.SharedFlow]: the player is built in this
-     * class's initialiser, so it can report a failure before the owner has started collecting, and
-     * a shared flow with no subscriber discards what it is given. A channel buffers regardless and
-     * hands each event to exactly one collector.
-     *
-     * Unbounded, because a bounded channel can only deal with overflow by dropping — and dropping
-     * silently is the one outcome these events cannot tolerate, since a
-     * [VideoPlaybackEvent.ItemLeft] carries the only record of where playback left an item. The
-     * producers are player callbacks, so the volume is bounded by playback activity, and [release]
-     * closes the channel.
-     */
-    private val eventChannel = Channel<VideoPlaybackEvent>(Channel.UNLIMITED)
-    override val events: Flow<VideoPlaybackEvent> = eventChannel.receiveAsFlow()
 
     private var positionPollingJob: Job? = null
     private var isReleased = false
@@ -96,7 +79,8 @@ internal class VideoMediaControllerFacade @Inject constructor(
                 )
             }
         },
-        onRepeatModeChanged = { mode -> updateState { copy(repeatMode = mode) } },
+        // Empty until a repeat control exists to read the mode back.
+        onRepeatModeChanged = {},
         onPlayWhenReadyChanged = { state, pausedByUser ->
             val playing = state == MediaPlaybackState.Playing
             updateState { copy(playWhenReady = playing, pausedByUserRequest = pausedByUser) }
@@ -111,13 +95,11 @@ internal class VideoMediaControllerFacade @Inject constructor(
                 )
             }
         },
-        onPlaybackPositionJumped = { eventChannel.trySend(VideoPlaybackEvent.PositionJumped) },
-        onMediaItemLeft = { handle, positionMs ->
-            handle?.toLongOrNull()?.let {
-                eventChannel.trySend(VideoPlaybackEvent.ItemLeft(it, positionMs))
-            }
-        },
-        onPlayerError = { errorCode -> eventChannel.trySend(VideoPlaybackEvent.Error(errorCode)) },
+        // Nothing consumes playback events yet. Resume-position persistence and retry will take
+        // whichever of these they need.
+        onPlaybackPositionJumped = {},
+        onMediaItemLeft = { _, _ -> },
+        onPlayerError = { errorCode -> Timber.e("Video player error, code %d", errorCode) },
         onVideoSizeChanged = { size ->
             updateState { copy(videoWidth = size.width, videoHeight = size.height) }
         },
@@ -166,33 +148,6 @@ internal class VideoMediaControllerFacade @Inject constructor(
 
     override fun play() = mediaPlayerManager.setPlayWhenReady(true)
 
-    override fun pause() = mediaPlayerManager.setPlayWhenReady(false)
-
-    override fun setPlayWhenReady(playWhenReady: Boolean) =
-        mediaPlayerManager.setPlayWhenReady(playWhenReady)
-
-    override fun seekTo(positionMs: Long) = mediaPlayerManager.playerSeekToPositionInMs(positionMs)
-
-    override fun seekToMediaItem(index: Int) = mediaPlayerManager.playerSeekTo(index)
-
-    override fun setRepeatMode(mode: RepeatToggleMode) =
-        mediaPlayerManager.setRepeatToggleMode(mode)
-
-    override fun setPlaybackSpeed(speed: Float) {
-        // MediaPlayerManager takes a SpeedPlaybackItem but reads only its speed, so the value is
-        // passed straight through. Looking the enum up by a float comparison would fail for any
-        // speed not spelled exactly like one of its constants.
-        mediaPlayerManager.updatePlaybackSpeed(
-            object : SpeedPlaybackItem {
-                override val speed: Float = speed
-                override val text: String = ""
-            }
-        )
-        updateState { copy(playbackSpeed = speed) }
-    }
-
-    override fun retry() = mediaPlayerManager.retry()
-
     @MainThread
     override fun attachSurface(textureView: TextureView) {
         player.setVideoTextureView(textureView)
@@ -202,13 +157,6 @@ internal class VideoMediaControllerFacade @Inject constructor(
     override fun clearSurface() {
         player.clearVideoSurface()
     }
-
-    override fun addSubtitle(subtitleFileUrl: String): Boolean =
-        mediaPlayerManager.addSubtitle(subtitleFileUrl)
-
-    override fun showSubtitle() = mediaPlayerManager.showSubtitle()
-
-    override fun hideSubtitle() = mediaPlayerManager.hideSubtitle()
 
     @MainThread
     override fun release() {
@@ -221,7 +169,6 @@ internal class VideoMediaControllerFacade @Inject constructor(
             .onFailure { Timber.e(it, "Failed to detach the video surface") }
         runCatching { mediaPlayerManager.release() }
             .onFailure { Timber.e(it, "Failed to release the video player") }
-        eventChannel.close()
         gatewayScope.cancel()
     }
 

@@ -1,8 +1,8 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
+import android.net.Uri
 import android.view.TextureView
 import androidx.media3.common.C
-import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import app.cash.turbine.test
@@ -15,8 +15,6 @@ import mega.privacy.android.app.presentation.videoplayer.MediaPlayerManager
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
-import mega.privacy.android.feature.mediaplayer.data.model.VideoPlaybackEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -58,10 +56,9 @@ internal class VideoMediaControllerFacadeTest {
      * declares them. Driving these is the only way to exercise the translation: the facade keeps
      * no listener of its own.
      *
-     * Known blind spot: indices 4 (`onPlaybackStateChanged`) and 7 (`onPlayerError`) both erase to
-     * `Function1<Integer, Unit>`, so swapping those two parameters in `createPlayer` would leave
-     * these tests passing while asserting the wrong thing. Every other reordering surfaces as a
-     * ClassCastException, and adding or removing a parameter stops the stub matching at all.
+     * Only the four the facade acts on are read back; the rest are empty lambdas with nothing to
+     * assert. Reordering `createPlayer` surfaces as a ClassCastException, and adding or removing a
+     * parameter stops the stub matching at all.
      */
     private lateinit var callbacks: Array<Any>
 
@@ -102,15 +99,6 @@ internal class VideoMediaControllerFacadeTest {
 
     @Suppress("UNCHECKED_CAST")
     private fun onPlaybackStateChanged() = callbacks[4] as (Int) -> Unit
-
-    @Suppress("UNCHECKED_CAST")
-    private fun onPlaybackPositionJumped() = callbacks[5] as () -> Unit
-
-    @Suppress("UNCHECKED_CAST")
-    private fun onMediaItemLeft() = callbacks[6] as (String?, Long) -> Unit
-
-    @Suppress("UNCHECKED_CAST")
-    private fun onPlayerError() = callbacks[7] as (Int) -> Unit
 
     @Suppress("UNCHECKED_CAST")
     private fun onVideoSizeChanged() = callbacks[8] as (VideoSize) -> Unit
@@ -220,38 +208,6 @@ internal class VideoMediaControllerFacadeTest {
         }
 
     @Test
-    fun `test that onPlayerError delivers the event when it is raised before the collector attaches`() =
-        runTest {
-            val errorCode = PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED
-            onPlayerError()(errorCode)
-
-            underTest.events.test {
-                assertThat(awaitItem()).isEqualTo(VideoPlaybackEvent.Error(errorCode))
-            }
-        }
-
-    @Test
-    fun `test that onMediaItemLeft is not displaced by a later event`() = runTest {
-        onMediaItemLeft()("123", 4_500L)
-        onPlaybackPositionJumped()()
-
-        underTest.events.test {
-            assertThat(awaitItem()).isEqualTo(VideoPlaybackEvent.ItemLeft(123L, 4_500L))
-            assertThat(awaitItem()).isEqualTo(VideoPlaybackEvent.PositionJumped)
-        }
-    }
-
-    @Test
-    fun `test that onMediaItemLeft emits nothing when the handle is unparsable`() = runTest {
-        onMediaItemLeft()(null, 4_500L)
-        onPlaybackPositionJumped()()
-
-        underTest.events.test {
-            assertThat(awaitItem()).isEqualTo(VideoPlaybackEvent.PositionJumped)
-        }
-    }
-
-    @Test
     fun `test that onMediaItemTransition clears the video size of the previous item`() = runTest {
         onVideoSizeChanged()(VideoSize(1920, 1080))
 
@@ -267,21 +223,21 @@ internal class VideoMediaControllerFacadeTest {
     }
 
     @Test
-    fun `test that setPlaybackSpeed forwards the raw value and records it in the state`() =
-        runTest {
-            underTest.setPlaybackSpeed(1.35f)
+    fun `test that setPlaySource builds a single-item source and prepares the player`() {
+        underTest.setPlaySource(mock<Uri>(), "123")
 
-            verify(mediaPlayerManager).updatePlaybackSpeed(argThat { speed == 1.35f })
-            underTest.playerState.test {
-                assertThat(awaitItem().playbackSpeed).isEqualTo(1.35f)
-            }
-        }
+        // Preparing before the source is built would prepare the previous item, or nothing at all.
+        val inOrder = inOrder(mediaPlayerManager)
+        inOrder.verify(mediaPlayerManager)
+            .buildPlaySources(argThat { mediaItems.singleOrNull()?.mediaId == "123" })
+        inOrder.verify(mediaPlayerManager).playerPrepare()
+    }
 
     @Test
-    fun `test that setRepeatMode forwards the mode to the manager`() {
-        underTest.setRepeatMode(RepeatToggleMode.REPEAT_ONE)
+    fun `test that play starts playback`() {
+        underTest.play()
 
-        verify(mediaPlayerManager).setRepeatToggleMode(RepeatToggleMode.REPEAT_ONE)
+        verify(mediaPlayerManager).setPlayWhenReady(true)
     }
 
     @Test
@@ -298,14 +254,6 @@ internal class VideoMediaControllerFacadeTest {
         underTest.clearSurface()
 
         verify(player).clearVideoSurface()
-    }
-
-    @Test
-    fun `test that addSubtitle returns what the manager reports`() {
-        whenever(mediaPlayerManager.addSubtitle(SUBTITLE_URL)).thenReturn(true)
-
-        assertThat(underTest.addSubtitle(SUBTITLE_URL)).isTrue()
-        verify(mediaPlayerManager).addSubtitle(SUBTITLE_URL)
     }
 
     @Test
@@ -328,22 +276,10 @@ internal class VideoMediaControllerFacadeTest {
         verify(mediaPlayerManager, never()).release()
     }
 
-    @Test
-    fun `test that release completes the event stream`() = runTest {
-        underTest.events.test {
-            underTest.release()
-            awaitComplete()
-        }
-    }
-
     private fun playbackStates(): Stream<Arguments> = Stream.of(
         Arguments.of(Player.STATE_BUFFERING, true, false, false),
         Arguments.of(Player.STATE_ENDED, false, true, false),
         Arguments.of(Player.STATE_READY, false, false, true),
         Arguments.of(Player.STATE_IDLE, false, false, false),
     )
-
-    private companion object {
-        const val SUBTITLE_URL = "https://mega.nz/subtitle.srt"
-    }
 }
