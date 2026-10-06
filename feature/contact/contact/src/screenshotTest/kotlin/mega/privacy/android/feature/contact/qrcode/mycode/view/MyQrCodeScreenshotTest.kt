@@ -18,6 +18,7 @@ import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
  * - R.string.contacts_qr_screen_title ("QR code") → both states.
  * - R.string.contacts_qr_scan_action ("Scan QR code") → both states.
  * - R.string.contacts_qr_create_action ("Create QR code") → [MyQrCodeCreate].
+ * - R.string.general_share ("Share") → [MyQrCodeAvailable], as the top bar share action.
  *
  * - R.string.contacts_qr_generating ("Generating QR code…") → [MyQrCodeGenerating].
  *
@@ -48,6 +49,7 @@ class MyQrCodeScreenshotTest {
                         qrCodeFilePath = null,
                     ),
                     message = consumed(),
+                    shareEvent = consumed(),
                     uploadQrCodeEvent = consumed(),
                 ),
                 onBackClick = {},
@@ -57,6 +59,10 @@ class MyQrCodeScreenshotTest {
                 onSaveToCloudDrive = {},
                 onResetQRCode = {},
                 onDeleteQRCode = {},
+                onShareClick = {},
+                onShareQRCode = {},
+                onShareEventConsumed = {},
+                onSettingsClick = {},
                 onScanClick = {},
                 onMessageConsumed = {},
             )
@@ -80,6 +86,10 @@ class MyQrCodeScreenshotTest {
                 onSaveToCloudDrive = {},
                 onResetQRCode = {},
                 onDeleteQRCode = {},
+                onShareClick = {},
+                onShareQRCode = {},
+                onShareEventConsumed = {},
+                onSettingsClick = {},
                 onScanClick = {},
                 onMessageConsumed = {},
             )
@@ -103,6 +113,10 @@ class MyQrCodeScreenshotTest {
                 onSaveToCloudDrive = {},
                 onResetQRCode = {},
                 onDeleteQRCode = {},
+                onShareClick = {},
+                onShareQRCode = {},
+                onShareEventConsumed = {},
+                onSettingsClick = {},
                 onScanClick = {},
                 onMessageConsumed = {},
             )

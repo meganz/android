@@ -50,6 +50,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.model.menu.MenuActionWithoutIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -94,6 +95,10 @@ private val ContentAreaHeight =
  * @param onSaveToCloudDrive the on save to cloud drive
  * @param onResetQRCode the on reset qr code
  * @param onDeleteQRCode the on delete qr code
+ * @param onShareClick the on share click
+ * @param onShareQRCode shares the QR code image at the given file path
+ * @param onShareEventConsumed the on share event consumed
+ * @param onSettingsClick the on settings click
  * @param onScanClick the on scan click
  * @param onMessageConsumed the on message consumed
  * @param modifier
@@ -109,6 +114,10 @@ internal fun MyQrCodeScreen(
     onSaveToCloudDrive: () -> Unit,
     onResetQRCode: () -> Unit,
     onDeleteQRCode: (String) -> Unit,
+    onShareClick: () -> Unit,
+    onShareQRCode: (String) -> Unit,
+    onShareEventConsumed: () -> Unit,
+    onSettingsClick: () -> Unit,
     onScanClick: () -> Unit,
     onMessageConsumed: () -> Unit,
     modifier: Modifier = Modifier,
@@ -130,8 +139,10 @@ internal fun MyQrCodeScreen(
                 navigationType = AppBarNavigationType.Back(onBackClick),
                 actions = if (uiState is MyQrCodeUiState.QRCodeAvailable) {
                     listOf(
+                        MenuActionWithClick(ShareQrCodeMenuAction, onShareClick),
                         MenuActionWithClick(SaveToCloudDriveMenuAction, onSaveToCloudDrive),
                         MenuActionWithClick(SaveQrCodeMenuAction) { folderPicker.launch(null) },
+                        MenuActionWithClick(QrCodeSettingsMenuAction, onSettingsClick),
                         MenuActionWithClick(ResetQrCodeMenuAction, onResetQRCode),
                         MenuActionWithClick(
                             DeleteQrCodeMenuAction,
@@ -150,6 +161,11 @@ internal fun MyQrCodeScreen(
         ) { message ->
             snackbarHostState?.showAutoDurationSnackbar(message.toText(context))
         }
+        EventEffect(
+            event = (uiState as? MyQrCodeUiState.QRCodeAvailable)?.shareEvent ?: consumed(),
+            onConsumed = onShareEventConsumed,
+            action = onShareQRCode,
+        )
 
         Column(
             modifier = Modifier
@@ -349,6 +365,7 @@ private fun MyQrCodeMessage.toText(context: Context): String = when (this) {
         context.getString(sharedR.string.general_link_copied_clipboard)
 
     MyQrCodeMessage.SaveError,
+    MyQrCodeMessage.ShareError,
     MyQrCodeMessage.GeneralError,
         -> context.getString(sharedR.string.general_text_error)
 
@@ -371,6 +388,20 @@ private fun MyQrCodeMessage.toText(context: Context): String = when (this) {
 }
 
 /**
+ * Top bar action that shares the QR code image.
+ */
+internal data object ShareQrCodeMenuAction : MenuActionWithIcon {
+    @Composable
+    override fun getIconPainter() =
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork)
+
+    override val testTag = MY_QR_CODE_SHARE_ACTION_TAG
+
+    @Composable
+    override fun getDescription() = stringResource(sharedR.string.general_share)
+}
+
+/**
  * Overflow action that uploads the QR code image to the root of the Cloud drive.
  */
 internal data object SaveToCloudDriveMenuAction : MenuActionWithoutIcon(
@@ -384,6 +415,14 @@ internal data object SaveToCloudDriveMenuAction : MenuActionWithoutIcon(
 internal data object SaveQrCodeMenuAction : MenuActionWithoutIcon(
     descriptionRes = sharedR.string.general_save_to_device,
     testTag = MY_QR_CODE_SAVE_ACTION_TAG,
+)
+
+/**
+ * Overflow action that opens the QR code settings.
+ */
+internal data object QrCodeSettingsMenuAction : MenuActionWithoutIcon(
+    descriptionRes = sharedR.string.general_settings,
+    testTag = MY_QR_CODE_SETTINGS_ACTION_TAG,
 )
 
 /**
@@ -409,9 +448,11 @@ internal const val MY_QR_CODE_COPY_ICON_TAG = "my_qr_code_screen:icon_copy_conta
 internal const val MY_QR_CODE_CREATE_TAG = "my_qr_code_screen:button_create"
 internal const val MY_QR_CODE_SCAN_TAG = "my_qr_code_screen:button_scan"
 internal const val MY_QR_CODE_LOADING_TAG = "my_qr_code_screen:progress_generating"
+internal const val MY_QR_CODE_SHARE_ACTION_TAG = "my_qr_code_screen:action_share"
 internal const val MY_QR_CODE_SAVE_TO_CLOUD_DRIVE_ACTION_TAG =
     "my_qr_code_screen:action_save_to_cloud_drive"
 internal const val MY_QR_CODE_SAVE_ACTION_TAG = "my_qr_code_screen:action_save"
+internal const val MY_QR_CODE_SETTINGS_ACTION_TAG = "my_qr_code_screen:action_settings"
 internal const val MY_QR_CODE_RESET_ACTION_TAG = "my_qr_code_screen:action_reset"
 internal const val MY_QR_CODE_DELETE_ACTION_TAG = "my_qr_code_screen:action_delete"
 
@@ -430,6 +471,10 @@ private fun MyQrCodeScreenPreview(
             onSaveToCloudDrive = {},
             onResetQRCode = {},
             onDeleteQRCode = {},
+            onShareClick = {},
+            onShareQRCode = {},
+            onShareEventConsumed = {},
+            onSettingsClick = {},
             onScanClick = {},
             onMessageConsumed = {},
         )
@@ -451,6 +496,7 @@ private class MyQrCodeContentStateProvider : PreviewParameterProvider<MyQrCodeUi
                 qrCodeFilePath = null,
             ),
             message = consumed(),
+            shareEvent = consumed(),
             uploadQrCodeEvent = consumed(),
         ),
         MyQrCodeUiState.QRCodeUnavailable(

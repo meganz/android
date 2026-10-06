@@ -12,7 +12,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.presentation.settings.model.qrTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
@@ -21,6 +20,7 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.qrCodeSettingsTargetPreference
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -102,7 +102,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
                     onUploadFileConsumed = viewModel::resetUploadFile,
                     onScanCancelConsumed = viewModel::resetScanCancel,
                     onUploadEventConsumed = viewModel::onUploadEventConsumed,
-                    navigateToQrSettings = { megaNavigator.openSettings(this, qrTargetPreference) },
+                    navigateToQrSettings = { megaNavigator.openSettings(this, qrCodeSettingsTargetPreference) },
                 )
             }
         }

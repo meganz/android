@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.sp
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.CompletableDeferred
@@ -13,7 +14,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
-import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
+import mega.privacy.android.domain.usecase.account.qr.SaveQRCodeImageUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.feature.contact.qrcode.mycode.mapper.MyQrCodeErrorMapper
+import mega.privacy.android.feature.contact.qrcode.mycode.mapper.QrCodeImageMapper
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeError
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeMessage
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeUiState
@@ -37,6 +39,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -53,7 +56,7 @@ class MyQrCodeViewModelTest {
     private val createContactLinkUseCase = mock<CreateContactLinkUseCase>()
     private val resetContactLinkUseCase = mock<ResetContactLinkUseCase>()
     private val deleteQRCodeUseCase = mock<DeleteQRCodeUseCase>()
-    private val getQRCodeFileUseCase = mock<GetQRCodeFileUseCase>()
+    private val saveQRCodeImageUseCase = mock<SaveQRCodeImageUseCase>()
     private val getUserFullNameUseCase = mock<GetUserFullNameUseCase>()
     private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
     private val getMyAvatarFileUseCase = mock<GetMyAvatarFileUseCase>()
@@ -62,10 +65,16 @@ class MyQrCodeViewModelTest {
         mock<DoesUriPathHaveSufficientSpaceUseCase>()
     private val getPathByDocumentContentUriUseCase = mock<GetPathByDocumentContentUriUseCase>()
     private val avatarContentMapper = mock<AvatarContentMapper>()
+    private val qrCodeImageMapper = mock<QrCodeImageMapper>()
     private val myQrCodeErrorMapper = mock<MyQrCodeErrorMapper>()
 
     private val initialContactLink = "https://contact_link1"
-    private val qrFilePath = "/test/qr.png"
+    private val avatarContent = PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true)
+    private val imageBytes = byteArrayOf(1, 2, 3)
+    private val qrFile = File.createTempFile("qr_code", ".jpg").apply {
+        writeBytes(ByteArray(1000))
+        deleteOnExit()
+    }
 
     @BeforeEach
     fun setUp() {
@@ -74,7 +83,7 @@ class MyQrCodeViewModelTest {
             createContactLinkUseCase = createContactLinkUseCase,
             resetContactLinkUseCase = resetContactLinkUseCase,
             deleteQRCodeUseCase = deleteQRCodeUseCase,
-            getQRCodeFileUseCase = getQRCodeFileUseCase,
+            saveQRCodeImageUseCase = saveQRCodeImageUseCase,
             getUserFullNameUseCase = getUserFullNameUseCase,
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
@@ -82,6 +91,7 @@ class MyQrCodeViewModelTest {
             doesUriPathHaveSufficientSpaceUseCase = doesUriPathHaveSufficientSpaceUseCase,
             getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase,
             avatarContentMapper = avatarContentMapper,
+            qrCodeImageMapper = qrCodeImageMapper,
             myQrCodeErrorMapper = myQrCodeErrorMapper,
         )
     }
@@ -93,7 +103,7 @@ class MyQrCodeViewModelTest {
             createContactLinkUseCase,
             resetContactLinkUseCase,
             deleteQRCodeUseCase,
-            getQRCodeFileUseCase,
+            saveQRCodeImageUseCase,
             getUserFullNameUseCase,
             getMyAvatarColorUseCase,
             getMyAvatarFileUseCase,
@@ -101,6 +111,7 @@ class MyQrCodeViewModelTest {
             doesUriPathHaveSufficientSpaceUseCase,
             getPathByDocumentContentUriUseCase,
             avatarContentMapper,
+            qrCodeImageMapper,
             myQrCodeErrorMapper,
         )
     }
@@ -348,27 +359,25 @@ class MyQrCodeViewModelTest {
     }
 
     @Test
-    fun `test that saveToFileSystem emits SaveError when QR file is null`() = runTest {
-        stubQRCodeCreationFailure()
-        whenever(getQRCodeFileUseCase()).thenReturn(null)
+    fun `test that saveToFileSystem emits SaveError when no QR code image was persisted`() =
+        runTest {
+            stubQRCodeCreation(persistedFile = null)
 
-        underTest.uiState.test {
-            settleAfterCreationFailure()
-            underTest.saveToFileSystem(UriPath("/test/destination"))
-            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+            underTest.uiState.test {
+                awaitAvailableState()
+                underTest.saveToFileSystem(UriPath("/test/destination"))
+                assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+            }
         }
-    }
 
     @Test
     fun `test that saveToFileSystem emits NotEnoughSpace when space is insufficient`() = runTest {
-        stubQRCodeCreationFailure()
+        stubQRCodeCreation()
         val destination = UriPath("/test/destination")
-        val qrFile = mock<File> { on { length() } doReturn 1000L }
-        whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
         whenever(doesUriPathHaveSufficientSpaceUseCase(destination, 1000L)).thenReturn(false)
 
         underTest.uiState.test {
-            settleAfterCreationFailure()
+            awaitAvailableState()
             underTest.saveToFileSystem(destination)
             assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.NotEnoughSpace)
         }
@@ -377,90 +386,156 @@ class MyQrCodeViewModelTest {
     @Test
     fun `test that saveToFileSystem emits SaveSuccess with the display path when save succeeds`() =
         runTest {
-            stubQRCodeCreationFailure()
+            stubQRCodeCreation()
             val destination = UriPath("content://downloads/tree")
             val displayPath = "/storage/emulated/0/Download"
-            val qrFile = mock<File> {
-                on { length() } doReturn 1000L
-                on { name } doReturn "qr_code.png"
-            }
-            whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
             whenever(doesUriPathHaveSufficientSpaceUseCase(destination, 1000L)).thenReturn(true)
             whenever(getPathByDocumentContentUriUseCase(destination.value)).thenReturn(displayPath)
 
             underTest.uiState.test {
-                settleAfterCreationFailure()
+                awaitAvailableState()
                 underTest.saveToFileSystem(destination)
                 assertThat(awaitMessage())
                     .isEqualTo(MyQrCodeMessage.SaveSuccess(displayPath))
             }
+            verify(saveFileToDestinationUseCase).invoke(qrFile, destination)
         }
 
     @Test
     fun `test that saveToFileSystem emits GeneralError when saving throws IOException`() = runTest {
-        stubQRCodeCreationFailure()
+        stubQRCodeCreation()
         val destination = UriPath("/test/destination")
-        val qrFile = mock<File> { on { length() } doReturn 1000L }
-        whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
         whenever(doesUriPathHaveSufficientSpaceUseCase(destination, 1000L)).thenReturn(true)
         whenever(getPathByDocumentContentUriUseCase(destination.value)).thenReturn("/test/path")
         whenever(saveFileToDestinationUseCase(any(), any())).thenAnswer { throw IOException("io") }
 
         underTest.uiState.test {
-            settleAfterCreationFailure()
+            awaitAvailableState()
             underTest.saveToFileSystem(destination)
             assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.GeneralError)
         }
     }
 
     @Test
-    fun `test that saveToCloudDrive emits the upload event with the QR file path when the QR file exists`() =
+    fun `test that init writes the QR code image when creation succeeds`() = runTest {
+        stubQRCodeCreation()
+
+        underTest.uiState.test {
+            val state = awaitAvailableState()
+            assertThat(state.qrCode.qrCodeFilePath).isEqualTo(qrFile.absolutePath)
+        }
+        verify(qrCodeImageMapper).invoke(initialContactLink, avatarContent)
+        verify(saveQRCodeImageUseCase).invoke(imageBytes)
+    }
+
+    @Test
+    fun `test that init emits QRCodeAvailable without a file path when writing the image fails`() =
+        runTest {
+            stubQRCodeCreation()
+            whenever(saveQRCodeImageUseCase(any())).thenAnswer { throw IOException("io") }
+
+            underTest.uiState.test {
+                val state = awaitAvailableState()
+                assertThat(state.qrCode.contactLink).isEqualTo(initialContactLink)
+                assertThat(state.qrCode.qrCodeFilePath).isNull()
+            }
+        }
+
+    @Test
+    fun `test that resetQRCode writes the QR code image for the new link`() = runTest {
+        stubQRCodeCreation()
+        val newContactLink = "https://contact_link2"
+        whenever(resetContactLinkUseCase()).thenReturn(newContactLink)
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.resetQRCode()
+            awaitAvailableStateWithLink(newContactLink)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(qrCodeImageMapper).invoke(newContactLink, avatarContent)
+        verify(saveQRCodeImageUseCase, times(2)).invoke(imageBytes)
+    }
+
+    @Test
+    fun `test that shareQRCode emits a share event with the persisted file path`() = runTest {
+        stubQRCodeCreation()
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.shareQRCode()
+            val state = awaitState {
+                (it as? MyQrCodeUiState.QRCodeAvailable)?.shareEvent is StateEventWithContentTriggered
+            } as MyQrCodeUiState.QRCodeAvailable
+            assertThat((state.shareEvent as StateEventWithContentTriggered).content)
+                .isEqualTo(qrFile.absolutePath)
+        }
+    }
+
+    @Test
+    fun `test that shareQRCode emits ShareError when no QR code image was persisted`() = runTest {
+        stubQRCodeCreation(persistedFile = null)
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.shareQRCode()
+            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.ShareError)
+        }
+    }
+
+    @Test
+    fun `test that onShareEventConsumed clears the share event`() = runTest {
+        stubQRCodeCreation()
+
+        underTest.uiState.test {
+            awaitAvailableState()
+            underTest.shareQRCode()
+            awaitState {
+                (it as? MyQrCodeUiState.QRCodeAvailable)?.shareEvent is StateEventWithContentTriggered
+            }
+            underTest.onShareEventConsumed()
+            val state = awaitState {
+                (it as? MyQrCodeUiState.QRCodeAvailable)?.shareEvent is StateEventWithContentConsumed
+            } as MyQrCodeUiState.QRCodeAvailable
+            assertThat(state.shareEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that saveToCloudDrive emits the upload event with the persisted file path when the QR file exists`() =
         runTest {
             stubQRCodeCreation()
 
             underTest.uiState.test {
                 awaitAvailableState()
                 underTest.saveToCloudDrive()
-                assertThat(awaitUploadQrCodeEvent()).isEqualTo(UriPath(qrFilePath))
+                assertThat(awaitUploadQrCodeEvent()).isEqualTo(UriPath(qrFile.absolutePath))
             }
         }
 
     @Test
-    fun `test that saveToCloudDrive emits SaveError when the QR file is null`() = runTest {
-        stubQRCodeCreation()
-        whenever(getQRCodeFileUseCase()).thenReturn(null)
+    fun `test that saveToCloudDrive emits SaveError when no QR code image was persisted`() =
+        runTest {
+            stubQRCodeCreation(persistedFile = null)
 
-        underTest.uiState.test {
-            awaitAvailableState()
-            underTest.saveToCloudDrive()
-            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+            underTest.uiState.test {
+                awaitAvailableState()
+                underTest.saveToCloudDrive()
+                assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+            }
         }
-    }
 
     @Test
-    fun `test that saveToCloudDrive emits SaveError when the QR file does not exist`() = runTest {
-        stubQRCodeCreation()
-        val missingFile = mock<File> { on { exists() } doReturn false }
-        whenever(getQRCodeFileUseCase()).thenReturn(missingFile)
+    fun `test that saveToCloudDrive emits SaveError when the persisted QR file does not exist`() =
+        runTest {
+            stubQRCodeCreation(persistedFile = File("/missing/qr_code.jpg"))
 
-        underTest.uiState.test {
-            awaitAvailableState()
-            underTest.saveToCloudDrive()
-            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+            underTest.uiState.test {
+                awaitAvailableState()
+                underTest.saveToCloudDrive()
+                assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
+            }
         }
-    }
-
-    @Test
-    fun `test that saveToCloudDrive emits SaveError when resolving the QR file fails`() = runTest {
-        stubQRCodeCreation()
-
-        underTest.uiState.test {
-            awaitAvailableState()
-            whenever(getQRCodeFileUseCase()).thenAnswer { throw RuntimeException() }
-            underTest.saveToCloudDrive()
-            assertThat(awaitMessage()).isEqualTo(MyQrCodeMessage.SaveError)
-        }
-    }
 
     @Test
     fun `test that onUploadQrCodeEventConsumed clears the event`() = runTest {
@@ -493,21 +568,16 @@ class MyQrCodeViewModelTest {
         }
     }
 
-    private suspend fun stubQRCodeCreation() {
+    private suspend fun stubQRCodeCreation(persistedFile: File? = qrFile) {
         val localAvatarFile = mock<File> {
             on { exists() } doReturn true
             on { length() } doReturn 100L
-        }
-        val qrFile = mock<File> {
-            on { exists() } doReturn true
-            on { absolutePath } doReturn qrFilePath
         }
 
         whenever(createContactLinkUseCase(renew = false)).thenReturn(initialContactLink)
         whenever(getUserFullNameUseCase(any())).thenReturn("FullName")
         whenever(getMyAvatarColorUseCase()).thenReturn(0xFFFFF)
         whenever(getMyAvatarFileUseCase(any())).thenReturn(localAvatarFile)
-        whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
         whenever(
             avatarContentMapper.invoke(
                 fullName = "FullName",
@@ -516,7 +586,9 @@ class MyQrCodeViewModelTest {
                 textSize = 38.sp,
                 backgroundColor = 0xFFFFF,
             )
-        ).thenReturn(PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true))
+        ).thenReturn(avatarContent)
+        whenever(qrCodeImageMapper(any(), any())).thenReturn(imageBytes)
+        whenever(saveQRCodeImageUseCase(imageBytes)).thenReturn(persistedFile)
     }
 
     private suspend fun stubQRCodeCreationFailure() {

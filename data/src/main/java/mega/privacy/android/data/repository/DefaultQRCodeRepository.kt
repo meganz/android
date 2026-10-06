@@ -5,6 +5,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -26,6 +27,7 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 internal class DefaultQRCodeRepository @Inject constructor(
     private val cacheGateway: CacheGateway,
+    private val fileGateway: FileGateway,
     private val megaApiGateway: MegaApiGateway,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val scannedContactLinkResultMapper: ScannedContactLinkResultMapper,
@@ -37,6 +39,11 @@ internal class DefaultQRCodeRepository @Inject constructor(
         cacheGateway
             .getCacheFile(CacheFolderConstant.QR_FOLDER, fileName)
     }
+
+    override suspend fun writeQRFile(file: File, imageBytes: ByteArray) =
+        withContext(ioDispatcher) {
+            fileGateway.writeBytesToPath(file.absolutePath, imageBytes)
+        }
 
     override suspend fun queryScannedContactLink(scannedHandle: String) =
         withContext(ioDispatcher) {

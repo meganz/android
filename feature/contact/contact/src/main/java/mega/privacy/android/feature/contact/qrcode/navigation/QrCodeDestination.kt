@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.contact.qrcode.navigation
 
+import android.content.ClipData
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -22,8 +24,11 @@ import mega.privacy.android.feature.contact.qrcode.scan.view.ScanQrCodeScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.LegacySettingsNavKey
 import mega.privacy.android.navigation.destination.QrCodeNavKey
+import mega.privacy.android.navigation.destination.qrCodeSettingsTargetPreference
 import mega.privacy.android.shared.nodes.namecollision.rememberNameCollisionLauncher
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.UploadingFiles
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 import java.io.File
@@ -75,6 +80,12 @@ internal fun EntryProviderScope<NavKey>.qrCode(
             onSaveToCloudDrive = myQrCodeViewModel::saveToCloudDrive,
             onResetQRCode = myQrCodeViewModel::resetQRCode,
             onDeleteQRCode = myQrCodeViewModel::deleteQRCode,
+            onShareClick = myQrCodeViewModel::shareQRCode,
+            onShareQRCode = context::shareQrCodeImage,
+            onShareEventConsumed = myQrCodeViewModel::onShareEventConsumed,
+            onSettingsClick = {
+                navigationHandler.navigate(LegacySettingsNavKey(qrCodeSettingsTargetPreference))
+            },
             onScanClick = scanQrCodeViewModel::scanCode,
             onMessageConsumed = myQrCodeViewModel::onMessageConsumed,
         )
@@ -91,6 +102,24 @@ internal fun EntryProviderScope<NavKey>.qrCode(
             onScannedContactAvatarReset = scanQrCodeViewModel::resetScannedContactAvatar,
         )
     }
+}
+
+/**
+ * Offers the QR code image at [filePath] to other apps through the app's FileProvider.
+ */
+private fun Context.shareQrCodeImage(filePath: String) {
+    val uri = FileProvider.getUriForFile(
+        this,
+        "$packageName.providers.fileprovider",
+        File(filePath),
+    )
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/*"
+        putExtra(Intent.EXTRA_STREAM, uri)
+        clipData = ClipData.newUri(contentResolver, "", uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    startActivity(Intent.createChooser(shareIntent, getString(sharedR.string.general_share)))
 }
 
 /**

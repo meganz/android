@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -23,6 +24,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -32,6 +34,7 @@ class DefaultQRCodeRepositoryTest {
     private lateinit var underTest: DefaultQRCodeRepository
     private val testCoroutineDispatcher = StandardTestDispatcher()
     private val cacheGateway = mock<CacheGateway>()
+    private val fileGateway = mock<FileGateway>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val scannedContactLinkResultMapper = mock<ScannedContactLinkResultMapper>()
@@ -42,6 +45,7 @@ class DefaultQRCodeRepositoryTest {
         underTest =
             DefaultQRCodeRepository(
                 cacheGateway = cacheGateway,
+                fileGateway = fileGateway,
                 megaApiGateway = megaApiGateway,
                 megaLocalStorageGateway = megaLocalStorageGateway,
                 scannedContactLinkResultMapper = scannedContactLinkResultMapper,
@@ -57,6 +61,16 @@ class DefaultQRCodeRepositoryTest {
             underTest.getQRFile(fileName)
             verify(cacheGateway).getCacheFile(CacheFolderConstant.QR_FOLDER, fileName)
         }
+
+    @Test
+    fun `test that writeQRFile writes the image bytes to the file path`() = runTest {
+        val file = mock<File> { on { absolutePath }.thenReturn("/cache/qr/image.jpg") }
+        val imageBytes = byteArrayOf(1, 2, 3)
+
+        underTest.writeQRFile(file, imageBytes)
+
+        verify(fileGateway).writeBytesToPath("/cache/qr/image.jpg", imageBytes)
+    }
 
     @Test
     fun `test that contact details is successfully returned`() = runTest {

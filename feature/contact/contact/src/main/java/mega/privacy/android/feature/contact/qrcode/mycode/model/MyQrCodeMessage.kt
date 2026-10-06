@@ -17,6 +17,11 @@ sealed interface MyQrCodeMessage {
     data object SaveError : MyQrCodeMessage
 
     /**
+     * The QR code image is not available to share.
+     */
+    data object ShareError : MyQrCodeMessage
+
+    /**
      * There is not enough free space to save the QR code.
      */
     data object NotEnoughSpace : MyQrCodeMessage

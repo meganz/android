@@ -35,11 +35,13 @@ sealed interface MyQrCodeUiState {
      * @constructor Creates a new QRCodeAvailable
      * @property qrCode the qr code
      * @property message
+     * @property shareEvent one-shot event carrying the path of the QR code image to share
      * @property uploadQrCodeEvent the QR code image to hand over to the Cloud drive upload flow
      */
     data class QRCodeAvailable(
         val qrCode: QrCode,
         override val message: StateEventWithContent<MyQrCodeMessage>,
+        val shareEvent: StateEventWithContent<String>,
         val uploadQrCodeEvent: StateEventWithContent<UriPath>,
     ) : MyQrCodeUiState
 

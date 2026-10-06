@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
-import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
+import mega.privacy.android.domain.usecase.account.qr.SaveQRCodeImageUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
@@ -31,19 +31,21 @@ import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.feature.contact.qrcode.mycode.MyQrCodeViewModel.Companion.MINIMUM_LOADING_DURATION
 import mega.privacy.android.feature.contact.qrcode.mycode.mapper.MyQrCodeErrorMapper
+import mega.privacy.android.feature.contact.qrcode.mycode.mapper.QrCodeImageMapper
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeMessage
 import mega.privacy.android.feature.contact.qrcode.mycode.model.MyQrCodeUiState
 import mega.privacy.android.feature.contact.qrcode.mycode.model.QrCode
 import mega.privacy.android.shared.account.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.shared.account.presentation.model.AvatarContent
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel driving the personal "My QR code" flow: creating, resetting and deleting the
- * current user's contact link, exposing their avatar, copying the link and saving the QR
- * image to the device or handing it over for upload to the Cloud drive.
+ * current user's contact link, exposing their avatar, copying the link, sharing the QR image
+ * and saving it to the device or handing it over for upload to the Cloud drive.
  */
 @HiltViewModel
 class MyQrCodeViewModel @Inject constructor(
@@ -51,7 +53,7 @@ class MyQrCodeViewModel @Inject constructor(
     private val createContactLinkUseCase: CreateContactLinkUseCase,
     private val resetContactLinkUseCase: ResetContactLinkUseCase,
     private val deleteQRCodeUseCase: DeleteQRCodeUseCase,
-    private val getQRCodeFileUseCase: GetQRCodeFileUseCase,
+    private val saveQRCodeImageUseCase: SaveQRCodeImageUseCase,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
@@ -59,6 +61,7 @@ class MyQrCodeViewModel @Inject constructor(
     private val doesUriPathHaveSufficientSpaceUseCase: DoesUriPathHaveSufficientSpaceUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
     private val avatarContentMapper: AvatarContentMapper,
+    private val qrCodeImageMapper: QrCodeImageMapper,
     private val myQrCodeErrorMapper: MyQrCodeErrorMapper,
 ) : ViewModel() {
 
@@ -70,6 +73,7 @@ class MyQrCodeViewModel @Inject constructor(
      */
     private var lastQrData: QrData = QrData.Loading
     private val messageChannel = Channel<StateEventWithContent<MyQrCodeMessage>>(Channel.BUFFERED)
+    private val shareChannel = Channel<StateEventWithContent<String>>(Channel.BUFFERED)
     private val uploadQrCodeChannel = Channel<StateEventWithContent<UriPath>>(Channel.BUFFERED)
 
     /**
@@ -79,12 +83,14 @@ class MyQrCodeViewModel @Inject constructor(
         combine(
             qrCodeChannel.receiveAsFlow().onStart { createQRCode() },
             messageChannel.receiveAsFlow().onStart { emit(consumed()) },
+            shareChannel.receiveAsFlow().onStart { emit(consumed()) },
             uploadQrCodeChannel.receiveAsFlow().onStart { emit(consumed()) },
-        ) { qrData, message, uploadQrCodeEvent ->
+        ) { qrData, message, shareEvent, uploadQrCodeEvent ->
             when (qrData) {
                 is QrData.Data -> MyQrCodeUiState.QRCodeAvailable(
                     qrCode = qrData.qrCode,
                     message = message,
+                    shareEvent = shareEvent,
                     uploadQrCodeEvent = uploadQrCodeEvent,
                 )
 
@@ -195,9 +201,7 @@ class MyQrCodeViewModel @Inject constructor(
      */
     fun saveToFileSystem(parentPath: UriPath) {
         viewModelScope.launch {
-            val qrFile = runCatching { getQRCodeFileUseCase() }
-                .onFailure { Timber.e(it) }
-                .getOrNull()
+            val qrFile = persistedQrCodeFile()
 
             if (qrFile == null) {
                 messageChannel.trySend(triggered(MyQrCodeMessage.SaveError))
@@ -229,22 +233,36 @@ class MyQrCodeViewModel @Inject constructor(
     }
 
     /**
+     * Share the persisted QR code image, surfacing its path through
+     * [MyQrCodeUiState.QRCodeAvailable.shareEvent].
+     */
+    fun shareQRCode() {
+        val qrFile = persistedQrCodeFile()
+        if (qrFile == null) {
+            messageChannel.trySend(triggered(MyQrCodeMessage.ShareError))
+        } else {
+            shareChannel.trySend(triggered(qrFile.absolutePath))
+        }
+    }
+
+    /**
      * Hand the QR code image over for upload to the Cloud drive. Only the file is resolved here;
      * everything from that point on (quota, name collisions, progress) belongs to the upload flow.
      */
     fun saveToCloudDrive() {
-        viewModelScope.launch {
-            val qrFile = runCatching { getQRCodeFileUseCase() }
-                .onFailure { Timber.e(it) }
-                .getOrNull()
-                ?.takeIf { it.exists() }
-
-            if (qrFile == null) {
-                messageChannel.send(triggered(MyQrCodeMessage.SaveError))
-            } else {
-                uploadQrCodeChannel.send(triggered(UriPath(qrFile.absolutePath)))
-            }
+        val qrFile = persistedQrCodeFile()?.takeIf { it.exists() }
+        if (qrFile == null) {
+            messageChannel.trySend(triggered(MyQrCodeMessage.SaveError))
+        } else {
+            uploadQrCodeChannel.trySend(triggered(UriPath(qrFile.absolutePath)))
         }
+    }
+
+    /**
+     * Notify that the current [MyQrCodeUiState.QRCodeAvailable.shareEvent] has been consumed.
+     */
+    fun onShareEventConsumed() {
+        shareChannel.trySend(consumed())
     }
 
     /**
@@ -262,15 +280,36 @@ class MyQrCodeViewModel @Inject constructor(
         uploadQrCodeChannel.trySend(consumed())
     }
 
+    /**
+     * The image written for the QR code currently on screen. Only the path recorded alongside the
+     * code is trusted: the cache location may still hold the image of a previous link.
+     */
+    private fun persistedQrCodeFile(): File? =
+        (lastQrData as? QrData.Data)?.qrCode?.qrCodeFilePath?.let(::File)
+
     private suspend fun getQrCodeData(contactLink: String): QrCode {
         val avatarBgColor = getMyAvatarColorUseCase()
+        val avatarContent = buildAvatarContent(avatarBgColor)
         return QrCode(
             contactLink = contactLink,
-            avatarContent = buildAvatarContent(avatarBgColor),
+            avatarContent = avatarContent,
             avatarBgColor = avatarBgColor,
-            qrCodeFilePath = getQRCodeFileUseCase()?.absolutePath,
+            qrCodeFilePath = persistQrCodeImage(contactLink, avatarContent),
         )
     }
+
+    /**
+     * Writes the image the user will share or save. A failure here is not a failure to create the
+     * code — the screen can still show it — so it only leaves the file path unset.
+     */
+    private suspend fun persistQrCodeImage(
+        contactLink: String,
+        avatarContent: AvatarContent,
+    ): String? = runCatching {
+        qrCodeImageMapper(contactLink, avatarContent)
+            ?.let { saveQRCodeImageUseCase(it) }
+            ?.absolutePath
+    }.onFailure { Timber.e(it) }.getOrNull()
 
     private suspend fun buildAvatarContent(backgroundColor: Int): AvatarContent =
         avatarContentMapper(

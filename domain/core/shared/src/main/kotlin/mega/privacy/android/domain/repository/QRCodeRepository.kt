@@ -18,6 +18,14 @@ interface QRCodeRepository {
     suspend fun getQRFile(fileName: String): File?
 
     /**
+     * Write the rendered QR code image to [file], replacing any previous image.
+     *
+     * @param file destination file, as returned by [getQRFile]
+     * @param imageBytes encoded image content
+     */
+    suspend fun writeQRFile(file: File, imageBytes: ByteArray)
+
+    /**
      * Query details of the scanned contact
      *
      * @param scannedHandle Base 64 handle of the scanned qr code
