@@ -11,7 +11,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.feature.contact.group.create.navigation.NewChatEntry
+import mega.privacy.android.feature.contact.conversation.navigation.StartConversationEntry
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.NewChatNavKey
@@ -20,7 +20,8 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
  * Registers the [NewChatNavKey] destination. Behind [ApiFeatures.ContactComposeFeature] either renders the
- * Compose [NewChatEntry] screen (flag on) or launches the legacy [StartConversationActivity] (flag off).
+ * Compose [StartConversationEntry] screen (flag on) or launches the legacy [StartConversationActivity]
+ * (flag off).
  *
  * The Compose screen publishes the chosen [NewChatNavKey.NewChatResult] under [NewChatNavKey.KEY] and the
  * consuming caller creates the chat. The legacy screen creates the chat itself, so this destination
@@ -40,7 +41,7 @@ fun EntryProviderScope<NavKey>.newChatLegacyDestination(navigationHandler: Navig
                 )
             },
             enabled = {
-                NewChatEntry(navigationHandler = navigationHandler)
+                StartConversationEntry(navigationHandler = navigationHandler)
             },
         )
     }

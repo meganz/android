@@ -7,20 +7,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.feature.contact.group.create.navigation.NewChatEntry
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.destination.NewChatNavKey
@@ -28,9 +30,10 @@ import javax.inject.Inject
 
 /**
  * A thin Compose host that lets a legacy Activity (the share/forward target pickers) open the Compose
- * "new chat" flow for a result. It renders the [NewChatNavKey] destination via [LegacyActivityScaffold]
- * and bridges the published [NewChatNavKey.NewChatResult] back to the caller as an Activity result,
- * mirroring the legacy [AddContactActivity] new-chat contract: always [AddContactActivity.EXTRA_CONTACTS]
+ * "new chat" multi-select picker ([NewChatEntry]) for a result. It renders the picker via
+ * [LegacyActivityScaffold] under its own key, because the shared [NewChatNavKey] destination shows
+ * the chat list's start-conversation screen. It bridges the published [NewChatNavKey.NewChatResult]
+ * back to the caller as an Activity result, mirroring the legacy [AddContactActivity] new-chat contract: always [AddContactActivity.EXTRA_CONTACTS]
  * (the selected emails), plus — only for a group (two or more selected) —
  * [AddContactActivity.EXTRA_CHAT_TITLE], [AddContactActivity.EXTRA_EKR], [AddContactActivity.EXTRA_CHAT_LINK]
  * and [AddContactActivity.ALLOW_ADD_PARTICIPANTS]. The caller branches on the selected-contact count, so
@@ -64,7 +67,6 @@ class NewChatComposeActivity : AppCompatActivity() {
         setContent {
             val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val startKey = remember { NewChatNavKey }
             LegacyActivityScaffold(
                 container = { content ->
                     MegaAppContainer(
@@ -73,12 +75,16 @@ class NewChatComposeActivity : AppCompatActivity() {
                         content = content,
                     )
                 },
-                initialKey = startKey,
+                initialKey = InternalNewChatNavKey,
                 navigationResultManager = navigationResultManager,
                 featureDestinations = featureDestinations,
                 appDialogDestinations = appDialogDestinations,
                 onEmptyBackStack = { if (!isFinishing) finish() },
-            ) { _, _ -> }
+            ) { navigationHandler, _ ->
+                entry<InternalNewChatNavKey> {
+                    NewChatEntry(navigationHandler = navigationHandler)
+                }
+            }
         }
     }
 
@@ -123,3 +129,6 @@ class NewChatComposeActivity : AppCompatActivity() {
             Intent(context, NewChatComposeActivity::class.java)
     }
 }
+
+@Serializable
+private data object InternalNewChatNavKey : NavKey

@@ -2,6 +2,7 @@ package mega.privacy.android.shared.chats.components
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsOff
@@ -42,6 +43,7 @@ class ChatExplorerListItemViewTest {
         avatarSecondaryColor: Color? = null,
         contactAvatarFile: File? = null,
         icon: ImageVector? = null,
+        showCheckbox: Boolean = true,
         onItemClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -58,6 +60,7 @@ class ChatExplorerListItemViewTest {
                     icon = icon,
                     avatarColor = avatarColor,
                     avatarSecondaryColor = avatarSecondaryColor,
+                    showCheckbox = showCheckbox,
                     onItemClicked = onItemClicked,
                 )
             }
@@ -176,6 +179,13 @@ class ChatExplorerListItemViewTest {
         composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true)
             .onFirst()
             .assertIsOff()
+    }
+
+    @Test
+    fun `test that checkbox is not shown when showCheckbox is false`() {
+        setContent(isSelected = false, showCheckbox = false)
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true)
+            .assertCountEquals(0)
     }
 
     @Test

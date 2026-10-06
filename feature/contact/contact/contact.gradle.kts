@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":domain:feature:chat"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
+    implementation(project(":shared:chats"))
     implementation(project(":shared:contact"))
     implementation(project(":shared:account"))
     implementation(project(":shared:nodes"))

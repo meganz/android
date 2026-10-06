@@ -42,6 +42,8 @@ import java.io.File
  *
  * @param item The ChatExplorerUiItem to display
  * @param onItemClicked Callback when the item is clicked
+ * @param showCheckbox When false the trailing selection checkbox is omitted, for single-tap
+ * lists where the row is not selectable.
  */
 @Composable
 fun ChatExplorerListItemView(
@@ -49,6 +51,7 @@ fun ChatExplorerListItemView(
     isProcessingAction: Boolean,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    showCheckbox: Boolean = true,
 ) {
     when (item) {
         is ChatExplorerUiItem.NoteToSelf ->
@@ -57,6 +60,7 @@ fun ChatExplorerListItemView(
                 isSelected = item.isSelected,
                 isEnabled = item.isEnabled,
                 isProcessingAction = isProcessingAction,
+                showCheckbox = showCheckbox,
                 isHint = item.isHint,
                 hasAvatarIcon = item.hasAvatarIcon,
                 icon = item.icon,
@@ -72,6 +76,7 @@ fun ChatExplorerListItemView(
                 isSelected = item.isSelected,
                 isEnabled = item.isEnabled,
                 isProcessingAction = isProcessingAction,
+                showCheckbox = showCheckbox,
                 hasAvatarIcon = item.hasAvatarIcon,
                 icon = item.icon,
                 title = item.title,
@@ -92,6 +97,7 @@ fun ChatExplorerListItemView(
             isSelected = item.isSelected,
             isEnabled = item.isEnabled,
             isProcessingAction = isProcessingAction,
+            showCheckbox = showCheckbox,
             title = item.contactName,
             subtitle = item.userStatus?.toSubtitleStringRes()?.let { stringResource(it) },
             avatarColor = item.avatarPrimaryColor,
@@ -118,6 +124,7 @@ fun ChatExplorerListItemView(
  * @param avatarColor The background primary color for the avatar.
  * @param avatarSecondaryColor The background secondary color for the avatar.
  * @param onItemClicked Callback when the row is clicked.
+ * @param showCheckbox When false the trailing selection checkbox is omitted.
  */
 @Composable
 internal fun ChatExplorerListItemView(
@@ -125,6 +132,7 @@ internal fun ChatExplorerListItemView(
     isEnabled: Boolean,
     isProcessingAction: Boolean,
     modifier: Modifier = Modifier,
+    showCheckbox: Boolean = true,
     title: String? = null,
     subtitle: String? = null,
     isHint: Boolean = false,
@@ -216,24 +224,28 @@ internal fun ChatExplorerListItemView(
                 )
             }
         },
-        trailingElement = {
-            Box(
-                modifier = Modifier
-                    .alpha(contentAlpha)
-                    .size(24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Checkbox(
-                    checked = isSelected,
-                    enabled = if (isSelected) !isProcessingAction else true,
-                    onCheckStateChanged = { },
-                    tapTargetArea = false,
-                    clickable = false,
+        trailingElement = if (showCheckbox) {
+            {
+                Box(
                     modifier = Modifier
-                        .semantics { toggleableState = ToggleableState(isSelected) }
-                        .testTag(CHECKBOX_TAG)
-                )
+                        .alpha(contentAlpha)
+                        .size(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Checkbox(
+                        checked = isSelected,
+                        enabled = if (isSelected) !isProcessingAction else true,
+                        onCheckStateChanged = { },
+                        tapTargetArea = false,
+                        clickable = false,
+                        modifier = Modifier
+                            .semantics { toggleableState = ToggleableState(isSelected) }
+                            .testTag(CHECKBOX_TAG)
+                    )
+                }
             }
+        } else {
+            null
         },
         onClickListener = onItemClicked,
     )

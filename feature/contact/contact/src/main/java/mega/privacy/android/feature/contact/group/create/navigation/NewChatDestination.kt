@@ -18,7 +18,8 @@ import mega.privacy.android.navigation.destination.NewChatNavKey
  * more yields a group result carrying the chosen settings. The consuming caller creates the chat and
  * sends its content into it, mirroring the legacy `AddContactActivity` new-chat contract.
  *
- * Hosted by the app module's gated `NewChatNavKey` destination (behind `ContactComposeFeature`).
+ * Hosted by the app module's share/forward `NewChatComposeActivity`, which registers this entry under
+ * its own key, so leaving the screen goes back rather than removing a specific key.
  *
  * @param navigationHandler
  */
@@ -56,6 +57,6 @@ fun NewChatEntry(
                 ),
             )
         },
-        onBack = { navigationHandler.remove(NewChatNavKey) },
+        onBack = navigationHandler::back,
     )
 }

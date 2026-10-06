@@ -81,10 +81,10 @@ data class AddMeetingParticipantsNavKey(val chatId: Long) : NavKey {
 }
 
 /**
- * Launches the "new chat" flow used by the share/forward target pickers; result published under
- * [KEY]. This is a single mode-less MEGA-contacts multi-select picker whose selection count decides
- * the outcome: exactly one selected contact yields a 1:1 chat (no group settings); two or more yields
- * a group chat with the chosen settings.
+ * Launches the chat list's start-conversation flow; result published under [KEY]. Tapping a contact
+ * yields a 1:1 chat (no group settings); creating a group yields a group chat with the chosen
+ * settings. The share/forward target pickers publish the same [NewChatResult] under [KEY] from their
+ * own multi-select picker.
  *
  * With `ContactComposeFeature` off the legacy start-conversation screen is shown instead; it creates
  * the chat itself and opens it, so no result is published.
