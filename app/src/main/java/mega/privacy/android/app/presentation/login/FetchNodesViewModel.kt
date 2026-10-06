@@ -305,14 +305,14 @@ class FetchNodesViewModel @AssistedInject constructor(
             }
 
             Timber.d("fetch nodes started")
-            performFetchNodes()
+            performFetchNodes(isRefreshSession)
         }
     }
 
-    private fun performFetchNodes() {
+    private fun performFetchNodes(isRefreshSession: Boolean) {
         performFetchNodesJob = viewModelScope.launch {
             runCatching {
-                fetchNodesUseCase().collectLatest { update ->
+                fetchNodesUseCase(isRefreshSession).collectLatest { update ->
                     if (update.progress?.floatValue == 1F) {
                         fetchNodeProvider.clearLoginByAccount()
                         Timber.d("fetch nodes finished")

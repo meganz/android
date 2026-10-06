@@ -7,11 +7,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import mega.privacy.android.domain.repository.security.LoginRepository
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -19,7 +21,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -33,12 +37,17 @@ class FetchNodesUseCaseTest {
     private val loginRepository = mock<LoginRepository>()
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
     private val loginMutex = mock<Mutex>()
+    private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
 
     @BeforeEach
     fun setUp() {
+        rootNodeExistsUseCase.stub {
+            on { invoke() }.thenReturn(false)
+        }
         underTest = FetchNodesUseCase(
             loginRepository = loginRepository,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
             loginMutex = loginMutex
         )
     }
@@ -50,6 +59,7 @@ class FetchNodesUseCaseTest {
             loginRepository,
             resetChatSettingsUseCase,
             loginMutex,
+            rootNodeExistsUseCase,
         )
     }
 
@@ -124,5 +134,54 @@ class FetchNodesUseCaseTest {
         val inOrder = inOrder(loginMutex)
         inOrder.verify(loginMutex).lock()
         inOrder.verify(loginMutex).unlock()
+    }
+
+    @Test
+    fun `test that invoke emits finished progress without fetching nodes when root node already exists`() =
+        runTest {
+            rootNodeExistsUseCase.stub {
+                on { invoke() }.thenReturn(true)
+            }
+
+            underTest.invoke().test {
+                assertThat(awaitItem()).isEqualTo(FetchNodesUpdate(progress = Progress(1F)))
+                awaitComplete()
+            }
+
+            verify(loginRepository, never()).fetchNodesFlow()
+            val inOrder = inOrder(loginMutex, rootNodeExistsUseCase)
+            inOrder.verify(loginMutex).lock()
+            inOrder.verify(rootNodeExistsUseCase).invoke()
+            inOrder.verify(loginMutex).unlock()
+        }
+
+    @Test
+    fun `test that invoke fetches nodes when root node exists and the session is refreshed`() =
+        runTest {
+            val expectedUpdate = FetchNodesUpdate(mock(), mock())
+            rootNodeExistsUseCase.stub {
+                on { invoke() }.thenReturn(true)
+            }
+            whenever(loginRepository.fetchNodesFlow()).thenReturn(flowOf(expectedUpdate))
+
+            underTest.invoke(isRefreshSession = true).test {
+                assertThat(awaitItem()).isEqualTo(expectedUpdate)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(loginRepository).fetchNodesFlow()
+        }
+
+    @Test
+    fun `test that invoke fetches nodes when root node does not exist`() = runTest {
+        val expectedUpdate = FetchNodesUpdate(mock(), mock())
+        whenever(loginRepository.fetchNodesFlow()).thenReturn(flowOf(expectedUpdate))
+
+        underTest.invoke().test {
+            assertThat(awaitItem()).isEqualTo(expectedUpdate)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(loginRepository).fetchNodesFlow()
     }
 }

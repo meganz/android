@@ -168,7 +168,7 @@ class FetchNodesViewModelTest {
         whenever(fetchNodeProvider.isLogInByAccount).thenReturn(false)
         val loginStatusFlow = MutableStateFlow<LoginStatus>(LoginStatus.LoginStarted)
         whenever(fastLoginUseCase.invoke(any(), any(), any())).thenReturn(loginStatusFlow)
-        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+        whenever(fetchNodesUseCase(any())).thenReturn(emptyFlow())
 
         initViewModel()
 
@@ -196,7 +196,7 @@ class FetchNodesViewModelTest {
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(true)
         whenever(fetchNodeProvider.isLogInByAccount).thenReturn(true)
-        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+        whenever(fetchNodesUseCase(any())).thenReturn(emptyFlow())
 
         initViewModel()
         advanceUntilIdle()
@@ -206,7 +206,7 @@ class FetchNodesViewModelTest {
             assertThat(state.isFastLoginInProgress).isFalse()
             assertThat(state.isFastLogin).isFalse()
 
-            verify(fetchNodesUseCase).invoke()
+            verify(fetchNodesUseCase).invoke(false)
             verify(fastLoginUseCase, never()).invoke(any(), any(), any())
             verify(globalInitialiser).onPostLogin("test-session", false)
             cancelAndIgnoreRemainingEvents()
@@ -269,7 +269,7 @@ class FetchNodesViewModelTest {
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(true)
         val fetchNodesFlow = MutableStateFlow(FetchNodesUpdate())
-        whenever(fetchNodesUseCase()).thenReturn(fetchNodesFlow)
+        whenever(fetchNodesUseCase(any())).thenReturn(fetchNodesFlow)
 
         initViewModel()
 
@@ -301,7 +301,7 @@ class FetchNodesViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(true)
-        whenever(fetchNodesUseCase()).thenReturn(
+        whenever(fetchNodesUseCase(any())).thenReturn(
             flow { throw fetchNodesException }
         )
 
@@ -324,7 +324,7 @@ class FetchNodesViewModelTest {
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(true)
         val fetchNodesErrorAccess = mock<FetchNodesErrorAccess>()
-        whenever(fetchNodesUseCase()).thenReturn(
+        whenever(fetchNodesUseCase(any())).thenReturn(
             flow { throw fetchNodesErrorAccess }
         )
 
@@ -376,7 +376,7 @@ class FetchNodesViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(true)
         val fetchNodesFlow = MutableStateFlow(FetchNodesUpdate())
-        whenever(fetchNodesUseCase()).thenReturn(fetchNodesFlow)
+        whenever(fetchNodesUseCase(any())).thenReturn(fetchNodesFlow)
         val accountBlockedFlow = MutableSharedFlow<AccountBlockedEvent>()
         whenever(monitorAccountBlockedUseCase()).thenReturn(accountBlockedFlow)
 
@@ -391,7 +391,7 @@ class FetchNodesViewModelTest {
             accountBlockedFlow.emit(blockedEvent)
 
             // Verify fetch nodes was called initially
-            verify(fetchNodesUseCase).invoke()
+            verify(fetchNodesUseCase).invoke(any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -423,7 +423,7 @@ class FetchNodesViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
-        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+        whenever(fetchNodesUseCase(any())).thenReturn(emptyFlow())
 
         initViewModel(
             args = FetchNodesViewModel.Args(
@@ -452,7 +452,7 @@ class FetchNodesViewModelTest {
             whenever(fetchNodeProvider.isLogInByAccount).thenReturn(false)
             val loginStatusFlow = MutableStateFlow<LoginStatus>(LoginStatus.LoginStarted)
             whenever(fastLoginUseCase.invoke(any(), any(), any())).thenReturn(loginStatusFlow)
-            whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+            whenever(fetchNodesUseCase(any())).thenReturn(emptyFlow())
 
             initViewModel(
                 args = FetchNodesViewModel.Args(
@@ -469,7 +469,7 @@ class FetchNodesViewModelTest {
                 assertThat(state.isFastLogin).isTrue()
 
                 verify(fastLoginUseCase).invoke(eq("test-session"), eq(true), any())
-                verify(fetchNodesUseCase, never()).invoke()
+                verify(fetchNodesUseCase, never()).invoke(any())
                 verify(globalInitialiser, never()).onPostLogin(any(), any())
 
                 loginStatusFlow.emit(LoginStatus.LoginSucceed)
@@ -489,7 +489,7 @@ class FetchNodesViewModelTest {
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
         whenever(fetchNodeProvider.isLogInByAccount).thenReturn(true)
-        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+        whenever(fetchNodesUseCase(any())).thenReturn(emptyFlow())
 
         initViewModel(
             args = FetchNodesViewModel.Args(
@@ -505,7 +505,7 @@ class FetchNodesViewModelTest {
             assertThat(state.isFastLoginInProgress).isFalse()
             assertThat(state.isFastLogin).isFalse()
 
-            verify(fetchNodesUseCase).invoke()
+            verify(fetchNodesUseCase).invoke(any())
             verify(globalInitialiser).onPostLogin("test-session", false)
             verify(fastLoginUseCase, never()).invoke(any(), any(), any())
 
@@ -583,7 +583,7 @@ class FetchNodesViewModelTest {
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
         val fetchNodesFlow = MutableStateFlow(FetchNodesUpdate())
-        whenever(fetchNodesUseCase()).thenReturn(fetchNodesFlow)
+        whenever(fetchNodesUseCase(any())).thenReturn(fetchNodesFlow)
 
         initViewModel(
             args = FetchNodesViewModel.Args(
@@ -598,7 +598,7 @@ class FetchNodesViewModelTest {
             val state = awaitItem()
             assertThat(state.fetchNodesUpdate).isNotNull()
 
-            verify(fetchNodesUseCase).invoke()
+            verify(fetchNodesUseCase).invoke(true)
             verify(globalInitialiser, never()).onPostLogin(any(), any())
             verify(fastLoginUseCase, never()).invoke(any(), any(), any())
 
