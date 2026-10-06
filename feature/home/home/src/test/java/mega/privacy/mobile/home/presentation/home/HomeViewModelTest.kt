@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorHomeConfigurationTooltipShownUseCase
 import mega.privacy.android.domain.usecase.SetHomeConfigurationTooltipShownUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
@@ -45,6 +47,7 @@ class HomeViewModelTest {
         mock<MonitorHomeWidgetConfigurationUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val hasOfflineFilesUseCase = mock<HasOfflineFilesUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorHomeConfigurationTooltipShownUseCase =
         mock<MonitorHomeConfigurationTooltipShownUseCase>()
     private val setHomeConfigurationTooltipShownUseCase =
@@ -53,6 +56,7 @@ class HomeViewModelTest {
     @BeforeEach
     fun setUp() {
         stubTooltipShown(shown = true)
+        stubOfflineModeFlag(enabled = false)
         underTest = HomeViewModel(
             widgetProviders = homeWidgetProviders,
             monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
@@ -60,6 +64,7 @@ class HomeViewModelTest {
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
             monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -73,6 +78,7 @@ class HomeViewModelTest {
             hasOfflineFilesUseCase,
             monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -314,6 +320,12 @@ class HomeViewModelTest {
         }
     }
 
+    private fun stubOfflineModeFlag(enabled: Boolean) {
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.OfflineModePhase1) } doReturn enabled
+        }
+    }
+
     private fun stubTooltipShown(shown: Boolean) {
         monitorHomeConfigurationTooltipShownUseCase.stub {
             on { invoke() } doReturn flowOf(shown)
@@ -339,6 +351,7 @@ class HomeViewModelTest {
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
+                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             )
 
             underTest.state.test {
@@ -366,6 +379,7 @@ class HomeViewModelTest {
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
+                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             )
 
             underTest.state.test {
@@ -405,6 +419,7 @@ class HomeViewModelTest {
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
+                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             )
 
             underTest.state.test {
@@ -433,6 +448,7 @@ class HomeViewModelTest {
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
             monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         verifyNoInteractions(setHomeConfigurationTooltipShownUseCase)
@@ -461,6 +477,7 @@ class HomeViewModelTest {
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
+                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             )
 
             underTest.state.test {
@@ -481,4 +498,25 @@ class HomeViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that state is Data when disconnected and offline mode flag is enabled`() = runTest {
+        stubConnectivity(connected = false)
+        stubOfflineModeFlag(enabled = true)
+        stubWidgetProviders()
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(emptyList())
+                awaitCancellation()
+            }
+        }
+
+        underTest.state.test {
+            var item: HomeUiState = awaitItem()
+            while (item is HomeUiState.Loading) {
+                item = awaitItem()
+            }
+            assertThat(item).isInstanceOf(HomeUiState.Data::class.java)
+        }
+    }
 }

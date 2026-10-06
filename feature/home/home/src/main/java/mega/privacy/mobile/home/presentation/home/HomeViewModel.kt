@@ -7,11 +7,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorHomeConfigurationTooltipShownUseCase
 import mega.privacy.android.domain.usecase.SetHomeConfigurationTooltipShownUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
@@ -31,6 +34,7 @@ class HomeViewModel @Inject constructor(
     private val hasOfflineFilesUseCase: HasOfflineFilesUseCase,
     private val monitorHomeConfigurationTooltipShownUseCase: MonitorHomeConfigurationTooltipShownUseCase,
     private val setHomeConfigurationTooltipShownUseCase: SetHomeConfigurationTooltipShownUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     val state: StateFlow<HomeUiState> by lazy {
@@ -61,8 +65,13 @@ class HomeViewModel @Inject constructor(
                 },
             monitorConnectivityUseCase().catch { Timber.e(it) },
             monitorHomeConfigurationTooltipShownUseCase().catch { Timber.e(it) },
-        ) { widgets, hasInternetConnection, isTooltipShown ->
-            if (hasInternetConnection) {
+            flow { emit(getFeatureFlagValueUseCase(ApiFeatures.OfflineModePhase1)) }
+                .catch {
+                    Timber.e(it)
+                    emit(false)
+                },
+        ) { widgets, hasInternetConnection, isTooltipShown, isOfflineModeEnabled ->
+            if (hasInternetConnection || isOfflineModeEnabled) {
                 HomeUiState.Data(
                     widgets = widgets,
                     showHomeConfigurationTooltip = !isTooltipShown,

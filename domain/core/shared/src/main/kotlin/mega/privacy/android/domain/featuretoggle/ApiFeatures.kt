@@ -375,6 +375,17 @@ enum class ApiFeatures(
         experimentName = "zipst",
         description = "Browse cloud archives by reading only the parts that are opened",
         defaultValue = false,
+    ),
+
+    /**
+     * Android Offline Mode Phase 1 (server flag `ff_aomp1`; the SDK strips the `ff_` prefix).
+     * When enabled, Home stays usable without a connection instead of showing a full-screen
+     * offline state.
+     */
+    OfflineModePhase1(
+        experimentName = "aomp1",
+        description = "Enable Offline Mode Phase 1 on the Home screen",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {
