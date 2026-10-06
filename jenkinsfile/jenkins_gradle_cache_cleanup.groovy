@@ -156,10 +156,10 @@ void buildProject() {
             sh "./gradlew --no-daemon app:assembleGmsDebug"
             sh "./gradlew --no-daemon lint"
             sh "./gradlew --no-daemon app:testGmsDebugUnitTest"
-            sh "./gradlew --no-daemon domain:test"
+            sh "./gradlew --no-daemon -p domain test"
             sh "./gradlew --no-daemon feature:devicecenter:testDebugUnitTest"
             sh "./gradlew --no-daemon feature:sync:testDebugUnitTest"
-            sh "./gradlew --no-daemon core-ui:testDebugUnitTest"
+            sh "./gradlew --no-daemon legacy-core-ui:testDebugUnitTest"
         }
     }
 }
