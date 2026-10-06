@@ -24,16 +24,19 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.persistentListOf
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.contact.list.model.CallEventData
+import mega.privacy.android.feature.contact.list.model.ContactListMessage
 import mega.privacy.android.feature.contact.list.model.ContactListUiState
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.feature.contact.components.ContactListLoadingView
@@ -54,10 +57,12 @@ import mega.privacy.mobile.analytics.event.ContactItemSelectedEvent
  * @param onAddContactClick
  * @param onRequestsClick
  * @param onGroupsClick
- * @param onStartCall
+ * @param onStartCall invoked when a call is requested from the contact actions sheet; the host
+ * requests the call permissions before starting the call.
  * @param onRemoveContact
  * @param onChatEventConsumed
  * @param onCallEventConsumed
+ * @param onMessageEventConsumed
  * @param onNavigateToChat
  * @param onStartCallTriggered
  * @param modifier
@@ -72,10 +77,11 @@ fun ContactListScreen(
     onAddContactClick: () -> Unit,
     onRequestsClick: () -> Unit,
     onGroupsClick: () -> Unit,
-    onStartCall: (handle: Long, video: Boolean, audio: Boolean) -> Unit,
+    onStartCall: (handle: Long, video: Boolean) -> Unit,
     onRemoveContact: (email: String) -> Unit,
     onChatEventConsumed: () -> Unit,
     onCallEventConsumed: () -> Unit,
+    onMessageEventConsumed: () -> Unit,
     onNavigateToChat: (chatId: Long) -> Unit,
     onStartCallTriggered: (CallEventData) -> Unit,
     modifier: Modifier = Modifier,
@@ -142,6 +148,24 @@ fun ContactListScreen(
             ContactListUiState.Loading -> ContactListLoading(padding)
 
             is ContactListUiState.Data -> {
+                val snackbarHostState = LocalSnackBarHostState.current
+                val microphonePermissionMessage =
+                    stringResource(sharedR.string.contact_info_microphone_permission_message)
+                val ongoingCallMessage =
+                    stringResource(sharedR.string.chat_start_meeting_already_in_call_error)
+                EventEffect(
+                    event = state.messageEvent,
+                    onConsumed = onMessageEventConsumed,
+                ) { message ->
+                    snackbarHostState?.showAutoDurationSnackbar(
+                        when (message) {
+                            ContactListMessage.MicrophonePermissionDenied ->
+                                microphonePermissionMessage
+
+                            ContactListMessage.OngoingCall -> ongoingCallMessage
+                        }
+                    )
+                }
                 val layoutDirection = LocalLayoutDirection.current
                 ContactListContent(
                     state = state,
@@ -179,11 +203,11 @@ fun ContactListScreen(
             },
             onAudioCall = {
                 selectedContactForSheet = null
-                onStartCall(selected.handle, false, true)
+                onStartCall(selected.handle, false)
             },
             onVideoCall = {
                 selectedContactForSheet = null
-                onStartCall(selected.handle, true, true)
+                onStartCall(selected.handle, true)
             },
             onContactInfo = {
                 selectedContactForSheet = null
@@ -246,10 +270,11 @@ private fun ContactListScreenPreview(
             onAddContactClick = {},
             onRequestsClick = {},
             onGroupsClick = {},
-            onStartCall = { _, _, _ -> },
+            onStartCall = { _, _ -> },
             onRemoveContact = {},
             onChatEventConsumed = {},
             onCallEventConsumed = {},
+            onMessageEventConsumed = {},
             onNavigateToChat = {},
             onStartCallTriggered = {},
         )
@@ -269,6 +294,8 @@ private class ContactListUiStateProvider :
             incomingRequestCount = 2,
             openChatEvent = consumed(),
             startCallEvent = consumed(),
+            messageEvent = consumed(),
+            storageOverQuotaEvent = consumed,
         ),
     )
 

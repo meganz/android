@@ -5,23 +5,30 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestLists
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
+import mega.privacy.android.feature.contact.list.model.ContactListMessage
 import mega.privacy.android.feature.contact.list.model.ContactListUiState
 import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
@@ -33,9 +40,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.Instant
 
@@ -49,6 +58,8 @@ class ContactListViewModelTest {
     private val removeContactByEmailUseCase = mock<RemoveContactByEmailUseCase>()
     private val startCallUseCase = mock<StartCallUseCase>()
     private val getChatCallUseCase = mock<GetChatCallUseCase>()
+    private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
+    private val getCurrentStorageStateUseCase = mock<GetCurrentStorageStateUseCase>()
     private val monitorContactRequestsUseCase = mock<MonitorContactRequestsUseCase>()
     private val contactItemUiStateMapper = ContactItemUiStateMapper(
         contactItemStatusMapper = ContactItemStatusMapper(),
@@ -56,13 +67,17 @@ class ContactListViewModelTest {
     )
 
     @BeforeEach
-    fun setUp() {
+    fun setUp() = runTest {
+        whenever(getCurrentStorageStateUseCase()).thenReturn(StorageState.Green)
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(false)
         underTest = ContactListViewModel(
             getContactsUseCase = getContactsUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             removeContactByEmailUseCase = removeContactByEmailUseCase,
             startCallUseCase = startCallUseCase,
             getChatCallUseCase = getChatCallUseCase,
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
+            getCurrentStorageStateUseCase = getCurrentStorageStateUseCase,
             monitorContactRequestsUseCase = monitorContactRequestsUseCase,
             contactItemUiStateMapper = contactItemUiStateMapper,
         )
@@ -76,6 +91,8 @@ class ContactListViewModelTest {
             removeContactByEmailUseCase,
             startCallUseCase,
             getChatCallUseCase,
+            isParticipatingInChatCallUseCase,
+            getCurrentStorageStateUseCase,
             monitorContactRequestsUseCase,
         )
     }
@@ -336,6 +353,130 @@ class ContactListViewModelTest {
     }
 
     @Test
+    fun `test that onCallTap passes audio false to startCallUseCase when audio is false`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            whenever(get1On1ChatIdUseCase(any())).thenReturn(789L)
+            whenever(getChatCallUseCase(789L)).thenReturn(null)
+            whenever(startCallUseCase(chatId = 789L, audio = false, video = true))
+                .thenReturn(null)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onCallTap(userHandle = 1L, video = true, audio = false)
+                val state = awaitDataState()
+                val data = (state.startCallEvent as StateEventWithContentTriggered).content
+                assertThat(data.hasLocalAudio).isFalse()
+                assertThat(data.hasLocalVideo).isTrue()
+            }
+            verify(startCallUseCase).invoke(chatId = 789L, audio = false, video = true)
+        }
+
+    @Test
+    fun `test that onCallTap triggers the storage over quota event without starting a call when the account is in paywall state`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            whenever(getCurrentStorageStateUseCase()).thenReturn(StorageState.PayWall)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onCallTap(userHandle = 1L, video = false, audio = true)
+                val state = awaitDataState { it.storageOverQuotaEvent == triggered }
+                assertThat(state.startCallEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+            verifyNoInteractions(get1On1ChatIdUseCase, startCallUseCase)
+        }
+
+    @Test
+    fun `test that onStorageOverQuotaEventConsumed clears the storage over quota event`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            whenever(getCurrentStorageStateUseCase()).thenReturn(StorageState.PayWall)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onCallTap(userHandle = 1L, video = false, audio = true)
+                awaitDataState { it.storageOverQuotaEvent == triggered }
+                underTest.onStorageOverQuotaEventConsumed()
+                awaitDataState { it.storageOverQuotaEvent == consumed }
+            }
+        }
+
+    @Test
+    fun `test that onCallTap triggers the ongoing call message without starting a call when participating in a call in another chat`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            whenever(get1On1ChatIdUseCase(any())).thenReturn(789L)
+            whenever(getChatCallUseCase(789L)).thenReturn(null)
+            whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onCallTap(userHandle = 1L, video = false, audio = true)
+                val state = awaitDataState {
+                    it.messageEvent is StateEventWithContentTriggered
+                }
+                val event = state.messageEvent as StateEventWithContentTriggered
+                assertThat(event.content).isEqualTo(ContactListMessage.OngoingCall)
+                assertThat(state.startCallEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+            verify(startCallUseCase, never()).invoke(any(), any(), any())
+        }
+
+    @Test
+    fun `test that onCallTap returns to the existing call when participating in a call in the same chat`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            whenever(get1On1ChatIdUseCase(any())).thenReturn(789L)
+            whenever(getChatCallUseCase(789L)).thenReturn(mock<ChatCall>())
+            whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onCallTap(userHandle = 1L, video = false, audio = true)
+                val state = awaitDataState {
+                    it.startCallEvent is StateEventWithContentTriggered
+                }
+                val data = (state.startCallEvent as StateEventWithContentTriggered).content
+                assertThat(data.isExistingCall).isTrue()
+                assertThat(state.messageEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that onCallPermissionsDenied triggers the microphone permission message`() =
+        runTest {
+            stubContactsFlow(emptyList())
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onCallPermissionsDenied()
+                val state = awaitDataState {
+                    it.messageEvent is StateEventWithContentTriggered
+                }
+                val event = state.messageEvent as StateEventWithContentTriggered
+                assertThat(event.content)
+                    .isEqualTo(ContactListMessage.MicrophonePermissionDenied)
+            }
+        }
+
+    @Test
+    fun `test that onMessageEventConsumed clears the message event`() = runTest {
+        stubContactsFlow(emptyList())
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onCallPermissionsDenied()
+            awaitDataState { it.messageEvent is StateEventWithContentTriggered }
+            underTest.onMessageEventConsumed()
+            awaitDataState { it.messageEvent is StateEventWithContentConsumed }
+        }
+    }
+
+    @Test
     fun `test that onCallTap handles failure gracefully`() = runTest {
         stubContactsFlow(emptyList())
         whenever(get1On1ChatIdUseCase(any())).thenThrow(RuntimeException("error"))
@@ -433,9 +574,11 @@ class ContactListViewModelTest {
             }
         }
 
-    private suspend fun ReceiveTurbine<ContactListUiState>.awaitDataState(): ContactListUiState.Data {
+    private suspend fun ReceiveTurbine<ContactListUiState>.awaitDataState(
+        predicate: (ContactListUiState.Data) -> Boolean = { true },
+    ): ContactListUiState.Data {
         var item = awaitItem()
-        while (item !is ContactListUiState.Data) {
+        while (item !is ContactListUiState.Data || !predicate(item)) {
             item = awaitItem()
         }
         return item

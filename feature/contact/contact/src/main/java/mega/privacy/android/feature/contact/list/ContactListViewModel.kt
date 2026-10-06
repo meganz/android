@@ -3,6 +3,7 @@ package mega.privacy.android.feature.contact.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -19,14 +20,18 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.feature.contact.list.model.CallEventData
+import mega.privacy.android.feature.contact.list.model.ContactListMessage
 import mega.privacy.android.feature.contact.list.model.ContactListUiState
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
 import mega.privacy.android.shared.contact.model.ContactItemUiState
@@ -45,6 +50,8 @@ import javax.inject.Inject
  * @property removeContactByEmailUseCase
  * @property startCallUseCase
  * @property getChatCallUseCase
+ * @property isParticipatingInChatCallUseCase
+ * @property getCurrentStorageStateUseCase
  * @property monitorContactRequestsUseCase
  * @property contactItemUiStateMapper
  */
@@ -56,6 +63,8 @@ class ContactListViewModel @Inject constructor(
     private val removeContactByEmailUseCase: RemoveContactByEmailUseCase,
     private val startCallUseCase: StartCallUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
+    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
+    private val getCurrentStorageStateUseCase: GetCurrentStorageStateUseCase,
     private val monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
     private val contactItemUiStateMapper: ContactItemUiStateMapper,
 ) : ViewModel() {
@@ -64,6 +73,9 @@ class ContactListViewModel @Inject constructor(
     private val openChatEventChannel = Channel<StateEventWithContent<Long>>(Channel.BUFFERED)
     private val startCallEventChannel =
         Channel<StateEventWithContent<CallEventData>>(Channel.BUFFERED)
+    private val messageEventChannel =
+        Channel<StateEventWithContent<ContactListMessage>>(Channel.BUFFERED)
+    private val storageOverQuotaEventChannel = Channel<StateEvent>(Channel.BUFFERED)
 
     /**
      * UI state for the contact list screen.
@@ -77,20 +89,33 @@ class ContactListViewModel @Inject constructor(
                     Timber.e(it)
                     emit(0)
                 },
-            openChatEventChannel.receiveAsFlow()
-                .onStart { emit(consumed()) },
-            startCallEventChannel.receiveAsFlow()
-                .onStart { emit(consumed()) },
-        ) { contactData, requestCount, openChatEvent, startCallEvent ->
+            monitorStateEvents(),
+        ) { contactData, requestCount, events ->
             ContactListUiState.Data(
                 contacts = contactData.groupedContacts,
                 recentlyAddedContacts = contactData.recentlyAdded,
                 incomingRequestCount = requestCount,
-                openChatEvent = openChatEvent,
-                startCallEvent = startCallEvent,
+                openChatEvent = events.openChatEvent,
+                startCallEvent = events.startCallEvent,
+                messageEvent = events.messageEvent,
+                storageOverQuotaEvent = events.storageOverQuotaEvent,
             )
         }.catch { Timber.e(it) }
             .asUiStateFlow(viewModelScope, ContactListUiState.Loading)
+    }
+
+    private fun monitorStateEvents(): Flow<ContactListEvents> = combine(
+        openChatEventChannel.receiveAsFlow().onStart { emit(consumed()) },
+        startCallEventChannel.receiveAsFlow().onStart { emit(consumed()) },
+        messageEventChannel.receiveAsFlow().onStart { emit(consumed()) },
+        storageOverQuotaEventChannel.receiveAsFlow().onStart { emit(consumed) },
+    ) { openChatEvent, startCallEvent, messageEvent, storageOverQuotaEvent ->
+        ContactListEvents(
+            openChatEvent = openChatEvent,
+            startCallEvent = startCallEvent,
+            messageEvent = messageEvent,
+            storageOverQuotaEvent = storageOverQuotaEvent,
+        )
     }
 
     private fun contactsWithSearchFlow(): Flow<ContactData> =
@@ -173,7 +198,10 @@ class ContactListViewModel @Inject constructor(
     }
 
     /**
-     * On call tap
+     * Start a call with the contact, or fire the start call event for the ongoing call when one
+     * already exists in the 1:1 chat. Fires the storage over quota event instead when the account
+     * is in paywall state, and the ongoing call message when the user is already participating
+     * in a call in another chat.
      *
      * @param userHandle
      * @param video
@@ -181,6 +209,7 @@ class ContactListViewModel @Inject constructor(
      */
     fun onCallTap(userHandle: Long, video: Boolean, audio: Boolean) {
         viewModelScope.launch {
+            if (isStorageStatePayWall()) return@launch
             runCatching {
                 val chatId = get1On1ChatIdUseCase(userHandle)
                 val existingCall = getChatCallUseCase(chatId)
@@ -195,6 +224,8 @@ class ContactListViewModel @Inject constructor(
                             )
                         )
                     )
+                } else if (isParticipatingInChatCallUseCase()) {
+                    messageEventChannel.send(triggered(ContactListMessage.OngoingCall))
                 } else {
                     val call = startCallUseCase(chatId = chatId, audio = audio, video = video)
                     startCallEventChannel.send(
@@ -214,11 +245,41 @@ class ContactListViewModel @Inject constructor(
         }
     }
 
+    private suspend fun isStorageStatePayWall(): Boolean {
+        val isPayWall = runCatching { getCurrentStorageStateUseCase() }
+            .getOrNull() == StorageState.PayWall
+        if (isPayWall) {
+            storageOverQuotaEventChannel.send(triggered)
+        }
+        return isPayWall
+    }
+
+    /**
+     * Show the feedback message for a denied microphone permission when starting a call.
+     */
+    fun onCallPermissionsDenied() {
+        messageEventChannel.trySend(triggered(ContactListMessage.MicrophonePermissionDenied))
+    }
+
     /**
      * Consume the start call event.
      */
     fun onCallEventConsumed() {
         startCallEventChannel.trySend(consumed())
+    }
+
+    /**
+     * Consume the message event once the screen has shown the message.
+     */
+    fun onMessageEventConsumed() {
+        messageEventChannel.trySend(consumed())
+    }
+
+    /**
+     * Consume the storage over quota event once the paywall warning has been shown.
+     */
+    fun onStorageOverQuotaEventConsumed() {
+        storageOverQuotaEventChannel.trySend(consumed)
     }
 
     private fun IndexedContact.matches(query: String): Boolean {
@@ -262,6 +323,21 @@ class ContactListViewModel @Inject constructor(
     private data class ContactData(
         val groupedContacts: Map<String, List<ContactItemUiState>>,
         val recentlyAdded: ImmutableList<ContactItemUiState>,
+    )
+
+    /**
+     * One-shot events combined separately to stay within the combine arity.
+     *
+     * @property openChatEvent
+     * @property startCallEvent
+     * @property messageEvent
+     * @property storageOverQuotaEvent
+     */
+    private data class ContactListEvents(
+        val openChatEvent: StateEventWithContent<Long>,
+        val startCallEvent: StateEventWithContent<CallEventData>,
+        val messageEvent: StateEventWithContent<ContactListMessage>,
+        val storageOverQuotaEvent: StateEvent,
     )
 }
 

@@ -224,7 +224,7 @@ class ContactListScreenTest {
         onAddContactClick: () -> Unit = {},
         onRequestsClick: () -> Unit = {},
         onGroupsClick: () -> Unit = {},
-        onStartCall: (Long, Boolean, Boolean) -> Unit = { _, _, _ -> },
+        onStartCall: (Long, Boolean) -> Unit = { _, _ -> },
         onRemoveContact: (String) -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -240,6 +240,7 @@ class ContactListScreenTest {
                 onRemoveContact = onRemoveContact,
                 onChatEventConsumed = {},
                 onCallEventConsumed = {},
+                onMessageEventConsumed = {},
                 onNavigateToChat = {},
                 onStartCallTriggered = {},
             )
@@ -256,6 +257,8 @@ class ContactListScreenTest {
         incomingRequestCount = incomingRequestCount,
         openChatEvent = consumed(),
         startCallEvent = consumed(),
+        messageEvent = consumed(),
+        storageOverQuotaEvent = consumed,
     )
 
     private fun contact(
