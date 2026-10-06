@@ -48,6 +48,9 @@ import javax.inject.Inject
  * A second journey covers the other way into that flow: arriving with `createNewChat` set on the
  * navigation key must open the new-chat picker without any tap.
  *
+ * A third journey turns [ApiFeatures.ContactComposeFeature] off: the FAB must then open the legacy
+ * chat-originated start-conversation screen, as the legacy chat tab did.
+ *
  * Built on the `:data-test` fake-SDK framework following [ChatListSelectionTest]: the whole app runs
  * as in production with only the SDK gateways faked; the UI is driven with UiAutomator, and Compose
  * test tags are matched as resource ids because MegaActivity sets `testTagsAsResourceId = true`.
@@ -178,6 +181,39 @@ class ChatListFabAndEmptyStateTest {
         awaitObject(By.text(pickerTitle), LAUNCH_TIMEOUT, "new-chat-picker")
 
         // Leaving the picker lands on the chat list the key also asked for.
+        device.pressBack()
+        awaitObject(By.res(CHAT_LIST_EMPTY_TAG), LOAD_TIMEOUT, "chat-empty-state")
+    }
+
+    @Test
+    fun newChatFabOpensTheLegacyStartConversationScreenWhenContactComposeIsOff() {
+        fakeFlags.set(ApiFeatures.ContactComposeFeature, false)
+        val intent = MegaActivity.getIntentWithExtraDestinations(
+            targetContext,
+            listOf(ChatListNavKey(showMeetingTab = false)),
+        )
+        ActivityScenario.launch<MegaActivity>(intent)
+
+        awaitObject(By.res(CHAT_LIST_FAB_TAG), LAUNCH_TIMEOUT, "new-chat-fab")
+        device.findObject(By.res(CHAT_LIST_FAB_TAG)).click()
+
+        // The chat-originated start-conversation screen: titled "New chat", offering "New group
+        // chat" and none of the meeting actions the standalone variant lists.
+        awaitObject(
+            By.text(targetContext.getString(R.string.fab_label_new_chat)),
+            LOAD_TIMEOUT,
+            "start-conversation-title",
+        )
+        awaitObject(
+            By.text(targetContext.getString(R.string.new_group_chat_label)),
+            LOAD_TIMEOUT,
+            "new-group-chat-action",
+        )
+        if (device.hasObject(By.text(targetContext.getString(R.string.new_meeting)))) {
+            dumpHierarchy("new-meeting-action")
+            throw AssertionError("The chat-originated start-conversation screen must not offer New meeting")
+        }
+
         device.pressBack()
         awaitObject(By.res(CHAT_LIST_EMPTY_TAG), LOAD_TIMEOUT, "chat-empty-state")
     }

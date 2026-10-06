@@ -74,6 +74,9 @@ data class AddMeetingParticipantsNavKey(val chatId: Long) : NavKey {
  * [KEY]. This is a single mode-less MEGA-contacts multi-select picker whose selection count decides
  * the outcome: exactly one selected contact yields a 1:1 chat (no group settings); two or more yields
  * a group chat with the chosen settings.
+ *
+ * With `ContactComposeFeature` off the legacy start-conversation screen is shown instead; it creates
+ * the chat itself and opens it, so no result is published.
  */
 @Serializable
 data object NewChatNavKey : NavKey {
