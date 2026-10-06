@@ -8,6 +8,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retainRetainedValuesStoreRegistry
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -125,6 +128,10 @@ fun LegacyActivityScaffold(
             )
 
             NavDisplay(
+                // Mirrors [mega.privacy.android.app.appstate.MegaActivity], so test tags set by
+                // destinations hosted here are matchable as resource ids by UiAutomator instead of
+                // forcing instrumented tests onto user-visible text.
+                modifier = Modifier.semantics { testTagsAsResourceId = true },
                 backStack = backStack,
                 onBack = { navigationHandler.back() },
                 sceneStrategies = listOf(dialogStrategy, bottomSheetStrategy),
