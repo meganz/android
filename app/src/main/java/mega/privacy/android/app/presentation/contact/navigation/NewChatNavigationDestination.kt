@@ -9,30 +9,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.app.main.legacycontact.AddContactActivity
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.feature.contact.group.create.navigation.NewChatEntry
+import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.feature.contact.group.create.navigation.NewChatEntry
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.NewChatNavKey
+import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
  * Registers the [NewChatNavKey] destination. Behind [ApiFeatures.ContactComposeFeature] either renders the
- * Compose [NewChatEntry] screen (flag on) or launches the legacy [AddContactActivity] new-chat picker
- * (flag off). Both paths publish the chosen [NewChatNavKey.NewChatResult] under [NewChatNavKey.KEY]; the
- * consuming caller creates the chat and sends its content into it.
+ * Compose [NewChatEntry] screen (flag on) or launches the legacy [StartConversationActivity] (flag off).
+ *
+ * The Compose screen publishes the chosen [NewChatNavKey.NewChatResult] under [NewChatNavKey.KEY] and the
+ * consuming caller creates the chat. The legacy screen creates the chat itself, so this destination
+ * replaces itself with the created chat instead of publishing a result.
  */
 fun EntryProviderScope<NavKey>.newChatLegacyDestination(navigationHandler: NavigationHandler) {
     entry<NewChatNavKey> {
         FeatureFlagGate(
             feature = ApiFeatures.ContactComposeFeature,
             disabled = {
-                LegacyNewChatEntry(
-                    onResult = { result ->
-                        navigationHandler.returnResult(NewChatNavKey.KEY, result)
+                LegacyStartConversationEntry(
+                    onChatCreated = { chatId ->
+                        navigationHandler.navigate(ShowChatMessagesNavKey(chatId))
+                        navigationHandler.remove(NewChatNavKey)
                     },
+                    onCancelled = { navigationHandler.remove(NewChatNavKey) },
                 )
             },
             enabled = {
@@ -43,52 +47,32 @@ fun EntryProviderScope<NavKey>.newChatLegacyDestination(navigationHandler: Navig
 }
 
 /**
- * Launches the legacy [AddContactActivity] new-chat picker and forwards the parsed
- * [NewChatNavKey.NewChatResult] (null when cancelled) through [onResult].
+ * Launches the legacy [StartConversationActivity] and reports the id of the chat it created through
+ * [onChatCreated], or [onCancelled] when no chat was created.
  */
 @Composable
-private fun LegacyNewChatEntry(
-    onResult: (NewChatNavKey.NewChatResult?) -> Unit,
+private fun LegacyStartConversationEntry(
+    onChatCreated: (Long) -> Unit,
+    onCancelled: () -> Unit,
 ) {
     val launcher = rememberLauncherForActivityResult(
-        contract = NewChatContract(),
-    ) { result ->
-        onResult(result)
+        contract = StartConversationContract(),
+    ) { chatId ->
+        if (chatId != null) onChatCreated(chatId) else onCancelled()
     }
     LaunchedEffect(Unit) {
         launcher.launch(Unit)
     }
 }
 
-private class NewChatContract : ActivityResultContract<Unit, NewChatNavKey.NewChatResult?>() {
+private class StartConversationContract : ActivityResultContract<Unit, Long?>() {
 
     override fun createIntent(context: Context, input: Unit): Intent =
-        Intent(context, AddContactActivity::class.java)
-            .putExtra(AddContactActivity.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
+        StartConversationActivity.getChatIntent(context)
 
-    override fun parseResult(
-        resultCode: Int,
-        intent: Intent?,
-    ): NewChatNavKey.NewChatResult? {
+    override fun parseResult(resultCode: Int, intent: Intent?): Long? {
         if (resultCode != Activity.RESULT_OK || intent == null) return null
-        val emails = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)?.toList()
-            ?: return null
-        if (emails.isEmpty()) return null
-        val groupSettings = if (emails.size > 1) {
-            NewChatNavKey.NewChatResult.GroupSettings(
-                title = intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE),
-                isEkr = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false),
-                isChatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false),
-                allowAddParticipants = intent.getBooleanExtra(
-                    AddContactActivity.ALLOW_ADD_PARTICIPANTS,
-                    false,
-                ),
-                imageUri = intent.getStringExtra(AddContactActivity.EXTRA_GROUP_CHAT_IMAGE)
-                    ?.let(::UriPath),
-            )
-        } else {
-            null
-        }
-        return NewChatNavKey.NewChatResult(emails = emails, groupSettings = groupSettings)
+        return intent.getLongExtra(StartConversationActivity.EXTRA_NEW_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+            .takeIf { it != MEGACHAT_INVALID_HANDLE }
     }
 }
