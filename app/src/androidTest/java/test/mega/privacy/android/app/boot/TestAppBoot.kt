@@ -42,6 +42,8 @@ object TestAppBoot {
      *
      * WorkManager is initialised first: some units' dependency graphs (and the FCM service's) can
      * resolve WorkManager on demand, so it must be ready before [GlobalInitialiser.onAppCreate].
+     * [GlobalInitialiser.onAppCreate] then runs on the main thread, as `Application.onCreate` does,
+     * because synchronous units such as `AppLifecycleInitialiser` require it.
      *
      * @param exclude names of app-create units to skip, matching [AppCreateInitialiser.name]. Empty
      * by default so tests boot with the full production unit set; add a name only for a unit a test
@@ -73,7 +75,9 @@ object TestAppBoot {
         )
 
         val globalInitialiser = entryPoint.globalInitialiser()
-        globalInitialiser.onAppCreate { it.name !in exclude }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            globalInitialiser.onAppCreate { it.name !in exclude }
+        }
         if (includeAppStart) {
             globalInitialiser.onAppStart()
         }

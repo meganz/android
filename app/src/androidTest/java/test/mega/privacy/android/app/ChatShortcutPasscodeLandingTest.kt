@@ -134,11 +134,8 @@ class ChatShortcutPasscodeLandingTest {
     }
 
     /**
-     * The launched scenarios are deliberately neither held nor closed. The shortcut intent's action
-     * is consumed — set to null — once it has been handled, so `ActivityScenario` stops matching the
-     * activity's lifecycle callbacks against the launch intent and `close()` would block until its
-     * own timeout before failing, even though the activity is destroyed. Per-test process isolation
-     * tears the activity down instead.
+     * The launched activities are deliberately neither held nor closed: per-test process isolation
+     * tears them down.
      */
     @After
     fun tearDown() {
@@ -156,10 +153,7 @@ class ChatShortcutPasscodeLandingTest {
 
     @Test
     fun chatShortcutLandsOnChatListAfterUnlockingThePasscode() {
-        val intent = Intent(targetContext, MegaActivity::class.java).apply {
-            action = Constants.ACTION_SHORTCUT_CHAT
-        }
-        ActivityScenario.launch<MegaActivity>(intent)
+        launchChatShortcut()
 
         awaitPasscodeScreen()
         assertThat(device.hasObject(By.res(CHAT_LIST_SCREEN_TAG))).isFalse()
@@ -179,6 +173,21 @@ class ChatShortcutPasscodeLandingTest {
         enterPasscode()
 
         awaitObject(By.res(HOME_APP_BAR_TAG), LOAD_TIMEOUT, "home-landing")
+    }
+
+    /**
+     * Fires the shortcut intent without `ActivityScenario`. The intent handler consumes the action —
+     * sets it to null — and when the connectivity state is already known it does so inside
+     * `onCreate`, before `ActivityScenario` sees the first lifecycle callback; from then on the
+     * activity's intent no longer matches the launch intent and `launch` times out on
+     * `PRE_ON_CREATE`.
+     */
+    private fun launchChatShortcut() {
+        targetContext.startActivity(
+            Intent(targetContext, MegaActivity::class.java)
+                .setAction(Constants.ACTION_SHORTCUT_CHAT)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
     }
 
     /**

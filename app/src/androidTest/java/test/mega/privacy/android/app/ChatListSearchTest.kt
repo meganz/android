@@ -129,7 +129,7 @@ class ChatListSearchTest {
         awaitGone(chatRow(TITLES[0]), "non-matching-chat-row")
 
         // Clearing the field restores every row without leaving search mode.
-        device.findObject(By.desc(CLEAR_TEXT_DESC)).click()
+        awaitObject(By.desc(CLEAR_TEXT_DESC), LOAD_TIMEOUT, "clear-text").click()
         TITLES.forEach { awaitObject(chatRow(it), LOAD_TIMEOUT, "restored-chat-row-$it") }
         awaitObject(searchField(), LOAD_TIMEOUT, "search-field-still-open")
 
