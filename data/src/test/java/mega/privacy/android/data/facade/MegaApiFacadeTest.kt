@@ -3,18 +3,24 @@ package mega.privacy.android.data.facade
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferListenerInterface
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -123,5 +129,35 @@ internal class MegaApiFacadeTest {
 
         verify(megaApi).getMaxDownloadConnections(listener)
     }
-}
 
+    @Test
+    fun `test that globalTransferListenerGeneration increments after each transfer listener registration`() =
+        runTest {
+            val base = underTest.globalTransferListenerGeneration.value
+            val generationsWhenAdded = mutableListOf<Long>()
+            doAnswer { generationsWhenAdded += underTest.globalTransferListenerGeneration.value }
+                .whenever(megaApi).addTransferListener(any<MegaTransferListenerInterface>())
+
+            val first = launch(UnconfinedTestDispatcher(testScheduler)) {
+                underTest.globalTransfer.collect {}
+            }
+
+            assertThat(generationsWhenAdded).containsExactly(base)
+            assertThat(underTest.globalTransferListenerGeneration.value).isEqualTo(base + 1)
+
+            first.cancel()
+            val removed = argumentCaptor<MegaTransferListenerInterface>()
+            verify(megaApi).removeTransferListener(removed.capture())
+            assertThat(underTest.globalTransferListenerGeneration.value).isEqualTo(base + 1)
+            val second = launch(UnconfinedTestDispatcher(testScheduler)) {
+                underTest.globalTransfer.collect {}
+            }
+
+            assertThat(generationsWhenAdded).containsExactly(base, base + 1).inOrder()
+            assertThat(underTest.globalTransferListenerGeneration.value).isEqualTo(base + 2)
+            val added = argumentCaptor<MegaTransferListenerInterface>()
+            verify(megaApi, times(2)).addTransferListener(added.capture())
+            assertThat(removed.firstValue).isSameInstanceAs(added.firstValue)
+            second.cancel()
+        }
+}

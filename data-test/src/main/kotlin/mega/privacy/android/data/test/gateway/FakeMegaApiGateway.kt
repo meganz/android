@@ -2,6 +2,8 @@ package mega.privacy.android.data.test.gateway
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
@@ -582,6 +584,9 @@ class FakeMegaApiGateway(
     override val globalUpdates: Flow<GlobalUpdate> = globalUpdatesFlow
 
     override val globalTransfer: Flow<GlobalTransfer> = globalTransferFlow
+
+    // Emissions go straight to collectors, so there is never a registration gap to wait for.
+    override val globalTransferListenerGeneration: StateFlow<Long> = MutableStateFlow(1L)
 
     override val globalRequestEvents: Flow<RequestEvent> = globalRequestEventsFlow
 

@@ -4,10 +4,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.data.constant.HttpServerConstant
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -308,6 +312,11 @@ internal class MegaApiFacade @Inject constructor(
         SharingStarted.WhileSubscribed()
     )
 
+    private val globalTransferListenerGenerationFlow = MutableStateFlow(0L)
+
+    override val globalTransferListenerGeneration: StateFlow<Long> =
+        globalTransferListenerGenerationFlow.asStateFlow()
+
     override val globalTransfer: Flow<GlobalTransfer> = callbackFlow {
         val listener = OptionalMegaTransferListenerInterface(
             onTransferStart = { transfer ->
@@ -349,6 +358,7 @@ internal class MegaApiFacade @Inject constructor(
         )
 
         addTransferListener(listener)
+        globalTransferListenerGenerationFlow.update { it + 1 }
 
         awaitClose {
             removeTransferListener(listener)

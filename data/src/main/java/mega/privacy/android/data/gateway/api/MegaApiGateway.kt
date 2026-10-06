@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
@@ -394,6 +395,13 @@ interface MegaApiGateway {
      * Global transfer
      */
     val globalTransfer: Flow<GlobalTransfer>
+
+    /**
+     * Counts registrations of [globalTransfer]'s SDK listener; 0 means never registered.
+     * The listener is added asynchronously and re-added after each stop, so a caller that
+     * snapshots transfers waits for a value above 0 and reseeds on any later increase.
+     */
+    val globalTransferListenerGeneration: StateFlow<Long>
 
     /**
      * Global [RequestEvent] for all requests processed within this gateway.
