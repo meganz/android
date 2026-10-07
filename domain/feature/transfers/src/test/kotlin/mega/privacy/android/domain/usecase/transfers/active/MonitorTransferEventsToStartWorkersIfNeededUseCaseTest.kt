@@ -12,6 +12,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -160,6 +161,25 @@ class MonitorTransferEventsToStartWorkersIfNeededUseCaseTest {
             awaitComplete()
         }
         verify(type, 0)
+    }
+
+    @Test
+    fun `test that download batch parent events do not start the download worker`() = runTest {
+        val transferEvent = TransferEvent.TransferUpdateEvent(
+            mock<Transfer> {
+                on { transferType } doReturn TransferType.DOWNLOAD
+                on { isFolderTransfer } doReturn true
+                on { nodeHandle } doReturn -1L
+            }
+        )
+        whenever(monitorIsWorkerFinished(TransferType.DOWNLOAD)) doReturn flowOf(true)
+        whenever(monitorTransferEventsUseCase()).thenReturn(
+            flowOf(transferEvent)
+        )
+        underTest().test {
+            awaitComplete()
+        }
+        verify(TransferType.DOWNLOAD, 0)
     }
 
     private fun monitorIsWorkerFinished(transferType: TransferType) = when (transferType) {
