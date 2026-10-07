@@ -37,6 +37,7 @@ dependencies {
     implementation(lib.mega.analytics)
     implementation(lib.compose.state.events)
     implementation(lib.kotlinx.collections.immutable)
+    implementation(lib.coil.compose)
     implementation(androidx.material3.window)
     implementation(androidx.bundles.compose.bom)
     implementation(androidx.compose.runtime.retain)

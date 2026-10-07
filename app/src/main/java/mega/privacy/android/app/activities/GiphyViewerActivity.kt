@@ -3,52 +3,31 @@ package mega.privacy.android.app.activities
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatDelegate
-import coil3.load
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.fragment.app.FragmentActivity
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
-import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.objects.GifData
+import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.toGiphyUri
 import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
-import mega.privacy.android.app.utils.Util.isScreenInPortrait
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.feature.chat.giphy.view.GiphyViewerScreen
 
-class GiphyViewerActivity : PasscodeActivity() {
-
-    private lateinit var binding: ActivityGiphyViewerBinding
-
-    private var gifData: GifData? = null
-
-    private var picking = true
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            setResult(RESULT_CANCELED)
-            retryConnectionsAndSignalPresence()
-            finish()
-        }
-    }
+/**
+ * Shows a GIF full screen. When opened from the Giphy picker it also lets the user confirm the
+ * GIF has to be sent, returning it as the activity result.
+ */
+@AndroidEntryPoint
+class GiphyViewerActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
-        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        enableEdgeToEdge()
 
-        binding = ActivityGiphyViewerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        if (intent.action.equals(ACTION_PREVIEW_GIPHY)) {
-            picking = false
-            onBackPressedCallback.isEnabled = false
-            binding.sendFab.visibility = View.GONE
-        } else {
-            binding.sendFab.setOnClickListener { sendGifToChat() }
-        }
-
-        gifData = with(intent) {
+        val isPicking = intent.action != ACTION_PREVIEW_GIPHY
+        val gifData = with(intent) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 getParcelableExtra(GIF_DATA, GifData::class.java)
             } else {
@@ -57,69 +36,21 @@ class GiphyViewerActivity : PasscodeActivity() {
             }
         }
 
-        val (width, height) = updateGifDimensionsView()
-        gifData?.webpUrl?.toGiphyUri()?.let {
-            binding.gifImage.load(it) {
-                if (width > 0 && height > 0) size(width, height)
-                listener(
-                    onStart = { binding.gifProgressBar.visibility = View.VISIBLE },
-                    onSuccess = { _, _ -> binding.gifProgressBar.visibility = View.GONE },
-                    onError = { _, _ -> binding.gifProgressBar.visibility = View.GONE }
+        setContent {
+            SharedAppContainer(
+                themeMode = ThemeMode.Dark,
+                useLegacyStatusBarColor = false,
+            ) {
+                GiphyViewerScreen(
+                    imageUrl = gifData?.webpUrl?.toGiphyUri()?.toString(),
+                    title = gifData?.title,
+                    showSendButton = isPicking,
+                    onSend = {
+                        setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
+                        finish()
+                    },
                 )
             }
         }
-    }
-
-    /**
-     * Updates the dimensions of the view where the GIF will be shown to show the right ones
-     * depending on the available space on screen and orientation.
-     */
-    private fun updateGifDimensionsView(): Pair<Int, Int> {
-        val params = binding.gifImage.layoutParams ?: return 0 to 0
-        val gifWidth = gifData?.width?.takeIf { it > 0 } ?: return 0 to 0
-        val gifHeight = gifData?.height?.takeIf { it > 0 } ?: return 0 to 0
-        val gifScreenWidth: Int
-        val gifScreenHeight: Int
-
-        if (isScreenInPortrait(this@GiphyViewerActivity)) {
-            gifScreenWidth = outMetrics.widthPixels
-
-            gifScreenHeight = if (gifWidth == gifHeight) {
-                gifScreenWidth
-            } else {
-                val factor = gifScreenWidth.toFloat() / gifWidth.toFloat()
-                (gifHeight * factor).toInt()
-            }
-
-            if (gifScreenHeight > 0) {
-                params.height = gifScreenHeight
-            }
-        } else {
-            gifScreenHeight = outMetrics.heightPixels
-
-            gifScreenWidth = if (gifWidth == gifHeight) {
-                gifScreenHeight
-            } else {
-                val factor = gifScreenHeight.toFloat() / gifHeight.toFloat()
-                (gifWidth * factor).toInt()
-            }
-
-            if (gifScreenWidth > 0) {
-                params.width = gifScreenWidth
-            }
-        }
-
-        binding.gifImage.layoutParams = params
-        return gifScreenWidth to gifScreenHeight
-    }
-
-    /**
-     * Confirms the selected GIF has to be sent to the chat.
-     */
-    private fun sendGifToChat() {
-        if (picking) {
-            setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
-        }
-        finish()
     }
 }
