@@ -375,6 +375,11 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
     public int onBackPressed() {
         Timber.d("onBackPressed");
 
+        // The adapter only exists once the root node is available, which may happen after the view is created
+        if (adapter == null) {
+            return 0;
+        }
+
         parentHandle = adapter.parentHandle;
 
         MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
@@ -426,7 +431,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
     }
 
     public long getParentHandle() {
-        return adapter.parentHandle;
+        return adapter != null ? adapter.parentHandle : parentHandle;
     }
 
     public void setParentHandle(long parentHandle) {
