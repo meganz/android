@@ -33,8 +33,9 @@ JUnit 5 + Mockito + Turbine (Flow/UiState) + Truth, with Hilt test support. Run:
 
 ## Notes & Gotchas
 
-- The `namespace` is `mega.privacy.android.feature.chat`. The module has no `res/` of its own and
-  uses `mega.privacy.android.shared.resources.R`.
+- The `namespace` is `mega.privacy.android.feature.chat`. Strings come from
+  `mega.privacy.android.shared.resources.R`; the module's own `res/` only holds the GIPHY picker
+  drawables (`ic_no_gifs`, `ic_powered_by_giphy`).
 - Build plugins: `mega.android.library`, `mega.android.library.compose`, `mega.android.room`, `mega.android.hilt`, plus Kotlin serialization. The Room plugin is applied even though no Room entities/DAOs currently live here.
 - Entry points are registered via Hilt `@IntoSet` multibindings in `ChatModule` — add new destinations/handlers there, not in the app module.
 - Mix of Navigation3 (`FeatureDestination`, `NavKey`) for new screens/dialogs and a legacy fragment + nav-graph path for call settings.

@@ -4587,4 +4587,12 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">This call can only support 100 participants. Ask the organiser to remove this restriction.</string>
     <!-- Label of the acknowledge button on the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, got it</string>
+    <!-- Title of the screen to pick a GIF from GIPHY, also used as the hint of its search field -->
+    <string name="chat_giphy_picker_title">Search GIPHY</string>
+    <!-- Label shown when a GIF search returns no results. [A] and [/A] mark the part shown in a different colour. -->
+    <string name="chat_giphy_picker_no_results">No [A]GIFs[/A] found</string>
+    <!-- Label shown when GIFs cannot be loaded because the GIPHY service is unavailable -->
+    <string name="chat_giphy_picker_server_down">No available GIFs. Please try again later</string>
+    <!-- Label shown at the bottom of the GIF list once there are no more results. [A] and [/A] mark the part shown in a different colour. -->
+    <string name="chat_giphy_picker_end_of_results">[A]End of[/A] results</string>
 </resources>

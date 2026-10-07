@@ -18,7 +18,7 @@ internal fun openGiphyViewerActivity(
     }.also { context.startActivity(it) }
 }
 
-private fun ChatGifInfo.toGifData() = GifData(
+internal fun ChatGifInfo.toGifData() = GifData(
     mp4Src,
     webpSrc,
     mp4Size.toLong(),

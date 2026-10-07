@@ -1,97 +1,36 @@
 package mega.privacy.android.app.activities
 
 import android.content.Intent
-import android.content.res.Configuration
-import android.content.res.Configuration.ORIENTATION_LANDSCAPE
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Bundle
-import android.text.Spanned
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
-import android.widget.RelativeLayout
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.compose.runtime.getValue
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ViewGifActivityContract
-import mega.privacy.android.app.adapters.GiphyAdapter
-import mega.privacy.android.app.databinding.ActivityGiphyBinding
-import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
-import mega.privacy.android.app.interfaces.GiphyInterface
-import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_DOWN_SERVER
-import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_SEARCH
-import mega.privacy.android.app.interfaces.GiphyInterface.Companion.NON_EMPTY
-import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Util.dp2px
-import mega.privacy.android.app.utils.Util.hideKeyboard
-import mega.privacy.android.domain.entity.chat.Giphy
-import mega.privacy.android.domain.usecase.chat.giphy.GetTrendingGiphysUseCase
-import mega.privacy.android.domain.usecase.chat.giphy.SearchGiphysUseCase
-import timber.log.Timber
+import mega.privacy.android.app.presentation.container.SharedAppContainer
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.toGifData
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.feature.chat.giphy.view.GiphyPickerScreen
 import javax.inject.Inject
 
 /**
  * Activity for the Giphy picker
  */
 @AndroidEntryPoint
-class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
+class GiphyPickerActivity : FragmentActivity() {
 
     companion object {
-        private const val NUM_COLUMNS_PORTRAIT = 2
-        private const val NUM_COLUMNS_LANDSCAPE = 4
-        private const val GIF_MARGIN = 4F
-        private const val DEFAULT_LIMIT = 25
-        private const val EMPTY_IMAGE_MARGIN_TOP_PORTRAIT = 152F
-        private const val EMPTY_TEXT_MARGIN_TOP_PORTRAIT = 12F
-        private const val EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE = 20F
-        private const val EMPTY_TEXT_MARGIN_TOP_LANDSCAPE = 0
-
         /**
          * To specify GIF data values
          */
         const val GIF_DATA = "GIF_DATA"
     }
 
-    private lateinit var binding: ActivityGiphyBinding
-
-    private var giphyAdapter: GiphyAdapter? = null
-    private var staggeredGridLayoutManager: StaggeredGridLayoutManager? = null
-
     @Inject
-    lateinit var getTrendingGiphysUseCase: GetTrendingGiphysUseCase
-
-    @Inject
-    lateinit var searchGiphysUseCase: SearchGiphysUseCase
-
-    private var screenOrientation = 0
-    private var numColumns = 0
-    private var screenGifWidth = 0
-
-    private var previousRequest: Job? = null
-    private var trendingData: ArrayList<Giphy> = ArrayList()
-    private var searchData = hashMapOf<String, ArrayList<Giphy>>()
-
-    private var searchMenuItem: MenuItem? = null
-
-    private var currentQuery: String? = null
-    private var queryOffset = 0
-    private var isEndOfList = false
-
-    private lateinit var emptyText: Spanned
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val pickGifLauncher = registerForActivityResult(ViewGifActivityContract()) { gifData ->
         if (gifData != null) {
@@ -100,394 +39,23 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         }
     }
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            setResult(RESULT_CANCELED)
-            retryConnectionsAndSignalPresence()
-            finish()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
         enableEdgeToEdge()
-        binding = ActivityGiphyBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        consumeInsetsWithToolbar(customToolbar = binding.giphyToolbar)
 
-        setSupportActionBar(binding.giphyToolbar)
+        setContent {
+            val themeMode by monitorThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            title = getString(R.string.search_giphy_title)
-        }
-
-        binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
-
-        screenOrientation = resources.configuration.orientation
-        updateView()
-
-        binding.giphyList.apply {
-            setHasFixedSize(true)
-            staggeredGridLayoutManager =
-                StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
-            layoutManager = staggeredGridLayoutManager
-            itemAnimator = DefaultItemAnimator()
-            addScrollBehaviour()
-        }
-
-        binding.giphyListView.visibility = GONE
-        binding.emptyGiphyView.visibility = GONE
-
-        var endOfList = getString(R.string.end_of_results_giphy)
-        var emptyTextSearch = getString(R.string.empty_search_giphy)
-
-        try {
-            endOfList = endOfList.replace(
-                "[A]",
-                "<font color='${ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)}'>"
-            )
-            endOfList = endOfList.replace("[/A]", "</font>")
-            emptyTextSearch = emptyTextSearch.replace(
-                "[A]",
-                "<font color='${ColorUtils.getColorHexString(this, R.color.black_white)}'>"
-            )
-            emptyTextSearch = emptyTextSearch.replace("[/A]", "</font>")
-        } catch (e: Exception) {
-            Timber.w(e, "Exception formatting string")
-        }
-
-        binding.giphyEndList.text = HtmlCompat.fromHtml(endOfList, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        binding.giphyEndList.visibility = GONE
-        emptyText = HtmlCompat.fromHtml(emptyTextSearch, HtmlCompat.FROM_HTML_MODE_LEGACY)
-
-        requestTrendingData(false)
-    }
-
-    private fun addScrollBehaviour() {
-        binding.giphyList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val latestPosition = staggeredGridLayoutManager?.itemCount?.minus(1)
-                val lastVisibleItems =
-                    staggeredGridLayoutManager?.findLastVisibleItemPositions(IntArray(numColumns))
-                        ?: return
-
-                var latestIsVisible = false
-                for (visibleItem in lastVisibleItems) {
-                    if (latestPosition == visibleItem) {
-                        latestIsVisible = true
-
-                        if (!isEndOfList) {
-                            if (searchMenuItem?.isActionViewExpanded == true && !currentQuery.isNullOrBlank()
-                            ) requestSearchData(
-                                currentQuery.toString(),
-                                true
-                            ) else requestTrendingData(true)
-                        }
-
-                        break
-                    }
-                }
-
-                binding.giphyEndList.visibility =
-                    if (latestIsVisible && isEndOfList) VISIBLE else GONE
-            }
-        })
-    }
-
-    override fun onDestroy() {
-        cancelPreviousRequests()
-        super.onDestroy()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home)
-            onBackPressedDispatcher.onBackPressed()
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-
-        val newOrientation = newConfig.orientation
-        if (newOrientation == screenOrientation) return
-
-        val firstVisibleItems =
-            staggeredGridLayoutManager?.findFirstCompletelyVisibleItemPositions(IntArray(numColumns))
-
-        screenOrientation = newOrientation
-        updateView()
-
-        staggeredGridLayoutManager?.scrollToPosition(firstVisibleItems?.get(0) ?: 0)
-    }
-
-    /**
-     * Updates the view after an orientation change or onCreate execution.
-     */
-    private fun updateView() {
-        var widthScreen = 0
-
-        val paramsEmptyImage = binding.emptyGiphyImage.layoutParams as RelativeLayout.LayoutParams
-        val paramsEmptyText = binding.emptyGiphyText.layoutParams as RelativeLayout.LayoutParams
-
-        if (screenOrientation == ORIENTATION_PORTRAIT) {
-            numColumns = NUM_COLUMNS_PORTRAIT
-            widthScreen = outMetrics.widthPixels
-
-            paramsEmptyImage.topMargin =
-                dp2px(EMPTY_IMAGE_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
-            paramsEmptyText.topMargin =
-                dp2px(EMPTY_TEXT_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
-        } else if (screenOrientation == ORIENTATION_LANDSCAPE) {
-            numColumns = NUM_COLUMNS_LANDSCAPE
-            widthScreen = outMetrics.heightPixels
-
-            paramsEmptyImage.topMargin =
-                dp2px(EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE, resources.displayMetrics)
-            paramsEmptyText.topMargin = EMPTY_TEXT_MARGIN_TOP_LANDSCAPE
-        }
-
-        binding.emptyGiphyImage.layoutParams = paramsEmptyImage
-        binding.emptyGiphyText.layoutParams = paramsEmptyText
-
-        screenGifWidth = (widthScreen / numColumns) - (dp2px(GIF_MARGIN, outMetrics) * numColumns)
-        staggeredGridLayoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
-        binding.giphyList.layoutManager = staggeredGridLayoutManager
-
-        giphyAdapter?.notifyDataSetChanged()
-    }
-
-    /**
-     * Requests trending data to the Giphy API.
-     *
-     * @param scrolling True if the query corresponds to an scrolling action to the user,
-     *                  false otherwise
-     */
-    private fun requestTrendingData(scrolling: Boolean) {
-        if (scrolling && isEndOfList) return
-
-        if (trendingData.isEmpty() || scrolling) {
-            if (trendingData.isEmpty()) resetQueryValues()
-
-            val offset = queryOffset
-            getAndSetData(null) { getTrendingGiphysUseCase(DEFAULT_LIMIT, offset) }
-        } else {
-            cancelPreviousRequests()
-            queryOffset = trendingData.size
-            updateAdapter(trendingData, true)
-        }
-    }
-
-    /**
-     * Requests search data to the Giphy API.
-     *
-     * @param query     The search String.
-     * @param scrolling True if the query corresponds to an scrolling action to the user,
-     *                  false otherwise
-     */
-    private fun requestSearchData(query: String, scrolling: Boolean) {
-        if (scrolling && isEndOfList) return
-
-        val searchValue = searchData[query]
-
-        if (searchValue == null || scrolling) {
-            if (searchValue == null) resetQueryValues()
-
-            val offset = queryOffset
-            getAndSetData(query) { searchGiphysUseCase(query, DEFAULT_LIMIT, offset) }
-        } else {
-            cancelPreviousRequests()
-            queryOffset = searchValue.size
-            updateAdapter(searchValue, true)
-        }
-    }
-
-    private fun resetQueryValues() {
-        binding.giphyEndList.visibility = GONE
-        queryOffset = 0
-        isEndOfList = false
-    }
-
-    /**
-     *  Launches a request to the Giphy API and manages the response when it finishes,
-     *  showing the result on screen if everything was correct.
-     *  If there is already a request in progress, cancels it to launch the new one.
-     *
-     * @param query   Search query if is a search request, null otherwise.
-     * @param request The request to launch. It can be Trending or Search.
-     */
-    private fun getAndSetData(query: String?, request: suspend () -> List<Giphy>) {
-        cancelPreviousRequests()
-
-        previousRequest = lifecycleScope.launch {
-            val gifData = try {
-                request()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Timber.e(e, "Giphy request failed")
-                checkIfShouldShowDownServerState()
-                return@launch
-            }
-
-            isEndOfList = false
-
-            if (gifData.isEmpty()) {
-                if (query == null || (searchData[query] != null && searchData[query]?.isNotEmpty() == true)) {
-                    isEndOfList = true
-                } else {
-                    searchData[query] = ArrayList()
-                    updateAdapter(searchData[query], false)
-                }
-
-                return@launch
-            }
-
-            if (gifData.size < DEFAULT_LIMIT) isEndOfList = true
-            else queryOffset += DEFAULT_LIMIT
-
-            if (query == null) {
-                trendingData.addAll(gifData)
-                updateAdapter(trendingData, false)
-            } else {
-                val searchDataValue = searchData[query]?.apply { addAll(gifData) }
-                    ?: ArrayList(gifData)
-
-                searchData[query] = searchDataValue
-                updateAdapter(searchData[query], false)
+            SharedAppContainer(
+                themeMode = themeMode,
+                useLegacyStatusBarColor = false,
+            ) {
+                GiphyPickerScreen(
+                    onGifSelected = { pickGifLauncher.launch(it.toGifData()) },
+                    onBack = ::finish,
+                )
             }
         }
-    }
-
-    /**
-     *Shows down server state if the response of server failed and there is no GIF in the adapter.
-     */
-    private fun checkIfShouldShowDownServerState() {
-        if (giphyAdapter == null || giphyAdapter?.itemCount == 0) {
-            setEmptyState(EMPTY_DOWN_SERVER)
-        }
-    }
-
-    /**
-     * Cancels the previous request if exist and is in progress.
-     */
-    private fun cancelPreviousRequests() {
-        previousRequest?.cancel()
-    }
-
-    /**
-     * Updates the adapter with new data.
-     *
-     * @param gifsData          Data to set in the adapter
-     * @param isChangeOfType    True if the adapter has to change from trending to search data
-     *                          or vice versa, false otherwise
-     */
-    private fun updateAdapter(gifsData: ArrayList<Giphy>?, isChangeOfType: Boolean) {
-        when {
-            giphyAdapter == null -> {
-                giphyAdapter = GiphyAdapter(gifsData, this@GiphyPickerActivity)
-                binding.giphyList.adapter = giphyAdapter
-                binding.giphyListView.visibility = VISIBLE
-            }
-
-            isChangeOfType || (gifsData?.size ?: return) <= DEFAULT_LIMIT -> {
-                giphyAdapter?.setGifs(gifsData)
-                binding.giphyList.scrollToPosition(0)
-            }
-
-            else -> {
-                giphyAdapter?.addGifs(gifsData)
-            }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_giphy, menu)
-
-        searchMenuItem = menu.findItem(R.id.action_search)
-        val searchView = searchMenuItem?.actionView as SearchView
-        searchView.maxWidth = Int.MAX_VALUE
-
-        val line = searchView.findViewById(androidx.appcompat.R.id.search_plate) as View
-        line.setBackgroundColor(
-            ContextCompat.getColor(
-                applicationContext,
-                android.R.color.transparent
-            )
-        )
-
-        val searchAutoComplete =
-            searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
-        searchAutoComplete.hint = getString(R.string.search_giphy_title)
-
-        searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem): Boolean = true
-
-            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                requestTrendingData(false)
-                return true
-            }
-        })
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                hideKeyboard(this@GiphyPickerActivity)
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                currentQuery = newText
-                if (newText.isNullOrBlank()) {
-                    requestTrendingData(false)
-                } else {
-                    requestSearchData(newText, false)
-                }
-
-                return true
-            }
-
-        })
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun openGifViewer(gifData: GifData?) {
-        gifData?.let { pickGifLauncher.launch(it) }
-    }
-
-    override fun setEmptyState(emptyState: Int) {
-        when (emptyState) {
-            NON_EMPTY -> {
-                binding.emptyGiphyView.visibility = GONE
-                binding.giphyListView.visibility = VISIBLE
-            }
-
-            else -> {
-                binding.emptyGiphyView.visibility = VISIBLE
-                binding.giphyListView.visibility = GONE
-                binding.emptyGiphyText.text =
-                    if (emptyState == EMPTY_SEARCH) emptyText
-                    else getString(R.string.server_down_giphy)
-            }
-        }
-    }
-
-    override fun getScreenGifHeight(gifWidth: Int, gifHeight: Int): Int {
-        if (gifWidth == gifHeight) {
-            return screenGifWidth
-        }
-
-        val factor = screenGifWidth.toFloat() / gifWidth.toFloat()
-
-        return (gifHeight * factor).toInt()
-    }
-
-    override fun getScreenGifWidth(): Int {
-        return screenGifWidth
     }
 }
