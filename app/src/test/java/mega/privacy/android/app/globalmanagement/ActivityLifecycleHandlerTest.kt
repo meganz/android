@@ -48,8 +48,8 @@ internal class ActivityLifecycleHandlerTest {
         )
         underTest = ActivityLifecycleHandler(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-            startSyncWorkerUseCase = startSyncWorkerUseCase,
-            stopSyncWorkerUseCase = stopSyncWorkerUseCase,
+            startSyncWorkerUseCase = { startSyncWorkerUseCase },
+            stopSyncWorkerUseCase = { stopSyncWorkerUseCase },
             applicationScope = applicationScope,
         )
     }
@@ -89,8 +89,8 @@ internal class ActivityLifecycleHandlerTest {
                 CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
             val handler = ActivityLifecycleHandler(
                 monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-                startSyncWorkerUseCase = startSyncWorkerUseCase,
-                stopSyncWorkerUseCase = stopSyncWorkerUseCase,
+                startSyncWorkerUseCase = { startSyncWorkerUseCase },
+                stopSyncWorkerUseCase = { stopSyncWorkerUseCase },
                 applicationScope = queuedScope,
             )
 

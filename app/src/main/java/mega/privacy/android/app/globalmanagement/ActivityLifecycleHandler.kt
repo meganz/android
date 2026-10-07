@@ -3,6 +3,7 @@ package mega.privacy.android.app.globalmanagement
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -24,8 +25,9 @@ import javax.inject.Singleton
 @Singleton
 class ActivityLifecycleHandler @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val startSyncWorkerUseCase: StartSyncWorkerUseCase,
-    private val stopSyncWorkerUseCase: StopSyncWorkerUseCase,
+    // Lazy so the sync dependency graph is built off the main thread, not in Application.onCreate
+    private val startSyncWorkerUseCase: Lazy<StartSyncWorkerUseCase>,
+    private val stopSyncWorkerUseCase: Lazy<StopSyncWorkerUseCase>,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : Application.ActivityLifecycleCallbacks {
     // The current App Activity
@@ -139,9 +141,9 @@ class ActivityLifecycleHandler @Inject constructor(
         applicationScope.launch {
             syncWorkerLifecycleMutex.withLock {
                 if (shouldSyncWorkerRun) {
-                    startSyncWorkerUseCase()
+                    startSyncWorkerUseCase.get()()
                 } else {
-                    stopSyncWorkerUseCase()
+                    stopSyncWorkerUseCase.get()()
                 }
             }
         }
