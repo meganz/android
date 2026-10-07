@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.home.PinnedHomeItem
 import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
+import mega.privacy.android.domain.entity.media.MediaTimelineSort
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.node.NodeId
@@ -107,6 +108,20 @@ interface SettingsRepository {
      * @param value
      */
     suspend fun setTimelineGridSize(value: Int)
+
+    /**
+     * Monitor the timeline sort preference
+     *
+     * @return timeline sort preference as a flow, or `null` when none has been stored
+     */
+    fun monitorTimelineSort(): Flow<MediaTimelineSort?>
+
+    /**
+     * Set the timeline sort preference
+     *
+     * @param sort
+     */
+    suspend fun setTimelineSort(sort: MediaTimelineSort)
 
     /**
      * Monitor subfolder media discovery setting

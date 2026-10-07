@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.home.PinnedHomeItem
 import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
+import mega.privacy.android.domain.entity.media.MediaTimelineSort
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.node.NodeId
@@ -199,6 +200,13 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setTimelineGridSize(value: Int) =
         uiPreferencesGateway.setTimelineGridSize(value)
+
+    override fun monitorTimelineSort(): Flow<MediaTimelineSort?> =
+        uiPreferencesGateway.monitorTimelineSort()
+            .flowOn(ioDispatcher)
+
+    override suspend fun setTimelineSort(sort: MediaTimelineSort) =
+        withContext(ioDispatcher) { uiPreferencesGateway.setTimelineSort(sort) }
 
     override fun monitorSubfolderMediaDiscoveryEnabled(): Flow<Boolean?> =
         uiPreferencesGateway.monitorSubfolderMediaDiscoveryEnabled()

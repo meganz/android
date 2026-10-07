@@ -17,6 +17,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.domain.entity.media.MediaTimelineSort
+import mega.privacy.android.domain.entity.media.MediaTimelineSortField
+import mega.privacy.android.domain.entity.node.SortDirection
 import javax.inject.Inject
 
 private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
@@ -28,6 +31,8 @@ private const val SHOW_OFFLINE_WARNING_VIEW = "SHOW_OFFLINE_WARNING_VIEW"
 private const val PHOTOS_RECENT_QUERIES = "PHOTOS_RECENT_QUERIES"
 private const val VIEW_TYPE = "VIEW_TYPE"
 private const val TIMELINE_GRID_SIZE = "TIMELINE_GRID_SIZE"
+private const val TIMELINE_SORT_FIELD = "TIMELINE_SORT_FIELD"
+private const val TIMELINE_SORT_DIRECTION = "TIMELINE_SORT_DIRECTION"
 private const val SORTING_PREFERENCE = "SORTING_PREFERENCE"
 private const val VIEW_MODE_PREFERENCE = "VIEW_MODE_PREFERENCE"
 private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
@@ -74,6 +79,8 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val subFolderMediaDiscoveryKey = booleanPreferencesKey(SUBFOLDER_MEDIA_DISCOVERY)
     private val viewTypeKey = intPreferencesKey(VIEW_TYPE)
     private val timelineGridSizeKey = intPreferencesKey(TIMELINE_GRID_SIZE)
+    private val timelineSortFieldKey = stringPreferencesKey(TIMELINE_SORT_FIELD)
+    private val timelineSortDirectionKey = stringPreferencesKey(TIMELINE_SORT_DIRECTION)
     private val sortingPreferenceKey = intPreferencesKey(SORTING_PREFERENCE)
     private val viewModePreferenceKey = intPreferencesKey(VIEW_MODE_PREFERENCE)
     private val offlineWarningViewKey = booleanPreferencesKey(SHOW_OFFLINE_WARNING_VIEW)
@@ -107,6 +114,22 @@ internal class UIPreferencesDatastore @Inject constructor(
     override suspend fun setTimelineGridSize(value: Int) {
         context.uiPreferenceDataStore.edit {
             it[timelineGridSizeKey] = value
+        }
+    }
+
+    override fun monitorTimelineSort(): Flow<MediaTimelineSort?> =
+        context.uiPreferenceDataStore.data.map { prefs ->
+            val field = prefs[timelineSortFieldKey]
+                ?.let { runCatching { MediaTimelineSortField.valueOf(it) }.getOrNull() }
+            val direction = prefs[timelineSortDirectionKey]
+                ?.let { runCatching { SortDirection.valueOf(it) }.getOrNull() }
+            if (field != null && direction != null) MediaTimelineSort(field, direction) else null
+        }
+
+    override suspend fun setTimelineSort(sort: MediaTimelineSort) {
+        context.uiPreferenceDataStore.edit {
+            it[timelineSortFieldKey] = sort.field.name
+            it[timelineSortDirectionKey] = sort.direction.name
         }
     }
 

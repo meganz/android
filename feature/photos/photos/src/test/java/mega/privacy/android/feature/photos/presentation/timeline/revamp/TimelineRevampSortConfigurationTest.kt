@@ -2,9 +2,13 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.media.MediaTimelineSort
+import mega.privacy.android.domain.entity.media.MediaTimelineSortField
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration.Companion.toLegacySort
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration.Companion.toMediaTimelineSort
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration.Companion.toTimelineRevampSortConfiguration
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -49,12 +53,59 @@ internal class TimelineRevampSortConfigurationTest {
         assertThat(underTest.toLegacySort()).isEqualTo(expected)
     }
 
+    @ParameterizedTest(name = "{0} {1} maps to {2}")
+    @MethodSource("mediaTimelineSorts")
+    fun `test that toMediaTimelineSort maps the option and keeps the direction`(
+        option: TimelineRevampSortOption,
+        direction: SortDirection,
+        expectedField: MediaTimelineSortField,
+    ) {
+        val underTest = TimelineRevampSortConfiguration(option, direction)
+
+        assertThat(underTest.toMediaTimelineSort())
+            .isEqualTo(MediaTimelineSort(expectedField, direction))
+    }
+
+    @ParameterizedTest(name = "{0} {1} maps from {2}")
+    @MethodSource("mediaTimelineSorts")
+    fun `test that toTimelineRevampSortConfiguration restores the persisted sort`(
+        option: TimelineRevampSortOption,
+        direction: SortDirection,
+        field: MediaTimelineSortField,
+    ) {
+        assertThat(MediaTimelineSort(field, direction).toTimelineRevampSortConfiguration())
+            .isEqualTo(TimelineRevampSortConfiguration(option, direction))
+    }
+
     @Test
     fun `test that every option defaults to newest first`() {
         TimelineRevampSortOption.entries.forEach { option ->
             assertThat(option.defaultSortDirection).isEqualTo(SortDirection.Descending)
         }
     }
+
+    private fun mediaTimelineSorts(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            TimelineRevampSortOption.DateTaken,
+            SortDirection.Ascending,
+            MediaTimelineSortField.DateTaken,
+        ),
+        Arguments.of(
+            TimelineRevampSortOption.DateTaken,
+            SortDirection.Descending,
+            MediaTimelineSortField.DateTaken,
+        ),
+        Arguments.of(
+            TimelineRevampSortOption.DateAdded,
+            SortDirection.Ascending,
+            MediaTimelineSortField.DateAdded,
+        ),
+        Arguments.of(
+            TimelineRevampSortOption.DateAdded,
+            SortDirection.Descending,
+            MediaTimelineSortField.DateAdded,
+        ),
+    )
 
     private fun sortOrders(): Stream<Arguments> = Stream.of(
         Arguments.of(

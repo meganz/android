@@ -6,6 +6,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
@@ -216,6 +217,70 @@ class VideoPlaylistsTabViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that selectionUiState drives selection mode through select all and clear`() = runTest {
+        val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+        val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+        stubInitialValues(
+            nodesAndEntities = mapOf(
+                createVideoPlaylist(playlist1) to playlist1,
+                createVideoPlaylist(playlist2) to playlist2
+            )
+        )
+        // selectAllVideos reads uiState.value, which only leaves Loading once something collects it.
+        backgroundScope.launch { underTest.uiState.collect { } }
+        runCurrent()
+
+        underTest.selectionUiState.test {
+            assertThat(awaitItem().count).isEqualTo(0)
+
+            underTest.selectAllVideos()
+            awaitItem().let {
+                assertThat(it.count).isEqualTo(2)
+                assertThat(it.areAllSelected).isTrue()
+            }
+
+            underTest.onItemLongClicked(playlist1)
+            awaitItem().let {
+                assertThat(it.count).isEqualTo(1)
+                assertThat(it.areAllSelected).isFalse()
+            }
+
+            underTest.clearSelection()
+            awaitItem().let {
+                assertThat(it.count).isEqualTo(0)
+                assertThat(it.areAllSelected).isFalse()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that selectionUiState enters selection mode when a playlist is long clicked`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(playlist1) to playlist1,
+                    createVideoPlaylist(playlist2) to playlist2
+                )
+            )
+            backgroundScope.launch { underTest.uiState.collect { } }
+            runCurrent()
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().count).isEqualTo(0)
+
+                underTest.onItemLongClicked(playlist1)
+                awaitItem().let {
+                    assertThat(it.count).isEqualTo(1)
+                    assertThat(it.areAllSelected).isFalse()
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that Data state is returned if values found`() = runTest {

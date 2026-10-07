@@ -15,6 +15,7 @@ import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -63,8 +65,10 @@ import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUs
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorMediaNodeContentChangesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineGridSizeUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelineSortUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineGridSizeUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineSortUseCase
 import mega.privacy.android.domain.usecase.photos.SignalMediaCountChangesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
@@ -80,6 +84,8 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTime
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration.Companion.toMediaTimelineSort
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration.Companion.toTimelineRevampSortConfiguration
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.MAX_CACHED_ITEMS
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineSectionDateMapper
@@ -114,6 +120,8 @@ class TimelineRevampViewModel @Inject constructor(
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
     private val monitorTimelineGridSizeUseCase: MonitorTimelineGridSizeUseCase,
     private val setTimelineGridSizeUseCase: SetTimelineGridSizeUseCase,
+    private val monitorTimelineSortUseCase: MonitorTimelineSortUseCase,
+    private val setTimelineSortUseCase: SetTimelineSortUseCase,
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
     private val getCameraUploadFolderHandlesUseCase: GetCameraUploadFolderHandlesUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
@@ -131,6 +139,7 @@ class TimelineRevampViewModel @Inject constructor(
     private val sectionsMonitorStarted = AtomicBoolean(false)
     private val contentMonitorStarted = AtomicBoolean(false)
     private val gridSizeMonitorStarted = AtomicBoolean(false)
+    private var monitorTimelineSortJob: Job? = null
 
     /**
      * Backs [TimelineRevampUiState.Data.takenDownDialogEvent]; folded into [uiState] so the screen
@@ -152,8 +161,15 @@ class TimelineRevampViewModel @Inject constructor(
     /**
      * The selected timestamp column and direction. Drives the section order and the per-section page
      * order; changing it reloads the timeline (via [monitorTimelineSections]).
+     *
+     * Null until [monitorTimelineSort] reads the persisted preference, so the timeline is not first
+     * loaded with [TimelineRevampSortConfiguration.Default] and then reloaded with the stored sort.
+     * Observe it through [selectedSortFlow].
      */
-    private val sortOptionsFlow = MutableStateFlow(TimelineRevampSortConfiguration.Default)
+    private val sortOptionsFlow = MutableStateFlow<TimelineRevampSortConfiguration?>(null)
+
+    private val selectedSortFlow: Flow<TimelineRevampSortConfiguration> =
+        sortOptionsFlow.filterNotNull().onStart { monitorTimelineSort() }
 
     /**
      * Whether the sort toolbar action is enabled. Mirrors the tab: disabled when there is no content
@@ -310,7 +326,7 @@ class TimelineRevampViewModel @Inject constructor(
             loadedNodes,
             isHiddenNodesEnabled,
             gridSizeFlow.onStart { monitorTimelineGridSize() },
-            sortOptionsFlow,
+            selectedSortFlow,
         ) { sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort ->
             GridBundle(sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort)
         }
@@ -369,7 +385,7 @@ class TimelineRevampViewModel @Inject constructor(
     private val periodCards: StateFlow<PeriodCards> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             currentFilter,
-            sortOptionsFlow,
+            selectedSortFlow,
             monitorMediaChanges.onStart { emit(Unit) },
         ) { filter, sort, _ -> filter to sort }
             .flatMapLatest { (filter, sort) ->
@@ -533,10 +549,26 @@ class TimelineRevampViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Seeds [sortOptionsFlow] from the persisted preference and keeps it in sync with later writes.
+     */
+    private fun monitorTimelineSort() {
+        if (monitorTimelineSortJob?.isActive == true) return
+        monitorTimelineSortJob = viewModelScope.launch {
+            monitorTimelineSortUseCase()
+                .map { it.toTimelineRevampSortConfiguration() }
+                .catch {
+                    Timber.e(it, "Unable to monitor timeline sort")
+                    emit(TimelineRevampSortConfiguration.Default)
+                }
+                .collect { sortOptionsFlow.value = it }
+        }
+    }
+
     private fun monitorTimelineSections() {
         if (!sectionsMonitorStarted.compareAndSet(false, true)) return
         viewModelScope.launch {
-            combine(currentFilter, sortOptionsFlow) { filter, sort -> filter to sort }
+            combine(currentFilter, selectedSortFlow) { filter, sort -> filter to sort }
                 .collectLatest { (filter, sort) ->
                     loadSections(filter, sort.sortOrder)
                     refreshSectionsOnMediaChange(filter, sort.sortOrder)
@@ -929,11 +961,12 @@ class TimelineRevampViewModel @Inject constructor(
         localRange: IntRange,
     ): List<TypedFileNode>? {
         Timber.d("Fetching section '${section.groupId}' offsets [${localRange.first}, ${localRange.last}]")
+        val sort = sortOptionsFlow.value ?: TimelineRevampSortConfiguration.Default
         return runCatching {
             listMediaNodesByOffsetUseCase(
                 filter = currentFilter.value,
                 section = section,
-                order = sortOptionsFlow.value.sortOrder,
+                order = sort.sortOrder,
                 maxElements = localRange.last - localRange.first + 1,
                 offset = localRange.first.toLong(),
             )
@@ -1216,11 +1249,16 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * Updates the timestamp column and direction to sort by. Changing it reloads the timeline through
-     * [monitorTimelineSections], re-bucketing the sections and re-ordering the per-section pages.
+     * Updates the timestamp column and direction to sort by, and persists it so it is restored on the
+     * next session. Changing it reloads the timeline through [monitorTimelineSections], re-bucketing
+     * the sections and re-ordering the per-section pages.
      */
     fun onSortOptionsChange(value: TimelineRevampSortConfiguration) {
         sortOptionsFlow.update { value }
+        viewModelScope.launch {
+            runCatching { setTimelineSortUseCase(value.toMediaTimelineSort()) }
+                .onFailure { Timber.e(it, "Unable to persist timeline sort") }
+        }
     }
 
     /**

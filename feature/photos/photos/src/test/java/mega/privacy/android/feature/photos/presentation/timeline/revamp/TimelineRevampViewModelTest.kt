@@ -18,6 +18,8 @@ import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import kotlinx.coroutines.test.advanceUntilIdle
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.media.MediaTimelineSort
+import mega.privacy.android.domain.entity.media.MediaTimelineSortField
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
@@ -36,8 +38,10 @@ import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUs
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorMediaNodeContentChangesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineGridSizeUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelineSortUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineGridSizeUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineSortUseCase
 import mega.privacy.android.domain.usecase.photos.SignalMediaCountChangesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
@@ -85,6 +89,8 @@ internal class TimelineRevampViewModelTest {
     private val setTimelineFilterPreferencesUseCase = mock<SetTimelineFilterPreferencesUseCase>()
     private val monitorTimelineGridSizeUseCase = mock<MonitorTimelineGridSizeUseCase>()
     private val setTimelineGridSizeUseCase = mock<SetTimelineGridSizeUseCase>()
+    private val monitorTimelineSortUseCase = mock<MonitorTimelineSortUseCase>()
+    private val setTimelineSortUseCase = mock<SetTimelineSortUseCase>()
     private val timelineFilterUiStateMapper = mock<TimelineFilterUiStateMapper>()
     private val getCameraUploadFolderHandlesUseCase = mock<GetCameraUploadFolderHandlesUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
@@ -94,6 +100,7 @@ internal class TimelineRevampViewModelTest {
     private val monitorMediaNodeContentChangesUseCase =
         mock<MonitorMediaNodeContentChangesUseCase>()
     private val gridSizePreference = MutableStateFlow<Int?>(null)
+    private val sortPreference = MutableStateFlow(MediaTimelineSort.Default)
 
     /**
      * Awaits the Data emission carrying [expected], skipping any earlier ones. The grid size reaches
@@ -133,6 +140,10 @@ internal class TimelineRevampViewModelTest {
         whenever(setTimelineGridSizeUseCase(any())) doSuspendableAnswer {
             if (persistedGridSizeEchoes) gridSizePreference.value = it.getArgument(0)
         }
+        whenever(monitorTimelineSortUseCase()).thenReturn(sortPreference)
+        whenever(setTimelineSortUseCase(any())) doSuspendableAnswer {
+            sortPreference.value = it.getArgument(0)
+        }
         underTest = TimelineRevampViewModel(
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
             listMediaNodesByOffsetUseCase = listMediaNodesByOffsetUseCase,
@@ -142,6 +153,8 @@ internal class TimelineRevampViewModelTest {
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             monitorTimelineGridSizeUseCase = monitorTimelineGridSizeUseCase,
             setTimelineGridSizeUseCase = setTimelineGridSizeUseCase,
+            monitorTimelineSortUseCase = monitorTimelineSortUseCase,
+            setTimelineSortUseCase = setTimelineSortUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
             getCameraUploadFolderHandlesUseCase = getCameraUploadFolderHandlesUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
@@ -698,6 +711,52 @@ internal class TimelineRevampViewModelTest {
                 .isEqualTo(TimelineRevampSortConfiguration.Default)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that uiState Data restores the persisted sort option`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        sortPreference.value =
+            MediaTimelineSort(MediaTimelineSortField.DateTaken, SortDirection.Ascending)
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            assertThat(awaitItem().currentSort).isEqualTo(DATE_TAKEN_OLDEST)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the first sections load uses the persisted sort order`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+        sortPreference.value =
+            MediaTimelineSort(MediaTimelineSortField.DateTaken, SortDirection.Ascending)
+        initUnderTest()
+
+        underTest.uiState.test {
+            awaitItem()
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(getMediaTimelineSectionsUseCase)
+            .invoke(any(), eq(SortOrder.ORDER_MEDIATS_ASC))
+        verify(getMediaTimelineSectionsUseCase, never())
+            .invoke(any(), eq(SortOrder.ORDER_MODIFICATION_DESC))
+    }
+
+    @Test
+    fun `test that onSortOptionsChange persists the selected sort`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+        initUnderTest()
+
+        underTest.onSortOptionsChange(DATE_TAKEN_OLDEST)
+        advanceUntilIdle()
+
+        verify(setTimelineSortUseCase)(
+            MediaTimelineSort(MediaTimelineSortField.DateTaken, SortDirection.Ascending)
+        )
     }
 
     @Test

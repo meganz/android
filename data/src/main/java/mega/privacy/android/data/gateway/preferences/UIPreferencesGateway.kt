@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway.preferences
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.media.MediaTimelineSort
 
 /**
  * UI preferences gateway
@@ -76,6 +77,20 @@ interface UIPreferencesGateway {
      * @param value An [Int] representing the new timeline grid size preference
      */
     suspend fun setTimelineGridSize(value: Int)
+
+    /**
+     * Monitor the timeline sort preference
+     *
+     * @return a [Flow] to observe the timeline sort preference, or `null` when none is stored
+     */
+    fun monitorTimelineSort(): Flow<MediaTimelineSort?>
+
+    /**
+     * Set the timeline sort preference
+     *
+     * @param sort the new timeline sort preference
+     */
+    suspend fun setTimelineSort(sort: MediaTimelineSort)
 
     /**
      * Monitor subfolder media discovery setting

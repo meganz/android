@@ -23,6 +23,8 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
+import mega.privacy.android.domain.entity.media.MediaTimelineSortField
+import mega.privacy.android.domain.entity.media.MediaTimelineSort
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.home.PinnedHomeItem
@@ -367,6 +369,26 @@ internal class DefaultSettingsRepositoryTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `test that setTimelineSort calls uiPreferencesGateway setTimelineSort`() = runTest {
+        val sort = MediaTimelineSort(MediaTimelineSortField.DateTaken, SortDirection.Ascending)
+
+        underTest.setTimelineSort(sort)
+
+        verify(uiPreferencesGateway).setTimelineSort(sort)
+    }
+
+    @Test
+    fun `test that monitorTimelineSort returns flow from uiPreferencesGateway`() = runTest {
+        val sort = MediaTimelineSort(MediaTimelineSortField.DateAdded, SortDirection.Descending)
+        whenever(uiPreferencesGateway.monitorTimelineSort()).thenReturn(flowOf(sort))
+
+        underTest.monitorTimelineSort().test {
+            assertThat(awaitItem()).isEqualTo(sort)
+            awaitComplete()
+        }
+    }
 
     @ParameterizedTest
     @EnumSource(SortingPreference::class)

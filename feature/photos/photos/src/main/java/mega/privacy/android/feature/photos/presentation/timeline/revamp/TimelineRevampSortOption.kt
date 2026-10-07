@@ -2,6 +2,8 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.media.MediaTimelineSort
+import mega.privacy.android.domain.entity.media.MediaTimelineSortField
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.shared.nodes.model.SortOptionItem
@@ -70,12 +72,9 @@ data class TimelineRevampSortConfiguration(
 
     companion object {
         /**
-         * Date added, newest first — the ordering the timeline used before Date taken existed.
+         * The selection for [MediaTimelineSort.Default].
          */
-        val Default = TimelineRevampSortConfiguration(
-            option = TimelineRevampSortOption.DateAdded,
-            direction = SortDirection.Descending,
-        )
+        val Default = MediaTimelineSort.Default.toTimelineRevampSortConfiguration()
 
         /**
          * The direction as the legacy [Sort], for the screens that still speak newest / oldest only.
@@ -83,5 +82,29 @@ data class TimelineRevampSortConfiguration(
          */
         fun TimelineRevampSortConfiguration.toLegacySort(): Sort =
             if (direction == SortDirection.Ascending) Sort.OLDEST else Sort.NEWEST
+
+        /**
+         * The selection as the persisted [MediaTimelineSort].
+         */
+        fun TimelineRevampSortConfiguration.toMediaTimelineSort(): MediaTimelineSort =
+            MediaTimelineSort(
+                field = when (option) {
+                    TimelineRevampSortOption.DateTaken -> MediaTimelineSortField.DateTaken
+                    TimelineRevampSortOption.DateAdded -> MediaTimelineSortField.DateAdded
+                },
+                direction = direction,
+            )
+
+        /**
+         * The selection restored from a persisted [MediaTimelineSort].
+         */
+        fun MediaTimelineSort.toTimelineRevampSortConfiguration(): TimelineRevampSortConfiguration =
+            TimelineRevampSortConfiguration(
+                option = when (field) {
+                    MediaTimelineSortField.DateTaken -> TimelineRevampSortOption.DateTaken
+                    MediaTimelineSortField.DateAdded -> TimelineRevampSortOption.DateAdded
+                },
+                direction = direction,
+            )
     }
 }
