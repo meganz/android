@@ -2,11 +2,16 @@ package mega.privacy.android.feature.sync.data.repository
 
 import androidx.work.NetworkType
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.backup.SyncErrorMapper
@@ -38,6 +43,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -226,9 +232,109 @@ internal class SyncRepositoryImplTest {
             verify(syncGateway).rescanSync(syncId, false)
         }
 
+    @Test
+    fun `test that monitorStalledIssues does not delay sync updates when they arrive faster than the refresh delay`() =
+        runTest {
+            val syncUpdates = stubSyncEventSources()
+            val dispatcher = UnconfinedTestDispatcher(testScheduler)
+            val repository = createRepositoryForFlows(backgroundScope, dispatcher)
+            backgroundScope.launch(dispatcher) { repository.monitorStalledIssues().collect {} }
+            runCurrent()
+            assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
+            val event = MegaSyncListenerEvent.OnSyncStateChanged(mock())
+            val timeBeforeBurst = currentTime
+
+            repeat(BURST_SIZE) { syncUpdates.emit(event) }
+
+            assertThat(currentTime).isEqualTo(timeBeforeBurst)
+        }
+
+    @Test
+    fun `test that monitorStalledIssues refreshes with the latest change after a burst`() =
+        runTest {
+            val syncUpdates = stubSyncEventSources()
+            val refreshTimes = mutableListOf<Long>()
+            whenever(syncGateway.getSyncStalledIssues()).doSuspendableAnswer {
+                refreshTimes += currentTime
+                null
+            }
+            val dispatcher = UnconfinedTestDispatcher(testScheduler)
+            val repository = createRepositoryForFlows(backgroundScope, dispatcher)
+            backgroundScope.launch(dispatcher) { repository.monitorStalledIssues().collect {} }
+            runCurrent()
+            assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
+            val event = MegaSyncListenerEvent.OnSyncStateChanged(mock())
+
+            repeat(BURST_SIZE) { syncUpdates.emit(event) }
+            advanceTimeBy(10 * REFRESH_DELAY_MILLIS)
+            runCurrent()
+
+            assertThat(refreshTimes)
+                .containsExactly(0L, REFRESH_DELAY_MILLIS, 2 * REFRESH_DELAY_MILLIS)
+                .inOrder()
+        }
+
+    @Test
+    fun `test that monitorFolderPairChanges still emits for every sync update during a stalled issue refresh`() =
+        runTest {
+            val syncUpdates = stubSyncEventSources()
+            val dispatcher = UnconfinedTestDispatcher(testScheduler)
+            val repository = createRepositoryForFlows(backgroundScope, dispatcher)
+            var folderPairEmissions = 0
+            backgroundScope.launch(dispatcher) { repository.monitorStalledIssues().collect {} }
+            backgroundScope.launch(dispatcher) {
+                repository.monitorFolderPairChanges().collect { folderPairEmissions++ }
+            }
+            runCurrent()
+            assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
+            val event = MegaSyncListenerEvent.OnSyncStateChanged(mock())
+            val timeBeforeBurst = currentTime
+
+            backgroundScope.launch(dispatcher) {
+                repeat(BURST_SIZE) { syncUpdates.emit(event) }
+            }
+            runCurrent()
+
+            assertThat(currentTime).isEqualTo(timeBeforeBurst)
+            assertThat(folderPairEmissions).isEqualTo(BURST_SIZE + 1)
+        }
+
+    private fun createRepositoryForFlows(
+        appScope: CoroutineScope,
+        ioDispatcher: CoroutineDispatcher,
+    ) = SyncRepositoryImpl(
+        syncWorkManagerGateway = syncWorkManagerGateway,
+        syncGateway = syncGateway,
+        syncStatsCacheGateway = syncStatsCacheGateway,
+        megaApiGateway = megaApiGateway,
+        folderPairMapper = folderPairMapper,
+        stalledIssuesMapper = stalledIssuesMapper,
+        syncErrorMapper = syncErrorMapper,
+        syncTypeMapper = syncTypeMapper,
+        syncByWifiToNetworkTypeMapper = syncByWifiToNetworkTypeMapper,
+        ioDispatcher = ioDispatcher,
+        appScope = appScope,
+    )
+
+    private suspend fun stubSyncEventSources(): MutableSharedFlow<MegaSyncListenerEvent> {
+        val syncUpdates = MutableSharedFlow<MegaSyncListenerEvent>()
+        whenever(syncGateway.syncUpdate).thenReturn(syncUpdates)
+        whenever(megaApiGateway.globalUpdates).thenReturn(MutableSharedFlow())
+        whenever(syncGateway.getSyncStalledIssues()).thenReturn(null)
+        val emptySyncList = mock<MegaSyncList> { on { size() } doReturn 0 }
+        whenever(syncGateway.getFolderPairs()).thenReturn(emptySyncList)
+        return syncUpdates
+    }
+
     private fun provideSyncTypeMapperParametersDirect(): Stream<Arguments> = Stream.of(
         Arguments.of(SyncType.TYPE_TWOWAY, MegaSync.SyncType.TYPE_TWOWAY),
         Arguments.of(SyncType.TYPE_BACKUP, MegaSync.SyncType.TYPE_BACKUP),
         Arguments.of(SyncType.TYPE_UNKNOWN, MegaSync.SyncType.TYPE_UNKNOWN),
     )
+
+    private companion object {
+        // Must exceed the merge channel plus the shared buffer (64 + 64) to expose back-pressure.
+        const val BURST_SIZE = 200
+        const val REFRESH_DELAY_MILLIS = 5_000L
+    }
 }

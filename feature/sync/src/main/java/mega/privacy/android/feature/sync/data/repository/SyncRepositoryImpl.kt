@@ -6,6 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -144,7 +145,9 @@ internal class SyncRepositoryImpl @Inject constructor(
     }
 
     private val _syncStalledIssues by lazy {
+        // Conflated: the refresh delay must never back-pressure the shared sync event flow.
         _syncChanges
+            .conflate()
             .onEach {
                 delay(SYNC_REFRESH_DELAY.milliseconds)
             }
