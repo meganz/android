@@ -3518,4 +3518,13 @@
         <item quantity="many">%1$d lat</item>
         <item quantity="other">%1$d lat</item>
     </plurals>
+    <string name="more_than_meeting">Więcej niż tylko spotkania</string>
+    <string name="left_meeting_join_title">Twoja prywatność ma znaczenie</string>
+    <string name="left_meeting_join_content">Dołącz do największej na świecie platformy bezpiecznego przechowywania danych i współpracy w chmurze.</string>
+    <string name="left_meeting_bonus_content">Zarejestruj się teraz i korzystaj z zaawansowanych funkcji współpracy za darmo.</string>
+    <string name="create_account">Utwórz konto MEGA</string>
+    <string name="call_error_too_many_participants">Nie można dołączyć do połączenia, ponieważ przekroczona została maksymalna liczba uczestników.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Nie można dołączyć</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">To połączenie może wesprzeć tylko 100 uczestników. Poproś organizatora o usunięcie tego ograniczenia.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, rozumiem</string>
 </resources>

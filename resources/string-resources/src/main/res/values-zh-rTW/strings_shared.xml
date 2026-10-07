@@ -3092,4 +3092,13 @@
     <string name="reset_pin_title_2">重新輸入新密碼</string>
     <string name="settings_passcode_option">密碼選項</string>
     <string name="AN_pin_lock">字母與數字混合</string>
+    <string name="more_than_meeting">不僅僅是會議</string>
+    <string name="left_meeting_join_title">您的隱私非常重要</string>
+    <string name="left_meeting_join_content">加入世界上最大的安全雲端空間與協作平台。</string>
+    <string name="left_meeting_bonus_content">立即註冊並免費享有進階的協作功能。</string>
+    <string name="create_account">註冊</string>
+    <string name="call_error_too_many_participants">已超過最大與會人數，無法加入通話。</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">無法登入</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">此通話僅支援100位與會者。請會議召集人移除此限制。</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">好的，明白了</string>
 </resources>

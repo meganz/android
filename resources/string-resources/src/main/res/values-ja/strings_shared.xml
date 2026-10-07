@@ -3107,4 +3107,13 @@
     <plurals name="contact_info_retention_time_years">
         <item quantity="other">%1$d年</item>
     </plurals>
+    <string name="more_than_meeting">ただのミーティングではありません</string>
+    <string name="left_meeting_join_title">お客様のプライバシーは重要です</string>
+    <string name="left_meeting_join_content">世界最大の安全なクラウドストレージとコラボレーションプラットフォームにご参加ください。</string>
+    <string name="left_meeting_bonus_content">今すぐ登録して、高度なコラボレーション機能を無料でお楽しみください。</string>
+    <string name="create_account">サインアップ</string>
+    <string name="call_error_too_many_participants">最大参加者数を超えてしまったため、通話に参加できません。</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">参加できません</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">この通話では100 人の参加者のみをサポートできます。この制限を解除するには、主催者様にご依頼ください。</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">はい、わかりました。</string>
 </resources>

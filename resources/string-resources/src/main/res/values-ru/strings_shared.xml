@@ -3508,4 +3508,13 @@
     <string name="reset_pin_title_2">Повторно введите новый код доступа</string>
     <string name="settings_passcode_option">Варианты кода</string>
     <string name="AN_pin_lock">Буквенно-цифровой</string>
+    <string name="more_than_meeting">Больше чем просто встречи</string>
+    <string name="left_meeting_join_title">Ваша конфиденциальность имеет значение</string>
+    <string name="left_meeting_join_content">Присоединяйтесь к самой большой в мире безопасной облачной платформе хранения данных и совместной работы.</string>
+    <string name="left_meeting_bonus_content">Зарегистрируйтесь сейчас и наслаждайтесь расширенными функциями совместной работы бесплатно.</string>
+    <string name="create_account">Зарегистрироваться в MEGA</string>
+    <string name="call_error_too_many_participants">Невозможно присоединиться к звонку, поскольку превышено максимальное количество участников.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Не удалось войти</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Этот звонок может включать до 100&#160;участников. Попросите организатора снять это ограничение.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Понятно</string>
 </resources>

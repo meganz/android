@@ -3364,4 +3364,13 @@
     <string name="AN_pin_lock">Alphanumérique</string>
     <string name="reset_pin_title_2">Saisissez votre nouveau code d’accès de nouveau</string>
     <string name="title_change_passcode">Changer le code d’accès</string>
+    <string name="more_than_meeting">Plus que de simples réunions</string>
+    <string name="left_meeting_join_title">La protection de vos renseignements personnels est importante</string>
+    <string name="left_meeting_join_content">Joignez-vous à la plus grande plateforme de stockage Cloud et de collaboration sécurisée au monde.</string>
+    <string name="left_meeting_bonus_content">Inscrivez-vous maintenant et profitez gratuitement de fonctions évoluées de collaboration.</string>
+    <string name="create_account">M’inscrire</string>
+    <string name="call_error_too_many_participants">Vous ne pouvez pas vous joindre à l’appel, car la limite de participants a été dépassée.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Impossible de vous joindre</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Un maximum de 100&#160;personnes peut participer à cet appel. Demandez à la personne qui l’a organisé de lever cette limite.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">D’accord, j’ai compris</string>
 </resources>

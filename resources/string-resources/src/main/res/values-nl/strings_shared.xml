@@ -3243,4 +3243,13 @@
         <item quantity="one">%1$d jaar</item>
         <item quantity="other">%1$d jaar</item>
     </plurals>
+    <string name="more_than_meeting">Meer dan alleen vergaderingen</string>
+    <string name="left_meeting_join_title">Uw privacy is belangrijk</string>
+    <string name="left_meeting_join_content">Word lid van het grootste veilige cloud opslag- en samenwerkingsplatform ter wereld.</string>
+    <string name="left_meeting_bonus_content">Meld u nu aan en profiteer gratis van geavanceerde samenwerkingsfuncties.</string>
+    <string name="create_account">Aanmelden</string>
+    <string name="call_error_too_many_participants">Er kan niet worden deelgenomen aan de oproep omdat het maximum aantal deelnemers is overschreden.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Kan niet aansluiten</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Deze oproep kan slechts 100 deelnemers ondersteunen. Vraag de organisator om deze beperking op te heffen.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Ok, ik snap het</string>
 </resources>

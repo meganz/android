@@ -3052,4 +3052,13 @@
     <string name="AN_pin_lock">Alphanumeric</string>
     <string name="reset_pin_title_2">Masukkan kembali passcode baru anda</string>
     <string name="title_change_passcode">Ganti passcode</string>
+    <string name="more_than_meeting">Lebih dari sekedar pertemuan</string>
+    <string name="left_meeting_join_title">Privasi anda penting</string>
+    <string name="left_meeting_join_content">Bergabunglah dengan platform kolaborasi dan penyimpanan cloud aman terbesar di dunia.</string>
+    <string name="left_meeting_bonus_content">Daftar sekarang dan nikmati fitur kolaborasi lanjutan secara gratis.</string>
+    <string name="create_account">Buat akun MEGA</string>
+    <string name="call_error_too_many_participants">Panggilan tidak dapat disambungkan karena jumlah peserta telah terlampaui.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Tidak dapat bergabung</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Panggilan ini hanya dapat mendukung 100 peserta. Minta penyelenggara untuk menghapus batasan ini.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, mengerti</string>
 </resources>

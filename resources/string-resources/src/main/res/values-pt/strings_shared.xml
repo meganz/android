@@ -3380,4 +3380,13 @@
         <item quantity="many">%1$d de anos</item>
         <item quantity="other">%1$d anos</item>
     </plurals>
+    <string name="more_than_meeting">Mais do que reuniões</string>
+    <string name="left_meeting_join_title">A sua privacidade é importante</string>
+    <string name="left_meeting_join_content">Faça parte da maior plataforma de colaboração e armazenamento em nuvem segura do mundo.</string>
+    <string name="left_meeting_bonus_content">Cadastre-se agora e aproveite de forma gratuita os recursos de colaboração avançados.</string>
+    <string name="create_account">Criar conta</string>
+    <string name="call_error_too_many_participants">Não é possível participar desta chamada porque o número máximo de participantes foi atingido.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Não foi possível entrar</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Esta chamada permite um máximo de 100 participantes. Solicite ao organizador que elimine essa restrição.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Entendi</string>
 </resources>

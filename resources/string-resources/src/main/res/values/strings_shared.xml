@@ -4511,4 +4511,22 @@
         <item quantity="one">Apply to all %1$d duplicate</item>
         <item quantity="other">Apply to all %1$d duplicates</item>
     </plurals>
+    <!-- Headline of the screen a guest lands on after leaving a meeting, introducing MEGA as more than a meeting app -->
+    <string name="more_than_meeting">More than just meetings</string>
+    <!-- Title of the privacy section on the screen a guest lands on after leaving a meeting -->
+    <string name="left_meeting_join_title">Your privacy matters</string>
+    <!-- Body of the privacy section on the screen a guest lands on after leaving a meeting -->
+    <string name="left_meeting_join_content">Join the largest secure cloud storage and collaboration platform in the world.</string>
+    <!-- Body of the free storage section on the screen a guest lands on after leaving a meeting -->
+    <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
+    <!-- Label of the button that takes the user to the sign up screen -->
+    <string name="create_account">Sign up</string>
+    <!-- Snackbar message shown when a call cannot be joined because it already holds the maximum number of participants -->
+    <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
+    <!-- Title of the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Cannot join</string>
+    <!-- Description of the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">This call can only support 100 participants. Ask the organiser to remove this restriction.</string>
+    <!-- Label of the acknowledge button on the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, got it</string>
 </resources>

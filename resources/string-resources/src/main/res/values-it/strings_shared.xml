@@ -3341,4 +3341,13 @@
     <string name="AN_pin_lock">Codice alfanumerico</string>
     <string name="reset_pin_title_2">Reinserisci il nuovo codice</string>
     <string name="title_change_passcode">Cambia codice d’accesso</string>
+    <string name="more_than_meeting">Non solo meeting</string>
+    <string name="left_meeting_join_title">La tua privacy importa</string>
+    <string name="left_meeting_join_content">Unisciti alla più grande piattaforma sicura di archiviazione cloud e collaborazione del mondo.</string>
+    <string name="left_meeting_bonus_content">Registrati ora ed utilizza la collaborazione avanzata gratuitamente.</string>
+    <string name="create_account">Registrati</string>
+    <string name="call_error_too_many_participants">Non è stato possibile unirsi alla chiamata perché è stato superato il numero massimo di partecipanti.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Impossibile unirsi</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Questa chiamata può supportare solo 100 partecipanti. Chiedi all\’organizzatore di rimuovere questa restrizione.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, capito</string>
 </resources>

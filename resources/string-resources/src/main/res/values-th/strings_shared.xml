@@ -3098,4 +3098,13 @@
     <plurals name="contact_info_retention_time_years">
         <item quantity="other">%1$d ปี</item>
     </plurals>
+    <string name="more_than_meeting">เป็นมากกว่าการประชุม</string>
+    <string name="left_meeting_join_title">ความเป็นส่วนตัวของคุณมีความสำคัญเป็นอันดับแรก</string>
+    <string name="left_meeting_join_content">เข้าร่วมพื้นที่เก็บข้อมูลบนคลาวด์ที่ปลอดภัยและแพลตฟอร์มการทำงานร่วมกันที่ใหญ่ที่สุดในโลก</string>
+    <string name="left_meeting_bonus_content">ลงทะเบียนตอนนี้และเพลิดเพลินไปกับฟีเจอร์การทำงานร่วมกันขั้นสูงได้ฟรี</string>
+    <string name="create_account">ลงทะเบียน</string>
+    <string name="call_error_too_many_participants">ไม่สามารถเข้าร่วมการโทรได้ เนื่องจากเกินจำนวนผู้เข้าร่วมสูงสุดแล้ว</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">ไม่สามารถเข้าร่วมได้</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">การโทรนี้รองรับผู้เข้าร่วมได้สูงสุด 100&#160;คน หากต้องการเพิ่มจำนวนผู้เข้าร่วม กรุณาขอให้ผู้จัดการประชุมยกเลิกข้อจำกัดนี้ก่อน</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">โอเค เข้าใจแล้ว</string>
 </resources>

@@ -3223,4 +3223,13 @@
     <string name="AN_pin_lock">alphanumerischer Passcode</string>
     <string name="reset_pin_title_2">Neuen Passcode wiederholen</string>
     <string name="title_change_passcode">Passcode ändern</string>
+    <string name="more_than_meeting">Mehr als nur Meetings</string>
+    <string name="left_meeting_join_title">Ihre Privatsphäre ist wichtig</string>
+    <string name="left_meeting_join_content">Treten Sie der größten sicheren Cloud-Storage- und Collaboration-Plattform der Welt bei.</string>
+    <string name="left_meeting_bonus_content">Melden Sie sich jetzt an und nutzen Sie kostenlos erweiterte Funktionen für die Zusammenarbeit.</string>
+    <string name="create_account">Registrieren</string>
+    <string name="call_error_too_many_participants">Beitritt zum Anruf nicht möglich, da die maximale Teilnehmerzahl überschritten wurde.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Beitritt nicht möglich</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Dieser Konferenz können nur 100 Teilnehmer beitreten. Bitten Sie den Organisator, diese Einschränkung aufzuheben.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Alles klar</string>
 </resources>

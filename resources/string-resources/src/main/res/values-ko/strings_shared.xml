@@ -3082,4 +3082,13 @@
     <string name="reset_pin_title_2">새로운 암호 재입력</string>
     <string name="settings_passcode_option">암호 옵션</string>
     <string name="AN_pin_lock">영숫자</string>
+    <string name="more_than_meeting">회의 이상의 것</string>
+    <string name="left_meeting_join_title">당신의 프라이버시가 중요합니다</string>
+    <string name="left_meeting_join_content">세계에서 가장 큰 안전한 클라우드 저장소와 협업 플랫폼에 가입하세요.</string>
+    <string name="left_meeting_bonus_content">지금 가입하고 고급 협업 기능을 무료로 즐기세요.</string>
+    <string name="create_account">가입</string>
+    <string name="call_error_too_many_participants">최대 참여자 수가 초과하여 통화에 참가할 수 없습니다.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">참여할 수 없음</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">이 통화는 100명의 참여자만 지원합니다. 주최자에게 이 제한을 없앨 것을 요청하세요.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">알겠습니다</string>
 </resources>

@@ -3352,4 +3352,13 @@
     <string name="reset_pin_title_2">Reintroduceți noul cod de acces</string>
     <string name="settings_passcode_option">Opțiuni pentru codul de acces</string>
     <string name="AN_pin_lock">Alfanumeric</string>
+    <string name="more_than_meeting">Mai mult decât simple întâlniri</string>
+    <string name="left_meeting_join_title">Intimitatea ta contează</string>
+    <string name="left_meeting_join_content">Alăturați-vă celei mai mari platforme securizate de stocare în cloud și colaborare din lume.</string>
+    <string name="left_meeting_bonus_content">Înscrieți-vă acum și bucurați-vă gratuit de funcții avansate de colaborare.</string>
+    <string name="create_account">Înscrieți-vă</string>
+    <string name="call_error_too_many_participants">Nu te poți alătura apelului deoarece numărul maxim de participanți a fost depășit.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Imposibil de a participa</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">La acest apel pot participa maximum 100 de persoane. Cereți persoanei care a organizat-o să ridice această limită.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Bine, am înțeles</string>
 </resources>
