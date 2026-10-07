@@ -249,13 +249,11 @@ private fun NavigationPreviewBar(
             items.forEach { item ->
                 NavigationPreviewBarSegment(
                     item = item,
-                    isEnabled = true,
                     modifier = Modifier.weight(1f),
                 )
             }
             NavigationPreviewBarSegment(
                 item = menuItem,
-                isEnabled = false,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -265,7 +263,6 @@ private fun NavigationPreviewBar(
 @Composable
 private fun NavigationPreviewBarSegment(
     item: NavigationItemUiModel,
-    isEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -275,12 +272,12 @@ private fun NavigationPreviewBarSegment(
     ) {
         MegaIcon(
             imageVector = item.icon,
-            tint = if (isEnabled) IconColor.Secondary else IconColor.Disabled,
+            tint = IconColor.Secondary,
             modifier = Modifier.size(24.dp),
         )
         MegaText(
             text = stringResource(item.label),
-            textColor = if (isEnabled) TextColor.Secondary else TextColor.Disabled,
+            textColor = TextColor.Secondary,
             style = AppTheme.typography.labelSmall,
             maxLines = 1,
         )
