@@ -22,6 +22,16 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Sync and backup progress: the session behind the progress widget and screen (sync activity,
+     * sync transfer store, stale-row reconciliation) and their view models.
+     */
+    SyncProgress(
+        experimentName = "sprog",
+        description = "Enable the sync and backup progress widget and screen",
+        defaultValue = false,
+    ),
+
+    /**
      * Paged folder browsing: Cloud Drive folders open in FolderBrowserScreen, which loads
      * children page by page instead of the whole folder
      */
