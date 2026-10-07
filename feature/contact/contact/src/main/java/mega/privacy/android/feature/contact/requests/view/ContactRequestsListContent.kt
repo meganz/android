@@ -2,6 +2,7 @@ package mega.privacy.android.feature.contact.requests.view
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -39,6 +40,7 @@ internal fun ContactRequestsListContent(
                 tab = tab,
                 modifier = modifier
                     .fillMaxSize()
+                    .padding(contentPadding)
                     .testTag(CONTACT_REQUESTS_EMPTY_TAG),
             )
         }
