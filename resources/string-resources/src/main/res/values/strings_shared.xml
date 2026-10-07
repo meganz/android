@@ -4511,6 +4511,60 @@
         <item quantity="one">Apply to all %1$d duplicate</item>
         <item quantity="other">Apply to all %1$d duplicates</item>
     </plurals>
+    <!-- Title of the manage chat history screen, where the user controls how long a chat's messages are kept. -->
+    <string name="chat_manage_history_title">Manage chat history</string>
+    <!-- Title of the manage chat history screen when the conversation is a meeting rather than a chat. -->
+    <string name="chat_manage_history_meeting_title">Manage meeting history</string>
+    <!-- Manage chat history: title of the row that turns automatic message deletion on and off. -->
+    <string name="chat_manage_history_clearing_title">History clearing</string>
+    <!-- Manage chat history: subtitle of the history clearing row while automatic deletion is off. -->
+    <string name="chat_manage_history_clearing_subtitle">Automatically delete messages older than a certain amount of time.</string>
+    <!-- Manage chat history: title of the row showing how long messages are kept, shown while automatic deletion is on. The period itself, for example "1 day", is shown underneath. -->
+    <string name="chat_manage_history_retention_period_title">Automatically delete messages older than:</string>
+    <!-- Manage chat history: the row that deletes every message in the conversation. -->
+    <string name="chat_manage_history_clear_action">Clear chat history</string>
+    <!-- Manage chat history: the row that deletes every message in the conversation, when it is a meeting rather than a chat. -->
+    <string name="chat_manage_history_clear_meeting_action">Clear meeting history</string>
+    <!-- Manage chat history: subtitle of the row that deletes every message in the conversation. -->
+    <string name="chat_manage_history_clear_action_subtitle">Delete all messages and files shared in this conversation. This action is irreversible.</string>
+    <!-- Manage chat history: option in the history clearing dialog that keeps messages indefinitely. -->
+    <string name="chat_manage_history_retention_option_disabled">Disabled</string>
+    <!-- Manage chat history: option in the history clearing dialog that deletes messages older than one day. -->
+    <string name="chat_manage_history_retention_option_one_day">One day</string>
+    <!-- Manage chat history: option in the history clearing dialog that deletes messages older than one week. -->
+    <string name="chat_manage_history_retention_option_one_week">One week</string>
+    <!-- Manage chat history: option in the history clearing dialog that deletes messages older than one month. -->
+    <string name="chat_manage_history_retention_option_one_month">One month</string>
+    <!-- Manage chat history: option in the history clearing dialog that lets the user pick their own period. -->
+    <string name="chat_manage_history_retention_option_custom">Custom</string>
+    <!-- Manage chat history: button that moves on to the custom period picker after the Custom option is chosen. -->
+    <string name="chat_manage_history_retention_next_button">Next</string>
+    <!-- Manage chat history: unit shown in the custom period picker beside the number of hours the user picked, for example the "hour" in "3 hours". The number is on a separate wheel, so it is not part of this text; it only decides which plural form is used. -->
+    <plurals name="chat_manage_history_picker_hours">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+    <!-- Manage chat history: unit shown in the custom period picker beside the number of days the user picked, for example the "day" in "3 days". The number is on a separate wheel, so it is not part of this text; it only decides which plural form is used. -->
+    <plurals name="chat_manage_history_picker_days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <!-- Manage chat history: unit shown in the custom period picker beside the number of weeks the user picked, for example the "week" in "3 weeks". The number is on a separate wheel, so it is not part of this text; it only decides which plural form is used. -->
+    <plurals name="chat_manage_history_picker_weeks">
+        <item quantity="one">week</item>
+        <item quantity="other">weeks</item>
+    </plurals>
+    <!-- Manage chat history: unit shown in the custom period picker beside the number of months the user picked, for example the "month" in "3 months". The number is on a separate wheel, so it is not part of this text; it only decides which plural form is used. -->
+    <plurals name="chat_manage_history_picker_months">
+        <item quantity="one">month</item>
+        <item quantity="other">months</item>
+    </plurals>
+    <!-- Manage chat history: the longest period the custom picker offers, always exactly one year, so it is never pluralised. -->
+    <string name="chat_manage_history_picker_year">year</string>
+    <!-- Manage chat history: title of the dialog confirming that every message in a meeting will be deleted. -->
+    <string name="chat_manage_history_clear_meeting_confirmation_title">Clear meeting history</string>
+    <!-- Manage chat history: body of the dialog confirming that every message in a meeting will be deleted. -->
+    <string name="chat_manage_history_clear_meeting_confirmation_message">Are you sure you want to clear the full message history of this meeting?</string>
     <!-- Headline of the screen a guest lands on after leaving a meeting, introducing MEGA as more than a meeting app -->
     <string name="more_than_meeting">More than just meetings</string>
     <!-- Title of the privacy section on the screen a guest lands on after leaving a meeting -->

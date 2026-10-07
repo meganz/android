@@ -22,6 +22,7 @@ android {
 dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
+    implementation(project(":feature:chat:chat-snowflake-components"))
     implementation(project(":domain:core:shared"))
     implementation(project(":domain:feature:contact"))
     implementation(project(":domain:feature:chat"))
