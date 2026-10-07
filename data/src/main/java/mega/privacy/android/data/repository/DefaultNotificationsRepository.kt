@@ -14,6 +14,7 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.NotificationsGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -52,6 +53,7 @@ import kotlin.coroutines.suspendCoroutine
 @Singleton
 internal class DefaultNotificationsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val userAlertsMapper: UserAlertMapper,
     private val eventMapper: EventMapper,
     private val fetchSchedOccurrencesByChatUseCase: FetchNumberOfScheduledMeetingOccurrencesByChat,
@@ -118,6 +120,10 @@ internal class DefaultNotificationsRepository @Inject constructor(
         .mapNotNull { (event) ->
             event?.let { eventMapper(it) }
         }
+        .flowOn(dispatcher)
+
+    override fun monitorFolderLinkEvent(): Flow<Event> = megaApiFolderGateway.events
+        .mapNotNull { eventMapper(it) }
         .flowOn(dispatcher)
 
     override fun monitorSdkReloadNeeded(): Flow<Boolean> = megaApiGateway.globalUpdates

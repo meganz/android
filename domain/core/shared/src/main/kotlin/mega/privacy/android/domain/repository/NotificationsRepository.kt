@@ -37,6 +37,16 @@ interface NotificationsRepository {
     fun monitorEvent(): Flow<Event>
 
     /**
+     * Monitor events raised by the folder link instance
+     *
+     * Media from a folder link streams through that instance, so its streaming transfer quota
+     * events never reach [monitorEvent].
+     *
+     * @return a flow of [Event] raised by the folder link instance
+     */
+    fun monitorFolderLinkEvent(): Flow<Event>
+
+    /**
      * Get user alerts
      *
      * @return list of current user alerts
