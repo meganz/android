@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.file
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -38,7 +39,7 @@ class CreateTextFileWithContentUseCaseTest {
     }
 
     @Test
-    fun `test that invoke writes content to cache file and returns its UriPath`() = runTest {
+    fun `test that invoke writes content to cache file and returns its document entity`() = runTest {
         val fileName = "shared.txt"
         val content = "hello world"
         val cacheFile = File("/tmp/cache/shared.txt")
@@ -49,7 +50,14 @@ class CreateTextFileWithContentUseCaseTest {
         val result = underTest(fileName, content)
 
         verify(fileSystemRepository).writeTextToPath(cacheFile.absolutePath, content)
-        assertThat(result).isEqualTo(UriPath.fromFile(cacheFile))
+        assertThat(result).isEqualTo(
+            DocumentEntity(
+                name = fileName,
+                size = cacheFile.length(),
+                lastModified = cacheFile.lastModified(),
+                uri = UriPath.fromFile(cacheFile),
+            )
+        )
     }
 
     @Test

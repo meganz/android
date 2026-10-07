@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
@@ -16,7 +18,6 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -28,6 +29,7 @@ import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.NewURLFileDialogNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,10 +41,13 @@ internal fun ShareTextToMegaScreen(
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     onChatsSelected: () -> Unit,
-    onFileUriConsumed: () -> Unit,
+    onTextFileConsumed: () -> Unit,
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
+    uploadFileViewModel: UploadFileViewModel = hiltViewModel(),
 ) {
+    val uploadUiState by uploadFileViewModel.uiState.collectAsStateWithLifecycle()
+
     when (uiState) {
         is ShareTextToMegaUiState.Loading -> {
             //See if we need a loading view
@@ -56,10 +61,14 @@ internal fun ShareTextToMegaScreen(
             var prepareChatsEvent: StateEvent by remember { mutableStateOf(consumed) }
 
             EventEffect(
-                event = uiState.fileUri,
-                onConsumed = onFileUriConsumed,
-            ) { uri ->
-                uploadUrisEventState.trigger(listOf(uri.toUri()))
+                event = uiState.textFile,
+                onConsumed = onTextFileConsumed,
+            ) { file ->
+                uploadFileViewModel.proceedDocuments(
+                    documents = listOf(file),
+                    parentNodeId = folderPickedId,
+                    pitagTrigger = PitagTrigger.ShareFromApp,
+                )
             }
 
             ExplorerScreen(
@@ -71,7 +80,7 @@ internal fun ShareTextToMegaScreen(
                 onCloseExplorerScreen = onNavigateBack,
                 onNavigateBack = onNavigateBack,
                 onNavigate = onNavigate,
-                isProcessingAction = isProcessingAction,
+                isProcessingAction = isProcessingAction || uploadUiState.isProcessing,
                 onFolderPicked = { nodeId ->
                     folderPickedIdLong = nodeId.longValue
                     onNavigate(
@@ -102,6 +111,7 @@ internal fun ShareTextToMegaScreen(
                 onStartUpload = onStartUpload,
                 onCloseExplorerScreen = onNavigateBack,
                 onNavigate = onNavigate,
+                viewModel = uploadFileViewModel,
             )
         }
     }

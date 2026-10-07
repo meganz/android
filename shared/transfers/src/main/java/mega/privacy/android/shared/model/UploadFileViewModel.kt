@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -45,8 +46,6 @@ class UploadFileViewModel @Inject constructor(
             if (isInPayWall()) return@launch
             _uiState.update { it.copy(isProcessing = true) }
             runCatching {
-                val parentOrRootNodeId = if (parentNodeId.longValue != -1L) parentNodeId
-                else getRootNodeUseCase()?.id ?: NodeId(-1L)
                 val entities = filePrepareUseCase(uris.map { UriPath(it.toString()) })
                 // Uris can become unreadable between selection and upload confirmation
                 // (deleted files, expired permission grants); surface an error instead
@@ -62,46 +61,81 @@ class UploadFileViewModel @Inject constructor(
                     }
                     return@launch
                 }
-                val collisions = checkFileNameCollisionsUseCase(
-                    files = entities,
-                    parentNodeId = parentOrRootNodeId,
-                    pitagTrigger = pitagTrigger,
+                uploadDocuments(entities, parentNodeId, pitagTrigger)
+            }.onFailure(::onUploadFailure)
+        }
+    }
+
+    /**
+     * Proceed documents the app created itself for upload under the specified parent node,
+     * handling storage quotas and file name collisions like [proceedUris]. Unlike shared uris,
+     * these do not go through file preparation, which rejects files inside the app's private
+     * storage.
+     *
+     * @param documents [DocumentEntity] list describing the files to be uploaded.
+     * @param parentNodeId [NodeId] for the parent folder node where files will be uploaded. If invalid, falls back to root node.
+     * @param pitagTrigger [PitagTrigger] to indicate whether to trigger PiTAG for this upload.
+     */
+    fun proceedDocuments(
+        documents: List<DocumentEntity>,
+        parentNodeId: NodeId,
+        pitagTrigger: PitagTrigger,
+    ) {
+        viewModelScope.launch {
+            if (isInPayWall()) return@launch
+            _uiState.update { it.copy(isProcessing = true) }
+            runCatching { uploadDocuments(documents, parentNodeId, pitagTrigger) }
+                .onFailure(::onUploadFailure)
+        }
+    }
+
+    private suspend fun uploadDocuments(
+        entities: List<DocumentEntity>,
+        parentNodeId: NodeId,
+        pitagTrigger: PitagTrigger,
+    ) {
+        val parentOrRootNodeId = if (parentNodeId.longValue != -1L) parentNodeId
+        else getRootNodeUseCase()?.id ?: NodeId(-1L)
+        val collisions = checkFileNameCollisionsUseCase(
+            files = entities,
+            parentNodeId = parentOrRootNodeId,
+            pitagTrigger = pitagTrigger,
+        )
+        // resolve name collisions and keep uploading files without collisions
+        if (collisions.isNotEmpty()) {
+            _uiState.update {
+                it.copy(
+                    nameCollisionEvent = triggered(collisions)
                 )
-                // resolve name collisions and keep uploading files without collisions
-                if (collisions.isNotEmpty()) {
-                    _uiState.update {
-                        it.copy(
-                            nameCollisionEvent = triggered(collisions)
-                        )
-                    }
-                }
-                val collidedPaths = collisions.mapTo(mutableSetOf()) { it.path.value }
-                val noCollisionPaths = entities.filter {
-                    collidedPaths.contains(it.uri.value).not()
-                }
-                if (noCollisionPaths.isNotEmpty()) {
-                    _uiState.update {
-                        it.copy(
-                            startUploadEvent = triggered(
-                                TransferTriggerEvent.StartUpload.Files(
-                                    pathsAndNames = noCollisionPaths.associate { entity -> entity.uri.value to null },
-                                    destinationId = parentOrRootNodeId,
-                                    pitagTrigger = pitagTrigger,
-                                )
-                            )
-                        )
-                    }
-                }
-            }.onFailure { e ->
-                _uiState.update {
-                    it.copy(
-                        isProcessing = false,
-                        uploadErrorEvent = triggered(e)
-                    )
-                }
-                Timber.e(e)
             }
         }
+        val collidedPaths = collisions.mapTo(mutableSetOf()) { it.path.value }
+        val noCollisionPaths = entities.filter {
+            collidedPaths.contains(it.uri.value).not()
+        }
+        if (noCollisionPaths.isNotEmpty()) {
+            _uiState.update {
+                it.copy(
+                    startUploadEvent = triggered(
+                        TransferTriggerEvent.StartUpload.Files(
+                            pathsAndNames = noCollisionPaths.associate { entity -> entity.uri.value to null },
+                            destinationId = parentOrRootNodeId,
+                            pitagTrigger = pitagTrigger,
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private fun onUploadFailure(e: Throwable) {
+        _uiState.update {
+            it.copy(
+                isProcessing = false,
+                uploadErrorEvent = triggered(e)
+            )
+        }
+        Timber.e(e)
     }
 
     /**

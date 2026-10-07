@@ -5,9 +5,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.CacheRepository
@@ -20,6 +24,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -65,6 +70,14 @@ class ShareTextToMegaViewModelTest {
         return item
     }
 
+    private suspend fun ReceiveTurbine<ShareTextToMegaUiState>.awaitSettledDataState(): ShareTextToMegaUiState.Data {
+        var item = awaitDataState()
+        while (item.isCreatingFile) {
+            item = awaitDataState()
+        }
+        return item
+    }
+
     private fun stubCacheFile(fileName: String, file: File) {
         whenever(cacheRepository.getCacheFolderNameForTransfer(false)).thenReturn(CACHE_FOLDER)
         whenever(getCacheFileUseCase(CACHE_FOLDER, fileName)).thenReturn(file)
@@ -82,13 +95,15 @@ class ShareTextToMegaViewModelTest {
     }
 
     @Test
-    fun `test that uiState initially exposes a consumed fileUri event`() = runTest {
+    fun `test that uiState initially exposes no text file and no failure`() = runTest {
         whenever(getRootNodeIdUseCase()).thenReturn(NodeId(1L))
         val underTest = buildViewModel()
 
         underTest.uiState.test {
             val data = awaitDataState()
-            assertThat(data.fileUri).isInstanceOf(StateEventWithContentConsumed::class.java)
+            assertThat(data.textFile).isInstanceOf(StateEventWithContentConsumed::class.java)
+            assertThat(data.isCreatingFile).isFalse()
+            assertThat(data.createFileFailedEvent).isEqualTo(consumed)
         }
     }
 
@@ -133,7 +148,7 @@ class ShareTextToMegaViewModelTest {
         }
 
     @Test
-    fun `test that createTextFile triggers fileUri event with the cache file uri`() = runTest {
+    fun `test that createTextFile triggers textFile event with the created file`() = runTest {
         whenever(getRootNodeIdUseCase()).thenReturn(NodeId(1L))
         val cacheFile = File("/tmp/shared.txt")
         stubCacheFile("shared.txt", cacheFile)
@@ -142,15 +157,43 @@ class ShareTextToMegaViewModelTest {
         underTest.uiState.test {
             awaitDataState()
             underTest.createTextFile("shared.txt", "hello")
-            val updated = awaitDataState()
-            assertThat(updated.fileUri).isInstanceOf(StateEventWithContentTriggered::class.java)
-            val triggered = updated.fileUri as StateEventWithContentTriggered
-            assertThat(triggered.content).isEqualTo(UriPath.fromFile(cacheFile))
+            val updated = awaitSettledDataState()
+            assertThat(updated.isCreatingFile).isFalse()
+            val triggered = updated.textFile as StateEventWithContentTriggered
+            assertThat(triggered.content).isEqualTo(
+                DocumentEntity(
+                    name = "shared.txt",
+                    size = cacheFile.length(),
+                    lastModified = cacheFile.lastModified(),
+                    uri = UriPath.fromFile(cacheFile),
+                )
+            )
         }
     }
 
     @Test
-    fun `test that createTextFile keeps fileUri consumed when cache file cannot be created`() =
+    fun `test that createTextFile sets isCreatingFile while the file is being written`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(NodeId(1L))
+            stubCacheFile("shared.txt", File("/tmp/shared.txt"))
+            val gate = CompletableDeferred<Unit>()
+            whenever { fileSystemRepository.writeTextToPath(any(), any()) } doSuspendableAnswer {
+                gate.await()
+            }
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.createTextFile("shared.txt", "hello")
+                assertThat(awaitDataState().isCreatingFile).isTrue()
+
+                gate.complete(Unit)
+                assertThat(awaitDataState().isCreatingFile).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that createTextFile triggers createFileFailedEvent when cache file cannot be created`() =
         runTest {
             whenever(getRootNodeIdUseCase()).thenReturn(NodeId(1L))
             whenever(cacheRepository.getCacheFolderNameForTransfer(false)).thenReturn(CACHE_FOLDER)
@@ -158,51 +201,70 @@ class ShareTextToMegaViewModelTest {
             val underTest = buildViewModel()
 
             underTest.uiState.test {
-                val initial = awaitDataState()
-                assertThat(initial.fileUri).isInstanceOf(StateEventWithContentConsumed::class.java)
+                awaitDataState()
                 underTest.createTextFile("shared.txt", "hello")
-                expectNoEvents()
+                val updated = awaitSettledDataState()
+                assertThat(updated.createFileFailedEvent).isEqualTo(triggered)
+                assertThat(updated.textFile).isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(updated.isCreatingFile).isFalse()
             }
 
             verify(fileSystemRepository, never()).writeTextToPath(any(), any())
         }
 
     @Test
-    fun `test that createTextFile keeps fileUri consumed when write to file throws`() = runTest {
-        whenever(getRootNodeIdUseCase()).thenReturn(NodeId(1L))
-        val cacheFile = File("/tmp/shared.txt")
-        stubCacheFile("shared.txt", cacheFile)
-        whenever(fileSystemRepository.writeTextToPath(any(), any()))
-            .thenThrow(RuntimeException("boom"))
-        val underTest = buildViewModel()
-
-        underTest.uiState.test {
-            val initial = awaitDataState()
-            assertThat(initial.fileUri).isInstanceOf(StateEventWithContentConsumed::class.java)
-            underTest.createTextFile("shared.txt", "hello")
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun `test that onFileUriConsumed transitions fileUri back to consumed after a triggered event`() =
+    fun `test that createTextFile triggers createFileFailedEvent when write to file throws`() =
         runTest {
             whenever(getRootNodeIdUseCase()).thenReturn(NodeId(1L))
-            val cacheFile = File("/tmp/shared.txt")
-            stubCacheFile("shared.txt", cacheFile)
+            stubCacheFile("shared.txt", File("/tmp/shared.txt"))
+            whenever(fileSystemRepository.writeTextToPath(any(), any()))
+                .thenThrow(RuntimeException("boom"))
             val underTest = buildViewModel()
 
             underTest.uiState.test {
                 awaitDataState()
                 underTest.createTextFile("shared.txt", "hello")
-                val triggeredState = awaitDataState()
-                assertThat(triggeredState.fileUri)
+                val updated = awaitSettledDataState()
+                assertThat(updated.createFileFailedEvent).isEqualTo(triggered)
+                assertThat(updated.textFile).isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(updated.isCreatingFile).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that onTextFileConsumed transitions textFile back to consumed after a triggered event`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(NodeId(1L))
+            stubCacheFile("shared.txt", File("/tmp/shared.txt"))
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.createTextFile("shared.txt", "hello")
+                assertThat(awaitSettledDataState().textFile)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
 
-                underTest.onFileUriConsumed()
-                val consumedState = awaitDataState()
-                assertThat(consumedState.fileUri)
+                underTest.onTextFileConsumed()
+                assertThat(awaitDataState().textFile)
                     .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that onCreateFileFailedEventConsumed transitions the failure event back to consumed`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(NodeId(1L))
+            whenever(cacheRepository.getCacheFolderNameForTransfer(false)).thenReturn(CACHE_FOLDER)
+            whenever(getCacheFileUseCase(CACHE_FOLDER, "shared.txt")).thenReturn(null)
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.createTextFile("shared.txt", "hello")
+                assertThat(awaitSettledDataState().createFileFailedEvent).isEqualTo(triggered)
+
+                underTest.onCreateFileFailedEventConsumed()
+                assertThat(awaitDataState().createFileFailedEvent).isEqualTo(consumed)
             }
         }
 

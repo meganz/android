@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.flow.MutableStateFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CLOUD_EXPLORER_VIEW_TAG
@@ -13,9 +14,13 @@ import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.transfers.model.UploadFileUiState
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 internal class ShareTextToMegaScreenTest {
@@ -24,6 +29,10 @@ internal class ShareTextToMegaScreenTest {
     val composeTestRule = createComposeRule()
 
     private val viewModelStoreOwner = explorerViewModelStoreOwner()
+
+    private val uploadFileViewModel = mock<UploadFileViewModel> {
+        on { uiState } doReturn MutableStateFlow(UploadFileUiState())
+    }
 
     @Test
     fun `test that nothing is rendered while loading`() {
@@ -54,7 +63,8 @@ internal class ShareTextToMegaScreenTest {
                         onNavigateBack = {},
                         onNavigate = {},
                         onChatsSelected = {},
-                        onFileUriConsumed = {},
+                        onTextFileConsumed = {},
+                        uploadFileViewModel = uploadFileViewModel,
                     )
                 }
             }

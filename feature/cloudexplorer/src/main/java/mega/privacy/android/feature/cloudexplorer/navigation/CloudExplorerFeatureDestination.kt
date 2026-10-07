@@ -12,9 +12,9 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.copy.CopyViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.move.MoveViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
@@ -23,6 +23,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.picker.NodePicker
 import mega.privacy.android.feature.cloudexplorer.presentation.picker.TargetNodePickerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.CreateTextFileFailedEffect
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaViewModel
@@ -268,25 +269,29 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             var isProcessingAction by rememberSaveable { mutableStateOf(false) }
 
+            val textFileState = uiState as? ShareTextToMegaUiState.Data
+
             rememberNewFileNameResult(
                 monitorResult = monitorResult,
                 clearResult = clearResult,
                 startNavKey = key,
-                createTextFile = { name, content ->
-                    isProcessingAction = true
-                    viewModel.createTextFile(name, content)
-                },
+                createTextFile = viewModel::createTextFile,
+            )
+
+            CreateTextFileFailedEffect(
+                event = textFileState?.createFileFailedEvent ?: consumed,
+                onConsumed = viewModel::onCreateFileFailedEventConsumed,
             )
 
             ShareTextToMegaScreen(
                 uiState = uiState,
                 startNavKey = key,
-                isProcessingAction = isProcessingAction,
+                isProcessingAction = isProcessingAction || textFileState?.isCreatingFile == true,
                 onStartUpload = onStartUpload,
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 onChatsSelected = { isProcessingAction = true },
-                onFileUriConsumed = viewModel::onFileUriConsumed,
+                onTextFileConsumed = viewModel::onTextFileConsumed,
                 monitorResult = monitorResult,
                 clearResult = clearResult,
             )
@@ -376,40 +381,43 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             // Route picked files to the right result key based on the originating flow.
             val onFilesPickedForKey: (List<NodeId>) -> Unit =
                 if (key.startNavKey is AddVideoToPlaylistNavKey) onVideosPicked else onFilesPicked
-            var isProcessingAction by rememberSaveable { mutableStateOf(false) }
-            val (fileUriEvent, onFileUriConsumed) =
-                (key.startNavKey as? ShareTextToMegaNavKey)?.let { startNavKey ->
-                    val viewModel = hiltViewModel<ShareTextToMegaViewModel>()
-                    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                    val fileUri: StateEventWithContent<UriPath> =
-                        (uiState as? ShareTextToMegaUiState.Data)?.fileUri ?: consumed()
+            val shareTextFile = (key.startNavKey as? ShareTextToMegaNavKey)?.let { startNavKey ->
+                val viewModel = hiltViewModel<ShareTextToMegaViewModel>()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val textFileState = uiState as? ShareTextToMegaUiState.Data
 
-                    rememberNewFileNameResult(
-                        monitorResult = monitorResult,
-                        clearResult = clearResult,
-                        startNavKey = startNavKey,
-                        createTextFile = { name, content ->
-                            isProcessingAction = true
-                            viewModel.createTextFile(name, content)
-                        },
-                    )
+                rememberNewFileNameResult(
+                    monitorResult = monitorResult,
+                    clearResult = clearResult,
+                    startNavKey = startNavKey,
+                    createTextFile = viewModel::createTextFile,
+                )
 
-                    fileUri to viewModel::onFileUriConsumed
-                } ?: (consumed() to {})
+                CreateTextFileFailedEffect(
+                    event = textFileState?.createFileFailedEvent ?: consumed,
+                    onConsumed = viewModel::onCreateFileFailedEventConsumed,
+                )
+
+                ShareTextFile(
+                    event = textFileState?.textFile ?: consumed(),
+                    onConsumed = viewModel::onTextFileConsumed,
+                    isCreating = textFileState?.isCreatingFile == true,
+                )
+            }
 
             NodesExplorerScreen(
                 explorerMode = key.explorerMode,
                 startNavKey = key.startNavKey,
                 nodeExplorerId = key.nodeId,
                 nodeSourceType = key.nodeSourceType,
-                isProcessingAction = isProcessingAction,
+                isProcessingAction = shareTextFile?.isCreating == true,
                 shareUris = key.shareUris,
-                fileUriEvent = fileUriEvent,
+                textFileEvent = shareTextFile?.event ?: consumed(),
                 onCloseExplorerScreen = { onCloseExplorerScreen(key.startNavKey) },
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 onStartUpload = onStartUpload,
-                onFileUriConsumed = onFileUriConsumed,
+                onTextFileConsumed = shareTextFile?.onConsumed ?: {},
                 onSelectFolder = onFolderSelected,
                 onFilesPicked = onFilesPickedForKey,
                 disabledTargetId = disabledTargetId,
@@ -420,3 +428,9 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         }
     }
 }
+
+private class ShareTextFile(
+    val event: StateEventWithContent<DocumentEntity>,
+    val onConsumed: () -> Unit,
+    val isCreating: Boolean,
+)

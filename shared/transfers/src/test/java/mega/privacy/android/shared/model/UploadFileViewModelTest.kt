@@ -30,8 +30,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -294,6 +296,109 @@ class UploadFileViewModelTest {
             assertThat((uiState.uploadErrorEvent as StateEventWithContentTriggered).content).isEqualTo(
                 exception
             )
+        }
+
+    @Test
+    fun `test that proceedDocuments triggers startUploadEvent without preparing the files`() =
+        runTest {
+            reset(filePrepareUseCase)
+            val parentNodeId = NodeId(123L)
+            val document = DocumentEntity(
+                name = "note.txt",
+                size = 5L,
+                lastModified = 0L,
+                uri = UriPath("/data/user/0/mega/cache/note.txt"),
+            )
+            whenever(monitorStorageStateEventUseCase())
+                .thenReturn(MutableStateFlow(StorageStateEvent(1L, StorageState.Green)))
+            whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(emptyList())
+
+            viewModel.proceedDocuments(listOf(document), parentNodeId, PitagTrigger.ShareFromApp)
+
+            val uiState = viewModel.uiState.value
+            val filesEvent = (uiState.startUploadEvent as StateEventWithContentTriggered).content
+                    as TransferTriggerEvent.StartUpload.Files
+            assertThat(filesEvent.pathsAndNames).containsExactly(document.uri.value, null)
+            assertThat(filesEvent.destinationId).isEqualTo(parentNodeId)
+            assertThat(filesEvent.pitagTrigger).isEqualTo(PitagTrigger.ShareFromApp)
+            assertThat(uiState.isProcessing).isTrue()
+            verifyNoInteractions(filePrepareUseCase)
+        }
+
+    @Test
+    fun `test that proceedDocuments triggers nameCollisionEvent when collisions exist`() = runTest {
+        val document = DocumentEntity(
+            name = "note.txt",
+            size = 5L,
+            lastModified = 0L,
+            uri = UriPath("/cache/note.txt"),
+        )
+        val collisions = listOf(
+            FileNameCollision(
+                collisionHandle = 1L,
+                name = "note.txt",
+                size = 5L,
+                childFolderCount = 0,
+                childFileCount = 0,
+                lastModified = 0L,
+                parentHandle = 123L,
+                isFile = true,
+                renameName = null,
+                path = UriPath("/cache/note.txt"),
+                pitagTrigger = PitagTrigger.ShareFromApp,
+            )
+        )
+        whenever(monitorStorageStateEventUseCase())
+            .thenReturn(MutableStateFlow(StorageStateEvent(1L, StorageState.Green)))
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
+
+        viewModel.proceedDocuments(listOf(document), NodeId(123L), PitagTrigger.ShareFromApp)
+
+        val uiState = viewModel.uiState.value
+        assertThat((uiState.nameCollisionEvent as StateEventWithContentTriggered).content)
+            .isEqualTo(collisions)
+        assertThat(uiState.startUploadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+    }
+
+    @Test
+    fun `test that proceedDocuments triggers overQuotaEvent when storage state is PayWall`() =
+        runTest {
+            val document = DocumentEntity(
+                name = "note.txt",
+                size = 5L,
+                lastModified = 0L,
+                uri = UriPath("/cache/note.txt"),
+            )
+            whenever(monitorStorageStateEventUseCase())
+                .thenReturn(MutableStateFlow(StorageStateEvent(1L, StorageState.PayWall)))
+
+            viewModel.proceedDocuments(listOf(document), NodeId(123L), PitagTrigger.ShareFromApp)
+
+            val uiState = viewModel.uiState.value
+            assertThat(uiState.overQuotaEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            assertThat(uiState.isProcessing).isFalse()
+        }
+
+    @Test
+    fun `test that proceedDocuments triggers uploadErrorEvent and resets isProcessing when processing fails`() =
+        runTest {
+            val document = DocumentEntity(
+                name = "note.txt",
+                size = 5L,
+                lastModified = 0L,
+                uri = UriPath("/cache/note.txt"),
+            )
+            val exception = RuntimeException("Collision check failed")
+            whenever(monitorStorageStateEventUseCase())
+                .thenReturn(MutableStateFlow(StorageStateEvent(1L, StorageState.Green)))
+            whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenThrow(exception)
+
+            viewModel.proceedDocuments(listOf(document), NodeId(123L), PitagTrigger.ShareFromApp)
+
+            val uiState = viewModel.uiState.value
+            assertThat((uiState.uploadErrorEvent as StateEventWithContentTriggered).content)
+                .isEqualTo(exception)
+            assertThat(uiState.isProcessing).isFalse()
         }
 
     @Test

@@ -27,6 +27,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
@@ -73,10 +74,10 @@ internal fun NodesExplorerScreen(
     onCloseExplorerScreen: () -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
-    fileUriEvent: StateEventWithContent<UriPath>,
+    textFileEvent: StateEventWithContent<DocumentEntity>,
     shareUris: List<UriPath>? = null,
     onStartUpload: (TransferTriggerEvent) -> Unit = {},
-    onFileUriConsumed: () -> Unit = {},
+    onTextFileConsumed: () -> Unit = {},
     onSelectFolder: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
     disabledTargetId: NodeId? = null,
@@ -101,10 +102,14 @@ internal fun NodesExplorerScreen(
     )
 
     EventEffect(
-        event = fileUriEvent,
-        onConsumed = onFileUriConsumed,
-    ) { uri ->
-        uploadUrisEventState.trigger(listOf(uri.toUri()))
+        event = textFileEvent,
+        onConsumed = onTextFileConsumed,
+    ) { file ->
+        uploadFileViewModel.proceedDocuments(
+            documents = listOf(file),
+            parentNodeId = folderPickedId,
+            pitagTrigger = PitagTrigger.ShareFromApp,
+        )
     }
 
     val onCancelExplorerScreen: () -> Unit = if (explorerMode == ExplorerMode.SaveScannedDocument
