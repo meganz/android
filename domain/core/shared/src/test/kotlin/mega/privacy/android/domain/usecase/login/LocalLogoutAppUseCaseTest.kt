@@ -1,9 +1,12 @@
 package mega.privacy.android.domain.usecase.login
 
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.exception.login.RestoreCredentialException
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BannerRepository
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -48,6 +52,7 @@ class LocalLogoutAppUseCaseTest {
     private val setSecurityUpgradeInAppUseCase = mock<SetSecurityUpgradeInAppUseCase>()
     private val bannerRepository = mock<BannerRepository>()
     private val pdfRepository = mock<PdfRepository>()
+    private val clearRestoreCredentialUseCase = mock<ClearRestoreCredentialUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -67,6 +72,7 @@ class LocalLogoutAppUseCaseTest {
             setSecurityUpgradeInAppUseCase = setSecurityUpgradeInAppUseCase,
             bannerRepository = bannerRepository,
             pdfRepository = pdfRepository,
+            clearRestoreCredentialUseCase = clearRestoreCredentialUseCase,
         )
     }
 
@@ -85,6 +91,7 @@ class LocalLogoutAppUseCaseTest {
             setSecurityUpgradeInAppUseCase,
             bannerRepository,
             pdfRepository,
+            clearRestoreCredentialUseCase,
         )
     }
 
@@ -113,5 +120,32 @@ class LocalLogoutAppUseCaseTest {
         verify(setSecurityUpgradeInAppUseCase).invoke(false)
         verify(bannerRepository).clearCache()
         verify(pdfRepository).deleteAllLastPageViewedInPdf()
+        verify(clearRestoreCredentialUseCase).invoke()
     }
+
+    @Test
+    fun `test that invoke completes the logout when clearing the restore credential fails`() =
+        runTest {
+            whenever(clearRestoreCredentialUseCase()).thenThrow(
+                RestoreCredentialException.Failed(RuntimeException("Clear failed"))
+            )
+
+            underTest.invoke()
+
+            verify(clearRestoreCredentialUseCase).invoke()
+            verify(accountRepository).clearAppDataAndCache()
+            verify(loginRepository).broadcastLogout()
+            verify(setSecurityUpgradeInAppUseCase).invoke(false)
+        }
+
+    @Test
+    fun `test that invoke rethrows the cancellation when clearing the restore credential is cancelled`() =
+        runTest {
+            val cancellation = CancellationException("Cancelled")
+            whenever(clearRestoreCredentialUseCase()).thenThrow(cancellation)
+
+            val result = runCatching { underTest.invoke() }
+
+            assertThat(result.exceptionOrNull()).isSameInstanceAs(cancellation)
+        }
 }

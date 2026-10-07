@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.usecase.login
 
+import kotlinx.coroutines.CancellationException
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BannerRepository
@@ -38,12 +40,14 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val setSecurityUpgradeInAppUseCase: SetSecurityUpgradeInAppUseCase,
     private val bannerRepository: BannerRepository,
     private val pdfRepository: PdfRepository,
+    private val clearRestoreCredentialUseCase: ClearRestoreCredentialUseCase,
 ) {
 
     /**
      * Invoke.
      */
     suspend operator fun invoke() {
+        clearRestoreCredential()
         pdfRepository.deleteAllLastPageViewedInPdf()
         bannerRepository.clearCache()
         with(transferRepository) {
@@ -72,5 +76,19 @@ class LocalLogoutAppUseCase @Inject constructor(
         stopAudioService()
         clearPsaUseCase()
         setSecurityUpgradeInAppUseCase(false)
+    }
+
+    /**
+     * A restore credential left behind would let a later device restore sign the user back in,
+     * but failing to delete it must not stop the logout.
+     */
+    private suspend fun clearRestoreCredential() {
+        try {
+            clearRestoreCredentialUseCase()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("Failed to clear the restore credential on logout", e)
+        }
     }
 }
