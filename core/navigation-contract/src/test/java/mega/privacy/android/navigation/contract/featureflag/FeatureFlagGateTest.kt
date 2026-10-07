@@ -3,6 +3,7 @@ package mega.privacy.android.navigation.contract.featureflag
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -98,5 +99,34 @@ class FeatureFlagGateTest {
         }
 
         composeTestRule.onNodeWithText("Disabled").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the resolved branch is shown in the first frame after recreation`() {
+        val restorationTester = StateRestorationTester(composeTestRule)
+        var resolutions = 0
+        restorationTester.setContent {
+            CompositionLocalProvider(
+                LocalFeatureFlagResolver provides FeatureFlagResolver {
+                    // Resolved once before the restore; afterwards it never answers, so only a
+                    // restored value can put the enabled branch on screen
+                    if (resolutions++ == 0) true else awaitCancellation()
+                }
+            ) {
+                FeatureFlagGate(
+                    feature = testFeature,
+                    loading = { Text("Loading") },
+                    disabled = { Text("Disabled") },
+                ) {
+                    Text("Enabled")
+                }
+            }
+        }
+        composeTestRule.onNodeWithText("Enabled").assertIsDisplayed()
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        composeTestRule.onNodeWithText("Enabled").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Loading").assertDoesNotExist()
     }
 }
