@@ -16,4 +16,8 @@ internal data class SyncCompletedTransfer(
     val mediaType: SyncMediaType,
     val finishedAtMillis: Long,
     val batchId: Long,
-)
+) {
+    /** Desktop's finished-row speed: the SDK's mean speed, or the total bytes when it reported none. */
+    val averageSpeed: Long
+        get() = if (entry.meanSpeed != 0L) entry.meanSpeed else entry.totalBytes
+}
