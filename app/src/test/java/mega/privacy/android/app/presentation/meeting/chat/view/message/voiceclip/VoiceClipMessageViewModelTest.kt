@@ -22,7 +22,7 @@ import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdateDoesNotExistInMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeInBatchUseCase
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -71,7 +71,7 @@ class VoiceClipMessageViewModelTest {
     private val voiceClipPlayer: VoiceClipPlayer = mock()
     private val cacheFile: File = mock()
     private val getCacheFileUseCase: GetCacheFileUseCase = mock()
-    private val downloadNodeUseCase: DownloadNodeUseCase = mock()
+    private val downloadNodeInBatchUseCase: DownloadNodeInBatchUseCase = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val voiceClipPlayResultFlow: MutableSharedFlow<VoiceClipPlayState> = MutableSharedFlow()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
@@ -87,7 +87,7 @@ class VoiceClipMessageViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            downloadNodeUseCase,
+            downloadNodeInBatchUseCase,
             getCacheFileUseCase,
             voiceClipPlayer,
             durationInSecondsTextMapper,
@@ -96,7 +96,7 @@ class VoiceClipMessageViewModelTest {
         )
         whenever(getCacheFileUseCase(any(), any())).thenReturn(cacheFile)
         whenever(
-            downloadNodeUseCase(
+            downloadNodeInBatchUseCase(
                 any(),
                 any(),
                 any(),
@@ -119,7 +119,7 @@ class VoiceClipMessageViewModelTest {
     @BeforeEach
     fun setupUnderTest() {
         underTest = VoiceClipMessageViewModel(
-            downloadNodeUseCase = downloadNodeUseCase,
+            downloadNodeInBatchUseCase = downloadNodeInBatchUseCase,
             getCacheFileUseCase = getCacheFileUseCase,
             voiceClipPlayer = voiceClipPlayer,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
@@ -186,7 +186,7 @@ class VoiceClipMessageViewModelTest {
             setCacheFileNotExists()
             val downloadNodeResultFlow: MutableSharedFlow<TransferEvent?> = MutableSharedFlow()
             whenever(
-                downloadNodeUseCase(
+                downloadNodeInBatchUseCase(
                     any(),
                     any(),
                     any(),
@@ -216,7 +216,7 @@ class VoiceClipMessageViewModelTest {
             setCacheFileNotExists()
             val endEvent = TransferEvent.TransferFinishEvent(mock(), null)
             whenever(
-                downloadNodeUseCase(
+                downloadNodeInBatchUseCase(
                     any(),
                     any(),
                     any(),

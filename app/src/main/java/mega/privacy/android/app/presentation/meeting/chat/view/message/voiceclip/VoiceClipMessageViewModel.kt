@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdateDoesNotExistInMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeInBatchUseCase
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -32,12 +32,12 @@ import kotlin.time.Duration.Companion.milliseconds
  * View model for voice clip message. This view model manages all visible voice clip messages
  * in a chat room.
  *
- * @property downloadNodeUseCase [DownloadNodeUseCase]
+ * @property downloadNodeInBatchUseCase [DownloadNodeInBatchUseCase]
  * @property getCacheFileUseCase [GetCacheFileUseCase]
  */
 @HiltViewModel
 class VoiceClipMessageViewModel @Inject constructor(
-    private val downloadNodeUseCase: DownloadNodeUseCase,
+    private val downloadNodeInBatchUseCase: DownloadNodeInBatchUseCase,
     private val getCacheFileUseCase: GetCacheFileUseCase,
     private val voiceClipPlayer: VoiceClipPlayer,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
@@ -121,7 +121,7 @@ class VoiceClipMessageViewModel @Inject constructor(
 
 
     private suspend fun download(node: TypedNode, destinationPath: String, msgId: Long) {
-        downloadNodeUseCase(
+        downloadNodeInBatchUseCase(
             node = node,
             destinationPath = destinationPath,
             appData = listOf(TransferAppData.VoiceClip),
