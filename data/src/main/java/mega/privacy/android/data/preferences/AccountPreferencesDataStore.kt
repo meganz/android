@@ -38,6 +38,7 @@ private const val STORAGE_QUOTA_WARNING_SHOWN_DAY = "STORAGE_QUOTA_WARNING_SHOWN
 private const val TRANSFER_QUOTA_WARNING_SHOWN_DAY = "TRANSFER_QUOTA_WARNING_SHOWN_DAY"
 private const val ACCOUNT_DETAILS_TIMESTAMP = "ACCOUNT_DETAILS_TIMESTAMP"
 private const val EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "EXTENDED_ACCOUNT_DETAILS_TIMESTAMP"
+private const val SHOW_COPYRIGHT = "SHOW_COPYRIGHT"
 
 private val Context.accountPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
     name = accountPreferenceFileName,
@@ -69,6 +70,7 @@ class AccountPreferencesDataStore @Inject constructor(
     private val accountDetailsTimeStampKey = longPreferencesKey(ACCOUNT_DETAILS_TIMESTAMP)
     private val extendedAccountDetailsTimeStampKey =
         longPreferencesKey(EXTENDED_ACCOUNT_DETAILS_TIMESTAMP)
+    private val showCopyrightKey = booleanPreferencesKey(SHOW_COPYRIGHT)
 
     override suspend fun setDisplay2FADialog(show2FA: Boolean) {
         context.accountPreferencesDataStore.edit {
@@ -192,6 +194,19 @@ class AccountPreferencesDataStore @Inject constructor(
         withContext(ioDispatcher) {
             context.accountPreferencesDataStore.edit {
                 it.remove(extendedAccountDetailsTimeStampKey)
+            }
+        }
+    }
+
+    override suspend fun getShowCopyright(): Boolean? =
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore.monitor(showCopyrightKey).firstOrNull()
+        }
+
+    override suspend fun setShowCopyright(show: Boolean) {
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore.edit {
+                it[showCopyrightKey] = show
             }
         }
     }

@@ -164,13 +164,6 @@ interface MegaLocalStorageGateway {
     suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean)
 
     /**
-     * Set show copyright
-     *
-     * @param showCopyrights
-     */
-    suspend fun setShowCopyright(showCopyrights: Boolean)
-
-    /**
      * Gets attributes from DB
      */
     suspend fun getAttributes(): MegaAttributes?
@@ -249,7 +242,10 @@ interface MegaLocalStorageGateway {
     suspend fun getTransferQueueStatus(): Boolean
 
     /**
-     * Should show copyright
+     * Should show copyright, as stored in the legacy database
+     *
+     * Only read to migrate the value to
+     * [mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway].
      */
     suspend fun shouldShowCopyright(): Boolean
 }

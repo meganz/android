@@ -15,6 +15,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import org.junit.jupiter.api.BeforeAll
@@ -85,6 +87,7 @@ internal class DefaultSettingsRepositoryTest {
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val appVersionMapper = mock<AppVersionMapper>()
     private val pinnedItemsSortPreferenceDataStore = mock<PinnedItemsSortPreferenceDataStore>()
+    private val accountPreferencesGateway = mock<AccountPreferencesGateway>()
 
     @BeforeAll
     fun setUp() {
@@ -105,6 +108,7 @@ internal class DefaultSettingsRepositoryTest {
             megaLocalRoomGateway = megaLocalRoomGateway,
             appVersionMapper = appVersionMapper,
             pinnedItemsSortPreferenceDataStore = pinnedItemsSortPreferenceDataStore,
+            accountPreferencesGateway = accountPreferencesGateway,
         )
     }
 
@@ -125,6 +129,7 @@ internal class DefaultSettingsRepositoryTest {
             megaLocalRoomGateway,
             appVersionMapper,
             pinnedItemsSortPreferenceDataStore,
+            accountPreferencesGateway,
         )
     }
 
@@ -898,5 +903,32 @@ internal class DefaultSettingsRepositoryTest {
         assertThrows<MegaException> {
             underTest.getContactLinksOption()
         }
+    }
+
+    @ParameterizedTest(name = "show: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that setShowCopyright saves the value in account preferences`(show: Boolean) =
+        runTest {
+            underTest.setShowCopyright(show)
+
+            verify(accountPreferencesGateway).setShowCopyright(show)
+        }
+
+    @Test
+    fun `test that setShowCopyright saves true when there are no public links`() = runTest {
+        whenever(megaApiGateway.getPublicLinks()).thenReturn(emptyList())
+
+        underTest.setShowCopyright()
+
+        verify(accountPreferencesGateway).setShowCopyright(true)
+    }
+
+    @Test
+    fun `test that setShowCopyright saves false when there are public links`() = runTest {
+        whenever(megaApiGateway.getPublicLinks()).thenReturn(listOf(mock<MegaNode>()))
+
+        underTest.setShowCopyright()
+
+        verify(accountPreferencesGateway).setShowCopyright(false)
     }
 }

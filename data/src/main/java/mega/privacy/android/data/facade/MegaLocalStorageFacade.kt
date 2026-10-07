@@ -148,11 +148,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
             dbHandler.get().setAttrAskSizeDownload(askForConfirmation.toString())
         }
 
-    override suspend fun setShowCopyright(showCopyrights: Boolean) =
-        withContext(databaseDispatcher) {
-            dbHandler.get().setShowCopyright(showCopyrights)
-        }
-
     override suspend fun getAttributes(): MegaAttributes? = withContext(databaseDispatcher) {
         dbHandler.get().attributes
     }

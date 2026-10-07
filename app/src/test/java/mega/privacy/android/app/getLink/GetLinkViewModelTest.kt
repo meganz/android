@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
@@ -50,6 +51,7 @@ class GetLinkViewModelTest {
     private val hasSensitiveInheritedUseCase = mock<HasSensitiveInheritedUseCase>()
     private val hasSensitiveDescendantUseCase = mock<HasSensitiveDescendantUseCase>()
     private val shouldShowCopyrightUseCase = mock<ShouldShowCopyrightUseCase>()
+    private val setShowCopyrightUseCase = mock<SetShowCopyrightUseCase>()
     private val exportNodeUseCase = mock<ExportNodeUseCase>()
     private val megaApi = mock<MegaApiAndroid>()
 
@@ -62,7 +64,6 @@ class GetLinkViewModelTest {
     private fun initUnderTest() {
         underTest = GetLinkViewModel(
             megaApi = megaApi,
-            dbH = mock(),
             encryptLinkWithPasswordUseCase = mock(),
             exportNodeUseCase = exportNodeUseCase,
             context = mock(),
@@ -72,6 +73,7 @@ class GetLinkViewModelTest {
             getBusinessStatusUseCase = mock(),
             getNodeByIdUseCase = getNodeByIdUseCase,
             shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
+            setShowCopyrightUseCase = setShowCopyrightUseCase,
             get1On1ChatIdUseCase = mock(),
             sendTextMessageUseCase = mock(),
         )
@@ -85,6 +87,7 @@ class GetLinkViewModelTest {
             hasSensitiveDescendantUseCase,
             hasSensitiveInheritedUseCase,
             shouldShowCopyrightUseCase,
+            setShowCopyrightUseCase,
             exportNodeUseCase,
             megaApi,
         )
@@ -176,6 +179,16 @@ class GetLinkViewModelTest {
             val result = underTest.shouldShowCopyright()
 
             assertThat(result).isEqualTo(shouldShow)
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that updateShowCopyRight saves the value through the use case`(show: Boolean) =
+        runTest {
+            underTest.updateShowCopyRight(show)
+            advanceUntilIdle()
+
+            verify(setShowCopyrightUseCase).invoke(show)
         }
 
     @Test

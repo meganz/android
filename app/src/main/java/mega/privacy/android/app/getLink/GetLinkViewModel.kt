@@ -22,7 +22,6 @@ import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WA
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -32,6 +31,7 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
@@ -72,14 +72,12 @@ import javax.inject.Inject
  * [LinkPasswordFragment] and their activity [GetLinkActivity].
  *
  * @property megaApi                        MegaApiAndroid instance to use.
- * @property dbH                            DataBaseHandle instance to use.
  * @property encryptLinkWithPasswordUseCase Use case to encrypt a link with a password.
  * @property exportNodeUseCase              Use case to export a node.
  */
 @HiltViewModel
 class GetLinkViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler,
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     @ApplicationContext private val context: Context,
@@ -89,6 +87,7 @@ class GetLinkViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase,
+    private val setShowCopyrightUseCase: SetShowCopyrightUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -286,7 +285,10 @@ class GetLinkViewModel @Inject constructor(
      * Updates the flag to show or not [mega.privacy.android.feature.photos.presentation.albums.copyright.CopyRightScreen] in DB.
      */
     fun updateShowCopyRight(show: Boolean) {
-        dbH.setShowCopyright(show)
+        viewModelScope.launch {
+            runCatching { setShowCopyrightUseCase(show) }
+                .onFailure { Timber.e(it) }
+        }
     }
 
     /**

@@ -133,6 +133,20 @@ interface AccountPreferencesGateway {
     suspend fun clearExtendedAccountDetailsTimeStamp()
 
     /**
+     * Get whether the copyright agreement should be shown before creating a link
+     *
+     * @return the stored value, or null if it has not been stored yet
+     */
+    suspend fun getShowCopyright(): Boolean?
+
+    /**
+     * Set whether the copyright agreement should be shown before creating a link
+     *
+     * @param show true to show it, false otherwise
+     */
+    suspend fun setShowCopyright(show: Boolean)
+
+    /**
      * Clears account preferences except last registered email
      */
     suspend fun clearPreferences()

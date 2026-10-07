@@ -103,7 +103,6 @@ interface DatabaseHandler {
     fun setStorageAskAlways(storageAskAlways: Boolean)
     fun setStorageDownloadLocation(storageDownloadLocation: String?)
     fun setAttrAskSizeDownload(askSizeDownload: String?)
-    fun setShowCopyright(showCopyright: Boolean)
     fun setLastPublicHandle(handle: Long)
     fun setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp: Long)
     fun setLastPublicHandleTimeStamp()

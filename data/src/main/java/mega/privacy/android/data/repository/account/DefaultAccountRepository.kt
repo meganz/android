@@ -1177,7 +1177,11 @@ internal class DefaultAccountRepository @Inject constructor(
         appEventGateway.monitorCookieSettings
 
     override suspend fun shouldShowCopyright(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.shouldShowCopyright()
+        accountPreferencesGateway.getShowCopyright()
+            ?: localStorageGateway.shouldShowCopyright().also { legacy ->
+                runCatching { accountPreferencesGateway.setShowCopyright(legacy) }
+                    .onFailure { Timber.w(it, "Failed to migrate showCopyright to DataStore") }
+            }
     }
 
     override suspend fun killOtherSessions() = withContext(ioDispatcher) {

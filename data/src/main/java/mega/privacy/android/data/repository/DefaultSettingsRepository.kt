@@ -27,6 +27,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
@@ -113,6 +114,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val appVersionMapper: AppVersionMapper,
     private val pinnedItemsSortPreferenceDataStore: PinnedItemsSortPreferenceDataStore,
+    private val accountPreferencesGateway: AccountPreferencesGateway,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -299,15 +301,15 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setShowCopyright() = withContext(ioDispatcher) {
         if (megaApiGateway.getPublicLinks().isEmpty()) {
             Timber.d("No public links: showCopyright set true")
-            megaLocalStorageGateway.setShowCopyright(true)
+            accountPreferencesGateway.setShowCopyright(true)
         } else {
             Timber.d("Already public links: showCopyright set false")
-            megaLocalStorageGateway.setShowCopyright(false)
+            accountPreferencesGateway.setShowCopyright(false)
         }
     }
 
     override suspend fun setShowCopyright(show: Boolean) = withContext(ioDispatcher) {
-        megaLocalStorageGateway.setShowCopyright(show)
+        accountPreferencesGateway.setShowCopyright(show)
     }
 
     override fun getChatImageQuality(): Flow<ChatImageQuality> =

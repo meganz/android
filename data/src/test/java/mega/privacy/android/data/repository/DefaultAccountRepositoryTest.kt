@@ -101,6 +101,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
@@ -860,6 +861,40 @@ class DefaultAccountRepositoryTest {
             whenever(accountPreferencesGateway.getExtendedAccountDetailsTimeStamp())
                 .thenReturn(5678L)
             assertThat(underTest.getExtendedAccountDetailsTimeStampInSeconds()).isEqualTo("5678")
+        }
+
+    @ParameterizedTest(name = "stored: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that shouldShowCopyright returns the value stored in account preferences`(
+        stored: Boolean,
+    ) = runTest {
+        whenever(accountPreferencesGateway.getShowCopyright()).thenReturn(stored)
+
+        assertThat(underTest.shouldShowCopyright()).isEqualTo(stored)
+        verify(localStorageGateway, never()).shouldShowCopyright()
+    }
+
+    @ParameterizedTest(name = "legacy: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that shouldShowCopyright returns and saves the legacy value when account preferences has no value`(
+        legacy: Boolean,
+    ) = runTest {
+        whenever(accountPreferencesGateway.getShowCopyright()).thenReturn(null)
+        whenever(localStorageGateway.shouldShowCopyright()).thenReturn(legacy)
+
+        assertThat(underTest.shouldShowCopyright()).isEqualTo(legacy)
+        verify(accountPreferencesGateway).setShowCopyright(legacy)
+    }
+
+    @Test
+    fun `test that shouldShowCopyright returns the legacy value when saving it to account preferences fails`() =
+        runTest {
+            whenever(accountPreferencesGateway.getShowCopyright()).thenReturn(null)
+            whenever(localStorageGateway.shouldShowCopyright()).thenReturn(false)
+            whenever(accountPreferencesGateway.setShowCopyright(any()))
+                .thenAnswer { throw IOException() }
+
+            assertThat(underTest.shouldShowCopyright()).isFalse()
         }
 
     @Test

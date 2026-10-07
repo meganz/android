@@ -726,25 +726,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setShowCopyright(showCopyright: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTES_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_SHOW_COPYRIGHT='${encrypt(showCopyright.toString())}' WHERE $KEY_ID ='1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
-                } else {
-                    values.put(KEY_SHOW_COPYRIGHT, encrypt(showCopyright.toString()))
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
     override val shouldShowCopyright: Boolean
         get() {
             val selectQuery =
