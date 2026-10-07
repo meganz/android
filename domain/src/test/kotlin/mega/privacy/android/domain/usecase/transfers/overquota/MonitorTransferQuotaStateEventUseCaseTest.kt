@@ -33,6 +33,11 @@ class MonitorTransferQuotaStateEventUseCaseTest {
     @BeforeEach
     fun cleanUp() {
         reset(notificationsRepository, transferRepository)
+        notificationsRepository.stub {
+            on { monitorEvent() } doReturn emptyFlow()
+            on { monitorFolderLinkEvent() } doReturn emptyFlow()
+        }
+        transferRepository.stub { on { monitorTransferQuotaState() } doReturn emptyFlow() }
     }
 
     @Test
@@ -42,7 +47,20 @@ class MonitorTransferQuotaStateEventUseCaseTest {
                 TransferQuotaStateEvent(handle = 1L, state = TransferQuotaState.Orange)
             )
         }
-        transferRepository.stub { on { monitorTransferQuotaState() } doReturn emptyFlow() }
+
+        underTest().test {
+            assertThat(awaitItem()).isEqualTo(TransferQuotaState.Orange)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that the state raised by the folder link instance is emitted`() = runTest {
+        notificationsRepository.stub {
+            on { monitorFolderLinkEvent() } doReturn flowOf(
+                TransferQuotaStateEvent(handle = 1L, state = TransferQuotaState.Orange)
+            )
+        }
 
         underTest().test {
             assertThat(awaitItem()).isEqualTo(TransferQuotaState.Orange)
@@ -52,7 +70,6 @@ class MonitorTransferQuotaStateEventUseCaseTest {
 
     @Test
     fun `test that the state broadcast by a batch download is emitted`() = runTest {
-        notificationsRepository.stub { on { monitorEvent() } doReturn emptyFlow() }
         transferRepository.stub {
             on { monitorTransferQuotaState() } doReturn flowOf(TransferQuotaState.Red)
         }
@@ -70,7 +87,6 @@ class MonitorTransferQuotaStateEventUseCaseTest {
                 StreamOverQuotaEvent(handle = 1L, timeLeft = 10.seconds)
             )
         }
-        transferRepository.stub { on { monitorTransferQuotaState() } doReturn emptyFlow() }
 
         underTest().test {
             awaitComplete()

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.overquota
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
 import mega.privacy.android.domain.entity.StreamOverQuotaEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
 import javax.inject.Inject
@@ -12,7 +13,8 @@ import kotlin.time.Duration
  * Monitor bandwidth over quota hit while streaming media.
  *
  * Streaming reads bypass the transfer subsystem, so they never raise a transfer temporary error.
- * The SDK reports them through a dedicated global event instead.
+ * The SDK reports them through a dedicated global event instead, raised on the folder link instance
+ * when the media comes from a folder link.
  */
 class MonitorStreamOverQuotaEventUseCase @Inject constructor(
     private val notificationsRepository: NotificationsRepository,
@@ -23,7 +25,9 @@ class MonitorStreamOverQuotaEventUseCase @Inject constructor(
      * @return a [Flow] emitting the time left until the over quota state ends, each time a
      * streaming over quota event occurs.
      */
-    operator fun invoke(): Flow<Duration> = notificationsRepository.monitorEvent()
-        .filterIsInstance<StreamOverQuotaEvent>()
+    operator fun invoke(): Flow<Duration> = merge(
+        notificationsRepository.monitorEvent(),
+        notificationsRepository.monitorFolderLinkEvent(),
+    ).filterIsInstance<StreamOverQuotaEvent>()
         .mapNotNull { event -> event.timeLeft.takeIf { it.isPositive() } }
 }

@@ -13,8 +13,9 @@ import javax.inject.Inject
 /**
  * Monitor the transfer quota state the SDK predicts, from both paths it can arrive by.
  *
- * A streaming read has no transfer to report on, so the SDK raises a global event for it. A batch
- * download reports it to the listener of the batch that asked, which is broadcast on from there.
+ * A streaming read has no transfer to report on, so the SDK raises a global event for it, on the
+ * folder link instance when the media comes from a folder link. A batch download reports it to the
+ * listener of the batch that asked, which is broadcast on from there.
  */
 class MonitorTransferQuotaStateEventUseCase @Inject constructor(
     private val notificationsRepository: NotificationsRepository,
@@ -26,9 +27,14 @@ class MonitorTransferQuotaStateEventUseCase @Inject constructor(
      * @return a [Flow] emitting the predicted [TransferQuotaState] each time one is reported.
      */
     operator fun invoke(): Flow<TransferQuotaState> = merge(
-        notificationsRepository.monitorEvent()
+        globalEvents()
             .filterIsInstance<TransferQuotaStateEvent>()
             .map { it.state },
         transferRepository.monitorTransferQuotaState(),
+    )
+
+    private fun globalEvents() = merge(
+        notificationsRepository.monitorEvent(),
+        notificationsRepository.monitorFolderLinkEvent(),
     )
 }

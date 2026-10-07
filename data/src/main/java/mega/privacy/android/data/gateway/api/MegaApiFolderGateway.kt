@@ -1,7 +1,9 @@
 package mega.privacy.android.data.gateway.api
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -14,6 +16,12 @@ import nz.mega.sdk.MegaSearchPage
  * The gateway interface to the Mega Api folder functionality
  */
 interface MegaApiFolderGateway {
+    /**
+     * Global events raised by the folder link instance, such as the streaming transfer quota
+     * events of its HTTP proxy server
+     */
+    val events: Flow<MegaEvent>
+
     /**
      * Authentication token that can be used to identify the user account.
      */

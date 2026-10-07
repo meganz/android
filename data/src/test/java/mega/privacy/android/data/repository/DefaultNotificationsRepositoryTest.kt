@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.NotificationsGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.EventMapper
@@ -25,8 +26,10 @@ import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.NodesCurrentEvent
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
+import mega.privacy.android.domain.entity.TransferQuotaStateEvent
 import mega.privacy.android.domain.entity.UserAlertDestination
 import mega.privacy.android.domain.entity.notifications.PromoNotification
+import mega.privacy.android.domain.entity.transfer.TransferQuotaState
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
@@ -63,6 +66,7 @@ class DefaultNotificationsRepositoryTest {
     private lateinit var underTest: NotificationsRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val eventMapper = mock<EventMapper>()
     private val userHandle = 12L
     private val email = "email"
@@ -82,6 +86,7 @@ class DefaultNotificationsRepositoryTest {
     fun setUp() {
         underTest = DefaultNotificationsRepository(
             megaApiGateway = megaApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             userAlertsMapper = userAlertsMapper,
             eventMapper = eventMapper,
             localStorageGateway = megaLocalStorageGateway,
@@ -100,6 +105,7 @@ class DefaultNotificationsRepositoryTest {
     fun resetMocks() {
         reset(
             megaApiGateway,
+            megaApiFolderGateway,
             eventMapper,
             megaLocalStorageGateway,
             fetchSchedOccurrencesByChatUseCase,
@@ -293,6 +299,23 @@ class DefaultNotificationsRepositoryTest {
             awaitComplete()
         }
     }
+
+    @Test
+    fun `test that monitorFolderLinkEvent emits the events of the folder link instance`() =
+        runTest {
+            val expectedEvent = TransferQuotaStateEvent(
+                handle = 1L,
+                state = TransferQuotaState.Orange,
+            )
+            val megaEvent = mock<MegaEvent>()
+            whenever(megaApiFolderGateway.events).thenReturn(flowOf(megaEvent))
+            whenever(eventMapper(megaEvent)).thenReturn(expectedEvent)
+
+            underTest.monitorFolderLinkEvent().test {
+                assertThat(awaitItem()).isEqualTo(expectedEvent)
+                awaitComplete()
+            }
+        }
 
     @Test
     fun `test that list of enabled notifications will be returned when requested`() = runTest {
