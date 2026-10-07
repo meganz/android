@@ -6,7 +6,6 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
@@ -15,7 +14,7 @@ import mega.privacy.android.domain.usecase.MonitorHomeConfigurationTooltipShownU
 import mega.privacy.android.domain.usecase.SetHomeConfigurationTooltipShownUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
@@ -45,7 +44,7 @@ class HomeViewModelTest {
     )
     private val monitorHomeWidgetConfigurationUseCase =
         mock<MonitorHomeWidgetConfigurationUseCase>()
-    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val monitorOfflineModeUseCase = mock<MonitorOfflineModeUseCase>()
     private val hasOfflineFilesUseCase = mock<HasOfflineFilesUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorHomeConfigurationTooltipShownUseCase =
@@ -56,11 +55,12 @@ class HomeViewModelTest {
     @BeforeEach
     fun setUp() {
         stubTooltipShown(shown = true)
+        stubOfflineMode(isOfflineMode = false)
         stubOfflineModeFlag(enabled = false)
         underTest = HomeViewModel(
             widgetProviders = homeWidgetProviders,
             monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            monitorOfflineModeUseCase = monitorOfflineModeUseCase,
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
             monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
@@ -74,17 +74,16 @@ class HomeViewModelTest {
             dynamicWidgetsProvider,
             staticWidgetsProvider,
             monitorHomeWidgetConfigurationUseCase,
-            monitorConnectivityUseCase,
-            hasOfflineFilesUseCase,
+            monitorOfflineModeUseCase,
             monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase,
+            hasOfflineFilesUseCase,
             getFeatureFlagValueUseCase,
         )
     }
 
     @Test
     fun `test that widgets are displayed if no configurations exist`() = runTest {
-        stubConnectivity(connected = true)
         monitorHomeWidgetConfigurationUseCase.stub {
             on { invoke() } doReturn flow {
                 emit(emptyList())
@@ -114,7 +113,6 @@ class HomeViewModelTest {
 
     @Test
     fun `test that configuration overrides displaying widgets`() = runTest {
-        stubConnectivity(connected = true)
         val staticIdentifier = "static1"
         val dynamicIdentifier = "dynamic1"
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -159,7 +157,6 @@ class HomeViewModelTest {
 
     @Test
     fun `test that configuration items override default order`() = runTest {
-        stubConnectivity(connected = true)
         val staticIdentifier = "static1"
         val dynamicIdentifier = "dynamic1"
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -204,100 +201,24 @@ class HomeViewModelTest {
         }
     }
 
-    @Test
-    fun `test that offline state is returned when disconnected and has offline files`() = runTest {
-        stubConnectivity(connected = false)
-        stubHasOfflineFiles(hasOfflineFiles = true)
-        stubWidgetProviders()
-        monitorHomeWidgetConfigurationUseCase.stub {
+    private fun stubOfflineMode(isOfflineMode: Boolean) {
+        monitorOfflineModeUseCase.stub {
             on { invoke() } doReturn flow {
-                emit(emptyList())
+                emit(isOfflineMode)
                 awaitCancellation()
             }
-        }
-
-        underTest.state.test {
-            // Find the Offline state (may skip Loading if flows emit immediately)
-            val actual = awaitItem().let { state ->
-                if (state is HomeUiState.Offline) {
-                    state
-                } else {
-                    // If first item was Loading, await the next one
-                    awaitItem() as HomeUiState.Offline
-                }
-            }
-            assertThat(actual.hasOfflineFiles).isTrue()
         }
     }
 
-    @Test
-    fun `test that offline state is returned when disconnected and has no offline files`() =
-        runTest {
-            stubConnectivity(connected = false)
-            stubHasOfflineFiles(hasOfflineFiles = false)
-            stubWidgetProviders()
-            monitorHomeWidgetConfigurationUseCase.stub {
-                on { invoke() } doReturn flow {
-                    emit(emptyList())
-                    awaitCancellation()
-                }
-            }
-
-            underTest.state.test {
-                // Find the Offline state (may skip Loading if flows emit immediately)
-                val actual = awaitItem().let { state ->
-                    if (state is HomeUiState.Offline) {
-                        state
-                    } else {
-                        // If first item was Loading, await the next one
-                        awaitItem() as HomeUiState.Offline
-                    }
-                }
-                assertThat(actual.hasOfflineFiles).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that offline state defaults to false when hasOfflineFilesUseCase throws exception`() =
-        runTest {
-            stubConnectivity(connected = false)
-            hasOfflineFilesUseCase.stub {
-                on { invoke() }.thenThrow(RuntimeException("Test exception"))
-            }
-            stubWidgetProviders()
-            monitorHomeWidgetConfigurationUseCase.stub {
-                on { invoke() } doReturn flow {
-                    emit(emptyList())
-                    awaitCancellation()
-                }
-            }
-
-            underTest.state.test {
-                // Find the Offline state (may skip Loading if flows emit immediately)
-                val actual = awaitItem().let { state ->
-                    if (state is HomeUiState.Offline) {
-                        state
-                    } else {
-                        // If first item was Loading, await the next one
-                        awaitItem() as HomeUiState.Offline
-                    }
-                }
-                assertThat(actual.hasOfflineFiles).isFalse()
-            }
-        }
-
-    private fun stubConnectivity(connected: Boolean = true) {
-        monitorConnectivityUseCase.stub {
-            on { invoke() } doReturn flow {
-                emit(connected)
-                awaitCancellation()
-            }
+    private fun stubOfflineModeFlag(enabled: Boolean) {
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.OfflineModePhase1) } doReturn enabled
         }
     }
 
     private fun stubHasOfflineFiles(hasOfflineFiles: Boolean) {
         hasOfflineFilesUseCase.stub {
-            on { invoke() } doReturn hasOfflineFiles
+            onBlocking { invoke() } doReturn hasOfflineFiles
         }
     }
 
@@ -320,12 +241,6 @@ class HomeViewModelTest {
         }
     }
 
-    private fun stubOfflineModeFlag(enabled: Boolean) {
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.OfflineModePhase1) } doReturn enabled
-        }
-    }
-
     private fun stubTooltipShown(shown: Boolean) {
         monitorHomeConfigurationTooltipShownUseCase.stub {
             on { invoke() } doReturn flowOf(shown)
@@ -335,7 +250,6 @@ class HomeViewModelTest {
     @Test
     fun `test that showHomeConfigurationTooltip is true when tooltip not shown before`() =
         runTest {
-            stubConnectivity(connected = true)
             stubTooltipShown(shown = false)
             stubWidgetProviders()
             monitorHomeWidgetConfigurationUseCase.stub {
@@ -347,7 +261,7 @@ class HomeViewModelTest {
             underTest = HomeViewModel(
                 widgetProviders = homeWidgetProviders,
                 monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
-                monitorConnectivityUseCase = monitorConnectivityUseCase,
+                monitorOfflineModeUseCase = monitorOfflineModeUseCase,
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
@@ -363,7 +277,6 @@ class HomeViewModelTest {
     @Test
     fun `test that showHomeConfigurationTooltip is false when tooltip already shown`() =
         runTest {
-            stubConnectivity(connected = true)
             stubTooltipShown(shown = true)
             stubWidgetProviders()
             monitorHomeWidgetConfigurationUseCase.stub {
@@ -375,7 +288,7 @@ class HomeViewModelTest {
             underTest = HomeViewModel(
                 widgetProviders = homeWidgetProviders,
                 monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
-                monitorConnectivityUseCase = monitorConnectivityUseCase,
+                monitorOfflineModeUseCase = monitorOfflineModeUseCase,
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
@@ -391,7 +304,6 @@ class HomeViewModelTest {
     @Test
     fun `test that onHomeConfigurationTooltipDismissed hides the tooltip and calls SetHomeConfigurationTooltipShownUseCase`() =
         runTest {
-            stubConnectivity(connected = true)
             // Simulate DataStore reactivity: the monitor flow re-emits whenever the
             // "shown" preference is written. The fake set use-case flips the same flow,
             // so dismissing through the ViewModel naturally drives the state to hidden.
@@ -415,7 +327,7 @@ class HomeViewModelTest {
             underTest = HomeViewModel(
                 widgetProviders = homeWidgetProviders,
                 monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
-                monitorConnectivityUseCase = monitorConnectivityUseCase,
+                monitorOfflineModeUseCase = monitorOfflineModeUseCase,
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
@@ -432,7 +344,6 @@ class HomeViewModelTest {
 
     @Test
     fun `test that init does not call SetHomeConfigurationTooltipShownUseCase`() = runTest {
-        stubConnectivity(connected = true)
         stubTooltipShown(shown = false)
         stubWidgetProviders()
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -444,7 +355,7 @@ class HomeViewModelTest {
         underTest = HomeViewModel(
             widgetProviders = homeWidgetProviders,
             monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            monitorOfflineModeUseCase = monitorOfflineModeUseCase,
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
             monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
@@ -455,54 +366,72 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test that state returns to Data when connectivity is restored`() =
-        runTest {
-            val connectivityFlow = MutableStateFlow(true)
-            monitorConnectivityUseCase.stub {
-                on { invoke() } doReturn connectivityFlow
-            }
-            stubHasOfflineFiles(hasOfflineFiles = false)
-            stubTooltipShown(shown = true)
-            stubWidgetProviders()
-            monitorHomeWidgetConfigurationUseCase.stub {
-                on { invoke() } doReturn flow {
-                    emit(emptyList())
-                    awaitCancellation()
-                }
-            }
-            underTest = HomeViewModel(
-                widgetProviders = homeWidgetProviders,
-                monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
-                monitorConnectivityUseCase = monitorConnectivityUseCase,
-                hasOfflineFilesUseCase = hasOfflineFilesUseCase,
-                monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
-                setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
-                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            )
-
-            underTest.state.test {
-                var item: HomeUiState = awaitItem()
-                while (item is HomeUiState.Loading) {
-                    item = awaitItem()
-                }
-                assertThat(item).isInstanceOf(HomeUiState.Data::class.java)
-
-                connectivityFlow.update { false }
-                val offline = awaitItem()
-                assertThat(offline).isInstanceOf(HomeUiState.Offline::class.java)
-                assertThat((offline as HomeUiState.Offline).hasOfflineFiles).isFalse()
-
-                connectivityFlow.update { true }
-                assertThat(awaitItem()).isInstanceOf(HomeUiState.Data::class.java)
-
-                cancelAndIgnoreRemainingEvents()
+    fun `test that state is Data with isOfflineMode true when offline and offline mode flag is enabled`() = runTest {
+        stubOfflineMode(isOfflineMode = true)
+        stubOfflineModeFlag(enabled = true)
+        stubWidgetProviders()
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(emptyList())
+                awaitCancellation()
             }
         }
 
+        underTest.state.test {
+            val actual = awaitItem() as HomeUiState.Data
+            assertThat(actual.isOfflineMode).isTrue()
+        }
+    }
+
     @Test
-    fun `test that state is Data when disconnected and offline mode flag is enabled`() = runTest {
-        stubConnectivity(connected = false)
+    fun `test that showHomeConfigurationTooltip is false when offline and offline mode flag is enabled`() = runTest {
+        stubOfflineMode(isOfflineMode = true)
         stubOfflineModeFlag(enabled = true)
+        stubTooltipShown(shown = false)
+        stubWidgetProviders()
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(emptyList())
+                awaitCancellation()
+            }
+        }
+
+        underTest.state.test {
+            val actual = awaitItem() as HomeUiState.Data
+            assertThat(actual.showHomeConfigurationTooltip).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isOfflineMode updates when offline mode changes and offline mode flag is enabled`() = runTest {
+        stubOfflineModeFlag(enabled = true)
+        val offlineModeFlow = MutableStateFlow(false)
+        monitorOfflineModeUseCase.stub {
+            on { invoke() } doReturn offlineModeFlow
+        }
+        stubWidgetProviders()
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(emptyList())
+                awaitCancellation()
+            }
+        }
+
+        underTest.state.test {
+            assertThat((awaitItem() as HomeUiState.Data).isOfflineMode).isFalse()
+
+            offlineModeFlow.value = true
+            assertThat((awaitItem() as HomeUiState.Data).isOfflineMode).isTrue()
+
+            offlineModeFlow.value = false
+            assertThat((awaitItem() as HomeUiState.Data).isOfflineMode).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that offline state is returned when offline and offline mode flag is disabled`() = runTest {
+        stubOfflineMode(isOfflineMode = true)
+        stubHasOfflineFiles(hasOfflineFiles = true)
         stubWidgetProviders()
         monitorHomeWidgetConfigurationUseCase.stub {
             on { invoke() } doReturn flow {
@@ -516,7 +445,63 @@ class HomeViewModelTest {
             while (item is HomeUiState.Loading) {
                 item = awaitItem()
             }
-            assertThat(item).isInstanceOf(HomeUiState.Data::class.java)
+            assertThat(item).isInstanceOf(HomeUiState.Offline::class.java)
+            assertThat((item as HomeUiState.Offline).hasOfflineFiles).isTrue()
         }
     }
+
+    @Test
+    fun `test that offline state defaults hasOfflineFiles to false when hasOfflineFilesUseCase throws`() =
+        runTest {
+            stubOfflineMode(isOfflineMode = true)
+            hasOfflineFilesUseCase.stub {
+                onBlocking { invoke() }.thenThrow(RuntimeException("Test exception"))
+            }
+            stubWidgetProviders()
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            }
+
+            underTest.state.test {
+                var item: HomeUiState = awaitItem()
+                while (item is HomeUiState.Loading) {
+                    item = awaitItem()
+                }
+                assertThat((item as HomeUiState.Offline).hasOfflineFiles).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that state returns to Data when back online and offline mode flag is disabled`() =
+        runTest {
+            val offlineModeFlow = MutableStateFlow(false)
+            monitorOfflineModeUseCase.stub {
+                on { invoke() } doReturn offlineModeFlow
+            }
+            stubHasOfflineFiles(hasOfflineFiles = false)
+            stubWidgetProviders()
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            }
+
+            underTest.state.test {
+                var item: HomeUiState = awaitItem()
+                while (item is HomeUiState.Loading) {
+                    item = awaitItem()
+                }
+                assertThat(item).isInstanceOf(HomeUiState.Data::class.java)
+
+                offlineModeFlow.value = true
+                assertThat(awaitItem()).isInstanceOf(HomeUiState.Offline::class.java)
+
+                offlineModeFlow.value = false
+                assertThat(awaitItem()).isInstanceOf(HomeUiState.Data::class.java)
+            }
+        }
 }

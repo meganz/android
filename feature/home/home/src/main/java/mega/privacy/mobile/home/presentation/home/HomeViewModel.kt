@@ -16,7 +16,7 @@ import mega.privacy.android.domain.usecase.MonitorHomeConfigurationTooltipShownU
 import mega.privacy.android.domain.usecase.SetHomeConfigurationTooltipShownUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
 import mega.privacy.android.core.coroutine.asUiStateFlow
@@ -30,7 +30,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val widgetProviders: Set<@JvmSuppressWildcards HomeWidgetProvider>,
     private val monitorHomeWidgetConfigurationUseCase: MonitorHomeWidgetConfigurationUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val monitorOfflineModeUseCase: MonitorOfflineModeUseCase,
     private val hasOfflineFilesUseCase: HasOfflineFilesUseCase,
     private val monitorHomeConfigurationTooltipShownUseCase: MonitorHomeConfigurationTooltipShownUseCase,
     private val setHomeConfigurationTooltipShownUseCase: SetHomeConfigurationTooltipShownUseCase,
@@ -63,23 +63,24 @@ class HomeViewModel @Inject constructor(
                         }
                     list
                 },
-            monitorConnectivityUseCase().catch { Timber.e(it) },
+            monitorOfflineModeUseCase().catch { Timber.e(it) },
             monitorHomeConfigurationTooltipShownUseCase().catch { Timber.e(it) },
             flow { emit(getFeatureFlagValueUseCase(ApiFeatures.OfflineModePhase1)) }
                 .catch {
                     Timber.e(it)
                     emit(false)
                 },
-        ) { widgets, hasInternetConnection, isTooltipShown, isOfflineModeEnabled ->
-            if (hasInternetConnection || isOfflineModeEnabled) {
-                HomeUiState.Data(
-                    widgets = widgets,
-                    showHomeConfigurationTooltip = !isTooltipShown,
-                )
-            } else {
+        ) { widgets, isOffline, isTooltipShown, isOfflineModeEnabled ->
+            if (isOffline && !isOfflineModeEnabled) {
                 val hasOfflineFiles =
                     runCatching { hasOfflineFilesUseCase() }.getOrDefault(false)
                 HomeUiState.Offline(hasOfflineFiles = hasOfflineFiles)
+            } else {
+                HomeUiState.Data(
+                    widgets = widgets,
+                    isOfflineMode = isOffline,
+                    showHomeConfigurationTooltip = !isOffline && !isTooltipShown,
+                )
             }
         }.asUiStateFlow(
             viewModelScope,

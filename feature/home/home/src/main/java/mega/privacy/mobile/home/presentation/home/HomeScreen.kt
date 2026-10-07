@@ -1,9 +1,12 @@
 package mega.privacy.mobile.home.presentation.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
@@ -29,10 +33,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.prompt.ErrorPrompt
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
@@ -52,6 +58,7 @@ import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.isPushedMainNavScreen
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
+import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
@@ -138,73 +145,96 @@ internal fun HomeScreen(
 
     var homeConfigurationIconCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
+    val isOfflineMode = (state as? HomeUiState.Data)?.isOfflineMode ?: false
+    val showNoConnectionSnackbar = rememberNoConnectionSnackbar()
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         topBar = {
-            MegaTopAppBar(
-                modifier = Modifier.testTag(HOME_MAIN_APP_BAR_TAG),
-                title = stringResource(sharedR.string.general_section_home),
-                navigationType = if (isPushedMainNavScreen(Home::class)) {
-                    AppBarNavigationType.Back { navigationHandler.back() }
-                } else {
-                    AppBarNavigationType.None
-                },
-                trailingIcons = {
-                    TransfersToolbarWidget {
-                        navigationHandler.navigate(TransfersNavKey())
-                    }
-
-                    if (state is HomeUiState.Data) {
-                        IconButton(
-                            modifier = Modifier
-                                .testTag(CommonMenuAction.Search.testTag)
-                                .align(Alignment.CenterVertically),
-                            onClick = {
-                                Analytics.tracker.trackEvent(HomeSearchBarPressedEvent)
-                                navigationHandler.navigate(
-                                    SearchNavKey(
-                                        parentHandle = -1L,
-                                        nodeSourceType = NodeSourceType.CLOUD_DRIVE
-                                    )
-                                )
-                            },
-                        ) {
-                            MegaIcon(
-                                painter = CommonMenuAction.Search.getIconPainter(),
-                                contentDescription = CommonMenuAction.Search.getDescription(),
-                            )
+            Column(
+                modifier = if (isOfflineMode) Modifier.statusBarsPadding() else Modifier,
+            ) {
+                AnimatedVisibility(visible = isOfflineMode) {
+                    ErrorPrompt(
+                        message = stringResource(sharedR.string.sync_no_network_state),
+                        modifier = Modifier.testTag(HOME_NO_CONNECTION_PROMPT_TAG),
+                    )
+                }
+                MegaTopAppBar(
+                    modifier = Modifier.testTag(HOME_MAIN_APP_BAR_TAG),
+                    title = stringResource(sharedR.string.general_section_home),
+                    navigationType = if (isPushedMainNavScreen(Home::class)) {
+                        AppBarNavigationType.Back { navigationHandler.back() }
+                    } else {
+                        AppBarNavigationType.None
+                    },
+                    trailingIcons = {
+                        TransfersToolbarWidget {
+                            navigationHandler.navigate(TransfersNavKey())
                         }
 
-                        IconButton(
-                            modifier = Modifier
-                                .testTag(HomeScreenAction.Customize.testTag)
-                                .align(Alignment.CenterVertically)
-                                .onGloballyPositioned { coordinates ->
-                                    homeConfigurationIconCoordinates = coordinates
+                        if (state is HomeUiState.Data) {
+                            IconButton(
+                                modifier = Modifier
+                                    .testTag(CommonMenuAction.Search.testTag)
+                                    .align(Alignment.CenterVertically),
+                                onClick = {
+                                    if (!isOfflineMode) {
+                                        Analytics.tracker.trackEvent(HomeSearchBarPressedEvent)
+                                        navigationHandler.navigate(
+                                            SearchNavKey(
+                                                parentHandle = -1L,
+                                                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                                            )
+                                        )
+                                    } else {
+                                        showNoConnectionSnackbar()
+                                    }
                                 },
-                            onClick = {
-                                onHomeConfigurationTooltipDismissed()
-                                navigationHandler.navigate(HomeConfiguration)
-                            },
-                        ) {
-                            MegaIcon(
-                                painter = HomeScreenAction.Customize.getIconPainter(),
-                                contentDescription = HomeScreenAction.Customize.getDescription(),
-                            )
-                        }
-                        DisposableEffect(Unit) {
-                            onDispose {
-                                homeConfigurationIconCoordinates = null
+                            ) {
+                                HomeToolbarIcon(
+                                    painter = CommonMenuAction.Search.getIconPainter(),
+                                    contentDescription = CommonMenuAction.Search.getDescription(),
+                                    isEnabled = !isOfflineMode,
+                                )
+                            }
+
+                            IconButton(
+                                modifier = Modifier
+                                    .testTag(HomeScreenAction.Customize.testTag)
+                                    .align(Alignment.CenterVertically)
+                                    .onGloballyPositioned { coordinates ->
+                                        homeConfigurationIconCoordinates = coordinates
+                                    },
+                                onClick = {
+                                    if (!isOfflineMode) {
+                                        onHomeConfigurationTooltipDismissed()
+                                        navigationHandler.navigate(HomeConfiguration)
+                                    } else {
+                                        showNoConnectionSnackbar()
+                                    }
+                                },
+                            ) {
+                                HomeToolbarIcon(
+                                    painter = HomeScreenAction.Customize.getIconPainter(),
+                                    contentDescription = HomeScreenAction.Customize.getDescription(),
+                                    isEnabled = !isOfflineMode,
+                                )
+                            }
+                            DisposableEffect(Unit) {
+                                onDispose {
+                                    homeConfigurationIconCoordinates = null
+                                }
                             }
                         }
-                    }
-                },
-            )
+                    },
+                )
+            }
         },
         floatingActionButton = {
-            if (state is HomeUiState.Data) {
+            if (state is HomeUiState.Data && !state.isOfflineMode) {
                 AddContentFab(
                     modifier = Modifier
                         .testTag(HOME_FAB_TAG)
@@ -239,11 +269,7 @@ internal fun HomeScreen(
             is HomeUiState.Offline -> {
                 HomeOfflineScreen(
                     hasOfflineFiles = state.hasOfflineFiles,
-                    onViewOfflineFilesClick = {
-                        navigationHandler.navigate(
-                            mega.privacy.android.navigation.destination.OfflineNavKey()
-                        )
-                    },
+                    onViewOfflineFilesClick = { navigationHandler.navigate(OfflineNavKey()) },
                     modifier = Modifier.padding(paddingValues.excludingBottomPadding()),
                 )
             }
@@ -291,5 +317,23 @@ internal fun HomeScreen(
 
 }
 
+@Composable
+private fun HomeToolbarIcon(
+    painter: Painter,
+    contentDescription: String,
+    isEnabled: Boolean,
+) {
+    if (isEnabled) {
+        MegaIcon(painter = painter, contentDescription = contentDescription)
+    } else {
+        MegaIcon(
+            painter = painter,
+            tint = IconColor.Disabled,
+            contentDescription = contentDescription,
+        )
+    }
+}
+
 internal const val HOME_FAB_TAG = "home_screen:add_content_fab"
 internal const val HOME_MAIN_APP_BAR_TAG = "home_screen:main_app_bar"
+internal const val HOME_NO_CONNECTION_PROMPT_TAG = "home_screen:no_connection_prompt"
