@@ -87,7 +87,6 @@ internal fun FavouritesExplorerContent(
                 videosOnly = videosOnly,
                 isSelectionModeEnabled = isSelectionModeEnabled,
                 onFolderClick = onFolderClick,
-                allowsFolderSelection = allowsFolderSelection,
             )
             NodeViewWithHeader(
                 items = visibleItems,

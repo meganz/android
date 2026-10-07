@@ -119,14 +119,18 @@ internal fun ExplorerScreen(
             )
         }
     }
-    val onConnectedNavigate: (NavKey) -> Unit = { navKey ->
-        if (uiState.isConnected) onNavigate(navKey) else showNoConnectionSnackbar()
-    }
     val chatExplorerSelectionState = rememberChatExplorerSelectionState()
     val selection = rememberNodeIdSelection(
         selectableNodeIds = uiState.selectableNodeIds,
         loadingState = uiState.nodesLoadingState,
     )
+    val onConnectedNavigate: (NavKey) -> Unit = { navKey ->
+        if (uiState.isConnected) onNavigate(navKey) else showNoConnectionSnackbar()
+    }
+    val onFolderNavigate: (NavKey) -> Unit = { navKey ->
+        if (uiState.isConnected && !explorerMode.allowsFolderSelection) selection.deselectAll()
+        onConnectedNavigate(navKey)
+    }
     val hasSelection = when {
         !explorerMode.isFolderPicker -> selection.isInSelectionMode
         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
@@ -377,7 +381,7 @@ internal fun ExplorerScreen(
                     onSearchQueryChanged = onSearchQueryChanged,
                     onCloseSearch = onCloseSearch,
                     protectedUserTap = protectedUserTap,
-                    onNavigate = onConnectedNavigate,
+                    onNavigate = onFolderNavigate,
                     onNavigateBack = onNavigateBack,
                     selectionState = selection.state,
                     isFileSelectionEnabled = !explorerMode.isFolderPicker,
@@ -399,7 +403,7 @@ internal fun ExplorerScreen(
                         onSearchQueryChanged = onSearchQueryChanged,
                         onCloseSearch = onCloseSearch,
                         protectedUserTap = protectedUserTap,
-                        onNavigate = onConnectedNavigate,
+                        onNavigate = onFolderNavigate,
                         onNavigateBack = onNavigateBack,
                         selectionState = selection.state,
                         isSelectionModeEnabled = !explorerMode.isFolderPicker,
@@ -417,7 +421,7 @@ internal fun ExplorerScreen(
                         onSearchQueryChanged = onSearchQueryChanged,
                         onCloseSearch = onCloseSearch,
                         protectedUserTap = protectedUserTap,
-                        onNavigate = onConnectedNavigate,
+                        onNavigate = onFolderNavigate,
                         onNavigateBack = onNavigateBack,
                         selectionState = selection.state,
                         isSelectionModeEnabled = !explorerMode.isFolderPicker,

@@ -111,7 +111,6 @@ internal fun IncomingSharesExplorerContent(
                             }
                         } else {
                             onFolderClick(item.id)
-                            if (!allowsFolderSelection) selectionState.deselectAll()
                         }
                     }
 

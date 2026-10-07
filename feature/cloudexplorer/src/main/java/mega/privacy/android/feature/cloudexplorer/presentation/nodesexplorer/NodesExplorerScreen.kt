@@ -248,7 +248,6 @@ internal fun NodesExplorerScreenContent(
                 onFolderClick = onFolderClick,
                 restrictedNodeIds = restrictedNodeIds,
                 onRestrictedNodeClick = onRestrictedNodeClick,
-                allowsFolderSelection = allowsFolderSelection,
             )
 
             EventEffect(

@@ -244,9 +244,9 @@ internal fun selectableNodeIds(
     .toSet()
 
 /**
- * Tap handler shared by the cloud-drive and favourites lists: folders open (clearing any selection),
- * pre-added nodes and unsupported (non-video, in video-only mode) files ignore taps, and files
- * toggle selection when selection is enabled.
+ * Tap handler shared by the cloud-drive and favourites lists: folders open, pre-added nodes and
+ * unsupported (non-video, in video-only mode) files ignore taps, and files toggle selection when
+ * selection is enabled.
  */
 internal fun explorerNodeClick(
     selectionState: NodeSelectionState,
@@ -256,17 +256,13 @@ internal fun explorerNodeClick(
     onFolderClick: (NodeId) -> Unit,
     restrictedNodeIds: Set<NodeId> = emptySet(),
     onRestrictedNodeClick: (NodeId) -> Unit = {},
-    allowsFolderSelection: Boolean = false,
 ): (NodeViewItem<TypedNode>) -> Unit = { item ->
     when {
         item.id in disabledNodeIds -> Unit
 
         item.id in restrictedNodeIds -> onRestrictedNodeClick(item.id)
 
-        item.isFolderNode -> {
-            onFolderClick(item.id)
-            if (!allowsFolderSelection) selectionState.deselectAll()
-        }
+        item.isFolderNode -> onFolderClick(item.id)
 
         videosOnly && !item.isVideoNode -> Unit
 

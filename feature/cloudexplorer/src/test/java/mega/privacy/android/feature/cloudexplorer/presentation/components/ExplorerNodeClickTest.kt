@@ -12,7 +12,7 @@ import org.junit.jupiter.api.TestInstance
 internal class ExplorerNodeClickTest {
 
     @Test
-    fun `test that clicking a folder navigates into it and clears the selection`() {
+    fun `test that clicking a folder navigates into it without changing the selection`() {
         var clickedFolder: NodeId? = null
         val selectionState = NodeSelectionState(initialSelectedIds = setOf(NodeId(99L)))
         val click = explorerNodeClick(
@@ -21,25 +21,6 @@ internal class ExplorerNodeClickTest {
             videosOnly = false,
             isSelectionModeEnabled = true,
             onFolderClick = { clickedFolder = it },
-        )
-
-        click(previewFolderNodeUiItem(FOLDER_ID.longValue))
-
-        assertThat(clickedFolder).isEqualTo(FOLDER_ID)
-        assertThat(selectionState.selectedNodeIds).isEmpty()
-    }
-
-    @Test
-    fun `test that clicking a folder navigates but keeps the selection when folder selection is allowed`() {
-        var clickedFolder: NodeId? = null
-        val selectionState = NodeSelectionState(initialSelectedIds = setOf(NodeId(99L)))
-        val click = explorerNodeClick(
-            selectionState = selectionState,
-            disabledNodeIds = emptySet(),
-            videosOnly = false,
-            isSelectionModeEnabled = true,
-            onFolderClick = { clickedFolder = it },
-            allowsFolderSelection = true,
         )
 
         click(previewFolderNodeUiItem(FOLDER_ID.longValue))

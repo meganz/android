@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.navigation3.runtime.NavKey
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -25,12 +26,15 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.nodeExplorerDataState
 import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
+import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeViewItem
@@ -239,6 +243,103 @@ internal class SelectedItemsCountTest {
         composeTestRule.onNodeWithTag(SELECTING_TAG).assertDoesNotExist()
     }
 
+    @Test
+    fun `test that tapping a folder keeps the selection when offline`() {
+        val navigated = mutableListOf<NavKey>()
+        setContent(
+            explorerMode = ExplorerMode.ShareFilesToChat,
+            items = fileAndFolder(),
+            isConnected = false,
+            onNavigate = { navigated += it },
+        )
+        composeTestRule.onNodeWithText(FILE_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(SELECTED_COUNT).assertIsDisplayed()
+        assertThat(navigated).isEmpty()
+    }
+
+    @Test
+    fun `test that tapping a folder clears the selection when navigating into it`() {
+        val navigated = mutableListOf<NavKey>()
+        setContent(
+            explorerMode = ExplorerMode.ShareFilesToChat,
+            items = fileAndFolder(),
+            onNavigate = { navigated += it },
+        )
+        composeTestRule.onNodeWithText(FILE_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(SELECTED_COUNT).assertDoesNotExist()
+        assertThat((navigated.single() as NodesExplorerNavKey).nodeId).isEqualTo(NodeId(FOLDER_ID))
+    }
+
+    @Test
+    fun `test that tapping a folder keeps the selection when folder selection is allowed`() {
+        val navigated = mutableListOf<NavKey>()
+        setContent(
+            explorerMode = ExplorerMode.PinToHome,
+            items = fileAndFolder(),
+            onNavigate = { navigated += it },
+        )
+        composeTestRule.onNodeWithText(FILE_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(SELECTED_COUNT).assertIsDisplayed()
+        assertThat(navigated).hasSize(1)
+    }
+
+    @Test
+    fun `test that tapping an incoming shares folder clears the selection when navigating into it`() {
+        val navigated = mutableListOf<NavKey>()
+        setIncomingSharesContent(onNavigate = { navigated += it })
+        composeTestRule.onNodeWithText(FILE_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(SELECTED_COUNT).assertDoesNotExist()
+        assertThat((navigated.single() as NodesExplorerNavKey).nodeId).isEqualTo(NodeId(FOLDER_ID))
+    }
+
+    @Test
+    fun `test that tapping an incoming shares folder keeps the selection when offline`() {
+        val navigated = mutableListOf<NavKey>()
+        setIncomingSharesContent(isConnected = false, onNavigate = { navigated += it })
+        composeTestRule.onNodeWithText(FILE_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText(SELECTED_COUNT).assertIsDisplayed()
+        assertThat(navigated).isEmpty()
+    }
+
+    private fun setIncomingSharesContent(
+        isConnected: Boolean = true,
+        onNavigate: (NavKey) -> Unit,
+    ) = setContent(
+        explorerMode = ExplorerMode.ShareFilesToChat,
+        isInnerNavigation = false,
+        tabIndex = INCOMING_TAB_INDEX,
+        incoming = mock {
+            on { uiState } doReturn MutableStateFlow<NodeExplorerUiState>(
+                nodeExplorerDataState(
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                    items = fileAndFolder(),
+                )
+            )
+        },
+        isConnected = isConnected,
+        onNavigate = onNavigate,
+    )
+
+    private fun fileAndFolder(): List<NodeViewItem<TypedNode>> = listOf(
+        previewFolderNodeUiItem(id = FOLDER_ID, name = FOLDER_NAME),
+        previewFileNodeUiItem(id = FILE_ID, name = FILE_NAME),
+    )
+
     private fun files(vararg ids: Long): List<NodeViewItem<TypedNode>> =
         ids.map { previewFileNodeUiItem(id = it, name = fileName(it)) }
 
@@ -266,9 +367,18 @@ internal class SelectedItemsCountTest {
         ),
         onCloseExplorerScreen: () -> Unit = {},
         onNavigateBack: () -> Unit = {},
+        isConnected: Boolean = true,
+        onNavigate: (NavKey) -> Unit = {},
+        isInnerNavigation: Boolean = true,
+        tabIndex: Int = CLOUD_TAB_INDEX,
+        incoming: IncomingSharesExplorerViewModel = stubIncomingSharesExplorerViewModel(),
     ) {
         val nodes = mock<NodesExplorerViewModel> { on { uiState } doReturn nodesUiState }
-        val owner = explorerViewModelStoreOwner(nodes = nodes)
+        val owner = explorerViewModelStoreOwner(
+            nodes = nodes,
+            incoming = incoming,
+            coordinator = stubExplorerViewModel(isConnected = isConnected),
+        )
 
         composeTestRule.setContent {
             AndroidThemeForPreviews {
@@ -282,14 +392,15 @@ internal class SelectedItemsCountTest {
                     ExplorerScreen(
                         explorerMode = explorerMode,
                         startNavKey = CopyNavKey(emptyList()),
-                        isInnerNavigation = true,
+                        isInnerNavigation = isInnerNavigation,
                         nodeExplorerId = NodeId(-1),
                         nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                         onCloseExplorerScreen = onCloseExplorerScreen,
                         onNavigateBack = onNavigateBack,
-                        onNavigate = {},
+                        onNavigate = onNavigate,
                         isProcessingAction = false,
                         disabledNodeIds = disabledNodeIds,
+                        tabIndex = tabIndex,
                     )
                 }
             }
@@ -299,6 +410,8 @@ internal class SelectedItemsCountTest {
     private companion object {
         const val FILE_ID = 10L
         const val FILE_NAME = "Selected file"
+        const val FOLDER_ID = 1L
+        const val FOLDER_NAME = "Folder"
         const val SELECTED_COUNT = "1"
         const val NAVIGATION_ICON = "Navigation Icon"
         const val SEARCH_TAG = "app_bar:search"
