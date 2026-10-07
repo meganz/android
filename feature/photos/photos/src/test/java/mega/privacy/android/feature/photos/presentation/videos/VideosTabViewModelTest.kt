@@ -366,7 +366,7 @@ class VideosTabViewModelTest {
         }
 
     @Test
-    fun `test that getAllVideosUseCase is invoked once when a burst of node updates is emitted`() =
+    fun `test that getAllVideosUseCase is invoked without waiting for the refresh debounce when a video node is updated`() =
         runTest {
             val testNode = mock<FileNode> {
                 on { id }.thenReturn(NodeId(1L))
@@ -387,8 +387,42 @@ class VideosTabViewModelTest {
                     advanceUntilIdle()
                     clearInvocations(getAllVideosUseCase)
 
-                    repeat(5) {
-                        nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    runCurrent()
+
+                    verify(getAllVideosUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull())
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that getAllVideosUseCase is invoked once when a burst of offline video updates is emitted`() =
+        runTest {
+            val offlineVideo = createOffline(name = "offline video.mp4", lastModifiedTime = 0)
+            stubInitialValues()
+            getFileTypeInfoByNameUseCase.stub {
+                on { invoke(eq(offlineVideo.name), any()) } doReturn
+                        VideoFileTypeInfo("video", "mp4", 1.minutes)
+            }
+            val offlineNodeUpdateFlow = MutableSharedFlow<List<Offline>>()
+
+            monitorOfflineNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(offlineNodeUpdateFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.allVideoEntities).isNotEmpty()
+                    offlineNodeUpdateFlow.emit(listOf(offlineVideo))
+                    advanceUntilIdle()
+                    clearInvocations(getAllVideosUseCase)
+
+                    (1L..5L).forEach { time ->
+                        offlineNodeUpdateFlow.emit(
+                            listOf(offlineVideo.copy(lastModifiedTime = time))
+                        )
                     }
                     advanceUntilIdle()
 

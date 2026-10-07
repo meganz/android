@@ -181,6 +181,36 @@ class VideoPlaylistsTabViewModelTest {
         }
 
     @Test
+    fun `test that getVideoPlaylistsUseCase is invoked without waiting for the refresh debounce when a video node is updated`() =
+        runTest {
+            val testNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(1L))
+                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 1.minutes))
+            }
+            stubInitialValues()
+            val nodeUpdateFlow = MutableStateFlow(NodeUpdate(emptyMap()))
+
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(nodeUpdateFlow)
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.videoPlaylistEntities).isNotEmpty()
+                    advanceUntilIdle()
+                    clearInvocations(getVideoPlaylistsUseCase)
+
+                    nodeUpdateFlow.emit(NodeUpdate(mapOf(testNode to emptyList())))
+                    runCurrent()
+
+                    verify(getVideoPlaylistsUseCase).invoke()
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
     fun `test that getVideoPlaylistsUseCase should not be invoked when no video nodes updated`() =
         runTest {
             val testNode = mock<FileNode> {

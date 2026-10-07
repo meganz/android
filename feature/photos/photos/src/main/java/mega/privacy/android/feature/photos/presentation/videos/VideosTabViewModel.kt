@@ -109,24 +109,23 @@ class VideosTabViewModel @Inject constructor(
     }
 
     private fun combinedTriggerFlow(): Flow<Unit> = merge(
-        merge(
-            monitorNodeUpdatesUseCase().filter {
-                it.changes.keys.any { node ->
-                    node is FileNode && node.type is VideoFileTypeInfo
-                }
-            }.mapLatest { }
-                .catch { Timber.e(it) },
-            monitorOfflineNodeUpdatesUseCase()
-                .map { offlineNodes ->
-                    offlineNodes
-                        .filter { getFileTypeInfoByNameUseCase(it.name) is VideoFileTypeInfo }
-                        .toSet()
-                }
-                .distinctUntilChanged()
-                .drop(1)
-                .mapLatest { }
-                .catch { Timber.e(it) }
-        ).debounce(REFRESH_DEBOUNCE_MS.milliseconds),
+        monitorNodeUpdatesUseCase().filter {
+            it.changes.keys.any { node ->
+                node is FileNode && node.type is VideoFileTypeInfo
+            }
+        }.mapLatest { }
+            .catch { Timber.e(it) },
+        monitorOfflineNodeUpdatesUseCase()
+            .map { offlineNodes ->
+                offlineNodes
+                    .filter { getFileTypeInfoByNameUseCase(it.name) is VideoFileTypeInfo }
+                    .toSet()
+            }
+            .distinctUntilChanged()
+            .drop(1)
+            .debounce(REFRESH_DEBOUNCE_MS.milliseconds)
+            .mapLatest { }
+            .catch { Timber.e(it) },
         monitorSortCloudOrderUseCase()
             .filterNotNull()
             .distinctUntilChanged()

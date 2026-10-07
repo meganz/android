@@ -112,18 +112,18 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     }
 
     private fun combinedTriggerFlow(): Flow<Unit> = merge(
-        merge(
-            monitorVideoPlaylistSetsUpdateUseCase()
-                .filter {
-                    args.playlistHandle in it
-                }.mapLatest { }
-                .catch { Timber.e(it) },
-            monitorNodeUpdatesUseCase()
-                .filter { nodeUpdate ->
-                    isMatchRefreshCondition(nodeUpdate)
-                }.mapLatest { }
-                .catch { Timber.e(it) }
-        ).debounce(REFRESH_DEBOUNCE_MS.milliseconds),
+        monitorVideoPlaylistSetsUpdateUseCase()
+            .filter {
+                args.playlistHandle in it
+            }
+            .debounce(REFRESH_DEBOUNCE_MS.milliseconds)
+            .mapLatest { }
+            .catch { Timber.e(it) },
+        monitorNodeUpdatesUseCase()
+            .filter { nodeUpdate ->
+                isMatchRefreshCondition(nodeUpdate)
+            }.mapLatest { }
+            .catch { Timber.e(it) },
         monitorSortCloudOrderUseCase()
             .filterNotNull()
             .distinctUntilChanged()
