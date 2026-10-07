@@ -87,6 +87,9 @@ internal interface SyncGateway {
      */
     suspend fun getSyncStalledIssues(): List<MegaSyncStall>?
 
+    /** The SDK's sync stall or name-conflict flag; a lock-free read. */
+    fun isSyncStalled(): Boolean
+
     suspend fun isNodeSyncableWithError(megaNode: MegaNode): MegaError
 
     /**

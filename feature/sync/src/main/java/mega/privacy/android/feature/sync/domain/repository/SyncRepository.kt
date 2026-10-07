@@ -7,6 +7,7 @@ import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncEngineSignals
 
 /**
  * Repository for syncing folder pairs
@@ -135,4 +136,10 @@ interface SyncRepository {
      * Lightweight alternative to getFolderPairs() when only IDs are needed.
      */
     suspend fun getSyncedNodeIds(): List<NodeId>
+
+    /**
+     * Monitors the SDK's waiting and sync stall flags. Reads at once, then every 5 seconds and on
+     * each global sync state change, while collected.
+     */
+    fun monitorSyncEngineSignals(): Flow<SyncEngineSignals>
 }

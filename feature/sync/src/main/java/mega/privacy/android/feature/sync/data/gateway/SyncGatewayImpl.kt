@@ -144,6 +144,8 @@ internal class SyncGatewayImpl @Inject constructor(
         }
     }
 
+    override fun isSyncStalled(): Boolean = megaApi.isSyncStalled
+
     override suspend fun isNodeSyncableWithError(megaNode: MegaNode): MegaError =
         megaApi.isNodeSyncableWithError(megaNode)
 

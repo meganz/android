@@ -20,6 +20,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -189,4 +191,12 @@ internal class SyncGatewayImplTest {
 
             verify(megaApi).rescanSync(folderPairId, false)
         }
+
+    @ParameterizedTest(name = "stalled {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isSyncStalled returns the sdk flag`(value: Boolean) {
+        whenever(megaApi.isSyncStalled).thenReturn(value)
+
+        assertThat(underTest.isSyncStalled()).isEqualTo(value)
+    }
 }

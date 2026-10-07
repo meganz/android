@@ -6,8 +6,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -33,12 +36,14 @@ import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesM
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncEngineSignals
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaSyncList
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 internal class SyncRepositoryImpl @Inject constructor(
     private val syncWorkManagerGateway: SyncWorkManagerGateway,
@@ -218,6 +223,35 @@ internal class SyncRepositoryImpl @Inject constructor(
         }.getOrElse { emptyList() }
     }
 
+    private val signals: Flow<SyncEngineSignals> by lazy {
+        merge(
+            // The SDK fires no callback when the waiting reason changes, so it is polled.
+            flow { while (true) { emit(Unit); delay(WAITING_POLL) } },
+            megaApiGateway.globalUpdates
+                .filter { it is GlobalUpdate.OnGlobalSyncStateChanged }
+                .map { }
+                .catch { Timber.w(it, "Global updates failed; the waiting poll continues") },
+        )
+            .map { read() }
+            .distinctUntilChanged()
+            .flowOn(ioDispatcher)
+            .shareIn(
+                scope = appScope,
+                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000, replayExpirationMillis = 0),
+                replay = 1,
+            )
+    }
+
+    override fun monitorSyncEngineSignals(): Flow<SyncEngineSignals> = signals
+
+    private fun read(): SyncEngineSignals = runCatching {
+        SyncEngineSignals(
+            isWaiting = megaApiGateway.getWaitingReason() != 0,
+            isSyncStalled = syncGateway.isSyncStalled(),
+        )
+    }.onFailure { Timber.w(it, "Failed to read the sync engine signals") }
+        .getOrDefault(SyncEngineSignals.NotWaiting)
+
     private companion object {
         /**
          * Delay to ensure two things:
@@ -227,5 +261,7 @@ internal class SyncRepositoryImpl @Inject constructor(
          * issues that are later resolved by the following sync loop.
          */
         const val SYNC_REFRESH_DELAY = 5000L
+
+        val WAITING_POLL = 5.seconds
     }
 }
