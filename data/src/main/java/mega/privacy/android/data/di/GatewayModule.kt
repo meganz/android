@@ -94,6 +94,8 @@ import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
+import mega.privacy.android.data.gateway.zipremote.RangeReaderGateway
+import mega.privacy.android.data.gateway.zipremote.RangeReaderGatewayImpl
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
 import mega.privacy.android.data.preferences.AdPreferencesDataStore
 import mega.privacy.android.data.preferences.AppPreferencesDatastore
@@ -361,6 +363,10 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindRestoreCredentialGateway(implementation: RestoreCredentialFacade): RestoreCredentialGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindRangeReaderGateway(implementation: RangeReaderGatewayImpl): RangeReaderGateway
 
     companion object {
         @Provides

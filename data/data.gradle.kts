@@ -52,6 +52,7 @@ dependencies {
     implementation(google.gson)
     implementation(lib.retrofit)
     implementation(lib.retrofit.gson)
+    implementation(lib.okhttp3)
     implementation(google.play.age.signals)
     implementation(google.zxing)
     implementation(androidx.java.core)
