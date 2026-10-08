@@ -16,10 +16,12 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
+import mega.privacy.android.app.flags.RemoteFeatureFlagSeeder
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
 import mega.privacy.android.data.test.stub.StubMegaError
 import mega.privacy.android.data.test.stub.StubMegaRequest
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import nz.mega.sdk.MegaError
@@ -60,6 +62,9 @@ class SettingsOptions2Test {
 
     @Inject
     lateinit var fakeMegaApi: FakeMegaApiGateway
+
+    @Inject
+    lateinit var flagSeeder: RemoteFeatureFlagSeeder
 
     @Inject
     lateinit var saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase
@@ -121,9 +126,14 @@ class SettingsOptions2Test {
 
     // region tests
 
-    /** tc01 — choosing a start screen option updates the shown selection on Settings. */
+    /**
+     * tc01 — choosing a start screen option updates the shown selection on Settings. The "Start
+     * screen" row only renders with [ApiFeatures.CustomisableBottomNavigation] off; with it on,
+     * "Customise navigation" replaces it (covered by [CustomiseNavigationStartScreenTest]).
+     */
     @Test
     fun startScreenSelectionUpdatesSummary() {
+        flagSeeder.seed(ApiFeatures.CustomisableBottomNavigation, enabled = false)
         openSettings()
 
         val startScreen = str("start_screen_setting")

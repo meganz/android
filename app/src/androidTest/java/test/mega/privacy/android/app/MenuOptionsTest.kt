@@ -64,10 +64,10 @@ import javax.inject.Inject
  *   route and the "No transfers" empty state are asserted only here.
  * - tc07's AAT checklist is stale — it asserts an "Advanced" row and a "Send feedback" row that no
  *   longer exist, and misses rows added since. What is asserted here is what `preferences.xml`
- *   renders for a free account on default feature flags, top to bottom. "Customise navigation" and
- *   "Sorting and view mode" stay hidden behind [ApiFeatures.CustomisableBottomNavigation] and
- *   [ApiFeatures.SortingAndViewMode], and "Show hidden items" renders for paid plans only, so none
- *   of the three is part of this baseline.
+ *   renders for a free account on default feature flags, top to bottom. With
+ *   [ApiFeatures.CustomisableBottomNavigation] on by default, "Customise navigation" replaces
+ *   "Start screen". "Sorting and view mode" stays hidden behind [ApiFeatures.SortingAndViewMode]
+ *   and "Show hidden items" renders for paid plans only, so neither is part of this baseline.
  * - tc08 (Upgrade account) is not ported: the plan list is priced through Google Play, not the SDK,
  *   so the screen renders its error state under the fakes.
  */
@@ -432,7 +432,7 @@ class MenuOptionsTest {
             "download_location",
             "settings_file_management_category",
             "user_interface_setting",
-            "start_screen_setting",
+            "settings_customise_navigation_title",
             "hide_recent_setting",
             "settings_media_discovery_sub_folder_title",
             "settings_media",
