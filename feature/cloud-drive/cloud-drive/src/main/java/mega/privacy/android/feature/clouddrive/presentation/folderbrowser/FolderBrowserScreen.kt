@@ -40,7 +40,7 @@ import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
-import mega.privacy.android.shared.nodes.selection.rememberNodeSelection
+import mega.privacy.android.shared.nodes.selection.rememberPagedNodeSelection
 import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveParentNodeMoreButtonPressedEvent
@@ -77,9 +77,9 @@ fun FolderBrowserScreen(
         megaNavigator = megaNavigator,
     )
 
-    val selection = rememberNodeSelection(
+    val selection = rememberPagedNodeSelection(
         items = uiState.items,
-        loadingState = uiState.nodesLoadingState,
+        reconcileVersion = uiState.reconcileVersion,
     )
     ReportSelectionMode(isInSelectionMode = selection.isInSelectionMode)
     NodeSelectionActionsEffect(
@@ -118,6 +118,7 @@ fun FolderBrowserScreen(
                     NodeSelectionModeAppBar(
                         modifier = Modifier.testTag(FOLDER_BROWSER_SELECTION_MODE_APP_BAR_TAG),
                         selection = selection,
+                        total = uiState.total,
                     )
                 }
 

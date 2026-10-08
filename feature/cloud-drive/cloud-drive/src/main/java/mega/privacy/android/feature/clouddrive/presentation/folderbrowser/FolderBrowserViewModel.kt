@@ -286,8 +286,10 @@ class FolderBrowserViewModel @AssistedInject constructor(
                 isContactVerificationOn = isContactVerificationOn,
             )
         },
-        // The SDK count ignores the sensitivity filter, so it only matches the list unfiltered
-        count = if (key.excludeSensitives) null else ({ getChildrenCountUseCase(folderId) }),
+        // TODO The SDK count ignores the sensitivity filter, so with hidden nodes excluded it can
+        //  exceed what the list will ever load; switch to the getNumChildren variant that takes
+        //  excludeSensitives once the SDK team provides it
+        count = { getChildrenCountUseCase(folderId) },
     )
 
     /**

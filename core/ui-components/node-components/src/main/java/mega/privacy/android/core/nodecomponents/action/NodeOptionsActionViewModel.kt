@@ -1242,7 +1242,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         selectedNodes: List<TypedNode>,
     ) = rubbishBinNode?.let { rubbishBinNode ->
         runCatching {
-            selectedNodes.any { node ->
+            selectedNodes.onePerAncestry().any { node ->
                 checkNodeCanBeMovedToTargetNode(nodeId = node.id, targetNodeId = rubbishBinNode.id)
             }
         }.getOrDefault(true)
@@ -1250,16 +1250,27 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
 
     private suspend fun hasFullAccessPermission(selectedNodes: List<TypedNode>): Boolean {
         return runCatching {
-            selectedNodes.all { getNodeAccessPermission(it.id) == AccessPermission.FULL }
+            selectedNodes.onePerAncestry().all {
+                getNodeAccessPermission(it.id) == AccessPermission.FULL
+            }
         }.getOrDefault(false)
     }
 
     private suspend fun anyNodesInBackups(selectedNodes: List<TypedNode>): Boolean =
-        selectedNodes.any {
+        selectedNodes.onePerAncestry().any {
             runCatching {
                 isNodeInBackupsUseCase(handle = it.id.longValue)
             }.getOrDefault(false)
         }
+
+    /**
+     * Backups membership, access level and the move checks are inherited from the parent, so
+     * siblings answer alike and one SDK call per parent is enough; a selection of a whole folder
+     * is one call instead of one per row. An incoming share root carries its own access level, so
+     * each one is kept.
+     */
+    private fun List<TypedNode>.onePerAncestry(): List<TypedNode> =
+        distinctBy { if (it.isIncomingShare) it.id else it.parentId }
 
     private fun onRestoreSuccess(
         message: String,

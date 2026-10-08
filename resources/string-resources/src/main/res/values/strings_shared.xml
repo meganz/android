@@ -1649,6 +1649,8 @@
     <string name="share_folder_dialog_read_write_radio_option">Read and write</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
     <string name="app_bar_selection_mode_description">Selecting</string>
+    <!-- App bar title in selection mode of a paged folder: number of selected nodes out of the folder's total, both numbers formatted for the locale, e.g. "500 of 213,456 selected" -->
+    <string name="app_bar_selection_mode_count_of_total">%1$s of %2$s selected</string>
     <!-- success message when moving a node -->
     <string name="node_moved_success_message">Item moved</string>
     <!-- success message when a node was restore from Rubbish bin to a location -->

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import mega.privacy.android.domain.entity.node.NodeId
@@ -112,6 +113,32 @@ fun <T : TypedNode> rememberNodeSelection(
             // NodesLoadingState.Failed arrives with an empty list.
             state.retainOnly(selection.selectableIds)
         }
+    }
+    return selection
+}
+
+/**
+ * Remembers a [NodeSelection] over a paged list. Select-all takes the rows loaded so far; rows that
+ * load afterwards are not selected. Ids that are gone after a re-read of the list, a new
+ * [reconcileVersion], are dropped.
+ *
+ * @param items the loaded rows; pass only the items the user may select
+ * @param reconcileVersion bumped by the pager after every completed re-read of the loaded rows
+ * @param state the selection to bind; defaults to one retained for the screen
+ */
+@Composable
+fun <T : TypedNode> rememberPagedNodeSelection(
+    items: List<TypedNodeItem<T>>,
+    reconcileVersion: Int,
+    state: NodeSelectionState = rememberNodeSelectionState(),
+): NodeSelection<T> {
+    val currentItems = rememberUpdatedState(items)
+    val loadingState = remember { mutableStateOf(NodesLoadingState.FullyLoaded) }
+    val selection = remember(state) { NodeSelection(state, currentItems, loadingState) }
+
+    // Keyed on the version, not the list: comparing the lists would walk the whole loaded prefix
+    LaunchedEffect(selection, reconcileVersion) {
+        if (state.isInSelectionMode) state.retainOnly(selection.selectableIds)
     }
     return selection
 }

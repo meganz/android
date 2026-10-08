@@ -25,7 +25,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodePage
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.PageRequest
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -58,6 +57,7 @@ import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeU
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.paging.PagedLoadState
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
@@ -304,7 +304,7 @@ class FolderBrowserViewModelTest {
 
             assertThat(pageRequests).containsExactly(PageRequest(offset = 0, limit = PAGE_SIZE))
             assertThat(underTest.itemIds()).isEqualTo((1L..PAGE_SIZE).toList())
-            assertThat(underTest.uiState.value.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
+            assertThat(underTest.uiState.value.paged.loadState).isEqualTo(PagedLoadState.Idle)
             assertThat(underTest.uiState.value.hasMore).isTrue()
             assertThat(underTest.uiState.value.currentFolderId).isEqualTo(folderId)
         }
@@ -591,8 +591,8 @@ class FolderBrowserViewModelTest {
             advanceUntilIdle()
 
             verify(getNodeChildrenPageUseCase).invoke(eq(folderId), any(), eq(true), any())
-            assertThat(underTest.uiState.value.total).isNull()
-            verify(getChildrenCountUseCase, never()).invoke(any())
+            // The SDK count has no sensitivity variant yet, so the unfiltered count is shown
+            assertThat(underTest.uiState.value.total).isEqualTo(source.size)
         }
 
     @Test

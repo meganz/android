@@ -134,6 +134,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -2195,6 +2196,73 @@ class NodeOptionsActionViewModelTest {
                 allNodeCanBeMovedToTarget = true,
                 noNodeInBackups = true,
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+        }
+
+    private fun siblingFile(id: Long, parentId: Long, isIncomingShare: Boolean = false) =
+        mock<TypedFileNode> {
+            on { this.id } doReturn NodeId(id)
+            on { this.parentId } doReturn NodeId(parentId)
+            on { this.isIncomingShare } doReturn isIncomingShare
+        }
+
+    @Test
+    fun `test that the backups and access checks run once per parent folder`() = runTest {
+        initViewModel()
+        val selectedNodes = listOf(
+            siblingFile(id = 1L, parentId = 10L),
+            siblingFile(id = 2L, parentId = 10L),
+            siblingFile(id = 3L, parentId = 10L),
+            siblingFile(id = 4L, parentId = 20L),
+        )
+
+        viewModel.processIntent(
+            NodeOptionsActionIntent.SelectedNodesChanged(
+                nodes = selectedNodes,
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+            )
+        )
+        viewModel.uiState.test { cancelAndIgnoreRemainingEvents() }
+
+        verify(isNodeInBackupsUseCase, times(2)).invoke(any())
+        verify(getNodeAccessPermission, times(2)).invoke(any())
+        verify(nodeSelectionModeActionMapper).invoke(
+            options = setOf(mockNodeSelectionMenuItem),
+            hasNodeAccessPermission = true,
+            selectedNodes = selectedNodes,
+            allNodeCanBeMovedToTarget = true,
+            noNodeInBackups = true,
+            nodeSourceType = NodeSourceType.INCOMING_SHARES,
+        )
+    }
+
+    @Test
+    fun `test that incoming share roots are checked individually even with a common parent`() =
+        runTest {
+            initViewModel()
+            val readOnlyRoot = siblingFile(id = 2L, parentId = 10L, isIncomingShare = true)
+            whenever(getNodeAccessPermission(NodeId(2L))).thenReturn(AccessPermission.READ)
+            val selectedNodes = listOf(
+                siblingFile(id = 1L, parentId = 10L, isIncomingShare = true),
+                readOnlyRoot,
+            )
+
+            viewModel.processIntent(
+                NodeOptionsActionIntent.SelectedNodesChanged(
+                    nodes = selectedNodes,
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                )
+            )
+            viewModel.uiState.test { cancelAndIgnoreRemainingEvents() }
+
+            verify(getNodeAccessPermission, times(2)).invoke(any())
+            verify(nodeSelectionModeActionMapper).invoke(
+                options = setOf(mockNodeSelectionMenuItem),
+                hasNodeAccessPermission = false,
+                selectedNodes = selectedNodes,
+                allNodeCanBeMovedToTarget = true,
+                noNodeInBackups = true,
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
             )
         }
 

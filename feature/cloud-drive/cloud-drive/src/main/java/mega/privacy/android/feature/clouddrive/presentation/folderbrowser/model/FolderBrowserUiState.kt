@@ -7,13 +7,12 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.TypedNodeItem
 import mega.privacy.android.shared.nodes.paging.PagedNodes
-import mega.privacy.android.shared.nodes.paging.nodesLoadingState
+import mega.privacy.android.shared.nodes.paging.PagedLoadState
 
 /**
  * State of the folder browser screen
@@ -51,8 +50,6 @@ data class FolderBrowserUiState(
     val items: List<TypedNodeItem<TypedNode>>
         get() = paged.items
 
-    val nodesLoadingState: NodesLoadingState
-        get() = paged.nodesLoadingState
 
     val hasMore: Boolean
         get() = paged.hasMore
@@ -70,7 +67,13 @@ data class FolderBrowserUiState(
      * True until the first page has landed
      */
     val isLoading: Boolean
-        get() = nodesLoadingState == NodesLoadingState.Loading
+        get() = paged.loadState == PagedLoadState.FirstPage
+
+    /**
+     * True while a further page is being appended, for the shimmer below the list
+     */
+    val isNextPageLoading: Boolean
+        get() = paged.loadState == PagedLoadState.LoadingMore
 
     val isUploadAllowed: Boolean
         get() = hasWritePermission && nodeSourceType != NodeSourceType.RUBBISH_BIN && !isNodeInBackups
