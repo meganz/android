@@ -9,9 +9,13 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
+import mega.privacy.android.feature.clouddrive.presentation.folderbrowser.FolderBrowserViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
@@ -29,19 +33,6 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
         }
     ) { key ->
         val viewModel = hiltViewModel<DriveSyncViewModel>()
-        val cloudDriveViewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(
-            creationCallback = { factory ->
-                val args = CloudDriveViewModel.Args(
-                    currentFolderId = NodeId(-1L),
-                    title = LocalizedText.Literal(""),
-                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                    highlightedNodeId = key.highlightedNodeHandle?.let { NodeId(it) },
-                    highlightedNodeNames = null,
-                )
-
-                factory.create(args)
-            }
-        )
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                 creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
@@ -53,23 +44,68 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
             onTransfer = onTransfer,
         )
 
-        DriveSyncScreen(
-            navigationHandler = navigationHandler,
-            viewModel = viewModel,
-            cloudDriveViewModel = cloudDriveViewModel,
-            setNavigationBarVisibility = setNavigationVisibility,
-            onTransfer = onTransfer,
-            initialTabIndex = key.initialTabIndex,
-            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            navigateToCloudDriveFolder = { folder, nodeSourceType ->
-                navigationHandler.navigate(
-                    CloudDriveNavKey(
-                        nodeHandle = folder.id.longValue,
-                        nodeName = folder.name,
-                        nodeSourceType = nodeSourceType,
-                    )
+        val navigateToCloudDriveFolder = { folder: TypedFolderNode, source: NodeSourceType ->
+            navigationHandler.navigate(
+                CloudDriveNavKey(
+                    nodeHandle = folder.id.longValue,
+                    nodeName = folder.name,
+                    nodeSourceType = source,
                 )
-            }
-        )
+            )
+        }
+
+        FeatureFlagGate(
+            feature = ApiFeatures.NodeListPagination,
+            disabled = {
+                val cloudDriveViewModel =
+                    hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory> { factory ->
+                        factory.create(
+                            CloudDriveViewModel.Args(
+                                currentFolderId = NodeId(-1L),
+                                title = LocalizedText.Literal(""),
+                                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                                highlightedNodeId = key.highlightedNodeHandle
+                                    ?.let { NodeId(it) },
+                                highlightedNodeNames = null,
+                            )
+                        )
+                    }
+
+                LegacyDriveSyncScreen(
+                    navigationHandler = navigationHandler,
+                    viewModel = viewModel,
+                    cloudDriveViewModel = cloudDriveViewModel,
+                    setNavigationBarVisibility = setNavigationVisibility,
+                    onTransfer = onTransfer,
+                    initialTabIndex = key.initialTabIndex,
+                    nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                    navigateToCloudDriveFolder = navigateToCloudDriveFolder,
+                )
+            },
+        ) {
+            val folderBrowserViewModel =
+                hiltViewModel<FolderBrowserViewModel, FolderBrowserViewModel.Factory> { factory ->
+                    factory.create(
+                        FolderBrowserViewModel.Args(
+                            currentFolderId = NodeId(-1L),
+                            title = LocalizedText.Literal(""),
+                            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                            highlightedNodeId = key.highlightedNodeHandle?.let { NodeId(it) },
+                            highlightedNodeNames = null,
+                        )
+                    )
+                }
+
+            DriveSyncScreen(
+                navigationHandler = navigationHandler,
+                viewModel = viewModel,
+                folderBrowserViewModel = folderBrowserViewModel,
+                setNavigationBarVisibility = setNavigationVisibility,
+                onTransfer = onTransfer,
+                initialTabIndex = key.initialTabIndex,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                navigateToCloudDriveFolder = navigateToCloudDriveFolder,
+            )
+        }
     }
 }
