@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.copy.CopyViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.move.MoveViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.move.rememberMoveDisabledTargetId
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.picker.NodePickerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.picker.NodePickerViewModel
@@ -376,8 +377,11 @@ class CloudExplorerFeatureDestination : FeatureDestination {
 
                 else -> onSelectCUFolder
             }
-            // Block re-selecting the source nodes' current parent as the move target.
-            val disabledTargetId = (key.startNavKey as? MoveNavKey)?.disabledTargetId
+            // Block the source nodes' current parent, and the moved folders with their subfolders,
+            // as the move target.
+            val disabledTargetId = (key.startNavKey as? MoveNavKey)?.let {
+                rememberMoveDisabledTargetId(folderId = key.nodeId, moveNavKey = it)
+            }
             // Route picked files to the right result key based on the originating flow.
             val onFilesPickedForKey: (List<NodeId>) -> Unit =
                 if (key.startNavKey is AddVideoToPlaylistNavKey) onVideosPicked else onFilesPicked
