@@ -25,8 +25,8 @@ import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.mapper.progress.SyncStatsSampleMapper
 import mega.privacy.android.feature.sync.data.mapper.progress.SyncWorkStateMapper
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncActivity
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressEpisode
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncStatsSample
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkState
@@ -38,7 +38,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Folds the existing sync listener into one app-wide activity, so every surface shares one run
+ * Folds the existing sync listener into one app-wide run snapshot, so every surface shares one run
  * baseline. Nothing is read or collected until the first subscriber.
  */
 @Singleton
@@ -57,7 +57,7 @@ internal class SyncProgressRepositoryImpl @Inject constructor(
     private val resetSignal = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     // Built on first use and never stopped, so the run survives screens and sessions.
-    private val activity: StateFlow<SyncActivity> by lazy {
+    private val runSnapshot: StateFlow<SyncRunSnapshot> by lazy {
         // Subscribes before the seed read, so no event between the read and the subscription is lost.
         channelFlow {
             launch(start = CoroutineStart.UNDISPATCHED) {
@@ -67,16 +67,16 @@ internal class SyncProgressRepositoryImpl @Inject constructor(
             send(Input.Refresh)
         }
             .runningFold(State.Initial) { state, input -> reduce(state, input) }
-            .map { it.toSyncActivity() }
+            .map { it.toSyncRunSnapshot() }
             .distinctUntilChanged()
-            .catch { Timber.e(it, "Sync activity monitoring stopped") }
+            .catch { Timber.e(it, "Sync run snapshot monitoring stopped") }
             .flowOn(ioDispatcher)
-            .stateIn(appScope, SharingStarted.Lazily, SyncActivity.NotSeeded)
+            .stateIn(appScope, SharingStarted.Lazily, SyncRunSnapshot.NotSeeded)
     }
 
-    override fun monitorSyncActivity(): Flow<SyncActivity> = activity
+    override fun monitorSyncRunSnapshot(): Flow<SyncRunSnapshot> = runSnapshot
 
-    override suspend fun resetSyncActivity() {
+    override suspend fun resetSyncRunSnapshot() {
         resetSignal.emit(Unit)
     }
 
@@ -186,7 +186,7 @@ internal class SyncProgressRepositoryImpl @Inject constructor(
         val syncs: Map<Long, SyncWorkState>,
         val episode: SyncProgressEpisode,
     ) {
-        fun toSyncActivity() = SyncActivity(
+        fun toSyncRunSnapshot() = SyncRunSnapshot(
             isSeeded = isSeeded,
             syncs = syncs.values.sortedBy { it.syncId },
             progress = episode.toProgress(),

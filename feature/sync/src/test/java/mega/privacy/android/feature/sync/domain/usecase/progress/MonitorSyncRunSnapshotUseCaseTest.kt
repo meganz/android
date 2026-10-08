@@ -4,8 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncActivity
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncEpisodeProgress
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.repository.SyncProgressRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -16,15 +16,15 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class MonitorSyncActivityUseCaseTest {
+internal class MonitorSyncRunSnapshotUseCaseTest {
 
-    private lateinit var underTest: MonitorSyncActivityUseCase
+    private lateinit var underTest: MonitorSyncRunSnapshotUseCase
 
     private val syncProgressRepository = mock<SyncProgressRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = MonitorSyncActivityUseCase(syncProgressRepository = syncProgressRepository)
+        underTest = MonitorSyncRunSnapshotUseCase(syncProgressRepository = syncProgressRepository)
     }
 
     @BeforeEach
@@ -33,17 +33,17 @@ internal class MonitorSyncActivityUseCaseTest {
     }
 
     @Test
-    fun `test that invoke returns the sync activity from the repository`() = runTest {
-        val seeded = SyncActivity(
+    fun `test that invoke returns the sync run snapshot from the repository`() = runTest {
+        val seeded = SyncRunSnapshot(
             isSeeded = true,
             syncs = emptyList(),
             progress = SyncEpisodeProgress.None,
         )
-        whenever(syncProgressRepository.monitorSyncActivity())
-            .thenReturn(flowOf(SyncActivity.NotSeeded, seeded))
+        whenever(syncProgressRepository.monitorSyncRunSnapshot())
+            .thenReturn(flowOf(SyncRunSnapshot.NotSeeded, seeded))
 
         underTest().test {
-            assertThat(awaitItem()).isEqualTo(SyncActivity.NotSeeded)
+            assertThat(awaitItem()).isEqualTo(SyncRunSnapshot.NotSeeded)
             assertThat(awaitItem()).isEqualTo(seeded)
             awaitComplete()
         }

@@ -1,32 +1,37 @@
 package mega.privacy.android.feature.sync.domain.usecase.progress
 
 import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncActivity
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncPauseCause
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressPhase
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkState
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Works out the sync progress phase from the sync activity. Never returns Completed: only
+ * Works out the sync progress phase from the sync run snapshot. Never returns Completed: only
  * [ResolveSyncProgressStatusUseCase] does, after a run.
  */
-internal class SyncProgressPhaseCalculator @Inject constructor() {
+internal class GetSyncProgressPhaseUseCase @Inject constructor() {
 
     /**
-     * Calculate the phase
+     * Returns the phase for the run snapshot, and when a Checking phase held by a sync without stats
+     * should be re-evaluated.
      *
-     * @param activity The sync activity; a not seeded one gives UpToDate
+     * @param runSnapshot The sync run snapshot; a not seeded one gives UpToDate
      * @param pauseReason The condition blocking the syncs, if any
      * @param nowMillis The current time
      */
-    fun calculate(activity: SyncActivity, pauseReason: SyncPauseReason?, nowMillis: Long): Result {
-        val syncs = activity.syncs
-        if (activity.isSeeded && syncs.isEmpty()) return Result(SyncProgressPhase.NoSyncs, null)
+    operator fun invoke(
+        runSnapshot: SyncRunSnapshot,
+        pauseReason: SyncPauseReason?,
+        nowMillis: Long,
+    ): Result {
+        val syncs = runSnapshot.syncs
+        if (runSnapshot.isSeeded && syncs.isEmpty()) return Result(SyncProgressPhase.NoSyncs, null)
         val hasWork = syncs.any { it.hasWork }
-        if (hasWork && activity.progress.pendingItems > 0) {
+        if (hasWork && runSnapshot.progress.pendingItems > 0) {
             return Result(SyncProgressPhase.Transferring, null)
         }
         // A sync that just entered Running sends no stats until it has something to say, and an
@@ -42,7 +47,7 @@ internal class SyncProgressPhaseCalculator @Inject constructor() {
         }
         val isPaused = (syncs.none { it.runState == SyncRunState.Running } &&
                 syncs.any { it.runState == SyncRunState.Suspended }) ||
-                activity.progress.interruptedItems > 0
+                runSnapshot.progress.interruptedItems > 0
         if (isPaused) return Result(SyncProgressPhase.Paused(pauseCause(syncs, pauseReason)), null)
         return Result(SyncProgressPhase.UpToDate, null)
     }
@@ -61,7 +66,7 @@ internal class SyncProgressPhaseCalculator @Inject constructor() {
     }
 
     /**
-     * The calculated phase
+     * The phase, and when to re-evaluate it
      *
      * @property phase The phase; never Completed
      * @property reevaluateAtMillis When a Checking phase held by a sync without stats ends, or null

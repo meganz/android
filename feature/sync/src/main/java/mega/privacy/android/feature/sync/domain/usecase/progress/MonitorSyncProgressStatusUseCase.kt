@@ -29,7 +29,7 @@ import javax.inject.Inject
  * when the run processed files.
  */
 internal class MonitorSyncProgressStatusUseCase @Inject constructor(
-    private val monitorSyncActivityUseCase: MonitorSyncActivityUseCase,
+    private val monitorSyncRunSnapshotUseCase: MonitorSyncRunSnapshotUseCase,
     private val monitorSyncPauseReasonUseCase: MonitorSyncPauseReasonUseCase,
     private val advanceSyncProgressTimelineUseCase: AdvanceSyncProgressTimelineUseCase,
     private val resolveSyncProgressStatusUseCase: ResolveSyncProgressStatusUseCase,
@@ -44,14 +44,14 @@ internal class MonitorSyncProgressStatusUseCase @Inject constructor(
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<SyncProgressStatus> = combine(
-        monitorSyncActivityUseCase(),
+        monitorSyncRunSnapshotUseCase(),
         monitorSyncPauseReasonUseCase()
             .distinctUntilChanged()
             .map<SyncPauseReason?, SyncPauseReasonInput> { SyncPauseReasonInput.Known(it) }
             // The reason's first value is sampled about a second late. Only a Paused status waits
             // for it, so the cause never flips from User to a condition right after collection.
             .onStart { emit(SyncPauseReasonInput.Unknown) },
-    ) { activity, reason -> SyncProgressInput(activity, reason) }
+    ) { runSnapshot, reason -> SyncProgressInput(runSnapshot, reason) }
         .scan<SyncProgressInput, SyncProgressTimeline?>(null) { previous, input ->
             advanceSyncProgressTimelineUseCase(previous, input, currentTimeProvider())
         }

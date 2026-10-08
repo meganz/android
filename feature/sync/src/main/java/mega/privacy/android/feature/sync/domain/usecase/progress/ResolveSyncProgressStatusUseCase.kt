@@ -14,21 +14,21 @@ import kotlin.time.Duration.Companion.seconds
  * shows Completed for [COMPLETED_HOLD] when the run processed files.
  */
 internal class ResolveSyncProgressStatusUseCase @Inject constructor(
-    private val syncProgressPhaseCalculator: SyncProgressPhaseCalculator,
+    private val getSyncProgressPhaseUseCase: GetSyncProgressPhaseUseCase,
 ) {
 
     operator fun invoke(timeline: SyncProgressTimeline, nowMillis: Long): SyncProgressStep {
-        val activity = timeline.input.activity
-        if (!activity.isSeeded) {
+        val runSnapshot = timeline.input.runSnapshot
+        if (!runSnapshot.isSeeded) {
             val status = SyncProgressStatus(
                 isSeeded = false,
                 phase = SyncProgressPhase.UpToDate,
-                progress = activity.progress,
+                progress = runSnapshot.progress,
             )
             return SyncProgressStep(status = status, timeline = timeline, wakeAtMillis = null)
         }
-        val result = syncProgressPhaseCalculator.calculate(
-            activity = activity,
+        val result = getSyncProgressPhaseUseCase(
+            runSnapshot = runSnapshot,
             pauseReason = (timeline.input.reason as? SyncPauseReasonInput.Known)?.reason,
             nowMillis = nowMillis,
         )
@@ -74,7 +74,7 @@ internal class ResolveSyncProgressStatusUseCase @Inject constructor(
                 wakeAtMillis = debounceEnd,
             )
 
-            now < holdEnd && timeline.input.activity.progress.processedItems > 0 ->
+            now < holdEnd && timeline.input.runSnapshot.progress.processedItems > 0 ->
                 SyncProgressStep(
                     status = status(timeline, SyncProgressPhase.Completed),
                     timeline = timeline,
@@ -93,7 +93,7 @@ internal class ResolveSyncProgressStatusUseCase @Inject constructor(
         SyncProgressStatus(
             isSeeded = true,
             phase = phase,
-            progress = timeline.input.activity.progress,
+            progress = timeline.input.runSnapshot.progress,
         )
 
     companion object {

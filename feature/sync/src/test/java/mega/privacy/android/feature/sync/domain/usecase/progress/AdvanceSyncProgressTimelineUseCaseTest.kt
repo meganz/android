@@ -3,11 +3,11 @@ package mega.privacy.android.feature.sync.domain.usecase.progress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncActivity
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncEpisodeProgress
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncPauseReasonInput
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressInput
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressTimeline
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncStatsSample
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkState
@@ -26,7 +26,7 @@ internal class AdvanceSyncProgressTimelineUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = AdvanceSyncProgressTimelineUseCase(SyncProgressPhaseCalculator())
+        underTest = AdvanceSyncProgressTimelineUseCase(GetSyncProgressPhaseUseCase())
     }
 
     @ParameterizedTest(name = "{0}")
@@ -43,21 +43,21 @@ internal class AdvanceSyncProgressTimelineUseCaseTest {
     }
 
     private fun idleStarts(): Stream<Arguments> = Stream.of(
-        Arguments.of("not seeded", busy(), input(SyncActivity.NotSeeded), null),
+        Arguments.of("not seeded", busy(), input(SyncRunSnapshot.NotSeeded), null),
         Arguments.of("busy", idleSince(1_000), input(transferring()), null),
         Arguments.of("paused after busy", busy(), input(paused()), null),
-        Arguments.of("no syncs after busy", busy(), input(activity()), null),
+        Arguments.of("no syncs after busy", busy(), input(runSnapshot()), null),
         Arguments.of("idle cold start", null, input(idle()), null),
         Arguments.of("idle after busy", busy(), input(idle()), NOW),
         Arguments.of(
             "idle after a checking that ended at the cap",
-            busy(input(activity(runningWithoutStats(1, since = NOW - 13_000))), NOW - 3_000),
+            busy(input(runSnapshot(runningWithoutStats(1, since = NOW - 13_000))), NOW - 3_000),
             input(idle()),
             NOW - 3_000,
         ),
         Arguments.of(
             "idle before the cap of a checking",
-            busy(input(activity(runningWithoutStats(1, since = NOW - 3_000))), NOW + 7_000),
+            busy(input(runSnapshot(runningWithoutStats(1, since = NOW - 3_000))), NOW + 7_000),
             input(idle()),
             NOW,
         ),
@@ -65,7 +65,7 @@ internal class AdvanceSyncProgressTimelineUseCaseTest {
             "idle after a checking that ended at the cap in a pause",
             busy(
                 input(
-                    activity(
+                    runSnapshot(
                         runningWithoutStats(1, since = NOW - 11_000),
                         inState(2, SyncRunState.Suspended),
                         interrupted = 3,
@@ -82,7 +82,7 @@ internal class AdvanceSyncProgressTimelineUseCaseTest {
             "idle after a checking that ended at the last of several caps",
             busy(
                 input(
-                    activity(
+                    runSnapshot(
                         runningWithoutStats(1, since = NOW - 16_000),
                         runningWithoutStats(2, since = NOW - 11_000),
                         processed = 10,
@@ -97,7 +97,7 @@ internal class AdvanceSyncProgressTimelineUseCaseTest {
             "idle after a checking that ended at the last of several caps in a pause",
             busy(
                 input(
-                    activity(
+                    runSnapshot(
                         runningWithoutStats(1, since = NOW - 16_000),
                         runningWithoutStats(2, since = NOW - 11_000),
                         inState(3, SyncRunState.Suspended),
@@ -129,17 +129,17 @@ internal class AdvanceSyncProgressTimelineUseCaseTest {
     private fun busyUntils(): Stream<Arguments> = Stream.of(
         Arguments.of(
             "checking held by a sync without stats",
-            input(activity(runningWithoutStats(1, since = NOW))),
+            input(runSnapshot(runningWithoutStats(1, since = NOW))),
             true,
             NOW + 10_000,
         ),
         Arguments.of(
             "checking while a scanning sync also waits for stats",
-            input(activity(running(1, scanning = true), runningWithoutStats(2, since = NOW))),
+            input(runSnapshot(running(1, scanning = true), runningWithoutStats(2, since = NOW))),
             true,
             null,
         ),
-        Arguments.of("checking by a scanning sync", input(activity(running(1, scanning = true))), true, null),
+        Arguments.of("checking by a scanning sync", input(runSnapshot(running(1, scanning = true))), true, null),
         Arguments.of("transferring", input(transferring()), true, null),
         Arguments.of("idle", input(idle()), false, null),
         Arguments.of("paused", input(paused()), false, null),
@@ -170,22 +170,22 @@ internal class AdvanceSyncProgressTimelineUseCaseTest {
     )
 
     private fun input(
-        activity: SyncActivity,
+        runSnapshot: SyncRunSnapshot,
         reason: SyncPauseReasonInput = SyncPauseReasonInput.Known(null),
-    ) = SyncProgressInput(activity, reason)
+    ) = SyncProgressInput(runSnapshot, reason)
 
-    private fun transferring() = activity(running(1, pending = 5), processed = 5, pending = 5)
+    private fun transferring() = runSnapshot(running(1, pending = 5), processed = 5, pending = 5)
 
-    private fun idle() = activity(running(1), processed = 10)
+    private fun idle() = runSnapshot(running(1), processed = 10)
 
-    private fun paused() = activity(inState(1, SyncRunState.Suspended), processed = 5, interrupted = 5)
+    private fun paused() = runSnapshot(inState(1, SyncRunState.Suspended), processed = 5, interrupted = 5)
 
-    private fun activity(
+    private fun runSnapshot(
         vararg syncs: SyncWorkState,
         processed: Int = 0,
         pending: Int = 0,
         interrupted: Int = 0,
-    ) = SyncActivity(
+    ) = SyncRunSnapshot(
         isSeeded = true,
         syncs = syncs.toList(),
         progress = SyncEpisodeProgress(0, processed, pending, interrupted, fraction = null),

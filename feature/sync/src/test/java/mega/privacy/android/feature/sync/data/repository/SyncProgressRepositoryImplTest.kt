@@ -22,7 +22,7 @@ import mega.privacy.android.feature.sync.data.mapper.progress.mockMegaSync
 import mega.privacy.android.feature.sync.data.mapper.progress.mockMegaSyncList
 import mega.privacy.android.feature.sync.data.mapper.progress.mockMegaSyncStats
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncActivity
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
 import mega.privacy.android.feature.sync.domain.usecase.progress.AdvanceSyncProgressEpisodeUseCase
 import nz.mega.sdk.MegaSync
@@ -91,12 +91,12 @@ internal class SyncProgressRepositoryImplTest {
     )
 
     private fun TestScope.startCollecting(underTest: SyncProgressRepositoryImpl) {
-        backgroundScope.launch { underTest.monitorSyncActivity().collect {} }
+        backgroundScope.launch { underTest.monitorSyncRunSnapshot().collect {} }
         runCurrent()
     }
 
-    private suspend fun SyncProgressRepositoryImpl.current(): SyncActivity =
-        monitorSyncActivity().first()
+    private suspend fun SyncProgressRepositoryImpl.current(): SyncRunSnapshot =
+        monitorSyncRunSnapshot().first()
 
     private suspend fun emit(event: MegaSyncListenerEvent) = syncUpdates.emit(event)
 
@@ -107,7 +107,7 @@ internal class SyncProgressRepositoryImplTest {
         MegaSyncListenerEvent.OnSyncStateChanged(mockMegaSync(backupId, runState, error))
 
     @Test
-    fun `test that building the repository does not start the activity collection`() = runTest {
+    fun `test that building the repository does not start the run snapshot collection`() = runTest {
         createUnderTest()
         runCurrent()
 
@@ -117,11 +117,11 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that resetSyncActivity before the first collection does not start the activity collection`() =
+    fun `test that resetSyncRunSnapshot before the first collection does not start the run snapshot collection`() =
         runTest {
             val underTest = createUnderTest()
 
-            underTest.resetSyncActivity()
+            underTest.resetSyncRunSnapshot()
             runCurrent()
 
             assertThat(syncUpdates.subscriptionCount.value).isEqualTo(0)
@@ -133,7 +133,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity emits NotSeeded before the sync list is read`() = runTest {
+    fun `test that monitorSyncRunSnapshot emits NotSeeded before the sync list is read`() = runTest {
         val gate = CompletableDeferred<MegaSyncList>()
         var subscriptionsAtRead = -1
         syncGateway.stub {
@@ -144,8 +144,8 @@ internal class SyncProgressRepositoryImplTest {
         }
         val underTest = createUnderTest()
 
-        underTest.monitorSyncActivity().test {
-            assertThat(awaitItem()).isEqualTo(SyncActivity.NotSeeded)
+        underTest.monitorSyncRunSnapshot().test {
+            assertThat(awaitItem()).isEqualTo(SyncRunSnapshot.NotSeeded)
             runCurrent()
             expectNoEvents()
 
@@ -156,7 +156,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity is seeded with no syncs when the sync list is empty`() =
+    fun `test that monitorSyncRunSnapshot is seeded with no syncs when the sync list is empty`() =
         runTest {
             val underTest = createUnderTest()
             startCollecting(underTest)
@@ -167,7 +167,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity seeds running syncs from the cached stats`() = runTest {
+    fun `test that monitorSyncRunSnapshot seeds running syncs from the cached stats`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 5))
         val underTest = createUnderTest()
@@ -180,7 +180,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity ignores cached stats of syncs that are not running`() =
+    fun `test that monitorSyncRunSnapshot ignores cached stats of syncs that are not running`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(2L, runState = suspended)))
             stubCachedStats(mockMegaSyncStats(2L, uploads = 5))
@@ -191,7 +191,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity advances the episode when stats arrive`() = runTest {
+    fun `test that monitorSyncRunSnapshot advances the episode when stats arrive`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
@@ -204,7 +204,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity re-reads the sync list when stats arrive for an unknown sync`() =
+    fun `test that monitorSyncRunSnapshot re-reads the sync list when stats arrive for an unknown sync`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             val underTest = createUnderTest()
@@ -220,7 +220,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity does not re-read the sync list for stats of a known sync`() =
+    fun `test that monitorSyncRunSnapshot does not re-read the sync list for stats of a known sync`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             val underTest = createUnderTest()
@@ -233,7 +233,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity does not read cached stats after the seed`() = runTest {
+    fun `test that monitorSyncRunSnapshot does not read cached stats after the seed`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         val underTest = createUnderTest()
         startCollecting(underTest)
@@ -247,7 +247,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity keeps the stats of a running sync when the sync list is re-read`() =
+    fun `test that monitorSyncRunSnapshot keeps the stats of a running sync when the sync list is re-read`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             stubCachedStats(mockMegaSyncStats(1L, uploads = 5))
@@ -265,7 +265,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity ignores stats of a sync that is not running`() = runTest {
+    fun `test that monitorSyncRunSnapshot ignores stats of a sync that is not running`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L, runState = suspended)))
         val underTest = createUnderTest()
         startCollecting(underTest)
@@ -280,7 +280,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity advances the episode on an event that does not change the syncs`() =
+    fun `test that monitorSyncRunSnapshot advances the episode on an event that does not change the syncs`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
@@ -300,7 +300,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity drops the stats of a sync that leaves running`() = runTest {
+    fun `test that monitorSyncRunSnapshot drops the stats of a sync that leaves running`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
@@ -316,7 +316,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity records when a sync enters running`() = runTest {
+    fun `test that monitorSyncRunSnapshot records when a sync enters running`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L, runState = suspended)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
@@ -333,7 +333,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity keeps the running since time while the sync stays running`() =
+    fun `test that monitorSyncRunSnapshot keeps the running since time while the sync stays running`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L, runState = suspended)))
             val underTest = createUnderTest()
@@ -355,7 +355,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity adds a sync reported by a state change it did not know`() =
+    fun `test that monitorSyncRunSnapshot adds a sync reported by a state change it did not know`() =
         runTest {
             val underTest = createUnderTest()
             startCollecting(underTest)
@@ -368,7 +368,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity lists the syncs sorted by id`() = runTest {
+    fun `test that monitorSyncRunSnapshot lists the syncs sorted by id`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(3L), mockMegaSync(1L)))
         val underTest = createUnderTest()
         startCollecting(underTest)
@@ -381,7 +381,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity gives a running sync first found by a re-read the current time as running since`() =
+    fun `test that monitorSyncRunSnapshot gives a running sync first found by a re-read the current time as running since`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             val underTest = createUnderTest()
@@ -398,7 +398,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity removes a deleted sync`() = runTest {
+    fun `test that monitorSyncRunSnapshot removes a deleted sync`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L), mockMegaSync(2L)))
         val underTest = createUnderTest()
         startCollecting(underTest)
@@ -410,7 +410,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity marks a sync over storage quota from its error`() = runTest {
+    fun `test that monitorSyncRunSnapshot marks a sync over storage quota from its error`() = runTest {
         whenever(syncErrorMapper(any())).thenReturn(SyncError.STORAGE_OVERQUOTA)
         stubSyncList(mockMegaSyncList(mockMegaSync(1L, error = 22)))
         val underTest = createUnderTest()
@@ -420,7 +420,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity reports the error of a sync from its state change`() =
+    fun `test that monitorSyncRunSnapshot reports the error of a sync from its state change`() =
         runTest {
             whenever(syncErrorMapper(MegaSync.Error.UNKNOWN_ERROR.swigValue()))
                 .thenReturn(SyncError.UNKNOWN_ERROR)
@@ -441,7 +441,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity emits when only the error of a sync changes`() = runTest {
+    fun `test that monitorSyncRunSnapshot emits when only the error of a sync changes`() = runTest {
         whenever(syncErrorMapper(MegaSync.Error.UNKNOWN_ERROR.swigValue()))
             .thenReturn(SyncError.UNKNOWN_ERROR)
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
@@ -449,7 +449,7 @@ internal class SyncProgressRepositoryImplTest {
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        underTest.monitorSyncActivity().test {
+        underTest.monitorSyncRunSnapshot().test {
             val seeded = awaitItem().syncs.single()
 
             emit(stateChanged(1L, running, error = MegaSync.Error.UNKNOWN_ERROR.swigValue()))
@@ -464,7 +464,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncActivity reports every sync suspended after all syncs are paused`() =
+    fun `test that monitorSyncRunSnapshot reports every sync suspended after all syncs are paused`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L), mockMegaSync(2L)))
             stubCachedStats(mockMegaSyncStats(1L, uploads = 3), mockMegaSyncStats(2L, uploads = 4))
@@ -483,17 +483,17 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity stays not seeded when the sync list read fails`() = runTest {
+    fun `test that monitorSyncRunSnapshot stays not seeded when the sync list read fails`() = runTest {
         syncGateway.stub { onBlocking { getFolderPairs() }.thenThrow(RuntimeException("read failed")) }
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        assertThat(underTest.current()).isEqualTo(SyncActivity.NotSeeded)
+        assertThat(underTest.current()).isEqualTo(SyncRunSnapshot.NotSeeded)
         assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
     }
 
     @Test
-    fun `test that monitorSyncActivity retries the seed read on the next event when not seeded`() =
+    fun `test that monitorSyncRunSnapshot retries the seed read on the next event when not seeded`() =
         runTest {
             syncGateway.stub {
                 onBlocking { getFolderPairs() }
@@ -513,37 +513,37 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncActivity shares one episode baseline across collectors`() = runTest {
+    fun `test that monitorSyncRunSnapshot shares one episode baseline across collectors`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        underTest.monitorSyncActivity().test {
+        underTest.monitorSyncRunSnapshot().test {
             assertThat(awaitItem().isSeeded).isTrue()
             emit(stats(1L, uploads = 4))
             runCurrent()
             assertThat(expectMostRecentItem().progress.processedItems).isEqualTo(6)
 
-            underTest.monitorSyncActivity().test {
+            underTest.monitorSyncRunSnapshot().test {
                 assertThat(awaitItem().progress.processedItems).isEqualTo(6)
                 cancelAndIgnoreRemainingEvents()
             }
-            assertThat(underTest.monitorSyncActivity())
-                .isSameInstanceAs(underTest.monitorSyncActivity())
+            assertThat(underTest.monitorSyncRunSnapshot())
+                .isSameInstanceAs(underTest.monitorSyncRunSnapshot())
             assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that monitorSyncActivity does not emit when an event changes nothing`() = runTest {
+    fun `test that monitorSyncRunSnapshot does not emit when an event changes nothing`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        underTest.monitorSyncActivity().test {
+        underTest.monitorSyncRunSnapshot().test {
             assertThat(awaitItem().isSeeded).isTrue()
             emit(stats(1L, uploads = 6))
             runCurrent()
@@ -557,7 +557,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that resetSyncActivity returns an empty episode`() = runTest {
+    fun `test that resetSyncRunSnapshot returns an empty episode`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
@@ -566,7 +566,7 @@ internal class SyncProgressRepositoryImplTest {
         runCurrent()
         assertThat(underTest.current().progress.processedItems).isEqualTo(6)
 
-        underTest.resetSyncActivity()
+        underTest.resetSyncRunSnapshot()
         runCurrent()
 
         val actual = underTest.current().progress
@@ -575,11 +575,11 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that resetSyncActivity re-reads the sync list`() = runTest {
+    fun `test that resetSyncRunSnapshot re-reads the sync list`() = runTest {
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        underTest.resetSyncActivity()
+        underTest.resetSyncRunSnapshot()
         runCurrent()
 
         verify(syncGateway, times(2)).getFolderPairs()
@@ -587,7 +587,7 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that resetSyncActivity called twice in a row leaves one seeded initial episode`() =
+    fun `test that resetSyncRunSnapshot called twice in a row leaves one seeded initial episode`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
@@ -596,8 +596,8 @@ internal class SyncProgressRepositoryImplTest {
             emit(stats(1L, uploads = 4))
             runCurrent()
 
-            underTest.resetSyncActivity()
-            underTest.resetSyncActivity()
+            underTest.resetSyncRunSnapshot()
+            underTest.resetSyncRunSnapshot()
             runCurrent()
 
             val actual = underTest.current()
@@ -609,7 +609,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that resetSyncActivity while no account is logged in seeds an empty activity`() =
+    fun `test that resetSyncRunSnapshot while no account is logged in seeds an empty run snapshot`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
@@ -617,7 +617,7 @@ internal class SyncProgressRepositoryImplTest {
             startCollecting(underTest)
 
             stubSyncList(mockMegaSyncList())
-            underTest.resetSyncActivity()
+            underTest.resetSyncRunSnapshot()
             runCurrent()
 
             val actual = underTest.current()

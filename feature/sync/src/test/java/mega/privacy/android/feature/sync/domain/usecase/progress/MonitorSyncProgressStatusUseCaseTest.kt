@@ -12,11 +12,11 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncActivity
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncEpisodeProgress
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncPauseCause
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressPhase
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressStatus
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncStatsSample
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkState
@@ -48,17 +48,19 @@ internal class MonitorSyncProgressStatusUseCaseTest {
 
     private lateinit var underTest: MonitorSyncProgressStatusUseCase
 
-    private val monitorSyncActivityUseCase = mock<MonitorSyncActivityUseCase>()
+    private val monitorSyncRunSnapshotUseCase = mock<MonitorSyncRunSnapshotUseCase>()
     private val monitorSyncPauseReasonUseCase = mock<MonitorSyncPauseReasonUseCase>()
 
     @BeforeAll
     fun setUp() {
-        val calculator = SyncProgressPhaseCalculator()
+        val getSyncProgressPhaseUseCase = GetSyncProgressPhaseUseCase()
         underTest = MonitorSyncProgressStatusUseCase(
-            monitorSyncActivityUseCase = monitorSyncActivityUseCase,
+            monitorSyncRunSnapshotUseCase = monitorSyncRunSnapshotUseCase,
             monitorSyncPauseReasonUseCase = monitorSyncPauseReasonUseCase,
-            advanceSyncProgressTimelineUseCase = AdvanceSyncProgressTimelineUseCase(calculator),
-            resolveSyncProgressStatusUseCase = ResolveSyncProgressStatusUseCase(calculator),
+            advanceSyncProgressTimelineUseCase =
+                AdvanceSyncProgressTimelineUseCase(getSyncProgressPhaseUseCase),
+            resolveSyncProgressStatusUseCase =
+                ResolveSyncProgressStatusUseCase(getSyncProgressPhaseUseCase),
             currentTimeProvider = { scheduler.currentTime },
             defaultDispatcher = extension.testDispatcher,
         )
@@ -66,7 +68,7 @@ internal class MonitorSyncProgressStatusUseCaseTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(monitorSyncActivityUseCase, monitorSyncPauseReasonUseCase)
+        reset(monitorSyncRunSnapshotUseCase, monitorSyncPauseReasonUseCase)
     }
 
     @Test
@@ -82,8 +84,8 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     }
 
     @Test
-    fun `test that invoke reports isSeeded from the activity`() = runTest {
-        stub(MutableStateFlow(SyncActivity.NotSeeded))
+    fun `test that invoke reports isSeeded from the run snapshot`() = runTest {
+        stub(MutableStateFlow(SyncRunSnapshot.NotSeeded))
 
         underTest().test {
             runCurrent()
@@ -97,7 +99,7 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke emits a not seeded status without waiting for the pause reason`() =
         runTest {
             val t0 = testScheduler.currentTime
-            stub(MutableStateFlow(SyncActivity.NotSeeded), MutableSharedFlow())
+            stub(MutableStateFlow(SyncRunSnapshot.NotSeeded), MutableSharedFlow())
 
             underTest().test {
                 runCurrent()
@@ -115,15 +117,15 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     @Test
     fun `test that invoke emits a not seeded status at once after transferring`() = runTest {
         val t0 = testScheduler.currentTime
-        val activityFlow = MutableStateFlow(transferring())
-        stub(activityFlow)
+        val runSnapshotFlow = MutableStateFlow(transferring())
+        stub(runSnapshotFlow)
 
         underTest().test {
             runCurrent()
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
             advanceTimeBy(1_000)
-            activityFlow.value = SyncActivity.NotSeeded
+            runSnapshotFlow.value = SyncRunSnapshot.NotSeeded
             runCurrent()
             assertThat(awaitItem().isSeeded).isFalse()
             assertThat(testScheduler.currentTime - t0).isEqualTo(1_000)
@@ -138,9 +140,9 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke does not restart the idle debounce when the pause reason repeats`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(transferring())
+            val runSnapshotFlow = MutableStateFlow(transferring())
             val reason = MutableSharedFlow<SyncPauseReason?>()
-            stub(activityFlow, reason)
+            stub(runSnapshotFlow, reason)
 
             underTest().test {
                 runCurrent()
@@ -149,7 +151,7 @@ internal class MonitorSyncProgressStatusUseCaseTest {
                 runCurrent()
 
                 advanceTimeBy(10_000)
-                activityFlow.value = idle()
+                runSnapshotFlow.value = idle()
                 runCurrent()
                 advanceTimeBy(1_000)
                 reason.emit(null)
@@ -182,18 +184,18 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     }
 
     @Test
-    fun `test that invoke emits Completed after activity stays idle for the idle debounce`() =
+    fun `test that invoke emits Completed after the run snapshot stays idle for the idle debounce`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(transferring())
-            stub(activityFlow)
+            val runSnapshotFlow = MutableStateFlow(transferring())
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
                 advanceTimeBy(10_000)
-                activityFlow.value = idle()
+                runSnapshotFlow.value = idle()
                 runCurrent()
                 advanceTimeBy(1_999)
                 expectNoEvents()
@@ -211,18 +213,18 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     @Test
     fun `test that invoke does not emit Completed when work returns within the idle debounce`() =
         runTest {
-            val activityFlow = MutableStateFlow(transferring())
-            stub(activityFlow)
+            val runSnapshotFlow = MutableStateFlow(transferring())
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
                 advanceTimeBy(10_000)
-                activityFlow.value = idle()
+                runSnapshotFlow.value = idle()
                 runCurrent()
                 advanceTimeBy(1_500)
-                activityFlow.value = transferring(processed = 10, pending = 3)
+                runSnapshotFlow.value = transferring(processed = 10, pending = 3)
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
@@ -235,15 +237,15 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     @Test
     fun `test that invoke emits UpToDate after the completed hold`() = runTest {
         val t0 = testScheduler.currentTime
-        val activityFlow = MutableStateFlow(transferring())
-        stub(activityFlow)
+        val runSnapshotFlow = MutableStateFlow(transferring())
+        stub(runSnapshotFlow)
 
         underTest().test {
             runCurrent()
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
             advanceTimeBy(10_000)
-            activityFlow.value = idle()
+            runSnapshotFlow.value = idle()
             advanceTimeBy(2_000)
             runCurrent()
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Completed)
@@ -262,15 +264,15 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke emits UpToDate without Completed when nothing was processed`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(activity(running(1, scanning = true)))
-            stub(activityFlow)
+            val runSnapshotFlow = MutableStateFlow(runSnapshot(running(1, scanning = true)))
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Checking)
 
                 advanceTimeBy(1_000)
-                activityFlow.value = idle(processed = 0)
+                runSnapshotFlow.value = idle(processed = 0)
                 runCurrent()
                 advanceTimeBy(1_999)
                 expectNoEvents()
@@ -287,21 +289,21 @@ internal class MonitorSyncProgressStatusUseCaseTest {
         }
 
     @Test
-    fun `test that invoke keeps the idle debounce running when activity changes while idle`() =
+    fun `test that invoke keeps the idle debounce running when the run snapshot changes while idle`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(transferring())
-            stub(activityFlow)
+            val runSnapshotFlow = MutableStateFlow(transferring())
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
                 advanceTimeBy(10_000)
-                activityFlow.value = idle()
+                runSnapshotFlow.value = idle()
                 runCurrent()
                 advanceTimeBy(1_000)
-                activityFlow.value = activity(running(1, syncing = true), processed = 10)
+                runSnapshotFlow.value = runSnapshot(running(1, syncing = true), processed = 10)
                 runCurrent()
                 advanceTimeBy(999)
                 expectNoEvents()
@@ -316,22 +318,22 @@ internal class MonitorSyncProgressStatusUseCaseTest {
 
     @Test
     fun `test that invoke does not emit Completed again for later idle updates`() = runTest {
-        val activityFlow = MutableStateFlow(transferring())
-        stub(activityFlow)
+        val runSnapshotFlow = MutableStateFlow(transferring())
+        stub(runSnapshotFlow)
 
         underTest().test {
             runCurrent()
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
             advanceTimeBy(10_000)
-            activityFlow.value = idle()
+            runSnapshotFlow.value = idle()
             advanceTimeBy(6_000)
             runCurrent()
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Completed)
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.UpToDate)
 
             advanceTimeBy(4_000)
-            activityFlow.value = activity(running(1, syncing = true), processed = 10)
+            runSnapshotFlow.value = runSnapshot(running(1, syncing = true), processed = 10)
             runCurrent()
             advanceTimeBy(10_000)
             runCurrent()
@@ -342,7 +344,7 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     @Test
     fun `test that invoke re-evaluates when the unknown stats cap elapses`() = runTest {
         val t0 = testScheduler.currentTime
-        stub(MutableStateFlow(activity(runningWithoutStats(1, since = t0))))
+        stub(MutableStateFlow(runSnapshot(runningWithoutStats(1, since = t0))))
 
         underTest().test {
             runCurrent()
@@ -362,15 +364,15 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke starts the idle debounce at the unknown stats cap when a later idle input arrives`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(activity(runningWithoutStats(1, since = t0)))
-            stub(activityFlow)
+            val runSnapshotFlow = MutableStateFlow(runSnapshot(runningWithoutStats(1, since = t0)))
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Checking)
 
                 advanceTimeBy(11_000)
-                activityFlow.value = activity(running(1))
+                runSnapshotFlow.value = runSnapshot(running(1))
                 runCurrent()
                 expectNoEvents()
 
@@ -387,15 +389,15 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke emits Paused without the idle debounce when syncs are paused mid transfer`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(transferring())
-            stub(activityFlow)
+            val runSnapshotFlow = MutableStateFlow(transferring())
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
                 advanceTimeBy(10_000)
-                activityFlow.value = activity(
+                runSnapshotFlow.value = runSnapshot(
                     inState(1, SyncRunState.Suspended),
                     processed = 5,
                     interrupted = 5,
@@ -414,7 +416,7 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     @Test
     fun `test that invoke reports interrupted items as files left while paused`() = runTest {
         stub(
-            MutableStateFlow(activity(inState(1, SyncRunState.Suspended), interrupted = 60)),
+            MutableStateFlow(runSnapshot(inState(1, SyncRunState.Suspended), interrupted = 60)),
             MutableStateFlow(SyncPauseReason.NoWifi),
         )
 
@@ -432,15 +434,15 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke emits NoSyncs at once when the last sync is removed mid transfer`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(transferring())
-            stub(activityFlow)
+            val runSnapshotFlow = MutableStateFlow(transferring())
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
                 advanceTimeBy(10_000)
-                activityFlow.value = activity(processed = 5)
+                runSnapshotFlow.value = runSnapshot(processed = 5)
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.NoSyncs)
                 assertThat(testScheduler.currentTime - t0).isEqualTo(10_000)
@@ -456,7 +458,7 @@ internal class MonitorSyncProgressStatusUseCaseTest {
         runTest {
             val reason = MutableSharedFlow<SyncPauseReason?>()
             stub(
-                MutableStateFlow(activity(inState(1, SyncRunState.Suspended), interrupted = 5)),
+                MutableStateFlow(runSnapshot(inState(1, SyncRunState.Suspended), interrupted = 5)),
                 reason,
             )
 
@@ -487,14 +489,14 @@ internal class MonitorSyncProgressStatusUseCaseTest {
 
     @Test
     fun `test that invoke does not emit duplicate statuses`() = runTest {
-        val activityFlow = MutableSharedFlow<SyncActivity>()
-        stub(activityFlow)
+        val runSnapshotFlow = MutableSharedFlow<SyncRunSnapshot>()
+        stub(runSnapshotFlow)
 
         underTest().test {
             runCurrent()
-            activityFlow.emit(transferring())
+            runSnapshotFlow.emit(transferring())
             runCurrent()
-            activityFlow.emit(transferring())
+            runSnapshotFlow.emit(transferring())
             runCurrent()
 
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
@@ -506,15 +508,15 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke emits UpToDate at once when the unknown stats cap ends in a pause`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(
-                activity(
+            val runSnapshotFlow = MutableStateFlow(
+                runSnapshot(
                     runningWithoutStats(1, since = t0),
                     inState(2, SyncRunState.Suspended),
                     processed = 7,
                     interrupted = 3,
                 )
             )
-            stub(activityFlow)
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
@@ -526,7 +528,7 @@ internal class MonitorSyncProgressStatusUseCaseTest {
                     .isEqualTo(SyncProgressPhase.Paused(SyncPauseCause.User))
 
                 advanceTimeBy(1_000)
-                activityFlow.value = activity(runningWithoutStats(1, since = t0), processed = 7)
+                runSnapshotFlow.value = runSnapshot(runningWithoutStats(1, since = t0), processed = 7)
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.UpToDate)
                 assertThat(testScheduler.currentTime - t0).isEqualTo(11_000)
@@ -541,22 +543,22 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke emits UpToDate at once when the last of several unknown stats caps ends in a pause`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(
-                activity(
+            val runSnapshotFlow = MutableStateFlow(
+                runSnapshot(
                     runningWithoutStats(1, since = t0),
                     inState(3, SyncRunState.Suspended),
                     processed = 10,
                     interrupted = 3,
                 )
             )
-            stub(activityFlow)
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Checking)
 
                 advanceTimeBy(5_000)
-                activityFlow.value = activity(
+                runSnapshotFlow.value = runSnapshot(
                     runningWithoutStats(1, since = t0),
                     runningWithoutStats(2, since = t0 + 5_000),
                     inState(3, SyncRunState.Suspended),
@@ -575,7 +577,7 @@ internal class MonitorSyncProgressStatusUseCaseTest {
                 assertThat(testScheduler.currentTime - t0).isEqualTo(15_000)
 
                 advanceTimeBy(500)
-                activityFlow.value = activity(
+                runSnapshotFlow.value = runSnapshot(
                     runningWithoutStats(1, since = t0),
                     runningWithoutStats(2, since = t0 + 5_000),
                     processed = 10,
@@ -594,26 +596,26 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     @MethodSource("idleStretchStoppers")
     fun `test that invoke emits UpToDate at once when syncs resume after a pause during the idle debounce`(
         expectedStop: SyncProgressPhase,
-        stop: SyncActivity,
+        stop: SyncRunSnapshot,
     ) = runTest {
         val t0 = testScheduler.currentTime
-        val activityFlow = MutableStateFlow(transferring())
-        stub(activityFlow)
+        val runSnapshotFlow = MutableStateFlow(transferring())
+        stub(runSnapshotFlow)
 
         underTest().test {
             runCurrent()
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
 
             advanceTimeBy(10_000)
-            activityFlow.value = idle()
+            runSnapshotFlow.value = idle()
             runCurrent()
             advanceTimeBy(1_000)
-            activityFlow.value = stop
+            runSnapshotFlow.value = stop
             runCurrent()
             assertThat(awaitItem().phase).isEqualTo(expectedStop)
 
             advanceTimeBy(500)
-            activityFlow.value = idle()
+            runSnapshotFlow.value = idle()
             runCurrent()
             assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.UpToDate)
             assertThat(testScheduler.currentTime - t0).isEqualTo(11_500)
@@ -627,24 +629,24 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     private fun idleStretchStoppers(): Stream<Arguments> = Stream.of(
         Arguments.of(
             SyncProgressPhase.Paused(SyncPauseCause.User),
-            activity(inState(1, SyncRunState.Suspended), processed = 10, interrupted = 5),
+            runSnapshot(inState(1, SyncRunState.Suspended), processed = 10, interrupted = 5),
         ),
-        Arguments.of(SyncProgressPhase.NoSyncs, activity(processed = 10)),
+        Arguments.of(SyncProgressPhase.NoSyncs, runSnapshot(processed = 10)),
     )
 
     @Test
     fun `test that invoke starts the idle debounce at the idle input when it arrives before the unknown stats cap`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(activity(runningWithoutStats(1, since = t0)))
-            stub(activityFlow)
+            val runSnapshotFlow = MutableStateFlow(runSnapshot(runningWithoutStats(1, since = t0)))
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Checking)
 
                 advanceTimeBy(3_000)
-                activityFlow.value = activity(running(1))
+                runSnapshotFlow.value = runSnapshot(running(1))
                 runCurrent()
                 advanceTimeBy(1_999)
                 expectNoEvents()
@@ -660,21 +662,21 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     fun `test that invoke starts the idle debounce at the idle input when a scanning sync also waits for stats`() =
         runTest {
             val t0 = testScheduler.currentTime
-            val activityFlow = MutableStateFlow(
-                activity(
+            val runSnapshotFlow = MutableStateFlow(
+                runSnapshot(
                     running(1, scanning = true),
                     runningWithoutStats(2, since = t0),
                     processed = 5,
                 )
             )
-            stub(activityFlow)
+            stub(runSnapshotFlow)
 
             underTest().test {
                 runCurrent()
                 assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Checking)
 
                 advanceTimeBy(30_000)
-                activityFlow.value = activity(running(1), running(2), processed = 10)
+                runSnapshotFlow.value = runSnapshot(running(1), running(2), processed = 10)
                 runCurrent()
                 advanceTimeBy(1_999)
                 expectNoEvents()
@@ -691,10 +693,10 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     @MethodSource("nonPausedPhases")
     fun `test that invoke emits a non paused phase at once before the pause reason arrives`(
         expectedPhase: SyncProgressPhase,
-        activity: SyncActivity,
+        runSnapshot: SyncRunSnapshot,
     ) = runTest {
         val t0 = testScheduler.currentTime
-        stub(MutableStateFlow(activity), MutableSharedFlow())
+        stub(MutableStateFlow(runSnapshot), MutableSharedFlow())
 
         underTest().test {
             runCurrent()
@@ -704,31 +706,31 @@ internal class MonitorSyncProgressStatusUseCaseTest {
     }
 
     private fun nonPausedPhases(): Stream<Arguments> = Stream.of(
-        Arguments.of(SyncProgressPhase.Checking, activity(running(1, scanning = true))),
+        Arguments.of(SyncProgressPhase.Checking, runSnapshot(running(1, scanning = true))),
         Arguments.of(SyncProgressPhase.UpToDate, idle()),
-        Arguments.of(SyncProgressPhase.NoSyncs, activity()),
+        Arguments.of(SyncProgressPhase.NoSyncs, runSnapshot()),
     )
 
     private fun stub(
-        activity: Flow<SyncActivity>,
+        runSnapshot: Flow<SyncRunSnapshot>,
         reason: Flow<SyncPauseReason?> = MutableStateFlow(null),
     ) {
-        whenever(monitorSyncActivityUseCase()).thenReturn(activity)
+        whenever(monitorSyncRunSnapshotUseCase()).thenReturn(runSnapshot)
         whenever(monitorSyncPauseReasonUseCase()).thenReturn(reason)
     }
 
     private fun transferring(processed: Int = 5, pending: Int = 5) =
-        activity(running(1, pending = pending), processed = processed, pending = pending)
+        runSnapshot(running(1, pending = pending), processed = processed, pending = pending)
 
-    private fun idle(processed: Int = 10) = activity(running(1), processed = processed)
+    private fun idle(processed: Int = 10) = runSnapshot(running(1), processed = processed)
 
-    private fun activity(
+    private fun runSnapshot(
         vararg syncs: SyncWorkState,
         isSeeded: Boolean = true,
         processed: Int = 0,
         pending: Int = 0,
         interrupted: Int = 0,
-    ) = SyncActivity(
+    ) = SyncRunSnapshot(
         isSeeded = isSeeded,
         syncs = syncs.toList(),
         progress = SyncEpisodeProgress(0, processed, pending, interrupted, fraction = null),

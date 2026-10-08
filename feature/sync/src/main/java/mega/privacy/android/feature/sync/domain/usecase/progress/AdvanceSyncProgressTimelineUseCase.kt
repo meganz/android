@@ -12,7 +12,7 @@ import javax.inject.Inject
  * same idle start, so a run shows Completed once.
  */
 internal class AdvanceSyncProgressTimelineUseCase @Inject constructor(
-    private val syncProgressPhaseCalculator: SyncProgressPhaseCalculator,
+    private val getSyncProgressPhaseUseCase: GetSyncProgressPhaseUseCase,
 ) {
 
     operator fun invoke(
@@ -20,11 +20,11 @@ internal class AdvanceSyncProgressTimelineUseCase @Inject constructor(
         input: SyncProgressInput,
         nowMillis: Long,
     ): SyncProgressTimeline {
-        val result = calculate(input, nowMillis)
+        val result = getPhase(input, nowMillis)
         val isBusy = result.phase.isBusy()
-        val hasWork = input.activity.syncs.any { it.hasWork }
+        val hasWork = input.runSnapshot.syncs.any { it.hasWork }
         val idleStart = when {
-            !input.activity.isSeeded -> null
+            !input.runSnapshot.isSeeded -> null
             isBusy -> null
             result.phase is SyncProgressPhase.Paused -> null
             result.phase == SyncProgressPhase.NoSyncs -> null
@@ -45,25 +45,25 @@ internal class AdvanceSyncProgressTimelineUseCase @Inject constructor(
     // the status resolution saw, and an idle stretch after a pause never shows Completed
     private fun busyEndedAt(previous: SyncProgressTimeline, now: Long): Long? {
         val endedAt = minOf(now, busyEnd(previous.input, previous.busyUntilMillis ?: now, now))
-        val phaseAtEnd = calculate(previous.input, endedAt).phase
+        val phaseAtEnd = getPhase(previous.input, endedAt).phase
         return endedAt.takeUnless { phaseAtEnd is SyncProgressPhase.Paused }
     }
 
-    // The calculator re-evaluates at the earliest unknown-stats cap only, so a Checking held by
-    // several syncs without stats ends at the first re-evaluation that is no longer busy
+    // The phase use case re-evaluates at the earliest unknown-stats cap only, so a Checking held
+    // by several syncs without stats ends at the first re-evaluation that is no longer busy
     private fun busyEnd(input: SyncProgressInput, from: Long, now: Long): Long {
         var at = from
         while (at < now) {
-            val result = calculate(input, at)
+            val result = getPhase(input, at)
             if (!result.phase.isBusy()) break
             at = result.reevaluateAtMillis ?: now
         }
         return at
     }
 
-    private fun calculate(input: SyncProgressInput, now: Long) =
-        syncProgressPhaseCalculator.calculate(
-            activity = input.activity,
+    private fun getPhase(input: SyncProgressInput, now: Long) =
+        getSyncProgressPhaseUseCase(
+            runSnapshot = input.runSnapshot,
             pauseReason = (input.reason as? SyncPauseReasonInput.Known)?.reason,
             nowMillis = now,
         )

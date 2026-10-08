@@ -3,7 +3,6 @@ package mega.privacy.android.feature.sync.domain.usecase.progress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncActivity
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncEpisodeProgress
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncPauseCause
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncPauseReasonInput
@@ -12,6 +11,7 @@ import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressPhas
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressStatus
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressStep
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressTimeline
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncStatsSample
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkState
@@ -30,13 +30,13 @@ internal class ResolveSyncProgressStatusUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = ResolveSyncProgressStatusUseCase(SyncProgressPhaseCalculator())
+        underTest = ResolveSyncProgressStatusUseCase(GetSyncProgressPhaseUseCase())
     }
 
     @Test
     fun `test that invoke returns a not seeded UpToDate status without a wake when not seeded`() {
         val progress = SyncEpisodeProgress(1, 3, 2, 0, fraction = null)
-        val timeline = timeline(SyncActivity.NotSeeded.copy(progress = progress), isBusy = true)
+        val timeline = timeline(SyncRunSnapshot.NotSeeded.copy(progress = progress), isBusy = true)
 
         assertThat(underTest(timeline, NOW)).isEqualTo(
             SyncProgressStep(
@@ -80,33 +80,33 @@ internal class ResolveSyncProgressStatusUseCaseTest {
     @MethodSource("nonIdlePhases")
     fun `test that invoke returns a non idle phase with the re-evaluation time as the wake`(
         case: String,
-        activity: SyncActivity,
+        runSnapshot: SyncRunSnapshot,
         expectedPhase: SyncProgressPhase,
         expectedWakeAt: Long?,
     ) {
-        val timeline = timeline(activity, isBusy = true)
+        val timeline = timeline(runSnapshot, isBusy = true)
 
         val result = underTest(timeline, NOW)
 
         assertWithMessage(case).that(result)
-            .isEqualTo(SyncProgressStep(status(expectedPhase, activity), timeline, expectedWakeAt))
+            .isEqualTo(SyncProgressStep(status(expectedPhase, runSnapshot), timeline, expectedWakeAt))
     }
 
     private fun nonIdlePhases(): Stream<Arguments> = Stream.of(
         Arguments.of(
             "checking held by a sync without stats",
-            activity(runningWithoutStats(1, since = NOW - 4_000)),
+            runSnapshot(runningWithoutStats(1, since = NOW - 4_000)),
             SyncProgressPhase.Checking,
             NOW + 6_000,
         ),
         Arguments.of(
             "checking by a scanning sync",
-            activity(running(1, scanning = true)),
+            runSnapshot(running(1, scanning = true)),
             SyncProgressPhase.Checking,
             null,
         ),
         Arguments.of("transferring", transferring(), SyncProgressPhase.Transferring, null),
-        Arguments.of("no syncs", activity(), SyncProgressPhase.NoSyncs, null),
+        Arguments.of("no syncs", runSnapshot(), SyncProgressPhase.NoSyncs, null),
     )
 
     @Test
@@ -126,14 +126,14 @@ internal class ResolveSyncProgressStatusUseCaseTest {
         expectedPhase: SyncProgressPhase?,
         expectedWakeAfterIdleStart: Long?,
     ) {
-        val activity = idle(processed)
-        val timeline = timeline(activity, idleStart = IDLE_START)
+        val runSnapshot = idle(processed)
+        val timeline = timeline(runSnapshot, idleStart = IDLE_START)
 
         val result = underTest(timeline, IDLE_START + elapsed)
 
         assertWithMessage(case).that(result).isEqualTo(
             SyncProgressStep(
-                status = expectedPhase?.let { status(it, activity) },
+                status = expectedPhase?.let { status(it, runSnapshot) },
                 timeline = timeline,
                 wakeAtMillis = expectedWakeAfterIdleStart?.let { IDLE_START + it },
             )
@@ -152,8 +152,8 @@ internal class ResolveSyncProgressStatusUseCaseTest {
 
     @Test
     fun `test that invoke starts the idle stretch now when a busy phase ended without an input`() {
-        val activity = activity(runningWithoutStats(1, since = NOW - 10_000), processed = 4)
-        val timeline = timeline(activity, isBusy = true, idleStart = null)
+        val runSnapshot = runSnapshot(runningWithoutStats(1, since = NOW - 10_000), processed = 4)
+        val timeline = timeline(runSnapshot, isBusy = true, idleStart = null)
 
         assertThat(underTest(timeline, NOW)).isEqualTo(
             SyncProgressStep(
@@ -173,35 +173,35 @@ internal class ResolveSyncProgressStatusUseCaseTest {
     }
 
     private fun timeline(
-        activity: SyncActivity,
+        runSnapshot: SyncRunSnapshot,
         isBusy: Boolean = false,
         idleStart: Long? = null,
         reason: SyncPauseReasonInput = SyncPauseReasonInput.Known(null),
     ) = SyncProgressTimeline(
-        input = SyncProgressInput(activity, reason),
+        input = SyncProgressInput(runSnapshot, reason),
         isBusy = isBusy,
         busyUntilMillis = null,
         idleStartMillis = idleStart,
     )
 
-    private fun status(phase: SyncProgressPhase, activity: SyncActivity) = SyncProgressStatus(
+    private fun status(phase: SyncProgressPhase, runSnapshot: SyncRunSnapshot) = SyncProgressStatus(
         isSeeded = true,
         phase = phase,
-        progress = activity.progress,
+        progress = runSnapshot.progress,
     )
 
-    private fun transferring() = activity(running(1, pending = 5), processed = 5, pending = 5)
+    private fun transferring() = runSnapshot(running(1, pending = 5), processed = 5, pending = 5)
 
-    private fun idle(processed: Int = 10) = activity(running(1), processed = processed)
+    private fun idle(processed: Int = 10) = runSnapshot(running(1), processed = processed)
 
-    private fun paused() = activity(inState(1, SyncRunState.Suspended), processed = 5, interrupted = 5)
+    private fun paused() = runSnapshot(inState(1, SyncRunState.Suspended), processed = 5, interrupted = 5)
 
-    private fun activity(
+    private fun runSnapshot(
         vararg syncs: SyncWorkState,
         processed: Int = 0,
         pending: Int = 0,
         interrupted: Int = 0,
-    ) = SyncActivity(
+    ) = SyncRunSnapshot(
         isSeeded = true,
         syncs = syncs.toList(),
         progress = SyncEpisodeProgress(0, processed, pending, interrupted, fraction = null),

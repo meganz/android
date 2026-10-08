@@ -11,15 +11,15 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class ResetSyncActivityUseCaseTest {
+internal class ResetSyncRunSnapshotUseCaseTest {
 
-    private lateinit var underTest: ResetSyncActivityUseCase
+    private lateinit var underTest: ResetSyncRunSnapshotUseCase
 
     private val syncProgressRepository = mock<SyncProgressRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = ResetSyncActivityUseCase(syncProgressRepository = syncProgressRepository)
+        underTest = ResetSyncRunSnapshotUseCase(syncProgressRepository = syncProgressRepository)
     }
 
     @BeforeEach
@@ -28,9 +28,9 @@ internal class ResetSyncActivityUseCaseTest {
     }
 
     @Test
-    fun `test that invoke resets the sync activity in the repository`() = runTest {
+    fun `test that invoke resets the sync run snapshot in the repository`() = runTest {
         underTest()
 
-        verify(syncProgressRepository).resetSyncActivity()
+        verify(syncProgressRepository).resetSyncRunSnapshot()
     }
 }

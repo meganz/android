@@ -2,10 +2,10 @@ package mega.privacy.android.feature.sync.domain.usecase.progress
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncActivity
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncEpisodeProgress
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncPauseCause
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressPhase
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncStatsSample
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkState
@@ -17,30 +17,30 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class SyncProgressPhaseCalculatorTest {
+internal class GetSyncProgressPhaseUseCaseTest {
 
-    private val underTest = SyncProgressPhaseCalculator()
+    private val underTest = GetSyncProgressPhaseUseCase()
 
     @Test
-    fun `test that calculate returns NoSyncs when no sync is configured`() {
-        val result = underTest.calculate(activity(), pauseReason = null, nowMillis = 0)
+    fun `test that invoke returns NoSyncs when no sync is configured`() {
+        val result = underTest(runSnapshot(), pauseReason = null, nowMillis = 0)
 
         assertThat(result.phase).isEqualTo(SyncProgressPhase.NoSyncs)
     }
 
     @Test
-    fun `test that calculate returns UpToDate when the activity is not seeded`() {
-        val result = underTest.calculate(SyncActivity.NotSeeded, pauseReason = null, nowMillis = 0)
+    fun `test that invoke returns UpToDate when the run snapshot is not seeded`() {
+        val result = underTest(SyncRunSnapshot.NotSeeded, pauseReason = null, nowMillis = 0)
 
         assertThat(result).isEqualTo(
-            SyncProgressPhaseCalculator.Result(SyncProgressPhase.UpToDate, reevaluateAtMillis = null)
+            GetSyncProgressPhaseUseCase.Result(SyncProgressPhase.UpToDate, reevaluateAtMillis = null)
         )
     }
 
     @Test
-    fun `test that calculate returns Transferring when a running sync has pending items`() {
-        val result = underTest.calculate(
-            activity(running(1, pending = 3), pending = 3),
+    fun `test that invoke returns Transferring when a running sync has pending items`() {
+        val result = underTest(
+            runSnapshot(running(1, pending = 3), pending = 3),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -49,9 +49,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Transferring when pending items remain while another sync is suspended`() {
-        val result = underTest.calculate(
-            activity(running(1, pending = 3), inState(2, SyncRunState.Suspended), pending = 3),
+    fun `test that invoke returns Transferring when pending items remain while another sync is suspended`() {
+        val result = underTest(
+            runSnapshot(running(1, pending = 3), inState(2, SyncRunState.Suspended), pending = 3),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -60,22 +60,22 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Checking when a running sync is scanning with nothing pending`() {
-        val result = underTest.calculate(
-            activity(running(1, scanning = true)),
+    fun `test that invoke returns Checking when a running sync is scanning with nothing pending`() {
+        val result = underTest(
+            runSnapshot(running(1, scanning = true)),
             pauseReason = null,
             nowMillis = 0,
         )
 
         assertThat(result).isEqualTo(
-            SyncProgressPhaseCalculator.Result(SyncProgressPhase.Checking, reevaluateAtMillis = null)
+            GetSyncProgressPhaseUseCase.Result(SyncProgressPhase.Checking, reevaluateAtMillis = null)
         )
     }
 
     @Test
-    fun `test that calculate returns Checking when a sync is loading`() {
-        val result = underTest.calculate(
-            activity(inState(1, SyncRunState.Loading)),
+    fun `test that invoke returns Checking when a sync is loading`() {
+        val result = underTest(
+            runSnapshot(inState(1, SyncRunState.Loading)),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -84,9 +84,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Checking when a sync is pending`() {
-        val result = underTest.calculate(
-            activity(inState(1, SyncRunState.Pending)),
+    fun `test that invoke returns Checking when a sync is pending`() {
+        val result = underTest(
+            runSnapshot(inState(1, SyncRunState.Pending)),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -95,9 +95,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Checking while a sync that just entered running has no stats`() {
-        val result = underTest.calculate(
-            activity(runningWithoutStats(1, since = 0)),
+    fun `test that invoke returns Checking while a sync that just entered running has no stats`() {
+        val result = underTest(
+            runSnapshot(runningWithoutStats(1, since = 0)),
             pauseReason = null,
             nowMillis = 9_999,
         )
@@ -106,9 +106,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns a re-evaluation time at the unknown stats cap`() {
-        val result = underTest.calculate(
-            activity(runningWithoutStats(1, since = 1_000)),
+    fun `test that invoke returns a re-evaluation time at the unknown stats cap`() {
+        val result = underTest(
+            runSnapshot(runningWithoutStats(1, since = 1_000)),
             pauseReason = null,
             nowMillis = 2_000,
         )
@@ -117,9 +117,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns the earliest re-evaluation time among syncs without stats`() {
-        val result = underTest.calculate(
-            activity(runningWithoutStats(1, since = 4_000), runningWithoutStats(2, since = 1_000)),
+    fun `test that invoke returns the earliest re-evaluation time among syncs without stats`() {
+        val result = underTest(
+            runSnapshot(runningWithoutStats(1, since = 4_000), runningWithoutStats(2, since = 1_000)),
             pauseReason = null,
             nowMillis = 5_000,
         )
@@ -128,9 +128,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate does not return Checking once the unknown stats cap has passed`() {
-        val result = underTest.calculate(
-            activity(runningWithoutStats(1, since = 0)),
+    fun `test that invoke does not return Checking once the unknown stats cap has passed`() {
+        val result = underTest(
+            runSnapshot(runningWithoutStats(1, since = 0)),
             pauseReason = null,
             nowMillis = 10_000,
         )
@@ -139,9 +139,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate ignores a running sync without stats whose entry time is unknown`() {
-        val result = underTest.calculate(
-            activity(inState(1, SyncRunState.Running)),
+    fun `test that invoke ignores a running sync without stats whose entry time is unknown`() {
+        val result = underTest(
+            runSnapshot(inState(1, SyncRunState.Running)),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -150,9 +150,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns UpToDate when a running sync is only syncing`() {
-        val result = underTest.calculate(
-            activity(running(1, syncing = true)),
+    fun `test that invoke returns UpToDate when a running sync is only syncing`() {
+        val result = underTest(
+            runSnapshot(running(1, syncing = true)),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -161,9 +161,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Paused with StorageOverQuota when a suspended sync is over quota`() {
-        val result = underTest.calculate(
-            activity(inState(1, SyncRunState.Suspended, overQuota = true)),
+    fun `test that invoke returns Paused with StorageOverQuota when a suspended sync is over quota`() {
+        val result = underTest(
+            runSnapshot(inState(1, SyncRunState.Suspended, overQuota = true)),
             pauseReason = SyncPauseReason.NoWifi,
             nowMillis = 0,
         )
@@ -172,9 +172,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Paused with the condition when a pause reason exists`() {
-        val result = underTest.calculate(
-            activity(inState(1, SyncRunState.Suspended)),
+    fun `test that invoke returns Paused with the condition when a pause reason exists`() {
+        val result = underTest(
+            runSnapshot(inState(1, SyncRunState.Suspended)),
             pauseReason = SyncPauseReason.LowBattery,
             nowMillis = 0,
         )
@@ -185,9 +185,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Paused with User when there is no pause reason`() {
-        val result = underTest.calculate(
-            activity(inState(1, SyncRunState.Suspended)),
+    fun `test that invoke returns Paused with User when there is no pause reason`() {
+        val result = underTest(
+            runSnapshot(inState(1, SyncRunState.Suspended)),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -196,9 +196,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Paused with User when every sync is suspended by pause all`() {
-        val result = underTest.calculate(
-            activity(
+    fun `test that invoke returns Paused with User when every sync is suspended by pause all`() {
+        val result = underTest(
+            runSnapshot(
                 inState(1, SyncRunState.Suspended),
                 inState(2, SyncRunState.Suspended),
                 interrupted = 9,
@@ -208,7 +208,7 @@ internal class SyncProgressPhaseCalculatorTest {
         )
 
         assertThat(result).isEqualTo(
-            SyncProgressPhaseCalculator.Result(
+            GetSyncProgressPhaseUseCase.Result(
                 SyncProgressPhase.Paused(SyncPauseCause.User),
                 reevaluateAtMillis = null,
             )
@@ -216,9 +216,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Paused with the condition when pause all and a condition both hold`() {
-        val result = underTest.calculate(
-            activity(inState(1, SyncRunState.Suspended), interrupted = 4),
+    fun `test that invoke returns Paused with the condition when pause all and a condition both hold`() {
+        val result = underTest(
+            runSnapshot(inState(1, SyncRunState.Suspended), interrupted = 4),
             pauseReason = SyncPauseReason.NotCharging,
             nowMillis = 0,
         )
@@ -229,9 +229,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Paused when a suspended sync holds interrupted items and another sync is idle`() {
-        val result = underTest.calculate(
-            activity(running(1), inState(2, SyncRunState.Suspended), interrupted = 6),
+    fun `test that invoke returns Paused when a suspended sync holds interrupted items and another sync is idle`() {
+        val result = underTest(
+            runSnapshot(running(1), inState(2, SyncRunState.Suspended), interrupted = 6),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -240,9 +240,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns UpToDate when a sync is paused with nothing interrupted and others are idle`() {
-        val result = underTest.calculate(
-            activity(running(1), inState(2, SyncRunState.Suspended), interrupted = 0),
+    fun `test that invoke returns UpToDate when a sync is paused with nothing interrupted and others are idle`() {
+        val result = underTest(
+            runSnapshot(running(1), inState(2, SyncRunState.Suspended), interrupted = 0),
             pauseReason = null,
             nowMillis = 0,
         )
@@ -251,9 +251,9 @@ internal class SyncProgressPhaseCalculatorTest {
     }
 
     @Test
-    fun `test that calculate returns Paused with User when only a sync that is not suspended is over quota`() {
-        val result = underTest.calculate(
-            activity(
+    fun `test that invoke returns Paused with User when only a sync that is not suspended is over quota`() {
+        val result = underTest(
+            runSnapshot(
                 inState(1, SyncRunState.Running, overQuota = true),
                 inState(2, SyncRunState.Suspended),
                 interrupted = 6,
@@ -267,38 +267,38 @@ internal class SyncProgressPhaseCalculatorTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("nonCheckingPhases")
-    fun `test that calculate returns no re-evaluation time when the phase is not Checking`(
+    fun `test that invoke returns no re-evaluation time when the phase is not Checking`(
         expectedPhase: SyncProgressPhase,
-        activity: SyncActivity,
+        runSnapshot: SyncRunSnapshot,
     ) {
-        val result = underTest.calculate(activity, pauseReason = null, nowMillis = 0)
+        val result = underTest(runSnapshot, pauseReason = null, nowMillis = 0)
 
         assertThat(result).isEqualTo(
-            SyncProgressPhaseCalculator.Result(expectedPhase, reevaluateAtMillis = null)
+            GetSyncProgressPhaseUseCase.Result(expectedPhase, reevaluateAtMillis = null)
         )
     }
 
     private fun nonCheckingPhases(): Stream<Arguments> = Stream.of(
-        Arguments.of(SyncProgressPhase.NoSyncs, activity()),
+        Arguments.of(SyncProgressPhase.NoSyncs, runSnapshot()),
         Arguments.of(
             SyncProgressPhase.Transferring,
-            activity(running(1, pending = 2), pending = 2),
+            runSnapshot(running(1, pending = 2), pending = 2),
         ),
         Arguments.of(
             SyncProgressPhase.Paused(SyncPauseCause.User),
-            activity(inState(1, SyncRunState.Suspended), interrupted = 3),
+            runSnapshot(inState(1, SyncRunState.Suspended), interrupted = 3),
         ),
-        Arguments.of(SyncProgressPhase.UpToDate, activity(running(1))),
-        Arguments.of(SyncProgressPhase.UpToDate, activity(inState(1, SyncRunState.Disabled))),
+        Arguments.of(SyncProgressPhase.UpToDate, runSnapshot(running(1))),
+        Arguments.of(SyncProgressPhase.UpToDate, runSnapshot(inState(1, SyncRunState.Disabled))),
     )
 
-    private fun activity(
+    private fun runSnapshot(
         vararg syncs: SyncWorkState,
         isSeeded: Boolean = true,
         processed: Int = 0,
         pending: Int = 0,
         interrupted: Int = 0,
-    ) = SyncActivity(
+    ) = SyncRunSnapshot(
         isSeeded = isSeeded,
         syncs = syncs.toList(),
         progress = SyncEpisodeProgress(0, processed, pending, interrupted, fraction = null),
