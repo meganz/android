@@ -143,6 +143,28 @@ internal class VideoMediaControllerFacade @Inject constructor(
             }
         }
 
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int,
+        ) {
+            val positionMs = newPosition.positionMs.coerceAtLeast(0L)
+            // Read before the update for the reason samplePosition gives: the block re-runs under
+            // contention, and a re-run would pair this position with a later duration reading.
+            // A player that does not know the length yet answers `C.TIME_UNSET`, which is
+            // negative. Dropped rather than floored to zero, so the fallback below keeps the
+            // length already known instead of replacing it with "unknown".
+            val sampledDurationMs = controller?.duration?.takeIf { it > 0L }
+            // Polling only runs while playing; without this, a seek while paused snaps the
+            // UI back to the stale position as soon as the scrubber is released.
+            updateState {
+                copy(
+                    currentPositionMs = positionMs,
+                    durationMs = sampledDurationMs ?: durationMs,
+                )
+            }
+        }
+
         override fun onVideoSizeChanged(videoSize: VideoSize) {
             // A zero size is reported between items and would collapse the video frame to nothing.
             if (videoSize.width == 0 || videoSize.height == 0) return
@@ -264,8 +286,15 @@ internal class VideoMediaControllerFacade @Inject constructor(
         // re-run would otherwise re-query the player and pair a position with a duration read at
         // a different instant.
         val positionMs = ctrl.currentPosition.coerceAtLeast(0L)
-        val durationMs = ctrl.duration.coerceAtLeast(0L)
-        updateState { copy(currentPositionMs = positionMs, durationMs = durationMs) }
+        // Same reasoning as in onPositionDiscontinuity: an unknown length is dropped rather than
+        // floored, so a sample taken before the player knows it cannot erase it.
+        val sampledDurationMs = ctrl.duration.takeIf { it > 0L }
+        updateState {
+            copy(
+                currentPositionMs = positionMs,
+                durationMs = sampledDurationMs ?: durationMs,
+            )
+        }
     }
 
     private fun stopPositionPolling() {
@@ -308,6 +337,13 @@ internal class VideoMediaControllerFacade @Inject constructor(
             return
         }
         ctrl.pause()
+    }
+
+    @MainThread
+    override fun seekTo(positionMs: Long) {
+        if (isReleased) return
+        val ctrl = controller ?: return
+        ctrl.seekTo(positionMs)
     }
 
     @MainThread

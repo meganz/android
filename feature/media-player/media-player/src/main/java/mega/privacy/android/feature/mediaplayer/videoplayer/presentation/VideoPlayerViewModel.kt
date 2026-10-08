@@ -89,6 +89,8 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
                     videoHeight = player.videoHeight,
                     isLoading = player.isLoading,
                     playWhenReady = player.playWhenReady,
+                    currentPositionMs = player.currentPositionMs,
+                    durationMs = player.durationMs,
                 )
             }
         } else {
@@ -129,6 +131,8 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
                 videoHeight = 0,
                 isLoading = true,
                 playWhenReady = false,
+                currentPositionMs = 0L,
+                durationMs = 0L,
             )
         }
     }
@@ -187,6 +191,19 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
     fun onPlayPauseClick() {
         val state = uiState.value as? VideoPlayerUiState.Data ?: return
         if (state.playWhenReady) gateway.pause() else gateway.play()
+    }
+
+    /**
+     * Moves playback to [positionMs], which the scrub bar reports once the drag ends.
+     *
+     * Clamped to the duration the player reported, because the bar reports a position taken from
+     * where the finger was and the live player clamps the same way. A duration of `0` means the
+     * player does not know the length yet, and there is nothing to seek within.
+     */
+    fun onSeekTo(positionMs: Long) {
+        val state = uiState.value as? VideoPlayerUiState.Data ?: return
+        if (state.durationMs <= 0L) return
+        gateway.seekTo(positionMs.coerceIn(0L, state.durationMs))
     }
 
     /**

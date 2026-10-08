@@ -40,6 +40,10 @@ sealed interface VideoPlayerUiState {
      * @property playWhenReady Whether the user has playback running. Intent, not motion: it stays
      * `true` across a rebuffer, which is what the play/pause button has to show, because the
      * button says what the next tap does. Buffering is told apart by [isLoading].
+     * @property currentPositionMs How far playback has reached, as the player last reported it.
+     * Sampled on a timer while playback runs, and again on every position discontinuity, so a
+     * seek lands here even when the timer is stopped because the player is paused.
+     * @property durationMs Length of the item, `0` until the player knows it.
      */
     data class Data(
         val currentPlayingHandle: Long,
@@ -49,6 +53,8 @@ sealed interface VideoPlayerUiState {
         val videoHeight: Int,
         val isLoading: Boolean,
         val playWhenReady: Boolean,
+        val currentPositionMs: Long,
+        val durationMs: Long,
     ) : VideoPlayerUiState
 
     /**

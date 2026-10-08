@@ -51,6 +51,14 @@ interface VideoMediaControllerGateway {
     fun pause()
 
     /**
+     * Moves playback to [positionMs] within the current item.
+     *
+     * The caller is responsible for keeping [positionMs] within the item: the player clamps out
+     * of range values silently, which hides a caller that got the duration wrong.
+     */
+    fun seekTo(positionMs: Long)
+
+    /**
      * Binds the player's video output to [textureView].
      *
      * A `TextureView` rather than a `SurfaceView` because the player screen needs to read frames

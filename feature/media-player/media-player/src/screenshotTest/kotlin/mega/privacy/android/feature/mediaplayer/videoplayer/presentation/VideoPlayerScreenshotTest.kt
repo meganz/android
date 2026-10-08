@@ -14,10 +14,11 @@ import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.V
  * in a preview — so these goldens are about the controls and the black they sit on, which is the
  * whole of what this screen draws itself.
  *
- * Recorded in both themes although the player is always dark: the background, the throbber and
- * the control icon take their colours explicitly rather than from the theme, so the two goldens
- * are expected to be identical, and them diverging later is exactly the signal that something
- * started following the app theme when it should not.
+ * Recorded in both themes although the player is always dark. The background, the throbber and
+ * the control icon take their colours explicitly, so the two goldens may differ in one place
+ * only: the played part of the scrub bar and its scrubber, which follow the theme because the
+ * live player's `played_color` and `scrubber_color` do. A difference anywhere else is the signal
+ * that something started following the app theme when it should not.
  */
 class VideoPlayerScreenshotTest {
 
@@ -31,6 +32,7 @@ class VideoPlayerScreenshotTest {
                 onSurfaceReady = {},
                 onSurfaceReleased = {},
                 onPlayPauseClick = {},
+                onSeekTo = {},
             )
         }
     }
@@ -45,6 +47,7 @@ class VideoPlayerScreenshotTest {
                 onSurfaceReady = {},
                 onSurfaceReleased = {},
                 onPlayPauseClick = {},
+                onSeekTo = {},
             )
         }
     }
@@ -59,6 +62,7 @@ class VideoPlayerScreenshotTest {
                 onSurfaceReady = {},
                 onSurfaceReleased = {},
                 onPlayPauseClick = {},
+                onSeekTo = {},
             )
         }
     }
@@ -75,4 +79,8 @@ private fun videoState(
     videoHeight = 1080,
     isLoading = isLoading,
     playWhenReady = playWhenReady,
+    // A position partway through, so the scrub bar's played and unplayed halves are both in the
+    // golden and a colour that stopped being applied would show up as a change.
+    currentPositionMs = 72_000L,
+    durationMs = 225_000L,
 )

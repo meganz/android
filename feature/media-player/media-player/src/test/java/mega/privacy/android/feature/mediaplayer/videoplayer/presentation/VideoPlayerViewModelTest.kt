@@ -69,10 +69,15 @@ internal class VideoPlayerViewModelTest {
      */
     private suspend fun ReceiveTurbine<VideoPlayerUiState>.awaitUntilPlayWhenReady(
         expected: Boolean,
+    ): VideoPlayerUiState.Data = awaitUntilData { it.playWhenReady == expected }
+
+    /** The general form of [awaitUntilPlayWhenReady], for the other fields a test waits on. */
+    private suspend fun ReceiveTurbine<VideoPlayerUiState>.awaitUntilData(
+        predicate: (VideoPlayerUiState.Data) -> Boolean,
     ): VideoPlayerUiState.Data {
         while (true) {
             val item = awaitItem()
-            if (item is VideoPlayerUiState.Data && item.playWhenReady == expected) return item
+            if (item is VideoPlayerUiState.Data && predicate(item)) return item
         }
     }
 
@@ -324,6 +329,79 @@ internal class VideoPlayerViewModelTest {
     }
 
     @Test
+    fun `test that onSeekTo moves the player to the position`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+        playerState.value = VideoControllerState(durationMs = TEST_DURATION_MS)
+
+        underTest.uiState.test {
+            awaitUntilData { it.durationMs == TEST_DURATION_MS }
+            underTest.onSeekTo(TEST_POSITION_MS)
+        }
+
+        verify(gateway).seekTo(TEST_POSITION_MS)
+    }
+
+    @Test
+    fun `test that onSeekTo clamps a position past the end of the item`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+        playerState.value = VideoControllerState(durationMs = TEST_DURATION_MS)
+
+        underTest.uiState.test {
+            awaitUntilData { it.durationMs == TEST_DURATION_MS }
+            underTest.onSeekTo(TEST_DURATION_MS * 4)
+        }
+
+        verify(gateway).seekTo(TEST_DURATION_MS)
+    }
+
+    @Test
+    fun `test that onSeekTo does nothing before the player reports a duration`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        // Seeking within an item of unknown length would land somewhere arbitrary; the bar has
+        // nothing to drag along yet either.
+        underTest.uiState.test {
+            awaitUntilData { it.durationMs == 0L }
+            underTest.onSeekTo(TEST_POSITION_MS)
+        }
+
+        verify(gateway, never()).seekTo(any())
+    }
+
+    @Test
+    fun `test that onSeekTo does nothing when the launch source is unusable`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(null)
+        initViewModel()
+
+        underTest.uiState.test {
+            while (awaitItem() !is VideoPlayerUiState.InvalidLaunchSource) Unit
+            underTest.onSeekTo(TEST_POSITION_MS)
+        }
+
+        verify(gateway, never()).seekTo(any())
+    }
+
+    @Test
+    fun `test that uiState carries the position and duration the player reports`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        underTest.uiState.test {
+            playerState.value = VideoControllerState(
+                currentPositionMs = TEST_POSITION_MS,
+                durationMs = TEST_DURATION_MS,
+            )
+
+            with(awaitUntilData { it.durationMs == TEST_DURATION_MS }) {
+                assertThat(currentPositionMs).isEqualTo(TEST_POSITION_MS)
+            }
+        }
+    }
+
+    @Test
     fun `test that uiState carries whether the user has playback running`() = runTest {
         whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
         initViewModel()
@@ -446,5 +524,7 @@ internal class VideoPlayerViewModelTest {
         const val LAUNCH_ID = "launch-id"
         const val TEST_HANDLE = 123456L
         const val TEST_FILE_NAME = "video.mp4"
+        const val TEST_DURATION_MS = 225_000L
+        const val TEST_POSITION_MS = 72_000L
     }
 }

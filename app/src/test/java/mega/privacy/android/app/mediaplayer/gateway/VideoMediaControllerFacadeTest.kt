@@ -84,6 +84,19 @@ internal class VideoMediaControllerFacadeTest {
         underTest.onControllerConnected(future, controller)
     }
 
+    /** Only the position is read from it; the rest is what an unset, ad-free position carries. */
+    private fun positionInfo(positionMs: Long) = Player.PositionInfo(
+        null,
+        0,
+        null,
+        null,
+        0,
+        positionMs,
+        positionMs,
+        C.INDEX_UNSET,
+        C.INDEX_UNSET,
+    )
+
     @ParameterizedTest(name = "playbackState={0} -> buffering={1}, ended={2}, ready={3}")
     @MethodSource("playbackStates")
     fun `test that onPlaybackStateChanged maps the raw player state`(
@@ -315,6 +328,72 @@ internal class VideoMediaControllerFacadeTest {
         connected()
 
         verify(controller, never()).play()
+    }
+
+    @Test
+    fun `test that seekTo moves the controller to the position`() {
+        connected()
+
+        underTest.seekTo(72_000L)
+
+        verify(controller).seekTo(72_000L)
+    }
+
+    @Test
+    fun `test that a position discontinuity refreshes the position and duration`() = runTest {
+        whenever(controller.duration).thenReturn(225_000L)
+        connected()
+
+        // Polling only runs while playing, so without this a seek made from the paused screen
+        // would leave the scrub bar showing where the drag began. Driven from the listener rather
+        // than from seekTo so that a seek this facade did not issue — a media button, or another
+        // controller on the player the service shares — is picked up too.
+        underTest.playerListener.onPositionDiscontinuity(
+            positionInfo(0L),
+            positionInfo(72_000L),
+            Player.DISCONTINUITY_REASON_SEEK,
+        )
+
+        underTest.playerState.test {
+            val emitted = awaitItem()
+            assertThat(emitted.currentPositionMs).isEqualTo(72_000L)
+            assertThat(emitted.durationMs).isEqualTo(225_000L)
+        }
+    }
+
+    @Test
+    fun `test that a position discontinuity keeps the duration the player already reported`() =
+        runTest {
+            whenever(controller.duration).thenReturn(225_000L)
+            connected()
+            underTest.playerListener.onPositionDiscontinuity(
+                positionInfo(0L),
+                positionInfo(72_000L),
+                Player.DISCONTINUITY_REASON_SEEK,
+            )
+
+            // A player that has not worked out the length answers C.TIME_UNSET. Flooring that to
+            // zero would erase a length already known, and the scrub bar refuses to seek without
+            // one, with nothing left running to repair it while playback is paused.
+            whenever(controller.duration).thenReturn(C.TIME_UNSET)
+            underTest.playerListener.onPositionDiscontinuity(
+                positionInfo(72_000L),
+                positionInfo(90_000L),
+                Player.DISCONTINUITY_REASON_SEEK,
+            )
+
+            underTest.playerState.test {
+                val emitted = awaitItem()
+                assertThat(emitted.currentPositionMs).isEqualTo(90_000L)
+                assertThat(emitted.durationMs).isEqualTo(225_000L)
+            }
+        }
+
+    @Test
+    fun `test that seekTo does nothing before the controller arrives`() {
+        underTest.seekTo(72_000L)
+
+        verify(controller, never()).seekTo(any<Long>())
     }
 
     @Test

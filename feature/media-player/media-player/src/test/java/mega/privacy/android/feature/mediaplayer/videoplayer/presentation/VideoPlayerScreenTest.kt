@@ -13,6 +13,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.feature.mediaplayer.components.VIDEO_PLAYER_SEEK_BAR_TEST_TAG
+import mega.privacy.android.feature.mediaplayer.components.VIDEO_PLAYER_TIME_TEST_TAG
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSourceType
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerUiState
 import org.junit.Rule
@@ -32,6 +34,8 @@ class VideoPlayerScreenTest {
         videoHeight: Int = 1080,
         isLoading: Boolean = false,
         playWhenReady: Boolean = false,
+        currentPositionMs: Long = 0L,
+        durationMs: Long = 0L,
     ) = VideoPlayerUiState.Data(
         currentPlayingHandle = 1L,
         currentPlayingItemName = "video.mp4",
@@ -40,6 +44,8 @@ class VideoPlayerScreenTest {
         videoHeight = videoHeight,
         isLoading = isLoading,
         playWhenReady = playWhenReady,
+        currentPositionMs = currentPositionMs,
+        durationMs = durationMs,
     )
 
     /**
@@ -49,6 +55,7 @@ class VideoPlayerScreenTest {
     private fun setScreen(
         uiState: VideoPlayerUiState,
         onPlayPauseClick: () -> Unit = {},
+        onSeekTo: (Long) -> Unit = {},
     ) {
         composeTestRule.setContent {
             Box(modifier = Modifier.size(CONTAINER_WIDTH, CONTAINER_HEIGHT)) {
@@ -57,6 +64,7 @@ class VideoPlayerScreenTest {
                     onSurfaceReady = {},
                     onSurfaceReleased = {},
                     onPlayPauseClick = onPlayPauseClick,
+                    onSeekTo = onSeekTo,
                 )
             }
         }
@@ -175,10 +183,20 @@ class VideoPlayerScreenTest {
     }
 
     @Test
+    fun `test that the scrub bar and the playback times are shown once the launch resolves`() {
+        setScreen(data(currentPositionMs = 12_000L, durationMs = 225_000L))
+
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_SEEK_BAR_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_TIME_TEST_TAG).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that no controls are shown while the launch is being resolved`() {
         setScreen(VideoPlayerUiState.Loading)
 
         composeTestRule.onNodeWithTag(VIDEO_PLAYER_PLAY_PAUSE_TEST_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_SEEK_BAR_TEST_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_TIME_TEST_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -186,6 +204,8 @@ class VideoPlayerScreenTest {
         setScreen(VideoPlayerUiState.InvalidLaunchSource)
 
         composeTestRule.onNodeWithTag(VIDEO_PLAYER_PLAY_PAUSE_TEST_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_SEEK_BAR_TEST_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(VIDEO_PLAYER_TIME_TEST_TAG).assertDoesNotExist()
     }
 
     private companion object {
