@@ -3,7 +3,6 @@ package mega.privacy.android.app.activities.destinations
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import dagger.Lazy
-import leftMeetingDestination
 import mega.privacy.android.app.businessExpiredAlertLegacyDestination
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
@@ -35,6 +34,7 @@ import mega.privacy.android.app.presentation.fileexplorer.fileExplorer
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScreen
 import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryLegacyDestination
+import mega.privacy.android.app.presentation.meeting.navigation.leftMeetingDestination
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.offlineFileInfoScreen
 import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.mediaDiscoveryLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
@@ -165,7 +165,7 @@ class LegacyCoreActivityFeatureGraph(
             )
             contactAttachmentDestination(navigationHandler = navigationHandler)
             businessExpiredAlertLegacyDestination(navigationHandler::back)
-            leftMeetingDestination(navigationHandler::remove)
+            leftMeetingDestination(navigationHandler = navigationHandler)
             fileExplorer(
                 removeDestination = navigationHandler::remove,
                 returnResult = navigationHandler::returnResult,
