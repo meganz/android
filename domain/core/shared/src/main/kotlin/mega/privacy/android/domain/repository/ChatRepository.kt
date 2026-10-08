@@ -1067,4 +1067,18 @@ interface ChatRepository {
      * @return True if the chat is the note to self, false otherwise.
      */
     suspend fun isNoteToSelfChat(chatId: Long): Boolean?
+
+    /**
+     * Get whether the chat engine is in background
+     *
+     * @return True when in background, false when in foreground, null when the status is unavailable
+     */
+    suspend fun isChatInBackground(): Boolean?
+
+    /**
+     * Notify the chat engine whether the app is in background
+     *
+     * @param inBackground True when the app is in background
+     */
+    suspend fun setChatBackgroundStatus(inBackground: Boolean)
 }

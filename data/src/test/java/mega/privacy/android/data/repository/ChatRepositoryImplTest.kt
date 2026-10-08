@@ -89,6 +89,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullSource
@@ -1435,6 +1436,27 @@ class ChatRepositoryImplTest {
             whenever(megaChatApiGateway.getChatRoom(chatId)) doReturn chatRoom
 
             assertThat(underTest.isNoteToSelfChat(chatId)).isEqualTo(isNoteToSelf)
+        }
+
+        @ParameterizedTest(name = "status: {0}, expected: {1}")
+        @CsvSource("1, true", "0, false", "-1,")
+        fun `test that isChatInBackground maps the background status`(
+            status: Int,
+            expected: Boolean?,
+        ) = runTest {
+            whenever(megaChatApiGateway.getBackgroundStatus()) doReturn status
+
+            assertThat(underTest.isChatInBackground()).isEqualTo(expected)
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        fun `test that setChatBackgroundStatus sets the background status in the gateway`(
+            inBackground: Boolean,
+        ) = runTest {
+            underTest.setChatBackgroundStatus(inBackground)
+
+            verify(megaChatApiGateway).setBackgroundStatus(inBackground)
         }
 
         private fun stubGetMyChatFilesFolder(folderHandle: Long = 1L) {

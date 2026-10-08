@@ -4,9 +4,6 @@ import android.app.Application
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.StrictMode
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
 import dagger.Lazy
 import dagger.hilt.EntryPoint
@@ -14,17 +11,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.SmsVerificationState
 import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import nz.mega.sdk.MegaChatApiAndroid
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -33,20 +25,9 @@ import javax.inject.Inject
  * @property activityLifecycleHandler
  * @property pushNotificationSettingManagement
  * @property chatManagement
- * @property applicationScope
  */
 @HiltAndroidApp
-class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.Provider {
-    @Inject
-    lateinit var _megaChatApi: Lazy<MegaChatApiAndroid>
-
-    private val megaChatApi: MegaChatApiAndroid
-        get() = _megaChatApi.get()
-
-    @ApplicationScope
-    @Inject
-    lateinit var applicationScope: CoroutineScope
-
+class MegaApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
 
@@ -75,43 +56,13 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
      *
      */
     override fun onCreate() {
-        super<Application>.onCreate()
+        super.onCreate()
         enableStrictMode()
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
         smsVerificationState.isVerificationShown = false
 
         globalInitialiser.onAppCreate()
-    }
-
-    /**
-     * On start
-     *
-     */
-    override fun onStart(owner: LifecycleOwner) {
-        globalInitialiser.onAppStart()
-        applicationScope.launch {
-            val backgroundStatus = megaChatApi.backgroundStatus
-            Timber.d("Application start with backgroundStatus: %s", backgroundStatus)
-            if (backgroundStatus != -1 && backgroundStatus != 0) {
-                megaChatApi.setBackgroundStatus(false)
-            }
-        }
-    }
-
-    /**
-     * On stop
-     *
-     */
-    override fun onStop(owner: LifecycleOwner) {
-        applicationScope.launch {
-            val backgroundStatus = megaChatApi.backgroundStatus
-            Timber.d("Application stop with backgroundStatus: %s", backgroundStatus)
-            if (backgroundStatus != -1 && backgroundStatus != 1) {
-                megaChatApi.setBackgroundStatus(true)
-            }
-        }
     }
 
     private fun enableStrictMode() {

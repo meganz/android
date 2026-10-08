@@ -7,6 +7,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
+import mega.privacy.android.domain.usecase.chat.SetChatBackgroundStatusUseCase
 import mega.privacy.android.domain.usecase.logging.FlushLogsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -25,13 +27,17 @@ class AppForegroundLifecycleObserverTest {
     private lateinit var underTest: AppForegroundLifecycleObserver
     private lateinit var applicationScope: CoroutineScope
 
+    private val globalInitialiser = mock<GlobalInitialiser>()
+    private val setChatBackgroundStatusUseCase = mock<SetChatBackgroundStatusUseCase>()
     private val flushLogsUseCase = mock<FlushLogsUseCase>()
 
     @BeforeEach
     fun setUp() {
-        reset(flushLogsUseCase)
+        reset(globalInitialiser, setChatBackgroundStatusUseCase, flushLogsUseCase)
         applicationScope = CoroutineScope(UnconfinedTestDispatcher())
         underTest = AppForegroundLifecycleObserver(
+            globalInitialiser = globalInitialiser,
+            setChatBackgroundStatusUseCase = setChatBackgroundStatusUseCase,
             flushLogsUseCase = flushLogsUseCase,
             applicationScope = applicationScope,
         )
@@ -41,6 +47,37 @@ class AppForegroundLifecycleObserverTest {
     fun tearDown() {
         applicationScope.cancel()
     }
+
+    @Test
+    fun `test that onStart runs the app start initialisers`() = runTest {
+        underTest.onStart(mock<LifecycleOwner>())
+
+        verify(globalInitialiser).onAppStart()
+    }
+
+    @Test
+    fun `test that onStart sets the chat background status to foreground`() = runTest {
+        underTest.onStart(mock<LifecycleOwner>())
+
+        verify(setChatBackgroundStatusUseCase).invoke(false)
+    }
+
+    @Test
+    fun `test that onStop sets the chat background status to background`() = runTest {
+        underTest.onStop(mock<LifecycleOwner>())
+
+        verify(setChatBackgroundStatusUseCase).invoke(true)
+    }
+
+    @Test
+    fun `test that onStop still flushes the logs when setting the chat background status throws`() =
+        runTest {
+            whenever(setChatBackgroundStatusUseCase(true)).thenThrow(RuntimeException("chat error"))
+
+            underTest.onStop(mock<LifecycleOwner>())
+
+            verify(flushLogsUseCase).invoke()
+        }
 
     @Test
     fun `test that onStop flushes the logs`() = runTest {

@@ -1480,6 +1480,17 @@ class FakeMegaChatApiGateway(
         engine.dispatch(MegaChatApiGateway::setUserStoppedTyping, listOf(chatId)) {}
     }
 
+    override fun getBackgroundStatus(): Int =
+        engine.dispatchBlocking(MegaChatApiGateway::getBackgroundStatus, emptyList()) {
+            chatState.backgroundStatus
+        }
+
+    override fun setBackgroundStatus(inBackground: Boolean) {
+        engine.dispatchBlocking(MegaChatApiGateway::setBackgroundStatus, listOf(inBackground)) {
+            chatState.backgroundStatus = if (inBackground) 1 else 0
+        }
+    }
+
     private companion object {
         const val HISTORY_COLLECTOR_TIMEOUT_MS = 500L
 

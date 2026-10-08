@@ -1382,6 +1382,19 @@ internal class ChatRepositoryImpl @Inject constructor(
         megaChatApiGateway.getChatRoom(chatId)?.isNoteToSelf
     }
 
+    override suspend fun isChatInBackground(): Boolean? = withContext(ioDispatcher) {
+        when (megaChatApiGateway.getBackgroundStatus()) {
+            1 -> true
+            0 -> false
+            else -> null
+        }
+    }
+
+    override suspend fun setChatBackgroundStatus(inBackground: Boolean) =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.setBackgroundStatus(inBackground)
+        }
+
     private suspend fun getMyChatsFilesFolderIdFromGateway(): NodeId? = withContext(ioDispatcher) {
         runCatching {
             suspendCancellableCoroutine { continuation ->

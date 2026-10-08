@@ -2100,4 +2100,18 @@ interface MegaChatApiGateway {
      * @param chatId
      */
     suspend fun setUserStoppedTyping(chatId: Long)
+
+    /**
+     * Get the background status of the chat engine
+     *
+     * @return 1 when in background, 0 when in foreground, -1 on error
+     */
+    fun getBackgroundStatus(): Int
+
+    /**
+     * Notify the chat engine whether the app is in background
+     *
+     * @param inBackground True when the app is in background
+     */
+    fun setBackgroundStatus(inBackground: Boolean)
 }

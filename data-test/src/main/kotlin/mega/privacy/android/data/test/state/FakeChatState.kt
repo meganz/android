@@ -21,6 +21,9 @@ class FakeChatState {
     /** Own online status. */
     var onlineStatus: Int = MegaChatApi.STATUS_ONLINE
 
+    /** Background status, as returned by MegaChatApi.getBackgroundStatus. */
+    var backgroundStatus: Int = 0
+
     /** Whether the presence auto-away option is enabled. */
     var presenceAutoAwayEnabled: Boolean = false
 
@@ -86,6 +89,7 @@ class FakeChatState {
     fun reset() {
         initState = MegaChatApi.INIT_ONLINE_SESSION
         onlineStatus = MegaChatApi.STATUS_ONLINE
+        backgroundStatus = 0
         presenceAutoAwayEnabled = false
         presenceAutoAwayTimeout = 0L
         presencePersist = false

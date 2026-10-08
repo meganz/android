@@ -982,6 +982,11 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.sendStopTypingNotification(chatId)
     }
 
+    override fun getBackgroundStatus(): Int = chatApi.backgroundStatus
+
+    override fun setBackgroundStatus(inBackground: Boolean) =
+        chatApi.setBackgroundStatus(inBackground)
+
     companion object {
         /**
          * Guards [MegaChatApiJava.openChatRoom] and [MegaChatApiJava.closeChatRoom], which mutate

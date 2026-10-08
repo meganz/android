@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 /**
  * Registers [AppForegroundLifecycleObserver] with the process lifecycle and the
- * application's component callbacks so it can flush logs at lifecycle boundaries.
+ * application's component callbacks so it can react to lifecycle boundaries.
  */
 internal class AppLifecycleInitialiser @Inject constructor(
     @ApplicationContext private val context: Context,
