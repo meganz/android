@@ -45,6 +45,66 @@ class CacheGatewayImplTest {
     }
 
     @Test
+    fun `test that getOrCreateCacheFolder creates the folder when it does not exist`() = runTest {
+        val actual = underTest.getOrCreateCacheFolder("previews")
+
+        assertThat(actual).isEqualTo(File(cacheDir, "previews"))
+        assertThat(actual?.isDirectory).isTrue()
+    }
+
+    @Test
+    fun `test that getOrCreateCacheFolder returns the folder when it already exists`() = runTest {
+        val folder = File(cacheDir, "previews").apply { mkdir() }
+
+        val actual = underTest.getOrCreateCacheFolder("previews")
+
+        assertThat(actual).isEqualTo(folder)
+    }
+
+    @Test
+    fun `test that getOrCreateCacheFolder returns null when a file has the folder name`() =
+        runTest {
+            File(cacheDir, "previews").writeText("not a folder")
+
+            val actual = underTest.getOrCreateCacheFolder("previews")
+
+            assertThat(actual).isNull()
+        }
+
+    @Test
+    fun `test that getOrCreateChatCacheFolder returns the folder when it already exists`() =
+        runTest {
+            whenever(context.filesDir).thenReturn(cacheDir)
+            val folder = File(cacheDir, CacheFolderConstant.CHAT_TEMPORARY_FOLDER).apply { mkdir() }
+
+            val actual = underTest.getOrCreateChatCacheFolder()
+
+            assertThat(actual).isEqualTo(folder)
+        }
+
+    @Test
+    fun `test that getOrCreateChatCacheFolder creates the folder when it does not exist`() =
+        runTest {
+            whenever(context.filesDir).thenReturn(cacheDir)
+
+            val actual = underTest.getOrCreateChatCacheFolder()
+
+            assertThat(actual).isEqualTo(File(cacheDir, CacheFolderConstant.CHAT_TEMPORARY_FOLDER))
+            assertThat(actual?.isDirectory).isTrue()
+        }
+
+    @Test
+    fun `test that getOrCreateChatCacheFolder returns null when a file has the folder name`() =
+        runTest {
+            whenever(context.filesDir).thenReturn(cacheDir)
+            File(cacheDir, CacheFolderConstant.CHAT_TEMPORARY_FOLDER).writeText("not a folder")
+
+            val actual = underTest.getOrCreateChatCacheFolder()
+
+            assertThat(actual).isNull()
+        }
+
+    @Test
     fun `test that getThumbnailCacheFolderPath creates the folder and returns its path`() =
         runTest {
             val actual = underTest.getThumbnailCacheFolderPath()
