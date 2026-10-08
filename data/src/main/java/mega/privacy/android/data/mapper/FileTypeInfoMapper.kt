@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,6 +46,16 @@ internal fun getFileTypeInfoForExtension(
     mimeType: String,
     extension: String,
     duration: Int,
+) = fileTypeInfoFor(
+    mimeType = mimeType,
+    extension = extension.lowercase(Locale.ROOT),
+    duration = duration,
+)
+
+private fun fileTypeInfoFor(
+    mimeType: String,
+    extension: String,
+    duration: Int,
 ) = when {
     mimeType.startsWith(PdfFileTypeInfo.mimeType) -> {
         PdfFileTypeInfo
@@ -61,21 +72,21 @@ internal fun getFileTypeInfoForExtension(
         UrlFileTypeInfo
     }
 
-    extension.lowercase().isGifExtension() -> {
+    extension.isGifExtension() -> {
         GifFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
         )
     }
 
-    extension.lowercase().isRawExtension() -> {
+    extension.isRawExtension() -> {
         RawFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
         )
     }
 
-    extension.lowercase().isSVGExtension() -> {
+    extension.isSVGExtension() -> {
         SvgFileTypeInfo(
             mimeType = mimeType,
             extension = extension,

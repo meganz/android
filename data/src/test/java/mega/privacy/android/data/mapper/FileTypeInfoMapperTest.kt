@@ -208,7 +208,7 @@ class FileTypeInfoMapperTest @Inject constructor() {
         assertThat(underTest(name, 0)).isEqualTo(
             GifFileTypeInfo(
                 mimeType = expectedMimeType,
-                extension = expectedExtension
+                extension = "gif"
             )
         )
     }
@@ -263,7 +263,7 @@ class FileTypeInfoMapperTest @Inject constructor() {
             assertThat(underTest(name, 0)).isEqualTo(
                 RawFileTypeInfo(
                     mimeType = expectedMimeType,
-                    extension = expectedExtension
+                    extension = it
                 )
             )
         }
@@ -430,8 +430,84 @@ class FileTypeInfoMapperTest @Inject constructor() {
         assertThat(underTest(name, 0)).isEqualTo(
             SvgFileTypeInfo(
                 mimeType = expectedMimeType,
-                extension = expectedExtension
+                extension = "svg"
             )
         )
+    }
+
+    @Test
+    fun `test that text extensions are mapped regardless of case`() {
+        val expectedMimeType = "expected"
+        listOf("SETUP.LOG", "Setup.Log", "NOTES.WPD", "Notes.Wpd").forEach { name ->
+            val extension = name.substringAfterLast('.')
+            whenever(mimeTypeMapper(extension)).thenReturn(expectedMimeType)
+
+            assertThat(underTest(name, 0)).isEqualTo(
+                TextFileTypeInfo(
+                    mimeType = expectedMimeType,
+                    extension = extension.lowercase(),
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `test that opus and weba extensions are mapped to audio regardless of case`() {
+        val expectedMimeType = "expected"
+        val expectedDuration = 120
+        listOf("TRACK.OPUS", "Track.Opus", "TRACK.WEBA", "Track.WebA").forEach { name ->
+            val extension = name.substringAfterLast('.')
+            whenever(mimeTypeMapper(extension)).thenReturn(expectedMimeType)
+
+            assertThat(underTest(name, expectedDuration)).isEqualTo(
+                AudioFileTypeInfo(
+                    mimeType = expectedMimeType,
+                    extension = extension.lowercase(),
+                    duration = expectedDuration.seconds,
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `test that vob extension is mapped to video regardless of case`() {
+        val expectedMimeType = "expected"
+        val expectedDuration = 120
+        listOf("MOVIE.VOB", "Movie.Vob").forEach { name ->
+            val extension = name.substringAfterLast('.')
+            whenever(mimeTypeMapper(extension)).thenReturn(expectedMimeType)
+
+            assertThat(underTest(name, expectedDuration)).isEqualTo(
+                VideoFileTypeInfo(
+                    mimeType = expectedMimeType,
+                    extension = extension.lowercase(),
+                    duration = expectedDuration.seconds,
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `test that gif raw and svg extensions are mapped regardless of case`() {
+        val expectedMimeType = "expected"
+        mapOf(
+            "Anim.Gif" to GifFileTypeInfo(mimeType = expectedMimeType, extension = "gif"),
+            "IMG.CR2" to RawFileTypeInfo(mimeType = expectedMimeType, extension = "cr2"),
+            "Img.Cr2" to RawFileTypeInfo(mimeType = expectedMimeType, extension = "cr2"),
+            "Logo.Svg" to SvgFileTypeInfo(mimeType = expectedMimeType, extension = "svg"),
+        ).forEach { (name, expected) ->
+            whenever(mimeTypeMapper(name.substringAfterLast('.'))).thenReturn(expectedMimeType)
+
+            assertThat(underTest(name, 0)).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that the returned extension is lower case when the name is upper case`() {
+        val expectedMimeType = "a mime type"
+        val name = "Archive.XyZ"
+        whenever(mimeTypeMapper("XyZ")).thenReturn(expectedMimeType)
+
+        assertThat(underTest(name, 0).extension).isEqualTo("xyz")
     }
 }
