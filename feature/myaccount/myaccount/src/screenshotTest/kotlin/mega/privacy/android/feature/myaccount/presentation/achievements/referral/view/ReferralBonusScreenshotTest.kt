@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.achievements.referral.view
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
@@ -22,7 +23,7 @@ class ReferralBonusScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun ReferralBonusList() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             ReferralBonusView(
                 uiState = ReferralBonusesUIState(
                     awardedInviteAchievements = listOf(

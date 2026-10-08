@@ -3,7 +3,6 @@ package mega.privacy.android.feature.contact.invite.view
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.android.tools.screenshot.PreviewTest
-import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -14,6 +13,13 @@ import mega.privacy.android.feature.contact.picker.ScannedContactDialog
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 
+/**
+ * Screenshot tests for the invite-contacts screen.
+ *
+ * Not covered here: the open-camera confirmation dialog. It is shown from a `rememberSaveable` flag
+ * that only an [de.palm.composestateevents.EventEffect] flips, and preview rendering never runs
+ * effects, so a golden driven by `ongoingCallConfirmEvent` renders the plain screen instead.
+ */
 class InviteContactsScreenScreenshotTest {
 
     @PreviewTest
@@ -78,21 +84,6 @@ class InviteContactsScreenScreenshotTest {
                 initialSelectedPhoneEmails = setOf("alice@example.com"),
                 initialSelectedManualEmails = setOf("guest@example.org"),
                 initialSelectedPhoneNumbers = setOf("+15551234567"),
-            )
-        }
-    }
-
-    @PreviewTest
-    @CombinedThemePreviews
-    @Composable
-    fun InviteContactsScreenOngoingCallConfirmation() {
-        AndroidThemeForPreviews {
-            InviteContactsScreen(
-                state = inviteDataState(PhoneContactsSection.PickerAvailable(persistentListOf()))
-                    .copy(ongoingCallConfirmEvent = triggered),
-                onSearchQueryChange = {},
-                onInvite = { _, _ -> },
-                onBack = {},
             )
         }
     }

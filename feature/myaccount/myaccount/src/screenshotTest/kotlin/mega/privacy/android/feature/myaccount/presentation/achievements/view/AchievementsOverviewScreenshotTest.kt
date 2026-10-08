@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.achievements.view
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import de.palm.composestateevents.consumed
@@ -20,7 +21,7 @@ class AchievementsOverviewScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun AchievementsOverviewWithReferrals() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             AchievementsOverviewView(
                 uiState = AchievementsUIState(
                     achievementsOverview = null,
@@ -61,7 +62,7 @@ class AchievementsOverviewScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun AchievementsOverviewAwardedTrials() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             AchievementsOverviewView(
                 uiState = AchievementsUIState(
                     achievementsOverview = null,

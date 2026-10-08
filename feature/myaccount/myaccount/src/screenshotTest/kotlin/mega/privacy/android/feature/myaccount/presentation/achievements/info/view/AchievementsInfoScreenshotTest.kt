@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.achievements.info.view
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -20,7 +21,7 @@ class AchievementsInfoScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun MobileInstallAwarded() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             AchievementsInfoView(
                 uiState = AchievementsInfoUIState(
                     awardId = -1,
@@ -40,7 +41,7 @@ class AchievementsInfoScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun DesktopInstallAwarded() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             AchievementsInfoView(
                 uiState = AchievementsInfoUIState(
                     awardId = -1,
@@ -60,7 +61,7 @@ class AchievementsInfoScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun RegistrationExpired() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             AchievementsInfoView(
                 uiState = AchievementsInfoUIState(
                     awardId = -1,

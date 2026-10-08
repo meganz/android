@@ -13,6 +13,15 @@ import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 
+/**
+ * Screenshot tests for the start-conversation screen, rendered through the stateless
+ * [StartConversationScreenContent] so every state can be driven from the test.
+ *
+ * The search *app bar* is the one thing these goldens cannot show: `MegaSearchTopAppBar` raises the
+ * search field from zero alpha inside a `LaunchedEffect`, and preview rendering never runs effects,
+ * so the bar always captures as its idle title. [StartConversationScreenSearchNoResults] therefore
+ * covers the search-empty body only.
+ */
 class StartConversationScreenScreenshotTest {
 
     @PreviewTest

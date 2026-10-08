@@ -67,6 +67,22 @@ Before changing a component, check that a golden exists for the states its chang
 - branches that select different resources — a button label chosen by a `when`
 - landscape, where a layout narrows or reflows
 
+## States a golden cannot reach
+
+Preview rendering composes once and never runs effects. A golden therefore cannot capture anything
+a `LaunchedEffect` or `EventEffect` puts on screen — a `StateEventWithContent` set to `triggered`
+renders the plain screen, and a component that animates itself in (a search field fading from zero
+alpha, a snackbar) captures at its starting frame. Nor can it reach state the screen owns privately
+in `remember` / `rememberSaveable`, which no caller can set.
+
+Render such a state through a stateless composable that takes it as a parameter, or through an
+`initial…` hook on the state holder. If neither exists without reshaping production code, do not
+assert the state — a deleted golden is better than one that quietly renders something else. Say so
+in the test's KDoc so the gap is a known one.
+
+Two goldens for *different* states that are byte-identical mean one of them is not rendering what
+it claims. Compare `md5` across a test class after recording.
+
 ## Goldens are environment-sensitive
 
 Reference images depend on the rendering environment. `updateDebugScreenshotTest` re-records

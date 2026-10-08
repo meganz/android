@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.achievements.invites.view
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import mega.privacy.android.feature.myaccount.presentation.achievements.invites.model.InviteFriendsUIState
@@ -21,7 +22,7 @@ class InviteFriendsScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun InviteFriendsScreen() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             InviteFriendsView(
                 uiState = InviteFriendsUIState(
                     grantStorageInBytes = 5L * 1024 * 1024 * 1024,
@@ -38,7 +39,7 @@ class InviteFriendsScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun InviteSentConfirmationDialogSingle() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             InviteConfirmationDialog(
                 isDialogVisible = true,
                 description = sharedR.string.invite_sent_text,
@@ -51,7 +52,7 @@ class InviteFriendsScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun InviteSentConfirmationDialogMulti() {
-        OriginalTheme(isDark = false) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             InviteConfirmationDialog(
                 isDialogVisible = true,
                 description = sharedR.string.invite_sent_text_multi,
