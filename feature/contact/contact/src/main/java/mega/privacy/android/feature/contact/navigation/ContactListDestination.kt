@@ -28,11 +28,18 @@ import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
  * Contacts entry
  *
  * @param navigationHandler
+ * @param onSendFileToChat invoked with the contact's email when the send file action is selected
+ * from the contact actions sheet; the host launches the file selection and attaches the picked
+ * files to the chat.
+ * @param onShareContact invoked with the contact's email and handle when the share contact action
+ * is selected; the host launches the chat selection and attaches the contact to the picked chats.
  * @param viewModel
  */
 @Composable
 fun ContactsEntry(
     navigationHandler: NavigationHandler,
+    onSendFileToChat: (contactEmail: String) -> Unit,
+    onShareContact: (contactEmail: String, userHandle: Long) -> Unit,
     viewModel: ContactListViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -92,6 +99,8 @@ fun ContactsEntry(
                 }
             )
         },
+        onSendFileToContact = onSendFileToChat,
+        onShareContact = onShareContact,
         onRemoveContact = viewModel::removeContact,
         onChatEventConsumed = viewModel::onChatEventConsumed,
         onCallEventConsumed = viewModel::onCallEventConsumed,

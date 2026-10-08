@@ -190,6 +190,38 @@ class ContactListScreenTest {
     }
 
     @Test
+    fun `test that bottom sheet send file invokes onSendFileToContact with email`() {
+        var receivedEmail: String? = null
+        val contacts = mapOf("A" to listOf(contact(11L, "Alice", email = "a@test.com")))
+        setScreen(
+            dataState(contacts = contacts),
+            onSendFileToContact = { receivedEmail = it },
+        )
+
+        composeTestRule.onAllNodesWithTag("contact_item_view:more")[0].performClick()
+        composeTestRule.onNodeWithTag(CONTACT_ACTION_SEND_FILE_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CONTACT_ACTION_SEND_FILE_TAG).performClick()
+        composeTestRule.waitForIdle()
+        assert(receivedEmail == "a@test.com")
+    }
+
+    @Test
+    fun `test that bottom sheet share contact invokes onShareContact with email and handle`() {
+        var received: Pair<String, Long>? = null
+        val contacts = mapOf("A" to listOf(contact(11L, "Alice", email = "a@test.com")))
+        setScreen(
+            dataState(contacts = contacts),
+            onShareContact = { email, handle -> received = email to handle },
+        )
+
+        composeTestRule.onAllNodesWithTag("contact_item_view:more")[0].performClick()
+        composeTestRule.onNodeWithTag(CONTACT_ACTION_SHARE_CONTACT_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CONTACT_ACTION_SHARE_CONTACT_TAG).performClick()
+        composeTestRule.waitForIdle()
+        assert(received == "a@test.com" to 11L)
+    }
+
+    @Test
     fun `test that search action toggles into search mode`() {
         setScreen(dataState())
         composeTestRule.onNode(searchActionMatcher).performClick()
@@ -225,6 +257,8 @@ class ContactListScreenTest {
         onRequestsClick: () -> Unit = {},
         onGroupsClick: () -> Unit = {},
         onStartCall: (Long, Boolean) -> Unit = { _, _ -> },
+        onSendFileToContact: (String) -> Unit = {},
+        onShareContact: (String, Long) -> Unit = { _, _ -> },
         onRemoveContact: (String) -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -237,6 +271,8 @@ class ContactListScreenTest {
                 onRequestsClick = onRequestsClick,
                 onGroupsClick = onGroupsClick,
                 onStartCall = onStartCall,
+                onSendFileToContact = onSendFileToContact,
+                onShareContact = onShareContact,
                 onRemoveContact = onRemoveContact,
                 onChatEventConsumed = {},
                 onCallEventConsumed = {},

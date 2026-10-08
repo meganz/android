@@ -59,6 +59,10 @@ import mega.privacy.mobile.analytics.event.ContactItemSelectedEvent
  * @param onGroupsClick
  * @param onStartCall invoked when a call is requested from the contact actions sheet; the host
  * requests the call permissions before starting the call.
+ * @param onSendFileToContact invoked with the contact's email when send file is selected; the host
+ * launches the file selection and attaches the picked files to the chat.
+ * @param onShareContact invoked with the contact's email and handle when share contact is selected;
+ * the host launches the chat selection and attaches the contact to the picked chats.
  * @param onRemoveContact
  * @param onChatEventConsumed
  * @param onCallEventConsumed
@@ -78,6 +82,8 @@ fun ContactListScreen(
     onRequestsClick: () -> Unit,
     onGroupsClick: () -> Unit,
     onStartCall: (handle: Long, video: Boolean) -> Unit,
+    onSendFileToContact: (email: String) -> Unit,
+    onShareContact: (email: String, handle: Long) -> Unit,
     onRemoveContact: (email: String) -> Unit,
     onChatEventConsumed: () -> Unit,
     onCallEventConsumed: () -> Unit,
@@ -213,6 +219,14 @@ fun ContactListScreen(
                 selectedContactForSheet = null
                 if (selected.email.isNotBlank()) onContactInfoClick(selected.email)
             },
+            onSendFile = {
+                selectedContactForSheet = null
+                if (selected.email.isNotBlank()) onSendFileToContact(selected.email)
+            },
+            onShareContact = {
+                selectedContactForSheet = null
+                if (selected.email.isNotBlank()) onShareContact(selected.email, selected.handle)
+            },
             onRemove = {
                 selectedContactForSheet = null
                 contactPendingRemoval = selected
@@ -271,6 +285,8 @@ private fun ContactListScreenPreview(
             onRequestsClick = {},
             onGroupsClick = {},
             onStartCall = { _, _ -> },
+            onSendFileToContact = {},
+            onShareContact = { _, _ -> },
             onRemoveContact = {},
             onChatEventConsumed = {},
             onCallEventConsumed = {},

@@ -8,8 +8,8 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import javax.inject.Inject
 
 /**
- * Exposes the current [StorageState] to the Compose contact info destination so actions that
- * upload data (send file, share contact) can be gated behind the over disk quota paywall.
+ * Exposes the current [StorageState] to the Compose contact destinations so actions that upload
+ * data (send file, share contact) can be gated behind the over disk quota paywall.
  */
 @HiltViewModel
 class ContactInfoStorageStateViewModel @Inject constructor(

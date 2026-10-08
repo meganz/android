@@ -18,7 +18,9 @@ import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ContactItemContactInfoMenuItemEvent
 import mega.privacy.mobile.analytics.event.ContactItemRemoveContactMenuItemEvent
+import mega.privacy.mobile.analytics.event.ContactItemSendFileMenuItemEvent
 import mega.privacy.mobile.analytics.event.ContactItemSendMessageMenuItemEvent
+import mega.privacy.mobile.analytics.event.ContactItemShareContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ContactItemStartCallMenuItemEvent
 import mega.privacy.mobile.analytics.event.ContactItemStartVideoCallMenuItemEvent
 import mega.privacy.mobile.analytics.event.RemoveContactConfirmButtonPressedEvent
@@ -84,6 +86,46 @@ class ContactActionsBottomSheetTest {
     }
 
     @Test
+    fun `test that tapping send file tracks ContactItemSendFileMenuItemEvent`() {
+        setSheet()
+
+        composeTestRule.onNodeWithTag(CONTACT_ACTION_SEND_FILE_TAG).performClick()
+
+        assertThat(analyticsRule.events).contains(ContactItemSendFileMenuItemEvent)
+    }
+
+    @Test
+    fun `test that tapping share contact tracks ContactItemShareContactMenuItemEvent`() {
+        setSheet()
+
+        composeTestRule.onNodeWithTag(CONTACT_ACTION_SHARE_CONTACT_TAG).performClick()
+
+        assertThat(analyticsRule.events).contains(ContactItemShareContactMenuItemEvent)
+    }
+
+    @Test
+    fun `test that tapping send file invokes onSendFile`() {
+        var clicked = false
+        setSheet(onSendFile = { clicked = true })
+
+        composeTestRule.onNodeWithText(sharedR.string.contact_info_send_file).performClick()
+        composeTestRule.waitForIdle()
+
+        assert(clicked)
+    }
+
+    @Test
+    fun `test that tapping share contact invokes onShareContact`() {
+        var clicked = false
+        setSheet(onShareContact = { clicked = true })
+
+        composeTestRule.onNodeWithText(sharedR.string.contact_info_share_contact).performClick()
+        composeTestRule.waitForIdle()
+
+        assert(clicked)
+    }
+
+    @Test
     fun `test that showing remove dialog tracks RemoveContactConfirmationDialogEvent`() {
         setRemoveDialog()
 
@@ -112,7 +154,10 @@ class ContactActionsBottomSheetTest {
         assert(dismissed)
     }
 
-    private fun setSheet() {
+    private fun setSheet(
+        onSendFile: () -> Unit = {},
+        onShareContact: () -> Unit = {},
+    ) {
         composeTestRule.setContent {
             ContactActionsBottomSheet(
                 contact = contact(),
@@ -121,6 +166,8 @@ class ContactActionsBottomSheetTest {
                 onAudioCall = {},
                 onVideoCall = {},
                 onContactInfo = {},
+                onSendFile = onSendFile,
+                onShareContact = onShareContact,
                 onRemove = {},
             )
         }

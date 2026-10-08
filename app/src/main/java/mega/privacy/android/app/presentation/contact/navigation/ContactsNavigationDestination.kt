@@ -40,9 +40,13 @@ fun EntryProviderScope<NavKey>.contactsListDestination(
                 LegacyContactsEntry({ navigationHandler.remove(key) })
             },
             enabled = {
-                ContactsEntry(
-                    navigationHandler = navigationHandler,
-                )
+                ContactAttachmentHost(navigationHandler) { onSendFileToChat, onShareContact ->
+                    ContactsEntry(
+                        navigationHandler = navigationHandler,
+                        onSendFileToChat = onSendFileToChat,
+                        onShareContact = onShareContact,
+                    )
+                }
             },
         )
     }

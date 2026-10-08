@@ -21,7 +21,9 @@ import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ContactItemContactInfoMenuItemEvent
 import mega.privacy.mobile.analytics.event.ContactItemRemoveContactMenuItemEvent
+import mega.privacy.mobile.analytics.event.ContactItemSendFileMenuItemEvent
 import mega.privacy.mobile.analytics.event.ContactItemSendMessageMenuItemEvent
+import mega.privacy.mobile.analytics.event.ContactItemShareContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ContactItemStartCallMenuItemEvent
 import mega.privacy.mobile.analytics.event.ContactItemStartVideoCallMenuItemEvent
 import mega.privacy.mobile.analytics.event.RemoveContactConfirmButtonPressedEvent
@@ -37,6 +39,8 @@ import mega.privacy.mobile.analytics.event.RemoveContactDismissButtonPressedEven
  * @param onAudioCall
  * @param onVideoCall
  * @param onContactInfo
+ * @param onSendFile
+ * @param onShareContact
  * @param onRemove
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +52,8 @@ internal fun ContactActionsBottomSheet(
     onAudioCall: () -> Unit,
     onVideoCall: () -> Unit,
     onContactInfo: () -> Unit,
+    onSendFile: () -> Unit,
+    onShareContact: () -> Unit,
     onRemove: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -107,6 +113,24 @@ internal fun ContactActionsBottomSheet(
                     modifier = Modifier.testTag(CONTACT_ACTION_CONTACT_INFO_TAG),
                 )
                 NodeActionListTile(
+                    text = stringResource(sharedR.string.contact_info_send_file),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.MessageArrowUp),
+                    onActionClicked = {
+                        Analytics.tracker.trackEvent(ContactItemSendFileMenuItemEvent)
+                        close(onSendFile)
+                    },
+                    modifier = Modifier.testTag(CONTACT_ACTION_SEND_FILE_TAG),
+                )
+                NodeActionListTile(
+                    text = stringResource(sharedR.string.contact_info_share_contact),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.UserRight),
+                    onActionClicked = {
+                        Analytics.tracker.trackEvent(ContactItemShareContactMenuItemEvent)
+                        close(onShareContact)
+                    },
+                    modifier = Modifier.testTag(CONTACT_ACTION_SHARE_CONTACT_TAG),
+                )
+                NodeActionListTile(
                     text = stringResource(sharedR.string.contacts_action_remove_contact),
                     icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
                     isDestructive = true,
@@ -152,5 +176,7 @@ internal const val CONTACT_ACTION_SEND_MESSAGE_TAG = "contact_actions_sheet:send
 internal const val CONTACT_ACTION_AUDIO_CALL_TAG = "contact_actions_sheet:audio_call"
 internal const val CONTACT_ACTION_VIDEO_CALL_TAG = "contact_actions_sheet:video_call"
 internal const val CONTACT_ACTION_CONTACT_INFO_TAG = "contact_actions_sheet:contact_info"
+internal const val CONTACT_ACTION_SEND_FILE_TAG = "contact_actions_sheet:send_file"
+internal const val CONTACT_ACTION_SHARE_CONTACT_TAG = "contact_actions_sheet:share_contact"
 internal const val CONTACT_ACTION_REMOVE_TAG = "contact_actions_sheet:remove"
 internal const val REMOVE_CONTACT_DIALOG_TAG = "contact_actions_sheet:remove_dialog"
