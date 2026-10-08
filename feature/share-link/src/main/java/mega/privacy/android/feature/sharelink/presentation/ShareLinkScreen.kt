@@ -1,10 +1,16 @@
 package mega.privacy.android.feature.sharelink.presentation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -136,7 +142,7 @@ fun ShareLinkScreen(
                     AnchoredButtonGroup(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .navigationBarsPadding(),
+                            .windowInsetsPadding(bottomBarInsets()),
                         buttonGroup = listOf(
                             {
                                 Button.PrimaryButton(
@@ -165,7 +171,7 @@ fun ShareLinkScreen(
                 ShareLinkUiState.CopyrightConsent -> AnchoredButtonGroup(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .navigationBarsPadding(),
+                        .windowInsetsPadding(bottomBarInsets()),
                     buttonGroup = listOf(
                         {
                             Button.PrimaryButton(
@@ -346,6 +352,21 @@ internal data object ShareLinkSettingsAction : MenuActionWithIcon {
     @Composable
     override fun getDescription() = stringResource(sharedR.string.general_settings)
 }
+
+/**
+ * Insets for the screen's bottom bar.
+ *
+ * The scaffold does not inset its bottom bar slot, so the navigation bar has to be accounted for
+ * here. The display cutout has to come with it: in landscape the cutout sits on one side while the
+ * navigation bar sits on the other, and the content above already keeps clear of both through the
+ * scaffold's content padding. Taking only the horizontal and bottom sides keeps the cutout's top
+ * inset — the camera notch in portrait — from pushing the button group down.
+ */
+@Composable
+private fun bottomBarInsets(): WindowInsets =
+    WindowInsets.navigationBars
+        .union(WindowInsets.displayCutout)
+        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
 
 internal const val SHARE_LINK_APP_BAR_TAG = "share_link_screen:app_bar"
 internal const val SHARE_LINK_SHARE_BUTTON_TAG = "share_link_screen:button_share"
