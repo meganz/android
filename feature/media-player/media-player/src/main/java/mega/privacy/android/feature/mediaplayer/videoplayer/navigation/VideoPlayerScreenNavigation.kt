@@ -49,6 +49,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             uiState = uiState,
             onSurfaceReady = viewModel::onSurfaceReady,
             onSurfaceReleased = viewModel::onSurfaceReleased,
+            onPlayPauseClick = viewModel::onPlayPauseClick,
         )
     }
 }

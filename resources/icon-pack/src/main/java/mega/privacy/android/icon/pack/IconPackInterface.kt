@@ -317,6 +317,7 @@ interface IconPackInterface {
                 val Link01: ImageVector
                 val Menu01: ImageVector
                 val MessageChatCircle: ImageVector
+                val PauseCircle: ImageVector
                 val Phone01: ImageVector
                 val PlayCircle: ImageVector
                 val RectangleVideoStack: ImageVector

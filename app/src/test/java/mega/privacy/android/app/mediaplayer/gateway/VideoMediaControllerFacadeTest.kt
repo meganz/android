@@ -297,6 +297,27 @@ internal class VideoMediaControllerFacadeTest {
     }
 
     @Test
+    fun `test that pause stops playback on the controller`() {
+        connected()
+
+        underTest.pause()
+
+        verify(controller).pause()
+    }
+
+    @Test
+    fun `test that pause drops a play that was waiting for the connection`() {
+        // Pausing before the controller arrives cannot reach the player, but it must still beat
+        // the held play, or the video starts the moment the connection lands.
+        underTest.play()
+        underTest.pause()
+
+        connected()
+
+        verify(controller, never()).play()
+    }
+
+    @Test
     fun `test that attachSurface binds the texture view to the controller`() {
         val textureView = mock<TextureView>()
         connected()

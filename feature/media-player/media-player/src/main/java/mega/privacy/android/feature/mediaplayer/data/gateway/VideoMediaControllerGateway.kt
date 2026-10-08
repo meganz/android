@@ -47,6 +47,9 @@ interface VideoMediaControllerGateway {
     /** Starts playback. */
     fun play()
 
+    /** Pauses playback, keeping the item and the position it reached. */
+    fun pause()
+
     /**
      * Binds the player's video output to [textureView].
      *

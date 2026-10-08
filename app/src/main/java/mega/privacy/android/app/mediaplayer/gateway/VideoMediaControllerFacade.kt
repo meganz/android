@@ -298,6 +298,19 @@ internal class VideoMediaControllerFacade @Inject constructor(
     }
 
     @MainThread
+    override fun pause() {
+        if (isReleased) return
+        val ctrl = controller
+        if (ctrl == null) {
+            // Nothing to pause yet, but a play held for the connection would start the moment it
+            // arrives, against the user's last instruction.
+            pendingPlay = false
+            return
+        }
+        ctrl.pause()
+    }
+
+    @MainThread
     override fun attachSurface(textureView: TextureView) {
         if (isReleased) return
         val ctrl = controller

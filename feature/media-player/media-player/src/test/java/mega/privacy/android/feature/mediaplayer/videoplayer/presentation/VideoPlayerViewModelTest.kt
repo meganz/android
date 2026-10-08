@@ -3,6 +3,7 @@ package mega.privacy.android.feature.mediaplayer.videoplayer.presentation
 import android.net.Uri
 import android.view.TextureView
 import androidx.lifecycle.ViewModelStore
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,6 +58,22 @@ internal class VideoPlayerViewModelTest {
             httpServerStopUseCase = httpServerStopUseCase,
             applicationScope = this,
         )
+    }
+
+    /**
+     * How many items arrive, and which, depends on how the player state was seeded and on what
+     * the state flow conflates away before the first `awaitItem`, so a test that changes
+     * `playWhenReady` waits for the value it cares about rather than counting items. Reaching the
+     * matching item is itself the assertion; it is returned for tests that also check the rest of
+     * the state that arrived with it.
+     */
+    private suspend fun ReceiveTurbine<VideoPlayerUiState>.awaitUntilPlayWhenReady(
+        expected: Boolean,
+    ): VideoPlayerUiState.Data {
+        while (true) {
+            val item = awaitItem()
+            if (item is VideoPlayerUiState.Data && item.playWhenReady == expected) return item
+        }
     }
 
     /** Clearing the store is what calls the ViewModel's protected `onCleared`. */
@@ -258,6 +275,82 @@ internal class VideoPlayerViewModelTest {
         underTest.onSurfaceReleased()
 
         verify(gateway).clearSurface()
+    }
+
+    @Test
+    fun `test that onPlayPauseClick pauses when playback is running`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+        playerState.value = VideoControllerState(playWhenReady = true)
+
+        // Clicked while the state is collected: the ViewModel reads the value the button was
+        // drawn from, which only stands while something is subscribed.
+        underTest.uiState.test {
+            awaitUntilPlayWhenReady(true)
+            underTest.onPlayPauseClick()
+        }
+
+        verify(gateway).pause()
+        verify(gateway, never()).play()
+    }
+
+    @Test
+    fun `test that onPlayPauseClick plays when playback is paused`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+        playerState.value = VideoControllerState(playWhenReady = false)
+
+        underTest.uiState.test {
+            awaitUntilPlayWhenReady(false)
+            underTest.onPlayPauseClick()
+        }
+
+        verify(gateway).play()
+        verify(gateway, never()).pause()
+    }
+
+    @Test
+    fun `test that onPlayPauseClick does nothing when the launch source is unusable`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(null)
+        initViewModel()
+
+        underTest.uiState.test {
+            while (awaitItem() !is VideoPlayerUiState.InvalidLaunchSource) Unit
+            underTest.onPlayPauseClick()
+        }
+
+        verify(gateway, never()).play()
+        verify(gateway, never()).pause()
+    }
+
+    @Test
+    fun `test that uiState carries whether the user has playback running`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        underTest.uiState.test {
+            awaitUntilPlayWhenReady(expected = false)
+
+            playerState.value = VideoControllerState(playWhenReady = true)
+
+            awaitUntilPlayWhenReady(expected = true)
+        }
+    }
+
+    @Test
+    fun `test that uiState keeps playWhenReady set while the player rebuffers`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        underTest.uiState.test {
+            awaitUntilPlayWhenReady(expected = false)
+
+            // The button has to keep saying "pause" through a rebuffer: the user never asked for
+            // playback to stop, so a tap must still mean pause.
+            playerState.value = VideoControllerState(playWhenReady = true, isBuffering = true)
+
+            assertThat(awaitUntilPlayWhenReady(expected = true).isLoading).isTrue()
+        }
     }
 
     @Test

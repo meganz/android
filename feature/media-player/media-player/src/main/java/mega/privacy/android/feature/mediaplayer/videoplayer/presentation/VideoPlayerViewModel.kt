@@ -88,6 +88,7 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
                     videoWidth = player.videoWidth,
                     videoHeight = player.videoHeight,
                     isLoading = player.isLoading,
+                    playWhenReady = player.playWhenReady,
                 )
             }
         } else {
@@ -127,6 +128,7 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
                 videoWidth = 0,
                 videoHeight = 0,
                 isLoading = true,
+                playWhenReady = false,
             )
         }
     }
@@ -173,6 +175,18 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
     /** Stops rendering into the surface that is going away; playback itself continues. */
     fun onSurfaceReleased() {
         gateway.clearSurface()
+    }
+
+    /**
+     * Toggles playback.
+     *
+     * The direction comes from the state the button was drawn from, so a tap does what the icon
+     * said it would. Nothing to toggle before the launch resolves: the button is not on screen
+     * then, and the player holds no item.
+     */
+    fun onPlayPauseClick() {
+        val state = uiState.value as? VideoPlayerUiState.Data ?: return
+        if (state.playWhenReady) gateway.pause() else gateway.play()
     }
 
     /**

@@ -14,12 +14,13 @@ import androidx.compose.runtime.Stable
 sealed interface VideoPlayerUiState {
 
     /**
-     * Whether the screen shows a spinner: the launch is still being resolved, or the player is
-     * working towards a picture. Both, so that the screen is never plain black on the way to the
-     * first frame. A rejected launch shows nothing — that screen is already closing.
+     * Whether the screen shows a spinner of its own, which it does only while the launch is still
+     * being resolved. Once [Data] is reached the play/pause button carries the spinner through
+     * [Data.isLoading], so answering `true` here as well would put two on screen at once. A
+     * rejected launch shows nothing — that screen is already closing.
      */
     val showsLoadingIndicator: Boolean
-        get() = this is Loading || (this is Data && isLoading)
+        get() = this is Loading
 
     /** The launch source has not been resolved yet. */
     data object Loading : VideoPlayerUiState
@@ -36,6 +37,9 @@ sealed interface VideoPlayerUiState {
      * been decoded.
      * @property isLoading Whether the player is working towards a picture, so the screen shows a
      * spinner rather than the black it would otherwise sit on.
+     * @property playWhenReady Whether the user has playback running. Intent, not motion: it stays
+     * `true` across a rebuffer, which is what the play/pause button has to show, because the
+     * button says what the next tap does. Buffering is told apart by [isLoading].
      */
     data class Data(
         val currentPlayingHandle: Long,
@@ -44,6 +48,7 @@ sealed interface VideoPlayerUiState {
         val videoWidth: Int,
         val videoHeight: Int,
         val isLoading: Boolean,
+        val playWhenReady: Boolean,
     ) : VideoPlayerUiState
 
     /**
