@@ -29,6 +29,9 @@ package mega.privacy.android.feature.mediaplayer.data.model
  * @property album Album of the current item from its Media3 metadata.
  * @property videoWidth Width of the decoded video in pixels; `0` before the first frame is sized.
  * @property videoHeight Height of the decoded video in pixels; `0` before the first frame is sized.
+ * @property isPlayerUnavailable True when the player could not be reached at all, so no command
+ * will ever take effect and nothing retries on its own. Distinct from a playback error, which
+ * leaves a working player: this one means the screen will stay black until it is recreated.
  */
 data class VideoControllerState(
     val playWhenReady: Boolean = false,
@@ -45,6 +48,7 @@ data class VideoControllerState(
     val album: String? = null,
     val videoWidth: Int = 0,
     val videoHeight: Int = 0,
+    val isPlayerUnavailable: Boolean = false,
 ) {
     /**
      * True when the player is actively rendering frames, i.e. ready and not paused.
