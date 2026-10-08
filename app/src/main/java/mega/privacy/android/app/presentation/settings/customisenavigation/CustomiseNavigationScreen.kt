@@ -26,9 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.TextOnlyButton
 import mega.android.core.ui.components.card.RoundCard
@@ -435,7 +435,7 @@ private fun NavigationItemRow(
             )
         },
         enableClick = false,
-        enable = isEnabled,
+        enable = true,
     )
 }
 
