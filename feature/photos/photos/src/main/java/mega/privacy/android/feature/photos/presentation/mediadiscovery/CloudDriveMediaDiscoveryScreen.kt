@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,6 +51,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.modifiers.excludingBottomPadding
@@ -583,13 +585,15 @@ private fun MediaDiscoveryGridView(
             ZoomLevel.Grid_5 -> GridCells.Fixed(5)
         }
     }
+    // Land on the date separator that precedes the item, so its date stays visible
+    val separatorIndex = (uiState.scrollStartIndex - 1).coerceAtLeast(0)
     val lazyGridState = rememberSaveable(
         uiState.scrollStartIndex,
         uiState.scrollStartOffset,
         saver = LazyGridState.Saver,
     ) {
         LazyGridState(
-            uiState.scrollStartIndex,
+            separatorIndex,
             uiState.scrollStartOffset,
         )
     }
@@ -597,7 +601,7 @@ private fun MediaDiscoveryGridView(
     LaunchedEffect(uiState.scrollStartIndex) {
         if (uiState.scrollStartIndex > 0) {
             val startIndex = if (uiState.selectedPeriod == MediaTimePeriod.All) {
-                uiState.scrollStartIndex
+                separatorIndex
             } else {
                 // Since CardListView has two headers, the index needs to be incremented by 2.
                 uiState.scrollStartIndex + 2
@@ -610,8 +614,53 @@ private fun MediaDiscoveryGridView(
         onScrollingListener(lazyGridState.isScrollInProgress)
     }
 
+    Column(modifier = Modifier.fillMaxSize()) {
+        NodeHeaderItem(
+            modifier = Modifier
+                .applyScrollToHideBehavior()
+                .padding(horizontal = 8.dp),
+            onSortOrderClick = {},
+            onChangeViewTypeClick = onBack,
+            onEnterMediaDiscoveryClick = {},
+            sortConfiguration = NodeSortConfiguration.default,
+            isListView = false,
+            showSortOrder = false,
+            showChangeViewType = true,
+            showMediaDiscoveryButton = false,
+        )
+
+        MediaDiscoveryGrid(
+            uiState = uiState,
+            lazyGridState = lazyGridState,
+            gridCells = gridCells,
+            fileTypeIconMapper = fileTypeIconMapper,
+            contentPadding = contentPadding,
+            onItemClicked = onItemClicked,
+            onItemLongPressed = onItemLongPressed,
+            zoomIn = zoomIn,
+            zoomOut = zoomOut,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun MediaDiscoveryGrid(
+    uiState: CloudDriveMediaDiscoveryUiState,
+    lazyGridState: LazyGridState,
+    gridCells: GridCells,
+    fileTypeIconMapper: FileTypeIconMapper,
+    contentPadding: PaddingValues,
+    onItemClicked: (Photo) -> Unit,
+    onItemLongPressed: (Photo) -> Unit,
+    zoomIn: () -> Unit,
+    zoomOut: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     FastScrollLazyVerticalGrid(
-        modifier = Modifier
+        modifier = modifier
             .photosZoomGestureDetector(
                 onZoomIn = zoomIn,
                 onZoomOut = zoomOut,
@@ -623,24 +672,6 @@ private fun MediaDiscoveryGridView(
         verticalArrangement = Arrangement.spacedBy(1.dp),
         contentPadding = contentPadding
     ) {
-        item(
-            key = "sort_header_item",
-            span = { GridItemSpan(maxLineSpan) }
-        ) {
-            NodeHeaderItem(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                onSortOrderClick = {},
-                onChangeViewTypeClick = onBack,
-                onEnterMediaDiscoveryClick = {},
-                sortConfiguration = NodeSortConfiguration.default,
-                isListView = false,
-                showSortOrder = false,
-                showChangeViewType = true,
-                showMediaDiscoveryButton = false,
-            )
-        }
-
         items(
             key = { uiState.mediaListItemList[it].key },
             count = uiState.mediaListItemList.size,
