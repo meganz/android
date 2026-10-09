@@ -868,7 +868,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                         getString(R.string.login_before_share)
                                     )
                                 }
-                                it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                // Reuse the running MegaActivity so its back stack is kept.
+                                it.addFlags(
+                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                            Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                )
                                 startActivity(it)
                             }
                             finish()
