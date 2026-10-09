@@ -2414,6 +2414,7 @@ internal class NodeRepositoryImplTest {
                 tag = anyOrNull(),
                 useAndForTextQuery = any(),
                 sensitivityFilter = eq(SensitivityFilterOption.NonSensitiveOnly),
+                favouriteOnly = eq(false),
             )
         }
 
@@ -2457,6 +2458,7 @@ internal class NodeRepositoryImplTest {
             tag = anyOrNull(),
             useAndForTextQuery = any(),
             sensitivityFilter = eq(SensitivityFilterOption.NonSensitiveOnly),
+            favouriteOnly = eq(false),
         )
         verify(typedNodeMapper, never()).invoke(
             megaNode = any(),
@@ -2515,6 +2517,7 @@ internal class NodeRepositoryImplTest {
                 tag = anyOrNull(),
                 useAndForTextQuery = any(),
                 sensitivityFilter = anyOrNull(),
+                favouriteOnly = eq(false),
             )
         ).thenReturn(filter)
         whenever(megaSearchPageMapper(any(), any())).thenReturn(searchPage)

@@ -106,6 +106,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         tag: String? = null,
         description: String? = null,
         order: SortOrder,
+        favouriteOnly: Boolean = false,
     ): List<MegaNode> {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
         val filter = megaSearchFilterMapper(
@@ -115,6 +116,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             tag = tag,
             description = description,
             useAndForTextQuery = description == null && tag == null,
+            favouriteOnly = favouriteOnly,
         )
         return megaApiGateway.searchWithFilter(
             filter,
@@ -154,8 +156,9 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         val outShareStatusByParentHandle = mutableMapOf<Long, Boolean>()
         val favouriteVideos =
             getAllVideoMegaNodes(
-                order = sortOrder
-            ).filter { it.isFavourite }
+                order = sortOrder,
+                favouriteOnly = true,
+            )
                 .mapNotNull { megaNode ->
                     megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()])
                         ?.let { fileNode ->

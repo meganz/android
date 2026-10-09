@@ -3,6 +3,7 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -72,6 +73,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -223,7 +225,32 @@ internal class TimelineRevampViewModelTest {
     }
 
     @Test
-    fun `test that getMediaTimelineSectionsUseCase is invoked with the default filter`() = runTest {
+    fun `test that getMediaTimelineSectionsUseCase is not invoked until the filter is derived`() =
+        runTest {
+            val derivedFilter = DEFAULT_FILTER.copy(category = MediaTimelineFilter.Category.Photos)
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+            initUnderTest()
+            // Deriving the filter is slow in production — it awaits the camera upload folder
+            // handles, which can fall back to a network round trip. Without that delay the derived
+            // value lands before anything collects and a placeholder seed would never be observed.
+            whenever(getCameraUploadFolderHandlesUseCase()) doSuspendableAnswer {
+                delay(1_000)
+                emptyList()
+            }
+            whenever(timelineFilterUiStateMapper(any<TimelineFilterUiState>(), any()))
+                .thenReturn(derivedFilter)
+
+            underTest.uiState.filterIsInstance<TimelineRevampUiState.Empty>().test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getMediaTimelineSectionsUseCase, never()).invoke(eq(DEFAULT_FILTER), any())
+            verify(getMediaTimelineSectionsUseCase, times(1)).invoke(eq(derivedFilter), any())
+        }
+
+    @Test
+    fun `test that getMediaTimelineSectionsUseCase is invoked with the derived filter`() = runTest {
         whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
         initUnderTest()
 
@@ -237,7 +264,7 @@ internal class TimelineRevampViewModelTest {
     }
 
     @Test
-    fun `test that listMediaNodesByOffsetUseCase is invoked with the default filter`() = runTest {
+    fun `test that listMediaNodesByOffsetUseCase is invoked with the derived filter`() = runTest {
         val sections = listOf(section(groupId = "May 2026", count = 5))
         val nodes = (0 until 5).map { mock<TypedFileNode>() }
         whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)

@@ -33,6 +33,9 @@ class MegaSearchFilterMapper @Inject constructor(
      * @param description [String]
      * @param tag [String]
      * @param useAndForTextQuery [Boolean]
+     * @param favouriteOnly restricts the results to favourite nodes, on top of [searchCategory].
+     * Unlike [SearchCategory.FAVOURITES] — which replaces the category — this composes with it, so a
+     * caller can ask the SDK for "favourite videos" rather than filtering a full category scan.
      */
     operator fun invoke(
         parentHandle: NodeId? = null,
@@ -45,6 +48,7 @@ class MegaSearchFilterMapper @Inject constructor(
         tag: String? = null,
         useAndForTextQuery: Boolean = true,
         sensitivityFilter: SensitivityFilterOption? = null,
+        favouriteOnly: Boolean = false,
     ): MegaSearchFilter = MegaSearchFilter.createInstance().apply {
 
         // Set the search query
@@ -105,6 +109,10 @@ class MegaSearchFilterMapper @Inject constructor(
 
         sensitivityFilter?.let {
             bySensitivity(sensitivityFilterOptionIntMapper(sensitivityFilter))
+        }
+
+        if (favouriteOnly) {
+            byFavourite(BOOL_FILTER_ONLY_TRUE)
         }
     }
 }

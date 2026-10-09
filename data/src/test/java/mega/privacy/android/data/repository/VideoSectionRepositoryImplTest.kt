@@ -114,7 +114,9 @@ class VideoSectionRepositoryImplTest {
             userVideoPlaylistMapper,
             appPreferencesGateway,
             videoRecentlyWatchedItemMapper,
-            favouritesVideoPlaylistMapper
+            favouritesVideoPlaylistMapper,
+            megaSearchFilterMapper,
+            cancelTokenProvider
         )
     }
 
@@ -277,7 +279,8 @@ class VideoSectionRepositoryImplTest {
         whenever(
             megaSearchFilterMapper(
                 searchTarget = SearchTarget.ROOT_NODES,
-                searchCategory = SearchCategory.VIDEO
+                searchCategory = SearchCategory.VIDEO,
+                favouriteOnly = true,
             )
         ).thenReturn(filter)
         whenever(
@@ -806,6 +809,7 @@ class VideoSectionRepositoryImplTest {
                 initTypedVideoNode(it.handle, 100, null, it.handle != 2L)
             }
             val expectedVideos = typedVideoNodes.filter { it.isFavourite }
+            val favouriteMegaNodes = megaNodes.filter { it.isFavourite }
             val favouritesVideoPlaylist = mock<FavouritesVideoPlaylist> {
                 on { videos }.thenReturn(expectedVideos)
             }
@@ -817,7 +821,8 @@ class VideoSectionRepositoryImplTest {
             whenever(
                 megaSearchFilterMapper(
                     searchTarget = SearchTarget.ROOT_NODES,
-                    searchCategory = SearchCategory.VIDEO
+                    searchCategory = SearchCategory.VIDEO,
+                    favouriteOnly = true,
                 )
             ).thenReturn(filter)
             whenever(
@@ -826,7 +831,7 @@ class VideoSectionRepositoryImplTest {
                     sortOrderIntMapper(SortOrder.ORDER_NONE),
                     token
                 )
-            ).thenReturn(megaNodes)
+            ).thenReturn(favouriteMegaNodes)
             whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
             megaNodes.mapIndexed { index, node ->
                 whenever(
@@ -1063,6 +1068,46 @@ class VideoSectionRepositoryImplTest {
     }
 
     @Test
+    fun `test that getFavouritePlaylist asks the sdk for favourite videos only`() = runTest {
+        initEmptyFavouritesVideoPlaylist()
+        initUnderTest()
+        underTest.getFavouritePlaylist(SortOrder.ORDER_NONE)
+        verify(megaSearchFilterMapper).invoke(
+            searchTarget = SearchTarget.ROOT_NODES,
+            searchCategory = SearchCategory.VIDEO,
+            favouriteOnly = true,
+        )
+    }
+
+    @Test
+    fun `test that getAllVideos does not restrict the sdk query to favourites`() = runTest {
+        val filter = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(
+            megaSearchFilterMapper(
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.VIDEO,
+            )
+        ).thenReturn(filter)
+        whenever(
+            megaApiGateway.searchWithFilter(
+                filter,
+                sortOrderIntMapper(SortOrder.ORDER_NONE),
+                token
+            )
+        ).thenReturn(emptyList())
+
+        initUnderTest()
+        underTest.getAllVideos("", null, null, SortOrder.ORDER_NONE)
+        verify(megaSearchFilterMapper).invoke(
+            searchTarget = SearchTarget.ROOT_NODES,
+            searchCategory = SearchCategory.VIDEO,
+            favouriteOnly = false,
+        )
+    }
+
+    @Test
     fun `test that getFavouritesVideoPlaylist only calls getMegaNodeByHandle once per unique parent`() =
         runTest {
             val parentHandle1 = 100L
@@ -1090,7 +1135,8 @@ class VideoSectionRepositoryImplTest {
             whenever(
                 megaSearchFilterMapper(
                     searchTarget = SearchTarget.ROOT_NODES,
-                    searchCategory = SearchCategory.VIDEO
+                    searchCategory = SearchCategory.VIDEO,
+                    favouriteOnly = true,
                 )
             ).thenReturn(filter)
             whenever(

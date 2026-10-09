@@ -75,6 +75,7 @@ class DefaultFavouritesRepositoryTest {
                     tag = anyOrNull(),
                     useAndForTextQuery = any(),
                     sensitivityFilter = eq(null),
+                    favouriteOnly = eq(false),
                 )
             ).thenReturn(filter)
             whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
@@ -107,6 +108,7 @@ class DefaultFavouritesRepositoryTest {
                     tag = anyOrNull(),
                     useAndForTextQuery = any(),
                     sensitivityFilter = eq(SensitivityFilterOption.NonSensitiveOnly),
+                    favouriteOnly = eq(false),
                 )
             ).thenReturn(filter)
             whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)

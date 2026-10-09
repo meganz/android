@@ -251,8 +251,12 @@ class TimelineRevampViewModel @Inject constructor(
      * when the hidden-nodes feature is enabled and "show hidden items" is off (matching the tab). The
      * grid is always grouped at day granularity; the Year / Month card lists are queried separately.
      * Eagerly shared so [fetchSectionNodes] can read the current value synchronously.
+     *
+     * Null until the first real filter is derived. Seeding it with [DEFAULT_FILTER] instead would
+     * load the timeline twice: once against the placeholder — briefly rendering a grid that is not
+     * sensitivity-filtered — and again when the real filter arrives.
      */
-    private val currentFilter: StateFlow<MediaTimelineFilter> by lazy(LazyThreadSafetyMode.NONE) {
+    private val currentFilter: StateFlow<MediaTimelineFilter?> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             filterUiState,
             isHiddenNodesEnabled,
@@ -270,7 +274,7 @@ class TimelineRevampViewModel @Inject constructor(
                 Timber.e(e, "Failed to derive current filter")
                 emit(DEFAULT_FILTER)
             }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_FILTER)
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
     }
 
     /**
@@ -384,7 +388,7 @@ class TimelineRevampViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val periodCards: StateFlow<PeriodCards> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            currentFilter,
+            currentFilter.filterNotNull(),
             selectedSortFlow,
             monitorMediaChanges.onStart { emit(Unit) },
         ) { filter, sort, _ -> filter to sort }
@@ -568,7 +572,10 @@ class TimelineRevampViewModel @Inject constructor(
     private fun monitorTimelineSections() {
         if (!sectionsMonitorStarted.compareAndSet(false, true)) return
         viewModelScope.launch {
-            combine(currentFilter, selectedSortFlow) { filter, sort -> filter to sort }
+            combine(
+                currentFilter.filterNotNull(),
+                selectedSortFlow
+            ) { filter, sort -> filter to sort }
                 .collectLatest { (filter, sort) ->
                     loadSections(filter, sort.sortOrder)
                     refreshSectionsOnMediaChange(filter, sort.sortOrder)
@@ -590,7 +597,10 @@ class TimelineRevampViewModel @Inject constructor(
      * On every media change, silently re-fetches the sections and applies them once the grid is idle.
      * Never returns; cancelled by [monitorTimelineSections] when the filter/sort changes.
      */
-    private suspend fun refreshSectionsOnMediaChange(filter: MediaTimelineFilter, order: SortOrder) {
+    private suspend fun refreshSectionsOnMediaChange(
+        filter: MediaTimelineFilter,
+        order: SortOrder,
+    ) {
         monitorMediaChanges.collectLatest {
             val refreshed = getTimelineSections(filter, order)
             if (refreshed != sectionsState.value.sectionsOrEmpty()) {
@@ -843,7 +853,8 @@ class TimelineRevampViewModel @Inject constructor(
                     slot.localIndex >= newCount
         }
         pendingSelectionFlow.update { pending ->
-            val stale = pending.keys.filter { slot -> (newCounts[slot.groupId] ?: 0) <= slot.localIndex }
+            val stale =
+                pending.keys.filter { slot -> (newCounts[slot.groupId] ?: 0) <= slot.localIndex }
             if (stale.isEmpty()) pending else pending.mutate { it.keys.removeAll(stale) }
         }
         cachedSections = newSections
@@ -960,11 +971,12 @@ class TimelineRevampViewModel @Inject constructor(
         section: MediaTimelineSection,
         localRange: IntRange,
     ): List<TypedFileNode>? {
+        val filter = currentFilter.value ?: return null
         Timber.d("Fetching section '${section.groupId}' offsets [${localRange.first}, ${localRange.last}]")
         val sort = sortOptionsFlow.value ?: TimelineRevampSortConfiguration.Default
         return runCatching {
             listMediaNodesByOffsetUseCase(
-                filter = currentFilter.value,
+                filter = filter,
                 section = section,
                 order = sort.sortOrder,
                 maxElements = localRange.last - localRange.first + 1,
