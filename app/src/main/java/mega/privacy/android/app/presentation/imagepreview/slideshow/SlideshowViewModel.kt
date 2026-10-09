@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package mega.privacy.android.app.presentation.imagepreview.slideshow
 
 import android.os.Bundle
@@ -5,15 +7,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,6 +25,8 @@ import mega.privacy.android.app.components.largebundle.LargeBundleHolder
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher.Companion.timelineSortOrderWithDirection
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -110,20 +116,15 @@ class SlideshowViewModel @Inject constructor(
 
     private fun monitorSlideshowSettings() = viewModelScope.launch {
         val params = loadParams()
-        val orderFlow = monitorSlideshowOrderSettingUseCase().distinctUntilChanged()
-        val imageNodesFlow = imageNodeFetchers[imagePreviewFetcherSource]?.monitorImageNodes(params)
-            ?.catch { Timber.e(it) } ?: flowOf(emptyList())
+        val orderFlow = monitorSlideshowOrderSettingUseCase()
+            .map { it ?: SlideshowOrder.Shuffle }
+            .distinctUntilChanged()
 
-        combine(orderFlow, imageNodesFlow) { order, imageNodes ->
-            val filteredImageNodes = imageNodes.filter {
+        monitorSortedImageNodes(params, orderFlow).onEach { (settingOrder, imageNodes) ->
+            val sortedItems = imageNodes.filter {
                 it.type !is VideoFileTypeInfo && (it.hasThumbnail || it.hasPreview)
             }.distinctBy { it.id }
 
-            val settingOrder = order ?: SlideshowOrder.Shuffle
-            val sortedItems = sortItems(
-                imageNodes = filteredImageNodes,
-                order = settingOrder
-            )
             val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
                 sortedItems
             )
@@ -149,6 +150,40 @@ class SlideshowViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+    }
+
+    /**
+     * Re-queries the timeline fetcher per order, as nodes carry no Date taken to sort on here.
+     */
+    private fun monitorSortedImageNodes(
+        params: Bundle,
+        orderFlow: Flow<SlideshowOrder>,
+    ): Flow<Pair<SlideshowOrder, List<ImageNode>>> {
+        val fetcher = imageNodeFetchers[imagePreviewFetcherSource]
+            ?: return orderFlow.map { it to emptyList() }
+
+        return if (imagePreviewFetcherSource == ImagePreviewFetcherSource.TIMELINE) {
+            orderFlow.flatMapLatest { order ->
+                fetcher.monitorImageNodes(params.withTimelineSlideshowOrder(order))
+                    .catch { Timber.e(it) }
+                    .map { order to it }
+            }
+        } else {
+            val imageNodesFlow = fetcher.monitorImageNodes(params).catch { Timber.e(it) }
+            combine(orderFlow, imageNodesFlow) { order, imageNodes ->
+                order to sortItems(imageNodes = imageNodes, order = order)
+            }
+        }
+    }
+
+    private fun Bundle.withTimelineSlideshowOrder(order: SlideshowOrder): Bundle = when (order) {
+        SlideshowOrder.Shuffle -> this
+        SlideshowOrder.Newest, SlideshowOrder.Oldest -> {
+            val sortOrder = timelineSortOrderWithDirection(ascending = order == SlideshowOrder.Oldest)
+            Bundle(this).apply {
+                putString(TimelineImageNodeFetcher.TIMELINE_SORT_ORDER, sortOrder.name)
+            }
+        }
     }
 
     private fun sortItems(

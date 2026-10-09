@@ -49,8 +49,10 @@ class TimelineImagePreviewManagerTest {
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
             listTimelineImageNodeInfoByOffsetUseCase = listTimelineImageNodeInfoByOffsetUseCase,
             getImageNodeByIdUseCase = getImageNodeByIdUseCase,
-            getCameraUploadFolderHandlesUseCase = getCameraUploadFolderHandlesUseCase,
-            timelineFilterUiStateMapper = timelineFilterUiStateMapper,
+            timelineMediaFilterBuilder = TimelineMediaFilterBuilder(
+                getCameraUploadFolderHandlesUseCase = getCameraUploadFolderHandlesUseCase,
+                timelineFilterUiStateMapper = timelineFilterUiStateMapper,
+            ),
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }

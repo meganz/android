@@ -5,6 +5,8 @@ package mega.privacy.android.app.presentation.imagepreview.slideshow
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -35,6 +37,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -108,6 +112,65 @@ class SlideshowViewModelTest {
         underTest.state.test {
             val state = expectMostRecentItem()
             assertThat(state.imageNodes).hasSize(1)
+        }
+    }
+
+    @Test
+    fun `test that timeline slideshow keeps the fetcher order when order is Newest`() = runTest {
+        val olderNode = imageNode(id = 1L, modificationTime = 100L)
+        val newerNode = imageNode(id = 2L, modificationTime = 200L)
+        val fetcher = mock<ImageNodeFetcher>()
+        whenever(fetcher.monitorImageNodes(any())) doReturn flowOf(listOf(olderNode, newerNode))
+        stubTimelineSlideshow(fetcher, flowOf(SlideshowOrder.Newest))
+
+        val underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = expectMostRecentItem()
+            assertThat(state.imageNodes).containsExactly(olderNode, newerNode).inOrder()
+        }
+    }
+
+    @Test
+    fun `test that timeline slideshow re-queries the fetcher when order changes`() = runTest {
+        val node = imageNode(id = 1L, modificationTime = 100L)
+        val fetcher = mock<ImageNodeFetcher>()
+        whenever(fetcher.monitorImageNodes(any())) doReturn flowOf(listOf(node))
+        val orderFlow = MutableStateFlow<SlideshowOrder?>(SlideshowOrder.Newest)
+        stubTimelineSlideshow(fetcher, orderFlow)
+
+        val underTest = initViewModel()
+        advanceUntilIdle()
+        orderFlow.value = SlideshowOrder.Oldest
+        advanceUntilIdle()
+
+        verify(fetcher, times(2)).monitorImageNodes(any())
+        assertThat(underTest.state.value.order).isEqualTo(SlideshowOrder.Oldest)
+    }
+
+    private fun stubTimelineSlideshow(
+        fetcher: ImageNodeFetcher,
+        orderFlow: Flow<SlideshowOrder?>,
+    ) {
+        whenever(monitorSlideshowOrderSettingUseCase()) doReturn orderFlow
+        whenever(monitorSlideshowSpeedSettingUseCase()) doReturn flowOf()
+        whenever(monitorSlideshowRepeatSettingUseCase()) doReturn flowOf()
+        whenever(monitorSecureSlideshowTutorialShownUseCase()) doReturn flowOf(true)
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE))
+            .thenReturn(1L)
+        imageNodeFetchers[ImagePreviewFetcherSource.TIMELINE] = fetcher
+    }
+
+    private fun imageNode(id: Long, modificationTime: Long): ImageNode {
+        val imageType = mock<StaticImageFileTypeInfo>()
+        return mock {
+            on { this.id } doReturn NodeId(id)
+            on { type } doReturn imageType
+            on { hasThumbnail } doReturn true
+            on { this.modificationTime } doReturn modificationTime
         }
     }
 }

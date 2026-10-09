@@ -15,13 +15,9 @@ import mega.privacy.android.domain.entity.photos.ImageNodeInfo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
 import mega.privacy.android.domain.usecase.photos.ListTimelineImageNodeInfoByOffsetUseCase
-import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
-import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -36,8 +32,7 @@ class TimelineImagePreviewManager @Inject constructor(
     private val getMediaTimelineSectionsUseCase: GetMediaTimelineSectionsUseCase,
     private val listTimelineImageNodeInfoByOffsetUseCase: ListTimelineImageNodeInfoByOffsetUseCase,
     private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase,
-    private val getCameraUploadFolderHandlesUseCase: GetCameraUploadFolderHandlesUseCase,
-    private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
+    private val timelineMediaFilterBuilder: TimelineMediaFilterBuilder,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     // All session fields are written in initialize() before ready.complete() and only read
@@ -71,7 +66,7 @@ class TimelineImagePreviewManager @Inject constructor(
             order = sortOrder
             mediaSource = source
             this@TimelineImagePreviewManager.hideSensitive = hideSensitive
-            filter = buildFilter(mediaType, source, hideSensitive)
+            filter = timelineMediaFilterBuilder(mediaType, source, hideSensitive)
             total = if (knownTotal > 0) {
                 knownTotal
             } else {
@@ -135,7 +130,8 @@ class TimelineImagePreviewManager @Inject constructor(
             return emptyList()
         }
         if (total <= 0) return emptyList()
-        val videoFilter = buildFilter(FilterMediaType.VIDEOS, mediaSource, hideSensitive)
+        val videoFilter =
+            timelineMediaFilterBuilder(FilterMediaType.VIDEOS, mediaSource, hideSensitive)
         return withContext(ioDispatcher) {
             runCatching {
                 listTimelineImageNodeInfoByOffsetUseCase(
@@ -172,36 +168,6 @@ class TimelineImagePreviewManager @Inject constructor(
             )
         }.onFailure { Timber.e(it, "Failed to load image node info at offset $offset") }
             .getOrDefault(emptyList())
-    }
-
-    private suspend fun buildFilter(
-        mediaType: FilterMediaType,
-        source: TimelinePhotosSource,
-        hideSensitive: Boolean,
-    ): MediaTimelineFilter {
-        val cameraUploadFolderHandles = runCatching { getCameraUploadFolderHandlesUseCase() }
-            .onFailure { Timber.e(it, "Failed to resolve camera upload folder handles") }
-            .getOrDefault(emptyList())
-        val baseFilter = timelineFilterUiStateMapper(
-            TimelineFilterUiState(
-                mediaType = mediaType,
-                mediaSource = source.toFilterMediaSource()
-            ),
-            cameraUploadFolderHandles,
-        )
-        return baseFilter.copy(
-            sensitivity = if (hideSensitive) {
-                MediaTimelineFilter.Sensitivity.HideSensitive
-            } else {
-                MediaTimelineFilter.Sensitivity.ShowAll
-            },
-        )
-    }
-
-    private fun TimelinePhotosSource.toFilterMediaSource(): FilterMediaSource = when (this) {
-        TimelinePhotosSource.ALL_PHOTOS -> FilterMediaSource.AllPhotos
-        TimelinePhotosSource.CLOUD_DRIVE -> FilterMediaSource.CloudDrive
-        TimelinePhotosSource.CAMERA_UPLOAD -> FilterMediaSource.CameraUpload
     }
 
     companion object {

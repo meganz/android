@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.photos.FilterMediaType
@@ -17,8 +18,10 @@ import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.FilterCameraUploadImageNodesUseCase
 import mega.privacy.android.domain.usecase.FilterCloudDriveImageNodesUseCase
+import mega.privacy.android.domain.usecase.photos.ListTimelineImageNodeInfoByOffsetUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineNodesUseCase
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
+import timber.log.Timber
 import javax.inject.Inject
 
 class TimelineImageNodeFetcher @Inject constructor(
@@ -26,10 +29,17 @@ class TimelineImageNodeFetcher @Inject constructor(
     private val monitorTimelineNodesUseCase: MonitorTimelineNodesUseCase,
     private val filterCloudDriveImageNodesUseCase: FilterCloudDriveImageNodesUseCase,
     private val filterCameraUploadImageNodesUseCase: FilterCameraUploadImageNodesUseCase,
+    private val listTimelineImageNodeInfoByOffsetUseCase: ListTimelineImageNodeInfoByOffsetUseCase,
+    private val timelineMediaFilterBuilder: TimelineMediaFilterBuilder,
 ) : ImageNodeFetcher {
 
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
-        val sortType = bundle.readEnum<Sort>(TIMELINE_SORT_TYPE) ?: Sort.NEWEST
+        val sortOrder = bundle.readEnum<SortOrder>(TIMELINE_SORT_ORDER)
+            ?: when (bundle.readEnum<Sort>(TIMELINE_SORT_TYPE) ?: Sort.NEWEST) {
+                Sort.NEWEST -> SortOrder.ORDER_MODIFICATION_DESC
+                Sort.OLDEST -> SortOrder.ORDER_MODIFICATION_ASC
+                else -> null
+            }
         val mediaType = bundle.readEnum<FilterMediaType>(TIMELINE_FILTER_TYPE)
             ?: FilterMediaType.ALL_MEDIA
         val source = bundle.readEnum<TimelinePhotosSource>(TIMELINE_MEDIA_SOURCE)
@@ -38,14 +48,9 @@ class TimelineImageNodeFetcher @Inject constructor(
         return monitorTimelineNodesUseCase()
             .mapLatest { imageNodes ->
                 val filteredImageNodes = filterImageNodes(imageNodes, mediaType, source)
-                sortImageNodes(filteredImageNodes, sortType)
+                sortImageNodes(filteredImageNodes, sortOrder, mediaType, source)
             }.flowOn(defaultDispatcher)
     }
-
-    private inline fun <reified T : Enum<T>> Bundle.readEnum(key: String): T? =
-        serializable<T>(key) ?: getString(key)?.let {
-            runCatching { enumValueOf<T>(it) }.getOrNull()
-        }
 
     private suspend fun filterImageNodes(
         imageNodes: List<ImageNode>,
@@ -65,13 +70,58 @@ class TimelineImageNodeFetcher @Inject constructor(
         }
     }
 
-    private fun sortImageNodes(imageNodes: List<ImageNode>, sortType: Sort): List<ImageNode> {
-        return when (sortType) {
-            Sort.NEWEST -> imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
-            Sort.OLDEST -> imageNodes.sortedWith(compareBy<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
+    private suspend fun sortImageNodes(
+        imageNodes: List<ImageNode>,
+        sortOrder: SortOrder?,
+        mediaType: FilterMediaType,
+        source: TimelinePhotosSource,
+    ): List<ImageNode> = when (sortOrder) {
+        SortOrder.ORDER_MODIFICATION_DESC, SortOrder.ORDER_MODIFICATION_ASC,
+        SortOrder.ORDER_MEDIATS_DESC, SortOrder.ORDER_MEDIATS_ASC,
+            -> sortBySdkOrder(imageNodes, sortOrder, mediaType, source)
+                ?: sortByModificationTime(imageNodes, sortOrder)
+
+        else -> imageNodes
+    }
+
+    /**
+     * Orders the nodes by the grid's own SDK query, so ties match the grid. Null on failure.
+     */
+    private suspend fun sortBySdkOrder(
+        imageNodes: List<ImageNode>,
+        sortOrder: SortOrder,
+        mediaType: FilterMediaType,
+        source: TimelinePhotosSource,
+    ): List<ImageNode>? {
+        val orderedIds = runCatching {
+            listTimelineImageNodeInfoByOffsetUseCase(
+                filter = timelineMediaFilterBuilder(mediaType, source, hideSensitive = false),
+                section = null,
+                order = sortOrder,
+                maxElements = 0,
+                offset = 0,
+            )
+        }.onFailure { Timber.e(it, "Failed to load the timeline ordering") }
+            .getOrNull()
+            ?.map { it.id }
+            ?: return null
+        val nodesById = imageNodes.associateBy { it.id }
+        return orderedIds.mapNotNull { nodesById[it] }
+    }
+
+    private fun sortByModificationTime(imageNodes: List<ImageNode>, sortOrder: SortOrder) =
+        when (sortOrder) {
+            SortOrder.ORDER_MODIFICATION_DESC -> imageNodes.sortedWith(
+                compareByDescending<ImageNode> { it.modificationTime }
+                    .thenByDescending { it.id.longValue }
+            )
+
+            SortOrder.ORDER_MODIFICATION_ASC -> imageNodes.sortedWith(
+                compareBy<ImageNode> { it.modificationTime }.thenBy { it.id.longValue }
+            )
+
             else -> imageNodes
         }
-    }
 
     internal companion object {
         const val TIMELINE_SORT_TYPE = "sortType"
@@ -84,5 +134,20 @@ class TimelineImageNodeFetcher @Inject constructor(
         const val TIMELINE_SORT_ORDER = "sortOrder"
         const val TIMELINE_FILTER_TYPE = "filterType"
         const val TIMELINE_MEDIA_SOURCE = "MediaSource"
+
+        internal inline fun <reified T : Enum<T>> Bundle.readEnum(key: String): T? =
+            getString(key)?.let { runCatching { enumValueOf<T>(it) }.getOrNull() }
+                ?: serializable<T>(key)
+
+        /**
+         * The grid's [TIMELINE_SORT_ORDER] column in the given direction.
+         */
+        internal fun Bundle.timelineSortOrderWithDirection(ascending: Boolean): SortOrder =
+            when (readEnum<SortOrder>(TIMELINE_SORT_ORDER)) {
+                SortOrder.ORDER_MEDIATS_ASC, SortOrder.ORDER_MEDIATS_DESC ->
+                    if (ascending) SortOrder.ORDER_MEDIATS_ASC else SortOrder.ORDER_MEDIATS_DESC
+
+                else -> if (ascending) SortOrder.ORDER_MODIFICATION_ASC else SortOrder.ORDER_MODIFICATION_DESC
+            }
     }
 }
