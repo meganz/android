@@ -115,3 +115,4 @@ firebase-debug.log
 
 /weblate_screenshots/
 /.idea/icon.svg
+*.tmp

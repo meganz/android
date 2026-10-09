@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,35 +29,32 @@ class MonitorCloudDriveNodesUseCaseTest {
 
     private val photosRepository = mock<PhotosRepository>()
     private val nodeRepository = mock<NodeRepository>()
-    private val getCloudSortOrder = mock<GetCloudSortOrder>()
 
     @BeforeAll
     fun setUp() {
         underTest = MonitorCloudDriveNodesUseCase(
             photosRepository,
             nodeRepository,
-            getCloudSortOrder,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(photosRepository, nodeRepository, getCloudSortOrder)
+        reset(photosRepository, nodeRepository)
     }
 
     @Test
-    fun `test that initial nodes are emitted`() = runTest {
+    fun `test that invoke emits the initial nodes fetched in the given sort order`() = runTest {
         val parentId = NodeId(1L)
-        val sortOrder = SortOrder.ORDER_NONE
+        val sortOrder = SortOrder.ORDER_SIZE_DESC
         val initialNodes = listOf(
             mock<ImageNode>(),
         )
 
-        whenever(getCloudSortOrder()).thenReturn(sortOrder)
         whenever(photosRepository.fetchImageNodes(parentId, sortOrder)).thenReturn(initialNodes)
         whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
 
-        underTest(parentId).test {
+        underTest(parentId, sortOrder).test {
             assertThat(awaitItem()).isEqualTo(initialNodes)
             cancelAndIgnoreRemainingEvents()
         }
@@ -69,7 +65,7 @@ class MonitorCloudDriveNodesUseCaseTest {
     @Test
     fun `test that invoke should emit updated nodes when node update occurs`() = runTest {
         val tempParentId = NodeId(1L)
-        val sortOrder = SortOrder.ORDER_NONE
+        val sortOrder = SortOrder.ORDER_SIZE_DESC
         val initialNodes = listOf(
             mock<ImageNode> {
                 on { id }.thenReturn(NodeId(11L))
@@ -78,7 +74,6 @@ class MonitorCloudDriveNodesUseCaseTest {
             }
         )
 
-        whenever(getCloudSortOrder()).thenReturn(sortOrder)
         whenever(photosRepository.fetchImageNodes(tempParentId, sortOrder)).thenReturn(initialNodes)
 
         val imageNode1 = mock<ImageNode> {
@@ -115,7 +110,7 @@ class MonitorCloudDriveNodesUseCaseTest {
         ).thenReturn(imageNode2)
         val nodeUpdate = NodeUpdate(update)
 
-        underTest(tempParentId).test {
+        underTest(tempParentId, sortOrder).test {
             assertThat(awaitItem()).isEqualTo(initialNodes)
             nodeUpdateFlow.emit(nodeUpdate)
             assertThat(awaitItem().size).isEqualTo(3)

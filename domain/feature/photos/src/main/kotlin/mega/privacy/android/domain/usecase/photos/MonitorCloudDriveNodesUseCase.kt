@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -13,7 +14,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import javax.inject.Inject
 
 /**
@@ -22,7 +22,6 @@ import javax.inject.Inject
 class MonitorCloudDriveNodesUseCase @Inject constructor(
     private val photosRepository: PhotosRepository,
     private val nodeRepository: NodeRepository,
-    private val getCloudSortOrder: GetCloudSortOrder,
 ) {
     private val nodesCache: MutableMap<NodeId, ImageNode> = mutableMapOf()
 
@@ -39,13 +38,16 @@ class MonitorCloudDriveNodesUseCase @Inject constructor(
         return node.parentId == targetParentId
     }
 
-    operator fun invoke(parentId: NodeId): Flow<List<ImageNode>> = flow {
-        emit(populateNodes(parentId))
+    /**
+     * @param parentId the folder whose media nodes to monitor
+     * @param sortOrder the order of the initial nodes, matching the folder's sort order
+     */
+    operator fun invoke(parentId: NodeId, sortOrder: SortOrder): Flow<List<ImageNode>> = flow {
+        emit(populateNodes(parentId, sortOrder))
         emitAll(monitorNodes(parentId))
     }
 
-    private suspend fun populateNodes(parentId: NodeId): List<ImageNode> {
-        val sortOrder = getCloudSortOrder()
+    private suspend fun populateNodes(parentId: NodeId, sortOrder: SortOrder): List<ImageNode> {
         val nodes = photosRepository.fetchImageNodes(parentId, sortOrder)
 
         nodesCache.clear()
