@@ -568,6 +568,12 @@ class UploadFileViewModelTest {
             )
             val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
             whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+            whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(
+                listOf(
+                    documentEntity("content://com.example.provider/a.txt"),
+                    documentEntity("content://com.example.provider/b.txt"),
+                )
+            )
 
             viewModel.attachFilesToChat(uris, listOf(10L, 11L), PitagTrigger.ShareFromApp)
 
@@ -584,6 +590,78 @@ class UploadFileViewModelTest {
                 ).inOrder()
             assertThat(chatUpload.pitagTrigger).isEqualTo(PitagTrigger.ShareFromApp)
         }
+
+    @Test
+    fun `test that attachFilesToChat only forwards the uris that file preparation accepts`() =
+        runTest {
+            val benignUri = "content://com.example.provider/a.txt"
+            val privateUri = "file:///data/data/mega.privacy.android.app/shared_prefs/x.xml"
+            val uris = listOf(
+                mock<Uri> { on { toString() } doReturn benignUri },
+                mock<Uri> { on { toString() } doReturn privateUri },
+            )
+            val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+            whenever(filePrepareUseCase(listOf(UriPath(benignUri), UriPath(privateUri))))
+                .thenReturn(listOf(documentEntity(benignUri)))
+
+            viewModel.attachFilesToChat(uris, listOf(10L), PitagTrigger.ShareFromApp)
+
+            val event = (viewModel.uiState.value.startUploadEvent as StateEventWithContentTriggered)
+                .content as TransferTriggerEvent.StartChatUpload.Files
+            assertThat(event.uris).containsExactly(UriPath(benignUri))
+        }
+
+    @Test
+    fun `test that attachFilesToChat triggers uploadErrorEvent and resets isProcessing when no files can be prepared`() =
+        runTest {
+            val uris = listOf(
+                mock<Uri> {
+                    on { toString() } doReturn "file:///data/data/mega.privacy.android.app/x.db"
+                }
+            )
+            val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+            whenever(filePrepareUseCase(any<List<UriPath>>()))
+                .thenReturn(emptyList<DocumentEntity>())
+
+            viewModel.attachFilesToChat(uris, listOf(10L), PitagTrigger.ShareFromApp)
+
+            val uiState = viewModel.uiState.value
+            assertThat(uiState.isProcessing).isFalse()
+            assertThat((uiState.uploadErrorEvent as StateEventWithContentTriggered).content)
+                .isInstanceOf(IllegalStateException::class.java)
+            assertThat(uiState.startUploadEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+
+    @Test
+    fun `test that attachFilesToChat triggers uploadErrorEvent when file preparation fails`() =
+        runTest {
+            val uris = listOf(
+                mock<Uri> { on { toString() } doReturn "content://com.example.provider/a.txt" }
+            )
+            val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+            whenever(filePrepareUseCase(any<List<UriPath>>()))
+                .thenThrow(RuntimeException("Prepare failed"))
+
+            viewModel.attachFilesToChat(uris, listOf(10L), PitagTrigger.ShareFromApp)
+
+            val uiState = viewModel.uiState.value
+            assertThat(uiState.isProcessing).isFalse()
+            assertThat(uiState.uploadErrorEvent)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat(uiState.startUploadEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+
+    private fun documentEntity(uri: String) = DocumentEntity(
+        name = uri.substringAfterLast('/'),
+        size = 0L,
+        lastModified = 0L,
+        uri = UriPath(uri),
+    )
 
     @Test
     fun `test that proceedUris sets isProcessing when the upload request is accepted`() = runTest {
@@ -651,6 +729,8 @@ class UploadFileViewModelTest {
             val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
 
             whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+            whenever(filePrepareUseCase(any<List<UriPath>>()))
+                .thenReturn(listOf(documentEntity("content://com.example.provider/test.txt")))
 
             viewModel.attachFilesToChat(uris, listOf(10L), PitagTrigger.ShareFromApp)
 

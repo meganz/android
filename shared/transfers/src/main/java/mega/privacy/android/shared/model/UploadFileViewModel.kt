@@ -46,24 +46,36 @@ class UploadFileViewModel @Inject constructor(
             if (isInPayWall()) return@launch
             _uiState.update { it.copy(isProcessing = true) }
             runCatching {
-                val entities = filePrepareUseCase(uris.map { UriPath(it.toString()) })
-                // Uris can become unreadable between selection and upload confirmation
-                // (deleted files, expired permission grants); surface an error instead
-                // of finishing silently with the UI locked in the processing state.
-                if (entities.isEmpty()) {
-                    _uiState.update {
-                        it.copy(
-                            isProcessing = false,
-                            uploadErrorEvent = triggered(
-                                IllegalStateException("None of the uris could be prepared for upload")
-                            ),
-                        )
-                    }
-                    return@launch
-                }
+                val entities = prepareUris(uris) ?: return@launch
                 uploadDocuments(entities, parentNodeId, pitagTrigger)
             }.onFailure(::onUploadFailure)
         }
+    }
+
+    /**
+     * Resolves shared [uris] into uploadable documents. File preparation drops uris that cannot
+     * be read and uris pointing into the app's private storage, so every upload of shared uris
+     * must go through here.
+     *
+     * @return the prepared documents, or null after surfacing an error when none could be prepared
+     */
+    private suspend fun prepareUris(uris: List<Uri>): List<DocumentEntity>? {
+        val entities = filePrepareUseCase(uris.map { UriPath(it.toString()) })
+        // Uris can become unreadable between selection and upload confirmation
+        // (deleted files, expired permission grants); surface an error instead
+        // of finishing silently with the UI locked in the processing state.
+        if (entities.isEmpty()) {
+            _uiState.update {
+                it.copy(
+                    isProcessing = false,
+                    uploadErrorEvent = triggered(
+                        IllegalStateException("None of the uris could be prepared for upload")
+                    ),
+                )
+            }
+            return null
+        }
+        return entities
     }
 
     /**
@@ -140,24 +152,27 @@ class UploadFileViewModel @Inject constructor(
 
     /**
      * Emits a single [TransferTriggerEvent.StartChatUpload.Files] addressed at every chat in
-     * [chatIds] for the upstream transfer handler. Short-circuits with [overQuotaEvent] when the
-     * account is in [StorageState.PayWall].
+     * [chatIds] for the upstream transfer handler, carrying only the uris that file preparation
+     * accepts. Short-circuits with [overQuotaEvent] when the account is in [StorageState.PayWall].
      */
     fun attachFilesToChat(uris: List<Uri>, chatIds: List<Long>, pitagTrigger: PitagTrigger) {
         viewModelScope.launch {
             if (isInPayWall()) return@launch
-            _uiState.update {
-                it.copy(
-                    isProcessing = true,
-                    startUploadEvent = triggered(
-                        TransferTriggerEvent.StartChatUpload.Files(
-                            chatIds = chatIds,
-                            uris = uris.map { uri -> UriPath(uri.toString()) },
-                            pitagTrigger = pitagTrigger,
+            _uiState.update { it.copy(isProcessing = true) }
+            runCatching {
+                val entities = prepareUris(uris) ?: return@launch
+                _uiState.update {
+                    it.copy(
+                        startUploadEvent = triggered(
+                            TransferTriggerEvent.StartChatUpload.Files(
+                                chatIds = chatIds,
+                                uris = entities.map { entity -> entity.uri },
+                                pitagTrigger = pitagTrigger,
+                            )
                         )
                     )
-                )
-            }
+                }
+            }.onFailure(::onUploadFailure)
         }
     }
 
