@@ -2,6 +2,7 @@ package mega.privacy.android.data.facade
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -27,6 +28,8 @@ import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.provider.MediaStore.VOLUME_INTERNAL
 import android.provider.OpenableColumns
+import android.system.Os
+import android.system.OsConstants
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
@@ -1365,6 +1368,18 @@ internal class FileFacade @Inject constructor(
         uriPath: UriPath,
         writePermission: Boolean,
     ) = getFileDescriptorSync(uriPath, writePermission)
+
+    override suspend fun isRegularFile(uriPath: UriPath): Boolean {
+        val uri = uriPath.toUri()
+        if (uri.scheme != ContentResolver.SCHEME_CONTENT) return true
+        return runCatching {
+            context.contentResolver.openFileDescriptor(uri, "r")?.use {
+                OsConstants.S_ISREG(Os.fstat(it.fileDescriptor).st_mode)
+            }
+        }.onFailure {
+            Timber.w(it, "Error checking the file type of $uriPath")
+        }.getOrNull() ?: true
+    }
 
     private fun getRealPathFromUri(context: Context, uri: Uri): String? {
         when {

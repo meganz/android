@@ -516,6 +516,14 @@ interface FileGateway {
     suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity>
 
     /**
+     * Checks whether [uriPath] is backed by a regular file. Content uris can also be served as a
+     * pipe or a socket, which can only be read sequentially.
+     *
+     * @return false only when the uri can be opened and it is not a regular file
+     */
+    suspend fun isRegularFile(uriPath: UriPath): Boolean
+
+    /**
      * Get a [DocumentEntity] from an [Uri] or null if the document doesn't exist
      *
      * Note that this fun is synchronous and must only be used in contexts where there is really

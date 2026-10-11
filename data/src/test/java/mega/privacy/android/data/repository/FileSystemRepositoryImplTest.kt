@@ -331,6 +331,15 @@ internal class FileSystemRepositoryImplTest {
         verify(fileGateway).copyContentUriToFile(uri, file)
     }
 
+    @ParameterizedTest(name = "is regular file: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isRegularFile returns the gateway result`(expected: Boolean) = runTest {
+        val uri = UriPath("content://provider/file.txt")
+        whenever(fileGateway.isRegularFile(uri)).thenReturn(expected)
+
+        assertThat(underTest.isRegularFile(uri)).isEqualTo(expected)
+    }
+
     @ParameterizedTest(name = "delete voice clip: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that voice clip can be deleted`(deleteVoiceClip: Boolean) =

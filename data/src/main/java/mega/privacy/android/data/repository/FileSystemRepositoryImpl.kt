@@ -345,6 +345,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun isRegularFile(uriPath: UriPath): Boolean =
+        withContext(ioDispatcher) {
+            fileGateway.isRegularFile(uriPath)
+        }
+
     override suspend fun getFileSiblingByUri(uriString: String) =
         withContext(ioDispatcher) {
             val currentFile = uriString.toUri().toFile()

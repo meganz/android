@@ -374,6 +374,14 @@ interface FileSystemRepository {
     suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File)
 
     /**
+     * Checks whether [uriPath] is backed by a regular file. Content uris can also be served as a
+     * pipe or a socket, which can only be read sequentially.
+     *
+     * @return false only when the uri can be opened and it is not a regular file
+     */
+    suspend fun isRegularFile(uriPath: UriPath): Boolean
+
+    /**
      * @return the files in same folder
      */
     suspend fun getFileSiblingByUri(uriString: String): List<File>
