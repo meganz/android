@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.presentation.playlists
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
@@ -42,6 +44,7 @@ import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitle
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -50,6 +53,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
@@ -84,6 +88,7 @@ class VideoPlaylistsTabViewModelTest {
     private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
     private val createVideoPlaylistUseCase = mock<CreateVideoPlaylistUseCase>()
     private val getNextDefaultAlbumNameUseCase = mock<GetNextDefaultAlbumNameUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val expectedId = NodeId(1L)
     private val expectedPlaylist = VideoPlaylistUiEntity(
@@ -103,21 +108,58 @@ class VideoPlaylistsTabViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = VideoPlaylistsTabViewModel(
-            getVideoPlaylistsUseCase = getVideoPlaylistsUseCase,
-            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
-            monitorVideoPlaylistSetsUpdateUseCase = monitorVideoPlaylistSetsUpdateUseCase,
-            videoPlaylistUiEntityMapper = videoPlaylistUiEntityMapper,
-            setCloudSortOrderUseCase = setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
-            monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
-            removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
-            videoPlaylistTitleValidationErrorMessageMapper = videoPlaylistTitleValidationErrorMessageMapper,
-            updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
-            createVideoPlaylistUseCase = createVideoPlaylistUseCase,
-            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
-        )
+        underTest = createViewModel()
     }
+
+    private fun createViewModel() = VideoPlaylistsTabViewModel(
+        getVideoPlaylistsUseCase = getVideoPlaylistsUseCase,
+        monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+        monitorVideoPlaylistSetsUpdateUseCase = monitorVideoPlaylistSetsUpdateUseCase,
+        videoPlaylistUiEntityMapper = videoPlaylistUiEntityMapper,
+        setCloudSortOrderUseCase = setCloudSortOrderUseCase,
+        nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+        monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+        removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
+        videoPlaylistTitleValidationErrorMessageMapper = videoPlaylistTitleValidationErrorMessageMapper,
+        updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
+        createVideoPlaylistUseCase = createVideoPlaylistUseCase,
+        getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+    )
+
+    @ParameterizedTest(name = "when the cloud explorer flag is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that createNewPlaylist reports the cloud explorer flag`(enabled: Boolean) =
+        runTest {
+            val playlist = mock<UserVideoPlaylist> { on { id }.thenReturn(NodeId(1L)) }
+            whenever(createVideoPlaylistUseCase(any())).thenReturn(playlist)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(enabled)
+
+            underTest.createNewPlaylist("new playlist")
+
+            underTest.videoPlaylistEditState.test {
+                val state = awaitItem()
+                assertThat(state.createVideoPlaylistSuccessEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                assertThat(state.isCloudExplorerAvailable).isEqualTo(enabled)
+            }
+        }
+
+    @Test
+    fun `test that createNewPlaylist reports the cloud explorer as unavailable when reading the flag fails`() =
+        runTest {
+            val playlist = mock<UserVideoPlaylist> { on { id }.thenReturn(NodeId(1L)) }
+            whenever(createVideoPlaylistUseCase(any())).thenReturn(playlist)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
+                .thenThrow(RuntimeException("flag unavailable"))
+
+            underTest.createNewPlaylist("new playlist")
+
+            underTest.videoPlaylistEditState.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
 
     @AfterEach
     fun resetMocks() {
@@ -132,7 +174,8 @@ class VideoPlaylistsTabViewModelTest {
             videoPlaylistTitleValidationErrorMessageMapper,
             updateVideoPlaylistTitleUseCase,
             createVideoPlaylistUseCase,
-            getNextDefaultAlbumNameUseCase
+            getNextDefaultAlbumNameUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 

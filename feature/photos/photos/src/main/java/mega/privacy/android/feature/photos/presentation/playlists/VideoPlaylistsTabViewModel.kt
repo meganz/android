@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
@@ -45,6 +46,7 @@ import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitle
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistDeletedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenVideoPlaylistRenamedEvent
@@ -69,6 +71,7 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     private val updateVideoPlaylistTitleUseCase: UpdateVideoPlaylistTitleUseCase,
     private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val selectedVideoPlaylistsFlow =
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
@@ -383,8 +386,14 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             }.onSuccess { videoPlaylist ->
                 Analytics.tracker.trackEvent(PlaylistCreatedSuccessfullyEvent)
                 (videoPlaylist as? UserVideoPlaylist)?.let { playlist ->
+                    val isCloudExplorerAvailable = runCatching {
+                        getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+                    }.onFailure { Timber.e(it) }.getOrDefault(false)
                     videoPlaylistEditState.update {
-                        it.copy(createVideoPlaylistSuccessEvent = triggered(playlist))
+                        it.copy(
+                            createVideoPlaylistSuccessEvent = triggered(playlist),
+                            isCloudExplorerAvailable = isCloudExplorerAvailable,
+                        )
                     }
                     Timber.d("Current video playlist: ${playlist.title}")
                 }

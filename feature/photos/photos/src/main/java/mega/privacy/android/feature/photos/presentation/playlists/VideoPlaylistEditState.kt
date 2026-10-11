@@ -16,6 +16,8 @@ import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
  * @property playlistsRemovedEvent Event for playlists removed
  * @property numberOfRemovedVideosEvent Event for number of videos removed from playlist
  * @property numberOfAddedVideosEvent Event for number of videos added to playlist
+ * @property isCloudExplorerAvailable true if the Cloud Explorer feature flag is enabled, which
+ * decides which video picker opens after a playlist is created
  */
 data class VideoPlaylistEditState(
     val showUpdateVideoPlaylist: Boolean = false,
@@ -26,4 +28,5 @@ data class VideoPlaylistEditState(
     val playlistsRemovedEvent: StateEventWithContent<List<String>> = consumed(),
     val numberOfRemovedVideosEvent: StateEventWithContent<Int> = consumed(),
     val numberOfAddedVideosEvent: StateEventWithContent<Int> = consumed(),
+    val isCloudExplorerAvailable: Boolean = false,
 )

@@ -93,10 +93,32 @@ fun VideoPlaylistsTabRoute(
             navigate(VideoPlaylistDetailNavKey(handle, type))
         },
         newlyCreatedVideoPlaylist = { handle ->
-            navigate(SelectVideosForPlaylistNavKey(playlistHandle = handle, isNewlyCreated = true))
+            navigate(
+                newPlaylistVideoPickerDestination(
+                    playlistHandle = handle,
+                    isCloudExplorerAvailable = videoPlaylistEditState.isCloudExplorerAvailable,
+                )
+            )
         },
         contentPadding = contentPadding
     )
+}
+
+/**
+ * Where to go once a playlist has been created, so the user can fill it with videos.
+ *
+ * The Cloud Explorer picker lives outside the Media navigation graph, so it cannot be pushed in
+ * the same step as the detail screen: the host bounces each unknown destination out to the outer
+ * back stack one at a time, which reverses the pair. The detail screen opens the picker itself
+ * instead, exactly as it does for the "add videos" button on an existing playlist.
+ */
+internal fun newPlaylistVideoPickerDestination(
+    playlistHandle: Long,
+    isCloudExplorerAvailable: Boolean,
+): NavKey = if (isCloudExplorerAvailable) {
+    VideoPlaylistDetailNavKey(playlistHandle, PlaylistType.User, isNewlyCreated = true)
+} else {
+    SelectVideosForPlaylistNavKey(playlistHandle = playlistHandle, isNewlyCreated = true)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

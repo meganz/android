@@ -87,6 +87,7 @@ internal fun VideoPlaylistDetailRoute(
     navigate: (navKey: NavKey) -> Unit,
     onBack: () -> Unit,
     addedVideoIds: List<NodeId>? = null,
+    isNewlyCreated: Boolean = false,
     viewModel: VideoPlaylistDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -97,6 +98,11 @@ internal fun VideoPlaylistDetailRoute(
         event = navigateEvent,
         onConsumed = viewModel::resetNavigateToVideoPlayer,
         action = navigate
+    )
+
+    OpenVideoPickerForNewPlaylistEffect(
+        isNewlyCreated = isNewlyCreated,
+        onOpenVideoPicker = { navigate(AddVideoToPlaylistNavKey(emptyList())) },
     )
 
     // Videos picked from the cloud explorer (AddVideoToPlaylistNavKey) are added here.
@@ -132,6 +138,27 @@ internal fun VideoPlaylistDetailRoute(
         onMenuClick = navigate,
         onSortNodes = viewModel::setCloudSortOrder
     )
+}
+
+/**
+ * Opens the video picker once for a playlist that was just created, which arrives empty.
+ *
+ * The guard is saved state rather than [LaunchedEffect]'s key: the effect is recreated whenever
+ * the screen re-enters composition, which would reopen the picker after a rotation or after the
+ * user has backed out of it.
+ */
+@Composable
+internal fun OpenVideoPickerForNewPlaylistEffect(
+    isNewlyCreated: Boolean,
+    onOpenVideoPicker: () -> Unit,
+) {
+    var hasOpenedPicker by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(isNewlyCreated) {
+        if (isNewlyCreated && !hasOpenedPicker) {
+            hasOpenedPicker = true
+            onOpenVideoPicker()
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -204,6 +204,7 @@ fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
         VideoPlaylistDetailRoute(
             numberOfAddedVideos = numberOfAddedVideos,
             addedVideoIds = addedVideoIds,
+            isNewlyCreated = key.isNewlyCreated,
             clearResult = navigationHandler::clearResult,
             navigate = navigationHandler::navigate,
             onBack = navigationHandler::back,

@@ -18,10 +18,15 @@ data class AlbumContentNavKey(
     val isNewlyCreated: Boolean = false,
 ) : NavKey
 
+/**
+ * @property isNewlyCreated true when the playlist was just created and the screen should open the
+ * video picker straight away, so the user can fill the empty playlist.
+ */
 @Serializable
 data class VideoPlaylistDetailNavKey(
     val playlistHandle: Long,
     val type: PlaylistType,
+    val isNewlyCreated: Boolean = false,
 ) : NavKey
 
 @Serializable
