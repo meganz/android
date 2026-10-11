@@ -106,7 +106,8 @@ fun PasscodeView(
 
     MegaScaffold(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        showTopBanner = false,
     ) { paddingValues ->
         when (val currentState = uiState) {
             is PasscodeUnlockState.Loading -> {}

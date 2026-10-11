@@ -13,7 +13,6 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +37,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalMegaScaffoldTopBanner
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.android.core.ui.theme.AndroidTheme
@@ -54,7 +54,7 @@ import mega.privacy.android.app.appstate.content.navigation.view.StorageQuotaWar
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
-import mega.privacy.android.app.appstate.global.call.OngoingCallBanner
+import mega.privacy.android.app.appstate.global.call.rememberOngoingCallBanner
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaWarningEffect
@@ -245,6 +245,7 @@ class MegaActivity : FragmentActivity() {
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
             val requestStatusProgressViewModel = hiltViewModel<RequestStatusProgressViewModel>()
             val loginViewModel = hiltViewModel<LoginViewModel>()
+            val ongoingCallBanner = rememberOngoingCallBanner()
 
             val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
             val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()
@@ -372,6 +373,7 @@ class MegaActivity : FragmentActivity() {
 
                                 CompositionLocalProvider(
                                     LocalSnackBarHostState provides snackbarHostState,
+                                    LocalMegaScaffoldTopBanner provides ongoingCallBanner,
                                     LocalMiniAudioPlayer provides { modifier, applyNavigationBarsPadding ->
                                         MiniAudioPlayerView(
                                             modifier = modifier,
@@ -410,12 +412,6 @@ class MegaActivity : FragmentActivity() {
                                         event = transferState.transferEvent,
                                         onConsumeEvent = appTransferViewModel::consumedTransferEvent,
                                         isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
-                                    )
-
-                                    OngoingCallBanner(
-                                        modifier = Modifier
-                                            .align(Alignment.TopCenter)
-                                            .statusBarsPadding(),
                                     )
 
                                     if (currentNavKey !is HomeScreensNavKey && (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
