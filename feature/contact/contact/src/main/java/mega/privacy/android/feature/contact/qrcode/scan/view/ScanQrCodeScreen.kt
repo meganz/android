@@ -118,6 +118,11 @@ internal fun ScannedContactDialog(
             contactEmail = result.email,
             contactAvatarFile = result.avatarFile,
             contactAvatarColor = avatarContentColor,
+            title = if (result.isContact) {
+                null
+            } else {
+                stringResource(sharedR.string.contacts_qr_invite_contact_dialog_title)
+            },
             description = if (result.isContact) {
                 stringResource(sharedR.string.contacts_qr_contact_already_exists, result.contactName)
             } else {

@@ -3251,6 +3251,8 @@
     <string name="contacts_qr_invitation_not_sent_dialog_title">Invitation not sent</string>
     <!-- Body of the dialog shown when the scanned contact QR code belongs to someone who is already in the user's contact list. %1$s is the contact's email address. -->
     <string name="contacts_qr_already_contact_dialog_body">The invitation has not been sent. %1$s is already in your contacts list.</string>
+    <!-- Title of the dialog shown after scanning a contact QR code that belongs to someone who is not yet a contact, asking the user to confirm sending them a contact invitation. The scanned contact's avatar, name and email are shown below the title. -->
+    <string name="contacts_qr_invite_contact_dialog_title">Invite contact?</string>
     <!-- Body of the dialog shown when the scanned QR code or contact link is not a valid MEGA contact link -->
     <string name="contacts_qr_invalid_code_dialog_body">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <!-- Title of the dialog shown when the QR scanner needs a one-time download that has not finished yet -->

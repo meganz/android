@@ -14,7 +14,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Dialog shown when a scanned contact QR code resolves to a user that is not yet a contact.
- * Presents the contact's avatar, name and email with a confirm action and a cancel action.
+ * Presents an "Invite contact?" title above the contact's avatar, name and email, with a confirm
+ * action and a cancel action.
  *
  * @param contactName Display name of the scanned contact.
  * @param contactEmail Email of the scanned contact.
@@ -41,6 +42,7 @@ fun ScannedContactFoundDialog(
         contactEmail = contactEmail,
         contactAvatarFile = (avatar as? AvatarData.Image)?.file,
         contactAvatarColor = (avatar as? AvatarData.Initials)?.avatarColor ?: Color.Unspecified,
+        title = stringResource(sharedR.string.contacts_qr_invite_contact_dialog_title),
         positiveButtonText = confirmActionText,
         onPositiveButtonClicked = onConfirm,
         negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),

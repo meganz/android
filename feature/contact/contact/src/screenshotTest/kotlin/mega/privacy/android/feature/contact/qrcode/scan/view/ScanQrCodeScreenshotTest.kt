@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
  *
  * String → screenshot coverage:
  * - R.string.contact_invite ("Invite") → [ScanInviteNonContact] (reused shared string).
+ * - R.string.contacts_qr_invite_contact_dialog_title → [ScanInviteNonContact].
  * - R.string.contacts_qr_contact_already_exists → [ScanInviteExistingContact].
  * - R.string.contacts_qr_view_contact_action → [ScanInviteExistingContact].
  * - R.string.contacts_qr_invitation_not_sent_dialog_title → [ScanAlreadyContact] (existing string).
