@@ -17,6 +17,7 @@ dependencies {
     lintChecks(project(":lint"))
     implementation(project(":data"))
     implementation(project(":domain:core:shared"))
+    implementation(project(":domain:core:transfer"))
     implementation(project(":domain:feature:camerauploads"))
 
     implementation(lib.coroutines.core)

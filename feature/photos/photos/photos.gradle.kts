@@ -32,7 +32,7 @@ dependencies {
     implementation(project(":core:transfers"))
     implementation(project(":navigation"))
     implementation(project(":domain:core:shared"))
-    implementation(project(":domain:feature:transfers"))
+    implementation(project(":domain:core:transfer"))
     implementation(project(":domain:feature:node"))
     implementation(project(":domain:feature:account"))
     implementation(project(":domain:feature:setting"))

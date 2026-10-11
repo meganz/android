@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":core:coroutine"))
     implementation(project(":navigation"))
     implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:node"))
     implementation(project(":domain:feature:account"))
     implementation(project(":domain:feature:contact"))
     implementation(project(":domain:feature:chat"))

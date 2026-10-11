@@ -12,6 +12,7 @@ lint {
 dependencies {
     lintChecks(project(":lint"))
     implementation(project(":domain:core:shared"))
+    implementation(project(":domain:core:transfer"))
     implementation(project(":domain:core:common"))
     implementation(lib.coroutines.core)
     implementation(lib.javax.inject)

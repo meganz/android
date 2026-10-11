@@ -37,6 +37,7 @@ configurations.matching { it.name.contains("AndroidTest") }.configureEach {
 
 dependencies {
     implementation(project(":domain:core:shared"))
+    implementation(project(":domain:core:transfer"))
     implementation(project(":core:coroutine"))
     implementation(project(":shared:sync"))
     implementation(google.guava)

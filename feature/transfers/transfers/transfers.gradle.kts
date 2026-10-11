@@ -24,7 +24,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
     implementation(project(":domain:core:shared"))
-    implementation(project(":domain:feature:transfers"))
+    implementation(project(":domain:core:transfer"))
     implementation(project(":navigation"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))

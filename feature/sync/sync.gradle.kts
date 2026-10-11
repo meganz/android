@@ -34,10 +34,10 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
 
     implementation(project(":domain:core:shared"))
+    implementation(project(":domain:core:transfer"))
     implementation(project(":domain:feature:node"))
     implementation(project(":domain:feature:account"))
     implementation(project(":domain:feature:camerauploads"))
-    implementation(project(":domain:feature:transfers"))
     implementation(project(":data"))
     implementation(project(":core:formatter"))
     implementation(project(":shared:original-core-ui"))

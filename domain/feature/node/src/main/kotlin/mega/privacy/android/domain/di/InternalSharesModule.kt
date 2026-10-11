@@ -9,6 +9,8 @@ import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInSha
 import mega.privacy.android.domain.usecase.shares.DefaultSetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 
@@ -45,5 +47,13 @@ abstract class InternalSharesModule {
         @Provides
         fun provideStopSharingNode(repository: NodeRepository) =
             StopSharingNode(repository::stopSharingNode)
+
+        @Provides
+        fun provideGetUnverifiedIncomingShares(repository: NodeRepository): GetUnverifiedIncomingShares =
+            GetUnverifiedIncomingShares(repository::getUnverifiedIncomingShares)
+
+        @Provides
+        fun provideGetUnverifiedOutgoingShares(repository: NodeRepository): GetUnverifiedOutgoingShares =
+            GetUnverifiedOutgoingShares(repository::getUnverifiedOutgoingShares)
     }
 }

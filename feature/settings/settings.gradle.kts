@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
     implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:node"))
     implementation(project(":domain:feature:setting"))
     implementation(project(":navigation"))
     implementation(project(":resources:icon-pack"))

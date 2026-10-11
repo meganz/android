@@ -25,7 +25,6 @@ import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
 import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
-import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
 import mega.privacy.android.navigation.contract.settings.FeatureSettings
 import mega.privacy.android.navigation.contract.settings.MoreSettingEntryPoint
@@ -146,9 +145,6 @@ object TestSettingsModule {
     @Provides
     @ElementsIntoSet
     fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()
-
-    @Provides
-    fun provideEnableFileVersionsOption(): EnableFileVersionsOption = mock()
 
     @Provides
     @ElementsIntoSet
