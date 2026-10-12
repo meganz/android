@@ -66,6 +66,12 @@ check("origin inside a name is kept", common.bareBranchName("do/origin/x") == "d
 check("whitespace trimmed", common.bareBranchName("  develop  ") == "develop")
 check("null branch name survives", common.bareBranchName(null) == null)
 
+// The commit Jenkins built is diffed against directly, because a merge request that merges while
+// its build runs takes its branch with it. A commit is still a safe ref by the same rule.
+check("a commit sha is a usable ref", common.isSafeBranchName("e72958186efbdbd201373958893aff52620a0336"))
+check("an empty commit is not usable", !common.isSafeBranchName(""))
+check("a null commit is not usable", !common.isSafeBranchName(null))
+
 // A Gradle failure runs to dozens of lines; the report keeps the first one.
 check("first line taken", common.firstLineOf("boom\nstack\nmore") == "boom")
 check("leading blank lines skipped", common.firstLineOf("\n\nreal message") == "real message")

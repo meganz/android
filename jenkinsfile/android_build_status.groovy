@@ -772,7 +772,7 @@ def recordAffectedModuleShadowReport(List<String> unitTestModules, List<String> 
         String currentBranch = env.CHANGE_BRANCH ?: env.gitlabSourceBranch ?: env.GIT_BRANCH
         String targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET ?: env.gitlabTargetBranch ?: 'develop'
 
-        detection = common.getAffectedModules(currentBranch, targetBranch)
+        detection = common.getAffectedModules(currentBranch, targetBranch, env.GIT_COMMIT)
     } catch (Exception e) {
         detection = [available: false, mode: "", modules: [], reason: "shadow detection threw: ${e}".toString()]
     }

@@ -919,7 +919,7 @@ String jsonStringArray(List<String> values) {
     return "[" + values.collect { "\"${it}\"" }.join(", ") + "]"
 }
 
-Map getAffectedModules(String currentBranch, String targetBranch) {
+Map getAffectedModules(String currentBranch, String targetBranch, String currentCommit = null) {
     String current = bareBranchName(currentBranch)
     String target = bareBranchName(targetBranch)
 
@@ -928,7 +928,18 @@ Map getAffectedModules(String currentBranch, String targetBranch) {
             "unusable branch names (current='${currentBranch}', target='${targetBranch}')"
         )
     }
-    println("AFFECTED-MODULES: comparing ${current} against ${target}")
+
+    // The commit Jenkins checked out is in the workspace whether or not the branch still exists on
+    // the remote, so it is diffed against directly. A merge request that merges while its build is
+    // running takes its branch with it, and every report lost so far has been that case.
+    String commit = currentCommit?.trim()
+    String currentRef = isSafeBranchName(commit) ? commit : "origin/${current}"
+    boolean needsSourceFetch = currentRef != commit
+
+    println("AFFECTED-MODULES: comparing ${currentRef} against origin/${target}")
+    if (needsSourceFetch) {
+        println("AFFECTED-MODULES: no usable commit supplied, falling back to the source branch")
+    }
 
     try {
         // Everything runs as one captured script: the fetch and the ref checks are as much a part
@@ -941,9 +952,11 @@ Map getAffectedModules(String currentBranch, String targetBranch) {
         // credential helper rather than an authenticated remote URL so the token never reaches a
         // command line or a remote definition.
         //
-        // The two branches are fetched by name rather than relying on the configured refspec:
-        // Jenkins clones an MR narrowly enough that `origin/<branch>` need not exist at all, and
-        // that is exactly what `origin/target...origin/current` needs.
+        // Only the target is fetched by name. Jenkins clones a merge request narrowly enough that
+        // `origin/<branch>` need not exist, and the target is the one side that must be a branch.
+        String sourceFetch = needsSourceFetch
+            ? "git -c credential.helper=\"\$HELPER\" fetch --no-tags origin '+refs/heads/${current}:refs/remotes/origin/${current}' || echo 'DIAG: fetch of ${current} failed'"
+            : "true"
         withCredentials([usernamePassword(
             credentialsId: 'Gitlab-Access-Token',
             usernameVariable: 'GIT_USERNAME',
@@ -954,10 +967,10 @@ Map getAffectedModules(String currentBranch, String targetBranch) {
                     HELPER='!f() { echo username=\$GIT_USERNAME; echo password=\$GIT_TOKEN; }; f'
                     {
                       git -c credential.helper="\$HELPER" fetch --no-tags origin '+refs/heads/${target}:refs/remotes/origin/${target}' || echo 'DIAG: fetch of ${target} failed'
-                      git -c credential.helper="\$HELPER" fetch --no-tags origin '+refs/heads/${current}:refs/remotes/origin/${current}' || echo 'DIAG: fetch of ${current} failed'
+                      ${sourceFetch}
                       git rev-parse --verify --quiet 'origin/${target}' || echo 'DIAG: origin/${target} still missing'
-                      git rev-parse --verify --quiet 'origin/${current}' || echo 'DIAG: origin/${current} still missing'
-                      ${gradleQueryCmd()} printAffectedModules --current-branch="${current}" --target-branch="${target}" -q
+                      git rev-parse --verify --quiet '${currentRef}' || echo 'DIAG: ${currentRef} still missing'
+                      ${gradleQueryCmd()} printAffectedModules --current-branch="${current}" --target-branch="${target}" --current-ref="${currentRef}" -q
                     } > ${AFFECTED_MODULES_DETECTOR_LOG} 2>&1 || true
                 """,
                 returnStatus: true
@@ -973,7 +986,7 @@ Map getAffectedModules(String currentBranch, String targetBranch) {
             println("AFFECTED-MODULES: detector output was:\n${raw}")
             return unavailableAffectedModules("detector produced no result: ${tailOf(raw, 4)}")
         }
-        return parseAffectedModulesOutput(raw)
+        return parsed
     } catch (Exception e) {
         String reason = "detector threw: ${firstLineOf(e.message)}"
         println("AFFECTED-MODULES: ${reason}")
