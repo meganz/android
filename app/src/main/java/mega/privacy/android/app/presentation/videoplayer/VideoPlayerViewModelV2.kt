@@ -343,6 +343,13 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     private val mutex = Mutex()
     private var playbackPositionJob: Job? = null
     private var posterLoadJob: Job? = null
+    private var playbackSourcesJob: Job? = null
+
+    // Resolving a node's local path goes through MediaStore, and each query leaves an observer
+    // registered inside MediaProvider until its cursor is released. The system kills a provider
+    // that accumulates too many, so this caps how many of those are in flight at once. The rest
+    // of the per-node work stays at BUILD_PLAYBACK_SOURCES_CONCURRENCY.
+    private val localPathLookups = Semaphore(LOCAL_PATH_LOOKUP_CONCURRENCY)
     private var hasCheckedPlaybackPosition = false
     private var currentIntent: Intent? = null
 
@@ -627,7 +634,10 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     }
 
     private fun initVideoPlaybackSources() {
-        viewModelScope.launch {
+        // onNewIntent re-enters this with the same ViewModel, so a build already resolving a
+        // queue would otherwise keep running alongside the new one, doubling the work in flight.
+        playbackSourcesJob?.cancel()
+        playbackSourcesJob = viewModelScope.launch {
             runCatching {
                 buildPlaybackSources(currentIntent)
             }.onFailure {
@@ -1232,7 +1242,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     }
 
     private suspend fun getMediaItemForNode(node: TypedVideoNode, launchSource: Int) =
-        getLocalFilePathUseCase(node).let { localPath ->
+        localPathLookups.withPermit { getLocalFilePathUseCase(node) }.let { localPath ->
             if (localPath != null && isLocalFile(node, localPath)) {
                 MediaItem.Builder()
                     .setUri(FileUtil.getUriForFile(context, File(localPath)))
@@ -2365,6 +2375,12 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         // at ~22-26s (the SDK's internal request serialization is the floor), so higher
         // values add pressure without gain.
         private const val BUILD_PLAYBACK_SOURCES_CONCURRENCY = 16
+
+        // Measured on device: a queue build at the unrestricted 16 held a peak of 15 observers
+        // inside MediaProvider, against a 2-observer idle baseline; at 4 the peak drops to 6.
+        // Low enough to stay orders of magnitude below the per-process binder limit, high enough
+        // that the lookups still overlap.
+        private const val LOCAL_PATH_LOOKUP_CONCURRENCY = 4
 
         private const val MAX_RETRY = 6
 

@@ -7,7 +7,6 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.graphics.Bitmap.CompressFormat
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -180,7 +179,8 @@ internal class FileFacade @Inject constructor(
             fileSize.toString(),
             lastModifiedDate.toString()
         )
-        getExternalFile(selectionArgs) ?: getInternalFile(selectionArgs)
+        getFileFromVolume(MediaStore.Files.getContentUri(VOLUME_EXTERNAL), selectionArgs)
+            ?: getFileFromVolume(MediaStore.Files.getContentUri(VOLUME_INTERNAL), selectionArgs)
     }.getOrNull()
 
     override suspend fun getFileByPath(path: String): File? {
@@ -228,43 +228,21 @@ internal class FileFacade @Inject constructor(
         File(path).writeBytes(bytes)
     }
 
+    /**
+     * Looks up a file on one MediaStore volume by name, size and modification date.
+     *
+     * A cursor returned by MediaStore keeps an observer registered inside MediaProvider until it is
+     * closed, and the system kills a provider that accumulates too many of them, so the cursor is
+     * closed on every path here, including the ones where the column is missing or holds null.
+     */
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun getExternalFile(
+    private fun getFileFromVolume(
+        volumeUri: Uri,
         selectionArgs: Array<String>,
-    ) = getExternalCursor(selectionArgs)?.let { cursor ->
-        getFileFromCursor(cursor).also { cursor.close() }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun getInternalFile(
-        selectionArgs: Array<String>,
-    ) = getInternalCursor(selectionArgs)?.let { cursor ->
-        getFileFromCursor(cursor).also { cursor.close() }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun getExternalCursor(
-        selectionArgs: Array<String>,
-    ) = getNonEmptyCursor(
-        MediaStore.Files.getContentUri(VOLUME_EXTERNAL),
-        selectionArgs,
-    )
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun getInternalCursor(
-        selectionArgs: Array<String>,
-    ) = getNonEmptyCursor(
-        MediaStore.Files.getContentUri(VOLUME_INTERNAL),
-        selectionArgs,
-    )
-
-    private fun getNonEmptyCursor(
-        uri: Uri,
-        selectionArgs: Array<String>,
-    ): Cursor? {
-        val cursor = context.contentResolver.query(
+    ): File? =
+        context.contentResolver.query(
             /* uri = */
-            uri,
+            volumeUri,
             /* projection = */
             arrayOf(DATA),
             /* selection = */
@@ -273,20 +251,12 @@ internal class FileFacade @Inject constructor(
             selectionArgs,
             /* sortOrder = */
             null,
-        ) ?: return null
-
-        return if (cursor.moveToFirst()) {
-            cursor
-        } else {
-            cursor.close()
-            null
+        )?.use { cursor ->
+            if (!cursor.moveToFirst()) return@use null
+            val pathColumn = cursor.getColumnIndex(DATA)
+            if (pathColumn < 0) return@use null
+            cursor.getString(pathColumn)?.let { path -> File(path).takeIf { it.exists() } }
         }
-    }
-
-    private fun getFileFromCursor(cursor: Cursor): File? {
-        val path = cursor.getString(cursor.getColumnIndexOrThrow(DATA))
-        return File(path).takeIf { it.exists() }
-    }
 
     override suspend fun getOfflineFilesRootPath() =
         context.filesDir.absolutePath + File.separator + OFFLINE_DIR

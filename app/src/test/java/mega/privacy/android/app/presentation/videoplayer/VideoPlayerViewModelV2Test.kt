@@ -12,8 +12,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
@@ -187,9 +189,11 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -837,6 +841,50 @@ class VideoPlayerViewModelV2Test {
             on { this.duration }.thenReturn(testDurationString)
             on { this.type }.thenReturn(type)
             on { this.isSelected }.thenReturn(isSelect)
+        }
+
+    @Test
+    fun `test that initVideoPlayerData cancels a playback sources build that is still running`() =
+        runTest {
+            val firstBuildStarted = CompletableDeferred<Unit>()
+            val firstBuildCancelled = CompletableDeferred<Unit>()
+            val intent = mock<Intent>()
+            val testParentId = 654321
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = OFFLINE_ADAPTER,
+                data = mock(),
+                handle = 2L,
+                fileName = "test.mp4"
+            )
+            whenever(intent.getIntExtra(INTENT_EXTRA_KEY_PARENT_ID, -1)).thenReturn(testParentId)
+            val offlineNode = mock<OtherOfflineNodeInformation> {
+                on { name }.thenReturn("video queue title")
+            }
+            whenever(getOfflineNodeInformationByIdUseCase(testParentId)).thenReturn(offlineNode)
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+            // Hangs the first build so the re-entrant call has something in flight to cancel.
+            // Reaching the finally block is what proves the cancellation arrived.
+            getOfflineNodesByParentIdUseCase.stub {
+                onBlocking { invoke(testParentId) }.doSuspendableAnswer {
+                    firstBuildStarted.complete(Unit)
+                    try {
+                        awaitCancellation()
+                    } finally {
+                        firstBuildCancelled.complete(Unit)
+                    }
+                }
+            }
+
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            assertThat(firstBuildStarted.isCompleted).isTrue()
+            assertThat(firstBuildCancelled.isCompleted).isFalse()
+
+            underTest.initVideoPlayerData(intent)
+
+            assertThat(firstBuildCancelled.isCompleted).isTrue()
         }
 
     @Test

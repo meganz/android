@@ -13,6 +13,8 @@ import android.os.ParcelFileDescriptor
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
 import android.provider.DocumentsContract
+import android.provider.MediaStore
+import android.provider.MediaStore.MediaColumns.DATA
 import android.provider.MediaStore.MediaColumns.DATE_ADDED
 import android.provider.MediaStore.MediaColumns.DATE_MODIFIED
 import android.provider.MediaStore.MediaColumns.DATE_TAKEN
@@ -46,6 +48,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.ArgumentMatchers.isNull
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
@@ -2699,6 +2702,62 @@ internal class FileFacadeTest {
         }
     }
 
+    @Test
+    fun `test that getLocalFile closes the cursor and stops at the external volume on a match`() =
+        runTest {
+            val existing = File(temporaryFolder, "video.mkv").apply { writeText("content") }
+            withMediaStoreCursor { cursor ->
+                whenever(cursor.moveToFirst()) doReturn true
+                whenever(cursor.getColumnIndex(DATA)) doReturn 0
+                whenever(cursor.getString(0)) doReturn existing.absolutePath
+
+                val actual = underTest.getLocalFile("video.mkv", 1024L, 1234567890L)
+
+                assertThat(actual).isEqualTo(existing)
+                // One close, not two: a hit on the external volume must not query the internal one.
+                verify(cursor, times(1)).close()
+            }
+        }
+
+    @Test
+    fun `test that getLocalFile closes the cursor when the path column holds null`() = runTest {
+        withMediaStoreCursor { cursor ->
+            whenever(cursor.moveToFirst()) doReturn true
+            whenever(cursor.getColumnIndex(DATA)) doReturn 0
+            whenever(cursor.getString(0)) doReturn null
+
+            val actual = underTest.getLocalFile("video.mkv", 1024L, 1234567890L)
+
+            assertThat(actual).isNull()
+            verify(cursor, times(2)).close()
+        }
+    }
+
+    @Test
+    fun `test that getLocalFile closes the cursor when the path column is missing`() = runTest {
+        withMediaStoreCursor { cursor ->
+            whenever(cursor.moveToFirst()) doReturn true
+            whenever(cursor.getColumnIndex(DATA)) doReturn -1
+
+            val actual = underTest.getLocalFile("video.mkv", 1024L, 1234567890L)
+
+            assertThat(actual).isNull()
+            verify(cursor, times(2)).close()
+        }
+    }
+
+    @Test
+    fun `test that getLocalFile closes the cursor when no row matches`() = runTest {
+        withMediaStoreCursor { cursor ->
+            whenever(cursor.moveToFirst()) doReturn false
+
+            val actual = underTest.getLocalFile("video.mkv", 1024L, 1234567890L)
+
+            assertThat(actual).isNull()
+            verify(cursor, times(2)).close()
+        }
+    }
+
     private fun externalStorageDocumentUri(docId: String, uriString: String): Uri = mock {
         on { this.scheme } doReturn "content"
         on { this.authority } doReturn "com.android.externalstorage.documents"
@@ -2737,6 +2796,24 @@ internal class FileFacadeTest {
     private fun readOnlyDescriptorFor(file: File): ParcelFileDescriptor {
         val access = RandomAccessFile(file, "r")
         return mock<ParcelFileDescriptor> { on { fileDescriptor } doReturn access.fd }
+    }
+
+    /**
+     * Runs [block] with both MediaStore volumes answering from the same cursor mock, so a lookup
+     * that finds nothing usable queries twice and the mock records two closes.
+     */
+    private suspend fun withMediaStoreCursor(block: suspend (Cursor) -> Unit) {
+        mockStatic(MediaStore.Files::class.java).use { _ ->
+            val uri = mock<Uri>()
+            val cursor = mock<Cursor>()
+            val contentResolver = mock<ContentResolver>()
+            whenever(MediaStore.Files.getContentUri(any())) doReturn uri
+            whenever(context.contentResolver) doReturn contentResolver
+            whenever(
+                contentResolver.query(eq(uri), any(), any(), any(), anyOrNull())
+            ) doReturn cursor
+            block(cursor)
+        }
     }
 
     private companion object {
