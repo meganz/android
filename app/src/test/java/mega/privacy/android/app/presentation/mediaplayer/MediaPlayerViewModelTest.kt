@@ -2,6 +2,9 @@ package mega.privacy.android.app.presentation.mediaplayer
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import com.jraska.livedata.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -10,7 +13,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
@@ -21,8 +23,10 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -142,7 +146,8 @@ internal class MediaPlayerViewModelTest {
             )
             testScheduler.advanceUntilIdle()
 
-            underTest.onSnackbarMessage().test().assertValue(R.string.context_correctly_copied)
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(R.string.context_correctly_copied))
         }
 
     @Test
@@ -169,11 +174,12 @@ internal class MediaPlayerViewModelTest {
             )
             testScheduler.advanceUntilIdle()
 
-            underTest.onSnackbarMessage().test().assertValue(R.string.context_no_copied)
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(R.string.context_no_copied))
         }
 
     @Test
-    internal fun `test that onExceptionThrown is triggered when copy failed`() =
+    internal fun `test that exceptionEvent is triggered when copy failed`() =
         runTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
@@ -189,7 +195,8 @@ internal class MediaPlayerViewModelTest {
                 newParentHandle = newParentNode,
             )
             advanceUntilIdle()
-            underTest.onExceptionThrown().test().assertValue(runtimeException)
+            assertThat(underTest.state.value.exceptionEvent).isEqualTo(triggered(runtimeException))
+
         }
 
     @Test
@@ -214,9 +221,8 @@ internal class MediaPlayerViewModelTest {
                 newParentHandle = newParentNode,
             )
             advanceUntilIdle()
-            underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(sharedResR.string.node_moved_success_message)
-            }
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(sharedResR.string.node_moved_success_message))
         }
 
     @Test
@@ -241,13 +247,12 @@ internal class MediaPlayerViewModelTest {
                 newParentHandle = newParentNode,
             )
             advanceUntilIdle()
-            underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_no_moved)
-            }
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(R.string.context_no_moved))
         }
 
     @Test
-    internal fun `test that onExceptionThrown is triggered when move failed`() =
+    internal fun `test that exceptionEvent is triggered when move failed`() =
         runTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
@@ -265,7 +270,8 @@ internal class MediaPlayerViewModelTest {
             )
             advanceUntilIdle()
 
-            underTest.onExceptionThrown().test().assertValue(runtimeException)
+            assertThat(underTest.state.value.exceptionEvent).isEqualTo(triggered(runtimeException))
+
         }
 
     @Test
@@ -293,9 +299,8 @@ internal class MediaPlayerViewModelTest {
                 newParentHandle = newParentNode,
             )
             advanceUntilIdle()
-            underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_correctly_copied)
-            }
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(R.string.context_correctly_copied))
         }
 
     @Test
@@ -323,13 +328,12 @@ internal class MediaPlayerViewModelTest {
                 newParentHandle = newParentNode,
             )
             advanceUntilIdle()
-            underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_no_copied)
-            }
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(R.string.context_no_copied))
         }
 
     @Test
-    internal fun `test that onExceptionThrown is triggered when import failed`() =
+    internal fun `test that exceptionEvent is triggered when import failed`() =
         runTest {
             val newParentNode = NodeId(158401030174851)
             val chatId = 1000L
@@ -351,9 +355,8 @@ internal class MediaPlayerViewModelTest {
             )
             advanceUntilIdle()
 
-            underTest.onExceptionThrown().observeOnce {
-                assertThat(it).isEqualTo(runtimeException)
-            }
+            assertThat(underTest.state.value.exceptionEvent).isEqualTo(triggered(runtimeException))
+
         }
 
     @Test
@@ -391,11 +394,12 @@ internal class MediaPlayerViewModelTest {
             underTest.saveChatNodeToOffline(chatId, messageId)
             advanceUntilIdle()
 
-            underTest.onSnackbarMessage().test().assertValue(R.string.file_already_exists)
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(R.string.file_already_exists))
         }
 
     @Test
-    internal fun `test that startChatFileOfflineDownload event is triggered when chat file is not available offline`() =
+    internal fun `test that startChatFileOfflineDownloadEvent is triggered when chat file is not available offline`() =
         runTest {
             val chatId = 1000L
             val messageId = 2000L
@@ -406,7 +410,8 @@ internal class MediaPlayerViewModelTest {
             underTest.saveChatNodeToOffline(chatId, messageId)
             advanceUntilIdle()
 
-            underTest.onStartChatFileOfflineDownload().test().assertValue(chatFile)
+            assertThat(underTest.state.value.startChatFileOfflineDownloadEvent)
+                .isEqualTo(triggered(chatFile))
         }
 
     @Test
@@ -419,9 +424,10 @@ internal class MediaPlayerViewModelTest {
             underTest.saveChatNodeToOffline(chatId, messageId)
             advanceUntilIdle()
 
-            underTest.onExceptionThrown().test().assertValue {
-                it is IllegalStateException
-            }
+            val event = underTest.state.value.exceptionEvent
+            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((event as StateEventWithContentTriggered).content)
+                .isInstanceOf(IllegalStateException::class.java)
         }
 
     @Test
@@ -603,8 +609,8 @@ internal class MediaPlayerViewModelTest {
             underTest.moveNodeToRubbishBin(nodeHandle)
             advanceUntilIdle()
             underTest.itemToRemove.test().assertValue(nodeHandle)
-            underTest.onSnackbarMessage().test()
-                .assertValue(sharedResR.string.node_moved_success_message)
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(sharedResR.string.node_moved_success_message))
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.nodeToMoveToTrash).isNull()
@@ -620,7 +626,8 @@ internal class MediaPlayerViewModelTest {
         )
         underTest.moveNodeToRubbishBin(nodeHandle)
         advanceUntilIdle()
-        underTest.onSnackbarMessage().test().assertValue(R.string.context_no_moved)
+        assertThat(underTest.state.value.snackbarMessageEvent)
+            .isEqualTo(triggered(R.string.context_no_moved))
     }
 
     @Test
@@ -683,7 +690,7 @@ internal class MediaPlayerViewModelTest {
         }
 
     @Test
-    internal fun `test that downloadPublicLinkFile emits node via onDownloadFileLinkNode when successful`() =
+    internal fun `test that downloadPublicLinkFile triggers downloadFileLinkNodeEvent when successful`() =
         runTest {
             val url = "https://mega.nz/file/abc123"
             val publicNode = PublicLinkFile(node = mock())
@@ -693,7 +700,8 @@ internal class MediaPlayerViewModelTest {
             underTest.downloadPublicLinkFile(url)
             advanceUntilIdle()
 
-            underTest.onDownloadFileLinkNode().test().assertValue(publicNode)
+            assertThat(underTest.state.value.downloadFileLinkNodeEvent)
+                .isEqualTo(triggered(publicNode))
         }
 
     @Test
@@ -705,7 +713,117 @@ internal class MediaPlayerViewModelTest {
             underTest.downloadPublicLinkFile(url)
             advanceUntilIdle()
 
-            underTest.onSnackbarMessage().test().assertValue(R.string.general_error)
+            assertThat(underTest.state.value.snackbarMessageEvent)
+                .isEqualTo(triggered(R.string.general_error))
+        }
+
+    @Test
+    internal fun `test that nameCollisionEvent is triggered when copy finds a name collision`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val collision = mock<NodeNameCollision.Default>()
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = mapOf(selectedNode to collision),
+                    type = NodeNameCollisionType.COPY,
+                ),
+            )
+
+            underTest.copyNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+
+            assertThat(underTest.state.value.nameCollisionEvent).isEqualTo(triggered(collision))
+        }
+
+    @Test
+    internal fun `test that onNameCollisionEventConsumed consumes nameCollisionEvent`() = runTest {
+        val selectedNode = 73248538798194
+        val newParentNode = 158401030174851
+        whenever(
+            checkNodesNameCollisionWithActionUseCase(
+                nodes = mapOf(selectedNode to newParentNode),
+                type = NodeNameCollisionType.MOVE,
+            )
+        ) doReturn NodeNameCollisionWithActionResult(
+            collisionResult = NodeNameCollisionsResult(
+                noConflictNodes = emptyMap(),
+                conflictNodes = mapOf(selectedNode to mock<NodeNameCollision.Default>()),
+                type = NodeNameCollisionType.MOVE,
+            ),
+        )
+        underTest.moveNode(nodeHandle = selectedNode, newParentHandle = newParentNode)
+        advanceUntilIdle()
+
+        underTest.onNameCollisionEventConsumed()
+
+        assertThat(underTest.state.value.nameCollisionEvent).isEqualTo(consumed())
+    }
+
+    @Test
+    internal fun `test that onSnackbarMessageEventConsumed consumes snackbarMessageEvent`() =
+        runTest {
+            val url = "https://mega.nz/file/abc123"
+            whenever(getPublicNodeUseCase(url)).thenThrow(RuntimeException("Network error"))
+            underTest.downloadPublicLinkFile(url)
+            advanceUntilIdle()
+
+            underTest.onSnackbarMessageEventConsumed()
+
+            assertThat(underTest.state.value.snackbarMessageEvent).isEqualTo(consumed())
+        }
+
+    @Test
+    internal fun `test that onExceptionEventConsumed consumes exceptionEvent`() = runTest {
+        val chatId = 1000L
+        val messageId = 2000L
+        whenever(getChatFileUseCase(chatId, messageId)).thenReturn(null)
+        underTest.saveChatNodeToOffline(chatId, messageId)
+        advanceUntilIdle()
+
+        underTest.onExceptionEventConsumed()
+
+        assertThat(underTest.state.value.exceptionEvent).isEqualTo(consumed())
+    }
+
+    @Test
+    internal fun `test that onStartChatFileOfflineDownloadEventConsumed consumes startChatFileOfflineDownloadEvent`() =
+        runTest {
+            val chatId = 1000L
+            val messageId = 2000L
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(false)
+            underTest.saveChatNodeToOffline(chatId, messageId)
+            advanceUntilIdle()
+
+            underTest.onStartChatFileOfflineDownloadEventConsumed()
+
+            assertThat(underTest.state.value.startChatFileOfflineDownloadEvent)
+                .isEqualTo(consumed())
+        }
+
+    @Test
+    internal fun `test that onDownloadFileLinkNodeEventConsumed consumes downloadFileLinkNodeEvent`() =
+        runTest {
+            val url = "https://mega.nz/file/abc123"
+            whenever(getPublicNodeUseCase(url)).thenReturn(mock())
+            whenever(mapTypedNodeToPublicLinkUseCase(any())).thenReturn(PublicLinkFile(node = mock()))
+            underTest.downloadPublicLinkFile(url)
+            advanceUntilIdle()
+
+            underTest.onDownloadFileLinkNodeEventConsumed()
+
+            assertThat(underTest.state.value.downloadFileLinkNodeEvent).isEqualTo(consumed())
         }
 
     companion object {

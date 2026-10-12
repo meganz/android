@@ -7,7 +7,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.navigation.NavController
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
@@ -135,8 +137,11 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
     }
 
     protected fun observeDownloadFileLinkNode() {
-        viewModel.onDownloadFileLinkNode().observe(this) { node ->
-            startDownloadViewModel.onDownloadClicked(node = node, withStartMessage = true)
+        collectFlow(viewModel.state) { state ->
+            (state.downloadFileLinkNodeEvent as? StateEventWithContentTriggered)?.let {
+                viewModel.onDownloadFileLinkNodeEventConsumed()
+                startDownloadViewModel.onDownloadClicked(node = it.content, withStartMessage = true)
+            }
         }
     }
 

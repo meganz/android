@@ -17,7 +17,6 @@ import android.view.TextureView
 import android.view.View
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -101,7 +100,6 @@ import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -336,7 +334,6 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
 
     private val playedPastThresholdTracker = PlayedPastThresholdTracker()
 
-    private val snackbarMessage = SingleLiveEvent<Int>()
     private var searchQuery: String = ""
     private val mediaItemsDuringChanged = mutableListOf<MediaItem>()
     private var searchJob: Job? = null
@@ -1867,8 +1864,6 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                 }
             }
     }
-
-    internal fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
 
     internal fun updatePlaybackStateWithReplay(value: Boolean) {
         if (mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser) {

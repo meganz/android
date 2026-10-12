@@ -348,10 +348,6 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
             }
         }.launchIn(lifecycleScope)
 
-        videoPlayerViewModelV2.onSnackbarMessage().observe(this) { message ->
-            videoPlayerViewModelV2.updateSnackBarMessage(getString(message))
-        }
-
         collectFlow(videoPlayerViewModelV2.uiState.map { it.isClosedAfterHidingNode }
             .distinctUntilChanged()) { isClosed ->
             if (isClosed) {

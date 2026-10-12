@@ -2,11 +2,14 @@ package mega.privacy.android.app.mediaplayer
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,13 +23,9 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
-import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -66,12 +65,6 @@ class MediaPlayerViewModel @Inject constructor(
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
 ) : ViewModel() {
-
-    private val collision = SingleLiveEvent<NameCollision>()
-    private val throwable = SingleLiveEvent<Throwable>()
-    private val snackbarMessage = SingleLiveEvent<Int>()
-    private val startChatFileOfflineDownload = SingleLiveEvent<ChatFile>()
-    private val downloadFileLinkNode = SingleLiveEvent<TypedNode>()
 
     /**
      * The flow for clicked event
@@ -129,15 +122,23 @@ class MediaPlayerViewModel @Inject constructor(
         }
     }
 
-    internal fun getCollision(): LiveData<NameCollision> = collision
+    internal fun onNameCollisionEventConsumed() =
+        _state.update { it.copy(nameCollisionEvent = consumed()) }
 
-    internal fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
+    internal fun onSnackbarMessageEventConsumed() =
+        _state.update { it.copy(snackbarMessageEvent = consumed()) }
 
-    internal fun onExceptionThrown(): LiveData<Throwable> = throwable
+    internal fun onExceptionEventConsumed() =
+        _state.update { it.copy(exceptionEvent = consumed()) }
 
-    internal fun onStartChatFileOfflineDownload(): LiveData<ChatFile> = startChatFileOfflineDownload
+    internal fun onStartChatFileOfflineDownloadEventConsumed() =
+        _state.update { it.copy(startChatFileOfflineDownloadEvent = consumed()) }
 
-    internal fun onDownloadFileLinkNode(): LiveData<TypedNode> = downloadFileLinkNode
+    internal fun onDownloadFileLinkNodeEventConsumed() =
+        _state.update { it.copy(downloadFileLinkNodeEvent = consumed()) }
+
+    private fun showSnackbar(@StringRes message: Int) =
+        _state.update { it.copy(snackbarMessageEvent = triggered(message)) }
 
     /**
      * Rename update
@@ -168,21 +169,23 @@ class MediaPlayerViewModel @Inject constructor(
                 )
             }.onSuccess {
                 it.firstNodeCollisionOrNull?.let { item ->
-                    collision.value = item
+                    _state.update { state -> state.copy(nameCollisionEvent = triggered(item)) }
                 }
                 it.moveRequestResult?.let { result ->
-                    snackbarMessage.value = if (result.isSuccess) {
-                        R.string.context_correctly_copied
-                    } else {
-                        R.string.context_no_copied
-                    }
+                    showSnackbar(
+                        if (result.isSuccess) {
+                            R.string.context_correctly_copied
+                        } else {
+                            R.string.context_no_copied
+                        }
+                    )
                 }
             }.onFailure {
                 Timber.e(it, "Error not copied")
                 if (it is NodeDoesNotExistsException) {
-                    snackbarMessage.value = R.string.general_error
+                    showSnackbar(R.string.general_error)
                 } else {
-                    throwable.value = it
+                    _state.update { state -> state.copy(exceptionEvent = triggered(it)) }
                 }
             }
         }
@@ -208,17 +211,19 @@ class MediaPlayerViewModel @Inject constructor(
             )
         }.onSuccess {
             it.firstChatNodeCollisionOrNull?.let { item ->
-                collision.value = item
+                _state.update { state -> state.copy(nameCollisionEvent = triggered(item)) }
             }
             it.moveRequestResult?.let { result ->
-                snackbarMessage.value = if (result.isSuccess) {
-                    R.string.context_correctly_copied
-                } else {
-                    R.string.context_no_copied
-                }
+                showSnackbar(
+                    if (result.isSuccess) {
+                        R.string.context_correctly_copied
+                    } else {
+                        R.string.context_no_copied
+                    }
+                )
             }
         }.onFailure {
-            throwable.value = it
+            _state.update { state -> state.copy(exceptionEvent = triggered(it)) }
             Timber.e(it)
         }
     }
@@ -239,23 +244,23 @@ class MediaPlayerViewModel @Inject constructor(
                 )
             }.onSuccess { result ->
                 result.firstNodeCollisionOrNull?.let { item ->
-                    collision.value = item
+                    _state.update { state -> state.copy(nameCollisionEvent = triggered(item)) }
                 }
                 result.moveRequestResult?.let {
                     if (it.isSuccess) {
                         _itemToRemove.value =
                             result.firstNodeCollisionOrNull?.nodeHandle ?: nodeHandle
-                        snackbarMessage.value = sharedResR.string.node_moved_success_message
+                        showSnackbar(sharedResR.string.node_moved_success_message)
                     } else {
-                        snackbarMessage.value = R.string.context_no_moved
+                        showSnackbar(R.string.context_no_moved)
                     }
                 }
             }.onFailure {
                 Timber.e(it, "Error not copied")
                 if (it is NodeDoesNotExistsException) {
-                    snackbarMessage.value = R.string.general_error
+                    showSnackbar(R.string.general_error)
                 } else {
-                    throwable.value = it
+                    _state.update { state -> state.copy(exceptionEvent = triggered(it)) }
                 }
             }
         }
@@ -330,13 +335,15 @@ class MediaPlayerViewModel @Inject constructor(
                     ?: throw IllegalStateException("Chat file not found")
                 val isAvailableOffline = isAvailableOfflineUseCase(chatFile)
                 if (isAvailableOffline) {
-                    snackbarMessage.value = R.string.file_already_exists
+                    showSnackbar(R.string.file_already_exists)
                 } else {
-                    startChatFileOfflineDownload.value = chatFile
+                    _state.update { state ->
+                        state.copy(startChatFileOfflineDownloadEvent = triggered(chatFile))
+                    }
                 }
             }.onFailure {
                 Timber.e(it)
-                throwable.value = it
+                _state.update { state -> state.copy(exceptionEvent = triggered(it)) }
             }
         }
     }
@@ -347,11 +354,11 @@ class MediaPlayerViewModel @Inject constructor(
                 moveNodesToRubbishUseCase(listOf(nodeHandle))
             }.onSuccess {
                 _itemToRemove.value = nodeHandle
-                snackbarMessage.value = sharedResR.string.node_moved_success_message
+                showSnackbar(sharedResR.string.node_moved_success_message)
                 resetNodeToMoveToTrash()
             }.onFailure { exception ->
                 Timber.e(exception, "Failed to move nodes to rubbish: $nodeHandle")
-                snackbarMessage.value = R.string.context_no_moved
+                showSnackbar(R.string.context_no_moved)
             }
         }
     }
@@ -389,10 +396,10 @@ class MediaPlayerViewModel @Inject constructor(
             runCatching {
                 mapTypedNodeToPublicLinkUseCase(getPublicNodeUseCase(publicUrl))
             }.onSuccess { node ->
-                downloadFileLinkNode.value = node
+                _state.update { state -> state.copy(downloadFileLinkNodeEvent = triggered(node)) }
             }.onFailure {
                 Timber.e(it, "Get public node failed")
-                snackbarMessage.value = R.string.general_error
+                showSnackbar(R.string.general_error)
             }
         }
     }

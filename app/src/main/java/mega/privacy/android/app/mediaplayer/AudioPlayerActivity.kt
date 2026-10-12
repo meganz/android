@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -372,22 +373,27 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     @OptIn(FlowPreview::class)
     private fun setupObserver() {
         with(viewModel) {
-            onStartChatFileOfflineDownload().observe(this@AudioPlayerActivity) {
-                startDownloadViewModel.onSaveOfflineClicked(
-                    chatFile = it,
-                    withStartMessage = true,
-                )
+            collectFlow(state) { playerState ->
+                (playerState.startChatFileOfflineDownloadEvent as? StateEventWithContentTriggered)?.let {
+                    onStartChatFileOfflineDownloadEventConsumed()
+                    startDownloadViewModel.onSaveOfflineClicked(
+                        chatFile = it.content,
+                        withStartMessage = true,
+                    )
+                }
+                (playerState.nameCollisionEvent as? StateEventWithContentTriggered)?.let {
+                    onNameCollisionEventConsumed()
+                    nameCollisionActivityContract.launch(arrayListOf(it.content))
+                }
+                (playerState.snackbarMessageEvent as? StateEventWithContentTriggered)?.let {
+                    onSnackbarMessageEventConsumed()
+                    showSnackbar(getString(it.content))
+                }
+                (playerState.exceptionEvent as? StateEventWithContentTriggered)?.let {
+                    onExceptionEventConsumed()
+                    manageException(it.content)
+                }
             }
-
-            getCollision().observe(this@AudioPlayerActivity) { collision ->
-                nameCollisionActivityContract.launch(arrayListOf(collision))
-            }
-
-            onSnackbarMessage().observe(this@AudioPlayerActivity) { message ->
-                showSnackbar(getString(message))
-            }
-
-            onExceptionThrown().observe(this@AudioPlayerActivity, ::manageException)
 
             itemToRemove.observe(this@AudioPlayerActivity) { handle ->
                 playerServiceGateway?.removeItem(handle)
