@@ -9,9 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,6 +27,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
@@ -66,13 +66,13 @@ fun VideoPlaylistItemView(
                 onLongClick = onLongClick
             )
             .fillMaxWidth()
-            .height(87.dp)
+            .heightIn(min = VIDEO_PLAYLIST_ITEM_MIN_HEIGHT)
             .conditional(isSelected) {
                 background(DSTokens.colors.background.surface1)
             }
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .testTag(VIDEO_PLAYLIST_ITEM_VIEW_TEST_TAG),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         VideoPlaylistThumbnailView(
             emptyPlaylistIcon = emptyPlaylistIcon,
@@ -161,9 +161,10 @@ internal fun VideoPlaylistInfoView(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .padding(vertical = 5.dp, horizontal = 10.dp)
-            .fillMaxHeight()
+        modifier = modifier.padding(
+            vertical = VIDEO_PLAYLIST_ITEM_INFO_VERTICAL_PADDING,
+            horizontal = 10.dp
+        )
     ) {
         MegaText(
             text = title,
@@ -175,7 +176,8 @@ internal fun VideoPlaylistInfoView(
             ),
             textColor = TextColor.Primary,
             textAlign = TextAlign.Start,
-            maxLines = 2
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
         )
 
         MegaText(
@@ -252,6 +254,17 @@ private fun VideoPlaylistItemViewMultipleVideosPreview() {
         )
     }
 }
+
+/**
+ * Minimum height of a playlist row, taken from the design spec: the 126dp wide 16:9 thumbnail
+ * plus the row's vertical padding. The row grows past it when the text needs more space.
+ */
+internal val VIDEO_PLAYLIST_ITEM_MIN_HEIGHT = 87.dp
+
+/**
+ * Vertical padding around the title and info column.
+ */
+internal val VIDEO_PLAYLIST_ITEM_INFO_VERTICAL_PADDING = 5.dp
 
 /**
  * Test tag for VideoPlaylistItemView

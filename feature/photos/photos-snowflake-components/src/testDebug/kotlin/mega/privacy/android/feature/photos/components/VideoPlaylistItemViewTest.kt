@@ -2,15 +2,23 @@ package mega.privacy.android.feature.photos.components
 
 import androidx.activity.ComponentActivity
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.assertIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.height
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
@@ -43,23 +51,29 @@ class VideoPlaylistItemViewTest {
         isSystemVideoPlaylist: Boolean = false,
         onLongClick: (() -> Unit)? = null,
         onMenuClick: () -> Unit = {},
+        fontScale: Float = 1f,
     ) {
         composeTestRule.setContent {
-            VideoPlaylistItemView(
-                emptyPlaylistIcon = emptyPlaylistIcon,
-                noThumbnailIcon = noThumbnailIcon,
-                title = title,
-                numberOfVideos = numberOfVideos,
-                thumbnailList = thumbnailList,
-                totalDuration = totalDuration,
-                isSelected = isSelected,
-                isSystemVideoPlaylist = isSystemVideoPlaylist,
-                onClick = onClick,
-                onLongClick = onLongClick,
-                onMenuClick = onMenuClick,
-                modifier = modifier,
-                isSelectionMode = isSelectionMode
-            )
+            val density = LocalDensity.current
+            CompositionLocalProvider(
+                LocalDensity provides Density(density.density, fontScale)
+            ) {
+                VideoPlaylistItemView(
+                    emptyPlaylistIcon = emptyPlaylistIcon,
+                    noThumbnailIcon = noThumbnailIcon,
+                    title = title,
+                    numberOfVideos = numberOfVideos,
+                    thumbnailList = thumbnailList,
+                    totalDuration = totalDuration,
+                    isSelected = isSelected,
+                    isSystemVideoPlaylist = isSystemVideoPlaylist,
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                    onMenuClick = onMenuClick,
+                    modifier = modifier,
+                    isSelectionMode = isSelectionMode
+                )
+            }
         }
     }
 
@@ -164,6 +178,44 @@ class VideoPlaylistItemViewTest {
 
         VIDEO_PLAYLIST_ITEM_TAILING_ICON_TEST_TAG.assertIsDisplayedWithTag()
         VIDEO_PLAYLIST_ITEM_SELECTED_CHECKBOX_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that the item is never shorter than its minimum height`() {
+        setComposeContent()
+
+        composeTestRule.onNodeWithTag(VIDEO_PLAYLIST_ITEM_VIEW_TEST_TAG, useUnmergedTree = true)
+            .assertHeightIsAtLeast(VIDEO_PLAYLIST_ITEM_MIN_HEIGHT)
+    }
+
+    @Test
+    fun `test that the title is aligned with the top of the thumbnail`() {
+        setComposeContent()
+
+        val thumbnailTop = composeTestRule
+            .onNodeWithTag(VIDEO_PLAYLIST_ITEM_THUMBNAIL_VIEW_TEST_TAG, useUnmergedTree = true)
+            .getUnclippedBoundsInRoot().top
+        val titleTop = composeTestRule
+            .onNodeWithTag(VIDEO_PLAYLIST_ITEM_TITLE_TEST_TAG, useUnmergedTree = true)
+            .getUnclippedBoundsInRoot().top
+
+        titleTop.assertIsEqualTo(thumbnailTop + VIDEO_PLAYLIST_ITEM_INFO_VERTICAL_PADDING, "title top")
+    }
+
+    @Test
+    fun `test that the item grows beyond its minimum height when the font scale is large`() {
+        setComposeContent(
+            title = "A playlist name long enough to wrap onto a second line",
+            numberOfVideos = 5,
+            totalDuration = "15:30",
+            fontScale = 2f,
+        )
+
+        val height = composeTestRule
+            .onNodeWithTag(VIDEO_PLAYLIST_ITEM_VIEW_TEST_TAG, useUnmergedTree = true)
+            .getUnclippedBoundsInRoot().height
+
+        assertThat(height.value).isGreaterThan(VIDEO_PLAYLIST_ITEM_MIN_HEIGHT.value)
     }
 
     private fun String.assertIsDisplayedWithTag() =
