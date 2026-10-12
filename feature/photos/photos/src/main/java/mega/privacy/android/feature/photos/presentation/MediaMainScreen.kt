@@ -429,6 +429,7 @@ fun MediaMainRoute(
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
         handleNotificationPermissionResult = mediaCameraUploadViewModel::updateNotificationPermission,
         onCUBannerDismissRequest = mediaCameraUploadViewModel::dismissCUBanner,
+        onCameraUploadsWarningClick = mediaCameraUploadViewModel::onWarningStatusClicked,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
         onMediaTimePeriodSelected = timelineViewModel::onMediaTimePeriodSelected,
         onTimelineRevampMediaTimePeriodSelected = timelineRevampViewModel::onMediaTimePeriodSelected,
@@ -492,6 +493,7 @@ fun MediaMainScreen(
     handleCameraUploadsPermissionsResult: () -> Unit,
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
+    onCameraUploadsWarningClick: () -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onTimelineRevampMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
@@ -645,6 +647,7 @@ fun MediaMainScreen(
                     )
                 },
                 onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen,
+                onCameraUploadsWarningClick = onCameraUploadsWarningClick,
                 navigateToMediaSearch = { key ->
                     (MediaAppBarAction.Search as MediaAppBarAction).toTrackingEvent()
                         ?.let { Analytics.tracker.trackEvent(it) }
@@ -817,6 +820,7 @@ fun MediaMainScreen(
                                     handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                                     handleNotificationPermissionResult = handleNotificationPermissionResult,
                                     onCUBannerDismissRequest = onCUBannerDismissRequest,
+                                    onCameraUploadsWarningClick = onCameraUploadsWarningClick,
                                     onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
                                     onMediaTimePeriodSelected = effectiveOnMediaTimePeriodSelected,
                                     showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
@@ -914,6 +918,7 @@ private fun MediaScreen.MediaContent(
     handleCameraUploadsPermissionsResult: () -> Unit,
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
+    onCameraUploadsWarningClick: () -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     showVideoPlaylistRemovedDialog: Boolean,
@@ -1182,6 +1187,7 @@ private fun PhotosMainScreenPreview() {
             handleCameraUploadsPermissionsResult = {},
             handleNotificationPermissionResult = {},
             onCUBannerDismissRequest = {},
+            onCameraUploadsWarningClick = {},
             onNavigateToUpgradeAccount = {},
             onMediaTimePeriodSelected = {},
             onTimelineRevampMediaTimePeriodSelected = {},

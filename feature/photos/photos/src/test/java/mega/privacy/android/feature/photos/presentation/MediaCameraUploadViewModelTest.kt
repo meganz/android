@@ -421,4 +421,35 @@ class MediaCameraUploadViewModelTest {
             assertThat(expectMostRecentItem().status).isEqualTo(CUStatusUiState.None)
         }
     }
+
+    @Test
+    fun `test that dismissing the warning banner leaves the status alone`() = runTest {
+        isCameraUploadsEnabledFlow.value = true
+        whenever(hasCameraUploadsPermissionUseCase()) doReturn false
+        underTest.checkCameraUploadsPermissions()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().status)
+                .isEqualTo(CUStatusUiState.Warning.HasLimitedAccess)
+
+            underTest.dismissCUBanner(status = CUStatusUiState.Warning.HasLimitedAccess)
+
+            val after = awaitItem()
+            assertThat(after.isWarningBannerDismissed).isTrue()
+            assertThat(after.status).isEqualTo(CUStatusUiState.Warning.HasLimitedAccess)
+        }
+    }
+
+    @Test
+    fun `test that tapping the warning icon brings a dismissed banner back`() = runTest {
+        underTest.dismissCUBanner(status = CUStatusUiState.Warning.NotificationNotGranted)
+
+        underTest.onWarningStatusClicked()
+
+        underTest.uiState.test {
+            val state = expectMostRecentItem()
+            assertThat(state.isWarningBannerDismissed).isFalse()
+            assertThat(state.revealWarningBannerRequest).isEqualTo(1)
+        }
+    }
 }

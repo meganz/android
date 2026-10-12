@@ -67,6 +67,7 @@ internal fun MediaTopBar(
     onUpdatePlaylistSearchQuery: (value: String?) -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
+    onCameraUploadsWarningClick: () -> Unit,
     navigateToMediaSearch: (NavKey) -> Unit,
     onFilterActionClick: () -> Unit,
     onSortActionClick: () -> Unit,
@@ -215,7 +216,8 @@ internal fun MediaTopBar(
                             modifier = Modifier.padding(end = 14.dp),
                             cameraUploadsStatus = mediaCameraUploadUiState.status,
                             onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                            onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
+                            onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen,
+                            onWarningClick = onCameraUploadsWarningClick,
                         )
                     }
 

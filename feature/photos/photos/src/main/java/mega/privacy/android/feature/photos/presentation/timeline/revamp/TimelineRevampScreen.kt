@@ -82,6 +82,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Enabl
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PeriodCardsSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
+import mega.privacy.android.feature.photos.presentation.timeline.component.RevealWarningBannerEffect
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
@@ -174,6 +175,7 @@ internal fun TimelineRevampScreen(
 
         uiState is TimelineRevampUiState.Data -> {
             TimelineRevampContent(
+                revealBannerRequest = mediaCameraUploadUiState.revealWarningBannerRequest,
                 modifier = insetModifier.fillMaxSize(),
                 contentPadding = contentPadding,
                 sections = uiState.sections,
@@ -204,6 +206,7 @@ internal fun TimelineRevampScreen(
                     {
                         CameraUploadsBanner(
                             status = mediaCameraUploadUiState.status,
+                            isWarningDismissed = mediaCameraUploadUiState.isWarningBannerDismissed,
                             onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                             onDismissRequest = onCameraUploadsBannerDismiss,
                             onChangeCameraUploadsPermissions =
@@ -257,11 +260,20 @@ private fun TimelineRevampContent(
     onScrollingChanged: (Boolean) -> Unit,
     onSelectorVisibleChanged: (Boolean) -> Unit,
     contentPadding: PaddingValues,
+    revealBannerRequest: Int,
     modifier: Modifier = Modifier,
     bannerContent: (@Composable () -> Unit)? = null,
 ) {
     val lazyGridState = rememberLazyGridState()
     val cardListState = rememberLazyListState()
+
+    RevealWarningBannerEffect(
+        revealRequest = revealBannerRequest,
+        onReveal = {
+            lazyGridState.scrollToItem(0)
+            cardListState.scrollToItem(0)
+        },
+    )
     val configuration = LocalConfiguration.current
 
     val contentPaddingWithSelector = PaddingValues(

@@ -50,6 +50,7 @@ import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerUpgradeButt
 @Composable
 internal fun CameraUploadsBanner(
     status: CUStatusUiState,
+    isWarningDismissed: Boolean,
     onEnableCameraUploads: () -> Unit,
     onDismissRequest: (status: CUStatusUiState) -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
@@ -58,6 +59,8 @@ internal fun CameraUploadsBanner(
     onNavigateMobileDataSetting: () -> Unit,
     onNavigateUpgradeScreen: () -> Unit,
 ) {
+    if (status is CUStatusUiState.Warning && isWarningDismissed) return
+
     when (status) {
         is CUStatusUiState.Disabled -> {
             if (status.shouldNotifyUser) {

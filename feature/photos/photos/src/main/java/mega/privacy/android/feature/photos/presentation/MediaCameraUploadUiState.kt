@@ -10,6 +10,26 @@ data class MediaCameraUploadUiState(
     val status: CUStatusUiState = CUStatusUiState.None,
     val uploadComplete: StateEventWithContent<TotalUploaded> = consumed(),
     val enableCameraUploadPageShowing: Boolean = false,
+    /**
+     * Counts the taps on the warning status icon. The timeline scrolls to its header, which holds
+     * the banner that explains the current warning, each time this count increases.
+     *
+     * This is a count and not a one-shot event because the timeline recomposes many times while
+     * the user scrolls the list. A one-shot event that is raised again before the previous event
+     * is consumed stops the icon from responding for the rest of the session.
+     */
+    val revealWarningBannerRequest: Int = 0,
+    /**
+     * True after the user closes the warning banner, for as long as the Media screen exists. The
+     * banner is then hidden, but the status icon remains in the toolbar, and a tap on the icon
+     * shows the banner again. A close therefore hides the banner for now, not permanently.
+     *
+     * A close applies to every [CUStatusUiState.Warning] and not only to the warning that the
+     * user saw. If the reason changes, for example from a low battery to a full storage, the new
+     * banner also stays hidden until the user taps the icon. This matches the behaviour before
+     * the regression that this fix repairs.
+     */
+    val isWarningBannerDismissed: Boolean = false,
 )
 
 sealed interface CUStatusUiState {

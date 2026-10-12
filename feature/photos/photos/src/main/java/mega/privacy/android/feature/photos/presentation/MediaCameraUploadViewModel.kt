@@ -311,6 +311,13 @@ class MediaCameraUploadViewModel @Inject constructor(
     }
 
     internal fun dismissCUBanner(status: CUStatusUiState) {
+        if (status is CUStatusUiState.Warning) {
+            // Only the banner is hidden, because the status does not change: Camera Uploads is
+            // still blocked. Setting the status to None also removes the toolbar icon, and
+            // nothing then shows the user that a warning exists.
+            _uiState.update { it.copy(isWarningBannerDismissed = true) }
+            return
+        }
         if (status is CUStatusUiState.Disabled) {
             dismissEnableCUBanner()
         }
@@ -326,5 +333,20 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     internal fun onConsumeUploadCompleteEvent() {
         _uiState.update { it.copy(uploadComplete = consumed()) }
+    }
+
+    /**
+     * Shows the warning banner again after the user taps the warning status icon. Clears
+     * [MediaCameraUploadUiState.isWarningBannerDismissed] and increases
+     * [MediaCameraUploadUiState.revealWarningBannerRequest], so that the timeline scrolls to the
+     * header that holds the banner.
+     */
+    internal fun onWarningStatusClicked() {
+        _uiState.update {
+            it.copy(
+                isWarningBannerDismissed = false,
+                revealWarningBannerRequest = it.revealWarningBannerRequest + 1,
+            )
+        }
     }
 }

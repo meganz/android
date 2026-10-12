@@ -165,10 +165,36 @@ class CameraUploadBannerTest {
         }
     }
 
+    @Test
+    fun `test that the warning banner is not shown once it has been dismissed`() {
+        composeRuleScope {
+            setBanner(
+                status = CUStatusUiState.Warning.NotificationNotGranted,
+                isWarningDismissed = true,
+            )
+
+            onNodeWithTag(TIMELINE_CAMERA_UPLOADS_NOTIFICATION_NOT_GRANTED_BANNER_TEST_TAG)
+                .assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `test that dismissing the warning banner leaves the other banners alone`() {
+        composeRuleScope {
+            setBanner(
+                status = CUStatusUiState.Disabled(shouldNotifyUser = true),
+                isWarningDismissed = true,
+            )
+
+            onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG).assertIsDisplayed()
+        }
+    }
+
     private fun ComposeContentTestRule.setBanner(
         status: CUStatusUiState = CUStatusUiState.None,
         onEnableCameraUploads: () -> Unit = {},
         onDismissRequest: (status: CUStatusUiState) -> Unit = {},
+        isWarningDismissed: Boolean = false,
         onChangeCameraUploadsPermissions: () -> Unit = {},
         onRequestNotificationPermission: () -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
@@ -178,6 +204,7 @@ class CameraUploadBannerTest {
         setContent {
             CameraUploadsBanner(
                 status = status,
+                isWarningDismissed = isWarningDismissed,
                 onEnableCameraUploads = onEnableCameraUploads,
                 onDismissRequest = onDismissRequest,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,

@@ -71,6 +71,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Camer
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
+import mega.privacy.android.feature.photos.presentation.timeline.component.RevealWarningBannerEffect
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
@@ -168,6 +169,11 @@ internal fun TimelineTabScreen(
     val isScrollingDown by timelineLazyListState.isScrollingDown
     val isScrolledToEnd by timelineLazyListState.isScrolledToEnd
     val isScrolledToTop by timelineLazyListState.isScrolledToTop
+
+    RevealWarningBannerEffect(
+        revealRequest = mediaCameraUploadUiState.revealWarningBannerRequest,
+        onReveal = { timelineLazyListState.scrollToItem() },
+    )
 
     val shouldShowTimePeriodSelector by remember(selectedTimePeriod, uiState.isLoading) {
         derivedStateOf {
@@ -277,6 +283,7 @@ internal fun TimelineTabScreen(
                 contentPadding = contentPadding,
                 uiState = uiState,
                 cuStatusUiState = mediaCameraUploadUiState.status,
+                isWarningBannerDismissed = mediaCameraUploadUiState.isWarningBannerDismissed,
                 selectedPhotoIds = selectedPhotoIds,
                 lazyGridState = timelineLazyListState.lazyGridState,
                 lazyListState = timelineLazyListState.lazyListState,
@@ -392,6 +399,7 @@ private fun EmptyBodyContent(modifier: Modifier = Modifier) {
 private fun TimelineTabContent(
     uiState: TimelineTabUiState,
     cuStatusUiState: CUStatusUiState,
+    isWarningBannerDismissed: Boolean,
     selectedPhotoIds: Set<Long>,
     lazyGridState: LazyGridState,
     lazyListState: LazyListState,
@@ -463,6 +471,7 @@ private fun TimelineTabContent(
                         if (selectedPhotoIds.isEmpty()) {
                             CameraUploadsBanner(
                                 status = cuStatusUiState,
+                                isWarningDismissed = isWarningBannerDismissed,
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                                 onDismissRequest = onCUBannerDismissRequest,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
@@ -495,6 +504,7 @@ private fun TimelineTabContent(
                         if (selectedPhotoIds.isEmpty()) {
                             CameraUploadsBanner(
                                 status = cuStatusUiState,
+                                isWarningDismissed = isWarningBannerDismissed,
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                                 onDismissRequest = onCUBannerDismissRequest,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,

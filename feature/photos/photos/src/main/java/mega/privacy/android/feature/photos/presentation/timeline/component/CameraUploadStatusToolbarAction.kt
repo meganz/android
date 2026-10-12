@@ -18,6 +18,7 @@ internal fun CameraUploadStatusToolbarAction(
     cameraUploadsStatus: CUStatusUiState,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
+    onWarningClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val resources = LocalResources.current
@@ -29,7 +30,7 @@ internal fun CameraUploadStatusToolbarAction(
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_WARNING_TAG),
                 type = CameraUploadsStatusType.Warning,
-                enabled = false
+                onClick = onWarningClick
             )
         }
 

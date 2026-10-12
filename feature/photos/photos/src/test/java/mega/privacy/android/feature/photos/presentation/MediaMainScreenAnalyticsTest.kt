@@ -200,7 +200,8 @@ class MediaMainScreenAnalyticsTest {
                     showTimelineFilter = false,
                     onTimelineFilterVisibilityChange = {},
                     videoPlaylistsTabViewModel = mock(),
-                    handleNotificationPermissionResult = {}
+                    handleNotificationPermissionResult = {},
+                    onCameraUploadsWarningClick = {},
                 )
             }
         }

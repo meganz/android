@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -38,6 +39,20 @@ class CameraUploadStatusToolbarActionTest {
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_WARNING_TAG).assertIsDisplayed()
         }
+    }
+
+    @Test
+    fun `test that onWarningClick is invoked when the warning icon is clicked`() {
+        var clicked = false
+        composeRuleScope {
+            setAction(
+                cameraUploadsStatus = CUStatusUiState.Warning.HasLimitedAccess,
+                onWarningClick = { clicked = true },
+            )
+
+            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_WARNING_TAG).performClick()
+        }
+        assertThat(clicked).isTrue()
     }
 
     @Test
@@ -145,13 +160,15 @@ class CameraUploadStatusToolbarActionTest {
         cameraUploadsStatus: CUStatusUiState = CUStatusUiState.None,
         onNavigateToCameraUploadsSettings: () -> Unit = {},
         onNavigateToCameraUploadsProgressScreen: () -> Unit = {},
+        onWarningClick: () -> Unit = {},
     ) {
         setContent {
             CompositionLocalProvider(LocalSnackBarHostState provides snackBarHostState) {
                 CameraUploadStatusToolbarAction(
                     cameraUploadsStatus = cameraUploadsStatus,
                     onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                    onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
+                    onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen,
+                    onWarningClick = onWarningClick,
                 )
             }
         }
