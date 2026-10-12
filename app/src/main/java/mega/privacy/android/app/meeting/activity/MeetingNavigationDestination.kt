@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.CallStartSettings
 import mega.privacy.android.navigation.destination.CreateMeetingNavKey
 import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyMeetingNavKey
@@ -50,6 +51,13 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
             val intent = Intent(context, MeetingActivity::class.java).apply {
                 putExtra(MeetingActivity.MEETING_CHAT_ID, key.chatId)
                 when (val meetingInfo = key.meetingInfo) {
+                    is MeetingNavKeyInfo.CreateMeeting -> {
+                        setAction(MeetingActivity.MEETING_ACTION_CREATE)
+                        putExtra(MeetingActivity.MEETING_NAME, meetingInfo.meetingName)
+                        putCallStartSettings(meetingInfo.callStartSettings)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+
                     is MeetingNavKeyInfo.JoinAsGuest -> {
                         initGuestMeeting(
                             key.chatId,
@@ -60,6 +68,16 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                         setAction(MeetingActivity.MEETING_ACTION_GUEST)
                         putExtra(MeetingActivity.MEETING_IS_GUEST, true)
                         putExtra(MeetingActivity.MEETING_NAME, meetingInfo.meetingName)
+                        putExtra(MeetingActivity.MEETING_LINK, meetingInfo.link)
+                        putExtra(
+                            MeetingActivity.MEETING_GUEST_FIRST_NAME,
+                            meetingInfo.guestFirstName
+                        )
+                        putExtra(
+                            MeetingActivity.MEETING_GUEST_LAST_NAME,
+                            meetingInfo.guestLastName
+                        )
+                        putCallStartSettings(meetingInfo.callStartSettings)
                         setData(meetingInfo.link.toUri())
                         setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
@@ -73,6 +91,8 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                             meetingInfo.publicChatHandle
                         )
                         putExtra(MeetingActivity.MEETING_NAME, meetingInfo.meetingName)
+                        putExtra(MeetingActivity.MEETING_LINK, meetingInfo.link)
+                        putCallStartSettings(meetingInfo.callStartSettings)
                         setData(meetingInfo.link.toUri())
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
@@ -82,6 +102,8 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
 
                         setAction(MeetingActivity.MEETING_ACTION_JOIN)
                         putExtra(MeetingActivity.MEETING_NAME, meetingInfo.meetingName)
+                        putExtra(MeetingActivity.MEETING_LINK, meetingInfo.link)
+                        putCallStartSettings(meetingInfo.callStartSettings)
                         setData(meetingInfo.link.toUri())
                         setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
@@ -213,6 +235,13 @@ fun EntryProviderScope<NavKey>.createMeetingScreen(
             removeDestination()
         }
     }
+}
+
+private fun Intent.putCallStartSettings(settings: CallStartSettings?) {
+    settings ?: return
+    putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, settings.isMicEnabled)
+    putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, settings.isCameraEnabled)
+    putExtra(MeetingActivity.MEETING_SPEAKER_ENABLE, settings.isSpeakerEnabled)
 }
 
 private fun initGuestMeeting(

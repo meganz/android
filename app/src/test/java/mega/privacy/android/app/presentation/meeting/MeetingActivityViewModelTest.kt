@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.meeting.activity.InCallInputs
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityRepository
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
@@ -25,6 +26,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.call.CallNotificationType
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
@@ -85,6 +87,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -519,6 +522,126 @@ class MeetingActivityViewModelTest {
             }
         }
 
+    @ParameterizedTest(name = " when the action is {0}")
+    @ValueSource(
+        strings = [
+            MeetingActivity.MEETING_ACTION_CREATE,
+            MeetingActivity.MEETING_ACTION_JOIN,
+            MeetingActivity.MEETING_ACTION_REJOIN,
+            MeetingActivity.MEETING_ACTION_GUEST,
+            MeetingActivity.MEETING_ACTION_START,
+            MeetingActivity.MEETING_ACTION_IN,
+        ]
+    )
+    fun `test that setAction seeds the meeting name, link and guest names`(action: String) =
+        runTest {
+            initUnderTest()
+
+            underTest.setAction(action, fullInCallInputs)
+
+            val actual = underTest.state.value
+            assertThat(actual.action).isEqualTo(action)
+            assertThat(actual.meetingName).isEqualTo(MEETING_NAME)
+            assertThat(actual.meetingLink).isEqualTo(MEETING_LINK)
+            assertThat(actual.guestFirstName).isEqualTo(GUEST_FIRST_NAME)
+            assertThat(actual.guestLastName).isEqualTo(GUEST_LAST_NAME)
+        }
+
+    @ParameterizedTest(name = " when the action is {0}")
+    @ValueSource(
+        strings = [
+            MeetingActivity.MEETING_ACTION_CREATE,
+            MeetingActivity.MEETING_ACTION_JOIN,
+            MeetingActivity.MEETING_ACTION_REJOIN,
+            MeetingActivity.MEETING_ACTION_GUEST,
+            MeetingActivity.MEETING_ACTION_START,
+        ]
+    )
+    fun `test that setAction seeds the microphone, camera and speaker`(action: String) =
+        runTest {
+            initUnderTest()
+
+            underTest.setAction(action, fullInCallInputs)
+
+            val actual = underTest.state.value
+            assertThat(actual.micEnabled).isTrue()
+            assertThat(actual.camEnabled).isTrue()
+            assertThat(actual.speakerType).isEqualTo(AudioDevice.SpeakerPhone)
+        }
+
+    @Test
+    fun `test that setAction seeds the earpiece when the speaker is disabled`() = runTest {
+        initUnderTest()
+
+        underTest.setAction(
+            MeetingActivity.MEETING_ACTION_CREATE,
+            fullInCallInputs.copy(isSpeakerEnabled = false),
+        )
+
+        assertThat(underTest.state.value.speakerType).isEqualTo(AudioDevice.Earpiece)
+    }
+
+    @Test
+    fun `test that setAction does not seed the microphone, camera and speaker when the action is in meeting`() =
+        runTest {
+            initUnderTest()
+
+            underTest.setAction(MeetingActivity.MEETING_ACTION_IN, fullInCallInputs)
+
+            val actual = underTest.state.value
+            assertThat(actual.micEnabled).isFalse()
+            assertThat(actual.camEnabled).isFalse()
+            assertThat(actual.speakerType).isEqualTo(AudioDevice.None)
+        }
+
+    @ParameterizedTest(name = " when the action is {0}")
+    @ValueSource(
+        strings = [
+            MeetingActivity.MEETING_ACTION_RINGING,
+            MeetingActivity.MEETING_ACTION_MAKE_MODERATOR,
+        ]
+    )
+    fun `test that setAction does not seed the in-call inputs when the action does not open the call`(
+        action: String,
+    ) = runTest {
+        initUnderTest()
+        val initialState = underTest.state.value
+
+        underTest.setAction(action, fullInCallInputs)
+
+        assertThat(underTest.state.value).isEqualTo(initialState.copy(action = action))
+    }
+
+    @Test
+    fun `test that setAction keeps the current state when no inputs are supplied`() = runTest {
+        initUnderTest()
+        underTest.setAction(MeetingActivity.MEETING_ACTION_CREATE, fullInCallInputs)
+
+        underTest.setAction(MeetingActivity.MEETING_ACTION_JOIN, emptyInCallInputs)
+
+        val actual = underTest.state.value
+        assertThat(actual.action).isEqualTo(MeetingActivity.MEETING_ACTION_JOIN)
+        assertThat(actual.meetingName).isEqualTo(MEETING_NAME)
+        assertThat(actual.meetingLink).isEqualTo(MEETING_LINK)
+        assertThat(actual.guestFirstName).isEqualTo(GUEST_FIRST_NAME)
+        assertThat(actual.guestLastName).isEqualTo(GUEST_LAST_NAME)
+        assertThat(actual.micEnabled).isTrue()
+        assertThat(actual.camEnabled).isTrue()
+        assertThat(actual.speakerType).isEqualTo(AudioDevice.SpeakerPhone)
+    }
+
+    @Test
+    fun `test that setAction keeps the defaults when no inputs are supplied`() = runTest {
+        initUnderTest()
+        val initialState = underTest.state.value
+
+        underTest.setAction(MeetingActivity.MEETING_ACTION_CREATE, emptyInCallInputs)
+
+        assertThat(underTest.state.value).isEqualTo(
+            initialState.copy(action = MeetingActivity.MEETING_ACTION_CREATE)
+        )
+    }
+
     private fun stubChatCallUpdate(
         status: ChatCallStatus,
         changes: List<ChatCallChanges>,
@@ -539,6 +662,31 @@ class MeetingActivityViewModelTest {
 
     companion object {
         private val testDispatcher = UnconfinedTestDispatcher()
+
+        private const val MEETING_NAME = "Meeting name"
+        private const val MEETING_LINK = "https://mega.nz/chat/link"
+        private const val GUEST_FIRST_NAME = "First"
+        private const val GUEST_LAST_NAME = "Last"
+
+        private val fullInCallInputs = InCallInputs(
+            isMicEnabled = true,
+            isCameraEnabled = true,
+            isSpeakerEnabled = true,
+            meetingName = MEETING_NAME,
+            meetingLink = MEETING_LINK,
+            guestFirstName = GUEST_FIRST_NAME,
+            guestLastName = GUEST_LAST_NAME,
+        )
+
+        private val emptyInCallInputs = InCallInputs(
+            isMicEnabled = null,
+            isCameraEnabled = null,
+            isSpeakerEnabled = null,
+            meetingName = null,
+            meetingLink = null,
+            guestFirstName = null,
+            guestLastName = null,
+        )
 
         @JvmField
         @RegisterExtension

@@ -19,22 +19,48 @@ data class LegacyMeetingNavKey(
     val meetingInfo: MeetingNavKeyInfo,
 ) : NoSessionNavKey.Optional
 
+/**
+ * Microphone, camera and speaker the call starts with, chosen before the in-call screen opens.
+ */
+@Serializable
+data class CallStartSettings(
+    val isMicEnabled: Boolean,
+    val isCameraEnabled: Boolean,
+    val isSpeakerEnabled: Boolean,
+)
+
 @Serializable
 sealed interface MeetingNavKeyInfo {
+    /**
+     * Starts a new unscheduled meeting. The [LegacyMeetingNavKey.chatId] is not used, as the
+     * chat is created when the call starts.
+     */
+    @Serializable
+    data class CreateMeeting(
+        val meetingName: String,
+        val callStartSettings: CallStartSettings? = null,
+    ) : MeetingNavKeyInfo {
+        override fun toString() = "CreateMeeting(callStartSettings=$callStartSettings)"
+    }
+
     @Serializable
     data class JoinAsGuest(
         val meetingName: String?,
         val link: String,
+        val guestFirstName: String? = null,
+        val guestLastName: String? = null,
+        val callStartSettings: CallStartSettings? = null,
     ) : MeetingNavKeyInfo {
-        override fun toString() = "JoinAsGuest()"
+        override fun toString() = "JoinAsGuest(callStartSettings=$callStartSettings)"
     }
 
     @Serializable
     data class JoinInProgressCall(
         val meetingName: String,
         val link: String,
+        val callStartSettings: CallStartSettings? = null,
     ) : MeetingNavKeyInfo {
-        override fun toString() = "JoinInProgressCall()"
+        override fun toString() = "JoinInProgressCall(callStartSettings=$callStartSettings)"
     }
 
     @Serializable
@@ -42,8 +68,10 @@ sealed interface MeetingNavKeyInfo {
         val meetingName: String,
         val publicChatHandle: Long,
         val link: String,
+        val callStartSettings: CallStartSettings? = null,
     ) : MeetingNavKeyInfo {
-        override fun toString() = "RejoinInProgressCall(publicChatHandle=$publicChatHandle)"
+        override fun toString() =
+            "RejoinInProgressCall(publicChatHandle=$publicChatHandle, callStartSettings=$callStartSettings)"
     }
 
     @Serializable

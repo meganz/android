@@ -89,6 +89,24 @@ class NavKeyToStringTest {
         ),
         LegacyMeetingNavKey(
             chatId = 1L,
+            meetingInfo = MeetingNavKeyInfo.JoinAsGuest(
+                meetingName = SENSITIVE,
+                link = SENSITIVE,
+                guestFirstName = SENSITIVE,
+                guestLastName = SENSITIVE,
+                callStartSettings = CallStartSettings(
+                    isMicEnabled = true,
+                    isCameraEnabled = true,
+                    isSpeakerEnabled = true,
+                ),
+            ),
+        ),
+        LegacyMeetingNavKey(
+            chatId = 1L,
+            meetingInfo = MeetingNavKeyInfo.CreateMeeting(meetingName = SENSITIVE),
+        ),
+        LegacyMeetingNavKey(
+            chatId = 1L,
             meetingInfo = MeetingNavKeyInfo.JoinInProgressCall(
                 meetingName = SENSITIVE,
                 link = SENSITIVE,

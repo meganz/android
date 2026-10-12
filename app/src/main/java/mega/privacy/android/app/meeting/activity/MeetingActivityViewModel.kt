@@ -306,12 +306,35 @@ class MeetingActivityViewModel @Inject constructor(
     val finishMeetingActivity: StateFlow<Boolean> get() = _finishMeetingActivity
 
     /**
-     * Set meeting action
+     * Set meeting action and seed the in-call screen inputs that came with it
      *
-     * @param action meeting action type
+     * Microphone, camera and speaker are only seeded for actions that have not joined the call
+     * yet. For [MeetingActivity.MEETING_ACTION_IN] the call already exists, so the in-call screen
+     * applies them to the call once it is available.
+     *
+     * @param action        meeting action type
+     * @param inCallInputs  inputs supplied by the launcher
      */
-    fun setAction(action: String?) {
-        _state.update { it.copy(action = action) }
+    fun setAction(action: String?, inCallInputs: InCallInputs) {
+        val isInCallAction = action in inCallActions
+        val seedsCallSettings = isInCallAction && action != MeetingActivity.MEETING_ACTION_IN
+        _state.update { state ->
+            if (!isInCallAction) return@update state.copy(action = action)
+            state.copy(
+                action = action,
+                meetingName = inCallInputs.meetingName ?: state.meetingName,
+                meetingLink = inCallInputs.meetingLink ?: state.meetingLink,
+                guestFirstName = inCallInputs.guestFirstName ?: state.guestFirstName,
+                guestLastName = inCallInputs.guestLastName ?: state.guestLastName,
+                micEnabled = inCallInputs.isMicEnabled.takeIf { seedsCallSettings }
+                    ?: state.micEnabled,
+                camEnabled = inCallInputs.isCameraEnabled.takeIf { seedsCallSettings }
+                    ?: state.camEnabled,
+                speakerType = inCallInputs.isSpeakerEnabled.takeIf { seedsCallSettings }
+                    ?.let { if (it) AudioDevice.SpeakerPhone else AudioDevice.Earpiece }
+                    ?: state.speakerType,
+            )
+        }
     }
 
     init {
@@ -2645,5 +2668,14 @@ class MeetingActivityViewModel @Inject constructor(
         private const val INVALID_POSITION = -1
         private const val DEFAULT_RING_TIMEOUT_SECONDS = 40L
         private const val DEFAULT_GROUP_SNACKBARS_TIMEOUT_MILLISECONDS = 500L
+
+        private val inCallActions = setOf(
+            MeetingActivity.MEETING_ACTION_CREATE,
+            MeetingActivity.MEETING_ACTION_JOIN,
+            MeetingActivity.MEETING_ACTION_REJOIN,
+            MeetingActivity.MEETING_ACTION_GUEST,
+            MeetingActivity.MEETING_ACTION_START,
+            MeetingActivity.MEETING_ACTION_IN,
+        )
     }
 }

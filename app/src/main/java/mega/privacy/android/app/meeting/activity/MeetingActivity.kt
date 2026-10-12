@@ -499,9 +499,24 @@ class MeetingActivity : PasscodeActivity() {
             // Cancel current notification if needed
             notificationManager.cancel(chatId.toInt())
 
-            meetingViewModel.setAction(meetingAction)
+            meetingViewModel.setAction(meetingAction, it.toInCallInputs())
         }
     }
+
+    // Read from the intent rather than the SavedStateHandle: this activity is singleTask, so
+    // onNewIntent brings inputs the view model's SavedStateHandle never sees.
+    private fun Intent.toInCallInputs() = InCallInputs(
+        isMicEnabled = booleanExtraOrNull(MEETING_AUDIO_ENABLE),
+        isCameraEnabled = booleanExtraOrNull(MEETING_VIDEO_ENABLE),
+        isSpeakerEnabled = booleanExtraOrNull(MEETING_SPEAKER_ENABLE),
+        meetingName = getStringExtra(MEETING_NAME),
+        meetingLink = getStringExtra(MEETING_LINK),
+        guestFirstName = getStringExtra(MEETING_GUEST_FIRST_NAME),
+        guestLastName = getStringExtra(MEETING_GUEST_LAST_NAME),
+    )
+
+    private fun Intent.booleanExtraOrNull(key: String): Boolean? =
+        if (hasExtra(key)) getBooleanExtra(key, false) else null
 
     /**
      * Initialize Action Bar and set icon according to param
