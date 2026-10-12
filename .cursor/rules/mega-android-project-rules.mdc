@@ -296,6 +296,7 @@ write it, while the `hasDrawable` matcher that reads it lives in `:core-ui-test`
 - **Code comments**: Comment **why**, never **what**. If the behavior is clear from names and structure, add no comment. Do not restate the next line, mark section headers inside functions, or explain standard Kotlin/Android idioms.
 - **Never narrate refactoring in comments**: Do not write comments describing what changed, what was renamed from, what was moved, or why code was restructured (e.g. `// Extracted from X`, `// Now uses Y`, `// Moved out of loop`, `// Renamed from oldName`). That context belongs in the commit message / MR description, not in source.
 - **Match surrounding comment density**: When editing existing code, do not introduce new comments unless documenting genuinely non-obvious logic. If the file has few comments, keep it that way. Prefer KDoc on public APIs over inline comments for explaining intent.
+- **Comment wording**: Write comments in clear technical English that follows ASD-STE100 principles: use the same term as the code, short sentences, an explicit reason ("because", "so that"), no idioms or vague verbs ("handle", "properly"), "must" for requirements, and units for values. Accuracy comes first, and existing comments are not rewritten only for wording. See [comment-conventions.md](.claude/conventions/comment-conventions.md).
 - **README**: Maintain comprehensive README files
 - **Architecture Docs**: Document architectural decisions and patterns
 
