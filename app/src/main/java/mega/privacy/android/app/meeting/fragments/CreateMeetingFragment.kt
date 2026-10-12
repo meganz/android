@@ -15,7 +15,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.filterNotNull
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.utils.ChatUtil
@@ -119,10 +121,14 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
             it.visibility = View.VISIBLE
             it.setSelectAllOnFocus(true)
             it.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat(), resources.displayMetrics))
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.myFullName.filterNotNull()) {
             val defaultName = viewModel.initHintMeetingName(requireContext())
-            it.hint = defaultName
+            binding.typeMeetingEditText.hint = defaultName
             val maxAllowed = ChatUtil.getMaxAllowed(defaultName)
-            it.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxAllowed))
+            binding.typeMeetingEditText.filters =
+                arrayOf<InputFilter>(InputFilter.LengthFilter(maxAllowed))
         }
 
         binding.typeMeetingEditText.doAfterTextChanged { text ->
