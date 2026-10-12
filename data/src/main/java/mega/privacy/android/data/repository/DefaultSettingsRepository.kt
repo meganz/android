@@ -284,11 +284,18 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setDownloadLocation(downloadLocation: String?) =
         megaLocalStorageGateway.setDownloadLocation(downloadLocation)
 
-    override suspend fun isAskBeforeLargeDownloads() =
-        megaLocalStorageGateway.isAskBeforeLargeDownloads()
+    override suspend fun isAskBeforeLargeDownloads(): Boolean = withContext(ioDispatcher) {
+        accountPreferencesGateway.isAskBeforeLargeDownloads()
+            ?: megaLocalStorageGateway.isAskBeforeLargeDownloads().also { legacy ->
+                runCatching { accountPreferencesGateway.setAskBeforeLargeDownloads(legacy) }
+                    .onFailure {
+                        Timber.w(it, "Failed to migrate askBeforeLargeDownloads to DataStore")
+                    }
+            }
+    }
 
     override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) =
-        megaLocalStorageGateway.setAskBeforeLargeDownloads(askForConfirmation)
+        accountPreferencesGateway.setAskBeforeLargeDownloads(askForConfirmation)
 
     override fun monitorAskBeforePreviewDownloads(): Flow<Boolean> =
         appPreferencesGateway.monitorBoolean(ASK_BEFORE_PREVIEW_DOWNLOADS_KEY, true)

@@ -102,7 +102,6 @@ interface DatabaseHandler {
     fun setPreferredSortOthers(order: String?)
     fun setStorageAskAlways(storageAskAlways: Boolean)
     fun setStorageDownloadLocation(storageDownloadLocation: String?)
-    fun setAttrAskSizeDownload(askSizeDownload: String?)
     fun setLastPublicHandle(handle: Long)
     fun setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp: Long)
     fun setLastPublicHandleTimeStamp()

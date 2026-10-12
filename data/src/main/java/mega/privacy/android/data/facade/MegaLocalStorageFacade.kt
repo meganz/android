@@ -143,11 +143,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().attributes?.askSizeDownload?.equals(true.toString()) ?: true
     }
 
-    override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) =
-        withContext(databaseDispatcher) {
-            dbHandler.get().setAttrAskSizeDownload(askForConfirmation.toString())
-        }
-
     override suspend fun getAttributes(): MegaAttributes? = withContext(databaseDispatcher) {
         dbHandler.get().attributes
     }

@@ -147,6 +147,20 @@ interface AccountPreferencesGateway {
     suspend fun setShowCopyright(show: Boolean)
 
     /**
+     * Get whether to ask for confirmation before downloading large files
+     *
+     * @return the stored value, or null if it has not been stored yet
+     */
+    suspend fun isAskBeforeLargeDownloads(): Boolean?
+
+    /**
+     * Set whether to ask for confirmation before downloading large files
+     *
+     * @param askForConfirmation true to ask, false otherwise
+     */
+    suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean)
+
+    /**
      * Clears account preferences except last registered email
      */
     suspend fun clearPreferences()

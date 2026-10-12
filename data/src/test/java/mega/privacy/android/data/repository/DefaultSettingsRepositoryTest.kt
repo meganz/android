@@ -55,11 +55,13 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.IOException
 import kotlin.contracts.ExperimentalContracts
 
 /**
@@ -175,18 +177,44 @@ internal class DefaultSettingsRepositoryTest {
 
     @ParameterizedTest(name = "set to: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that set ask before large downloads sets the value to the storage gateway`(ask: Boolean) =
+    fun `test that setAskBeforeLargeDownloads saves the value in account preferences`(ask: Boolean) =
         runTest {
             underTest.setAskBeforeLargeDownloads(ask)
-            verify(megaLocalStorageGateway).setAskBeforeLargeDownloads(ask)
+            verify(accountPreferencesGateway).setAskBeforeLargeDownloads(ask)
         }
 
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that is ask before large downloads gets the value from the storage gateway`(expected: Boolean) =
+    fun `test that isAskBeforeLargeDownloads returns the account preferences value when it is stored`(
+        expected: Boolean,
+    ) = runTest {
+        whenever(accountPreferencesGateway.isAskBeforeLargeDownloads()).thenReturn(expected)
+
+        assertThat(underTest.isAskBeforeLargeDownloads()).isEqualTo(expected)
+        verify(megaLocalStorageGateway, never()).isAskBeforeLargeDownloads()
+    }
+
+    @ParameterizedTest(name = "legacy: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isAskBeforeLargeDownloads returns and saves the legacy value when account preferences has none`(
+        legacy: Boolean,
+    ) = runTest {
+        whenever(accountPreferencesGateway.isAskBeforeLargeDownloads()).thenReturn(null)
+        whenever(megaLocalStorageGateway.isAskBeforeLargeDownloads()).thenReturn(legacy)
+
+        assertThat(underTest.isAskBeforeLargeDownloads()).isEqualTo(legacy)
+        verify(accountPreferencesGateway).setAskBeforeLargeDownloads(legacy)
+    }
+
+    @Test
+    fun `test that isAskBeforeLargeDownloads returns the legacy value when saving it fails`() =
         runTest {
-            whenever(megaLocalStorageGateway.isAskBeforeLargeDownloads()).thenReturn(expected)
-            assertThat(underTest.isAskBeforeLargeDownloads()).isEqualTo(expected)
+            whenever(accountPreferencesGateway.isAskBeforeLargeDownloads()).thenReturn(null)
+            whenever(megaLocalStorageGateway.isAskBeforeLargeDownloads()).thenReturn(false)
+            whenever(accountPreferencesGateway.setAskBeforeLargeDownloads(false))
+                .thenAnswer { throw IOException() }
+
+            assertThat(underTest.isAskBeforeLargeDownloads()).isFalse()
         }
 
     @ParameterizedTest(name = "expected: {0}")

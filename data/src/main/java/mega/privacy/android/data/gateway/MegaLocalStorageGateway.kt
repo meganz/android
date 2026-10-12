@@ -154,14 +154,12 @@ interface MegaLocalStorageGateway {
     suspend fun setDownloadLocation(downloadLocation: String?)
 
     /**
+     * Only read to migrate the value to
+     * [mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway].
+     *
      * @return ask for confirmation before large downloads preference
      */
     suspend fun isAskBeforeLargeDownloads(): Boolean
-
-    /**
-     * Set ask for confirmation before large downloads preference
-     */
-    suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean)
 
     /**
      * Gets attributes from DB
