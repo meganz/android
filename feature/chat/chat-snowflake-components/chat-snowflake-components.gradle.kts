@@ -34,6 +34,7 @@ dependencies {
     implementation(androidx.material3.window)
     implementation(lib.coil3)
     implementation(lib.coil.compose)
+    implementation(androidx.emojiPicker)
 
     //test
     testImplementation(project(":core-test"))
