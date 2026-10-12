@@ -22,7 +22,7 @@ fun interface FeatureFlagResolver {
 /**
  * CompositionLocal for overriding feature flag resolution in tests and previews.
  */
-internal val LocalFeatureFlagResolver = compositionLocalOf<FeatureFlagResolver?> { null }
+val LocalFeatureFlagResolver = compositionLocalOf<FeatureFlagResolver?> { null }
 
 /**
  * A composable gate that shows [enabled] or [disabled] content based on a feature flag value.

@@ -22,6 +22,16 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Single-activity chat room: chats open as a Compose destination in MegaActivity instead of
+     * the legacy ChatActivity.
+     */
+    SingleActivityChatRoom(
+        experimentName = "nchat",
+        description = "Open chat rooms in the single-activity Compose chat room",
+        defaultValue = false,
+    ),
+
+    /**
      * Sync and backup progress: the session behind the progress widget and screen (sync activity,
      * sync transfer store, stale-row reconciliation) and their view models.
      */
