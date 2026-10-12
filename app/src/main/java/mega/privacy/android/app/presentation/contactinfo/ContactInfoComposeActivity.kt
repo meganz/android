@@ -6,12 +6,15 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.android.core.ui.components.LocalMegaScaffoldTopBanner
 import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.app.appstate.global.call.rememberOngoingCallBanner
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
@@ -60,20 +63,23 @@ class ContactInfoComposeActivity : AppCompatActivity() {
             val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val startKey = remember { initialKey }
-            LegacyActivityScaffold(
-                container = { content ->
-                    MegaAppContainer(
-                        themeMode = themeMode,
-                        finishOnSessionRefresh = false,
-                        content = content,
-                    )
-                },
-                initialKey = startKey,
-                navigationResultManager = navigationResultManager,
-                featureDestinations = featureDestinations,
-                appDialogDestinations = appDialogDestinations,
-                onEmptyBackStack = { if (!isFinishing) finish() },
-            ) { _, _ -> }
+            val ongoingCallBanner = rememberOngoingCallBanner()
+            CompositionLocalProvider(LocalMegaScaffoldTopBanner provides ongoingCallBanner) {
+                LegacyActivityScaffold(
+                    container = { content ->
+                        MegaAppContainer(
+                            themeMode = themeMode,
+                            finishOnSessionRefresh = false,
+                            content = content,
+                        )
+                    },
+                    initialKey = startKey,
+                    navigationResultManager = navigationResultManager,
+                    featureDestinations = featureDestinations,
+                    appDialogDestinations = appDialogDestinations,
+                    onEmptyBackStack = { if (!isFinishing) finish() },
+                ) { _, _ -> }
+            }
         }
     }
 
