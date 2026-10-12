@@ -8,7 +8,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -388,56 +387,27 @@ class CallService : LifecycleService() {
                 val newNotification: Notification? = mBuilderCompatO?.build()
                 newNotification?.let {
                     try {
-                        // Since API 34, foreground services
-                        // should not be specified before user grants permission.
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                            val pm = packageManager
-                            val microphoneServiceType = if (pm.hasPermissions(
-                                    Manifest.permission.FOREGROUND_SERVICE_MICROPHONE,
-                                    Manifest.permission.RECORD_AUDIO
-                                )
-                            ) {
-                                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-                            } else 0
-
-                            val cameraServiceType = if (pm.hasPermissions(
-                                    Manifest.permission.FOREGROUND_SERVICE_CAMERA
-                                )
-                            ) {
-                                ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
-                            } else 0
-
-                            val callServiceType =
-                                if (pm.hasPermissions(Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL)) {
-                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
-                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-                                } else 0
-
-                            startForeground(
-                                notificationId,
-                                newNotification,
-                                cameraServiceType or callServiceType
-                                        or microphoneServiceType
-                            )
-                            // Since API 30, microphone and camera should be specified for app to use them.
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-                            startForeground(
-                                notificationId,
-                                newNotification,
-                                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                                        or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-                            )
-                        // Since API 29, should specify foreground service type.
-                        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                            startForeground(
-                                notificationId,
-                                newNotification,
-                                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                            )
-                        else // Before API 29, just start foreground service.
+                        val pm = packageManager
+                        val foregroundServiceType = callServiceForegroundType(
+                            sdkInt = Build.VERSION.SDK_INT,
+                            hasPhoneCallPermissions = pm.hasPermissions(
+                                Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL,
+                                Manifest.permission.MANAGE_OWN_CALLS
+                            ),
+                            hasMicrophonePermissions = pm.hasPermissions(
+                                Manifest.permission.FOREGROUND_SERVICE_MICROPHONE,
+                                Manifest.permission.RECORD_AUDIO
+                            ),
+                            hasCameraPermissions = pm.hasPermissions(
+                                Manifest.permission.FOREGROUND_SERVICE_CAMERA,
+                                Manifest.permission.CAMERA
+                            ),
+                        )
+                        if (foregroundServiceType != null) {
+                            startForeground(notificationId, newNotification, foregroundServiceType)
+                        } else {
                             startForeground(notificationId, newNotification)
-
+                        }
                     } catch (e: Exception) {
                         Timber.e(e)
                     }
