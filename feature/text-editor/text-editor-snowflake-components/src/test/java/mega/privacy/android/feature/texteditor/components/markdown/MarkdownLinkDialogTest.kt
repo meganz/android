@@ -1,8 +1,8 @@
 package mega.privacy.android.feature.texteditor.components.markdown
 
 import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -56,8 +56,7 @@ class MarkdownLinkDialogTest {
     fun `test that save does nothing when the url is blank`() {
         setDialog(initialUrl = "")
 
-        // A disabled BasicDialogButton drops its clickable rather than reporting as disabled.
-        composeRule.onNodeWithText("Save").assertHasNoClickAction()
+        composeRule.onNodeWithText("Save").assertIsNotEnabled()
     }
 
     @Test
