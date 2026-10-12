@@ -33,6 +33,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.analytics.Analytics
 import mega.android.core.ui.extensions.LaunchedOncePerAppEffect
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerHost
 import mega.privacy.android.navigation.contract.retain.rememberRetainedValuesStoreNavEntryDecorator
 import mega.privacy.mobile.analytics.event.CustomNavigationActiveEvent
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
@@ -41,7 +42,6 @@ import mega.privacy.android.app.appstate.content.navigation.TopLevelBackStackNav
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.appstate.content.navigation.providingTopLevelNavKeyClass
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
-import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -194,7 +194,7 @@ fun HomeScreens(
                                     contentAlignment = Alignment.TopCenter
                                 ) {
                                     if (!isSelectionMode) {
-                                        MiniAudioPlayerView(
+                                        MiniAudioPlayerHost(
                                             modifier = Modifier
                                                 .fillMaxWidth(),
                                             onVisibilityChanged = { isVisible ->

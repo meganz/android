@@ -235,6 +235,23 @@ enum class ApiFeatures(
     ),
 
     /**
+     * Second phase of the revamped audio player: gestures, a configurable skip interval,
+     * per-file playback speed, the artwork and queue animations, and the Compose mini player.
+     *
+     * Everything it covers runs inside the revamped player, so it only takes effect alongside
+     * [AudioPlayerRevamp].
+     *
+     * `checkRemote` stays false while the phase is being built, which leaves the flag togglable
+     * from the QA build settings. Set it back to true before rolling the phase out to users.
+     */
+    AudioPlayerPhaseTwo(
+        experimentName = "apr2",
+        description = "Enable the second phase of the revamped Audio Player",
+        defaultValue = false,
+        checkRemote = false,
+    ),
+
+    /**
      * On-device voice message transcription using Gemma via LiteRT-LM.
      */
     VoiceTranscription(

@@ -6,9 +6,11 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
+import mega.privacy.android.feature.mediaplayer.data.AudioPlayerSessionSignals
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,6 +28,7 @@ class AudioMiniPlayerViewModelTest {
 
     private lateinit var underTest: AudioMiniPlayerViewModel
     private lateinit var playerStateFlow: MutableSharedFlow<AudioControllerState>
+    private lateinit var sessionSignals: AudioPlayerSessionSignals
 
     private val gateway = mock<AudioMediaControllerGateway>()
 
@@ -33,8 +36,9 @@ class AudioMiniPlayerViewModelTest {
     fun setUp() {
         reset(gateway)
         playerStateFlow = MutableSharedFlow(replay = 1)
+        sessionSignals = AudioPlayerSessionSignals()
         whenever(gateway.playerState).thenReturn(playerStateFlow)
-        underTest = AudioMiniPlayerViewModel(gateway)
+        underTest = AudioMiniPlayerViewModel(gateway, sessionSignals)
     }
 
     @Test
@@ -132,7 +136,7 @@ class AudioMiniPlayerViewModelTest {
                 throw IllegalStateException("controller disconnected")
             }
         )
-        underTest = AudioMiniPlayerViewModel(gateway)
+        underTest = AudioMiniPlayerViewModel(gateway, sessionSignals)
 
         underTest.uiState.test {
             var visible = awaitItem()
@@ -148,6 +152,32 @@ class AudioMiniPlayerViewModelTest {
         underTest.uiState.test {
             awaitItem()
             playerStateFlow.emit(AudioControllerState(mediaItemCount = 1, isBuffering = true))
+            assertThat((awaitItem() as AudioMiniPlayerUiState.Data).isLoading).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that uiState does not report loading while the notification is dismissed`() =
+        runTest {
+            sessionSignals.setDismissed(true)
+
+            underTest.uiState.test {
+                awaitItem()
+                playerStateFlow.emit(AudioControllerState(mediaItemCount = 1, isBuffering = true))
+                assertThat((awaitItem() as AudioMiniPlayerUiState.Data).isLoading).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that uiState reports loading again once the notification is shown`() = runTest {
+        sessionSignals.setDismissed(true)
+
+        underTest.uiState.test {
+            awaitItem()
+            playerStateFlow.emit(AudioControllerState(mediaItemCount = 1, isBuffering = true))
+            assertThat((awaitItem() as AudioMiniPlayerUiState.Data).isLoading).isFalse()
+
+            sessionSignals.setDismissed(false)
             assertThat((awaitItem() as AudioMiniPlayerUiState.Data).isLoading).isTrue()
         }
     }
@@ -182,4 +212,51 @@ class AudioMiniPlayerViewModelTest {
 
         verify(gateway).release()
     }
+
+    @Test
+    fun `test that a new session reconnects the controller once the previous one ended`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem()
+                playerStateFlow.emit(AudioControllerState(mediaItemCount = 1))
+                awaitItem()
+                playerStateFlow.emit(AudioControllerState(isSessionEnded = true))
+                awaitItem()
+            }
+
+            sessionSignals.onSessionStarted()
+            advanceUntilIdle()
+
+            verify(gateway).reconnect()
+        }
+
+    @Test
+    fun `test that a new session reconnects the controller when the player state flow errors`() =
+        runTest {
+            whenever(gateway.playerState).thenReturn(
+                flow { throw IllegalStateException("controller disconnected") }
+            )
+            underTest = AudioMiniPlayerViewModel(gateway, sessionSignals)
+            advanceUntilIdle()
+
+            sessionSignals.onSessionStarted()
+            advanceUntilIdle()
+
+            verify(gateway).reconnect()
+        }
+
+    @Test
+    fun `test that a new session does not reconnect the controller while one is connected`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem()
+                playerStateFlow.emit(AudioControllerState(mediaItemCount = 1))
+                awaitItem()
+            }
+
+            sessionSignals.onSessionStarted()
+            advanceUntilIdle()
+
+            verify(gateway, never()).reconnect()
+        }
 }

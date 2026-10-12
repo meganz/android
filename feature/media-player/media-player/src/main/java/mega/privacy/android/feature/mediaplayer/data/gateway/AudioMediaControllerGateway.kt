@@ -59,6 +59,15 @@ interface AudioMediaControllerGateway {
     /** Moves the media item at [fromIndex] to [toIndex] in the queue. No-op if either index is out of range. */
     fun moveMediaItem(fromIndex: Int, toIndex: Int)
 
+    /**
+     * Opens a MediaController against the current session, replacing any existing connection.
+     *
+     * A controller does not survive the session it was connected to: ending playback disconnects
+     * it for good. An owner that outlives a session, such as the mini player, calls this when a
+     * new one starts.
+     */
+    fun reconnect()
+
     /** Releases the MediaController connection and all associated resources. */
     fun release()
 }

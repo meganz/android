@@ -53,12 +53,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ads.LegacyAdsContainer
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerHost
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
@@ -66,7 +66,6 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MO
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
-import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.search.view.SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.presentation.view.NodesView
@@ -238,14 +237,13 @@ internal fun FolderLinkView(
                     .fillMaxSize()
             ) {
                 val (audioPlayer, folderLinkView) = createRefs()
-                MiniAudioPlayerView(
+                MiniAudioPlayerHost(
                     modifier = Modifier
                         .constrainAs(audioPlayer) {
                             bottom.linkTo(parent.bottom)
                         }
                         .fillMaxWidth()
                         .testTag(SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG),
-                    lifecycle = LocalLifecycleOwner.current.lifecycle,
                 )
 
                 Box(

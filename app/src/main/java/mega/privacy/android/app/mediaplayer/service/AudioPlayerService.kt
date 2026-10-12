@@ -99,6 +99,7 @@ import mega.privacy.android.feature.mediaplayer.data.AudioPlayerErrorEventQueue
 import mega.privacy.android.feature.mediaplayer.data.AudioResumeEvent
 import mega.privacy.android.feature.mediaplayer.data.AudioResumeEventQueue
 import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
+import mega.privacy.android.feature.mediaplayer.data.AudioPlayerSessionSignals
 import mega.privacy.android.feature.mediaplayer.data.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerScreenNavKey
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
@@ -117,6 +118,14 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     @Inject
     lateinit var audioPlayQueueBuilder: AudioPlayQueueBuilder
+
+    /**
+     * Carries the same signals as the `MiniAudioPlayerController` statics beside it, for the
+     * Compose mini player. Both are written while the Media3 bar is still there to serve legacy
+     * sessions; the statics go with it.
+     */
+    @Inject
+    lateinit var audioPlayerSessionSignals: AudioPlayerSessionSignals
 
     @Inject
     lateinit var trackAndSaveAudioPlaybackInfoUseCase: TrackAndSaveAudioPlaybackInfoUseCase
@@ -616,6 +625,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             isNotificationDismissed = false
+            audioPlayerSessionSignals.setDismissed(false)
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -623,10 +633,12 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 pausedByExternalCommand = false
                 isNotificationDismissed = false
                 MiniAudioPlayerController.notifyV2NotificationDismissed(false)
+                audioPlayerSessionSignals.setDismissed(false)
                 // Reconnect the mini player on every real resume: it is released while over
                 // quota, and resuming after the window passes goes through prepare() (see
                 // handlePlayRequestedWhileOverQuota), which does not re-show it itself.
                 MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
+                audioPlayerSessionSignals.onSessionStarted()
             } else {
                 forceSaveCurrentPlaybackInfo()
                 // Remove the foreground lock so the notification can be swiped away when the
@@ -800,6 +812,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             ACTION_DISMISS -> {
                 isNotificationDismissed = true
                 MiniAudioPlayerController.notifyV2NotificationDismissed(true)
+                audioPlayerSessionSignals.setDismissed(true)
                 ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
                 return START_NOT_STICKY
             }
@@ -863,11 +876,13 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         ) {
             lastPlayQueueParams = params
             MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
+            audioPlayerSessionSignals.onSessionStarted()
             return START_NOT_STICKY
         }
         lastPlayQueueParams = params
         rebuildPlayQueue(params)
         MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
+        audioPlayerSessionSignals.onSessionStarted()
         trackPlaybackInfoJob?.cancel()
         trackPlaybackInfoJob = lifecycleScope.launch {
             player?.let { exoPlayer ->

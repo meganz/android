@@ -60,6 +60,7 @@ import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaWarningEffect
 import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.util.show
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerHost
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
@@ -68,7 +69,6 @@ import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmai
 import mega.privacy.android.app.presentation.login.savePasswordCredential
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
-import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.coroutine.logTypeName
@@ -375,7 +375,7 @@ class MegaActivity : FragmentActivity() {
                                     LocalSnackBarHostState provides snackbarHostState,
                                     LocalMegaScaffoldTopBanner provides ongoingCallBanner,
                                     LocalMiniAudioPlayer provides { modifier, applyNavigationBarsPadding ->
-                                        MiniAudioPlayerView(
+                                        MiniAudioPlayerHost(
                                             modifier = modifier,
                                             applyNavigationBarsPadding = applyNavigationBarsPadding,
                                         )

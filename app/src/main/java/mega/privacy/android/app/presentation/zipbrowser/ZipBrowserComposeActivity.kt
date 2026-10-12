@@ -36,12 +36,12 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerHost
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ZipImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.zipbrowser.view.ZipBrowserScreen
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
@@ -187,13 +187,12 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
                 .fillMaxSize()
         ) {
             val (audioPlayer, audioSectionComposeView) = createRefs()
-            MiniAudioPlayerView(
+            MiniAudioPlayerHost(
                 modifier = Modifier
                     .constrainAs(audioPlayer) {
                         bottom.linkTo(parent.bottom)
                     }
                     .fillMaxWidth(),
-                lifecycle = lifecycle,
             )
             ZipBrowserScreen(
                 modifier = Modifier

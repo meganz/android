@@ -379,6 +379,10 @@ internal class AudioMediaControllerFacade @Inject constructor(
         reconnectController()
     }
 
+    override fun reconnect() {
+        reconnectController()
+    }
+
     @VisibleForTesting
     internal fun reconnectController() {
         isReconnecting = true

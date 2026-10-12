@@ -1,8 +1,15 @@
 package mega.privacy.android.feature.mediaplayer.presentation.miniplayer
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,13 +51,25 @@ fun AudioMiniPlayerRoute(
 
     LaunchedEffect(isVisible) { onVisibilityChanged?.invoke(isVisible) }
 
-    (state as? AudioMiniPlayerUiState.Data)?.let { data ->
-        AudioMiniPlayer(
-            state = data,
-            onPlayPauseClicked = viewModel::onPlayPauseClicked,
-            onCloseClicked = onCloseClicked,
-            onPlayerClicked = onPlayerClicked,
-            modifier = modifier,
-        )
+    // The session is already gone by the time the bar slides out, so the last rendered state is
+    // kept to draw it during the exit.
+    var lastData by remember { mutableStateOf<AudioMiniPlayerUiState.Data?>(null) }
+    val currentData = state as? AudioMiniPlayerUiState.Data
+    SideEffect { currentData?.let { lastData = it } }
+
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = slideInVertically { it },
+        exit = slideOutVertically { it },
+        modifier = modifier,
+    ) {
+        (currentData ?: lastData)?.let { data ->
+            AudioMiniPlayer(
+                state = data,
+                onPlayPauseClicked = viewModel::onPlayPauseClicked,
+                onCloseClicked = onCloseClicked,
+                onPlayerClicked = onPlayerClicked,
+            )
+        }
     }
 }

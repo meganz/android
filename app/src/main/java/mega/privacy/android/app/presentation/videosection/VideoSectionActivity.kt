@@ -48,6 +48,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerHost
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
@@ -58,7 +59,6 @@ import mega.privacy.android.app.presentation.search.navigation.contactArraySepar
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialog
-import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -241,13 +241,12 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                     ) {
                         val (audioPlayer, videoSectionFeatureScreen) = createRefs()
 
-                        MiniAudioPlayerView(
+                        MiniAudioPlayerHost(
                             modifier = Modifier
                                 .constrainAs(audioPlayer) {
                                     bottom.linkTo(parent.bottom)
                                 }
                                 .fillMaxWidth(),
-                            lifecycle = lifecycle,
                         )
 
                         VideoSectionScreen(
