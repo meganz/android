@@ -3,14 +3,22 @@ package mega.privacy.android.feature.sync.data.repository
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.mapper.backup.SyncErrorMapper
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
@@ -22,9 +30,11 @@ import mega.privacy.android.feature.sync.data.mapper.progress.mockMegaSync
 import mega.privacy.android.feature.sync.data.mapper.progress.mockMegaSyncList
 import mega.privacy.android.feature.sync.data.mapper.progress.mockMegaSyncStats
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncEpisodeProgress
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
-import mega.privacy.android.feature.sync.domain.usecase.progress.AdvanceSyncProgressEpisodeUseCase
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkState
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkStatesUpdate
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaSyncStats
@@ -53,19 +63,32 @@ internal class SyncProgressRepositoryImplTest {
 
     private lateinit var syncUpdates: MutableSharedFlow<MegaSyncListenerEvent>
     private var now = 0L
+    private var listenerSubscriptions = 0
 
     private val running = MegaSync.SyncRunningState.RUNSTATE_RUNNING.swigValue()
     private val suspended = MegaSync.SyncRunningState.RUNSTATE_SUSPENDED.swigValue()
     private val disabled = MegaSync.SyncRunningState.RUNSTATE_DISABLED.swigValue()
-    private val interruptionHoldMillis =
-        AdvanceSyncProgressEpisodeUseCase.INTERRUPTION_HOLD.inWholeMilliseconds
+
+    private val updates = mutableListOf<SyncWorkStatesUpdate>()
+    private val seededSnapshot = SyncRunSnapshot(
+        isSeeded = true,
+        syncs = emptyList(),
+        progress = SyncEpisodeProgress.None.copy(pendingItems = 3),
+    )
 
     @BeforeEach
     fun resetMocks() {
         reset(syncGateway, syncStatsCacheGateway, syncErrorMapper)
         syncUpdates = MutableSharedFlow(extraBufferCapacity = 64)
+        updates.clear()
         now = 0L
-        whenever(syncGateway.syncUpdate).thenReturn(syncUpdates)
+        listenerSubscriptions = 0
+        whenever(syncGateway.syncUpdate).thenReturn(
+            flow {
+                listenerSubscriptions++
+                emitAll(syncUpdates)
+            }
+        )
         whenever(syncErrorMapper(any())).thenReturn(SyncError.NO_SYNC_ERROR)
         whenever(syncStatsCacheGateway.getAllSyncStats()).thenReturn(emptyList())
         stubSyncList(mockMegaSyncList())
@@ -79,23 +102,25 @@ internal class SyncProgressRepositoryImplTest {
         whenever(syncStatsCacheGateway.getAllSyncStats()).thenReturn(stats.toList())
     }
 
-    private fun TestScope.createUnderTest() = SyncProgressRepositoryImpl(
+    private fun TestScope.createUnderTest(
+        dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(testScheduler),
+    ) = SyncProgressRepositoryImpl(
         syncGateway = syncGateway,
         syncStatsCacheGateway = syncStatsCacheGateway,
         syncWorkStateMapper = SyncWorkStateMapper(SyncRunStateMapper(), syncErrorMapper),
         syncStatsSampleMapper = SyncStatsSampleMapper(),
-        advanceSyncProgressEpisodeUseCase = AdvanceSyncProgressEpisodeUseCase(),
         currentTimeProvider = { now },
-        ioDispatcher = UnconfinedTestDispatcher(testScheduler),
-        appScope = backgroundScope,
+        ioDispatcher = dispatcher,
     )
 
     private fun TestScope.startCollecting(underTest: SyncProgressRepositoryImpl) {
-        backgroundScope.launch { underTest.monitorSyncRunSnapshot().collect {} }
+        backgroundScope.launch { underTest.monitorSyncWorkStates().toList(updates) }
         runCurrent()
     }
 
-    private suspend fun SyncProgressRepositoryImpl.current(): SyncRunSnapshot =
+    private fun current(): List<SyncWorkState> = updates.last().syncs
+
+    private suspend fun SyncProgressRepositoryImpl.snapshot(): SyncRunSnapshot =
         monitorSyncRunSnapshot().first()
 
     private suspend fun emit(event: MegaSyncListenerEvent) = syncUpdates.emit(event)
@@ -107,17 +132,20 @@ internal class SyncProgressRepositoryImplTest {
         MegaSyncListenerEvent.OnSyncStateChanged(mockMegaSync(backupId, runState, error))
 
     @Test
-    fun `test that building the repository does not start the run snapshot collection`() = runTest {
-        createUnderTest()
-        runCurrent()
+    fun `test that building the repository does not start the sync listener collection`() =
+        runTest {
+            val underTest = createUnderTest()
+            underTest.monitorSyncRunSnapshot()
+            underTest.monitorSyncWorkStates()
+            runCurrent()
 
-        assertThat(syncUpdates.subscriptionCount.value).isEqualTo(0)
-        verify(syncGateway, never()).getFolderPairs()
-        verifyNoInteractions(syncStatsCacheGateway)
-    }
+            assertThat(syncUpdates.subscriptionCount.value).isEqualTo(0)
+            verify(syncGateway, never()).getFolderPairs()
+            verifyNoInteractions(syncStatsCacheGateway)
+        }
 
     @Test
-    fun `test that resetSyncRunSnapshot before the first collection does not start the run snapshot collection`() =
+    fun `test that resetSyncRunSnapshot before the first collection does not start the sync listener collection`() =
         runTest {
             val underTest = createUnderTest()
 
@@ -133,65 +161,144 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot emits NotSeeded before the sync list is read`() = runTest {
-        val gate = CompletableDeferred<MegaSyncList>()
-        var subscriptionsAtRead = -1
-        syncGateway.stub {
-            onBlocking { getFolderPairs() } doSuspendableAnswer {
-                subscriptionsAtRead = syncUpdates.subscriptionCount.value
-                gate.await()
-            }
-        }
+    fun `test that monitorSyncRunSnapshot returns the same StateFlow to every caller`() = runTest {
         val underTest = createUnderTest()
 
-        underTest.monitorSyncRunSnapshot().test {
-            assertThat(awaitItem()).isEqualTo(SyncRunSnapshot.NotSeeded)
-            runCurrent()
-            expectNoEvents()
-
-            gate.complete(mockMegaSyncList())
-            assertThat(awaitItem().isSeeded).isTrue()
-        }
-        assertThat(subscriptionsAtRead).isEqualTo(1)
+        assertThat(underTest.monitorSyncRunSnapshot())
+            .isSameInstanceAs(underTest.monitorSyncRunSnapshot())
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot is seeded with no syncs when the sync list is empty`() =
+    fun `test that monitorSyncRunSnapshot emits NotSeeded before anything is published`() =
         runTest {
             val underTest = createUnderTest()
-            startCollecting(underTest)
 
-            val actual = underTest.current()
-            assertThat(actual.isSeeded).isTrue()
-            assertThat(actual.syncs).isEmpty()
+            assertThat(underTest.snapshot()).isEqualTo(SyncRunSnapshot.NotSeeded)
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot seeds running syncs from the cached stats`() = runTest {
+    fun `test that publishSyncRunSnapshot publishes a snapshot of the current generation`() =
+        runTest {
+            val underTest = createUnderTest()
+
+            underTest.publishSyncRunSnapshot(seededSnapshot, generation = 0L)
+
+            assertThat(underTest.snapshot()).isEqualTo(seededSnapshot)
+        }
+
+    @Test
+    fun `test that publishSyncRunSnapshot drops a snapshot of an older generation`() = runTest {
+        val underTest = createUnderTest()
+        underTest.resetSyncRunSnapshot()
+
+        underTest.publishSyncRunSnapshot(seededSnapshot, generation = 0L)
+
+        assertThat(underTest.snapshot()).isEqualTo(SyncRunSnapshot.NotSeeded)
+    }
+
+    @Test
+    fun `test that publishSyncRunSnapshot does not emit an equal snapshot again`() = runTest {
+        val underTest = createUnderTest()
+        underTest.publishSyncRunSnapshot(seededSnapshot, generation = 0L)
+
+        underTest.monitorSyncRunSnapshot().test {
+            assertThat(awaitItem()).isEqualTo(seededSnapshot)
+
+            underTest.publishSyncRunSnapshot(seededSnapshot.copy(), generation = 0L)
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `test that a publish racing a reset never leaves a snapshot of the older generation`() =
+        runTest {
+            repeat(RACE_ROUNDS) {
+                val underTest = createUnderTest()
+
+                withContext(Dispatchers.Default) {
+                    coroutineScope {
+                        launch { underTest.publishSyncRunSnapshot(seededSnapshot, generation = 0L) }
+                        launch { underTest.resetSyncRunSnapshot() }
+                    }
+                }
+
+                assertThat(underTest.snapshot()).isEqualTo(SyncRunSnapshot.NotSeeded)
+            }
+        }
+
+    @Test
+    fun `test that resetSyncRunSnapshot publishes NotSeeded at once without a collector`() =
+        runTest {
+            val underTest = createUnderTest()
+            underTest.publishSyncRunSnapshot(seededSnapshot, generation = 0L)
+
+            underTest.monitorSyncRunSnapshot().test {
+                assertThat(awaitItem()).isEqualTo(seededSnapshot)
+
+                underTest.resetSyncRunSnapshot()
+
+                assertThat(awaitItem()).isEqualTo(SyncRunSnapshot.NotSeeded)
+            }
+            assertThat(syncUpdates.subscriptionCount.value).isEqualTo(0)
+        }
+
+    @Test
+    fun `test that monitorSyncWorkStates subscribes to the sync listener before the sync list is read`() =
+        runTest {
+            val gate = CompletableDeferred<MegaSyncList>()
+            var subscriptionsAtRead = -1
+            syncGateway.stub {
+                onBlocking { getFolderPairs() } doSuspendableAnswer {
+                    subscriptionsAtRead = syncUpdates.subscriptionCount.value
+                    gate.await()
+                }
+            }
+            val underTest = createUnderTest(StandardTestDispatcher(testScheduler))
+            backgroundScope.launch { underTest.monitorSyncWorkStates().toList(updates) }
+            runCurrent()
+            assertThat(subscriptionsAtRead).isEqualTo(1)
+
+            emit(stateChanged(2L, running))
+            gate.complete(mockMegaSyncList(mockMegaSync(1L)))
+            runCurrent()
+
+            assertThat(current().map { it.syncId }).containsExactly(1L, 2L)
+        }
+
+    @Test
+    fun `test that monitorSyncWorkStates sends no syncs when the sync list is empty`() = runTest {
+        val underTest = createUnderTest()
+        startCollecting(underTest)
+
+        assertThat(updates).containsExactly(SyncWorkStatesUpdate(0L, emptyList()))
+    }
+
+    @Test
+    fun `test that monitorSyncWorkStates seeds running syncs from the cached stats`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 5))
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        val actual = underTest.current()
-        assertThat(actual.syncs.single().stats?.pendingItems).isEqualTo(5)
-        assertThat(actual.syncs.single().runningSinceMillis).isNull()
-        assertThat(actual.progress.pendingItems).isEqualTo(5)
+        val actual = current().single()
+        assertThat(actual.stats?.pendingItems).isEqualTo(5)
+        assertThat(actual.runningSinceMillis).isNull()
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot ignores cached stats of syncs that are not running`() =
+    fun `test that monitorSyncWorkStates ignores cached stats of syncs that are not running`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(2L, runState = suspended)))
             stubCachedStats(mockMegaSyncStats(2L, uploads = 5))
             val underTest = createUnderTest()
             startCollecting(underTest)
 
-            assertThat(underTest.current().syncs.single().stats).isNull()
+            assertThat(current().single().stats).isNull()
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot advances the episode when stats arrive`() = runTest {
+    fun `test that monitorSyncWorkStates applies the stats of a running sync`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
@@ -200,11 +307,12 @@ internal class SyncProgressRepositoryImplTest {
         emit(stats(1L, uploads = 4))
         runCurrent()
 
-        assertThat(underTest.current().progress.processedItems).isEqualTo(6)
+        assertThat(updates).hasSize(2)
+        assertThat(current().single().stats?.pendingItems).isEqualTo(4)
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot re-reads the sync list when stats arrive for an unknown sync`() =
+    fun `test that monitorSyncWorkStates re-reads the sync list when stats arrive for an unknown sync`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             val underTest = createUnderTest()
@@ -215,12 +323,12 @@ internal class SyncProgressRepositoryImplTest {
             runCurrent()
 
             verify(syncGateway, times(2)).getFolderPairs()
-            val second = underTest.current().syncs.single { it.syncId == 2L }
+            val second = current().single { it.syncId == 2L }
             assertThat(second.stats?.pendingUploads).isEqualTo(3)
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot does not re-read the sync list for stats of a known sync`() =
+    fun `test that monitorSyncWorkStates does not re-read the sync list for stats of a known sync`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             val underTest = createUnderTest()
@@ -233,7 +341,7 @@ internal class SyncProgressRepositoryImplTest {
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot does not read cached stats after the seed`() = runTest {
+    fun `test that monitorSyncWorkStates does not read cached stats after the seed`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         val underTest = createUnderTest()
         startCollecting(underTest)
@@ -247,60 +355,51 @@ internal class SyncProgressRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot keeps the stats of a running sync when the sync list is re-read`() =
+    fun `test that monitorSyncWorkStates keeps the stats of a running sync when the sync list is re-read`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             stubCachedStats(mockMegaSyncStats(1L, uploads = 5))
             val underTest = createUnderTest()
             startCollecting(underTest)
-            val before = underTest.current().syncs.single()
+            val before = current().single()
 
             stubSyncList(mockMegaSyncList(mockMegaSync(1L), mockMegaSync(2L)))
             emit(stats(2L, uploads = 3))
             runCurrent()
 
-            val first = underTest.current().syncs.single { it.syncId == 1L }
+            val first = current().single { it.syncId == 1L }
             assertThat(first.stats).isEqualTo(before.stats)
             assertThat(first.stats?.pendingUploads).isEqualTo(5)
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot ignores stats of a sync that is not running`() = runTest {
+    fun `test that monitorSyncWorkStates ignores stats of a sync that is not running`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L, runState = suspended)))
         val underTest = createUnderTest()
         startCollecting(underTest)
-        val before = underTest.current()
 
         emit(stats(1L, uploads = 3))
         runCurrent()
 
-        val actual = underTest.current()
-        assertThat(actual.syncs.single().stats).isNull()
-        assertThat(actual.progress).isEqualTo(before.progress)
+        assertThat(current().single().stats).isNull()
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot advances the episode on an event that does not change the syncs`() =
+    fun `test that monitorSyncWorkStates sends an update for an event that does not change the syncs`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
-            stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
             val underTest = createUnderTest()
             startCollecting(underTest)
-            emit(stats(1L, uploads = 6))
-            now = 1_000L
-            emit(stateChanged(1L, suspended))
-            runCurrent()
-            assertThat(underTest.current().progress.interruptedItems).isEqualTo(6)
 
-            now = 1_000L + interruptionHoldMillis
-            emit(stats(1L, uploads = 6))
+            emit(MegaSyncListenerEvent.OnGlobalSyncStateChanged)
             runCurrent()
 
-            assertThat(underTest.current().progress.interruptedItems).isEqualTo(0)
+            assertThat(updates).hasSize(2)
+            assertThat(updates[1]).isEqualTo(updates[0])
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot drops the stats of a sync that leaves running`() = runTest {
+    fun `test that monitorSyncWorkStates drops the stats of a sync that leaves running`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
@@ -309,14 +408,14 @@ internal class SyncProgressRepositoryImplTest {
         emit(stateChanged(1L, suspended))
         runCurrent()
 
-        val actual = underTest.current().syncs.single()
+        val actual = current().single()
         assertThat(actual.runState).isEqualTo(SyncRunState.Suspended)
         assertThat(actual.stats).isNull()
         assertThat(actual.runningSinceMillis).isNull()
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot records when a sync enters running`() = runTest {
+    fun `test that monitorSyncWorkStates records when a sync enters running`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L, runState = suspended)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
@@ -326,14 +425,14 @@ internal class SyncProgressRepositoryImplTest {
         emit(stateChanged(1L, running))
         runCurrent()
 
-        val actual = underTest.current().syncs.single()
+        val actual = current().single()
         assertThat(actual.runState).isEqualTo(SyncRunState.Running)
         assertThat(actual.runningSinceMillis).isEqualTo(1_000L)
         assertThat(actual.stats).isNull()
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot keeps the running since time while the sync stays running`() =
+    fun `test that monitorSyncWorkStates keeps the running since time while the sync stays running`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L, runState = suspended)))
             val underTest = createUnderTest()
@@ -342,20 +441,20 @@ internal class SyncProgressRepositoryImplTest {
             emit(stateChanged(1L, running))
             emit(stats(1L, uploads = 4))
             runCurrent()
-            val before = underTest.current().syncs.single()
+            val before = current().single()
 
             now = 2_000L
             emit(stateChanged(1L, running))
             runCurrent()
 
-            val actual = underTest.current().syncs.single()
+            val actual = current().single()
             assertThat(actual.runningSinceMillis).isEqualTo(1_000L)
             assertThat(actual.stats).isEqualTo(before.stats)
             assertThat(actual.stats?.pendingUploads).isEqualTo(4)
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot adds a sync reported by a state change it did not know`() =
+    fun `test that monitorSyncWorkStates adds a sync reported by a state change it did not know`() =
         runTest {
             val underTest = createUnderTest()
             startCollecting(underTest)
@@ -363,25 +462,12 @@ internal class SyncProgressRepositoryImplTest {
             emit(stateChanged(2L, running))
             runCurrent()
 
-            assertThat(underTest.current().syncs.map { it.syncId }).containsExactly(2L)
+            assertThat(current().map { it.syncId }).containsExactly(2L)
             verify(syncGateway, times(1)).getFolderPairs()
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot lists the syncs sorted by id`() = runTest {
-        stubSyncList(mockMegaSyncList(mockMegaSync(3L), mockMegaSync(1L)))
-        val underTest = createUnderTest()
-        startCollecting(underTest)
-
-        emit(stateChanged(2L, running))
-        runCurrent()
-
-        assertThat(underTest.current().syncs.map { it.syncId })
-            .containsExactly(1L, 2L, 3L).inOrder()
-    }
-
-    @Test
-    fun `test that monitorSyncRunSnapshot gives a running sync first found by a re-read the current time as running since`() =
+    fun `test that monitorSyncWorkStates gives a running sync first found by a re-read the current time as running since`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             val underTest = createUnderTest()
@@ -392,13 +478,13 @@ internal class SyncProgressRepositoryImplTest {
             emit(stats(2L, uploads = 3))
             runCurrent()
 
-            val syncs = underTest.current().syncs
+            val syncs = current()
             assertThat(syncs.single { it.syncId == 2L }.runningSinceMillis).isEqualTo(5_000L)
             assertThat(syncs.single { it.syncId == 1L }.runningSinceMillis).isNull()
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot removes a deleted sync`() = runTest {
+    fun `test that monitorSyncWorkStates removes a deleted sync`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L), mockMegaSync(2L)))
         val underTest = createUnderTest()
         startCollecting(underTest)
@@ -406,65 +492,62 @@ internal class SyncProgressRepositoryImplTest {
         emit(MegaSyncListenerEvent.OnSyncDeleted(mockMegaSync(1L)))
         runCurrent()
 
-        assertThat(underTest.current().syncs.map { it.syncId }).containsExactly(2L)
+        assertThat(current().map { it.syncId }).containsExactly(2L)
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot marks a sync over storage quota from its error`() = runTest {
+    fun `test that monitorSyncWorkStates marks a sync over storage quota from its error`() = runTest {
         whenever(syncErrorMapper(any())).thenReturn(SyncError.STORAGE_OVERQUOTA)
         stubSyncList(mockMegaSyncList(mockMegaSync(1L, error = 22)))
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        assertThat(underTest.current().syncs.single().isStorageOverQuota).isTrue()
+        assertThat(current().single().isStorageOverQuota).isTrue()
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot reports the error of a sync from its state change`() =
+    fun `test that monitorSyncWorkStates reports the error of a sync from its state change`() =
         runTest {
             whenever(syncErrorMapper(MegaSync.Error.UNKNOWN_ERROR.swigValue()))
                 .thenReturn(SyncError.UNKNOWN_ERROR)
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
             val underTest = createUnderTest()
             startCollecting(underTest)
-            assertThat(underTest.current().syncs.single().hasError).isFalse()
+            assertThat(current().single().hasError).isFalse()
 
             emit(stateChanged(1L, disabled, error = MegaSync.Error.UNKNOWN_ERROR.swigValue()))
             runCurrent()
-            val withError = underTest.current().syncs.single()
+            val withError = current().single()
             assertThat(withError.runState).isEqualTo(SyncRunState.Disabled)
             assertThat(withError.hasError).isTrue()
 
             emit(stateChanged(1L, disabled, error = MegaSync.Error.NO_SYNC_ERROR.swigValue()))
             runCurrent()
-            assertThat(underTest.current().syncs.single().hasError).isFalse()
+            assertThat(current().single().hasError).isFalse()
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot emits when only the error of a sync changes`() = runTest {
-        whenever(syncErrorMapper(MegaSync.Error.UNKNOWN_ERROR.swigValue()))
-            .thenReturn(SyncError.UNKNOWN_ERROR)
-        stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
-        stubCachedStats(mockMegaSyncStats(1L, uploads = 5))
-        val underTest = createUnderTest()
-        startCollecting(underTest)
-
-        underTest.monitorSyncRunSnapshot().test {
-            val seeded = awaitItem().syncs.single()
+    fun `test that monitorSyncWorkStates keeps the stats when only the error of a sync changes`() =
+        runTest {
+            whenever(syncErrorMapper(MegaSync.Error.UNKNOWN_ERROR.swigValue()))
+                .thenReturn(SyncError.UNKNOWN_ERROR)
+            stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
+            stubCachedStats(mockMegaSyncStats(1L, uploads = 5))
+            val underTest = createUnderTest()
+            startCollecting(underTest)
+            val seeded = current().single()
 
             emit(stateChanged(1L, running, error = MegaSync.Error.UNKNOWN_ERROR.swigValue()))
             runCurrent()
 
-            val actual = awaitItem().syncs.single()
+            val actual = current().single()
             assertThat(actual.hasError).isTrue()
             assertThat(actual.stats).isEqualTo(seeded.stats)
             assertThat(actual.runningSinceMillis).isEqualTo(seeded.runningSinceMillis)
-            expectNoEvents()
         }
-    }
 
     @Test
-    fun `test that monitorSyncRunSnapshot reports every sync suspended after all syncs are paused`() =
+    fun `test that monitorSyncWorkStates reports every sync suspended after all syncs are paused`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L), mockMegaSync(2L)))
             stubCachedStats(mockMegaSyncStats(1L, uploads = 3), mockMegaSyncStats(2L, uploads = 4))
@@ -475,25 +558,24 @@ internal class SyncProgressRepositoryImplTest {
             emit(stateChanged(2L, suspended))
             runCurrent()
 
-            val actual = underTest.current()
-            assertThat(actual.syncs.map { it.runState })
+            val actual = current()
+            assertThat(actual.map { it.runState })
                 .containsExactly(SyncRunState.Suspended, SyncRunState.Suspended)
-            assertThat(actual.syncs.all { it.stats == null && !it.hasError }).isTrue()
-            assertThat(actual.progress.interruptedItems).isEqualTo(7)
+            assertThat(actual.all { it.stats == null && !it.hasError }).isTrue()
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot stays not seeded when the sync list read fails`() = runTest {
+    fun `test that monitorSyncWorkStates sends nothing when the sync list read fails`() = runTest {
         syncGateway.stub { onBlocking { getFolderPairs() }.thenThrow(RuntimeException("read failed")) }
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        assertThat(underTest.current()).isEqualTo(SyncRunSnapshot.NotSeeded)
+        assertThat(updates).isEmpty()
         assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot retries the seed read on the next event when not seeded`() =
+    fun `test that monitorSyncWorkStates retries the seed read on the next event when not seeded`() =
         runTest {
             syncGateway.stub {
                 onBlocking { getFolderPairs() }
@@ -502,127 +584,133 @@ internal class SyncProgressRepositoryImplTest {
             }
             val underTest = createUnderTest()
             startCollecting(underTest)
-            assertThat(underTest.current().isSeeded).isFalse()
+            assertThat(updates).isEmpty()
 
             emit(stats(1L, uploads = 2))
             runCurrent()
 
-            val actual = underTest.current()
-            assertThat(actual.isSeeded).isTrue()
-            assertThat(actual.syncs.map { it.syncId }).containsExactly(1L)
+            assertThat(current().map { it.syncId }).containsExactly(1L)
         }
 
     @Test
-    fun `test that monitorSyncRunSnapshot shares one episode baseline across collectors`() = runTest {
+    fun `test that monitorSyncWorkStates stamps each update with the current generation`() =
+        runTest {
+            val underTest = createUnderTest()
+            underTest.resetSyncRunSnapshot()
+            startCollecting(underTest)
+
+            emit(stateChanged(1L, running))
+            runCurrent()
+
+            assertThat(updates.map { it.generation }).containsExactly(1L, 1L)
+        }
+
+    @Test
+    fun `test that resetSyncRunSnapshot reads the sync list again in a new generation`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
-        stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
         startCollecting(underTest)
 
-        underTest.monitorSyncRunSnapshot().test {
-            assertThat(awaitItem().isSeeded).isTrue()
-            emit(stats(1L, uploads = 4))
-            runCurrent()
-            assertThat(expectMostRecentItem().progress.processedItems).isEqualTo(6)
+        stubSyncList(mockMegaSyncList(mockMegaSync(2L)))
+        underTest.resetSyncRunSnapshot()
+        runCurrent()
 
-            underTest.monitorSyncRunSnapshot().test {
-                assertThat(awaitItem().progress.processedItems).isEqualTo(6)
-                cancelAndIgnoreRemainingEvents()
-            }
-            assertThat(underTest.monitorSyncRunSnapshot())
-                .isSameInstanceAs(underTest.monitorSyncRunSnapshot())
-            assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
-            cancelAndIgnoreRemainingEvents()
-        }
+        verify(syncGateway, times(2)).getFolderPairs()
+        assertThat(updates.last()).isEqualTo(SyncWorkStatesUpdate(1L, current()))
+        assertThat(current().map { it.syncId }).containsExactly(2L)
+        assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
     }
 
     @Test
-    fun `test that monitorSyncRunSnapshot does not emit when an event changes nothing`() = runTest {
-        stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
-        stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
-        val underTest = createUnderTest()
-        startCollecting(underTest)
-
-        underTest.monitorSyncRunSnapshot().test {
-            assertThat(awaitItem().isSeeded).isTrue()
-            emit(stats(1L, uploads = 6))
-            runCurrent()
-            assertThat(awaitItem().progress.fraction).isWithin(0.0001f).of(0.4f)
-
-            emit(stats(1L, uploads = 6))
-            runCurrent()
-
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun `test that resetSyncRunSnapshot returns an empty episode`() = runTest {
+    fun `test that resetSyncRunSnapshot reads the seed cached stats again`() = runTest {
         stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
         stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
         val underTest = createUnderTest()
         startCollecting(underTest)
         emit(stats(1L, uploads = 4))
         runCurrent()
-        assertThat(underTest.current().progress.processedItems).isEqualTo(6)
 
         underTest.resetSyncRunSnapshot()
         runCurrent()
 
-        val actual = underTest.current().progress
-        assertThat(actual.processedItems).isEqualTo(0)
-        assertThat(actual.episodeId).isEqualTo(0)
+        verify(syncStatsCacheGateway, times(2)).getAllSyncStats()
+        assertThat(current().single().stats?.pendingUploads).isEqualTo(10)
     }
 
     @Test
-    fun `test that resetSyncRunSnapshot re-reads the sync list`() = runTest {
+    fun `test that monitorSyncWorkStates does not apply an event queued before a reset`() = runTest {
+        val blockedRead = CompletableDeferred<MegaSyncList>()
+        var reads = 0
+        syncGateway.stub {
+            onBlocking { getFolderPairs() } doSuspendableAnswer {
+                reads++
+                if (reads == 2) blockedRead.await() else mockMegaSyncList(mockMegaSync(1L))
+            }
+        }
         val underTest = createUnderTest()
         startCollecting(underTest)
+        emit(stats(5L, uploads = 1))
+        runCurrent()
+        emit(stateChanged(9L, running))
+        runCurrent()
 
         underTest.resetSyncRunSnapshot()
         runCurrent()
 
-        verify(syncGateway, times(2)).getFolderPairs()
-        assertThat(underTest.current().isSeeded).isTrue()
+        val newGeneration = updates.filter { it.generation == 1L }
+        assertThat(newGeneration).isNotEmpty()
+        assertThat(newGeneration.flatMap { it.syncs }.map { it.syncId }).doesNotContain(9L)
+        assertThat(current().map { it.syncId }).containsExactly(1L)
     }
 
     @Test
-    fun `test that resetSyncRunSnapshot called twice in a row leaves one seeded initial episode`() =
+    fun `test that resetSyncRunSnapshot keeps one sync listener subscription across resets`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
-            stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
             val underTest = createUnderTest()
             startCollecting(underTest)
-            emit(stats(1L, uploads = 4))
-            runCurrent()
 
             underTest.resetSyncRunSnapshot()
+            runCurrent()
             underTest.resetSyncRunSnapshot()
             runCurrent()
 
-            val actual = underTest.current()
-            assertThat(actual.isSeeded).isTrue()
-            assertThat(actual.progress.episodeId).isEqualTo(0)
-            assertThat(actual.progress.processedItems).isEqualTo(0)
-            assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
+            assertThat(listenerSubscriptions).isEqualTo(1)
+            assertThat(updates.last().generation).isEqualTo(2L)
             verify(syncGateway, times(3)).getFolderPairs()
         }
 
     @Test
-    fun `test that resetSyncRunSnapshot while no account is logged in seeds an empty run snapshot`() =
+    fun `test that monitorSyncWorkStates applies sync events after a reset`() = runTest {
+        stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
+        val underTest = createUnderTest()
+        startCollecting(underTest)
+        underTest.resetSyncRunSnapshot()
+        runCurrent()
+
+        emit(stateChanged(2L, running))
+        runCurrent()
+
+        assertThat(updates.last().generation).isEqualTo(1L)
+        assertThat(current().map { it.syncId }).containsExactly(1L, 2L)
+    }
+
+    @Test
+    fun `test that resetSyncRunSnapshot called twice in a row leaves one subscription in the latest generation`() =
         runTest {
             stubSyncList(mockMegaSyncList(mockMegaSync(1L)))
-            stubCachedStats(mockMegaSyncStats(1L, uploads = 10))
             val underTest = createUnderTest()
             startCollecting(underTest)
 
-            stubSyncList(mockMegaSyncList())
+            underTest.resetSyncRunSnapshot()
             underTest.resetSyncRunSnapshot()
             runCurrent()
 
-            val actual = underTest.current()
-            assertThat(actual.isSeeded).isTrue()
-            assertThat(actual.syncs).isEmpty()
-            assertThat(actual.progress.episodeId).isEqualTo(0)
+            assertThat(updates.last().generation).isEqualTo(2L)
+            assertThat(syncUpdates.subscriptionCount.value).isEqualTo(1)
         }
+
+    companion object {
+        private const val RACE_ROUNDS = 1_000
+    }
 }

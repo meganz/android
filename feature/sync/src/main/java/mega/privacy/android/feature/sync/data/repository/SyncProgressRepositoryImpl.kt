@@ -2,21 +2,24 @@ package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.runningFold
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.qualifier.ApplicationScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.SystemTime
 import mega.privacy.android.feature.sync.data.forEach
@@ -25,21 +28,20 @@ import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.mapper.progress.SyncStatsSampleMapper
 import mega.privacy.android.feature.sync.data.mapper.progress.SyncWorkStateMapper
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
-import mega.privacy.android.feature.sync.domain.entity.progress.SyncProgressEpisode
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunSnapshot
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncRunState
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncStatsSample
 import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkState
+import mega.privacy.android.feature.sync.domain.entity.progress.SyncWorkStatesUpdate
 import mega.privacy.android.feature.sync.domain.repository.SyncProgressRepository
-import mega.privacy.android.feature.sync.domain.usecase.progress.AdvanceSyncProgressEpisodeUseCase
 import nz.mega.sdk.MegaSyncStats
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Folds the existing sync listener into one app-wide run snapshot, so every surface shares one run
- * baseline. Nothing is read or collected until the first subscriber.
+ * Holds the app-wide run snapshot, so every surface shares one run baseline, and reads the
+ * existing sync listener into the sync states its run folds. Building it starts nothing.
  */
 @Singleton
 internal class SyncProgressRepositoryImpl @Inject constructor(
@@ -47,55 +49,68 @@ internal class SyncProgressRepositoryImpl @Inject constructor(
     private val syncStatsCacheGateway: SyncStatsCacheGateway,
     private val syncWorkStateMapper: SyncWorkStateMapper,
     private val syncStatsSampleMapper: SyncStatsSampleMapper,
-    private val advanceSyncProgressEpisodeUseCase: AdvanceSyncProgressEpisodeUseCase,
     @SystemTime private val currentTimeProvider: () -> Long,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncProgressRepository {
 
-    // With no subscriber an emission is dropped, so a reset never starts the fold.
-    private val resetSignal = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val published = MutableStateFlow(SyncRunSnapshot.NotSeeded)
+    private val runSnapshot: StateFlow<SyncRunSnapshot> = published.asStateFlow()
+    private val currentGeneration = MutableStateFlow(0L)
 
-    // Built on first use and never stopped, so the run survives screens and sessions.
-    private val runSnapshot: StateFlow<SyncRunSnapshot> by lazy {
-        // Subscribes before the seed read, so no event between the read and the subscription is lost.
-        channelFlow {
-            launch(start = CoroutineStart.UNDISPATCHED) {
-                syncGateway.syncUpdate.collect { send(Input.Event(it)) }
-            }
-            launch { resetSignal.collect { send(Input.Reset) } }
-            send(Input.Refresh)
-        }
-            .runningFold(State.Initial) { state, input -> reduce(state, input) }
-            .map { it.toSyncRunSnapshot() }
-            .distinctUntilChanged()
-            .catch { Timber.e(it, "Sync run snapshot monitoring stopped") }
-            .flowOn(ioDispatcher)
-            .stateIn(appScope, SharingStarted.Lazily, SyncRunSnapshot.NotSeeded)
-    }
+    // Keeps a reset from landing between a publish's generation check and its write.
+    private val publishLock = Mutex()
 
     override fun monitorSyncRunSnapshot(): Flow<SyncRunSnapshot> = runSnapshot
 
-    override suspend fun resetSyncRunSnapshot() {
-        resetSignal.emit(Unit)
+    override fun monitorSyncWorkStates(): Flow<SyncWorkStatesUpdate> = channelFlow {
+        val events = Channel<MegaSyncListenerEvent>(Channel.UNLIMITED)
+        // One subscription for the whole collection: a reset must not re-register the SDK listener,
+        // and every seed read must find it already subscribed.
+        launch(start = CoroutineStart.UNDISPATCHED) {
+            syncGateway.syncUpdate.collect { events.send(it) }
+        }
+        var fold: Job? = null
+        currentGeneration.collect { generation ->
+            fold?.cancelAndJoin()
+            fold = launch(start = CoroutineStart.UNDISPATCHED) {
+                // A reset can change the account, so an event from before it must not be applied;
+                // the seed read below already covers it.
+                while (events.tryReceive().isSuccess) Unit
+                syncWorkStates(events).collect { send(SyncWorkStatesUpdate(generation, it)) }
+            }
+        }
+    }.flowOn(ioDispatcher)
+
+    override suspend fun publishSyncRunSnapshot(snapshot: SyncRunSnapshot, generation: Long) {
+        publishLock.withLock {
+            if (generation == currentGeneration.value) published.value = snapshot
+        }
     }
 
-    private suspend fun reduce(state: State, input: Input): State {
+    override suspend fun resetSyncRunSnapshot() {
+        publishLock.withLock {
+            currentGeneration.value += 1
+            published.value = SyncRunSnapshot.NotSeeded
+        }
+    }
+
+    // Null until the seed read succeeds, so an unreadable seed is retried at the next event.
+    private fun syncWorkStates(events: ReceiveChannel<MegaSyncListenerEvent>): Flow<List<SyncWorkState>> =
+        flow {
+            emit(Input.Refresh)
+            for (event in events) emit(Input.Event(event))
+        }
+            .runningFold<Input, Map<Long, SyncWorkState>?>(null) { syncs, input -> reduce(syncs, input) }
+            .filterNotNull()
+            .map { it.values.toList() }
+
+    private suspend fun reduce(syncs: Map<Long, SyncWorkState>?, input: Input): Map<Long, SyncWorkState>? {
         val now = currentTimeProvider()
-        var current = if (input is Input.Reset) State.Initial else state
-        if (!current.isSeeded) {
-            val seeded = readSyncList(previous = emptyMap(), isSeed = true, now = now)
-                ?: return current
-            current = current.copy(isSeeded = true, syncs = seeded)
+        val seeded = syncs ?: readSyncList(previous = emptyMap(), isSeed = true, now = now) ?: return null
+        return when (input) {
+            Input.Refresh -> seeded
+            is Input.Event -> apply(seeded, input.event, now)
         }
-        val next = when (input) {
-            Input.Refresh, Input.Reset -> current.syncs
-            is Input.Event -> apply(current.syncs, input.event, now)
-        }
-        return current.copy(
-            syncs = next,
-            episode = advanceSyncProgressEpisodeUseCase(current.episode, next.values.toList(), now),
-        )
     }
 
     private suspend fun apply(
@@ -181,25 +196,8 @@ internal class SyncProgressRepositoryImpl @Inject constructor(
             null to now
         }
 
-    private data class State(
-        val isSeeded: Boolean,
-        val syncs: Map<Long, SyncWorkState>,
-        val episode: SyncProgressEpisode,
-    ) {
-        fun toSyncRunSnapshot() = SyncRunSnapshot(
-            isSeeded = isSeeded,
-            syncs = syncs.values.sortedBy { it.syncId },
-            progress = episode.toProgress(),
-        )
-
-        companion object {
-            val Initial = State(false, emptyMap(), SyncProgressEpisode.Initial)
-        }
-    }
-
     private sealed interface Input {
         data object Refresh : Input
-        data object Reset : Input
         data class Event(val event: MegaSyncListenerEvent) : Input
     }
 }

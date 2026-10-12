@@ -41,6 +41,7 @@ import mega.privacy.android.feature.sync.data.repository.SyncProgressRepositoryI
 import mega.privacy.android.feature.sync.data.repository.SyncPromotionPreferencesRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncSolvedIssuesRepositoryImpl
+import mega.privacy.android.feature.sync.data.repository.SyncTransferStoreRepositoryImpl
 import mega.privacy.android.feature.sync.domain.repository.SyncDebrisRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncExclusionsRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncNewFolderParamsRepository
@@ -50,6 +51,7 @@ import mega.privacy.android.feature.sync.domain.repository.SyncProgressRepositor
 import mega.privacy.android.feature.sync.domain.repository.SyncPromotionPreferencesRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncSolvedIssuesRepository
+import mega.privacy.android.feature.sync.domain.repository.SyncTransferStoreRepository
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -128,6 +130,10 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindSyncProgressRepository(implementation: SyncProgressRepositoryImpl): SyncProgressRepository
+
+    @Binds
+    @Singleton
+    fun bindSyncTransferStoreRepository(implementation: SyncTransferStoreRepositoryImpl): SyncTransferStoreRepository
 
     companion object {
         @Provides
