@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.banner.GetPromoBannersUseCase
 import mega.privacy.android.domain.usecase.billing.DismissSubscriptionOfferCampaignUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorDismissedSubscriptionOfferCampaignsUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper.Companion.SUBSCRIPTION_OFFER_BANNER_ID
@@ -50,6 +51,7 @@ class BannerWidgetViewModelTest {
     private val dismissSubscriptionOfferCampaignUseCase =
         mock<DismissSubscriptionOfferCampaignUseCase>()
     private val subscriptionOfferBannerMapper = mock<SubscriptionOfferBannerMapper>()
+    private val monitorOfflineModeUseCase = mock<MonitorOfflineModeUseCase>()
 
     private val banner1 = PromotionalBanner(
         id = 1,
@@ -106,8 +108,10 @@ class BannerWidgetViewModelTest {
             monitorDismissedSubscriptionOfferCampaignsUseCase,
             dismissSubscriptionOfferCampaignUseCase,
             subscriptionOfferBannerMapper,
+            monitorOfflineModeUseCase,
         )
         stubNoDismissedCampaign()
+        stubOfflineMode(isOfflineMode = false)
     }
 
     private fun initViewModel() {
@@ -118,7 +122,12 @@ class BannerWidgetViewModelTest {
             monitorDismissedSubscriptionOfferCampaignsUseCase = monitorDismissedSubscriptionOfferCampaignsUseCase,
             dismissSubscriptionOfferCampaignUseCase = dismissSubscriptionOfferCampaignUseCase,
             subscriptionOfferBannerMapper = subscriptionOfferBannerMapper,
+            monitorOfflineModeUseCase = monitorOfflineModeUseCase,
         )
+    }
+
+    private fun stubOfflineMode(isOfflineMode: Boolean) {
+        whenever(monitorOfflineModeUseCase()).thenReturn(flowOf(isOfflineMode))
     }
 
     private fun stubNoOffer() {
@@ -426,6 +435,31 @@ class BannerWidgetViewModelTest {
             // State should remain unchanged
             expectNoEvents()
             assertThat(underTest.uiState.value).isEqualTo(initialState)
+        }
+    }
+
+    @Test
+    fun `test that isOfflineMode is false when the device is online`() = runTest {
+        whenever(getPromoBannersUseCase()).thenReturn(listOf(banner1))
+        stubNoOffer()
+
+        initViewModel()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isOfflineMode).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isOfflineMode is true when the device is offline`() = runTest {
+        whenever(getPromoBannersUseCase()).thenReturn(listOf(banner1))
+        stubNoOffer()
+        stubOfflineMode(isOfflineMode = true)
+
+        initViewModel()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isOfflineMode).isTrue()
         }
     }
 

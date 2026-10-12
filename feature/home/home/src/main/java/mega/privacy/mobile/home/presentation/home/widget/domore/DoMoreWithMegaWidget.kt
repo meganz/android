@@ -60,6 +60,7 @@ import mega.privacy.mobile.analytics.event.DoMoreWithMegaCameraUploadsButtonPres
 import mega.privacy.mobile.analytics.event.DoMoreWithMegaCreateAlbumButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DoMoreWithMegaScanDocumentButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DoMoreWithMegaScheduleMeetingButtonPressedEvent
+import mega.privacy.mobile.home.presentation.home.rememberNoConnectionSnackbar
 import javax.inject.Inject
 
 /**
@@ -89,16 +90,21 @@ class DoMoreWithMegaWidget @Inject constructor() : HomeWidget, Flagged {
         FeatureFlagGate(feature) {
             val viewModel = hiltViewModel<DoMoreWithMegaWidgetViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val showNoConnectionSnackbar = rememberNoConnectionSnackbar()
             if (uiState.items.isNotEmpty()) {
                 DoMoreWithMegaSection(
                     items = uiState.items,
                     onItemClick = { item ->
                         Analytics.tracker.trackEvent(item.identifier.buttonPressedEvent())
-                        navigationHandler.navigateForItem(
-                            identifier = item.identifier,
-                            isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
-                            hasPreviouslyEnabledCameraUploads = uiState.hasPreviouslyEnabledCameraUploads,
-                        )
+                        if (uiState.isOfflineMode) {
+                            showNoConnectionSnackbar()
+                        } else {
+                            navigationHandler.navigateForItem(
+                                identifier = item.identifier,
+                                isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
+                                hasPreviouslyEnabledCameraUploads = uiState.hasPreviouslyEnabledCameraUploads,
+                            )
+                        }
                     },
                     modifier = modifier,
                 )

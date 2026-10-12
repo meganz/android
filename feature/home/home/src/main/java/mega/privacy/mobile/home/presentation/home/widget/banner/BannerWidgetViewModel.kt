@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.banner.GetPromoBannersUseCase
 import mega.privacy.android.domain.usecase.billing.DismissSubscriptionOfferCampaignUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorDismissedSubscriptionOfferCampaignsUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper.Companion.SUBSCRIPTION_OFFER_BANNER_ID
 import mega.privacy.mobile.home.presentation.home.widget.banner.model.BannerUiState
@@ -35,6 +36,7 @@ class BannerWidgetViewModel @Inject constructor(
     private val monitorDismissedSubscriptionOfferCampaignsUseCase: MonitorDismissedSubscriptionOfferCampaignsUseCase,
     private val dismissSubscriptionOfferCampaignUseCase: DismissSubscriptionOfferCampaignUseCase,
     private val subscriptionOfferBannerMapper: SubscriptionOfferBannerMapper,
+    private val monitorOfflineModeUseCase: MonitorOfflineModeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BannerUiState())
@@ -43,6 +45,7 @@ class BannerWidgetViewModel @Inject constructor(
     init {
         loadBanners()
         monitorSubscriptionOfferBanner()
+        monitorOfflineMode()
     }
 
     private fun loadBanners() {
@@ -56,6 +59,16 @@ class BannerWidgetViewModel @Inject constructor(
             _uiState.update {
                 it.copy(banners = banners, isLoading = false)
             }
+        }
+    }
+
+    private fun monitorOfflineMode() {
+        viewModelScope.launch {
+            monitorOfflineModeUseCase()
+                .catch { Timber.e(it, "Failed to monitor offline mode") }
+                .collect { isOfflineMode ->
+                    _uiState.update { it.copy(isOfflineMode = isOfflineMode) }
+                }
         }
     }
 

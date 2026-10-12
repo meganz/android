@@ -54,6 +54,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
  * @param onClick Invoked when the banner or its call-to-action is tapped.
  * @param onDismissClick Invoked when the dismiss (✕) button is tapped.
  * @param modifier Modifier for the banner container.
+ * @param isButtonEnabled Whether the call-to-action button is enabled.
  */
 @Composable
 internal fun HomeOfferBanner(
@@ -62,6 +63,7 @@ internal fun HomeOfferBanner(
     onClick: () -> Unit,
     onDismissClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isButtonEnabled: Boolean = true,
 ) {
     AndroidTheme(isDark = false, useLegacyStatusBarColor = false) {
         val spacing = LocalSpacing.current
@@ -114,6 +116,7 @@ internal fun HomeOfferBanner(
                             .testTag(HOME_OFFER_BANNER_BUTTON_TAG),
                         text = buttonText,
                         onClick = onClick,
+                        enabled = isButtonEnabled,
                     )
                 }
 

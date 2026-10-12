@@ -50,6 +50,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param onDismiss Callback when a banner is dismissed, receives banner ID and URL
  * @param onClick Callback when a banner is clicked, receives banner URL
  * @param modifier Modifier for the composable
+ * @param isOfflineMode Whether the app is in offline mode; the offer call-to-action is disabled then
  */
 @Composable
 fun ScrollableBanner(
@@ -58,6 +59,7 @@ fun ScrollableBanner(
     onDismiss: (Int, String) -> Unit,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    isOfflineMode: Boolean = false,
 ) {
     val activeOfferBanner = offerBanner?.takeUnless { rememberOfferExpired(it.validUntil) }
     val totalCount = (if (activeOfferBanner != null) 1 else 0) + banners.size
@@ -103,13 +105,16 @@ fun ScrollableBanner(
                         },
                     title = "$title\n$subtitle",
                     buttonText = stringResource(sharedR.string.home_offer_banner_button),
+                    isButtonEnabled = !isOfflineMode,
                     onClick = {
                         onClick(SubscriptionOfferBannerMapper.SUBSCRIPTION_OFFER_BANNER_URL)
                     },
                     onDismissClick = {
-                        Analytics.tracker.trackEvent(
-                            HomeSubscriptionOfferBannerDismissButtonPressedEvent
-                        )
+                        if (!isOfflineMode) {
+                            Analytics.tracker.trackEvent(
+                                HomeSubscriptionOfferBannerDismissButtonPressedEvent
+                            )
+                        }
                         onDismiss(
                             SubscriptionOfferBannerMapper.SUBSCRIPTION_OFFER_BANNER_ID,
                             SubscriptionOfferBannerMapper.SUBSCRIPTION_OFFER_BANNER_URL,

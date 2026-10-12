@@ -12,9 +12,11 @@ import mega.privacy.mobile.home.presentation.home.widget.domore.DoMoreWithMegaIt
  * @property hasPreviouslyEnabledCameraUploads whether the user has enabled Camera uploads before
  * (the enabled preference has been set at least once). When true the Camera uploads shortcut skips
  * the permissions onboarding even if Camera uploads is currently disabled.
+ * @property isOfflineMode whether the app is in offline mode, where the shortcuts cannot be used.
  */
 data class DoMoreWithMegaUiState(
     val items: List<DoMoreWithMegaItem> = emptyList(),
     val isCameraUploadsEnabled: Boolean = false,
     val hasPreviouslyEnabledCameraUploads: Boolean = false,
+    val isOfflineMode: Boolean = false,
 )

@@ -7,6 +7,7 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.domain.usecase.node.GetCurrentVersionNodeUseCase
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.ContinueWhereLeftOffNameResolver
 import org.junit.jupiter.api.AfterEach
@@ -44,14 +46,17 @@ class ContinueWhereLeftOffViewModelTest {
         mock<MonitorContinueWhereLeftOffItemsUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getCurrentVersionNodeUseCase = mock<GetCurrentVersionNodeUseCase>()
+    private val monitorOfflineModeUseCase = mock<MonitorOfflineModeUseCase>()
 
     @BeforeEach
     fun setUp() {
+        stubOfflineMode(isOfflineMode = false)
         underTest = ContinueWhereLeftOffViewModel(
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getCurrentVersionNodeUseCase = getCurrentVersionNodeUseCase,
             nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, DurationInSecondsTextMapper(), mock(), mock { on { it.invoke() } doReturn true }),
+            monitorOfflineModeUseCase = monitorOfflineModeUseCase,
         )
     }
 
@@ -61,6 +66,7 @@ class ContinueWhereLeftOffViewModelTest {
             monitorContinueWhereLeftOffItemsUseCase,
             getNodeByIdUseCase,
             getCurrentVersionNodeUseCase,
+            monitorOfflineModeUseCase,
         )
     }
 
@@ -300,6 +306,57 @@ class ContinueWhereLeftOffViewModelTest {
             assertThat(state.openNodeEvent)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that showsLoading is false when offline and items have not loaded`() = runTest {
+        stubOfflineMode(isOfflineMode = true)
+        stubItemsNeverEmit()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isOfflineMode).isTrue()
+            assertThat(state.showsLoading).isFalse()
+            assertThat(state.items).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that showsLoading is false when offline and items have loaded`() = runTest {
+        stubOfflineMode(isOfflineMode = true)
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.showsLoading).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that showsLoading is true when online and items have not loaded`() = runTest {
+        stubItemsNeverEmit()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isTrue()
+            assertThat(state.showsLoading).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun stubOfflineMode(isOfflineMode: Boolean) {
+        monitorOfflineModeUseCase.stub {
+            on { invoke() } doReturn flowOf(isOfflineMode)
+        }
+    }
+
+    private fun stubItemsNeverEmit() {
+        monitorContinueWhereLeftOffItemsUseCase.stub {
+            on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow { awaitCancellation() }
         }
     }
 

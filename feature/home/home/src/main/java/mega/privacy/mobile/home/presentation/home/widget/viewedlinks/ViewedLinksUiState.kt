@@ -19,6 +19,7 @@ import mega.privacy.android.shared.nodes.model.NodeSortOption
  * @property isConnected Whether the device currently has a network connection.
  * @property isInSelectionMode Flag to determine if state is currently in selection mode
  * @property selectedCount The number of nodes selected
+ * @property isOfflineMode Whether the app is in offline mode, where links cannot be opened.
  */
 data class ViewedLinksUiState(
     val clearAllLinksEvent: StateEvent = consumed,
@@ -29,6 +30,7 @@ data class ViewedLinksUiState(
     val currentViewType: ViewType = ViewType.LIST,
     val selectedNodeHandles: Set<Long> = emptySet(),
     val isConnected: Boolean = true,
+    val isOfflineMode: Boolean = false,
 ) {
     val isInSelectionMode: Boolean = selectedNodeHandles.isNotEmpty()
     val selectedCount: Int = selectedNodeHandles.size

@@ -16,6 +16,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.mobile.home.presentation.home.widget.domore.model.DoMoreWithMegaUiState
@@ -29,13 +30,15 @@ import javax.inject.Inject
  * their order, and gates the whole section behind the
  * [ApiFeatures.DoMoreWithMEGA] remote feature flag. It also tracks whether Camera uploads is
  * enabled (and whether it was ever enabled) so the Camera uploads shortcut can route to either
- * its settings or the permissions onboarding screen.
+ * its settings or the permissions onboarding screen, and whether the app is in offline mode so the
+ * shortcuts can tell the user they need a connection instead of navigating.
  */
 @HiltViewModel
 class DoMoreWithMegaWidgetViewModel @Inject constructor(
     private val items: Set<@JvmSuppressWildcards DoMoreWithMegaItem>,
     isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val hasCameraSyncEnabledUseCase: HasCameraSyncEnabledUseCase,
+    monitorOfflineModeUseCase: MonitorOfflineModeUseCase,
     private val navigationEventQueue: NavigationEventQueue,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
@@ -60,10 +63,12 @@ class DoMoreWithMegaWidgetViewModel @Inject constructor(
         combine(
             visibleItems,
             isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled.catch { Timber.e(it) },
-        ) { visibleItems, isCameraUploadsEnabled ->
+            monitorOfflineModeUseCase().catch { Timber.e(it); emit(false) },
+        ) { visibleItems, isCameraUploadsEnabled, isOfflineMode ->
             DoMoreWithMegaUiState(
                 items = visibleItems,
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
+                isOfflineMode = isOfflineMode,
                 hasPreviouslyEnabledCameraUploads = runCatching { hasCameraSyncEnabledUseCase() }
                     .onFailure { Timber.e(it) }
                     .getOrDefault(false),

@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.ClearRecentActivityUseCase
@@ -52,6 +53,7 @@ class RecentsViewModel @AssistedInject constructor(
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val monitorRecentActivityClearedUseCase: MonitorRecentActivityClearedUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
+    private val monitorOfflineModeUseCase: MonitorOfflineModeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecentsUiState())
@@ -65,6 +67,17 @@ class RecentsViewModel @AssistedInject constructor(
         monitorNodeUpdates()
         monitorFetchNodesFinish()
         monitorRecentActivityCleared()
+        monitorOfflineMode()
+    }
+
+    private fun monitorOfflineMode() {
+        viewModelScope.launch {
+            monitorOfflineModeUseCase()
+                .catch { Timber.e(it) }
+                .collect { isOfflineMode ->
+                    _uiState.update { it.copy(isOfflineMode = isOfflineMode) }
+                }
+        }
     }
 
     private fun monitorRecentActivityCleared() {

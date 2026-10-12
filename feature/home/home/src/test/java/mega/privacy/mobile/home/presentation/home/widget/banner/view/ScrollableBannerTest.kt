@@ -10,12 +10,16 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.onNodeWithTag
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.banner.PromotionalBanner
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.HomeSubscriptionOfferBannerDismissButtonPressedEvent
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper.Companion.SUBSCRIPTION_OFFER_BANNER_ID
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper.Companion.SUBSCRIPTION_OFFER_BANNER_URL
 import mega.privacy.mobile.home.presentation.home.widget.banner.model.SubscriptionOfferBannerUiModel
@@ -328,5 +332,78 @@ class ScrollableBannerTest {
 
         assertThat(dismissedBannerId).isEqualTo(SUBSCRIPTION_OFFER_BANNER_ID)
         assertThat(dismissedBannerUrl).isEqualTo(SUBSCRIPTION_OFFER_BANNER_URL)
+    }
+
+    @Test
+    fun `test that the offer banner button is enabled when not in offline mode`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    offerBanner = offerBanner,
+                    banners = emptyList(),
+                    onDismiss = { _, _ -> },
+                    onClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(HOME_OFFER_BANNER_BUTTON_TAG, useUnmergedTree = true)
+            .assertIsEnabled()
+    }
+
+    @Test
+    fun `test that the offer banner button is disabled when in offline mode`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    offerBanner = offerBanner,
+                    banners = emptyList(),
+                    onDismiss = { _, _ -> },
+                    onClick = {},
+                    isOfflineMode = true,
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(HOME_OFFER_BANNER_BUTTON_TAG, useUnmergedTree = true)
+            .assertIsNotEnabled()
+    }
+
+    @Test
+    fun `test that dismissing the offer banner tracks the dismiss event when not in offline mode`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    offerBanner = offerBanner,
+                    banners = emptyList(),
+                    onDismiss = { _, _ -> },
+                    onClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Dismiss offer").performClick()
+
+        assertThat(analyticsRule.events).contains(HomeSubscriptionOfferBannerDismissButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that dismissing the offer banner does not track the dismiss event when in offline mode`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    offerBanner = offerBanner,
+                    banners = emptyList(),
+                    onDismiss = { _, _ -> },
+                    onClick = {},
+                    isOfflineMode = true,
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Dismiss offer").performClick()
+
+        assertThat(analyticsRule.events)
+            .doesNotContain(HomeSubscriptionOfferBannerDismissButtonPressedEvent)
     }
 }

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -74,6 +76,7 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget {
         transferHandler: TransferHandler,
     ) {
         val viewModel: ViewedLinksViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val lazyItems = viewModel.previewItems.collectAsLazyPagingItems()
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
@@ -88,6 +91,7 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget {
 
         ViewedLinksView(
             lazyItems = lazyItems,
+            isOfflineMode = uiState.isOfflineMode,
             modifier = modifier,
             onFolderLinkClicked = { link ->
                 navigationHandler.navigate(FolderLinkNavKey(link))
@@ -109,8 +113,11 @@ internal fun ViewedLinksView(
     onFileLinkClicked: (String) -> Unit,
     onViewAllClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    isOfflineMode: Boolean = false,
 ) {
-    val isLoading = lazyItems.loadState.refresh is LoadState.Loading
+    // Links cannot be fetched without a connection, so while offline the section settles on its
+    // empty layout instead of a skeleton that never resolves.
+    val isLoading = !isOfflineMode && lazyItems.loadState.refresh is LoadState.Loading
     Column(modifier = modifier) {
         ViewedLinksWidgetHeader(
             onViewAllClicked = onViewAllClicked,

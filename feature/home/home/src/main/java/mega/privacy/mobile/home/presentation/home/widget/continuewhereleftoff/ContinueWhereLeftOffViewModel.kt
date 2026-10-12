@@ -7,6 +7,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.domain.usecase.node.GetCurrentVersionNodeUseCase
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.ContinueWhereLeftOffNameResolver
@@ -34,12 +36,27 @@ internal class ContinueWhereLeftOffViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getCurrentVersionNodeUseCase: GetCurrentVersionNodeUseCase,
     private val nameResolver: ContinueWhereLeftOffNameResolver,
+    private val monitorOfflineModeUseCase: MonitorOfflineModeUseCase,
 ) : ViewModel() {
 
     private val openNodeEventChannel =
         Channel<StateEventWithContent<TypedFileNode>>(Channel.BUFFERED)
 
     val uiState: StateFlow<ContinueWhereLeftOffUiState> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            // Items may never emit while offline, so start from the loading state to still
+            // surface offline mode changes.
+            monitorContentState().onStart { emit(ContinueWhereLeftOffUiState()) },
+            monitorOfflineModeUseCase().catch { Timber.e(it) },
+        ) { state, isOfflineMode ->
+            state.copy(isOfflineMode = isOfflineMode)
+        }.asUiStateFlow(
+            viewModelScope,
+            ContinueWhereLeftOffUiState(),
+        )
+    }
+
+    private fun monitorContentState(): Flow<ContinueWhereLeftOffUiState> =
         combine(
             monitorContinueWhereLeftOffItemsUseCase(
                 limit = MAX_CAROUSEL_ITEMS,
@@ -64,11 +81,7 @@ internal class ContinueWhereLeftOffViewModel @Inject constructor(
             )
         }.catch { e ->
             Timber.e(e, "Failed to load CWLO items")
-        }.asUiStateFlow(
-            viewModelScope,
-            ContinueWhereLeftOffUiState(),
-        )
-    }
+        }
 
     fun onItemClicked(nodeHandle: Long, type: RecentlyUsedType) {
         viewModelScope.launch {

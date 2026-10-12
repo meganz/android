@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.ClearRecentActivityUseCase
@@ -36,6 +38,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -61,6 +64,7 @@ class RecentsViewModelTest {
     private val clearRecentActivityUseCase = mock<ClearRecentActivityUseCase>()
     private val monitorRecentActivityClearedUseCase = mock<MonitorRecentActivityClearedUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
+    private val monitorOfflineModeUseCase = mock<MonitorOfflineModeUseCase>()
 
     private val bucket1 = createMockRecentActionBucket(
         timestamp = 1000L,
@@ -104,6 +108,7 @@ class RecentsViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorRecentActivityClearedUseCase()).thenReturn(emptyFlow())
+        whenever(monitorOfflineModeUseCase()).thenReturn(flowOf(false))
     }
 
     private fun initViewModel() {
@@ -119,6 +124,7 @@ class RecentsViewModelTest {
             clearRecentActivityUseCase = clearRecentActivityUseCase,
             monitorRecentActivityClearedUseCase = monitorRecentActivityClearedUseCase,
             snackbarEventQueue = snackbarEventQueue,
+            monitorOfflineModeUseCase = monitorOfflineModeUseCase,
             maxBucketCount = 4
         )
     }
@@ -303,6 +309,7 @@ class RecentsViewModelTest {
             clearRecentActivityUseCase = clearRecentActivityUseCase,
             monitorRecentActivityClearedUseCase = monitorRecentActivityClearedUseCase,
             snackbarEventQueue = snackbarEventQueue,
+            monitorOfflineModeUseCase = monitorOfflineModeUseCase,
             maxBucketCount = testMaxBucketCount
         )
         advanceUntilIdle()
@@ -630,4 +637,55 @@ class RecentsViewModelTest {
             assertThat(state.recentsClearedEvent).isEqualTo(consumed)
         }
     }
+
+    @Test
+    fun `test that the section is empty when offline and recents have not loaded`() =
+        runTest {
+            whenever(monitorOfflineModeUseCase()).thenReturn(flowOf(true))
+            whenever(getRecentActionsUseCase(any(), any())).doSuspendableAnswer { awaitCancellation() }
+
+            initViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.isLoading).isFalse()
+            assertThat(underTest.uiState.value.isEmpty).isTrue()
+        }
+
+    @Test
+    fun `test that the section is empty when offline and recents loaded nothing`() =
+        runTest {
+            whenever(monitorOfflineModeUseCase()).thenReturn(flowOf(true))
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+
+            initViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.isLoading).isFalse()
+            assertThat(underTest.uiState.value.isEmpty).isTrue()
+        }
+
+    @Test
+    fun `test that the section is loading when online and recents have not loaded`() =
+        runTest {
+            whenever(getRecentActionsUseCase(any(), any())).doSuspendableAnswer { awaitCancellation() }
+
+            initViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.isLoading).isTrue()
+            assertThat(underTest.uiState.value.isEmpty).isFalse()
+        }
+
+    @Test
+    fun `test that the section is not loading when offline and recent activity is hidden`() =
+        runTest {
+            whenever(monitorOfflineModeUseCase()).thenReturn(flowOf(true))
+            whenever(monitorHideRecentActivityUseCase()).thenReturn(flowOf(true))
+            whenever(getRecentActionsUseCase(any(), any())).doSuspendableAnswer { awaitCancellation() }
+
+            initViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.isLoading).isFalse()
+        }
 }

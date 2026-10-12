@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -77,7 +78,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ViewedLinksViewModel @Inject constructor(
     monitorViewedLinksUseCase: MonitorViewedLinksUseCase,
-    monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewedLinksSortPreferenceUseCase: MonitorViewedLinksSortPreferenceUseCase,
     private val setViewedLinksSortUseCase: SetViewedLinksSortUseCase,
     private val viewedLinksSortMapper: ViewedLinksSortMapper,
@@ -88,12 +89,25 @@ internal class ViewedLinksViewModel @Inject constructor(
     private val snackbarEventQueue: SnackbarEventQueue,
     private val monitorViewTypeUseCase: MonitorViewType,
     private val setViewTypeUseCase: SetViewType,
+    private val monitorOfflineModeUseCase: MonitorOfflineModeUseCase,
 ) : ViewModel() {
     private val resolvedLinkCache = lruCache<String, ViewedLinkUiItem>(maxSize = PAGE_SIZE * 100)
     private val clearAllLinksEvent = MutableStateFlow<StateEvent>(consumed)
     private val selectedNodeHandles = MutableStateFlow<Set<Long>>(emptySet())
 
     val uiState: StateFlow<ViewedLinksUiState> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            monitorContentState(),
+            monitorOfflineModeUseCase().catch { Timber.e(it) },
+        ) { state, isOfflineMode ->
+            state.copy(isOfflineMode = isOfflineMode)
+        }.asUiStateFlow(
+            viewModelScope,
+            ViewedLinksUiState(),
+        )
+    }
+
+    private fun monitorContentState(): Flow<ViewedLinksUiState> =
         combine(
             monitorViewedLinksSortPreferenceUseCase()
                 .map { (field, direction) -> viewedLinksSortMapper(field, direction) },
@@ -111,11 +125,7 @@ internal class ViewedLinksViewModel @Inject constructor(
             )
         }.catch { e ->
             Timber.e(e, "Failed to build ViewedLinks UI state")
-        }.asUiStateFlow(
-            viewModelScope,
-            ViewedLinksUiState(),
-        )
-    }
+        }
 
     val pagedItems: Flow<PagingData<ViewedLinkUiItem>> by lazy(LazyThreadSafetyMode.NONE) {
         monitorViewedLinksSortPreferenceUseCase()

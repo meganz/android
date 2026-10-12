@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -15,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -36,21 +38,25 @@ class DoMoreWithMegaWidgetViewModelTest {
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val hasCameraSyncEnabledUseCase = mock<HasCameraSyncEnabledUseCase>()
     private val navigationEventQueue = mock<NavigationEventQueue>()
+    private val monitorOfflineModeUseCase = mock<MonitorOfflineModeUseCase>()
 
     private fun initViewModel(
         items: Set<DoMoreWithMegaItem> = emptySet(),
         isCameraUploadsEnabled: Boolean = false,
         hasPreviouslyEnabledCameraUploads: Boolean = false,
+        offlineMode: Flow<Boolean> = flowOf(false),
         applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher()),
     ) {
         whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled)
             .thenReturn(flowOf(isCameraUploadsEnabled))
         wheneverBlocking { hasCameraSyncEnabledUseCase() }
             .thenReturn(hasPreviouslyEnabledCameraUploads)
+        whenever(monitorOfflineModeUseCase()).thenReturn(offlineMode)
         underTest = DoMoreWithMegaWidgetViewModel(
             items = items,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             hasCameraSyncEnabledUseCase = hasCameraSyncEnabledUseCase,
+            monitorOfflineModeUseCase = monitorOfflineModeUseCase,
             navigationEventQueue = navigationEventQueue,
             applicationScope = applicationScope,
         )
@@ -152,6 +158,43 @@ class DoMoreWithMegaWidgetViewModelTest {
 
             assertThat(underTest.uiState.value.hasPreviouslyEnabledCameraUploads).isFalse()
         }
+
+    @Test
+    fun `test that uiState emits isOfflineMode true when the app is in offline mode`() =
+        runTest {
+            initViewModel(emptySet(), offlineMode = flowOf(true))
+            backgroundScope.launch { underTest.uiState.collect {} }
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.isOfflineMode).isTrue()
+        }
+
+    @Test
+    fun `test that uiState updates isOfflineMode when the offline mode changes`() = runTest {
+        val offlineMode = MutableStateFlow(false)
+        initViewModel(emptySet(), offlineMode = offlineMode)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isOfflineMode).isFalse()
+
+            offlineMode.value = true
+
+            assertThat(awaitItem().isOfflineMode).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that uiState emits items when monitoring offline mode fails`() = runTest {
+        val items = setOf(fakeItem(DoMoreWithMegaItem.Identifier.AddSync))
+        initViewModel(items, offlineMode = flow { throw RuntimeException() })
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.items.map { it.identifier })
+                .containsExactly(DoMoreWithMegaItem.Identifier.AddSync)
+            assertThat(state.isOfflineMode).isFalse()
+        }
+    }
 
     @Test
     fun `test that openCreatedAlbum emits AlbumContentNavKey through the navigation event queue`() =

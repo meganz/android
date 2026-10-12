@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.network.MonitorOfflineModeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
@@ -64,6 +65,7 @@ class ViewedLinksViewModelTest {
     private val monitorViewTypeUseCase = mock<MonitorViewType>()
     private val setViewTypeUseCase = mock<SetViewType>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val monitorOfflineModeUseCase = mock<MonitorOfflineModeUseCase>()
 
     private lateinit var underTest: ViewedLinksViewModel
 
@@ -91,7 +93,9 @@ class ViewedLinksViewModelTest {
         sortDirection: SortDirection = SortDirection.Descending,
         viewType: ViewType = ViewType.LIST,
         isConnected: Boolean = true,
+        isOfflineMode: Boolean = false,
     ) {
+        whenever(monitorOfflineModeUseCase()).thenReturn(flowOf(isOfflineMode))
         whenever(monitorViewedLinksSortPreferenceUseCase())
             .thenReturn(flowOf(sortField to sortDirection))
         whenever(monitorViewedLinksUseCase(any(), any())).thenAnswer { fakePagingSource(links) }
@@ -132,6 +136,7 @@ class ViewedLinksViewModelTest {
             monitorViewTypeUseCase = monitorViewTypeUseCase,
             setViewTypeUseCase = setViewTypeUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            monitorOfflineModeUseCase = monitorOfflineModeUseCase,
         )
     }
 
@@ -553,4 +558,24 @@ class ViewedLinksViewModelTest {
             override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ViewedLink> =
                 LoadResult.Page(data = items, prevKey = null, nextKey = null)
         }
+
+    @Test
+    fun `test that uiState reports offline mode when the app is offline`() = runTest {
+        initViewModel(links = emptyList(), isOfflineMode = true)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isOfflineMode).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that uiState does not report offline mode when the app is online`() = runTest {
+        initViewModel(links = emptyList(), isOfflineMode = false)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isOfflineMode).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }

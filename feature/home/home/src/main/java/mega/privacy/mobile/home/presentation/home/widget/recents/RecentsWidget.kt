@@ -50,6 +50,7 @@ import mega.privacy.android.navigation.destination.RecentsScreenNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.RecentsChildNodeMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.RecentsViewAllButtonPressedEvent
+import mega.privacy.mobile.home.presentation.home.rememberNoConnectionSnackbar
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsWidgetHeader
 import mega.privacy.mobile.home.presentation.recents.RecentsViewModel
 import mega.privacy.mobile.home.presentation.recents.RecentsWidgetConstants
@@ -94,6 +95,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
         var showOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
         val context = LocalContext.current
         val resources = LocalResources.current
+        val showNoConnectionSnackbar = rememberNoConnectionSnackbar()
         RecentsView(
             uiState = uiState,
             modifier = modifier,
@@ -124,7 +126,11 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             onWidgetOptionsClicked = { showOptionsBottomSheet = true },
             onShowRecentActivity = viewModel::showRecentActivity,
             onUploadClicked = {
-                navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
+                if (uiState.isOfflineMode) {
+                    showNoConnectionSnackbar()
+                } else {
+                    navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
+                }
             },
             onViewAllClicked = {
                 navigationHandler.navigate(RecentsScreenNavKey)
