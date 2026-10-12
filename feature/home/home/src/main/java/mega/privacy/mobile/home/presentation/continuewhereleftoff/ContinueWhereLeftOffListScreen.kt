@@ -59,9 +59,11 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -82,6 +84,10 @@ import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffClearHistoryDialogConfirmedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffClearHistoryMenuItemEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffListItemPressedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffMoreButtonPressedEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,6 +109,14 @@ internal fun ContinueWhereLeftOffListScreen(
     val coroutineScope = rememberCoroutineScope()
     var showClearConfirmationDialog by rememberSaveable { mutableStateOf(false) }
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
+    val onItemClicked = { item: ContinueWhereLeftOffItem ->
+        if (item.isTakenDown) {
+            showTakenDownDialog = true
+        } else {
+            Analytics.tracker.trackEvent(ContinueWhereLeftOffListItemPressedEvent)
+            viewModel.onItemClicked(item.nodeHandle, item.type)
+        }
+    }
 
     EventEffect(
         event = uiState.openNodeEvent,
@@ -126,6 +140,7 @@ internal fun ContinueWhereLeftOffListScreen(
                 navigationType = AppBarNavigationType.Back { onBack() },
                 actions = listOf(
                     MenuActionWithClick(CommonMenuAction.More) {
+                        Analytics.tracker.trackEvent(ContinueWhereLeftOffMoreButtonPressedEvent)
                         viewModel.showOptionsSheet()
                     }
                 ),
@@ -194,13 +209,7 @@ internal fun ContinueWhereLeftOffListScreen(
                             icon = iconForType(item.type),
                             isSensitive = item.isSensitive,
                             isTakenDown = item.isTakenDown,
-                            onItemClicked = {
-                                if (item.isTakenDown) {
-                                    showTakenDownDialog = true
-                                } else {
-                                    viewModel.onItemClicked(item.nodeHandle, item.type)
-                                }
-                            },
+                            onItemClicked = { onItemClicked(item) },
                         )
                     }
                 }
@@ -241,13 +250,7 @@ internal fun ContinueWhereLeftOffListScreen(
                             icon = iconForType(item.type),
                             isSensitive = item.isSensitive,
                             isTakenDown = item.isTakenDown,
-                            onItemClicked = {
-                                if (item.isTakenDown) {
-                                    showTakenDownDialog = true
-                                } else {
-                                    viewModel.onItemClicked(item.nodeHandle, item.type)
-                                }
-                            },
+                            onItemClicked = { onItemClicked(item) },
                         )
                     }
                 }
@@ -290,6 +293,7 @@ internal fun ContinueWhereLeftOffListScreen(
                 text = stringResource(sharedR.string.home_cwlo_clear_history),
                 icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
                 onActionClicked = {
+                    Analytics.tracker.trackEvent(ContinueWhereLeftOffClearHistoryMenuItemEvent)
                     viewModel.dismissOptionsSheet()
                     showClearConfirmationDialog = true
                 },
@@ -306,6 +310,7 @@ internal fun ContinueWhereLeftOffListScreen(
             positiveButtonText = stringResource(sharedR.string.general_clear),
             negativeButtonText = stringResource(sharedR.string.general_dismiss_dialog),
             onPositiveButtonClicked = {
+                Analytics.tracker.trackEvent(ContinueWhereLeftOffClearHistoryDialogConfirmedEvent)
                 showClearConfirmationDialog = false
                 viewModel.clearAll()
             },

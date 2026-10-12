@@ -14,10 +14,16 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import mega.android.core.ui.extensions.resetLaunchedOncePerAppEffect
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetDisplayedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetItemPressedEvent
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,6 +34,9 @@ class ContinueWhereLeftOffCarouselTest {
     @get:Rule
     val composeRule = createComposeRule()
 
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
+
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val pdfItem = ContinueWhereLeftOffItem(
@@ -36,6 +45,88 @@ class ContinueWhereLeftOffCarouselTest {
         type = RecentlyUsedType.PDF,
         lastAccessedTimestamp = 1712880000L,
     )
+
+    @Before
+    fun setUp() {
+        resetLaunchedOncePerAppEffect(CONTINUE_WHERE_LEFT_OFF_IMPRESSION_KEY)
+    }
+
+    @After
+    fun tearDown() {
+        resetLaunchedOncePerAppEffect(CONTINUE_WHERE_LEFT_OFF_IMPRESSION_KEY)
+    }
+
+    @Test
+    fun `test that widget displayed event is tracked when items is not empty`() {
+        setContent(items = listOf(pdfItem))
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events).containsExactly(ContinueWhereLeftOffWidgetDisplayedEvent)
+    }
+
+    @Test
+    fun `test that widget displayed event is not tracked when items is empty`() {
+        setContent(items = emptyList())
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events).doesNotContain(ContinueWhereLeftOffWidgetDisplayedEvent)
+    }
+
+    @Test
+    fun `test that widget displayed event is not tracked when isLoading is true`() {
+        setContent(items = listOf(pdfItem), isLoading = true)
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events).doesNotContain(ContinueWhereLeftOffWidgetDisplayedEvent)
+    }
+
+    @Test
+    fun `test that widget displayed event is tracked only once when the carousel re-enters composition`() {
+        val isShown = mutableStateOf(true)
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                if (isShown.value) {
+                    ContinueWhereLeftOffCarousel(
+                        items = listOf(pdfItem),
+                        isLoading = false,
+                        onItemClick = {},
+                        onViewAllClick = {},
+                    )
+                }
+            }
+        }
+        composeRule.waitForIdle()
+        isShown.value = false
+        composeRule.waitForIdle()
+        isShown.value = true
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events.count { it == ContinueWhereLeftOffWidgetDisplayedEvent })
+            .isEqualTo(1)
+    }
+
+    @Test
+    fun `test that widget item pressed event is tracked when an item is clicked`() {
+        var clickedItem: ContinueWhereLeftOffItem? = null
+        setContent(items = listOf(pdfItem), onItemClick = { clickedItem = it })
+
+        composeRule.onNodeWithText(pdfItem.title).performClick()
+
+        assertThat(clickedItem).isEqualTo(pdfItem)
+        assertThat(analyticsRule.events).contains(ContinueWhereLeftOffWidgetItemPressedEvent)
+    }
+
+    @Test
+    fun `test that widget item pressed event is not tracked when a taken down item is clicked`() {
+        var clickedItem: ContinueWhereLeftOffItem? = null
+        val takenDownItem = pdfItem.copy(isTakenDown = true)
+        setContent(items = listOf(takenDownItem), onItemClick = { clickedItem = it })
+
+        composeRule.onNodeWithText(takenDownItem.title).performClick()
+
+        assertThat(clickedItem).isNull()
+        assertThat(analyticsRule.events).doesNotContain(ContinueWhereLeftOffWidgetItemPressedEvent)
+    }
 
     @Test
     fun `test that title is displayed when items is empty`() {

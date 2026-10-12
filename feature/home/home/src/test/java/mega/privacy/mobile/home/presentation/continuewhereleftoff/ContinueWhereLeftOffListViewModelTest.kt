@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
@@ -29,10 +30,21 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.SetContinueWhere
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.mobile.analytics.core.event.identifier.ItemSelectedEventIdentifier
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffGridViewSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffListViewSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffSortByDateNewestSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffSortByDateOldestSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffSortByNameAscendingSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffSortByNameDescendingSelectedEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
@@ -44,6 +56,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 class ContinueWhereLeftOffListViewModelTest {
@@ -626,6 +639,45 @@ class ContinueWhereLeftOffListViewModelTest {
         )
     }
 
+    @ParameterizedTest(name = "{0} {1}")
+    @MethodSource("provideSortEvents")
+    fun `test that updateSortConfiguration tracks the matching sort selected event`(
+        sortOption: NodeSortOption,
+        sortDirection: SortDirection,
+        expected: ItemSelectedEventIdentifier,
+    ) = runTest {
+        stubEmptyItems()
+
+        underTest.updateSortConfiguration(NodeSortConfiguration(sortOption, sortDirection))
+
+        assertThat(analyticsExtension.events).containsExactly(expected)
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClicked tracks grid view selected when switching to GRID`() =
+        runTest {
+            stubEmptyItems()
+
+            underTest.onChangeViewTypeClicked()
+
+            assertThat(analyticsExtension.events)
+                .containsExactly(ContinueWhereLeftOffGridViewSelectedEvent)
+        }
+
+    @Test
+    fun `test that onChangeViewTypeClicked tracks list view selected when switching back to LIST`() =
+        runTest {
+            stubEmptyItems()
+
+            underTest.onChangeViewTypeClicked()
+            underTest.onChangeViewTypeClicked()
+
+            assertThat(analyticsExtension.events).containsExactly(
+                ContinueWhereLeftOffGridViewSelectedEvent,
+                ContinueWhereLeftOffListViewSelectedEvent,
+            )
+        }
+
     private fun stubSortPreference(
         sortField: ContinueWhereLeftOffSortField,
         sortDirection: SortDirection,
@@ -664,4 +716,34 @@ class ContinueWhereLeftOffListViewModelTest {
         items: List<ContinueWhereLeftOffItem>,
         isHiddenResolved: Boolean = true,
     ) = ContinueWhereLeftOffResult(items = items, isHiddenResolved = isHiddenResolved)
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+
+        @JvmStatic
+        fun provideSortEvents(): Stream<Arguments> = Stream.of(
+            Arguments.of(
+                NodeSortOption.Name,
+                SortDirection.Ascending,
+                ContinueWhereLeftOffSortByNameAscendingSelectedEvent,
+            ),
+            Arguments.of(
+                NodeSortOption.Name,
+                SortDirection.Descending,
+                ContinueWhereLeftOffSortByNameDescendingSelectedEvent,
+            ),
+            Arguments.of(
+                NodeSortOption.LastAccessed,
+                SortDirection.Descending,
+                ContinueWhereLeftOffSortByDateNewestSelectedEvent,
+            ),
+            Arguments.of(
+                NodeSortOption.LastAccessed,
+                SortDirection.Ascending,
+                ContinueWhereLeftOffSortByDateOldestSelectedEvent,
+            ),
+        )
+    }
 }

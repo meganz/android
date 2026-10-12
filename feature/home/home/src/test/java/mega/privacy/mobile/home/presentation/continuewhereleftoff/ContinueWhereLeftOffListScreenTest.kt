@@ -11,13 +11,23 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
+import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffClearHistoryDialogConfirmedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffClearHistoryMenuItemEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffListItemPressedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffMoreButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -29,10 +39,107 @@ class ContinueWhereLeftOffListScreenTest {
     @get:Rule
     val composeRule = createComposeRule()
 
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
+
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val viewModel = mock<ContinueWhereLeftOffListViewModel>()
     private val transferHandler = mock<TransferHandler>()
+
+    private val pdfItem = ContinueWhereLeftOffItem(
+        nodeHandle = 1L,
+        title = "Document.pdf",
+        type = RecentlyUsedType.PDF,
+        lastAccessedTimestamp = 1712880000L,
+    )
+
+    @Test
+    fun `test that more button pressed event is tracked when more menu is clicked`() {
+        setContent(ContinueWhereLeftOffListUiState(isLoading = false))
+
+        composeRule.onNodeWithTag(CommonMenuAction.More.testTag, useUnmergedTree = true)
+            .performClick()
+
+        assertThat(analyticsRule.events).contains(ContinueWhereLeftOffMoreButtonPressedEvent)
+        verify(viewModel).showOptionsSheet()
+    }
+
+    @Test
+    fun `test that clear history menu item event is tracked when clear history is clicked`() {
+        setContent(ContinueWhereLeftOffListUiState(isLoading = false, showOptionsSheet = true))
+
+        composeRule.onNodeWithTag(CLEAR_HISTORY_TAG, useUnmergedTree = true).performClick()
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events).contains(ContinueWhereLeftOffClearHistoryMenuItemEvent)
+        assertThat(analyticsRule.events)
+            .doesNotContain(ContinueWhereLeftOffClearHistoryDialogConfirmedEvent)
+    }
+
+    @Test
+    fun `test that clear history dialog confirmed event is tracked when clear is confirmed`() {
+        setContent(ContinueWhereLeftOffListUiState(isLoading = false, showOptionsSheet = true))
+
+        composeRule.onNodeWithTag(CLEAR_HISTORY_TAG, useUnmergedTree = true).performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_clear)).performClick()
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events)
+            .contains(ContinueWhereLeftOffClearHistoryDialogConfirmedEvent)
+    }
+
+    @Test
+    fun `test that clear history dialog confirmed event is not tracked when the dialog is dismissed`() {
+        setContent(ContinueWhereLeftOffListUiState(isLoading = false, showOptionsSheet = true))
+
+        composeRule.onNodeWithTag(CLEAR_HISTORY_TAG, useUnmergedTree = true).performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_dismiss_dialog))
+            .performClick()
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events)
+            .doesNotContain(ContinueWhereLeftOffClearHistoryDialogConfirmedEvent)
+    }
+
+    @Test
+    fun `test that list item pressed event is tracked when an item is clicked in list view`() {
+        setContent(ContinueWhereLeftOffListUiState(isLoading = false, items = listOf(pdfItem)))
+
+        composeRule.onNodeWithText(pdfItem.title).performClick()
+
+        assertThat(analyticsRule.events).contains(ContinueWhereLeftOffListItemPressedEvent)
+        verify(viewModel).onItemClicked(pdfItem.nodeHandle, pdfItem.type)
+    }
+
+    @Test
+    fun `test that list item pressed event is tracked when an item is clicked in grid view`() {
+        setContent(
+            ContinueWhereLeftOffListUiState(
+                isLoading = false,
+                items = listOf(pdfItem),
+                currentViewType = ViewType.GRID,
+            )
+        )
+
+        composeRule.onNodeWithText(pdfItem.title).performClick()
+
+        assertThat(analyticsRule.events).contains(ContinueWhereLeftOffListItemPressedEvent)
+        verify(viewModel).onItemClicked(pdfItem.nodeHandle, pdfItem.type)
+    }
+
+    @Test
+    fun `test that list item pressed event is not tracked when a taken down item is clicked`() {
+        val takenDownItem = pdfItem.copy(isTakenDown = true)
+        setContent(ContinueWhereLeftOffListUiState(isLoading = false, items = listOf(takenDownItem)))
+
+        composeRule.onNodeWithText(takenDownItem.title).performClick()
+
+        assertThat(analyticsRule.events).doesNotContain(ContinueWhereLeftOffListItemPressedEvent)
+        verify(viewModel, never()).onItemClicked(any(), any())
+    }
 
     @Test
     fun `test that clear history option is displayed when more menu is clicked`() {

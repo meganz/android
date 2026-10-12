@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
@@ -35,6 +37,13 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.mobile.analytics.core.event.identifier.ItemSelectedEventIdentifier
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffGridViewSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffListViewSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffSortByDateNewestSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffSortByDateOldestSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffSortByNameAscendingSelectedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffSortByNameDescendingSelectedEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -115,6 +124,7 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     }
 
     fun updateSortConfiguration(configuration: NodeSortConfiguration) {
+        Analytics.tracker.trackEvent(configuration.toSortSelectedEvent())
         uiAction.update { it.copy(showSortSheet = false) }
         viewModelScope.launch {
             runCatching {
@@ -127,7 +137,7 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     }
 
     fun onChangeViewTypeClicked() {
-        uiAction.update { current ->
+        val updated = uiAction.updateAndGet { current ->
             current.copy(
                 currentViewType = when (current.currentViewType) {
                     ViewType.LIST -> ViewType.GRID
@@ -135,6 +145,12 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
                 },
             )
         }
+        Analytics.tracker.trackEvent(
+            when (updated.currentViewType) {
+                ViewType.LIST -> ContinueWhereLeftOffListViewSelectedEvent
+                ViewType.GRID -> ContinueWhereLeftOffGridViewSelectedEvent
+            }
+        )
     }
 
     fun showSortSheet() {
@@ -200,6 +216,24 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
 
     companion object {
         private const val MAX_LIST_ITEMS = 50
+
+        /**
+         * Maps a sort selection to its analytics event. The CWLO sort sheet only offers Name and
+         * Last accessed (shown as "Date"), and anything else is treated as Last accessed, the
+         * same as [toCwloSortField].
+         */
+        private fun NodeSortConfiguration.toSortSelectedEvent(): ItemSelectedEventIdentifier =
+            when (sortOption) {
+                NodeSortOption.Name -> when (sortDirection) {
+                    SortDirection.Ascending -> ContinueWhereLeftOffSortByNameAscendingSelectedEvent
+                    SortDirection.Descending -> ContinueWhereLeftOffSortByNameDescendingSelectedEvent
+                }
+
+                else -> when (sortDirection) {
+                    SortDirection.Descending -> ContinueWhereLeftOffSortByDateNewestSelectedEvent
+                    SortDirection.Ascending -> ContinueWhereLeftOffSortByDateOldestSelectedEvent
+                }
+            }
 
         private fun NodeSortOption.toCwloSortField(): ContinueWhereLeftOffSortField =
             when (this) {

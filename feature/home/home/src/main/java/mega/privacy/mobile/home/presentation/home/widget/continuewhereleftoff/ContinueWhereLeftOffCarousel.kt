@@ -40,6 +40,7 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.extensions.LaunchedOncePerAppEffect
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -47,6 +48,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
@@ -58,6 +60,8 @@ import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetDisplayedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetItemPressedEvent
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.DurationBadge
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.iconForType
 
@@ -84,6 +88,11 @@ internal fun ContinueWhereLeftOffCarousel(
         } else if (items.isEmpty()) {
             ContinueWhereLeftOffEmptyView()
         } else {
+            // Once per process: the widget leaves and re-enters composition whenever Home is
+            // scrolled past it or navigated away from, which would otherwise inflate the count.
+            LaunchedOncePerAppEffect(CONTINUE_WHERE_LEFT_OFF_IMPRESSION_KEY) {
+                Analytics.tracker.trackEvent(ContinueWhereLeftOffWidgetDisplayedEvent)
+            }
             val listState = rememberLazyListState()
             // Keyed items keep the scroll anchored to the previously visible item, so when a
             // new most recent item is added (or moved) to the front it stays off-screen.
@@ -119,6 +128,9 @@ internal fun ContinueWhereLeftOffCarousel(
                             if (item.isTakenDown) {
                                 showTakenDownDialog = true
                             } else {
+                                Analytics.tracker.trackEvent(
+                                    ContinueWhereLeftOffWidgetItemPressedEvent
+                                )
                                 onItemClick(item)
                             }
                         },
@@ -443,6 +455,8 @@ private fun ContinueWhereLeftOffCarouselLoadingPreview() {
         )
     }
 }
+
+internal const val CONTINUE_WHERE_LEFT_OFF_IMPRESSION_KEY = "continue_where_left_off_impression"
 
 // The carousel renders at most this many cards; when there are more items a "More" tile is
 // appended that opens the full list (T21373295).
