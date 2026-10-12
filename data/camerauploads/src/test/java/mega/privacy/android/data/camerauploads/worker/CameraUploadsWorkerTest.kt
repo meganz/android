@@ -1460,6 +1460,34 @@ internal class CameraUploadsWorkerTest {
         }
 
     @Test
+    fun `test that doWork does not scan or upload files when wifi requirement is not satisfied`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            setupDefaultProcessingFilesConditionMocks(listOf(mock()))
+            whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+            whenever(isWifiNotSatisfiedUseCase()).thenReturn(true)
+
+            underTest.doWork()
+
+            verify(processCameraUploadsMediaUseCase, never()).invoke(any())
+            verifyNoInteractions(uploadCameraUploadsRecordsUseCase)
+        }
+
+    @Test
+    fun `test that doWork does not scan or upload files when charging requirement is not satisfied`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            setupDefaultProcessingFilesConditionMocks(listOf(mock()))
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
+            whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(true))
+
+            underTest.doWork()
+
+            verify(processCameraUploadsMediaUseCase, never()).invoke(any())
+            verifyNoInteractions(uploadCameraUploadsRecordsUseCase)
+        }
+
+    @Test
     fun `test that worker returns failure when connection is lost`() = runTest {
         setupDefaultCheckConditionMocks()
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))

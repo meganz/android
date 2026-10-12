@@ -13,10 +13,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -328,14 +328,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     private var monitorCrossDeviceFolderConflictsJob: Job? = null
 
     /**
-     * Job to retrieve files to upload
+     * Job to retrieve and upload files
      */
-    private var retrieveFilesJob: Job? = null
-
-    /**
-     * Job to upload files
-     */
-    private var uploadJob: Job? = null
+    private var processJob: Job? = null
 
     /**
      * Flag to detect if the worker received an internal signal to abort
@@ -364,6 +359,26 @@ class CameraUploadsWorker @AssistedInject constructor(
             }
 
             if (canRunCameraUploads()) {
+                val workerScope = this
+                // Assigned before the monitors start, as they can abort the work on their first emission
+                val processJob = launch(start = CoroutineStart.LAZY) {
+                    val primaryUploadNodeId =
+                        NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+                    val secondaryUploadNodeId =
+                        NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+
+                    scanFiles()
+                    getAndPrepareRecords(
+                        primaryUploadNodeId,
+                        secondaryUploadNodeId,
+                    )?.let {
+                        monitorUploadPauseStatusJob = workerScope.monitorUploadPauseStatus()
+                        sendBackupHeartbeatJob = workerScope.sendPeriodicBackupHeartBeat()
+                        uploadFiles(it, primaryUploadNodeId, secondaryUploadNodeId, tempRoot)
+                    }
+                }
+                this@CameraUploadsWorker.processJob = processJob
+
                 monitorConnectivityStatusJob = monitorConnectivityStatus()
                 monitorBatteryLevelAndChargingStatusesJob =
                     monitorBatteryLevelAndChargingStatusesJob()
@@ -376,29 +391,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 Timber.d("Starting upload process")
                 sendStartUploadStatus()
 
-                val primaryUploadNodeId =
-                    NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
-                val secondaryUploadNodeId =
-                    NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
-
-                val deferredRecords = async {
-                    scanFiles()
-                    getAndPrepareRecords(
-                        primaryUploadNodeId,
-                        secondaryUploadNodeId,
-                    )
-                }
-                retrieveFilesJob = deferredRecords
-                val records = deferredRecords.await()
-
-                records?.let {
-                    monitorUploadPauseStatusJob = monitorUploadPauseStatus()
-                    sendBackupHeartbeatJob = sendPeriodicBackupHeartBeat()
-                    uploadJob = launch {
-                        uploadFiles(it, primaryUploadNodeId, secondaryUploadNodeId, tempRoot)
-                    }
-                    uploadJob?.join()
-                }
+                processJob.join()
             }
         }.onFailure { throwable ->
             withContext(NonCancellable) {
@@ -1461,10 +1454,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         finishedReason = reason
         this@CameraUploadsWorker.restartMode = restartMode
 
-        listOf(
-            retrieveFilesJob,
-            uploadJob,
-        ).forEach { it?.cancelAndJoin() }
+        processJob?.cancelAndJoin()
     }
 
     /**
@@ -1493,8 +1483,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private suspend fun cancelJobs() {
         listOf(
-            retrieveFilesJob,
-            uploadJob,
+            processJob,
             monitorUploadPauseStatusJob,
             monitorConnectivityStatusJob,
             monitorBatteryLevelAndChargingStatusesJob,
