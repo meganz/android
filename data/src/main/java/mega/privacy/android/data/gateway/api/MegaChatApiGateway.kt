@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.model.ChatNodeHistoryUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -343,6 +344,20 @@ interface MegaChatApiGateway {
      * Opens a chat room and starts getting updates.
      */
     fun openChatRoom(chatId: Long): Flow<ChatRoomUpdate>
+
+    /**
+     * Opens the node history of a chat room and emits its updates while collected.
+     *
+     * Every call for the same chat returns the same shared flow, so there is at most one open node
+     * history per chat. The node history stays open for as long as the flow has collectors and is
+     * closed once the last collector stops. Every collector receives [ChatNodeHistoryUpdate.Opened] once the
+     * history is open, possibly more than once. The flow fails with a ChatRoomDoesNotExistException if the node
+     * history cannot be opened.
+     *
+     * @param chatId The chat id.
+     * @return Flow of [ChatNodeHistoryUpdate].
+     */
+    fun monitorNodeHistory(chatId: Long): Flow<ChatNodeHistoryUpdate>
 
     /**
      * Gets a chat conversation if exists.
@@ -1063,6 +1078,20 @@ interface MegaChatApiGateway {
      * The value MegaChatApi::SOURCE_REMOTE can be used to show a progress bar accordingly when network operation occurs.
      */
     suspend fun loadMessages(chatId: Long, count: Int): Int
+
+    /**
+     * Initiates fetching more node history of the specified chat room.
+     *
+     * Call only after [monitorNodeHistory] has emitted [ChatNodeHistoryUpdate.Opened]. The loaded messages
+     * are emitted one by one, from newest to oldest, as [ChatNodeHistoryUpdate.Loaded], followed
+     * by a [ChatNodeHistoryUpdate.Loaded] with a null message once the batch has been delivered.
+     *
+     * @param chatId The chat id.
+     * @param count The number of requested messages to load.
+     * @return The source of the messages that are going to be fetched, one of the
+     * MegaChatApi SOURCE_* values.
+     */
+    fun loadAttachments(chatId: Long, count: Int): Int
 
     /**
      * Set your online status.

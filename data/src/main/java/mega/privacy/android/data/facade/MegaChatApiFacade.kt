@@ -2,21 +2,27 @@ package mega.privacy.android.data.facade
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.IgnoredChatRequestListener
+import mega.privacy.android.data.model.ChatNodeHistoryUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
+import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
@@ -27,6 +33,7 @@ import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatNodeHistoryListenerInterface
 import nz.mega.sdk.MegaChatNotificationListenerInterface
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatPresenceConfig
@@ -42,6 +49,7 @@ import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaStringList
 import timber.log.Timber
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 /**
@@ -231,6 +239,78 @@ internal class MegaChatApiFacade @Inject constructor(
             }
         }
     }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
+    private val openNodeHistoryChatIds = ConcurrentHashMap.newKeySet<Long>()
+
+    private val nodeHistoryFlows = ConcurrentHashMap<Long, Flow<ChatNodeHistoryUpdate>>()
+
+    // shareIn rethrows upstream failures in the sharing scope instead of delivering them to
+    // collectors, so the open failure travels as a value and is rethrown after sharing.
+    // The listener cannot suspend, so the buffer is unbounded to never drop a callback while a
+    // collector is busy.
+    // A subscriber joining an already open history would never see Opened from upstream, so it
+    // gets its own on subscription; one subscribing while the history opens may see it twice.
+    // The SDK allows a single open node history per chat, so every caller for a chat shares one
+    // pipeline: a second pipeline's close-then-open would silently close the first one's history.
+    override fun monitorNodeHistory(chatId: Long): Flow<ChatNodeHistoryUpdate> =
+        nodeHistoryFlows.computeIfAbsent(chatId) { createNodeHistoryFlow(it) }
+
+    private fun createNodeHistoryFlow(chatId: Long): Flow<ChatNodeHistoryUpdate> =
+        callbackFlow<Result<ChatNodeHistoryUpdate>> {
+            val listener = object : MegaChatNodeHistoryListenerInterface {
+                override fun onAttachmentLoaded(api: MegaChatApiJava?, msg: MegaChatMessage?) {
+                    trySend(Result.success(ChatNodeHistoryUpdate.Loaded(msg)))
+                }
+
+                override fun onAttachmentReceived(api: MegaChatApiJava?, msg: MegaChatMessage) {
+                    trySend(Result.success(ChatNodeHistoryUpdate.Received(msg)))
+                }
+
+                override fun onAttachmentDeleted(api: MegaChatApiJava?, msgid: Long) {
+                    trySend(Result.success(ChatNodeHistoryUpdate.Deleted(msgid)))
+                }
+
+                override fun onTruncate(api: MegaChatApiJava?, msgid: Long) {
+                    trySend(Result.success(ChatNodeHistoryUpdate.Truncated(msgid)))
+                }
+            }
+
+            var opened = false
+            try {
+                nodeHistoryListenerMutex.withLock {
+                    chatApi.closeNodeHistory(chatId, listener)
+                    opened = chatApi.openNodeHistory(chatId, listener)
+                    Timber.d("Open node history $chatId: $opened")
+                }
+                if (opened) {
+                    openNodeHistoryChatIds.add(chatId)
+                    send(Result.success(ChatNodeHistoryUpdate.Opened))
+                } else {
+                    send(Result.failure(ChatRoomDoesNotExistException()))
+                    close()
+                }
+                awaitClose()
+            } finally {
+                if (opened) {
+                    Timber.d("Close node history $chatId")
+                    openNodeHistoryChatIds.remove(chatId)
+                    withContext(NonCancellable) {
+                        nodeHistoryListenerMutex.withLock {
+                            chatApi.removeNodeHistoryListener(chatId, listener)
+                            chatApi.closeNodeHistory(chatId, listener)
+                        }
+                    }
+                }
+            }
+        }.buffer(Channel.UNLIMITED)
+            .shareIn(sharingScope, SharingStarted.WhileSubscribed())
+            .onSubscription {
+                if (chatId in openNodeHistoryChatIds) emit(Result.success(ChatNodeHistoryUpdate.Opened))
+            }
+            .map { it.getOrThrow() }
+
+    override fun loadAttachments(chatId: Long, count: Int): Int =
+        chatApi.loadAttachments(chatId, count)
 
     override suspend fun requestLastGreen(userHandle: Long) =
         chatApi.requestLastGreen(userHandle)
@@ -1000,5 +1080,12 @@ internal class MegaChatApiFacade @Inject constructor(
          * the new listener.
          */
         private val chatRoomListenerMutex = Mutex()
+
+        /**
+         * Serialises [MegaChatApiJava.openNodeHistory] and [MegaChatApiJava.closeNodeHistory] so
+         * the close of a finished collection always completes before the next open: the SDK
+         * throws when a node history is opened while one is still open for the same chat.
+         */
+        private val nodeHistoryListenerMutex = Mutex()
     }
 }

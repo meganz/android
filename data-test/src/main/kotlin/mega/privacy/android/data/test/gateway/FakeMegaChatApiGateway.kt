@@ -7,8 +7,10 @@ import kotlin.reflect.KFunction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.model.ChatNodeHistoryUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -92,6 +94,8 @@ class FakeMegaChatApiGateway(
         MutableSharedFlow<ScheduledMeetingUpdate>(extraBufferCapacity = 64)
     private val chatRoomUpdateFlows =
         ConcurrentHashMap<Long, MutableSharedFlow<ChatRoomUpdate>>()
+    private val nodeHistoryUpdateFlows =
+        ConcurrentHashMap<Long, MutableSharedFlow<ChatNodeHistoryUpdate>>()
     private val historyCursors = ConcurrentHashMap<Long, Int>()
     private val nextMessageId = AtomicLong(FIRST_GENERATED_MESSAGE_ID)
     private val localVideoUpdateFlows =
@@ -183,6 +187,12 @@ class FakeMegaChatApiGateway(
         chatRoomUpdateFlow(chatId).emit(update)
 
     /**
+     * Emit an update into the flow returned by [monitorNodeHistory] for [chatId].
+     */
+    suspend fun emitNodeHistoryUpdate(chatId: Long, update: ChatNodeHistoryUpdate) =
+        nodeHistoryUpdateFlow(chatId).emit(update)
+
+    /**
      * Deliver a new incoming [message] to [chatId] as the SDK would deliver a live message:
      * the message is appended to the seeded history in [chatState] and emitted as
      * [ChatRoomUpdate.OnMessageReceived] into the flow returned by [openChatRoom].
@@ -207,6 +217,9 @@ class FakeMegaChatApiGateway(
 
     private fun chatRoomUpdateFlow(chatId: Long) =
         chatRoomUpdateFlows.getOrPut(chatId) { MutableSharedFlow(extraBufferCapacity = 64) }
+
+    private fun nodeHistoryUpdateFlow(chatId: Long) =
+        nodeHistoryUpdateFlows.getOrPut(chatId) { MutableSharedFlow(extraBufferCapacity = 64) }
 
     private fun localVideoUpdateFlow(chatId: Long) =
         localVideoUpdateFlows.getOrPut(chatId) { MutableSharedFlow(extraBufferCapacity = 64) }
@@ -524,6 +537,22 @@ class FakeMegaChatApiGateway(
     override fun openChatRoom(chatId: Long): Flow<ChatRoomUpdate> =
         engine.dispatchBlocking(MegaChatApiGateway::openChatRoom, listOf(chatId)) {
             chatRoomUpdateFlow(chatId)
+        }
+
+    override fun monitorNodeHistory(chatId: Long): Flow<ChatNodeHistoryUpdate> =
+        engine.dispatchBlocking(MegaChatApiGateway::monitorNodeHistory, listOf(chatId)) {
+            nodeHistoryUpdateFlow(chatId).onSubscription { emit(ChatNodeHistoryUpdate.Opened) }
+        }
+
+    /**
+     * Unstubbed, answers as an empty node history: only the null terminator is emitted and
+     * [MegaChatApi.SOURCE_NONE] is returned. Emit loaded attachments through
+     * [emitNodeHistoryUpdate] to simulate a non-empty history.
+     */
+    override fun loadAttachments(chatId: Long, count: Int): Int =
+        engine.dispatchBlocking(MegaChatApiGateway::loadAttachments, listOf(chatId, count)) {
+            nodeHistoryUpdateFlow(chatId).tryEmit(ChatNodeHistoryUpdate.Loaded(null))
+            MegaChatApi.SOURCE_NONE
         }
 
     override fun getChatRoom(chatId: Long): MegaChatRoom? =
