@@ -37,7 +37,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LocalMegaScaffoldTopBanner
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.android.core.ui.theme.AndroidTheme
@@ -54,13 +53,12 @@ import mega.privacy.android.app.appstate.content.navigation.view.StorageQuotaWar
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
-import mega.privacy.android.app.appstate.global.call.rememberOngoingCallBanner
+import mega.privacy.android.app.appstate.global.call.ProvideAppShellLocals
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaWarningEffect
 import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.util.show
-import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerHost
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
@@ -84,7 +82,6 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
-import mega.privacy.android.navigation.contract.state.LocalMiniAudioPlayer
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
@@ -245,7 +242,6 @@ class MegaActivity : FragmentActivity() {
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
             val requestStatusProgressViewModel = hiltViewModel<RequestStatusProgressViewModel>()
             val loginViewModel = hiltViewModel<LoginViewModel>()
-            val ongoingCallBanner = rememberOngoingCallBanner()
 
             val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
             val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()
@@ -373,57 +369,52 @@ class MegaActivity : FragmentActivity() {
 
                                 CompositionLocalProvider(
                                     LocalSnackBarHostState provides snackbarHostState,
-                                    LocalMegaScaffoldTopBanner provides ongoingCallBanner,
-                                    LocalMiniAudioPlayer provides { modifier, applyNavigationBarsPadding ->
-                                        MiniAudioPlayerHost(
-                                            modifier = modifier,
-                                            applyNavigationBarsPadding = applyNavigationBarsPadding,
-                                        )
-                                    },
                                 ) {
-                                    if (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
-                                            currentNavKey
+                                    ProvideAppShellLocals {
+                                        if (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
+                                                currentNavKey
+                                            )
+                                        ) {
+                                            SnackbarLifetimeController()
+                                        }
+                                        MegaNavDisplay(
+                                            backStack = backStack,
+                                            navigationHandler = navigationHandler,
+                                            graphstate = graphstate,
+                                            transferHandler = transferHandler,
+                                            loginViewModel = loginViewModel,
+                                            emitNavigationEvent = { event ->
+                                                when (event) {
+                                                    is NavigationQueueEvent -> navigationEventQueue.emit(
+                                                        navKeys = event.keys,
+                                                        navOptions = event.navOptions,
+                                                    )
+
+                                                    is AppDialogEvent -> appDialogsEventQueue.emit(
+                                                        event
+                                                    )
+                                                }
+                                            },
+                                            onFinish = ::finish,
                                         )
-                                    ) {
-                                        SnackbarLifetimeController()
-                                    }
-                                    MegaNavDisplay(
-                                        backStack = backStack,
-                                        navigationHandler = navigationHandler,
-                                        graphstate = graphstate,
-                                        transferHandler = transferHandler,
-                                        loginViewModel = loginViewModel,
-                                        emitNavigationEvent = { event ->
-                                            when (event) {
-                                                is NavigationQueueEvent -> navigationEventQueue.emit(
-                                                    navKeys = event.keys,
-                                                    navOptions = event.navOptions,
-                                                )
 
-                                                is AppDialogEvent -> appDialogsEventQueue.emit(
-                                                    event
-                                                )
-                                            }
-                                        },
-                                        onFinish = ::finish,
-                                    )
-
-                                    StartTransferComponent(
-                                        event = transferState.transferEvent,
-                                        onConsumeEvent = appTransferViewModel::consumedTransferEvent,
-                                        isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
-                                    )
-
-                                    if (currentNavKey !is HomeScreensNavKey && (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
-                                            currentNavKey
-                                        ))
-                                    ) {
-                                        RequestStatusProgressContainer(
-                                            viewModel = requestStatusProgressViewModel,
-                                            modifier = Modifier
-                                                .align(Alignment.BottomCenter)
-                                                .navigationBarsPadding(),
+                                        StartTransferComponent(
+                                            event = transferState.transferEvent,
+                                            onConsumeEvent = appTransferViewModel::consumedTransferEvent,
+                                            isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
                                         )
+
+                                        if (currentNavKey !is HomeScreensNavKey && (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
+                                                currentNavKey
+                                            ))
+                                        ) {
+                                            RequestStatusProgressContainer(
+                                                viewModel = requestStatusProgressViewModel,
+                                                modifier = Modifier
+                                                    .align(Alignment.BottomCenter)
+                                                    .navigationBarsPadding(),
+                                            )
+                                        }
                                     }
                                 }
 

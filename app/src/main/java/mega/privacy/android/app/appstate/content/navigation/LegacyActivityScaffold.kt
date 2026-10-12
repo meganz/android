@@ -23,6 +23,7 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
+import mega.privacy.android.app.appstate.global.call.ProvideAppShellLocals
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaWarningEffect
 import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.util.show
@@ -42,7 +43,8 @@ import kotlin.reflect.KClass
  * Shared scaffolding for activities that host their own back stack outside the
  * [mega.privacy.android.app.appstate.MegaActivity] single-activity shell. Wraps the body in
  * [container], builds a persisted [NavigationHandler] via [rememberLegacyActivityNavigation],
- * sets up snackbar/transfer/dialog/bottom-sheet plumbing, and renders a [NavDisplay] that
+ * sets up snackbar/transfer/dialog/bottom-sheet plumbing, provides the app-shell locals through
+ * [ProvideAppShellLocals] like the single-activity shell does, and renders a [NavDisplay] that
  * registers [featureDestinations] (minus [excludeOwnDestination]) and [appDialogDestinations]
  * alongside the activity's own entries from [entryContent].
  *
@@ -115,62 +117,64 @@ fun LegacyActivityScaffold(
         val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
         CompositionLocalProvider(LocalSnackBarHostState provides snackbarHostState) {
-            SnackbarLifetimeController()
+            ProvideAppShellLocals {
+                SnackbarLifetimeController()
 
-            // The global snackbar queue is consumed by the foreground activity; without
-            // this, messages queued here would stay pending until MegaActivity returns.
-            val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
-            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
-            EventEffect(
-                event = snackbarEventsState,
-                onConsumed = snackbarEventsViewModel::consumeEvent,
-                action = { snackbarHostState.show(it.attributes) },
-            )
+                // The global snackbar queue is consumed by the foreground activity; without
+                // this, messages queued here would stay pending until MegaActivity returns.
+                val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
+                val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
+                EventEffect(
+                    event = snackbarEventsState,
+                    onConsumed = snackbarEventsViewModel::consumeEvent,
+                    action = { snackbarHostState.show(it.attributes) },
+                )
 
-            NavDisplay(
-                // Mirrors [mega.privacy.android.app.appstate.MegaActivity], so test tags set by
-                // destinations hosted here are matchable as resource ids by UiAutomator instead of
-                // forcing instrumented tests onto user-visible text.
-                modifier = Modifier.semantics { testTagsAsResourceId = true },
-                backStack = backStack,
-                onBack = { navigationHandler.back() },
-                sceneStrategies = listOf(dialogStrategy, bottomSheetStrategy),
-                entryDecorators = listOf(
-                    rememberSaveableStateHolderNavEntryDecorator(),
-                    rememberSharedViewModelStoreNavEntryDecorator(),
-                    rememberRetainedValuesStoreNavEntryDecorator(retainedValuesStoreRegistry),
-                ),
-                transitionSpec = transitionSpec,
-                popTransitionSpec = popTransitionSpec,
-                predictivePopTransitionSpec = { popTransitionSpec() },
-                entryProvider = entryProvider {
-                    entryContent(navigationHandler, transferHandler)
-                    featureDestinations
-                        .filterNot { destination ->
-                            excludeOwnDestination?.isInstance(destination) == true
-                        }
-                        .forEach { destination ->
+                NavDisplay(
+                    // Mirrors [mega.privacy.android.app.appstate.MegaActivity], so test tags set by
+                    // destinations hosted here are matchable as resource ids by UiAutomator instead of
+                    // forcing instrumented tests onto user-visible text.
+                    modifier = Modifier.semantics { testTagsAsResourceId = true },
+                    backStack = backStack,
+                    onBack = { navigationHandler.back() },
+                    sceneStrategies = listOf(dialogStrategy, bottomSheetStrategy),
+                    entryDecorators = listOf(
+                        rememberSaveableStateHolderNavEntryDecorator(),
+                        rememberSharedViewModelStoreNavEntryDecorator(),
+                        rememberRetainedValuesStoreNavEntryDecorator(retainedValuesStoreRegistry),
+                    ),
+                    transitionSpec = transitionSpec,
+                    popTransitionSpec = popTransitionSpec,
+                    predictivePopTransitionSpec = { popTransitionSpec() },
+                    entryProvider = entryProvider {
+                        entryContent(navigationHandler, transferHandler)
+                        featureDestinations
+                            .filterNot { destination ->
+                                excludeOwnDestination?.isInstance(destination) == true
+                            }
+                            .forEach { destination ->
+                                destination.navigationGraph(
+                                    this,
+                                    navigationHandler,
+                                    transferHandler,
+                                )
+                            }
+                        appDialogDestinations.forEach { destination ->
                             destination.navigationGraph(
                                 this,
                                 navigationHandler,
-                                transferHandler,
+                                {},
                             )
                         }
-                    appDialogDestinations.forEach { destination ->
-                        destination.navigationGraph(
-                            this,
-                            navigationHandler,
-                            {},
-                        )
-                    }
-                },
-            )
-            StartTransferComponent(
-                event = transferState.transferEvent,
-                onConsumeEvent = appTransferViewModel::consumedTransferEvent,
-            )
-            TransferOverQuotaWarningEffect(navigationHandler)
-            overlayContent(navigationHandler)
+                    },
+                )
+                StartTransferComponent(
+                    event = transferState.transferEvent,
+                    onConsumeEvent = appTransferViewModel::consumedTransferEvent,
+                )
+                TransferOverQuotaWarningEffect(navigationHandler)
+                overlayContent(navigationHandler)
+            }
         }
     }
 }
