@@ -36,6 +36,10 @@ internal fun VideoPlayerScreen(
     onSurfaceReleased: () -> Unit,
     onPlayPauseClick: () -> Unit,
     onSeekTo: (Long) -> Unit,
+    onPreviousClick: () -> Unit,
+    onRewindClick: () -> Unit,
+    onFastForwardClick: () -> Unit,
+    onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -49,13 +53,17 @@ internal fun VideoPlayerScreen(
                 onSurfaceReady = onSurfaceReady,
                 onSurfaceReleased = onSurfaceReleased,
             )
-            // Sits where the live player's spinner sits, and swaps to one while the player works
-            // towards a picture, so the two never appear at once.
-            VideoPlayerPlayPauseButton(
+            // Centred on the picture, with play/pause where the live player's spinner sits. That
+            // button swaps to a spinner while the player works towards a picture, so the screen
+            // never carries two at once.
+            VideoPlayerTransportControls(
                 isPlaying = uiState.playWhenReady,
                 isLoading = uiState.isLoading,
-                onClick = onPlayPauseClick,
-                modifier = Modifier.testTag(VIDEO_PLAYER_PLAY_PAUSE_TEST_TAG),
+                onPreviousClick = onPreviousClick,
+                onRewindClick = onRewindClick,
+                onPlayPauseClick = onPlayPauseClick,
+                onFastForwardClick = onFastForwardClick,
+                onNextClick = onNextClick,
             )
             VideoPlayerSeekBar(
                 currentPositionMs = uiState.currentPositionMs,

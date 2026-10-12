@@ -59,6 +59,28 @@ interface VideoMediaControllerGateway {
     fun seekTo(positionMs: Long)
 
     /**
+     * Moves playback back by the increment the player was built with.
+     *
+     * The player's own command rather than arithmetic on the position the UI holds: that one is
+     * sampled on a timer and can be half a second behind, which would make the landing point
+     * drift from one press to the next. Clamping at the start of the item is the player's too.
+     */
+    fun seekBack()
+
+    /** Moves playback forward by the increment the player was built with, clamped at the end. */
+    fun seekForward()
+
+    /** Skips to the next item in the queue. No-op when there is none. */
+    fun skipToNext()
+
+    /**
+     * Skips to the previous item in the queue, or restarts the current one when playback is past
+     * its first few seconds — Media3 `seekToPrevious` semantics. Until the queue is built, every
+     * press takes the second path.
+     */
+    fun skipToPrevious()
+
+    /**
      * Binds the player's video output to [textureView].
      *
      * A `TextureView` rather than a `SurfaceView` because the player screen needs to read frames

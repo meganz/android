@@ -6,6 +6,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import timber.log.Timber
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Hosts the revamped video player's [ExoPlayer], so the player's lifetime stops being the
@@ -33,7 +34,12 @@ class VideoPlayerService : MediaSessionService() {
 
     override fun onCreate() {
         super.onCreate()
-        val exoPlayer = ExoPlayer.Builder(this).build()
+        // Media3 defaults to five seconds back against fifteen forward. The live player sets the
+        // back increment so the two buttons move the same distance, and the icons say fifteen.
+        val exoPlayer = ExoPlayer.Builder(this)
+            .setSeekBackIncrementMs(SEEK_INCREMENT.inWholeMilliseconds)
+            .setSeekForwardIncrementMs(SEEK_INCREMENT.inWholeMilliseconds)
+            .build()
         player = exoPlayer
         mediaSession = MediaSession.Builder(this, exoPlayer)
             .setCallback(object : MediaSession.Callback {
@@ -69,5 +75,15 @@ class VideoPlayerService : MediaSessionService() {
             .onFailure { Timber.e(it, "Failed to release the video player") }
         player = null
         super.onDestroy()
+    }
+
+    private companion object {
+        /**
+         * What the live player's rewind and fast-forward buttons move by.
+         *
+         * The buttons say so too: `VideoPlayerTransportControls` draws `FifteenBackward` and
+         * `FifteenForward` and labels them "15 seconds". Change this and those have to follow.
+         */
+        private val SEEK_INCREMENT = 15.seconds
     }
 }

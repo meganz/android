@@ -51,6 +51,10 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             onSurfaceReleased = viewModel::onSurfaceReleased,
             onPlayPauseClick = viewModel::onPlayPauseClick,
             onSeekTo = viewModel::onSeekTo,
+            onPreviousClick = viewModel::onPreviousClick,
+            onRewindClick = viewModel::onRewindClick,
+            onFastForwardClick = viewModel::onFastForwardClick,
+            onNextClick = viewModel::onNextClick,
         )
     }
 }

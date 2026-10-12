@@ -10,6 +10,7 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -56,15 +57,24 @@ class VideoPlayerScreenTest {
         uiState: VideoPlayerUiState,
         onPlayPauseClick: () -> Unit = {},
         onSeekTo: (Long) -> Unit = {},
+        onPreviousClick: () -> Unit = {},
+        onRewindClick: () -> Unit = {},
+        onFastForwardClick: () -> Unit = {},
+        onNextClick: () -> Unit = {},
+        containerWidth: Dp = CONTAINER_WIDTH,
     ) {
         composeTestRule.setContent {
-            Box(modifier = Modifier.size(CONTAINER_WIDTH, CONTAINER_HEIGHT)) {
+            Box(modifier = Modifier.size(containerWidth, CONTAINER_HEIGHT)) {
                 VideoPlayerScreen(
                     uiState = uiState,
                     onSurfaceReady = {},
                     onSurfaceReleased = {},
                     onPlayPauseClick = onPlayPauseClick,
                     onSeekTo = onSeekTo,
+                    onPreviousClick = onPreviousClick,
+                    onRewindClick = onRewindClick,
+                    onFastForwardClick = onFastForwardClick,
+                    onNextClick = onNextClick,
                 )
             }
         }
@@ -197,6 +207,37 @@ class VideoPlayerScreenTest {
         composeTestRule.onNodeWithTag(VIDEO_PLAYER_PLAY_PAUSE_TEST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(VIDEO_PLAYER_SEEK_BAR_TEST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(VIDEO_PLAYER_TIME_TEST_TAG).assertDoesNotExist()
+        TRANSPORT_TEST_TAGS.forEach {
+            composeTestRule.onNodeWithTag(it).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `test that the transport controls are shown once the launch resolves`() {
+        setScreen(data(), containerWidth = TRANSPORT_CONTAINER_WIDTH)
+
+        TRANSPORT_TEST_TAGS.forEach {
+            composeTestRule.onNodeWithTag(it).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that each transport control reports its own click`() {
+        val pressed = mutableListOf<String>()
+        setScreen(
+            data(),
+            onPreviousClick = { pressed += VIDEO_PLAYER_PREVIOUS_TEST_TAG },
+            onRewindClick = { pressed += VIDEO_PLAYER_REWIND_TEST_TAG },
+            onFastForwardClick = { pressed += VIDEO_PLAYER_FAST_FORWARD_TEST_TAG },
+            onNextClick = { pressed += VIDEO_PLAYER_NEXT_TEST_TAG },
+            containerWidth = TRANSPORT_CONTAINER_WIDTH,
+        )
+
+        // Pressed in layout order, which is not the order the callbacks are declared in: the
+        // live player puts rewind outside previous, and this guards the wiring against that.
+        TRANSPORT_TEST_TAGS.forEach { composeTestRule.onNodeWithTag(it).performClick() }
+
+        assertThat(pressed).isEqualTo(TRANSPORT_TEST_TAGS)
     }
 
     @Test
@@ -206,6 +247,9 @@ class VideoPlayerScreenTest {
         composeTestRule.onNodeWithTag(VIDEO_PLAYER_PLAY_PAUSE_TEST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(VIDEO_PLAYER_SEEK_BAR_TEST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(VIDEO_PLAYER_TIME_TEST_TAG).assertDoesNotExist()
+        TRANSPORT_TEST_TAGS.forEach {
+            composeTestRule.onNodeWithTag(it).assertDoesNotExist()
+        }
     }
 
     private companion object {
@@ -218,8 +262,24 @@ class VideoPlayerScreenTest {
         val CONTAINER_HEIGHT = 180.dp
         const val TOLERANCE = 1f
 
+        /**
+         * The transport row needs 312dp — five buttons at 52dp, 56dp for play/pause, and the
+         * live player's 24dp margin at each end — so the container the picture tests use is too
+         * narrow for it. 320dp is the narrowest screen the app ships on, and the Robolectric
+         * default, so this is also the tightest real fit.
+         */
+        val TRANSPORT_CONTAINER_WIDTH = 320.dp
+
         /** What `VideoPlayerPlayPauseButton` labels its icon with; it carries no string resource. */
         const val PLAY_DESCRIPTION = "Play"
         const val PAUSE_DESCRIPTION = "Pause"
+
+        /** The four buttons flanking play/pause, in the order the live player lays them out. */
+        val TRANSPORT_TEST_TAGS = listOf(
+            VIDEO_PLAYER_REWIND_TEST_TAG,
+            VIDEO_PLAYER_PREVIOUS_TEST_TAG,
+            VIDEO_PLAYER_NEXT_TEST_TAG,
+            VIDEO_PLAYER_FAST_FORWARD_TEST_TAG,
+        )
     }
 }

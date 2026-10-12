@@ -33,6 +33,10 @@ class VideoPlayerScreenshotTest {
                 onSurfaceReleased = {},
                 onPlayPauseClick = {},
                 onSeekTo = {},
+                onPreviousClick = {},
+                onRewindClick = {},
+                onFastForwardClick = {},
+                onNextClick = {},
             )
         }
     }
@@ -48,6 +52,10 @@ class VideoPlayerScreenshotTest {
                 onSurfaceReleased = {},
                 onPlayPauseClick = {},
                 onSeekTo = {},
+                onPreviousClick = {},
+                onRewindClick = {},
+                onFastForwardClick = {},
+                onNextClick = {},
             )
         }
     }
@@ -63,6 +71,10 @@ class VideoPlayerScreenshotTest {
                 onSurfaceReleased = {},
                 onPlayPauseClick = {},
                 onSeekTo = {},
+                onPreviousClick = {},
+                onRewindClick = {},
+                onFastForwardClick = {},
+                onNextClick = {},
             )
         }
     }

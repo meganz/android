@@ -97,6 +97,8 @@ interface IconPackInterface {
             interface Outline {
                 val FifteenForward: ImageVector
                 val FifteenBackward: ImageVector
+                val SkipBack: ImageVector
+                val SkipForward: ImageVector
             }
 
             /**

@@ -385,6 +385,47 @@ internal class VideoPlayerViewModelTest {
     }
 
     @Test
+    fun `test that the transport controls reach the player once the launch resolves`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        underTest.uiState.test {
+            awaitUntilData { true }
+            underTest.onRewindClick()
+            underTest.onFastForwardClick()
+            underTest.onPreviousClick()
+            underTest.onNextClick()
+        }
+
+        // Forwarded untouched: the increment and the clamping belong to the player, and so does
+        // the decision about what previous means when there is no queue behind it.
+        verify(gateway).seekBack()
+        verify(gateway).seekForward()
+        verify(gateway).skipToPrevious()
+        verify(gateway).skipToNext()
+    }
+
+    @Test
+    fun `test that the transport controls do nothing when the launch source is unusable`() =
+        runTest {
+            whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(null)
+            initViewModel()
+
+            underTest.uiState.test {
+                while (awaitItem() !is VideoPlayerUiState.InvalidLaunchSource) Unit
+                underTest.onRewindClick()
+                underTest.onFastForwardClick()
+                underTest.onPreviousClick()
+                underTest.onNextClick()
+            }
+
+            verify(gateway, never()).seekBack()
+            verify(gateway, never()).seekForward()
+            verify(gateway, never()).skipToPrevious()
+            verify(gateway, never()).skipToNext()
+        }
+
+    @Test
     fun `test that uiState carries the position and duration the player reports`() = runTest {
         whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
         initViewModel()

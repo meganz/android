@@ -207,6 +207,37 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
     }
 
     /**
+     * Moves playback back and forward by the player's own increment.
+     *
+     * No arithmetic here, unlike the audio player, which adds to the position its state holds.
+     * That position is sampled every half second, so the landing point drifts between presses;
+     * the player knows where it actually is, and clamps at both ends itself.
+     */
+    fun onRewindClick() = withResolvedLaunch { gateway.seekBack() }
+
+    /** @see onRewindClick */
+    fun onFastForwardClick() = withResolvedLaunch { gateway.seekForward() }
+
+    /**
+     * Moves between queue entries. Until the queue is built there is nothing to move to, so
+     * previous restarts the current video and next does nothing — the player decides both.
+     */
+    fun onPreviousClick() = withResolvedLaunch { gateway.skipToPrevious() }
+
+    /** @see onPreviousClick */
+    fun onNextClick() = withResolvedLaunch { gateway.skipToNext() }
+
+    /**
+     * Runs [action] only once the launch has resolved to something playable. A rejected launch
+     * holds no item, and the controls are not on screen before then, so a press that arrives
+     * either way is one the player cannot answer.
+     */
+    private inline fun withResolvedLaunch(action: () -> Unit) {
+        if (uiState.value !is VideoPlayerUiState.Data) return
+        action()
+    }
+
+    /**
      * The gateway is bound without a scope, so this ViewModel owns one player of its own and is
      * the only thing that can release it.
      *

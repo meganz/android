@@ -347,6 +347,34 @@ internal class VideoMediaControllerFacade @Inject constructor(
     }
 
     @MainThread
+    override fun seekBack() {
+        if (isReleased) return
+        val ctrl = controller ?: return
+        ctrl.seekBack()
+    }
+
+    @MainThread
+    override fun seekForward() {
+        if (isReleased) return
+        val ctrl = controller ?: return
+        ctrl.seekForward()
+    }
+
+    @MainThread
+    override fun skipToNext() {
+        if (isReleased) return
+        val ctrl = controller ?: return
+        ctrl.seekToNext()
+    }
+
+    @MainThread
+    override fun skipToPrevious() {
+        if (isReleased) return
+        val ctrl = controller ?: return
+        ctrl.seekToPrevious()
+    }
+
+    @MainThread
     override fun attachSurface(textureView: TextureView) {
         if (isReleased) return
         val ctrl = controller

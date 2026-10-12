@@ -340,6 +340,43 @@ internal class VideoMediaControllerFacadeTest {
     }
 
     @Test
+    fun `test that seekBack and seekForward use the player's own increment`() {
+        connected()
+
+        // Not arithmetic on a sampled position: the player knows where it is and clamps at both
+        // ends, and the increment is the one the service built it with.
+        underTest.seekBack()
+        underTest.seekForward()
+
+        verify(controller).seekBack()
+        verify(controller).seekForward()
+    }
+
+    @Test
+    fun `test that skipToPrevious and skipToNext move the controller between items`() {
+        connected()
+
+        underTest.skipToPrevious()
+        underTest.skipToNext()
+
+        verify(controller).seekToPrevious()
+        verify(controller).seekToNext()
+    }
+
+    @Test
+    fun `test that the transport commands do nothing before the controller arrives`() {
+        underTest.seekBack()
+        underTest.seekForward()
+        underTest.skipToPrevious()
+        underTest.skipToNext()
+
+        verify(controller, never()).seekBack()
+        verify(controller, never()).seekForward()
+        verify(controller, never()).seekToPrevious()
+        verify(controller, never()).seekToNext()
+    }
+
+    @Test
     fun `test that a position discontinuity refreshes the position and duration`() = runTest {
         whenever(controller.duration).thenReturn(225_000L)
         connected()
