@@ -181,5 +181,6 @@ private val textExtensions = listOf(
     "shtml", "inc", "cpp",
     "dhtml", "asp", "h",
     "js", "pl", "cs",
-    "sh", "vb", "swift", "org"
+    "sh", "vb", "swift", "org",
+    "markdown",
 )

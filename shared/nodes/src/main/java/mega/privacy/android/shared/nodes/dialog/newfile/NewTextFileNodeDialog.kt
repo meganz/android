@@ -41,6 +41,7 @@ import mega.privacy.android.domain.exception.InvalidNodeExtensionException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.exception.NodeNameException
+import mega.privacy.android.domain.extension.isMarkdownFileName
 import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_TEXT_FILE_EXTENSION
 import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.RICH_TEXT_FILE_EXTENSION
@@ -94,7 +95,7 @@ fun NewTextFileNodeDialog(
                 // invalid and duplicate names, and nothing is created in those cases.
                 if (uiState.showRichTextOption) {
                     Analytics.tracker.trackEvent(
-                        if (fileName.endsWith(RICH_TEXT_FILE_EXTENSION, ignoreCase = true)) {
+                        if (isMarkdownFileName(fileName)) {
                             RichTextFileCreatedEvent
                         } else {
                             PlainTextFileCreatedEvent
@@ -190,8 +191,9 @@ private fun NewTextFileDialogWithRichTextOption(
                 errorText = errorText,
                 onValueChanged = onInputChanged,
             )
-            val isRichText = fileNameInput.text.trim()
-                .endsWith(RICH_TEXT_FILE_EXTENSION, ignoreCase = true)
+            // Any Markdown extension counts, because the editor opens them all in rich text
+            // mode. Checking the box writes the mainstream one.
+            val isRichText = isMarkdownFileName(fileNameInput.text.trim())
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

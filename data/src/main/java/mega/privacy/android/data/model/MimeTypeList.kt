@@ -29,6 +29,7 @@ data class MimeTypeList(
             "wpd",
             "json",
             "md",
+            "markdown",
             //Web data
             "html",
             "xml",

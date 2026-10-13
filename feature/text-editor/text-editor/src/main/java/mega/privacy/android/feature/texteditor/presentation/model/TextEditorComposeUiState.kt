@@ -6,7 +6,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.extension.isMarkdownFile
+import mega.privacy.android.domain.extension.isMarkdownFileName
 
 /**
  * UI state for the Compose text editor screen.
@@ -81,7 +81,7 @@ data class TextEditorComposeUiState(
      * file name has a Markdown extension. Derived so it tracks rename/chat/link updates.
      * Markdown files open in a rendered preview in View mode; Edit shows the raw source.
      */
-    val isMarkdown: Boolean get() = isMarkdownEnabled && fileName.isMarkdownFile()
+    val isMarkdown: Boolean get() = isMarkdownEnabled && isMarkdownFileName(fileName)
 
     /**
      * True when WYSIWYG Markdown editing applies to the current document: the file is Markdown,

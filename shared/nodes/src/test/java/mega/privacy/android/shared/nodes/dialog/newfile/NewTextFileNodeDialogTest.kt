@@ -102,6 +102,24 @@ class NewTextFileNodeDialogTest {
     }
 
     @Test
+    fun `test that typing a markdown extension checks the rich text checkbox`() {
+        composeTestRule.setContent {
+            NewTextFileNodeDialog(
+                uiState = defaultState(showRichTextOption = true),
+                title = title,
+                onConfirm = {},
+                onFileNameChanged = {},
+                validateFileName = {},
+                onValidationSuccessEventConsumed = {},
+            )
+        }
+
+        composeTestRule.onNode(hasSetTextAction()).performTextReplacement("notes.markdown")
+
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).assertIsOn()
+    }
+
+    @Test
     fun `test that typing another extension unchecks the rich text checkbox`() {
         composeTestRule.setContent {
             NewTextFileNodeDialog(
@@ -324,6 +342,14 @@ class NewTextFileNodeDialogTest {
     @Test
     fun `test that creating a rich text file reports the rich text event`() {
         setDialogWithValidatedName("notes$RICH_TEXT_FILE_EXTENSION")
+
+        assertThat(analyticsRule.events).contains(RichTextFileCreatedEvent)
+        assertThat(analyticsRule.events).doesNotContain(PlainTextFileCreatedEvent)
+    }
+
+    @Test
+    fun `test that creating a markdown file reports the rich text event`() {
+        setDialogWithValidatedName("notes.markdown")
 
         assertThat(analyticsRule.events).contains(RichTextFileCreatedEvent)
         assertThat(analyticsRule.events).doesNotContain(PlainTextFileCreatedEvent)

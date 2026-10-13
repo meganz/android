@@ -14,6 +14,8 @@ class MimeTypeMapperTest {
     private val mimeTypeMap = mapOf(
         "dcr" to "image/dcr",
         "url" to "web/url",
+        "md" to "text/markdown",
+        "markdown" to "text/markdown",
         "jxl" to "image/jxl",
         "3fr" to "image/3fr",
         "iiq" to "image/iiq",

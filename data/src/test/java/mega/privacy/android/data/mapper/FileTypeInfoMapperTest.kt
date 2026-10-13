@@ -326,7 +326,8 @@ class FileTypeInfoMapperTest @Inject constructor() {
             "cs",
             "sh",
             "vb",
-            "swift"
+            "swift",
+            "markdown"
         ).forEach {
             val expectedExtension = it
             val name = "withExtension.$expectedExtension"

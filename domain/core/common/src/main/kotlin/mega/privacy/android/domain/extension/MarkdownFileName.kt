@@ -4,8 +4,8 @@ package mega.privacy.android.domain.extension
 private val MARKDOWN_EXTENSIONS = setOf("md", "markdown")
 
 /**
- * Returns true when this file name has a Markdown extension (`.md` / `.markdown`),
+ * Returns true when [fileName] has a Markdown extension (`.md` / `.markdown`),
  * case-insensitive. Single source of truth for Markdown detection.
  */
-fun String.isMarkdownFile(): Boolean =
-    contains('.') && substringAfterLast('.', "").lowercase() in MARKDOWN_EXTENSIONS
+fun isMarkdownFileName(fileName: String): Boolean =
+    fileName.contains('.') && fileName.substringAfterLast('.', "").lowercase() in MARKDOWN_EXTENSIONS

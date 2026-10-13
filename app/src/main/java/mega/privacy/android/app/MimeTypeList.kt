@@ -72,6 +72,7 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
             "wpd",
             "json",
             "md",
+            "markdown",
             //Web data
             "html",
             "xml",
