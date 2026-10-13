@@ -416,6 +416,10 @@ internal class AudioMediaControllerFacade @Inject constructor(
         controller?.seekToPrevious()
     }
 
+    override fun skipToPreviousMediaItem() {
+        controller?.seekToPreviousMediaItem()
+    }
+
     override fun setShuffleEnabled(enabled: Boolean) {
         controller?.setShuffleModeEnabled(enabled)
     }

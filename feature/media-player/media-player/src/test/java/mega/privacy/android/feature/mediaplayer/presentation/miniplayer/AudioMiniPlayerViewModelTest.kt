@@ -207,6 +207,21 @@ class AudioMiniPlayerViewModelTest {
     }
 
     @Test
+    fun `test that onSwipedToNext skips to the next item`() = runTest {
+        underTest.onSwipedToNext()
+
+        verify(gateway).skipToNext()
+    }
+
+    @Test
+    fun `test that onSwipedToPrevious goes straight to the previous item`() = runTest {
+        underTest.onSwipedToPrevious()
+
+        verify(gateway).skipToPreviousMediaItem()
+        verify(gateway, never()).skipToPrevious()
+    }
+
+    @Test
     fun `test that the media controller is released when the ViewModel is cleared`() = runTest {
         ViewModelStore().apply { put("mini_player", underTest) }.clear()
 

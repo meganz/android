@@ -29,8 +29,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
  * every destination change, where the `PlayerView` bar it replaces keeps one connection for the
  * whole activity.
  *
- * Not used by any host yet; see `AudioMiniPlayer` for why.
- *
  * @param onPlayerClicked Called when the bar is tapped.
  * @param onCloseClicked Called when the close button is tapped; the host is expected to end the
  * playback session, not merely pause it, or the bar stays on screen.
@@ -69,6 +67,8 @@ fun AudioMiniPlayerRoute(
                 onPlayPauseClicked = viewModel::onPlayPauseClicked,
                 onCloseClicked = onCloseClicked,
                 onPlayerClicked = onPlayerClicked,
+                onSwipeToNext = viewModel::onSwipedToNext,
+                onSwipeToPrevious = viewModel::onSwipedToPrevious,
             )
         }
     }

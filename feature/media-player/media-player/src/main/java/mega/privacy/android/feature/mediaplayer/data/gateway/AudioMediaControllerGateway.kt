@@ -44,6 +44,14 @@ interface AudioMediaControllerGateway {
      */
     fun skipToPrevious()
 
+    /**
+     * Goes straight to the previous media item, whatever the position in the current one.
+     *
+     * A swipe names the track it wants, so it does not take the restart-first rule that
+     * [skipToPrevious] applies to the button.
+     */
+    fun skipToPreviousMediaItem()
+
     /** Enables or disables shuffle mode. */
     fun setShuffleEnabled(enabled: Boolean)
 

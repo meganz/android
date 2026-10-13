@@ -20,10 +20,8 @@ import javax.inject.Inject
 /**
  * ViewModel behind the Compose mini player.
  *
- * Not wired to any host yet: the mini player is still rendered by the Media3 `PlayerView` in
- * `mini_audio_player.xml`. Nothing constructs this ViewModel, so no [AudioMediaControllerGateway]
- * is created and the shipped player is unaffected. Note that the gateway connects to the session
- * in its own `init`, so instantiating this ViewModel does open a `MediaController`.
+ * The gateway connects to the session in its own `init`, so constructing this ViewModel opens a
+ * `MediaController`. A host only does so while both audio player flags are on.
  */
 @HiltViewModel
 internal class AudioMiniPlayerViewModel @Inject constructor(
@@ -89,6 +87,21 @@ internal class AudioMiniPlayerViewModel @Inject constructor(
                 emit(AudioMiniPlayerUiState.Hidden)
             }
             .asUiStateFlow(viewModelScope, AudioMiniPlayerUiState.Hidden)
+    }
+
+    /** Moves to the next track, for a swipe across the bar. */
+    fun onSwipedToNext() {
+        gateway.skipToNext()
+    }
+
+    /**
+     * Moves to the previous track, for a swipe across the bar.
+     *
+     * A swipe goes straight there. The restart-first rule the previous button follows would make
+     * the same gesture mean two different things depending on how far the track had played.
+     */
+    fun onSwipedToPrevious() {
+        gateway.skipToPreviousMediaItem()
     }
 
     /** Toggles playback, mirroring the play/pause button of the full-screen player. */

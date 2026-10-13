@@ -30,6 +30,8 @@ class AudioMiniPlayerScreenshotTest {
                 onPlayPauseClicked = {},
                 onCloseClicked = {},
                 onPlayerClicked = {},
+                onSwipeToNext = {},
+                onSwipeToPrevious = {},
             )
         }
     }
@@ -50,6 +52,8 @@ class AudioMiniPlayerScreenshotTest {
                 onPlayPauseClicked = {},
                 onCloseClicked = {},
                 onPlayerClicked = {},
+                onSwipeToNext = {},
+                onSwipeToPrevious = {},
             )
         }
     }
@@ -70,6 +74,8 @@ class AudioMiniPlayerScreenshotTest {
                 onPlayPauseClicked = {},
                 onCloseClicked = {},
                 onPlayerClicked = {},
+                onSwipeToNext = {},
+                onSwipeToPrevious = {},
             )
         }
     }
@@ -91,6 +97,8 @@ class AudioMiniPlayerScreenshotTest {
                 onPlayPauseClicked = {},
                 onCloseClicked = {},
                 onPlayerClicked = {},
+                onSwipeToNext = {},
+                onSwipeToPrevious = {},
             )
         }
     }
@@ -112,6 +120,8 @@ class AudioMiniPlayerScreenshotTest {
                 onPlayPauseClicked = {},
                 onCloseClicked = {},
                 onPlayerClicked = {},
+                onSwipeToNext = {},
+                onSwipeToPrevious = {},
             )
         }
     }
