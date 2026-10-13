@@ -16,6 +16,7 @@ import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.feature.mediaplayer.data.gateway.VideoMediaControllerGateway
+import mega.privacy.android.feature.mediaplayer.videoplayer.data.mapper.VideoNodeToMediaItemMapper
 import mega.privacy.android.feature.mediaplayer.videoplayer.navigation.VideoPlayerLaunchSourceHolder
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSource
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSourceType
@@ -35,6 +36,7 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
     @Assisted private val launchId: String,
     private val launchSourceHolder: VideoPlayerLaunchSourceHolder,
     private val gateway: VideoMediaControllerGateway,
+    private val videoNodeToMediaItemMapper: VideoNodeToMediaItemMapper,
     private val httpServerStopUseCase: HttpServerStopUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
@@ -166,10 +168,16 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
         val source = launchSource ?: return
         val uri = source.contentUri ?: return
 
+        val mediaItem = videoNodeToMediaItemMapper(
+            handle = source.handle,
+            uri = uri,
+            displayName = source.fileName,
+        )
+
         // Latched only once the player has accepted the item, so a failure leaves the next
         // surface free to try again rather than stranding the screen on black for good.
         runCatching {
-            gateway.setPlaySource(uri, source.handle.toString())
+            gateway.setPlaySources(listOf(mediaItem), startIndex = 0)
             gateway.play()
         }
             .onSuccess { hasStartedPlayback = true }

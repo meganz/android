@@ -2,7 +2,6 @@ package mega.privacy.android.app.mediaplayer.gateway
 
 import android.content.ComponentName
 import android.content.Context
-import android.net.Uri
 import android.view.TextureView
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
@@ -81,9 +80,11 @@ internal class VideoMediaControllerFacade @Inject constructor(
      */
     private var isReleased = false
 
-    private var pendingMediaItem: MediaItem? = null
+    private var pendingSources: PlaySources? = null
     private var pendingPlay = false
     private var pendingSurface: TextureView? = null
+
+    private data class PlaySources(val mediaItems: List<MediaItem>, val startIndex: Int)
 
     /** The view this instance handed to the player, so only that one is ever detached. */
     private var attachedSurface: TextureView? = null
@@ -244,7 +245,7 @@ internal class VideoMediaControllerFacade @Inject constructor(
      */
     private fun onConnectionLost() {
         if (isReleased) return
-        pendingMediaItem = null
+        pendingSources = null
         pendingPlay = false
         pendingSurface = null
         updateState { copy(isPlayerUnavailable = true) }
@@ -253,11 +254,8 @@ internal class VideoMediaControllerFacade @Inject constructor(
     private fun applyPending(ctrl: MediaController) {
         pendingSurface?.let { ctrl.setVideoTextureView(it) }
         pendingSurface = null
-        pendingMediaItem?.let {
-            ctrl.setMediaItem(it)
-            ctrl.prepare()
-        }
-        pendingMediaItem = null
+        pendingSources?.let { applySources(ctrl, it.mediaItems, it.startIndex) }
+        pendingSources = null
         if (pendingPlay) ctrl.play()
         pendingPlay = false
     }
@@ -303,15 +301,31 @@ internal class VideoMediaControllerFacade @Inject constructor(
     }
 
     @MainThread
-    override fun setPlaySource(uri: Uri, mediaId: String) {
+    override fun setPlaySources(mediaItems: List<MediaItem>, startIndex: Int) {
         if (isReleased) return
-        val mediaItem = MediaItem.Builder().setUri(uri).setMediaId(mediaId).build()
+        if (mediaItems.isEmpty()) return
         val ctrl = controller
         if (ctrl == null) {
-            pendingMediaItem = mediaItem
+            pendingSources = PlaySources(mediaItems, startIndex)
             return
         }
-        ctrl.setMediaItem(mediaItem)
+        applySources(ctrl, mediaItems, startIndex)
+    }
+
+    private fun applySources(
+        ctrl: MediaController,
+        mediaItems: List<MediaItem>,
+        startIndex: Int,
+    ) {
+        if (mediaItems.isEmpty()) return
+        val index = startIndex.coerceIn(0, mediaItems.lastIndex)
+        // Clamping keeps the player alive, but an index this far off is a caller bug — a stale
+        // one from a queue that has since been rebuilt, say — and silently starting the wrong
+        // video would hide it.
+        if (index != startIndex) {
+            Timber.w("Start index $startIndex is outside a queue of ${mediaItems.size}; using $index")
+        }
+        ctrl.setMediaItems(mediaItems, index, 0L)
         ctrl.prepare()
     }
 
@@ -408,7 +422,7 @@ internal class VideoMediaControllerFacade @Inject constructor(
         if (isReleased) return
         isReleased = true
         stopPositionPolling()
-        pendingMediaItem = null
+        pendingSources = null
         pendingPlay = false
         pendingSurface = null
         // Each step is guarded on its own: a throw in any one of them would otherwise skip the

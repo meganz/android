@@ -3,6 +3,7 @@ package mega.privacy.android.feature.mediaplayer.videoplayer.presentation
 import android.net.Uri
 import android.view.TextureView
 import androidx.lifecycle.ViewModelStore
+import androidx.media3.common.MediaItem
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -14,6 +15,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.feature.mediaplayer.data.gateway.VideoMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.model.VideoControllerState
+import mega.privacy.android.feature.mediaplayer.videoplayer.data.mapper.VideoNodeToMediaItemMapper
 import mega.privacy.android.feature.mediaplayer.videoplayer.navigation.VideoPlayerLaunchSourceHolder
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSource
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSourceType
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -37,6 +40,8 @@ internal class VideoPlayerViewModelTest {
 
     private val launchSourceHolder = mock<VideoPlayerLaunchSourceHolder>()
     private val gateway = mock<VideoMediaControllerGateway>()
+    private val videoNodeToMediaItemMapper = mock<VideoNodeToMediaItemMapper>()
+    private val mediaItem = MediaItem.Builder().setMediaId(TEST_HANDLE.toString()).build()
     private val textureView = mock<TextureView>()
     private val httpServerStopUseCase = mock<HttpServerStopUseCase>()
 
@@ -45,9 +50,16 @@ internal class VideoPlayerViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        reset(launchSourceHolder, gateway, textureView, httpServerStopUseCase)
+        reset(
+            launchSourceHolder,
+            gateway,
+            videoNodeToMediaItemMapper,
+            textureView,
+            httpServerStopUseCase,
+        )
         playerState = MutableStateFlow(VideoControllerState())
         whenever(gateway.playerState).thenReturn(playerState)
+        whenever(videoNodeToMediaItemMapper(any(), any(), anyOrNull())).thenReturn(mediaItem)
     }
 
     private fun TestScope.initViewModel() {
@@ -55,6 +67,7 @@ internal class VideoPlayerViewModelTest {
             launchId = LAUNCH_ID,
             launchSourceHolder = launchSourceHolder,
             gateway = gateway,
+            videoNodeToMediaItemMapper = videoNodeToMediaItemMapper,
             httpServerStopUseCase = httpServerStopUseCase,
             applicationScope = this,
         )
@@ -221,7 +234,8 @@ internal class VideoPlayerViewModelTest {
 
         underTest.onSurfaceReady(textureView)
 
-        verify(gateway).setPlaySource(uri, TEST_HANDLE.toString())
+        verify(videoNodeToMediaItemMapper)(TEST_HANDLE, uri, TEST_FILE_NAME)
+        verify(gateway).setPlaySources(listOf(mediaItem), 0)
         verify(gateway).play()
     }
 
@@ -236,7 +250,7 @@ internal class VideoPlayerViewModelTest {
 
             // A configuration change recreates the surface. Loading again would restart the video
             // from the beginning.
-            verify(gateway, times(1)).setPlaySource(any(), any())
+            verify(gateway, times(1)).setPlaySources(any(), any())
             verify(gateway, times(1)).play()
             verify(gateway, times(2)).attachSurface(textureView)
         }
@@ -244,7 +258,7 @@ internal class VideoPlayerViewModelTest {
     @Test
     fun `test that onSurfaceReady tries again when starting playback failed`() = runTest {
         whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
-        whenever(gateway.setPlaySource(any(), any()))
+        whenever(gateway.setPlaySources(any(), any()))
             .thenThrow(IllegalStateException("player rejected the item"))
             .thenAnswer { }
         initViewModel()
@@ -254,7 +268,7 @@ internal class VideoPlayerViewModelTest {
 
         // Latching the flag on the failed attempt would strand the screen on black with no way
         // back, since nothing retries other than a new surface.
-        verify(gateway, times(2)).setPlaySource(any(), any())
+        verify(gateway, times(2)).setPlaySources(any(), any())
         verify(gateway, times(1)).play()
     }
 
@@ -268,7 +282,7 @@ internal class VideoPlayerViewModelTest {
 
         underTest.onSurfaceReady(textureView)
 
-        verify(gateway, never()).setPlaySource(any(), any())
+        verify(gateway, never()).setPlaySources(any(), any())
         verify(gateway, never()).play()
     }
 

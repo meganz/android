@@ -1,7 +1,6 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
 import android.content.Context
-import android.net.Uri
 import android.view.TextureView
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -64,6 +63,8 @@ internal class VideoMediaControllerFacadeTest {
             mainDispatcher = StandardTestDispatcher(playerScheduler),
         )
     }
+
+    private fun mediaItem(mediaId: String) = MediaItem.Builder().setMediaId(mediaId).build()
 
     @AfterEach
     fun tearDown() {
@@ -289,15 +290,49 @@ internal class VideoMediaControllerFacadeTest {
     }
 
     @Test
-    fun `test that setPlaySource prepares the controller with the item`() {
+    fun `test that setPlaySources prepares the controller with the queue`() {
+        connected()
+        val items = listOf(mediaItem("1"), mediaItem("2"))
+
+        underTest.setPlaySources(items, 1)
+
+        // Preparing before the items are set would prepare the previous one, or nothing at all.
+        val inOrder = inOrder(controller)
+        inOrder.verify(controller).setMediaItems(items, 1, 0L)
+        inOrder.verify(controller).prepare()
+    }
+
+    @Test
+    fun `test that setPlaySources ignores an empty queue`() {
         connected()
 
-        underTest.setPlaySource(mock<Uri>(), "123")
+        underTest.setPlaySources(emptyList(), 0)
 
-        // Preparing before the item is set would prepare the previous item, or nothing at all.
-        val inOrder = inOrder(controller)
-        inOrder.verify(controller).setMediaItem(any())
-        inOrder.verify(controller).prepare()
+        // An empty queue says the sibling search came back with nothing, not that the video the
+        // user opened should stop.
+        verify(controller, never()).setMediaItems(any<List<MediaItem>>(), any(), any())
+        verify(controller, never()).prepare()
+    }
+
+    @Test
+    fun `test that setPlaySources clamps a start index outside the queue`() {
+        connected()
+        val items = listOf(mediaItem("1"), mediaItem("2"))
+
+        underTest.setPlaySources(items, 7)
+
+        verify(controller).setMediaItems(items, 1, 0L)
+    }
+
+    @Test
+    fun `test that setPlaySources clamps a negative start index to the first item`() {
+        connected()
+        val items = listOf(mediaItem("1"), mediaItem("2"))
+
+        underTest.setPlaySources(items, -1)
+
+        // The clamp has two sides; only testing the upper one lets the lower regress unseen.
+        verify(controller).setMediaItems(items, 0, 0L)
     }
 
     @Test
@@ -472,7 +507,8 @@ internal class VideoMediaControllerFacadeTest {
         val future = mock<ListenableFuture<MediaController>>()
         underTest.controllerFuture = future
 
-        underTest.setPlaySource(mock<Uri>(), "123")
+        val items = listOf(mediaItem("123"))
+        underTest.setPlaySources(items, 0)
         underTest.play()
         underTest.attachSurface(textureView)
         underTest.onControllerConnected(future, controller)
@@ -480,7 +516,7 @@ internal class VideoMediaControllerFacadeTest {
         // Nothing retries these, so losing one leaves a player that never starts or never shows a
         // picture.
         verify(controller).setVideoTextureView(textureView)
-        verify(controller).setMediaItem(any())
+        verify(controller).setMediaItems(items, 0, 0L)
         verify(controller).prepare()
         verify(controller).play()
     }
@@ -503,7 +539,7 @@ internal class VideoMediaControllerFacadeTest {
     fun `test that a failed connection reports the player as unavailable`() = runTest {
         val future = mock<ListenableFuture<MediaController>>()
         underTest.controllerFuture = future
-        underTest.setPlaySource(mock<Uri>(), "123")
+        underTest.setPlaySources(listOf(mediaItem("123")), 0)
         underTest.play()
         underTest.attachSurface(mock<TextureView>())
 
@@ -515,7 +551,7 @@ internal class VideoMediaControllerFacadeTest {
             assertThat(awaitItem().isPlayerUnavailable).isTrue()
         }
         underTest.onControllerConnected(future, controller)
-        verify(controller, never()).setMediaItem(any())
+        verify(controller, never()).setMediaItems(any<List<MediaItem>>(), any(), any())
         verify(controller, never()).play()
         verify(controller, never()).setVideoTextureView(any())
     }

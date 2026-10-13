@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.mediaplayer.data.gateway
 
-import android.net.Uri
 import android.view.TextureView
+import androidx.media3.common.MediaItem
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.feature.mediaplayer.data.model.VideoControllerState
 
@@ -34,15 +34,15 @@ interface VideoMediaControllerGateway {
     val playerState: Flow<VideoControllerState>
 
     /**
-     * Replaces whatever the player holds with the single item at [uri], identified by [mediaId],
-     * and prepares it. Does not start playback — the caller decides that with [play].
+     * Hands the player [mediaItems], to start on the one at [startIndex], and prepares it. Does not
+     * start playback — the caller decides that with [play].
      *
-     * Takes one item rather than a list because nothing builds a queue yet.
+     * An empty list is ignored: nothing to play is not the same instruction as stop playing.
      *
-     * @param mediaId identifies the item in player callbacks, which is how a transition is matched
-     * back to the node it belongs to.
+     * The media id each item carries is what identifies it in player callbacks, which is how a
+     * transition is matched back to the node it belongs to.
      */
-    fun setPlaySource(uri: Uri, mediaId: String)
+    fun setPlaySources(mediaItems: List<MediaItem>, startIndex: Int)
 
     /** Starts playback. */
     fun play()
