@@ -56,13 +56,26 @@ object TestAppBoot {
      * `EVENT_MISC_FLAGS_READY` through the `MegaApiAndroid` global listener, which the fake gateways
      * never drive; without the mark every API feature-flag check waits out the provider's 2 s
      * timeout. Pass false for a test that sequences the flags-ready state itself.
+     * @param grantOnboardingPermissions when true (the default) the notification and media runtime
+     * permissions are granted, which keeps the first-launch permission onboarding off the screen.
+     * `OnboardingPermissionInitialiser` emits `PermissionScreensNavKey` whenever a first launch is
+     * missing either permission, and that screen covers the whole app including the navigation bar,
+     * so a suite that meets it stalls until it times out. It is a post-login initialiser, so it only
+     * runs when the app boots without a root node and routes through fetch-nodes — which under the
+     * fake gateways is a race, making the interception intermittent. Pass false for a test that
+     * drives the permission screens themselves.
      */
     fun runCoreInitializers(
         exclude: Set<String> = emptySet(),
         includeAppStart: Boolean = true,
         miscFlagsReady: Boolean = true,
+        grantOnboardingPermissions: Boolean = true,
     ) {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
+
+        if (grantOnboardingPermissions) {
+            grantRuntimePermissions(targetContext.packageName)
+        }
 
         val entryPoint = EntryPointAccessors.fromApplication(
             targetContext,
@@ -85,4 +98,24 @@ object TestAppBoot {
             runBlocking { entryPoint.broadcastMiscStateUseCase()(MiscLoadedState.FlagsReady) }
         }
     }
+
+    private fun grantRuntimePermissions(packageName: String) {
+        val uiAutomation = InstrumentationRegistry.getInstrumentation().uiAutomation
+        ONBOARDING_PERMISSIONS.forEach { permission ->
+            runCatching { uiAutomation.grantRuntimePermission(packageName, permission) }
+        }
+    }
+
+    /**
+     * The permissions `CheckOnboardingPermissionsUseCase` reads, as string literals because the
+     * media ones only exist from API 33 and the storage one only applies below it. Granting a
+     * permission that does not apply to the running device fails, hence the per-permission
+     * `runCatching`.
+     */
+    private val ONBOARDING_PERMISSIONS = listOf(
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+    )
 }
