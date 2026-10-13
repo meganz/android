@@ -28,6 +28,7 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.Session
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SessionCheckStateInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.StaticContextInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SyncMonitorInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.appcreate.SyncProgressMonitoringInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.ThemeInitialiser
 import mega.privacy.android.app.appstate.global.lifecycle.AppLifecycleInitialiser
 import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
@@ -75,6 +76,7 @@ internal class AppCreateInitialisersModule {
         remoteConfigInitialiser: RemoteConfigInitialiser,
         cameraUploadsWorkerNotificationInitialiser: CameraUploadsWorkerNotificationInitialiser,
         syncMonitorInitialiser: SyncMonitorInitialiser,
+        syncProgressMonitoringInitialiser: SyncProgressMonitoringInitialiser,
         cloudDriveDocumentProviderInitialiser: CloudDriveDocumentProviderInitialiser,
         sessionCheckStateInitialiser: SessionCheckStateInitialiser,
     ): Set<@JvmSuppressWildcards AsyncAppCreateInitialiser> = setOf(
@@ -87,6 +89,7 @@ internal class AppCreateInitialisersModule {
         remoteConfigInitialiser,
         cameraUploadsWorkerNotificationInitialiser,
         syncMonitorInitialiser,
+        syncProgressMonitoringInitialiser,
         cloudDriveDocumentProviderInitialiser,
         sessionCheckStateInitialiser,
     )

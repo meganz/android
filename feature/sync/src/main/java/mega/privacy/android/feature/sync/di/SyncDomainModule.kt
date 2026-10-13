@@ -9,6 +9,8 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.domain.usecase.backup.GetLocalSyncOrBackupUriPathUseCase
 import mega.privacy.android.domain.usecase.logout.LogoutTask
 import mega.privacy.android.feature.sync.domain.usecase.logout.ClearSyncSolvedIssuesLogoutTask
+import mega.privacy.android.feature.sync.domain.usecase.progress.StartSyncProgressMonitoringUseCase
+import mega.privacy.android.feature.sync.domain.usecase.progress.StartSyncProgressMonitoringUseCaseImpl
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetLocalSyncOrBackupUriPathUseCaseImpl
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCaseImpl
@@ -35,6 +37,9 @@ internal interface SyncDomainModule {
 
     @Binds
     fun bindGetLocalSyncOrBackupUriPathUseCase(impl: GetLocalSyncOrBackupUriPathUseCaseImpl): GetLocalSyncOrBackupUriPathUseCase
+
+    @Binds
+    fun bindStartSyncProgressMonitoringUseCase(impl: StartSyncProgressMonitoringUseCaseImpl): StartSyncProgressMonitoringUseCase
 
     companion object {
         @Provides
