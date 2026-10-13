@@ -9,6 +9,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import mega.privacy.android.core.sharedcomponents.systemui.DarkSystemBarsEffect
+import mega.privacy.android.core.sharedcomponents.systemui.TransparentNavigationBarEffect
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.VideoPlayerScreen
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.VideoPlayerViewModel
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerUiState
@@ -31,6 +33,11 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
     navigationHandler: NavigationHandler,
 ) {
     entry<VideoPlayerScreenNavKey> { navKey ->
+        // The picture is black whatever theme the app is in, and the window draws edge to edge,
+        // so the bars have to be told; left alone they follow the theme.
+        DarkSystemBarsEffect()
+        TransparentNavigationBarEffect()
+
         val viewModel = hiltViewModel<VideoPlayerViewModel, VideoPlayerViewModel.Factory>(
             creationCallback = { factory -> factory.create(navKey.launchId) }
         )
