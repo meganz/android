@@ -11,10 +11,12 @@ import javax.inject.Inject
 
 /**
  * Maps a sync [MegaTransfer] to a [SyncTransferEntry], reading each getter at most once.
- * The path is read only when [invoke]'s `readPath` is set or the transfer has ended, so active rows stay small.
+ * The path, and the location resolved from it, are read only when [invoke]'s `readPath` is set or
+ * the transfer has ended, so active rows stay small and parse-free.
  */
 internal class SyncTransferMapper @Inject constructor(
     private val transferStateMapper: TransferStateMapper,
+    private val syncTransferLocationMapper: SyncTransferLocationMapper,
 ) {
     operator fun invoke(transfer: MegaTransfer, readPath: Boolean): SyncTransferEntry {
         val state = transferStateMapper(transfer.state)
@@ -23,6 +25,7 @@ internal class SyncTransferMapper @Inject constructor(
         } else {
             SyncTransferDirection.Upload
         }
+        val path = if (readPath || state in TERMINAL_STATES) transfer.path else null
         return SyncTransferEntry(
             tag = transfer.tag,
             direction = direction,
@@ -39,7 +42,8 @@ internal class SyncTransferMapper @Inject constructor(
                     ?.let { SyncTransferError(code = it, value = error.value) }
             },
             isForeignOverQuota = direction == SyncTransferDirection.Upload && transfer.isForeignOverquota,
-            path = if (readPath || state in TERMINAL_STATES) transfer.path else null,
+            path = path,
+            location = path?.let { syncTransferLocationMapper(it) },
         )
     }
 

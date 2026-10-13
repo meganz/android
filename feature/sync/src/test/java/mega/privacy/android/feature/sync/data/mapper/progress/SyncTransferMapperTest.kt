@@ -21,7 +21,7 @@ internal class SyncTransferMapperTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = SyncTransferMapper(TransferStateMapper())
+        underTest = SyncTransferMapper(TransferStateMapper(), SyncTransferLocationMapper())
     }
 
     @Test
@@ -192,6 +192,40 @@ internal class SyncTransferMapperTest {
 
         assertThat(entry.path).isNull()
         verify(transfer, never()).path
+    }
+
+    @Test
+    fun `test that invoke sets the location when the path is read`() {
+        val transfer = mockSyncMegaTransfer(path = "/storage/emulated/0/MEGA Sync/Photos/a.jpg")
+
+        assertThat(underTest(transfer, readPath = true).location).isEqualTo("Photos")
+
+        whenever(transfer.path).thenReturn(null)
+        assertThat(underTest(transfer, readPath = true).location).isNull()
+    }
+
+    @ParameterizedTest(name = "state {0}")
+    @ValueSource(
+        ints = [
+            MegaTransfer.STATE_COMPLETED,
+            MegaTransfer.STATE_CANCELLED,
+            MegaTransfer.STATE_FAILED,
+        ]
+    )
+    fun `test that invoke sets the location of a terminal transfer`(state: Int) {
+        val transfer = mockSyncMegaTransfer(
+            state = state,
+            path = "content://com.android.externalstorage.documents/tree/primary%3ADCIM%2FCamera/IMG_1.jpg",
+        )
+
+        assertThat(underTest(transfer, readPath = false).location).isEqualTo("Camera")
+    }
+
+    @Test
+    fun `test that invoke leaves the location null for an unfinished transfer`() {
+        val transfer = mockSyncMegaTransfer(state = MegaTransfer.STATE_ACTIVE)
+
+        assertThat(underTest(transfer, readPath = false).location).isNull()
     }
 
     @Test
