@@ -2,6 +2,7 @@ package mega.privacy.android.feature.texteditor.components
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -225,9 +226,12 @@ internal fun MarkdownCodeFrame(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(colors.codeBackground, RoundedCornerShape(8.dp))
+            .background(colors.codeBackground, CodeFrameShape)
+            .border(1.dp, colors.divider, CodeFrameShape)
             .then(scrollState?.let { Modifier.horizontalScroll(it) } ?: Modifier)
-            .padding(12.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         content = content,
     )
 }
+
+private val CodeFrameShape = RoundedCornerShape(4.dp)

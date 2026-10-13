@@ -10,6 +10,7 @@ data class MarkdownSelectionFormats(
     val isStrikethrough: Boolean = false,
     val isUnderline: Boolean = false,
     val isInlineCode: Boolean = false,
+    val isCodeBlock: Boolean = false,
     val isLink: Boolean = false,
     val headingLevel: Int? = null,
     val isBulletList: Boolean = false,

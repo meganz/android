@@ -182,6 +182,14 @@ fun RichDocumentEditor(
     }
 
     LaunchedEffect(state) {
+        snapshotFlow { state.pendingCodeBlockExit }.collect { index ->
+            if (index == null) return@collect
+            state.pendingCodeBlockExit = null
+            state.exitCodeBlock(index)
+        }
+    }
+
+    LaunchedEffect(state) {
         snapshotFlow { state.pendingSmartInsert }.collect { request ->
             if (request == null) return@collect
             state.pendingSmartInsert = null
@@ -204,8 +212,12 @@ fun RichDocumentEditor(
             // Let the frame that composes a freshly split/merged block land first, so its
             // focus requester is attached before it is used.
             withFrameNanos { }
-            val block = state.blocks.getOrNull(request.index) as? RichTextBlockEditState
-            block?.text?.textFieldState?.edit {
+            val field = when (val block = state.blocks.getOrNull(request.index)) {
+                is RichTextBlockEditState -> block.text.textFieldState
+                is CodeBlockEditState -> block.code
+                else -> null
+            }
+            field?.edit {
                 selection = TextRange(
                     request.selection.start.coerceIn(0, length),
                     request.selection.end.coerceIn(0, length),
@@ -383,8 +395,15 @@ private fun RichDocumentBlocks(
                     geometry = geometry,
                 )
 
-                is CodeBlockEditState ->
-                    CodeBlockRow(index, block, state, visualStyles, colors, geometry)
+                is CodeBlockEditState -> CodeBlockRow(
+                    index = index,
+                    block = block,
+                    state = state,
+                    visualStyles = visualStyles,
+                    colors = colors,
+                    focusRequester = focusRequesters.getOrPut(index) { FocusRequester() },
+                    geometry = geometry,
+                )
 
                 is ThematicBreakEditState -> HorizontalDivider(
                     color = colors.divider,
@@ -561,6 +580,7 @@ private fun CodeBlockRow(
     state: RichDocumentState,
     visualStyles: RichSpanVisualStyles,
     colors: MarkdownColors,
+    focusRequester: FocusRequester,
     geometry: RichSelectionGeometry,
 ) {
     DisposableEffect(geometry, index) {
@@ -577,10 +597,11 @@ private fun CodeBlockRow(
                 color = colors.text,
             ),
             cursorBrush = SolidColor(colors.text),
-            inputTransformation = remember(block) {
+            inputTransformation = remember(block, index) {
                 DocumentSelectionInputTransformation(
                     documentSelectionActive = { state.documentSelection != null },
                     onReplaceDocumentSelection = { state.requestReplaceSelection(it) },
+                    onExitOnBlankLine = { state.requestCodeBlockExit(index) },
                 )
             },
             outputTransformation = remember(block, visualStyles, index) {
@@ -594,6 +615,7 @@ private fun CodeBlockRow(
                 .onGloballyPositioned {
                     geometry.fieldBounds[index] = Rect(it.positionInRoot(), it.size.toSize())
                 }
+                .focusRequester(focusRequester)
                 .onFocusChanged {
                     if (it.isFocused) {
                         state.focusedIndex = index

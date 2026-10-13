@@ -62,6 +62,7 @@ enum class MarkdownFormatAction {
     Underline,
     Strikethrough,
     InlineCode,
+    CodeBlock,
     BulletList,
     OrderedList,
     TaskList,
@@ -189,6 +190,14 @@ fun MarkdownFormattingToolbar(
                 contentDescription = stringResource(sharedR.string.text_editor_format_code),
                 isActive = formats.isInlineCode,
                 enabled = MarkdownFormatAction.InlineCode !in disabledActions,
+                onAction = onAction,
+            )
+            ToolbarToggleButton(
+                action = MarkdownFormatAction.CodeBlock,
+                icon = IconPack.Medium.Thin.Outline.TextCodeBlock,
+                contentDescription = stringResource(sharedR.string.text_editor_format_code_block),
+                isActive = formats.isCodeBlock,
+                enabled = MarkdownFormatAction.CodeBlock !in disabledActions,
                 onAction = onAction,
             )
             ToolbarToggleButton(

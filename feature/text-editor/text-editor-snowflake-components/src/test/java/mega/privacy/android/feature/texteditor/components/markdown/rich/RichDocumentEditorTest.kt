@@ -419,6 +419,66 @@ class RichDocumentEditorTest {
     }
 
     @Test
+    fun `test that Enter in a code block adds a line`() {
+        setEditor(RichDocument(listOf(RichBlock.CodeBlock(null, "val x = 1"))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(9))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("\n")
+        composeRule.waitForIdle()
+
+        assertThat(state.blocks).hasSize(1)
+        assertThat((state.blocks[0] as CodeBlockEditState).code.text.toString())
+            .isEqualTo("val x = 1\n")
+    }
+
+    @Test
+    fun `test that a second Enter in a code block exits it into a new paragraph`() {
+        setEditor(RichDocument(listOf(RichBlock.CodeBlock(null, "val x = 1\n"))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(10))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("\n")
+        composeRule.waitForIdle()
+
+        assertThat(state.blocks).hasSize(2)
+        assertThat((state.blocks[0] as CodeBlockEditState).code.text.toString())
+            .isEqualTo("val x = 1")
+        assertThat((state.blocks[1] as RichTextBlockEditState).text.textFieldState.text.toString())
+            .isEmpty()
+        assertThat(state.pendingCodeBlockExit).isNull()
+        composeRule.onNodeWithTag(richBlockFieldTag(1)).assertIsFocused()
+    }
+
+    @Test
+    fun `test that Enter on a blank line inside a code block keeps the line`() {
+        setEditor(RichDocument(listOf(RichBlock.CodeBlock(null, "first\n\nsecond"))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(7))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("\n")
+        composeRule.waitForIdle()
+
+        assertThat(state.blocks).hasSize(1)
+        assertThat((state.blocks[0] as CodeBlockEditState).code.text.toString())
+            .isEqualTo("first\n\n\nsecond")
+    }
+
+    @Test
+    fun `test that Enter on an empty code block replaces it with a paragraph`() {
+        setEditor(RichDocument(listOf(RichBlock.CodeBlock(null, "\n"))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(1))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("\n")
+        composeRule.waitForIdle()
+
+        assertThat(state.blocks).hasSize(1)
+        assertThat(state.blocks[0]).isInstanceOf(RichTextBlockEditState::class.java)
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsFocused()
+    }
+
+    @Test
     fun `test that ordered items respect the run's start number`() {
         setEditor(
             RichDocument(

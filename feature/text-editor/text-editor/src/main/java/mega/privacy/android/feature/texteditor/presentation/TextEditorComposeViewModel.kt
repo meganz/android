@@ -582,6 +582,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             MarkdownFormatAction.OrderedList -> rich.toggleFocusedListItem(ordered = true)
             MarkdownFormatAction.TaskList -> rich.toggleFocusedTaskItem()
             MarkdownFormatAction.Quote -> rich.toggleFocusedQuote()
+            MarkdownFormatAction.CodeBlock ->
+                if (!rich.toggleSelectionCodeBlock()) rich.toggleFocusedCodeBlock()
             MarkdownFormatAction.Link -> requestRichLinkDialog(rich)
         }
     }

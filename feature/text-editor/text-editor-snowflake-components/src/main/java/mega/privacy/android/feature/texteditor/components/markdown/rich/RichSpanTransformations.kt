@@ -174,11 +174,29 @@ private fun TextFieldBuffer.interceptDocumentSelectionEdit(
 class DocumentSelectionInputTransformation(
     private val documentSelectionActive: () -> Boolean,
     private val onReplaceDocumentSelection: (String) -> Unit,
+    private val onExitOnBlankLine: (() -> Unit)? = null,
 ) : InputTransformation {
 
     override fun TextFieldBuffer.transformInput() {
         if (changes.changeCount == 0) return
-        interceptDocumentSelectionEdit(documentSelectionActive, onReplaceDocumentSelection)
+        if (interceptDocumentSelectionEdit(documentSelectionActive, onReplaceDocumentSelection)) {
+            return
+        }
+        // A code block holds many lines, so Enter must stay available for a new line. Enter on
+        // a blank last line is the way out, the same gesture that sheds a list marker. The
+        // line must be the last one, because a blank line between two lines of code must stay
+        // a blank line. Like onSplit, this only RECORDS the request: the edit session is
+        // still open.
+        val exit = onExitOnBlankLine ?: return
+        if (changes.changeCount != 1) return
+        val range = changes.getRange(0)
+        if (range.max != length) return
+        if (asCharSequence().subSequence(range.min, range.max).toString() != "\n") return
+        val originalStart = changes.getOriginalRange(0).min
+        if (originalStart == 0) return
+        if (asCharSequence()[originalStart - 1] != '\n') return
+        revertAllChanges()
+        exit.invoke()
     }
 }
 

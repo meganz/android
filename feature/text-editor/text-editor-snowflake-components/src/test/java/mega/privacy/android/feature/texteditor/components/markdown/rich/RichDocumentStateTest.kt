@@ -335,6 +335,223 @@ internal class RichDocumentStateTest {
     }
 
     @Test
+    fun `test that toggleFocusedCodeBlock turns a paragraph into a code block`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("val x = 1")))
+        state.focusedIndex = 0
+
+        state.toggleFocusedCodeBlock()
+
+        val block = state.blocks[0] as CodeBlockEditState
+        assertThat(block.code.text.toString()).isEqualTo("val x = 1")
+        assertThat(block.language).isNull()
+    }
+
+    @Test
+    fun `test that toggleFocusedCodeBlock drops inline spans when making a code block`() {
+        val state = stateOf(
+            RichBlock.Paragraph(
+                RichText("bold text", listOf(RichSpan(0, 4, RichSpanStyle.Bold))),
+            ),
+        )
+        state.focusedIndex = 0
+
+        state.toggleFocusedCodeBlock()
+
+        assertThat(state.blocks[0]).isInstanceOf(CodeBlockEditState::class.java)
+        assertThat(state.toDocument().blocks.single())
+            .isEqualTo(RichBlock.CodeBlock(null, "bold text"))
+    }
+
+    @Test
+    fun `test that toggleFocusedCodeBlock returns one paragraph per code line`() {
+        val state = stateOf(RichBlock.CodeBlock("kotlin", "first\nsecond\nthird"))
+        state.focusedIndex = 0
+
+        state.toggleFocusedCodeBlock()
+
+        assertThat(state.blocks).hasSize(3)
+        assertThat(state.blocks.map { (it as RichTextBlockEditState).text.textFieldState.text.toString() })
+            .containsExactly("first", "second", "third").inOrder()
+        assertThat(state.focusedIndex).isEqualTo(2)
+    }
+
+    @Test
+    fun `test that toggleFocusedCodeBlock round trips a single line`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("plain")))
+        state.focusedIndex = 0
+
+        state.toggleFocusedCodeBlock()
+        state.toggleFocusedCodeBlock()
+
+        val block = state.blocks.single() as RichTextBlockEditState
+        assertThat(block.text.textFieldState.text.toString()).isEqualTo("plain")
+        assertThat(block.kind).isEqualTo(RichBlockKind.Paragraph)
+    }
+
+    @Test
+    fun `test that toggleFocusedCodeBlock is undoable`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("code me")))
+        state.focusedIndex = 0
+
+        state.toggleFocusedCodeBlock()
+        assertThat(state.undo()).isTrue()
+
+        assertThat(state.blocks.single()).isInstanceOf(RichTextBlockEditState::class.java)
+    }
+
+    @Test
+    fun `test that exitCodeBlock drops the blank line and focuses a new paragraph`() {
+        val state = stateOf(RichBlock.CodeBlock(null, "val x = 1\n"))
+        state.focusedIndex = 0
+
+        state.exitCodeBlock(0)
+
+        assertThat((state.blocks[0] as CodeBlockEditState).code.text.toString())
+            .isEqualTo("val x = 1")
+        val paragraph = state.blocks[1] as RichTextBlockEditState
+        assertThat(paragraph.text.textFieldState.text.toString()).isEmpty()
+        assertThat(paragraph.kind).isEqualTo(RichBlockKind.Paragraph)
+        assertThat(state.focusedIndex).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that exitCodeBlock replaces the block when it holds no code`() {
+        val state = stateOf(RichBlock.CodeBlock(null, "\n"))
+        state.focusedIndex = 0
+
+        state.exitCodeBlock(0)
+
+        val paragraph = state.blocks.single() as RichTextBlockEditState
+        assertThat(paragraph.text.textFieldState.text.toString()).isEmpty()
+        assertThat(state.focusedIndex).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that exitCodeBlock is undoable`() {
+        val state = stateOf(RichBlock.CodeBlock(null, "val x = 1\n"))
+        state.focusedIndex = 0
+
+        state.exitCodeBlock(0)
+        assertThat(state.undo()).isTrue()
+
+        assertThat(state.blocks.single()).isInstanceOf(CodeBlockEditState::class.java)
+    }
+
+    @Test
+    fun `test that exitCodeBlock does nothing when the block is not a code block`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("text")))
+        state.focusedIndex = 0
+
+        state.exitCodeBlock(0)
+
+        assertThat(state.blocks).hasSize(1)
+    }
+
+    @Test
+    fun `test that toggleSelectionCodeBlock joins the selected blocks into one code block`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first")),
+            RichBlock.Paragraph(RichText("second")),
+            RichBlock.Paragraph(RichText("third")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(1, 6),
+        )
+
+        assertThat(state.toggleSelectionCodeBlock()).isTrue()
+
+        assertThat(state.blocks).hasSize(2)
+        assertThat((state.blocks[0] as CodeBlockEditState).code.text.toString())
+            .isEqualTo("first\nsecond")
+        assertThat((state.blocks[1] as RichTextBlockEditState).text.textFieldState.text.toString())
+            .isEqualTo("third")
+        assertThat(state.documentSelection).isNull()
+        assertThat(state.focusedIndex).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that toggleSelectionCodeBlock converts whole blocks when the selection is partial`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first")),
+            RichBlock.Paragraph(RichText("second")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 3),
+            RichDocPosition(1, 2),
+        )
+
+        state.toggleSelectionCodeBlock()
+
+        assertThat((state.blocks.single() as CodeBlockEditState).code.text.toString())
+            .isEqualTo("first\nsecond")
+    }
+
+    @Test
+    fun `test that toggleSelectionCodeBlock turns selected code blocks back into paragraphs`() {
+        val state = stateOf(
+            RichBlock.CodeBlock(null, "first\nsecond"),
+            RichBlock.CodeBlock(null, "third"),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(1, 5),
+        )
+
+        state.toggleSelectionCodeBlock()
+
+        assertThat(state.blocks.map { (it as RichTextBlockEditState).text.textFieldState.text.toString() })
+            .containsExactly("first", "second", "third").inOrder()
+    }
+
+    @Test
+    fun `test that toggleSelectionCodeBlock does nothing when the selection is inside one block`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("text")))
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(0, 4),
+        )
+
+        assertThat(state.toggleSelectionCodeBlock()).isFalse()
+
+        assertThat(state.blocks.single()).isInstanceOf(RichTextBlockEditState::class.java)
+    }
+
+    @Test
+    fun `test that toggleSelectionCodeBlock does nothing when the selection holds a table`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first")),
+            RichBlock.Table(listOf(null), listOf(RichText("head")), listOf(listOf(RichText("cell")))),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(1, 0),
+        )
+
+        assertThat(state.canToggleSelectionCodeBlock()).isFalse()
+        assertThat(state.toggleSelectionCodeBlock()).isFalse()
+        assertThat(state.blocks).hasSize(2)
+    }
+
+    @Test
+    fun `test that toggleSelectionCodeBlock is undoable`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first")),
+            RichBlock.Paragraph(RichText("second")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(1, 6),
+        )
+
+        state.toggleSelectionCodeBlock()
+        assertThat(state.undo()).isTrue()
+
+        assertThat(state.blocks).hasSize(2)
+        assertThat(state.blocks.all { it is RichTextBlockEditState }).isTrue()
+    }
+
+    @Test
     fun `test that structural toggles do nothing when no block is focused`() {
         val state = stateOf(RichBlock.Paragraph(RichText("text")))
 

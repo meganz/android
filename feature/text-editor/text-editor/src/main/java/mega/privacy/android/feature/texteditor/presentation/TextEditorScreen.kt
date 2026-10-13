@@ -96,6 +96,7 @@ import mega.privacy.android.feature.texteditor.components.markdown.MarkdownForma
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormattingToolbar
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownLinkDialog
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSelectionFormats
+import mega.privacy.android.feature.texteditor.components.markdown.rich.CodeBlockEditState
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichBlockKind
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentEditor
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentState
@@ -909,9 +910,11 @@ private fun RichEditToolbar(
 ) {
     var formats by remember { mutableStateOf(MarkdownSelectionFormats.Empty) }
     val focused = richState.focusedInlineText
-    LaunchedEffect(focused) {
+    LaunchedEffect(focused, richState) {
         if (focused == null) {
-            formats = MarkdownSelectionFormats.Empty
+            // A focused code block has no inline text, so only its own button can light up.
+            snapshotFlow { richState.isCodeBlockFocused() }
+                .collect { formats = MarkdownSelectionFormats(isCodeBlock = it) }
             return@LaunchedEffect
         }
         // Everything the formats derive from (kind included) is read inside the snapshot flow,
@@ -937,21 +940,33 @@ private fun RichEditToolbar(
                 )
             } else {
                 base
-            }
+            }.copy(isCodeBlock = richState.isCodeBlockFocused())
         }.collect { formats = it }
     }
     // Structural actions are disabled where they cannot act on what the user sees:
-    // table cells take inline styles only, and a cross-block selection would silently
-    // retype just the origin block.
-    val structuralDisabled = richState.focusedCell != null ||
-            richState.documentSelection != null
+    // table cells take inline styles only, and a selection reaching across blocks would
+    // silently retype just the origin block. A selection held inside one block is that
+    // block, so the action still does what the user sees it do.
+    val selection = richState.documentSelection
+    val crossBlockSelection =
+        selection != null && selection.start.blockIndex != selection.end.blockIndex
+    val structuralDisabled = richState.focusedCell != null || crossBlockSelection
+    // The code block action is the exception: it takes the whole selection, so it stays
+    // available while every selected block can go into a code block.
+    val disabledActions = when {
+        !structuralDisabled -> emptySet()
+        richState.focusedCell == null && richState.canToggleSelectionCodeBlock() ->
+            StructuralFormatActions - MarkdownFormatAction.CodeBlock
+
+        else -> StructuralFormatActions
+    }
     MarkdownFormattingToolbar(
         formats = formats,
         onAction = viewModel::applyFormatAction,
         onTextStyleSelected = viewModel::setTextStyle,
         modifier = modifier,
         textStyleEnabled = !structuralDisabled,
-        disabledActions = if (structuralDisabled) StructuralFormatActions else emptySet(),
+        disabledActions = disabledActions,
     )
 }
 
@@ -986,11 +1001,15 @@ private fun richSelectionFormats(
     )
 }
 
+private fun RichDocumentState.isCodeBlockFocused(): Boolean =
+    focusedIndex?.let { blocks.getOrNull(it) } is CodeBlockEditState
+
 private val StructuralFormatActions = setOf(
     MarkdownFormatAction.BulletList,
     MarkdownFormatAction.OrderedList,
     MarkdownFormatAction.TaskList,
     MarkdownFormatAction.Quote,
+    MarkdownFormatAction.CodeBlock,
 )
 
 private val InlineToggleStyles = setOf(

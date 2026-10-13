@@ -301,6 +301,7 @@ interface IconPackInterface {
                 val ListSmall: ImageVector
                 val ListNumbers: ImageVector
                 val Code: ImageVector
+                val TextCodeBlock: ImageVector
                 val Url: ImageVector
             }
 

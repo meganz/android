@@ -4364,6 +4364,8 @@
     <string name="text_editor_format_quote">Quote</string>
     <!-- Content description for the code button in the rich text editor's formatting toolbar, which styles the selected text as a snippet of computer code -->
     <string name="text_editor_format_code">Code</string>
+    <!-- Content description for the code block button in the rich text editor's formatting toolbar, which turns the current line into a block of computer code set apart from the surrounding text -->
+    <string name="text_editor_format_code_block">Code block</string>
     <!-- Content description for the link button in the rich text editor's formatting toolbar, which opens the dialog for adding a web link -->
     <string name="text_editor_format_link">Link</string>
     <!-- Label of the text style chip in the rich text editor's formatting toolbar when the current line is ordinary paragraph text rather than a heading -->

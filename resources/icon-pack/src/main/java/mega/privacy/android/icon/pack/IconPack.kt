@@ -166,6 +166,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSunImageVec
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSync01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTagSimpleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextBoldImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextCodeBlockImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextItalicImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextQuoteImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTextStrikethroughImageVector
@@ -705,6 +706,9 @@ public object IconPack : IconPackInterface {
 
                 override val TextBold: ImageVector by
                         lazy { createMediumThinOutlineTextBoldImageVector() }
+
+                override val TextCodeBlock: ImageVector by
+                        lazy { createMediumThinOutlineTextCodeBlockImageVector() }
 
                 override val TextItalic: ImageVector by
                         lazy { createMediumThinOutlineTextItalicImageVector() }

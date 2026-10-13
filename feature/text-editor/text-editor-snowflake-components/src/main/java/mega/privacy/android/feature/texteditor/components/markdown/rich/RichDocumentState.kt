@@ -132,6 +132,9 @@ class RichDocumentState(document: RichDocument) {
 
     var pendingSplit: RichSplitRequest? by mutableStateOf(null)
 
+    /** Index of a code block the user asked to leave by pressing Enter on a blank line. */
+    var pendingCodeBlockExit: Int? by mutableStateOf(null)
+
     /**
      * The cross-block "document selection" (long-press + drag across blocks). Independent of
      * the per-field editing selection: it is painted through the span pipeline and copied via
@@ -236,6 +239,7 @@ class RichDocumentState(document: RichDocument) {
         focusedIndex = focusedIndex?.coerceIn(0, (blocks.size - 1).coerceAtLeast(0))
         pendingFocus = null
         pendingSplit = null
+        pendingCodeBlockExit = null
         pendingSelectionReplacement = null
         pendingSmartInsert = null
         documentSelection = null
@@ -784,6 +788,127 @@ class RichDocumentState(document: RichDocument) {
             else -> RichBlockKind.Item(ordered = false, indent = 0, checked = false)
         }
         restoreFocusAfterRetype()
+    }
+
+    /**
+     * True while the code block action can act on a selection that reaches across blocks.
+     * Every selected block must be a text block or a code block, because a table or a
+     * thematic break has no lines to carry into a code block.
+     */
+    fun canToggleSelectionCodeBlock(): Boolean {
+        val selection = documentSelection ?: return false
+        return (selection.start.blockIndex..selection.end.blockIndex).all { index ->
+            val block = blocks.getOrNull(index)
+            block is RichTextBlockEditState || block is CodeBlockEditState
+        }
+    }
+
+    /**
+     * Toolbar code block action over a selection that reaches across blocks: the selected
+     * blocks become one code block, one line per block, because a code block holds a single
+     * text run. A selection of code blocks goes the other way, one paragraph per line. Whole
+     * blocks are converted, like the other structural actions, so a partly selected block
+     * does not lose its unselected half. Returns false when there is nothing to act on, so
+     * the caller can fall back to the focused block.
+     */
+    fun toggleSelectionCodeBlock(): Boolean {
+        val selection = documentSelection ?: return false
+        val from = selection.start.blockIndex
+        val to = selection.end.blockIndex
+        if (from >= to || !canToggleSelectionCodeBlock()) return false
+        val selected = (from..to).map { blocks[it] }
+        recordUndo()
+        val lines = selected.flatMap { block ->
+            when (block) {
+                is CodeBlockEditState -> block.code.text.toString().split("\n")
+                else -> listOf(
+                    (block as RichTextBlockEditState).text.textFieldState.text.toString()
+                )
+            }
+        }
+        documentSelection = null
+        repeat(to - from + 1) { blocks.removeAt(from) }
+        if (selected.all { it is CodeBlockEditState }) {
+            lines.forEachIndexed { offset, line ->
+                blocks.add(
+                    from + offset,
+                    RichTextBlockEditState(RichBlockKind.Paragraph, RichTextBlockState(line)),
+                )
+            }
+            val last = from + lines.lastIndex
+            focusedIndex = last
+            pendingFocus = RichFocusRequest(last, TextRange(lines.last().length))
+        } else {
+            val code = lines.joinToString("\n")
+            blocks.add(from, CodeBlockEditState(language = null, initialCode = code))
+            focusedIndex = from
+            pendingFocus = RichFocusRequest(from, TextRange(code.length))
+        }
+        return true
+    }
+
+    /** Records the request; the editor runs [exitCodeBlock] once the edit session closes. */
+    fun requestCodeBlockExit(index: Int) {
+        pendingCodeBlockExit = index
+    }
+
+    /**
+     * Leaves the code block at [index] after Enter on a blank line: drops that blank line and
+     * puts the caret in an empty paragraph below. A code block left with nothing in it becomes
+     * the paragraph itself, so the gesture cannot strand an empty box.
+     */
+    fun exitCodeBlock(index: Int) {
+        val block = blocks.getOrNull(index) as? CodeBlockEditState ?: return
+        recordUndo()
+        val code = block.code.text.toString().removeSuffix("\n")
+        val paragraph = RichTextBlockEditState(RichBlockKind.Paragraph, RichTextBlockState(""))
+        if (code.isBlank()) {
+            blocks[index] = paragraph
+            focusedIndex = index
+            pendingFocus = RichFocusRequest(index, TextRange.Zero)
+            return
+        }
+        block.code.edit { replace(0, length, code) }
+        blocks.add(index + 1, paragraph)
+        focusedIndex = index + 1
+        pendingFocus = RichFocusRequest(index + 1, TextRange.Zero)
+    }
+
+    /**
+     * Toolbar code block action: swaps the focused block between a code block and plain text.
+     * A code block is its own block type rather than a [RichBlockKind], so the element is
+     * replaced in [blocks] instead of retyped. Code blocks hold no spans, so inline formatting
+     * does not survive the trip into one, and a code block with several lines comes back as one
+     * paragraph per line, because text blocks hold a single line each.
+     */
+    fun toggleFocusedCodeBlock() {
+        val index = focusedIndex ?: return
+        when (val block = blocks.getOrNull(index)) {
+            is RichTextBlockEditState -> {
+                recordUndo()
+                val text = block.text.textFieldState.text.toString()
+                blocks[index] = CodeBlockEditState(language = null, initialCode = text)
+                focusedIndex = index
+                pendingFocus = RichFocusRequest(index, TextRange(text.length))
+            }
+
+            is CodeBlockEditState -> {
+                recordUndo()
+                val lines = block.code.text.toString().split("\n")
+                blocks.removeAt(index)
+                lines.forEachIndexed { offset, line ->
+                    blocks.add(
+                        index + offset,
+                        RichTextBlockEditState(RichBlockKind.Paragraph, RichTextBlockState(line)),
+                    )
+                }
+                val last = index + lines.lastIndex
+                focusedIndex = last
+                pendingFocus = RichFocusRequest(last, TextRange(lines.last().length))
+            }
+
+            else -> Unit
+        }
     }
 
     /** Toolbar quote action: toggles the focused block between quote and paragraph. */
