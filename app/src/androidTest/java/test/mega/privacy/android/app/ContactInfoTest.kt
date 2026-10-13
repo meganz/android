@@ -497,7 +497,7 @@ class ContactInfoTest {
 
         awaitObject(By.text(oneDayOptionText()), LOAD_TIMEOUT, "one-day-option")
         clickText(oneDayOptionText(), "one-day-option")
-        clickText(retentionOkText(), "retention-dialog-ok")
+        clickText(okText(), "retention-dialog-ok")
 
         awaitInvocations("setChatRetentionTime($CHAT_ID, $SECONDS_IN_DAY)") {
             fakeMegaChat.invocations.filter {
@@ -714,8 +714,6 @@ class ContactInfoTest {
 
     private fun okText() = targetContext.getString(sharedR.string.general_ok_only)
 
-    private fun retentionOkText() = targetContext.getString(sharedR.string.general_ok)
-
     private fun clearText() = targetContext.getString(sharedR.string.general_clear)
 
     private fun infoText() = targetContext.getString(R.string.general_info)
@@ -730,13 +728,14 @@ class ContactInfoTest {
     private fun resetText() = targetContext.getString(R.string.action_reset)
 
     private fun oneDayOptionText() =
-        targetContext.getString(R.string.history_retention_option_one_day)
+        targetContext.getString(sharedR.string.chat_manage_history_retention_option_one_day)
 
     private fun oneDayRetentionText() = targetContext.resources.getQuantityString(
-        R.plurals.label_time_in_days_full, 1, 1,
+        sharedR.plurals.contact_info_retention_time_days, 1, 1,
     )
 
-    private fun historyClearedText() = targetContext.getString(R.string.clear_history_success)
+    private fun historyClearedText() =
+        targetContext.getString(sharedR.string.clear_history_success)
 
     // endregion
 
@@ -860,10 +859,9 @@ class ContactInfoTest {
         const val CHAT_TEXT_FIELD_TAG = "chat_text_field"
         const val SEND_ICON_TAG = "chat_input_text_toolbar:send_icon"
 
-        /** Mirrors HISTORY_CLEARING_OPTION_SWITCH_TAG / CLEAR_HISTORY_OPTION_TAG. */
-        const val HISTORY_CLEARING_SWITCH_TAG = "history_clearing_option:switch_enablement_toggle"
-        const val CLEAR_HISTORY_OPTION_TAG =
-            "manage_chat_history_screen:clear_history_option_the_clear_all_chat_or_meeting_history_option"
+        /** Mirrors HISTORY_CLEARING_TOGGLE_TAG / CLEAR_HISTORY_ROW_TAG. */
+        const val HISTORY_CLEARING_SWITCH_TAG = "settings_manage_chat_history_clearing:toggle"
+        const val CLEAR_HISTORY_OPTION_TAG = "settings_manage_chat_history_clear:list_item"
 
         const val NODE_ATTACHMENT_HISTORY_ACTIVITY =
             "mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity"
