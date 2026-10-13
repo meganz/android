@@ -1,5 +1,7 @@
 package mega.privacy.android.data.gateway.zipremote
 
+import android.system.ErrnoException
+import android.system.OsConstants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
@@ -96,7 +98,12 @@ internal class RangeReaderGatewayImpl @Inject constructor(
                         minOf(buffer.size.toLong(), length - copied).toInt(),
                     )
                     if (read == -1) break
-                    file.write(buffer, 0, read)
+                    try {
+                        file.write(buffer, 0, read)
+                    } catch (e: IOException) {
+                        if (e.isNoSpaceLeft()) throw DiskFullException(e)
+                        throw e
+                    }
                     copied += read
                     onBytes(read.toLong())
                 }
@@ -111,6 +118,9 @@ internal class RangeReaderGatewayImpl @Inject constructor(
             startedAt.elapsedNow().inWholeMilliseconds,
         )
     }
+
+    private fun IOException.isNoSpaceLeft(): Boolean =
+        (cause as? ErrnoException)?.errno == OsConstants.ENOSPC
 
     private companion object {
 

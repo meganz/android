@@ -105,6 +105,14 @@ class CacheGatewayImplTest {
         }
 
     @Test
+    fun `test that getCacheFolder returns the folder without creating it`() = runTest {
+        val actual = underTest.getCacheFolder("zip_browser_remote")
+
+        assertThat(actual).isEqualTo(File(cacheDir, "zip_browser_remote"))
+        assertThat(actual.exists()).isFalse()
+    }
+
+    @Test
     fun `test that getThumbnailCacheFolderPath creates the folder and returns its path`() =
         runTest {
             val actual = underTest.getThumbnailCacheFolderPath()

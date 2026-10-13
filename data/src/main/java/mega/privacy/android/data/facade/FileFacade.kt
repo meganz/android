@@ -1924,6 +1924,15 @@ internal class FileFacade @Inject constructor(
         }.getOrDefault(false)
     }
 
+    // A folder on no mounted volume (a removed SD card) has no uuid to ask about, and its usable
+    // space is then the only figure there is.
+    @SuppressLint("UsableSpace")
+    override fun allocateBytes(directory: File, bytes: Long): Long = runCatching {
+        val storageManager = context.getSystemService(StorageManager::class.java)
+        storageManager.allocateBytes(storageManager.getUuidForPath(directory), bytes)
+        maxOf(bytes, directory.usableSpace)
+    }.getOrElse { directory.usableSpace }
+
     /** Resets [isDirectQuerySupported] between unit tests. */
     internal fun resetDirectQuerySupportedCacheForTests() {
         isDirectQuerySupported = null

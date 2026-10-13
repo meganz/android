@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway.zipremote
 
 import java.io.File
+import java.io.IOException
 
 /**
  * Reads part of a file served over http, which is how the SDK's local streaming server hands out
@@ -16,6 +17,7 @@ internal interface RangeReaderGateway {
      *
      * @param onBytes called on an IO thread for each chunk written, with its size; it must be
      * fast and thread-safe
+     * @throws DiskFullException when [destination] is on a volume that has no space left
      * @throws java.io.IOException when the server does not return exactly that range
      */
     suspend fun copyRange(
@@ -26,3 +28,8 @@ internal interface RangeReaderGateway {
         onBytes: (Long) -> Unit = {},
     )
 }
+
+/**
+ * A write to the local copy failed because its volume is full. Retrying the read does not help.
+ */
+internal class DiskFullException(cause: IOException) : IOException(cause)

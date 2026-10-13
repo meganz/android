@@ -776,4 +776,14 @@ interface FileGateway {
      * @return true if a suitable app is available, false otherwise
      */
     fun hasSuitableAppToOpenFile(mimeType: String): Boolean
+
+    /**
+     * Makes [bytes] writable under [directory], asking the system to clear cached data to make
+     * room. Writing a file does not clear that data, so space that only counts it is not there
+     * when the bytes are written.
+     *
+     * @return the bytes that can be written under [directory]; less than [bytes] when the system
+     * could not make that much room
+     */
+    fun allocateBytes(directory: File, bytes: Long): Long
 }

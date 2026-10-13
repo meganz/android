@@ -18,6 +18,15 @@ interface CacheGateway {
     suspend fun getOrCreateCacheFolder(folderName: String): File?
 
     /**
+     * Get a folder in cache without creating it, for callers that only look up or remove what
+     * may already be there
+     *
+     * @param folderName
+     * @return the File corresponding to the folder in cache, which may not exist
+     */
+    suspend fun getCacheFolder(folderName: String): File
+
+    /**
      * Get the chat folder in cache and returns the file
      * Create the folder if it does not exist
      *

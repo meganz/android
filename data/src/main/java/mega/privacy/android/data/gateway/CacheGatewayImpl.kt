@@ -41,6 +41,9 @@ internal class CacheGatewayImpl @Inject constructor(
             File(context.cacheDir, folderName).takeIf { it.isDirectory || it.mkdir() || it.isDirectory }
         }
 
+    override suspend fun getCacheFolder(folderName: String): File =
+        withContext(ioDispatcher) { File(context.cacheDir, folderName) }
+
     override suspend fun getOrCreateChatCacheFolder(): File? = withContext(ioDispatcher) {
         File(
             context.filesDir,
