@@ -12,6 +12,8 @@ package mega.privacy.android.feature.texteditor.components.markdown.rich
  * - Replacing a selection that starts or ends exactly at a range's edge keeps the style
  *   (select a bold word and retype it — it stays bold).
  * - Deleting a range's whole content removes the span.
+ * - A link never grows from an edit made at a caret, even when the IME frames that edit as a
+ *   replacement of the whole word. See [adjust]'s `typedAtCaret`.
  */
 object RichSpanAdjuster {
 
@@ -29,17 +31,26 @@ object RichSpanAdjuster {
         val isInsertion: Boolean get() = originalStart == originalEnd
     }
 
-    /** Remaps [spans] through [changes], growing edge-adjacent spans for [typingStyles]. */
+    /**
+     * Remaps [spans] through [changes], growing edge-adjacent spans for [typingStyles].
+     *
+     * [typedAtCaret] says the edit came from typing with a collapsed caret rather than from
+     * replacing a selection. It holds links to their own text: a word-completing IME commits
+     * a letter typed onto the end of a link as a replacement of the whole word, which the
+     * rule above would otherwise read as retyping the link text.
+     */
     fun adjust(
         spans: List<RichSpan>,
         changes: List<TextChange>,
         typingStyles: Set<RichSpanStyle> = emptySet(),
+        typedAtCaret: Boolean = false,
     ): List<RichSpan> {
         if (changes.isEmpty()) return spans
         val mapped = spans.mapNotNull { span ->
             val extend = span.style in typingStyles
+            val clampToReplaced = typedAtCaret && span.style is RichSpanStyle.Link
             val start = mapStart(span.start, changes, extend)
-            val end = mapEnd(span.end, changes, extend)
+            val end = mapEnd(span.end, changes, extend, clampToReplaced)
             if (start < end) RichSpan(start, end, span.style) else null
         }
         // Styled typing into plain text: inserted ranges get the active styles even when there
@@ -120,7 +131,12 @@ object RichSpanAdjuster {
         return position + delta
     }
 
-    private fun mapEnd(position: Int, changes: List<TextChange>, extend: Boolean): Int {
+    private fun mapEnd(
+        position: Int,
+        changes: List<TextChange>,
+        extend: Boolean,
+        clampToReplaced: Boolean = false,
+    ): Int {
         var delta = 0
         changes.forEach { change ->
             when {
@@ -131,6 +147,12 @@ object RichSpanAdjuster {
                             (change.originalEnd - change.originalStart)
 
                 position == change.originalEnd -> return when {
+                    // The replacement stands in for the same characters, so the span covers
+                    // as many of them as it covered before, and no more.
+                    !change.isInsertion && clampToReplaced ->
+                        (change.newStart + (position - change.originalStart))
+                            .coerceIn(change.newStart, change.newEnd)
+
                     !change.isInsertion -> change.newEnd // replaced trailing content keeps style
                     extend -> change.newEnd
                     else -> change.newStart

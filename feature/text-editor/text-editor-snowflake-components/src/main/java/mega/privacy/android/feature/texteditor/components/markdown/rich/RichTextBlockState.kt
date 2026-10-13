@@ -30,9 +30,19 @@ class RichTextBlockState(
     var editCount: Int by mutableStateOf(0)
         internal set
 
-    /** Styles covering [offset] — a caret directly after styled text counts as inside it. */
+    /**
+     * Styles covering [offset] — a caret directly after styled text counts as inside it.
+     *
+     * A link is never reported, so it never becomes a typing style: text typed at a link
+     * boundary must stay plain instead of taking the link URL without the user asking for it.
+     * Typing inside a link still extends it, because those characters land inside the span,
+     * and the link text can also be changed in the link dialog.
+     */
     fun stylesAt(offset: Int): Set<RichSpanStyle> =
-        spans.filter { offset > it.start && offset <= it.end }.map { it.style }.toSet()
+        spans.filterNot { it.style is RichSpanStyle.Link }
+            .filter { offset > it.start && offset <= it.end }
+            .map { it.style }
+            .toSet()
 
     /**
      * Toolbar toggle: with a selection, applies/removes [style] over it; with a collapsed

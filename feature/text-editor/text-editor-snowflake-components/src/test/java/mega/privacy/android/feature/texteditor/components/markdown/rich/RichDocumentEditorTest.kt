@@ -505,6 +505,58 @@ class RichDocumentEditorTest {
     }
 
     @Test
+    fun `test that typing after a link stays plain`() {
+        setEditor(linkDocument())
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(4))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput(" more")
+        composeRule.waitForIdle()
+
+        val block = state.blocks[0] as RichTextBlockEditState
+        assertThat(block.text.textFieldState.text.toString()).isEqualTo("link more rest")
+        assertThat(block.text.spans)
+            .containsExactly(RichSpan(0, 4, RichSpanStyle.Link(LINK_URL)))
+    }
+
+    @Test
+    fun `test that typing inside a link extends it`() {
+        setEditor(linkDocument())
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(2))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("xx")
+        composeRule.waitForIdle()
+
+        val block = state.blocks[0] as RichTextBlockEditState
+        assertThat(block.text.textFieldState.text.toString()).isEqualTo("lixxnk rest")
+        assertThat(block.text.spans)
+            .containsExactly(RichSpan(0, 6, RichSpanStyle.Link(LINK_URL)))
+    }
+
+    @Test
+    fun `test that typing before a link stays plain`() {
+        setEditor(linkDocument())
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(0))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("a ")
+        composeRule.waitForIdle()
+
+        val block = state.blocks[0] as RichTextBlockEditState
+        assertThat(block.text.spans)
+            .containsExactly(RichSpan(2, 6, RichSpanStyle.Link(LINK_URL)))
+    }
+
+    private fun linkDocument() = RichDocument(
+        listOf(
+            RichBlock.Paragraph(
+                RichText("link rest", listOf(RichSpan(0, 4, RichSpanStyle.Link(LINK_URL)))),
+            ),
+        ),
+    )
+
+    @Test
     fun `test that raw source blocks render like the preview instead of showing syntax`() {
         val table = "| City | Nights |\n|------|--------|\n| Rome | 3 |"
         setEditor(RichDocument(listOf(RichBlock.RawSource(table))))
@@ -512,5 +564,9 @@ class RichDocumentEditorTest {
         composeRule.onNodeWithText("City").assertExists()
         composeRule.onNodeWithText("Rome").assertExists()
         composeRule.onNodeWithText("|------|", substring = true).assertDoesNotExist()
+    }
+
+    private companion object {
+        const val LINK_URL = "https://mega.io"
     }
 }

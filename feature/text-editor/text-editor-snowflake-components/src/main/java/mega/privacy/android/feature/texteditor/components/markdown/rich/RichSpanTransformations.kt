@@ -75,7 +75,12 @@ class RichSpanInputTransformation(
                 newEnd = newRange.max,
             )
         }
-        state.spans = RichSpanAdjuster.adjust(state.spans, edits, state.typingStyles)
+        state.spans = RichSpanAdjuster.adjust(
+            spans = state.spans,
+            changes = edits,
+            typingStyles = state.typingStyles,
+            typedAtCaret = originalSelection.collapsed,
+        )
         state.editCount++
         // An IME Enter arriving as a multi-change edit (commit word + newline) slips past the
         // single-change intercept above. Only newlines INSERTED BY THIS EDIT are handed to

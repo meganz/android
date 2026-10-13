@@ -139,7 +139,31 @@ class RichSpanEditingTest {
         assertThat(state.stylesAt(7)).isEmpty()
     }
 
+    @Test
+    fun `test that stylesAt never reports a link`() {
+        setField("link plain", listOf(RichSpan(0, 4, RichSpanStyle.Link(URL))))
+
+        assertThat(state.stylesAt(2)).isEmpty()
+        assertThat(state.stylesAt(4)).isEmpty()
+    }
+
+    @Test
+    fun `test that syncTypingStylesToCaret keeps a link out of the typing styles`() {
+        setField(
+            "link bold",
+            listOf(RichSpan(0, 4, RichSpanStyle.Link(URL)), RichSpan(5, 9, RichSpanStyle.Bold)),
+        )
+        composeRule.onNodeWithTag(FIELD_TAG).performTextInputSelection(TextRange(4))
+        state.syncTypingStylesToCaret()
+        assertThat(state.typingStyles).isEmpty()
+
+        composeRule.onNodeWithTag(FIELD_TAG).performTextInputSelection(TextRange(9))
+        state.syncTypingStylesToCaret()
+        assertThat(state.typingStyles).containsExactly(RichSpanStyle.Bold)
+    }
+
     private companion object {
         const val FIELD_TAG = "rich_span_field"
+        const val URL = "https://mega.io"
     }
 }

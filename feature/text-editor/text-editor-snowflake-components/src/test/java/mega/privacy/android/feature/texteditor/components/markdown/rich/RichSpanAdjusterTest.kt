@@ -10,10 +10,69 @@ internal class RichSpanAdjusterTest {
 
     private val bold = RichSpanStyle.Bold
     private val italic = RichSpanStyle.Italic
+    private val link = RichSpanStyle.Link("https://mega.io")
 
     private fun insertion(at: Int, length: Int) = TextChange(at, at, at, at + length)
 
     // ---- adjust: insertions ----
+
+    // ---- adjust: links ----
+
+    @Test
+    fun `test that adjust keeps a link when a word completing IME replaces its text at a caret`() {
+        val result = RichSpanAdjuster.adjust(
+            spans = listOf(RichSpan(0, 4, link)),
+            changes = listOf(TextChange(0, 4, 0, 5)),
+            typedAtCaret = true,
+        )
+
+        assertThat(result).containsExactly(RichSpan(0, 4, link))
+    }
+
+    @Test
+    fun `test that adjust shrinks a link when the replacement is shorter than its text`() {
+        val result = RichSpanAdjuster.adjust(
+            spans = listOf(RichSpan(0, 5, link)),
+            changes = listOf(TextChange(0, 5, 0, 4)),
+            typedAtCaret = true,
+        )
+
+        assertThat(result).containsExactly(RichSpan(0, 4, link))
+    }
+
+    @Test
+    fun `test that adjust keeps a link over retyped text when a selection was replaced`() {
+        val result = RichSpanAdjuster.adjust(
+            spans = listOf(RichSpan(0, 4, link)),
+            changes = listOf(TextChange(0, 4, 0, 5)),
+            typedAtCaret = false,
+        )
+
+        assertThat(result).containsExactly(RichSpan(0, 5, link))
+    }
+
+    @Test
+    fun `test that adjust grows a link when typing strictly inside it at a caret`() {
+        val result = RichSpanAdjuster.adjust(
+            spans = listOf(RichSpan(0, 4, link)),
+            changes = listOf(insertion(at = 2, length = 2)),
+            typedAtCaret = true,
+        )
+
+        assertThat(result).containsExactly(RichSpan(0, 6, link))
+    }
+
+    @Test
+    fun `test that adjust leaves a non link span on the replaced trailing rule`() {
+        val result = RichSpanAdjuster.adjust(
+            spans = listOf(RichSpan(0, 4, bold)),
+            changes = listOf(TextChange(0, 4, 0, 5)),
+            typedAtCaret = true,
+        )
+
+        assertThat(result).containsExactly(RichSpan(0, 5, bold))
+    }
+
 
     @Test
     fun `test that adjust grows a span when typing strictly inside it`() {
