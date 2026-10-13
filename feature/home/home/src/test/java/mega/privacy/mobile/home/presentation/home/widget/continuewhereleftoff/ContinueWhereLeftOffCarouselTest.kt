@@ -20,8 +20,10 @@ import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffViewAllButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetDisplayedEvent
 import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetItemPressedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetMoreCardPressedEvent
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -214,6 +216,17 @@ class ContinueWhereLeftOffCarouselTest {
     }
 
     @Test
+    fun `test that view all button pressed event is tracked when chevron is clicked`() {
+        setContent(items = buildItems(count = 9))
+
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_CHEVRON_TEST_TAG).performClick()
+
+        assertThat(analyticsRule.events).contains(ContinueWhereLeftOffViewAllButtonPressedEvent)
+        assertThat(analyticsRule.events)
+            .doesNotContain(ContinueWhereLeftOffWidgetMoreCardPressedEvent)
+    }
+
+    @Test
     fun `test that carousel scrolls to start when a new most recent item is added`() {
         val initialItems = buildItems(count = 8)
         val items = setContentWithMutableItems(initialItems)
@@ -287,6 +300,19 @@ class ContinueWhereLeftOffCarouselTest {
         composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG).performClick()
 
         assertThat(viewAllClicked).isTrue()
+    }
+
+    @Test
+    fun `test that more card pressed event is tracked when more tile is clicked`() {
+        setContent(items = buildItems(count = 9))
+
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG)
+            .performScrollToNode(hasTestTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG))
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG).performClick()
+
+        assertThat(analyticsRule.events).contains(ContinueWhereLeftOffWidgetMoreCardPressedEvent)
+        assertThat(analyticsRule.events)
+            .doesNotContain(ContinueWhereLeftOffViewAllButtonPressedEvent)
     }
 
     private fun buildItems(count: Int) = (1L..count).map { handle ->

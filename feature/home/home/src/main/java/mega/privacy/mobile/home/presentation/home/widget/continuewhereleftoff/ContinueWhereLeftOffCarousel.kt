@@ -60,8 +60,10 @@ import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffViewAllButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetDisplayedEvent
 import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetItemPressedEvent
+import mega.privacy.mobile.analytics.event.ContinueWhereLeftOffWidgetMoreCardPressedEvent
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.DurationBadge
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.iconForType
 
@@ -138,7 +140,14 @@ internal fun ContinueWhereLeftOffCarousel(
                 }
                 if (showMore) {
                     item(key = CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG) {
-                        ContinueWhereLeftOffMoreCard(onClick = onViewAllClick)
+                        ContinueWhereLeftOffMoreCard(
+                            onClick = {
+                                Analytics.tracker.trackEvent(
+                                    ContinueWhereLeftOffWidgetMoreCardPressedEvent
+                                )
+                                onViewAllClick()
+                            },
+                        )
                     }
                 }
             }
@@ -178,7 +187,10 @@ private fun ContinueWhereLeftOffHeader(
                     .wrapContentSize(unbounded = true, align = Alignment.Center)
                     .size(48.dp)
                     .testTag(CONTINUE_WHERE_LEFT_OFF_CHEVRON_TEST_TAG)
-                    .clickable { onViewAllClick() },
+                    .clickable {
+                        Analytics.tracker.trackEvent(ContinueWhereLeftOffViewAllButtonPressedEvent)
+                        onViewAllClick()
+                    },
                 contentAlignment = Alignment.Center,
             ) {
                 MegaIcon(
