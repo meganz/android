@@ -256,6 +256,7 @@ fun SearchScreen(
             // Search results are not a playlist: an audio file opened from search plays as a
             // single track instead of queueing its parent folder.
             isMediaQueueAvailable = openedFileNode.type !is AudioFileTypeInfo,
+            imageNodeIds = uiState.visibleMediaNodeIds,
             onNavigate = navigationHandler::navigate,
         )
     }

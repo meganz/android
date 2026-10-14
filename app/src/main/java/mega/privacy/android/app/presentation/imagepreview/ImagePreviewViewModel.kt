@@ -466,7 +466,9 @@ class ImagePreviewViewModel @Inject constructor(
         showHiddenItems ?: return@withContext imageNodes
         isPaid ?: return@withContext imageNodes
 
-        return@withContext if (showHiddenItems || !isPaid || imagePreviewFetcherSource == ImagePreviewFetcherSource.RUBBISH_BIN || isBusinessAccountExpired) {
+        val isRubbishBin = imagePreviewFetcherSource == ImagePreviewFetcherSource.RUBBISH_BIN ||
+                imagePreviewMenuSource == ImagePreviewMenuSource.RUBBISH_BIN
+        return@withContext if (showHiddenItems || !isPaid || isRubbishBin || isBusinessAccountExpired) {
             imageNodes
         } else {
             imageNodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }

@@ -2,14 +2,20 @@ package mega.privacy.android.feature.clouddrive.presentation.search.model
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.seconds
 
 class SearchUiStateTest {
 
@@ -332,6 +338,67 @@ class SearchUiStateTest {
         )
 
         assertThat(state.isPreSearch).isFalse()
+    }
+
+    @Test
+    fun `test that visibleMediaNodeIds returns image and video ids in display order`() {
+        val items = listOf(
+            createFileItem(id = 30L, type = StaticImageFileTypeInfo("image/jpeg", "jpg")),
+            createFileItem(id = 10L, type = PdfFileTypeInfo),
+            createTestItems(selected = listOf(false), sensitive = listOf(false)).first(),
+            createFileItem(id = 20L, type = VideoFileTypeInfo("video/mp4", "mp4", 1.seconds)),
+            createFileItem(id = 5L, type = StaticImageFileTypeInfo("image/png", "png")),
+        )
+
+        val state = SearchUiState(items = items)
+
+        assertThat(state.visibleMediaNodeIds).containsExactly(30L, 20L, 5L).inOrder()
+    }
+
+    @Test
+    fun `test that visibleMediaNodeIds excludes sensitive items when hidden nodes are not shown`() {
+        val image = StaticImageFileTypeInfo("image/jpeg", "jpg")
+        val items = listOf(
+            createFileItem(id = 1L, type = image, isSensitive = true),
+            createFileItem(id = 2L, type = image),
+        )
+
+        val state = SearchUiState(
+            items = items,
+            showHiddenNodes = false,
+            isHiddenNodesEnabled = true,
+        )
+
+        assertThat(state.visibleMediaNodeIds).containsExactly(2L)
+    }
+
+    @Test
+    fun `test that visibleMediaNodeIds includes sensitive items when hidden nodes are shown`() {
+        val image = StaticImageFileTypeInfo("image/jpeg", "jpg")
+        val items = listOf(
+            createFileItem(id = 1L, type = image, isSensitive = true),
+            createFileItem(id = 2L, type = image),
+        )
+
+        val state = SearchUiState(
+            items = items,
+            showHiddenNodes = true,
+            isHiddenNodesEnabled = true,
+        )
+
+        assertThat(state.visibleMediaNodeIds).containsExactly(1L, 2L).inOrder()
+    }
+
+    private fun createFileItem(
+        id: Long,
+        type: FileTypeInfo,
+        isSensitive: Boolean = false,
+    ): NodeUiItem<TypedNode> {
+        val node = mock<TypedFileNode> {
+            on { this.id } doReturn NodeId(id)
+            on { this.type } doReturn type
+        }
+        return NodeUiItem(node = node, isSelected = false, isSensitive = isSensitive)
     }
 
     private fun createTestItems(

@@ -68,20 +68,21 @@ fun EntryProviderScope<NavKey>.legacyImageViewerScreen(
 
                 else -> {
                     val nodeIds = key.nodeIds
-                    if (nodeIds != null) {
+                    key.nodeSourceType?.let { nodeSourceType ->
+                        ImagePreviewActivity.createIntent(
+                            context = context,
+                            fileNodeId = key.nodeHandle,
+                            parentNodeId = key.parentNodeHandle,
+                            nodeSourceType = nodeSourceType,
+                            orderedNodeIds = nodeIds,
+                        )
+                    } ?: nodeIds?.let {
                         ImagePreviewActivity.createIntent(
                             context = context,
                             imageSource = ImagePreviewFetcherSource.DEFAULT,
                             menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
                             anchorImageNodeId = NodeId(key.nodeHandle),
                             params = mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds.toLongArray()),
-                        )
-                    } else {
-                        ImagePreviewActivity.createIntent(
-                            context = context,
-                            fileNodeId = key.nodeHandle,
-                            parentNodeId = key.parentNodeHandle,
-                            nodeSourceType = key.nodeSourceType
                         )
                     }
                 }

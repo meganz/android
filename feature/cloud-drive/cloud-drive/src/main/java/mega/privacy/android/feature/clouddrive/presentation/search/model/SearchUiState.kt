@@ -4,6 +4,8 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
@@ -117,6 +119,20 @@ data class SearchUiState(
      */
     val selectedNodes: List<TypedNode>
         get() = items.mapNotNull { if (it.isSelected) it.node else null }
+
+    /**
+     * IDs of the visible image and video files in display order. The image viewer pages
+     * through these IDs so that it follows the search results and not the parent folder.
+     */
+    val visibleMediaNodeIds: List<Long>
+        get() {
+            val isSensitiveVisible = showHiddenNodes || !isHiddenNodesEnabled
+            return items.mapNotNull { item ->
+                val node = item.node as? TypedFileNode
+                val isMedia = node?.type is ImageFileTypeInfo || node?.type is VideoFileTypeInfo
+                node?.id?.longValue?.takeIf { isMedia && (isSensitiveVisible || !item.isSensitive) }
+            }
+        }
 
     /**
      * True if search filters can be applied in the current node source type

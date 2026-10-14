@@ -70,6 +70,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_INDEX
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
@@ -826,11 +827,18 @@ class ImagePreviewActivity : BaseActivity() {
             }
         }
 
+        /**
+         * Creates the intent to preview [fileNodeId] opened from a node list of [nodeSourceType].
+         *
+         * @param orderedNodeIds The IDs of the nodes to page through, in display order. When null, the
+         * viewer pages through the images in [parentNodeId].
+         */
         fun createIntent(
             context: Context,
             fileNodeId: Long,
             parentNodeId: Long,
             nodeSourceType: Int?,
+            orderedNodeIds: List<Long>? = null,
         ): Intent? {
             val (imageSource, menuOptionsSource, parentIdParamKey) = when (nodeSourceType) {
                 NodeSourceTypeInt.FILE_BROWSER_ADAPTER -> Triple(
@@ -877,11 +885,22 @@ class ImagePreviewActivity : BaseActivity() {
                 }
             }
 
-            val params = parentIdParamKey?.let { mapOf(it to parentNodeId) } ?: emptyMap()
+            val params = if (orderedNodeIds != null) {
+                mapOf(
+                    DefaultImageNodeFetcher.NODE_IDS to orderedNodeIds.toLongArray(),
+                    DefaultImageNodeFetcher.PRESERVE_ORDER to true,
+                )
+            } else {
+                parentIdParamKey?.let { mapOf(it to parentNodeId) } ?: emptyMap()
+            }
 
             return createIntent(
                 context = context,
-                imageSource = imageSource,
+                imageSource = if (orderedNodeIds != null) {
+                    ImagePreviewFetcherSource.DEFAULT
+                } else {
+                    imageSource
+                },
                 menuOptionsSource = menuOptionsSource,
                 anchorImageNodeId = NodeId(fileNodeId),
                 params = params,

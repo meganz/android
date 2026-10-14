@@ -17,6 +17,9 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 /**
  * Handle node action click for m3
+ *
+ * @param imageNodeIds The IDs of the nodes that the image viewer pages through, in display
+ * order. When null, the image viewer pages through the images in the parent folder.
  */
 @Composable
 fun HandleNodeAction3(
@@ -29,6 +32,7 @@ fun HandleNodeAction3(
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
     isMediaQueueAvailable: Boolean = true,
+    imageNodeIds: List<Long>? = null,
 ) {
     val fileNodeContentToNavKeyMapper = remember {
         FileNodeContentToNavKeyMapper(NodeSourceTypeToViewTypeMapper())
@@ -49,6 +53,7 @@ fun HandleNodeAction3(
                 nodeSourceData = nodeSourceData,
                 sortOrder = sortOrder,
                 isMediaQueueAvailable = isMediaQueueAvailable,
+                imageNodeIds = imageNodeIds,
             )?.let { navKey ->
                 onNavigate(navKey)
             }

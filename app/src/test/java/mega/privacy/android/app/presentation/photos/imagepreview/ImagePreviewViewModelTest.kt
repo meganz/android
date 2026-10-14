@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_PUBLIC_LINK_URL
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_INDEX
@@ -338,6 +339,28 @@ class ImagePreviewViewModelTest {
         runTest {
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.RUBBISH_BIN)
+            initViewModel()
+            val imageNodes = listOf(
+                createNonSensitiveNode(),
+                createSensitiveNode(),
+            )
+
+            val expectedNodes = underTest.filterNonSensitiveNodes(
+                imageNodes = imageNodes,
+                showHiddenItems = false,
+                isPaid = true,
+                isBusinessAccountExpired = false,
+            )
+            assertThat(expectedNodes).isEqualTo(imageNodes)
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes return nodes when menu source is Rubbish Bin regardless of params`() =
+        runTest {
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.DEFAULT)
+            whenever(savedStateHandle.get<ImagePreviewMenuSource>(IMAGE_PREVIEW_MENU_OPTIONS))
+                .thenReturn(ImagePreviewMenuSource.RUBBISH_BIN)
             initViewModel()
             val imageNodes = listOf(
                 createNonSensitiveNode(),

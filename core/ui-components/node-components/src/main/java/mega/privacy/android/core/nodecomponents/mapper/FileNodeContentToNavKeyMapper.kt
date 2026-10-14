@@ -32,6 +32,9 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
      * @param searchedItems The searched items for media player (default: null)
      * @param isMediaQueueAvailable Whether the media player may build a play queue around the
      * opened item; false plays it as a single track (default: true)
+     * @param imageNodeIds The IDs of the nodes that the image viewer pages through, in display
+     * order. When null, the image viewer pages through the images in the parent folder
+     * (default: null)
      * @return The corresponding NavKey or null if no navigation is found for this content
      */
     operator fun invoke(
@@ -42,6 +45,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         textEditorMode: TextEditorMode = TextEditorMode.View,
         searchedItems: List<Long>? = null,
         isMediaQueueAvailable: Boolean = true,
+        imageNodeIds: List<Long>? = null,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceData.nodeSourceType)
         val recentsBucket = nodeSourceData as? NodeSourceData.RecentsBucket
@@ -80,6 +84,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                     fileNode.parentId.longValue
                 },
                 nodeSourceType = viewType,
+                nodeIds = imageNodeIds,
                 isInShare = isInShare,
                 url = publicUrl,
                 bucketId = recentsBucket?.bucketId,

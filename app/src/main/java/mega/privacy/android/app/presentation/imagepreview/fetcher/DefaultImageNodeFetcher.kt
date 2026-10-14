@@ -18,14 +18,27 @@ internal class DefaultImageNodeFetcher @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ImageNodeFetcher {
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
+        val nodeIds = bundle.getLongArray(NODE_IDS)?.distinct()?.map { NodeId(it) }.orEmpty()
+        val isOrderPreserved = bundle.getBoolean(PRESERVE_ORDER, false)
+        val positions = nodeIds.withIndex().associate { (index, nodeId) -> nodeId to index }
         return monitorImageNodesUseCase(
-            nodeIds = bundle.getLongArray(NODE_IDS)?.distinct()?.map { NodeId(it) }.orEmpty(),
+            nodeIds = nodeIds,
         ).mapLatest { imageNodes ->
-            imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
+            if (isOrderPreserved) {
+                imageNodes.sortedBy { positions[it.id] ?: Int.MAX_VALUE }
+            } else {
+                imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
+            }
         }.flowOn(defaultDispatcher)
     }
 
     internal companion object {
         const val NODE_IDS: String = "nodeIds"
+
+        /**
+         * When true, the images are shown in the order of [NODE_IDS] instead of by
+         * modification time, so that the viewer pages in the same order as the caller's list.
+         */
+        const val PRESERVE_ORDER: String = "preserveOrder"
     }
 }

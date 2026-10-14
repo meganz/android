@@ -284,6 +284,38 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
+    fun `test that ImageForNode content maps to LegacyImageViewerNavKey with nodeIds when imageNodeIds is set`() {
+        val nodeHandle = 456L
+        val parentHandle = 12L
+        val imageNodeIds = listOf(9L, nodeHandle, 3L)
+        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            parentId = parentHandle,
+            name = "search.jpg",
+            fileTypeInfo = StaticImageFileTypeInfo("image/jpeg", "jpg")
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.CLOUD_DRIVE))
+            .thenReturn(expectedViewType)
+
+        val result = underTest(
+            content = FileNodeContent.ImageForNode,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
+            imageNodeIds = imageNodeIds,
+        )
+
+        val expected = LegacyImageViewerNavKey(
+            nodeHandle = nodeHandle,
+            parentNodeHandle = parentHandle,
+            nodeSourceType = expectedViewType,
+            nodeIds = imageNodeIds,
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
     fun `test that TextContent maps to LegacyTextEditorNavKey`() {
         val nodeHandle = 333L
         val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
