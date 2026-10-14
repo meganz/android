@@ -16,6 +16,7 @@ android {
 
 dependencies {
     implementation(project(":domain:core:shared"))
+    implementation(project(":domain:feature:photos"))
     implementation(project(":domain:core:transfer"))
     implementation(project(":domain:feature:node"))
     implementation(project(":domain:feature:zipbrowser"))
