@@ -18,7 +18,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CLOUD_TA
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CLOUD_TAB_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolder
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolder
 import mega.privacy.android.feature.cloudexplorer.presentation.search.NodesExplorerSearchContent
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.shared.nodes.selection.NodeSelectionState
@@ -38,7 +38,6 @@ internal fun TabsScope.CloudExplorerTab(
     showSearch: Boolean,
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
-    onCloseSearch: () -> Unit,
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
@@ -66,7 +65,6 @@ internal fun TabsScope.CloudExplorerTab(
         )
     }
     val explorerViewModel = hiltViewModel<ExplorerViewModel>()
-    val explorerUiState by explorerViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(signal) { explorerViewModel.onTabSignal(CLOUD_TAB_INDEX, signal) }
 
@@ -84,8 +82,7 @@ internal fun TabsScope.CloudExplorerTab(
                 isFileSelectionEnabled = isFileSelectionEnabled,
                 videosOnly = videosOnly,
                 disabledNodeIds = disabledNodeIds,
-                isConnected = explorerUiState.isConnected,
-                onNavigateToFolderPath = navigateToFolderPath(
+                onFolderClick = navigateToFolder(
                     nodeSourceType = nodeSourceType,
                     explorerMode = explorerMode,
                     startNavKey = startNavKey,
@@ -94,7 +91,6 @@ internal fun TabsScope.CloudExplorerTab(
                     protectedUserTap = protectedUserTap,
                     onNavigate = onNavigate,
                 ),
-                onCloseSearch = onCloseSearch,
                 recentSearchesEnabled = isActive,
                 modifier = modifier,
                 restrictedNodeIds = restrictedNodeIds,

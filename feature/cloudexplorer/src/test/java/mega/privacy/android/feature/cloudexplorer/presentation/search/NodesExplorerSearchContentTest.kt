@@ -54,25 +54,38 @@ internal class NodesExplorerSearchContentTest {
 
     @Test
     fun `test that clicking a restricted folder in search invokes the restricted callback instead of navigating`() {
-        var navigatedPath: List<NodeId>? = null
+        var clickedFolderId: NodeId? = null
         var restrictedNodeId: NodeId? = null
         setContent(
             searchItems = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME)),
             restrictedNodeIds = setOf(NodeId(1L)),
-            onNavigateToFolderPath = { navigatedPath = it },
+            onFolderClick = { clickedFolderId = it },
             onRestrictedNodeClick = { restrictedNodeId = it },
         )
 
         composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
 
         assertThat(restrictedNodeId).isEqualTo(NodeId(1L))
-        assertThat(navigatedPath).isNull()
+        assertThat(clickedFolderId).isNull()
+    }
+
+    @Test
+    fun `test that clicking a folder in search invokes onFolderClick with the folder id`() {
+        var clickedFolderId: NodeId? = null
+        setContent(
+            searchItems = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME)),
+            onFolderClick = { clickedFolderId = it },
+        )
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        assertThat(clickedFolderId).isEqualTo(NodeId(1L))
     }
 
     private fun setContent(
         searchItems: List<NodeViewItem<TypedNode>>,
         restrictedNodeIds: Set<NodeId> = emptySet(),
-        onNavigateToFolderPath: (List<NodeId>) -> Unit = {},
+        onFolderClick: (NodeId) -> Unit = {},
         onRestrictedNodeClick: (NodeId) -> Unit = {},
     ) {
         val searchViewModel = mock<ExplorerSearchViewModel> {
@@ -96,7 +109,7 @@ internal class NodesExplorerSearchContentTest {
                     NodesExplorerViewModel::class.java to nodesViewModel,
                 ),
                 restrictedNodeIds = restrictedNodeIds,
-                onNavigateToFolderPath = onNavigateToFolderPath,
+                onFolderClick = onFolderClick,
                 onRestrictedNodeClick = onRestrictedNodeClick,
             )
         }
@@ -106,7 +119,7 @@ internal class NodesExplorerSearchContentTest {
     private fun Content(
         owner: androidx.lifecycle.ViewModelStoreOwner,
         restrictedNodeIds: Set<NodeId> = emptySet(),
-        onNavigateToFolderPath: (List<NodeId>) -> Unit = {},
+        onFolderClick: (NodeId) -> Unit = {},
         onRestrictedNodeClick: (NodeId) -> Unit = {},
     ) {
         AndroidThemeForPreviews {
@@ -124,9 +137,7 @@ internal class NodesExplorerSearchContentTest {
                     isFileSelectionEnabled = true,
                     videosOnly = false,
                     disabledNodeIds = emptySet(),
-                    isConnected = true,
-                    onNavigateToFolderPath = onNavigateToFolderPath,
-                    onCloseSearch = {},
+                    onFolderClick = onFolderClick,
                     recentSearchesEnabled = true,
                     restrictedNodeIds = restrictedNodeIds,
                     onRestrictedNodeClick = onRestrictedNodeClick,

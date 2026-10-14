@@ -53,25 +53,6 @@ internal class ExplorerNavigationTest {
         assertThat(captured).isEmpty()
     }
 
-    @Test
-    fun `test that navigateToFolderPath navigates once per folder id in order`() {
-        val captured = mutableListOf<NavKey>()
-        val navigatePath = navigateToFolderPath(
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-            explorerMode = ExplorerMode.Copy,
-            startNavKey = START_NAV_KEY,
-            shareUris = null,
-            protectedUserTap = { it() },
-            onNavigate = { captured.add(it) },
-        )
-
-        navigatePath(listOf(NodeId(1), NodeId(2)))
-
-        assertThat(captured.map { (it as NodesExplorerNavKey).nodeId })
-            .containsExactly(NodeId(1), NodeId(2))
-            .inOrder()
-    }
-
     private companion object {
         val START_NAV_KEY = CopyNavKey(emptyList())
         val TAPPED_FOLDER_ID = NodeId(42)

@@ -20,14 +20,12 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNavigationStack
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -43,7 +41,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
@@ -64,7 +61,6 @@ class NodeExplorerSharedViewModelTest {
     private val nodeViewItemMapper = mock<NodeViewItemMapper>()
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
-    private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
 
     private val nodeId = NodeId(1234L)
     private val nodeSourceType = NodeSourceType.INCOMING_SHARES
@@ -80,7 +76,6 @@ class NodeExplorerSharedViewModelTest {
             nodeViewItemMapper,
             searchUseCase,
             nodeSourceTypeToSearchTargetMapper,
-            getNodeNavigationStackUseCase,
         )
         whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
@@ -103,7 +98,6 @@ class NodeExplorerSharedViewModelTest {
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
-            getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
             args = args,
         )
     }
@@ -177,36 +171,6 @@ class NodeExplorerSharedViewModelTest {
                 assertThat(settled.searchedQuery).isEqualTo("doc")
                 cancelAndIgnoreRemainingEvents()
             }
-        }
-
-    @Test
-    fun `test that resolveSearchResultStack returns the path from the use case`() = runTest {
-        val target = NodeId(5L)
-        val path = listOf(NodeId(1L), NodeId(3L), target)
-        whenever { getNodeNavigationStackUseCase(target) } doReturn
-                NodeNavigationStack(stack = path, isUnderRootNode = true)
-
-        assertThat(viewModel.resolveSearchResultStack(target)).isEqualTo(path)
-    }
-
-    @Test
-    fun `test that resolveSearchResultStack falls back to the node id when the path is empty`() =
-        runTest {
-            val target = NodeId(5L)
-            whenever { getNodeNavigationStackUseCase(target) } doReturn NodeNavigationStack()
-
-            assertThat(viewModel.resolveSearchResultStack(target)).containsExactly(target)
-        }
-
-    @Test
-    fun `test that resolveSearchResultStack falls back to the node id when the use case throws`() =
-        runTest {
-            val target = NodeId(5L)
-            whenever { getNodeNavigationStackUseCase(target) } doAnswer {
-                throw RuntimeException("boom")
-            }
-
-            assertThat(viewModel.resolveSearchResultStack(target)).containsExactly(target)
         }
 
     @ParameterizedTest
@@ -381,7 +345,6 @@ private class TestNodeExplorerSharedViewModel(
     getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
-    getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
     args: Args,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -392,7 +355,6 @@ private class TestNodeExplorerSharedViewModel(
     getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
-    getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
     args = args,
 ) {
     var nodesResult = NodesResult(emptyList(), NodesLoadingState.FullyLoaded)

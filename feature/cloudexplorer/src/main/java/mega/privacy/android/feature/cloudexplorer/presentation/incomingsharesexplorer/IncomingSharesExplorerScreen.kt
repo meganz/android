@@ -41,7 +41,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.Explorer
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_INDEX
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolder
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolder
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.rememberVisibleItems
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
@@ -202,7 +202,6 @@ internal fun TabsScope.IncomingExplorerTab(
     showSearch: Boolean,
     searchQuery: String?,
     onSearchQueryChanged: (String) -> Unit,
-    onCloseSearch: () -> Unit,
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
@@ -221,7 +220,6 @@ internal fun TabsScope.IncomingExplorerTab(
         )
     }
     val explorerViewModel = hiltViewModel<ExplorerViewModel>()
-    val explorerUiState by explorerViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(signal) { explorerViewModel.onTabSignal(INCOMING_TAB_INDEX, signal) }
 
@@ -234,9 +232,8 @@ internal fun TabsScope.IncomingExplorerTab(
         if (showSearch) {
             IncomingSharesExplorerSearchContent(
                 query = searchQuery,
-                isConnected = explorerUiState.isConnected,
                 onQueryChanged = onSearchQueryChanged,
-                onNavigateToFolderPath = navigateToFolderPath(
+                onFolderClick = navigateToFolder(
                     nodeSourceType = NodeSourceType.INCOMING_SHARES,
                     explorerMode = explorerMode,
                     startNavKey = startNavKey,
@@ -244,7 +241,6 @@ internal fun TabsScope.IncomingExplorerTab(
                     protectedUserTap = protectedUserTap,
                     onNavigate = onNavigate,
                 ),
-                onCloseSearch = onCloseSearch,
                 recentSearchesEnabled = isActive,
                 modifier = modifier,
             )

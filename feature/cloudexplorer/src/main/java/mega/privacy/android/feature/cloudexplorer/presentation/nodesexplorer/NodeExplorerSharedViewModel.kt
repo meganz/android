@@ -34,7 +34,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -59,7 +58,6 @@ abstract class NodeExplorerSharedViewModel(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val searchUseCase: SearchUseCase,
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
-    private val getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
     private val args: Args,
 ) : ViewModel() {
 
@@ -244,18 +242,6 @@ abstract class NodeExplorerSharedViewModel(
     fun onSearchQuery(query: String?) {
         viewModelScope.launch { searchQueryChannel.send(query) }
     }
-
-    /**
-     * Resolves the folder path (top-down, including [nodeId]) to push so navigating to a search
-     * result reproduces its hierarchy and Back walks the real directory tree instead of jumping to
-     * the root.
-     */
-    suspend fun resolveSearchResultStack(nodeId: NodeId): List<NodeId> =
-        runCatching { getNodeNavigationStackUseCase(nodeId).stack }
-            .onFailure { Timber.e(it) }
-            .getOrNull()
-            .orEmpty()
-            .ifEmpty { listOf(nodeId) }
 
     /** Pull-to-refresh: refetches this source's nodes through [refreshSignal]. */
     fun refreshNodes() {

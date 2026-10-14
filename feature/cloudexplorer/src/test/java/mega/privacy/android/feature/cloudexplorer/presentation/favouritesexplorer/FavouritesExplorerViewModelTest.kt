@@ -17,7 +17,6 @@ import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -54,7 +53,6 @@ class FavouritesExplorerViewModelTest {
     private val getAllFavoritesUseCase = mock<GetAllFavoritesUseCase>()
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
-    private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -88,7 +86,6 @@ class FavouritesExplorerViewModelTest {
             getAllFavoritesUseCase = getAllFavoritesUseCase,
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
-            getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             args = FavouritesExplorerViewModel.Args(showFiles),
         )

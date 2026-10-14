@@ -33,7 +33,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.Explorer
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.FAVOURITES_TAB_INDEX
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.FAVOURITES_TAB_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolder
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolder
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.rememberVisibleItems
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
@@ -150,7 +150,6 @@ internal fun TabsScope.FavouritesExplorerTab(
     showSearch: Boolean,
     searchQuery: String?,
     onSearchQueryChanged: (String) -> Unit,
-    onCloseSearch: () -> Unit,
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
@@ -177,7 +176,6 @@ internal fun TabsScope.FavouritesExplorerTab(
         )
     }
     val explorerViewModel = hiltViewModel<ExplorerViewModel>()
-    val explorerUiState by explorerViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(signal) { explorerViewModel.onTabSignal(FAVOURITES_TAB_INDEX, signal) }
 
@@ -196,8 +194,7 @@ internal fun TabsScope.FavouritesExplorerTab(
                 isFileSelectionEnabled = isSelectionModeEnabled,
                 videosOnly = videosOnly,
                 disabledNodeIds = disabledNodeIds,
-                isConnected = explorerUiState.isConnected,
-                onNavigateToFolderPath = navigateToFolderPath(
+                onFolderClick = navigateToFolder(
                     nodeSourceType = NodeSourceType.FAVOURITES,
                     explorerMode = explorerMode,
                     startNavKey = startNavKey,
@@ -206,7 +203,6 @@ internal fun TabsScope.FavouritesExplorerTab(
                     protectedUserTap = protectedUserTap,
                     onNavigate = onNavigate,
                 ),
-                onCloseSearch = onCloseSearch,
                 recentSearchesEnabled = isActive,
                 modifier = modifier,
             )

@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -51,7 +50,6 @@ class IncomingSharesExplorerViewModelTest {
     private val getIncomingSharesChildrenNodeUseCase = mock<GetIncomingSharesChildrenNodeUseCase>()
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
-    private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -85,7 +83,6 @@ class IncomingSharesExplorerViewModelTest {
             getIncomingSharesChildrenNodeUseCase = getIncomingSharesChildrenNodeUseCase,
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
-            getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
         )
     }

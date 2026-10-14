@@ -93,9 +93,7 @@ internal class FavouritesExplorerSearchContentTest {
                     isFileSelectionEnabled = true,
                     videosOnly = false,
                     disabledNodeIds = emptySet(),
-                    isConnected = true,
-                    onNavigateToFolderPath = {},
-                    onCloseSearch = {},
+                    onFolderClick = {},
                     recentSearchesEnabled = true,
                 )
             }

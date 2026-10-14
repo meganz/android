@@ -379,7 +379,6 @@ internal fun ExplorerScreen(
                     showSearch = showSearch,
                     searchQuery = searchText,
                     onSearchQueryChanged = onSearchQueryChanged,
-                    onCloseSearch = onCloseSearch,
                     protectedUserTap = protectedUserTap,
                     onNavigate = onFolderNavigate,
                     onNavigateBack = onNavigateBack,
@@ -401,7 +400,6 @@ internal fun ExplorerScreen(
                         showSearch = showSearch,
                         searchQuery = searchText,
                         onSearchQueryChanged = onSearchQueryChanged,
-                        onCloseSearch = onCloseSearch,
                         protectedUserTap = protectedUserTap,
                         onNavigate = onFolderNavigate,
                         onNavigateBack = onNavigateBack,
@@ -419,7 +417,6 @@ internal fun ExplorerScreen(
                         showSearch = showSearch,
                         searchQuery = searchText,
                         onSearchQueryChanged = onSearchQueryChanged,
-                        onCloseSearch = onCloseSearch,
                         protectedUserTap = protectedUserTap,
                         onNavigate = onFolderNavigate,
                         onNavigateBack = onNavigateBack,
@@ -491,27 +488,6 @@ internal fun navigateToFolder(
             )
         )
     }
-}
-
-internal fun navigateToFolderPath(
-    nodeSourceType: NodeSourceType,
-    explorerMode: ExplorerMode,
-    startNavKey: ExplorerNavKey,
-    shareUris: List<UriPath>?,
-    disabledNodeIds: List<NodeId> = emptyList(),
-    protectedUserTap: (() -> Unit) -> Unit,
-    onNavigate: (NavKey) -> Unit,
-): (List<NodeId>) -> Unit {
-    val navigateToFolder = navigateToFolder(
-        nodeSourceType = nodeSourceType,
-        explorerMode = explorerMode,
-        startNavKey = startNavKey,
-        shareUris = shareUris,
-        disabledNodeIds = disabledNodeIds,
-        protectedUserTap = protectedUserTap,
-        onNavigate = onNavigate,
-    )
-    return { nodeIds -> nodeIds.forEach(navigateToFolder) }
 }
 
 /**
