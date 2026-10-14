@@ -137,6 +137,7 @@ internal class VideoMediaControllerFacade @Inject constructor(
             updateState {
                 copy(
                     currentMediaHandle = mediaItem?.mediaId?.toLongOrNull(),
+                    currentMediaName = mediaItem?.mediaMetadata?.displayTitle?.toString(),
                     transitionUpdatesName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT,
                     videoWidth = 0,
                     videoHeight = 0,
@@ -312,6 +313,15 @@ internal class VideoMediaControllerFacade @Inject constructor(
         applySources(ctrl, mediaItems, startIndex)
     }
 
+    /**
+     * Grows the timeline around the item already playing when it can, and replaces it otherwise.
+     *
+     * `setMediaItems` resets the player to idle even when the item it lands on is the one already
+     * on screen, which costs a re-buffer and a visible stall. The full queue normally arrives while
+     * the tapped video is playing alone, so the siblings go in around it with `addMediaItems`
+     * instead and nothing on screen changes. The replacement path is still needed for the first
+     * call, and for a rebuild that moves the player onto a different item.
+     */
     private fun applySources(
         ctrl: MediaController,
         mediaItems: List<MediaItem>,
@@ -324,6 +334,17 @@ internal class VideoMediaControllerFacade @Inject constructor(
         // video would hide it.
         if (index != startIndex) {
             Timber.w("Start index $startIndex is outside a queue of ${mediaItems.size}; using $index")
+        }
+        if (ctrl.mediaItemCount == 1 &&
+            ctrl.currentMediaItem?.mediaId == mediaItems[index].mediaId &&
+            ctrl.playbackState != Player.STATE_IDLE
+        ) {
+            if (index > 0) ctrl.addMediaItems(0, mediaItems.subList(0, index))
+            val afterCurrent = index + 1
+            if (afterCurrent < mediaItems.size) {
+                ctrl.addMediaItems(afterCurrent, mediaItems.subList(afterCurrent, mediaItems.size))
+            }
+            return
         }
         ctrl.setMediaItems(mediaItems, index, 0L)
         ctrl.prepare()

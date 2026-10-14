@@ -37,10 +37,13 @@ interface VideoMediaControllerGateway {
      * Hands the player [mediaItems], to start on the one at [startIndex], and prepares it. Does not
      * start playback — the caller decides that with [play].
      *
-     * An empty list is ignored: nothing to play is not the same instruction as stop playing.
+     * Meant to be called more than once for a single launch: the queue is built in two passes, the
+     * tapped video first so playback can start, then the whole queue around it. The second call
+     * extends what is already playing rather than restarting it, as long as the item at
+     * [startIndex] carries the media id the player is already on.
      *
-     * The media id each item carries is what identifies it in player callbacks, which is how a
-     * transition is matched back to the node it belongs to.
+     * An empty list is ignored. A queue that filtered down to nothing says only that the sibling
+     * search came back empty, not that the video the user opened should stop.
      */
     fun setPlaySources(mediaItems: List<MediaItem>, startIndex: Int)
 

@@ -9,6 +9,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -16,7 +17,8 @@ import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.feature.mediaplayer.data.gateway.VideoMediaControllerGateway
-import mega.privacy.android.feature.mediaplayer.videoplayer.data.mapper.VideoNodeToMediaItemMapper
+import mega.privacy.android.feature.mediaplayer.videoplayer.data.VideoPlayQueueBuilder
+import mega.privacy.android.feature.mediaplayer.videoplayer.data.model.VideoPlayQueue
 import mega.privacy.android.feature.mediaplayer.videoplayer.navigation.VideoPlayerLaunchSourceHolder
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSource
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSourceType
@@ -36,7 +38,7 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
     @Assisted private val launchId: String,
     private val launchSourceHolder: VideoPlayerLaunchSourceHolder,
     private val gateway: VideoMediaControllerGateway,
-    private val videoNodeToMediaItemMapper: VideoNodeToMediaItemMapper,
+    private val playQueueBuilder: VideoPlayQueueBuilder,
     private val httpServerStopUseCase: HttpServerStopUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
@@ -47,6 +49,14 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
     }
 
     private var hasStartedPlayback = false
+    private var hasSetPlaySources = false
+
+    /**
+     * Whether building the queue started the streaming server, which makes this player responsible
+     * for stopping it — on top of the launch's own `needStopHttpServer`, which covers the server
+     * whoever resolved the content URI started.
+     */
+    private var queueStartedStreamingServer = false
 
     /**
      * What the player was asked to play, read from the holder exactly once.
@@ -87,6 +97,13 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
         val state = if (resolved is VideoPlayerUiState.Data) {
             gateway.playerState.map { player ->
                 resolved.copy(
+                    // The queue moves the player onto siblings the launch knew nothing about, so
+                    // what is playing comes from the player from here on. Until the first item
+                    // loads it reports nothing, and the launch is still the better answer.
+                    currentPlayingHandle = player.currentMediaHandle
+                        ?: resolved.currentPlayingHandle,
+                    currentPlayingItemName = player.currentMediaName
+                        ?: resolved.currentPlayingItemName,
                     videoWidth = player.videoWidth,
                     videoHeight = player.videoHeight,
                     isLoading = player.isLoading,
@@ -154,7 +171,7 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
      * Playback starts from here rather than from construction because there is nothing to watch
      * until the picture has somewhere to go, and because the launch source is read on first use.
      * A surface arriving again — a configuration change recreates it — re-attaches to the player
-     * that is already running instead of loading the video a second time.
+     * that is already running instead of building the queue a second time.
      */
     fun onSurfaceReady(textureView: TextureView) {
         gateway.attachSurface(textureView)
@@ -166,22 +183,41 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
         // content URI.
         if (resolvedState !is VideoPlayerUiState.Data) return
         val source = launchSource ?: return
-        val uri = source.contentUri ?: return
 
-        val mediaItem = videoNodeToMediaItemMapper(
-            handle = source.handle,
-            uri = uri,
-            displayName = source.fileName,
-        )
-
-        // Latched only once the player has accepted the item, so a failure leaves the next
-        // surface free to try again rather than stranding the screen on black for good.
-        runCatching {
-            gateway.setPlaySources(listOf(mediaItem), startIndex = 0)
-            gateway.play()
+        hasStartedPlayback = true
+        viewModelScope.launch {
+            playQueueBuilder(source)
+                .catch {
+                    Timber.e(it, "Failed to build the video play queue")
+                    // Released again so a surface arriving later can try once more. Nothing else
+                    // retries, and leaving it latched strands the screen on black for good.
+                    hasStartedPlayback = false
+                }
+                .collect(::applyQueue)
         }
-            .onSuccess { hasStartedPlayback = true }
-            .onFailure { Timber.e(it, "Failed to start video playback") }
+    }
+
+    /**
+     * Hands a queue to the player, and starts playback on the first one to arrive.
+     *
+     * Called twice for one launch — the tapped video, then the queue around it — so play is only
+     * requested the first time. Asking again on the second would override a pause the user made in
+     * between, while the siblings were still being gathered.
+     */
+    private fun applyQueue(queue: VideoPlayQueue) {
+        // Recorded before anything else can fail: the server is already running by this point, and
+        // losing the fact that this player started it leaves it up for the rest of the process.
+        if (queue.startedStreamingServer) queueStartedStreamingServer = true
+
+        // Latched only once the player has taken a queue, so a failure on the first one leaves
+        // the next emission still counting as the first and still asking for playback.
+        val isFirst = !hasSetPlaySources
+        runCatching {
+            gateway.setPlaySources(queue.mediaItems, queue.currentIndex)
+            if (isFirst) gateway.play()
+        }
+            .onSuccess { hasSetPlaySources = true }
+            .onFailure { Timber.e(it, "Failed to hand the play queue to the player") }
     }
 
     /** Stops rendering into the surface that is going away; playback itself continues. */
@@ -249,9 +285,10 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
      * The gateway is bound without a scope, so this ViewModel owns one player of its own and is
      * the only thing that can release it.
      *
-     * The streaming server goes down here too when the launch handed its ownership over. Whoever
-     * resolved the content URI had to start the server to obtain it, and says so with
-     * `needStopHttpServer`; nothing else is left to stop it once the player closes.
+     * The streaming server goes down here too when this player owns it. Two things can have
+     * started it: whoever resolved the content URI, which the launch reports with
+     * `needStopHttpServer`, and building the queue, which needs the server to resolve the
+     * siblings' streams. Either way nothing else is left to stop it once the player closes.
      */
     override fun onCleared() {
         // Guarded separately so that a failure to release the player cannot also leave the
@@ -267,7 +304,7 @@ internal class VideoPlayerViewModel @AssistedInject constructor(
      * the time [onCleared] is called, so the suspending stop would never run.
      */
     private fun stopStreamingServerIfOwned() {
-        if (launchSource?.needStopHttpServer != true) return
+        if (launchSource?.needStopHttpServer != true && !queueStartedStreamingServer) return
         applicationScope.launch {
             runCatching { httpServerStopUseCase() }
                 .onFailure { Timber.e(it, "Failed to stop the streaming server") }

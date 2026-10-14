@@ -19,6 +19,9 @@ package mega.privacy.android.feature.mediaplayer.data.model
  * @property isEnded True once the current item reached `Player.STATE_ENDED`.
  * @property isReady True while the player is in `Player.STATE_READY`.
  * @property currentMediaHandle MEGA node handle of the item in the player; `null` before the first item loads.
+ * @property currentMediaName File name of the item in the player; `null` before the first item
+ * loads. Read off the item's display title rather than its title, which the container's own
+ * metadata overwrites.
  * @property transitionUpdatesName True when the most recent item transition moved to a different
  * item, so the displayed name and subtitle track have to be refreshed. False for a repeat of the
  * same item.
@@ -40,6 +43,7 @@ data class VideoControllerState(
     val isEnded: Boolean = false,
     val isReady: Boolean = false,
     val currentMediaHandle: Long? = null,
+    val currentMediaName: String? = null,
     val transitionUpdatesName: Boolean = false,
     val currentPositionMs: Long = 0L,
     val durationMs: Long = 0L,

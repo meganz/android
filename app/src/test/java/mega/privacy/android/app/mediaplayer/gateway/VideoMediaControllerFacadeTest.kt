@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.TextureView
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
@@ -261,6 +262,26 @@ internal class VideoMediaControllerFacadeTest {
         }
 
     @Test
+    fun `test that onMediaItemTransition carries the name of the item the player moved to`() =
+        runTest {
+            underTest.playerListener.onMediaItemTransition(
+                MediaItem.Builder()
+                    .setMediaId("123")
+                    .setMediaMetadata(
+                        MediaMetadata.Builder().setDisplayTitle("holiday.mp4").build()
+                    )
+                    .build(),
+                Player.MEDIA_ITEM_TRANSITION_REASON_AUTO,
+            )
+
+            // The display title rather than the title: the queue builder writes the node's name
+            // there precisely because the container's own metadata overwrites the title.
+            underTest.playerState.test {
+                assertThat(awaitItem().currentMediaName).isEqualTo("holiday.mp4")
+            }
+        }
+
+    @Test
     fun `test that onVideoSizeChanged ignores a zero size`() = runTest {
         underTest.playerListener.onVideoSizeChanged(VideoSize(1920, 1080))
 
@@ -332,6 +353,51 @@ internal class VideoMediaControllerFacadeTest {
         underTest.setPlaySources(items, -1)
 
         // The clamp has two sides; only testing the upper one lets the lower regress unseen.
+        verify(controller).setMediaItems(items, 0, 0L)
+    }
+
+    @Test
+    fun `test that setPlaySources grows the queue around the item already playing`() {
+        connected()
+        whenever(controller.mediaItemCount).thenReturn(1)
+        whenever(controller.currentMediaItem).thenReturn(mediaItem("2"))
+        whenever(controller.playbackState).thenReturn(Player.STATE_READY)
+        val items = listOf(mediaItem("1"), mediaItem("2"), mediaItem("3"))
+
+        underTest.setPlaySources(items, 1)
+
+        // setMediaItems resets the player to idle even when it lands on the item already on
+        // screen, which costs a visible re-buffer.
+        verify(controller, never()).setMediaItems(any<List<MediaItem>>(), any(), any())
+        verify(controller).addMediaItems(0, items.subList(0, 1))
+        verify(controller).addMediaItems(2, items.subList(2, 3))
+    }
+
+    @Test
+    fun `test that setPlaySources replaces the queue when the player is on a different item`() {
+        connected()
+        whenever(controller.mediaItemCount).thenReturn(1)
+        whenever(controller.currentMediaItem).thenReturn(mediaItem("9"))
+        whenever(controller.playbackState).thenReturn(Player.STATE_READY)
+        val items = listOf(mediaItem("1"), mediaItem("2"))
+
+        underTest.setPlaySources(items, 0)
+
+        verify(controller).setMediaItems(items, 0, 0L)
+        verify(controller, never()).addMediaItems(any<Int>(), any<List<MediaItem>>())
+    }
+
+    @Test
+    fun `test that setPlaySources replaces the queue when the player has not prepared the item`() {
+        connected()
+        whenever(controller.mediaItemCount).thenReturn(1)
+        whenever(controller.currentMediaItem).thenReturn(mediaItem("1"))
+        whenever(controller.playbackState).thenReturn(Player.STATE_IDLE)
+        val items = listOf(mediaItem("1"), mediaItem("2"))
+
+        underTest.setPlaySources(items, 0)
+
+        // Growing an idle timeline leaves the player idle: nothing would ever prepare it.
         verify(controller).setMediaItems(items, 0, 0L)
     }
 

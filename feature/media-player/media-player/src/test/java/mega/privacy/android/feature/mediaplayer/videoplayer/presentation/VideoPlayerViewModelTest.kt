@@ -2,12 +2,14 @@ package mega.privacy.android.feature.mediaplayer.videoplayer.presentation
 
 import android.net.Uri
 import android.view.TextureView
-import androidx.lifecycle.ViewModelStore
 import androidx.media3.common.MediaItem
+import androidx.lifecycle.ViewModelStore
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -15,7 +17,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.feature.mediaplayer.data.gateway.VideoMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.model.VideoControllerState
-import mega.privacy.android.feature.mediaplayer.videoplayer.data.mapper.VideoNodeToMediaItemMapper
+import mega.privacy.android.feature.mediaplayer.videoplayer.data.VideoPlayQueueBuilder
+import mega.privacy.android.feature.mediaplayer.videoplayer.data.model.VideoPlayQueue
 import mega.privacy.android.feature.mediaplayer.videoplayer.navigation.VideoPlayerLaunchSourceHolder
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSource
 import mega.privacy.android.feature.mediaplayer.videoplayer.presentation.model.VideoPlayerLaunchSourceType
@@ -26,7 +29,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -40,34 +42,35 @@ internal class VideoPlayerViewModelTest {
 
     private val launchSourceHolder = mock<VideoPlayerLaunchSourceHolder>()
     private val gateway = mock<VideoMediaControllerGateway>()
-    private val videoNodeToMediaItemMapper = mock<VideoNodeToMediaItemMapper>()
-    private val mediaItem = MediaItem.Builder().setMediaId(TEST_HANDLE.toString()).build()
     private val textureView = mock<TextureView>()
     private val httpServerStopUseCase = mock<HttpServerStopUseCase>()
+    private val playQueueBuilder = mock<VideoPlayQueueBuilder>()
 
     private lateinit var playerState: MutableStateFlow<VideoControllerState>
     private lateinit var underTest: VideoPlayerViewModel
 
     @BeforeEach
     fun setUp() {
-        reset(
-            launchSourceHolder,
-            gateway,
-            videoNodeToMediaItemMapper,
-            textureView,
-            httpServerStopUseCase,
-        )
+        reset(launchSourceHolder, gateway, textureView, httpServerStopUseCase, playQueueBuilder)
         playerState = MutableStateFlow(VideoControllerState())
         whenever(gateway.playerState).thenReturn(playerState)
-        whenever(videoNodeToMediaItemMapper(any(), any(), anyOrNull())).thenReturn(mediaItem)
+        whenever(playQueueBuilder(any())).thenReturn(flowOf(queueOf(TEST_HANDLE)))
     }
+
+    private fun mediaItem(handle: Long) =
+        MediaItem.Builder().setMediaId(handle.toString()).build()
+
+    private fun queueOf(vararg handles: Long, currentIndex: Int = 0) = VideoPlayQueue(
+        mediaItems = handles.map(::mediaItem),
+        currentIndex = currentIndex,
+    )
 
     private fun TestScope.initViewModel() {
         underTest = VideoPlayerViewModel(
             launchId = LAUNCH_ID,
             launchSourceHolder = launchSourceHolder,
             gateway = gateway,
-            videoNodeToMediaItemMapper = videoNodeToMediaItemMapper,
+            playQueueBuilder = playQueueBuilder,
             httpServerStopUseCase = httpServerStopUseCase,
             applicationScope = this,
         )
@@ -227,49 +230,126 @@ internal class VideoPlayerViewModelTest {
     }
 
     @Test
-    fun `test that onSurfaceReady plays the launched video`() = runTest {
-        val uri = mock<Uri>()
-        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource(contentUri = uri))
+    fun `test that onSurfaceReady plays the queue the builder emits`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        val queue = queueOf(TEST_HANDLE)
+        whenever(playQueueBuilder(any())).thenReturn(flowOf(queue))
         initViewModel()
 
         underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
 
-        verify(videoNodeToMediaItemMapper)(TEST_HANDLE, uri, TEST_FILE_NAME)
-        verify(gateway).setPlaySources(listOf(mediaItem), 0)
+        verify(gateway).setPlaySources(queue.mediaItems, 0)
         verify(gateway).play()
     }
 
     @Test
-    fun `test that onSurfaceReady does not load the video again when the surface is recreated`() =
+    fun `test that onSurfaceReady builds the queue from the launch source`() = runTest {
+        val source = launchSource()
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(source)
+        initViewModel()
+
+        underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
+
+        verify(playQueueBuilder).invoke(source)
+    }
+
+    @Test
+    fun `test that each queue the builder emits is handed to the player`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        val single = queueOf(TEST_HANDLE)
+        val full = queueOf(11L, TEST_HANDLE, 13L, currentIndex = 1)
+        whenever(playQueueBuilder(any())).thenReturn(flowOf(single, full))
+        initViewModel()
+
+        underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
+
+        verify(gateway).setPlaySources(single.mediaItems, 0)
+        verify(gateway).setPlaySources(full.mediaItems, 1)
+    }
+
+    @Test
+    fun `test that play is requested only for the first queue the builder emits`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        whenever(playQueueBuilder(any()))
+            .thenReturn(flowOf(queueOf(TEST_HANDLE), queueOf(11L, TEST_HANDLE, currentIndex = 1)))
+        initViewModel()
+
+        underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
+
+        // Asking again on the full queue would override a pause the user made while the siblings
+        // were still being gathered.
+        verify(gateway, times(1)).play()
+    }
+
+    @Test
+    fun `test that onSurfaceReady does not build the queue again when the surface is recreated`() =
         runTest {
             whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
             initViewModel()
 
             underTest.onSurfaceReady(textureView)
             underTest.onSurfaceReady(textureView)
+            advanceUntilIdle()
 
-            // A configuration change recreates the surface. Loading again would restart the video
-            // from the beginning.
-            verify(gateway, times(1)).setPlaySources(any(), any())
+            // A configuration change recreates the surface. Building again would restart the
+            // video from the beginning.
+            verify(playQueueBuilder, times(1)).invoke(any())
             verify(gateway, times(1)).play()
             verify(gateway, times(2)).attachSurface(textureView)
         }
 
     @Test
-    fun `test that onSurfaceReady tries again when starting playback failed`() = runTest {
+    fun `test that a failing queue build leaves the player alone`() = runTest {
         whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        whenever(playQueueBuilder(any()))
+            .thenReturn(flow { throw IllegalStateException("the queue could not be built") })
+        initViewModel()
+
+        underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
+
+        verify(gateway, never()).setPlaySources(any(), any())
+    }
+
+    @Test
+    fun `test that a failing queue build leaves the next surface free to try again`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        whenever(playQueueBuilder(any()))
+            .thenReturn(flow { throw IllegalStateException("the queue could not be built") })
+            .thenReturn(flowOf(queueOf(TEST_HANDLE)))
+        initViewModel()
+
+        underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
+        underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
+
+        // Nothing else retries, so latching on the failed attempt would strand the screen on
+        // black for good.
+        verify(gateway).setPlaySources(any(), any())
+        verify(gateway).play()
+    }
+
+    @Test
+    fun `test that playback is still requested when the first queue was rejected`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        whenever(playQueueBuilder(any()))
+            .thenReturn(flowOf(queueOf(TEST_HANDLE), queueOf(TEST_HANDLE, NEXT_HANDLE)))
         whenever(gateway.setPlaySources(any(), any()))
-            .thenThrow(IllegalStateException("player rejected the item"))
+            .thenThrow(IllegalStateException("player rejected the queue"))
             .thenAnswer { }
         initViewModel()
 
         underTest.onSurfaceReady(textureView)
-        underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
 
-        // Latching the flag on the failed attempt would strand the screen on black with no way
-        // back, since nothing retries other than a new surface.
-        verify(gateway, times(2)).setPlaySources(any(), any())
-        verify(gateway, times(1)).play()
+        // The first queue never reached the player, so the second one is still the first it
+        // accepted — asking it to play is what actually starts playback.
+        verify(gateway).play()
     }
 
     @Test
@@ -281,7 +361,9 @@ internal class VideoPlayerViewModelTest {
         initViewModel()
 
         underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
 
+        verify(playQueueBuilder, never()).invoke(any())
         verify(gateway, never()).setPlaySources(any(), any())
         verify(gateway, never()).play()
     }
@@ -575,10 +657,59 @@ internal class VideoPlayerViewModelTest {
             verify(httpServerStopUseCase, never()).invoke()
         }
 
+    @Test
+    fun `test that the streaming server is stopped when building the queue started it`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID))
+            .thenReturn(launchSource(needStopHttpServer = false))
+        whenever(playQueueBuilder(any())).thenReturn(
+            flowOf(queueOf(TEST_HANDLE).copy(startedStreamingServer = true))
+        )
+        initViewModel()
+
+        underTest.onSurfaceReady(textureView)
+        advanceUntilIdle()
+        clearViewModel()
+        advanceUntilIdle()
+
+        // The launch did not own the server, but resolving the siblings' streams needed one and
+        // this player is what started it.
+        verify(httpServerStopUseCase).invoke()
+    }
+
+    @Test
+    fun `test that uiState follows the player onto the next item in the queue`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        underTest.uiState.test {
+            playerState.value = VideoControllerState(
+                currentMediaHandle = NEXT_HANDLE,
+                currentMediaName = NEXT_FILE_NAME,
+            )
+
+            val state = awaitUntilData { it.currentPlayingHandle == NEXT_HANDLE }
+            assertThat(state.currentPlayingItemName).isEqualTo(NEXT_FILE_NAME)
+        }
+    }
+
+    @Test
+    fun `test that uiState shows the launched video until the player reports an item`() = runTest {
+        whenever(launchSourceHolder.consume(LAUNCH_ID)).thenReturn(launchSource())
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitUntilData { true }
+            assertThat(state.currentPlayingHandle).isEqualTo(TEST_HANDLE)
+            assertThat(state.currentPlayingItemName).isEqualTo(TEST_FILE_NAME)
+        }
+    }
+
     private companion object {
         const val LAUNCH_ID = "launch-id"
         const val TEST_HANDLE = 123456L
         const val TEST_FILE_NAME = "video.mp4"
+        const val NEXT_HANDLE = 654321L
+        const val NEXT_FILE_NAME = "next-video.mp4"
         const val TEST_DURATION_MS = 225_000L
         const val TEST_POSITION_MS = 72_000L
     }

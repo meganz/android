@@ -2,6 +2,8 @@ package mega.privacy.android.feature.mediaplayer.videoplayer.data.mapper
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
@@ -42,6 +44,19 @@ internal class VideoNodeToMediaItemMapperTest {
         val result = underTest(handle = TEST_HANDLE, uri = uri)
 
         assertThat(result.localConfiguration?.uri).isEqualTo(uri)
+    }
+
+    @Test
+    fun `test that invoke takes the media id and the display title off a node`() {
+        val node = mock<TypedVideoNode> {
+            on { id }.thenReturn(NodeId(TEST_HANDLE))
+            on { name }.thenReturn(TEST_NAME)
+        }
+
+        val result = underTest(node = node, uri = mock<Uri>())
+
+        assertThat(result.mediaId).isEqualTo(TEST_HANDLE.toString())
+        assertThat(result.mediaMetadata.displayTitle.toString()).isEqualTo(TEST_NAME)
     }
 
     private companion object {
