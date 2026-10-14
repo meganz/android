@@ -11,7 +11,7 @@ Install the following prerequisites:
 - [Android Studio](https://developer.android.com/studio)
 - [Android SDK Tools](https://developer.android.com/studio#Other)
 - [Android NDK](https://developer.android.com/ndk/downloads)
-- JDK 21
+- JDK 25
 
 ## 2. Get the Source Code
 

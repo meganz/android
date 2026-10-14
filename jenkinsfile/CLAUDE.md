@@ -80,6 +80,6 @@ Results are posted back to GitLab MR comments via `common.sendToMR()` which call
 
 ```
 NDK_ROOT = /opt/buildtools/android-sdk/ndk/27.1.12297006
-JAVA_HOME = /opt/buildtools/zulu21.40.17-ca-jdk21.0.6-macosx
+JAVA_HOME = /opt/buildtools/zulu25.36.205-ca-jdk25.0.4.1-macosx/Contents/Home
 ANDROID_HOME = /opt/buildtools/android-sdk
 ```

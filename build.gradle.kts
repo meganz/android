@@ -137,8 +137,8 @@ extra["buildTools"] = "37.0.0"
 extra["megaSdkVersion"] = "20261013.064158-dev"
 
 //JDK and Java Version
-extra["jdk"] = "21"
-extra["javaVersion"] = JavaVersion.VERSION_21
+extra["jdk"] = "25"
+extra["javaVersion"] = JavaVersion.VERSION_25
 
 /**
  * Checks whether to Suppress Warnings

@@ -23,8 +23,8 @@ pipeline {
     environment {
         LC_ALL = "en_US.UTF-8"
         LANG = "en_US.UTF-8"
-        JAVA_HOME = "/opt/buildtools/zulu21.40.17-ca-jdk21.0.6-macosx"
-        PATH = "/opt/buildtools/zulu21.40.17-ca-jdk21.0.6-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:$PATH"
+        JAVA_HOME = "/opt/buildtools/zulu25.36.205-ca-jdk25.0.4.1-macosx/Contents/Home"
+        PATH = "${JAVA_HOME}/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:$PATH"
         CONSOLE_LOG_FILE = "console.txt"
         IS_CI_BUILD = 'true'
     }

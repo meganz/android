@@ -28,7 +28,7 @@ android {
         jvmToolchain(jdk.toInt())
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            jvmTarget.set(JvmTarget.fromTarget(jdk))
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
         }
     }

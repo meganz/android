@@ -50,7 +50,8 @@ fun Project.configureKotlin() {
     // Use withType to workaround https://youtrack.jetbrains.com/issue/KT-55947
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_21
+            val jdk: String by rootProject.extra
+            jvmTarget = JvmTarget.fromTarget(jdk)
             val shouldSuppressWarnings: Boolean by rootProject.extra
             suppressWarnings = shouldSuppressWarnings
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")

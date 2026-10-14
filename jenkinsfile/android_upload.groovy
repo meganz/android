@@ -42,10 +42,10 @@ pipeline {
         LANG = 'en_US.UTF-8'
 
         NDK_ROOT = '/opt/buildtools/android-sdk/ndk/27.1.12297006'
-        JAVA_HOME = '/opt/buildtools/zulu21.40.17-ca-jdk21.0.6-macosx'
+        JAVA_HOME = '/opt/buildtools/zulu25.36.205-ca-jdk25.0.4.1-macosx/Contents/Home'
         ANDROID_HOME = '/opt/buildtools/android-sdk'
 
-        PATH = "/opt/buildtools/android-sdk/cmake/3.22.1/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu21.40.17-ca-jdk21.0.6-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:/opt/buildtools/android-sdk/build-tools/30.0.3:/usr/sbin/:$PATH"
+        PATH = "/opt/buildtools/android-sdk/cmake/3.22.1/bin:/Applications/MEGAcmd.app/Contents/MacOS:${JAVA_HOME}/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:/opt/buildtools/android-sdk/build-tools/30.0.3:/usr/sbin/:$PATH"
 
         CONSOLE_LOG_FILE = 'console.txt'
 
