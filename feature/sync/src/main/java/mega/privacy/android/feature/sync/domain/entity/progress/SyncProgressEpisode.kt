@@ -3,6 +3,8 @@ package mega.privacy.android.feature.sync.domain.entity.progress
 /**
  * The state of the current run that the progress figure is folded from.
  * The fraction never decreases within an episode; only a new [episodeId] resets it.
+ * [fullSinceMillis] is when the fraction first became full at a stats sample with no pending
+ * file; null until then.
  */
 internal data class SyncProgressEpisode(
     val episodeId: Long,
@@ -11,6 +13,7 @@ internal data class SyncProgressEpisode(
     val interruptions: Map<Long, Interruption>,
     val fraction: Float?,
     val idleSinceMillis: Long?,
+    val fullSinceMillis: Long? = null,
 ) {
     /**
      * Files a live sync has discovered and still has pending in this run.

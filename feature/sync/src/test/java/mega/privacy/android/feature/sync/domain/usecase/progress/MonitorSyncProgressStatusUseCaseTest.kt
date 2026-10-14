@@ -705,6 +705,36 @@ internal class MonitorSyncProgressStatusUseCaseTest {
         }
     }
 
+    @Test
+    fun `test that invoke emits no Completed when a new episode starts while files are pending`() = runTest {
+        val runSnapshotFlow = MutableStateFlow(
+            SyncRunSnapshot(
+                isSeeded = true,
+                syncs = listOf(running(1, scanning = true)),
+                progress = SyncEpisodeProgress(0, 500, 0, 0, fraction = 1f),
+            )
+        )
+        stub(runSnapshotFlow)
+
+        underTest().test {
+            runCurrent()
+            assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Checking)
+
+            advanceTimeBy(13_000)
+            runSnapshotFlow.value = SyncRunSnapshot(
+                isSeeded = true,
+                syncs = listOf(running(1, pending = 750)),
+                progress = SyncEpisodeProgress(1, 0, 750, 0, fraction = null),
+            )
+            runCurrent()
+            assertThat(awaitItem().phase).isEqualTo(SyncProgressPhase.Transferring)
+
+            advanceTimeBy(7_300)
+            runCurrent()
+            expectNoEvents()
+        }
+    }
+
     private fun nonPausedPhases(): Stream<Arguments> = Stream.of(
         Arguments.of(SyncProgressPhase.Checking, runSnapshot(running(1, scanning = true))),
         Arguments.of(SyncProgressPhase.UpToDate, idle()),

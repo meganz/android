@@ -48,6 +48,19 @@ internal class AdvanceSyncProgressEpisodeUseCaseTest {
         runningSinceMillis = since,
     )
 
+    private fun runningDownloads(id: Long, pending: Int, scanning: Boolean = false) = SyncWorkState(
+        syncId = id,
+        runState = SyncRunState.Running,
+        isStorageOverQuota = false,
+        stats = SyncStatsSample(
+            isScanning = scanning,
+            isSyncing = false,
+            pendingUploads = 0,
+            pendingDownloads = pending,
+        ),
+        runningSinceMillis = null,
+    )
+
     private fun runningWithoutStats(id: Long, since: Long) =
         SyncWorkState(id, SyncRunState.Running, false, null, since)
 
@@ -76,6 +89,39 @@ internal class AdvanceSyncProgressEpisodeUseCaseTest {
         .step(0, running(1, 100))
         .step(1_000, running(1, 60))
         .step(2_000, inState(1, SyncRunState.Suspended))
+
+    private fun fullWhileScanning(): SyncProgressEpisode = Initial
+        .step(0, running(1, 10))
+        .step(500, running(1, 10))
+        .step(1_000, running(1, 0, scanning = true))
+
+    /**
+     * A device run with one sync: uploads finish while the sync keeps scanning, then downloads
+     * arrive. Each pair is the time in ms and the sync state at that time.
+     */
+    private val deviceRun = listOf(
+        0L to running(1, 250, scanning = true),
+        1_000L to running(1, 250),
+        2_000L to running(1, 500),
+        3_800L to running(1, 493),
+        56_800L to running(1, 1),
+        57_800L to running(1, 1, scanning = true),
+        58_800L to running(1, 0, scanning = true),
+        71_800L to runningDownloads(1, 750),
+        75_000L to runningDownloads(1, 1_000),
+        518_000L to runningDownloads(1, 2),
+        519_000L to runningDownloads(1, 2, scanning = true),
+        532_500L to runningDownloads(1, 0, scanning = true),
+        570_400L to runningDownloads(1, 0),
+    )
+
+    private fun deviceRunUntil(lastMillis: Long): Map<Long, SyncProgressEpisode> {
+        val samples = deviceRun.takeWhile { (millis, _) -> millis <= lastMillis }
+        val episodes = samples
+            .runningFold(Initial) { episode, (millis, sync) -> episode.step(millis, sync) }
+            .drop(1)
+        return samples.map { (millis, _) -> millis }.zip(episodes).toMap()
+    }
 
     @Test
     fun `test that invoke sets total to pending when a sync is first observed`() {
@@ -546,5 +592,172 @@ internal class AdvanceSyncProgressEpisodeUseCaseTest {
 
         row(1_003, running(1, 1), running(2, 0))
         assertRow(mapOf(1L to Counter(1, 1, false), 2L to Counter(0, 0, false)), 0, 1, 0, 0f)
+    }
+
+    @Test
+    fun `test that invoke starts a new episode when files arrive the idle grace after the episode became full while a sync kept scanning`() {
+        val episodes = deviceRunUntil(71_800)
+        val full = episodes.getValue(58_800)
+        val joined = episodes.getValue(71_800)
+
+        assertFraction(full.fraction, 1f)
+        assertThat(full.fullSinceMillis).isEqualTo(58_800L)
+        assertThat(full.idleSinceMillis).isNull()
+        assertThat(joined.episodeId).isEqualTo(1L)
+        assertThat(joined.toProgress().processedItems).isEqualTo(0)
+        assertThat(joined.toProgress().pendingItems).isEqualTo(750)
+        assertThat(joined.fraction).isNull()
+    }
+
+    @Test
+    fun `test that invoke starts a new episode when files arrive exactly the idle grace after the episode became full`() {
+        val episode = fullWhileScanning().step(1_000 + grace, running(1, 3))
+
+        assertThat(episode.episodeId).isEqualTo(1L)
+    }
+
+    @Test
+    fun `test that invoke starts a new episode when files arrive the idle grace after the episode became full and within the idle grace after it went idle`() {
+        val episode = fullWhileScanning()
+            .step(4_200, running(1, 0))
+            .step(7_300, running(1, 3))
+
+        assertThat(episode.episodeId).isEqualTo(1L)
+    }
+
+    @Test
+    fun `test that invoke starts a new episode when a scanning sync reports files the idle grace after the episode became full`() {
+        val episode = fullWhileScanning().step(1_000 + grace + 300, running(1, 3, scanning = true))
+
+        assertThat(episode.episodeId).isEqualTo(1L)
+        assertThat(episode.fraction).isNull()
+    }
+
+    @Test
+    fun `test that invoke continues a full episode when files arrive within the idle grace`() {
+        val episode = fullWhileScanning().step(1_000 + grace - 1, running(1, 3))
+
+        assertThat(episode.episodeId).isEqualTo(0L)
+        assertFraction(episode.fraction, 1f)
+        assertThat(episode.toProgress().processedItems).isEqualTo(10)
+        assertThat(episode.fullSinceMillis).isEqualTo(1_000L)
+    }
+
+    @Test
+    fun `test that invoke starts a new episode at the first sample after the idle grace when files joined a full episode`() {
+        val joined = Initial
+            .step(0, running(1, 1_000))
+            .step(1_000, running(1, 0))
+            .step(4_400, running(1, 40))
+        val rolledOver = joined.step(16_500, running(1, 39))
+
+        assertThat(joined.episodeId).isEqualTo(0L)
+        assertFraction(joined.fraction, 1f)
+        assertThat(rolledOver.episodeId).isEqualTo(1L)
+        assertThat(rolledOver.toProgress().pendingItems).isEqualTo(39)
+        assertThat(rolledOver.fraction).isNull()
+    }
+
+    @Test
+    fun `test that invoke measures the idle grace from when the episode first became full`() {
+        val scanned = (2_100L..11_000L step 1_100).fold(fullWhileScanning()) { episode, millis ->
+            episode.step(millis, running(1, 0, scanning = true))
+        }
+        val episode = scanned.step(12_300, running(1, 5))
+
+        assertThat(episode.episodeId).isEqualTo(1L)
+    }
+
+    @Test
+    fun `test that invoke keeps a full episode while a sync only scans`() {
+        val episode = (10_700L..61_000L step 9_700).fold(fullWhileScanning()) { episode, millis ->
+            episode.step(millis, running(1, 0, scanning = true))
+        }
+
+        assertThat(episode.episodeId).isEqualTo(0L)
+        assertFraction(episode.fraction, 1f)
+        assertThat(episode.toProgress().processedItems).isEqualTo(10)
+        assertThat(episode.idleSinceMillis).isNull()
+    }
+
+    @Test
+    fun `test that invoke continues the episode after a resume that holds the fraction below full`() {
+        val episodes = listOf(
+            0L to running(1, 100),
+            1_000L to running(1, 60),
+            2_000L to inState(1, SyncRunState.Suspended),
+            32_000L to runningWithoutStats(1, since = 32_000),
+            32_300L to running(1, 0, scanning = true),
+            62_000L to running(1, 0, scanning = true),
+            63_000L to running(1, 60),
+        ).runningFold(Initial) { episode, (millis, sync) -> episode.step(millis, sync) }.drop(1)
+        val resumed = episodes.last()
+
+        episodes.forEach { assertThat(it.fullSinceMillis).isNull() }
+        assertThat(resumed.episodeId).isEqualTo(0L)
+        assertFraction(resumed.fraction, 0.4f)
+    }
+
+    @Test
+    fun `test that invoke starts a new episode when a second sync reports files after the first sync's episode became full`() {
+        val episode = Initial
+            .step(0, running(1, 10), inState(2, SyncRunState.Loading))
+            .step(1_000, running(1, 0), inState(2, SyncRunState.Loading))
+            .step(8_000, running(1, 0), running(2, 500))
+
+        assertThat(episode.episodeId).isEqualTo(1L)
+        assertThat(episode.counters).containsExactly(
+            1L, Counter(0, 0, awaitingScanEnd = false),
+            2L, Counter(500, 500, awaitingScanEnd = true),
+        )
+        assertThat(episode.fraction).isNull()
+    }
+
+    @Test
+    fun `test that invoke gives a new episode after a full one no processed items and no full start`() {
+        val episode = deviceRunUntil(71_800).getValue(71_800)
+
+        assertThat(episode.retiredProcessed).isEqualTo(0)
+        assertThat(episode.toProgress().processedItems).isEqualTo(0)
+        assertThat(episode.fullSinceMillis).isNull()
+        assertThat(episode.idleSinceMillis).isNull()
+    }
+
+    @Test
+    fun `test that invoke records when the episode first became full`() {
+        val episodes = steps(
+            listOf(running(1, 10)),
+            listOf(running(1, 4)),
+            listOf(running(1, 0)),
+            listOf(running(1, 0)),
+        )
+
+        assertThat(episodes.map { it.fullSinceMillis }).containsExactly(null, null, 2_000L, 2_000L)
+            .inOrder()
+    }
+
+    @Test
+    fun `test that invoke starts a new episode for downloads that follow an upload run while the sync keeps scanning`() {
+        val episodes = deviceRunUntil(Long.MAX_VALUE)
+
+        fun assertSample(millis: Long, episodeId: Long, fraction: Float?) {
+            val episode = episodes.getValue(millis)
+            assertThat(episode.episodeId).isEqualTo(episodeId)
+            if (fraction == null) assertThat(episode.fraction).isNull()
+            else assertThat(episode.fraction!!).isWithin(1e-3f).of(fraction)
+        }
+
+        assertSample(1_000, 0, 0f)
+        assertSample(3_800, 0, 0.014f)
+        assertSample(56_800, 0, 0.998f)
+        assertSample(57_800, 0, 0.998f)
+        assertSample(58_800, 0, 1f)
+        assertSample(71_800, 1, null)
+        assertSample(75_000, 1, 0f)
+        assertSample(518_000, 1, 0.998f)
+        assertSample(519_000, 1, 0.998f)
+        assertSample(532_500, 1, 1f)
+        assertThat(episodes.getValue(532_500).fullSinceMillis).isEqualTo(532_500L)
+        assertThat(episodes.getValue(570_400).idleSinceMillis).isEqualTo(570_400L)
     }
 }

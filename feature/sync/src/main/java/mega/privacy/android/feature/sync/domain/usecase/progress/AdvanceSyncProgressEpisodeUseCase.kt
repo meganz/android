@@ -14,6 +14,8 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Returns the episode after applying the current state of every sync at `nowMillis`.
  * The fraction never decreases within an episode; only a new episode id resets it.
+ * A full episode also ends when files are still pending [EPISODE_IDLE_GRACE] after it filled,
+ * even while a sync keeps scanning.
  * Time is passed in so the use case reads no clock.
  */
 internal class AdvanceSyncProgressEpisodeUseCase @Inject constructor() {
@@ -24,10 +26,8 @@ internal class AdvanceSyncProgressEpisodeUseCase @Inject constructor() {
         nowMillis: Long,
     ): SyncProgressEpisode {
         val hasWork = syncs.any { it.hasWork }
-        val idleSinceMillis = episode.idleSinceMillis
-        val base = if (hasWork && idleSinceMillis != null &&
-            nowMillis - idleSinceMillis >= EPISODE_IDLE_GRACE.inWholeMilliseconds
-        ) {
+        val livePending = syncs.filter { it.isLive }.sumOf { requireNotNull(it.stats).pendingItems }
+        val base = if (endsEpisode(episode, hasWork, livePending, nowMillis)) {
             Initial.copy(episodeId = episode.episodeId + 1)
         } else {
             episode
@@ -58,14 +58,34 @@ internal class AdvanceSyncProgressEpisodeUseCase @Inject constructor() {
         } else {
             base.idleSinceMillis ?: nowMillis
         }
+        val fraction = nextFraction(base.fraction, counters, retired, interruptions)
         return SyncProgressEpisode(
             episodeId = base.episodeId,
             counters = counters,
             retiredProcessed = retired,
             interruptions = interruptions,
-            fraction = nextFraction(base.fraction, counters, retired, interruptions),
+            fraction = fraction,
             idleSinceMillis = idleSince,
+            fullSinceMillis = base.fullSinceMillis
+                ?: nowMillis.takeIf { fraction == 1f && counters.values.sumOf { it.pending } == 0 },
         )
+    }
+
+    /**
+     * A full fraction can never move again, and a sync may keep scanning long after a run,
+     * so files still pending [EPISODE_IDLE_GRACE] after the episode filled start a new episode.
+     */
+    private fun endsEpisode(
+        episode: SyncProgressEpisode,
+        hasWork: Boolean,
+        livePending: Int,
+        nowMillis: Long,
+    ): Boolean {
+        val grace = EPISODE_IDLE_GRACE.inWholeMilliseconds
+        val idleSince = episode.idleSinceMillis
+        val fullSince = episode.fullSinceMillis
+        return (hasWork && idleSince != null && nowMillis - idleSince >= grace) ||
+                (livePending > 0 && fullSince != null && nowMillis - fullSince >= grace)
     }
 
     private val SyncWorkState.isLive: Boolean
