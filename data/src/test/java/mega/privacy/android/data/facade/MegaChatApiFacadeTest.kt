@@ -5,7 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
@@ -300,6 +303,46 @@ internal class MegaChatApiFacadeTest {
                 assertThat(awaitError()).isInstanceOf(ChatRoomDoesNotExistException::class.java)
             }
         }
+
+    @Test
+    fun `test that monitorNodeHistory fails a subscriber that joins while an earlier subscriber still holds the failed node history`() {
+        val chatId = 11L
+        val earlierSubscriberDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+        val earlierSubscriberBlocked = CountDownLatch(1)
+        val releaseEarlierSubscriber = CountDownLatch(1)
+        whenever(chatApi.openNodeHistory(eq(chatId), any())) doAnswer {
+            earlierSubscriberDispatcher.executor.execute {
+                earlierSubscriberBlocked.countDown()
+                releaseEarlierSubscriber.await()
+            }
+            earlierSubscriberBlocked.await()
+            false
+        }
+        val scope = CoroutineScope(Dispatchers.IO)
+        val facade = MegaChatApiFacade(chatApiLazy = { chatApi }, sharingScope = scope)
+
+        try {
+            runBlocking {
+                val nodeHistory = facade.monitorNodeHistory(chatId)
+                val earlierSubscriber = scope.launch(earlierSubscriberDispatcher) {
+                    runCatching { nodeHistory.collect {} }
+                }
+                assertThat(earlierSubscriberBlocked.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue()
+                delay(100)
+
+                val actual = withTimeout(TIMEOUT_MILLIS) { runCatching { nodeHistory.first() } }
+
+                assertThat(actual.exceptionOrNull())
+                    .isInstanceOf(ChatRoomDoesNotExistException::class.java)
+                releaseEarlierSubscriber.countDown()
+                earlierSubscriber.join()
+            }
+        } finally {
+            releaseEarlierSubscriber.countDown()
+            scope.cancel()
+            earlierSubscriberDispatcher.close()
+        }
+    }
 
     @Test
     fun `test that monitorNodeHistory emits Opened when the node history opens`() = runTest {

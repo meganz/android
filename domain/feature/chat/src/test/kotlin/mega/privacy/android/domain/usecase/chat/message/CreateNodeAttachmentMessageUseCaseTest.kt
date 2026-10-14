@@ -101,6 +101,24 @@ class CreateNodeAttachmentMessageUseCaseTest {
         assertThat(actual).isEqualTo(expected)
     }
 
+    @Test
+    fun `test that the use case maps only the first node when the message carries several nodes`() =
+        runTest {
+            val firstNode = mock<FileNode>()
+            val message = mock<ChatMessage> {
+                on { nodeList } doReturn listOf(firstNode, mock<FileNode>(), mock<FileNode>())
+                on { status } doReturn ChatMessageStatus.UNKNOWN
+            }
+            val typedNode = mock<ChatImageFile>()
+            val request = buildRequest(message)
+            whenever(addChatFileTypeUseCase(firstNode, request.chatId, request.messageId))
+                .thenReturn(typedNode)
+
+            val actual = underTest(request)
+
+            assertThat((actual as NodeAttachmentMessage).fileNode).isEqualTo(typedNode)
+        }
+
     private fun buildRequest(message: ChatMessage, exists: Boolean = true) =
         CreateTypedMessageRequest(
             chatMessage = message,

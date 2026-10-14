@@ -242,6 +242,8 @@ internal class MegaChatApiFacade @Inject constructor(
 
     private val openNodeHistoryChatIds = ConcurrentHashMap.newKeySet<Long>()
 
+    private val failedNodeHistoryChatIds = ConcurrentHashMap.newKeySet<Long>()
+
     private val nodeHistoryFlows = ConcurrentHashMap<Long, Flow<ChatNodeHistoryUpdate>>()
 
     // shareIn rethrows upstream failures in the sharing scope instead of delivering them to
@@ -250,6 +252,10 @@ internal class MegaChatApiFacade @Inject constructor(
     // collector is busy.
     // A subscriber joining an already open history would never see Opened from upstream, so it
     // gets its own on subscription; one subscribing while the history opens may see it twice.
+    // The open failure is replayed the same way. After a failure the upstream stays active until
+    // the last subscriber goes away, so that WhileSubscribed can open the history again for the
+    // next subscriber. If the upstream completed, a subscriber joining before the others went away
+    // would keep the sharing active without an upstream and would wait forever.
     // The SDK allows a single open node history per chat, so every caller for a chat shares one
     // pipeline: a second pipeline's close-then-open would silently close the first one's history.
     override fun monitorNodeHistory(chatId: Long): Flow<ChatNodeHistoryUpdate> =
@@ -286,11 +292,12 @@ internal class MegaChatApiFacade @Inject constructor(
                     openNodeHistoryChatIds.add(chatId)
                     send(Result.success(ChatNodeHistoryUpdate.Opened))
                 } else {
+                    failedNodeHistoryChatIds.add(chatId)
                     send(Result.failure(ChatRoomDoesNotExistException()))
-                    close()
                 }
                 awaitClose()
             } finally {
+                failedNodeHistoryChatIds.remove(chatId)
                 if (opened) {
                     Timber.d("Close node history $chatId")
                     openNodeHistoryChatIds.remove(chatId)
@@ -305,7 +312,10 @@ internal class MegaChatApiFacade @Inject constructor(
         }.buffer(Channel.UNLIMITED)
             .shareIn(sharingScope, SharingStarted.WhileSubscribed())
             .onSubscription {
-                if (chatId in openNodeHistoryChatIds) emit(Result.success(ChatNodeHistoryUpdate.Opened))
+                when (chatId) {
+                    in openNodeHistoryChatIds -> emit(Result.success(ChatNodeHistoryUpdate.Opened))
+                    in failedNodeHistoryChatIds -> emit(Result.failure(ChatRoomDoesNotExistException()))
+                }
             }
             .map { it.getOrThrow() }
 
