@@ -139,7 +139,11 @@ fun AudioPlayerScreen(
             val queueVisible = isQueueVisible && queueContent != null
             val showQueuePane = isLandscape && queueVisible
             val showQueueOverlay = !isLandscape && queueVisible
-            BackHandler(enabled = queueVisible) { isQueueVisible = false }
+            // The player is drawn over the screen below it, which stays in the composition,
+            // so NavDisplay does not handle back for it. The player must pop itself.
+            BackHandler {
+                if (queueVisible) isQueueVisible = false else onBackPressed()
+            }
 
             // Tracks the overlay for as long as it is on screen, including while it animates out.
             // Restoring the player's semantics on the dismiss tap instead would expose it to
@@ -280,7 +284,17 @@ fun AudioPlayerScreen(
 
             // The player keeps a single call site across both layouts: moving it between branches
             // would dispose its subtree, resetting state such as whether the artwork has loaded.
-            Row(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    // The design specifies no swipe gestures in landscape. The queue overlay
+                    // covers the player in portrait and carries its own back action.
+                    .dragDownToCollapse(
+                        enabled = !isLandscape && !overlayOnScreen,
+                        containerHeight = maxHeight,
+                        onCollapse = onBackPressed,
+                    )
+            ) {
                 playerScaffold(
                     Modifier
                         .weight(1f)

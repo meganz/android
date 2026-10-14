@@ -36,7 +36,7 @@ All code lives under `mega.privacy.android.navigation.contract`:
   - `AppDialogDestinations` / `DialogNavKey` — dialog destinations contributed the same way as screens.
   - `HomeWidget` / `HomeWidgetProvider` — Home screen widget contract (single widget vs. provider of multiple).
   - `DeepLinkHandler` — abstract base for resolving a `Uri` to `List<NavKey>`, with login-state checks and snackbar fallbacks.
-  - Metadata + scenes — `buildMetadata`, `SharedViewModelStoreNavEntryDecorator`/`sharedViewModel`, `BottomSheetSceneStrategy`, `TransparentSceneStrategy`, `OverlaySuppression*`.
+  - Metadata + scenes — `buildMetadata`, `SharedViewModelStoreNavEntryDecorator`/`sharedViewModel`, `BottomSheetSceneStrategy`, `TransparentSceneStrategy`, `OverContentSceneStrategy`, `OverlaySuppression*`.
 
 ## Module Dependencies
 - Project: `:domain`, `:resources:string-resources`, `:resources:icon-pack`.

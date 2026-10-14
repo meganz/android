@@ -41,7 +41,9 @@ import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQu
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
 import mega.privacy.android.feature.mediaplayer.presentation.model.PlaybackSpeedSource
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.contract.transparent.withOverContent
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -67,7 +69,9 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
     launchSourceHolder: AudioPlayerLaunchSourceHolder,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
-    entry<AudioPlayerScreenNavKey> { navKey ->
+    // The screen below stays in the composition, so that it is visible when the user drags the
+    // player down to collapse it.
+    entry<AudioPlayerScreenNavKey>(metadata = buildMetadata { withOverContent() }) { navKey ->
         val activity = LocalActivity.current as? ComponentActivity
             ?: error("AudioPlayerScreen must be hosted in a ComponentActivity")
         val viewModel = hiltViewModel<AudioPlayerViewModel>(activity)

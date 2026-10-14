@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -16,7 +17,10 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.media3.common.Player
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -562,10 +566,7 @@ class AudioPlayerScreenTest {
         composeTestRule.onNodeWithContentDescription("Playlist").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.runOnUiThread {
-            composeTestRule.activity.onBackPressedDispatcher.onBackPressed()
-        }
-        composeTestRule.waitForIdle()
+        pressBack()
 
         composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertDoesNotExist()
     }
@@ -576,12 +577,35 @@ class AudioPlayerScreenTest {
         composeTestRule.onNodeWithContentDescription("Playlist").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.runOnUiThread {
-            composeTestRule.activity.onBackPressedDispatcher.onBackPressed()
-        }
-        composeTestRule.waitForIdle()
+        pressBack()
 
         composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that onBackPressed is called when back is pressed`() {
+        val onBackPressed = mock<() -> Unit>()
+        setContent(onBackPressed = onBackPressed)
+
+        pressBack()
+
+        verify(onBackPressed).invoke()
+    }
+
+    @Test
+    fun `test that onBackPressed is not called when back is pressed while the queue is shown`() {
+        val onBackPressed = mock<() -> Unit>()
+        setContent(
+            onBackPressed = onBackPressed,
+            queueContent = { queueModifier -> Box(modifier = queueModifier.testTag(QUEUE_TAG)) },
+        )
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertIsDisplayed()
+
+        pressBack()
+
+        verifyNoInteractions(onBackPressed)
     }
 
     @Test
@@ -618,10 +642,7 @@ class AudioPlayerScreenTest {
         composeTestRule.onNodeWithContentDescription("Playlist").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.runOnUiThread {
-            composeTestRule.activity.onBackPressedDispatcher.onBackPressed()
-        }
-        composeTestRule.waitForIdle()
+        pressBack()
 
         composeTestRule.onNodeWithContentDescription("Playlist").assertIsDisplayed()
     }
@@ -700,9 +721,101 @@ class AudioPlayerScreenTest {
 
     // endregion
 
+    // region Drag down to collapse
+
+    @Test
+    fun `test that onBackPressed is called when the player is dragged down past the threshold`() {
+        val onBackPressed = mock<() -> Unit>()
+        setContent(onBackPressed = onBackPressed)
+
+        dragPlayerDown(COLLAPSE_DISTANCE_FRACTION + DRAG_MARGIN_FRACTION)
+
+        verify(onBackPressed).invoke()
+    }
+
+    @Test
+    fun `test that onBackPressed is not called when the player is dragged down short of the threshold`() {
+        val onBackPressed = mock<() -> Unit>()
+        setContent(onBackPressed = onBackPressed)
+
+        dragPlayerDown(COLLAPSE_DISTANCE_FRACTION - DRAG_MARGIN_FRACTION)
+
+        verifyNoInteractions(onBackPressed)
+    }
+
+    @Test
+    @Config(qualifiers = LANDSCAPE_QUALIFIERS)
+    fun `test that onBackPressed is not called when the player is dragged down in landscape`() {
+        val onBackPressed = mock<() -> Unit>()
+        setContent(onBackPressed = onBackPressed)
+
+        dragPlayerDown(COLLAPSE_DISTANCE_FRACTION + DRAG_MARGIN_FRACTION)
+
+        verifyNoInteractions(onBackPressed)
+    }
+
+    @Test
+    fun `test that onBackPressed is not called when the player is dragged down while the queue is shown`() {
+        val onBackPressed = mock<() -> Unit>()
+        setContent(
+            onBackPressed = onBackPressed,
+            queueContent = { queueModifier -> Box(modifier = queueModifier.testTag(QUEUE_TAG)) },
+        )
+
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+        // The queue overlay consumes the pointer events, so this test passes with or without
+        // the enabled guard on the gesture. It covers the behaviour, not the guard.
+        dragPlayerDown(COLLAPSE_DISTANCE_FRACTION + DRAG_MARGIN_FRACTION)
+
+        verifyNoInteractions(onBackPressed)
+    }
+
+    // endregion
+
+    private fun pressBack() {
+        composeTestRule.runOnUiThread {
+            composeTestRule.activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    /**
+     * Drags the player down by [fraction] of the screen height, which is what the collapse
+     * distance is a fraction of. The drag is slow, so that the release speed stays below the
+     * velocity threshold and only the drag distance decides the outcome.
+     *
+     * The drag runs along the side of the screen, where the player draws its background. The
+     * playback controls consume their own pointer events, so a drag that starts on one of them
+     * never reaches the player.
+     */
+    private fun dragPlayerDown(fraction: Float) {
+        composeTestRule.onRoot().performTouchInput {
+            val startY = top + height * DRAG_START_FRACTION
+            swipe(
+                start = Offset(left + DRAG_X_PX, startY),
+                end = Offset(left + DRAG_X_PX, startY + height * fraction),
+                durationMillis = SLOW_DRAG_DURATION_MS,
+            )
+        }
+    }
+
     private companion object {
         const val LANDSCAPE_QUALIFIERS = "w800dp-h400dp-land"
         const val LANDSCAPE_WIDTH_DP = 800f
         const val QUEUE_TAG = "test:queue"
+
+        /**
+         * Distance each drag test stays clear of the threshold, as a fraction of the height. The
+         * margin must also absorb the touch slop, which the drag loses before it moves the player.
+         */
+        const val DRAG_MARGIN_FRACTION = 0.2f
+
+        /** Where the drag starts, below the top bar, as a fraction of the height. */
+        const val DRAG_START_FRACTION = 0.2f
+
+        const val SLOW_DRAG_DURATION_MS = 1_000L
+
+        /** Horizontal position of the drag, clear of the playback controls. */
+        const val DRAG_X_PX = 10f
     }
 }

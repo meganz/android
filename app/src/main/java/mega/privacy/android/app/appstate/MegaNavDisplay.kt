@@ -33,6 +33,7 @@ import mega.privacy.android.navigation.contract.shared.rememberSharedViewModelSt
 import mega.privacy.android.navigation.contract.suppression.OverlaySuppressionState
 import mega.privacy.android.navigation.contract.suppression.rememberOverlaySuppressionNavEntryDecorator
 import mega.privacy.android.navigation.contract.transition.fadeTransition
+import mega.privacy.android.navigation.contract.transparent.OverContentSceneStrategy
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 
 /**
@@ -63,6 +64,7 @@ internal fun MegaNavDisplay(
     ),
 ) {
     val transparentStrategy = remember { TransparentSceneStrategy<NavKey>() }
+    val overContentStrategy = remember { OverContentSceneStrategy<NavKey>() }
 
     val suppressionState = remember { OverlaySuppressionState() }
     val deferredEvents = remember { mutableStateListOf<QueueEvent>() }
@@ -76,7 +78,12 @@ internal fun MegaNavDisplay(
     NavDisplay(
         backStack = backStack,
         onBack = { navigationHandler.back() },
-        sceneStrategies = listOf(transparentStrategy, dialogStrategy, bottomSheetStrategy),
+        sceneStrategies = listOf(
+            transparentStrategy,
+            overContentStrategy,
+            dialogStrategy,
+            bottomSheetStrategy,
+        ),
         entryDecorators = entryDecorators + listOf(
             rememberOverlaySuppressionNavEntryDecorator(
                 suppressionState
