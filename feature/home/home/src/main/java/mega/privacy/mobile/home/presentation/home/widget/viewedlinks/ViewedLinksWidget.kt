@@ -34,6 +34,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -52,6 +53,9 @@ import mega.privacy.android.navigation.destination.ViewedLinksScreenNavKey
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ViewedLinksViewAllButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksWidgetFileLinkItemSelectedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksWidgetFolderLinkItemSelectedEvent
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.ViewedLinksViewModel.Companion.MAX_PREVIEW_COUNT
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkListLoadingItem
 import javax.inject.Inject
@@ -118,9 +122,13 @@ internal fun ViewedLinksView(
     // Links cannot be fetched without a connection, so while offline the section settles on its
     // empty layout instead of a skeleton that never resolves.
     val isLoading = !isOfflineMode && lazyItems.loadState.refresh is LoadState.Loading
+    val onViewAll = {
+        Analytics.tracker.trackEvent(ViewedLinksViewAllButtonPressedEvent)
+        onViewAllClicked()
+    }
     Column(modifier = modifier) {
         ViewedLinksWidgetHeader(
-            onViewAllClicked = onViewAllClicked,
+            onViewAllClicked = onViewAll,
             showMoreButton = !isLoading && lazyItems.itemCount > MAX_PREVIEW_COUNT,
         )
 
@@ -129,7 +137,7 @@ internal fun ViewedLinksView(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onViewAllClicked() },
+                        .clickable { onViewAll() },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     ViewedLinkListLoadingItem()
@@ -180,8 +188,19 @@ internal fun ViewedLinksView(
                         subtitle = {},
                         onClickListener = {
                             when (item.viewedLink.type) {
-                                RecentlyViewedLinkType.FolderLink -> onFolderLinkClicked(item.viewedLink.linkUrl)
-                                RecentlyViewedLinkType.FileLink -> onFileLinkClicked(item.viewedLink.linkUrl)
+                                RecentlyViewedLinkType.FolderLink -> {
+                                    Analytics.tracker.trackEvent(
+                                        ViewedLinksWidgetFolderLinkItemSelectedEvent
+                                    )
+                                    onFolderLinkClicked(item.viewedLink.linkUrl)
+                                }
+
+                                RecentlyViewedLinkType.FileLink -> {
+                                    Analytics.tracker.trackEvent(
+                                        ViewedLinksWidgetFileLinkItemSelectedEvent
+                                    )
+                                    onFileLinkClicked(item.viewedLink.linkUrl)
+                                }
                             }
                         },
                     )

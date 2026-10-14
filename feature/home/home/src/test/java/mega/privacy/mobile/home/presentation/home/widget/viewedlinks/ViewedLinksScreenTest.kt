@@ -21,6 +21,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -30,17 +31,30 @@ import mega.privacy.android.shared.nodes.components.GRID_VIEW_TOGGLE_TAG
 import mega.privacy.android.shared.nodes.components.LIST_VIEW_TOGGLE_TAG
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ViewedLinksClearHistoryConfirmButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksClearHistoryDialogEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksClearHistoryMenuItemEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksFileLinkItemSelectedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksFolderLinkItemSelectedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksRemoveSelectedConfirmButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksRemoveSelectedMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksScreenEvent
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.VIEWED_LINK_GRID_LOADING_ITEM_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.VIEWED_LINK_LOADING_ITEM_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ViewedLinksScreenTest {
 
+    private val composeRule = createComposeRule()
+
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    val composeRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeRule)
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -425,6 +439,154 @@ class ViewedLinksScreenTest {
             .performClick()
 
         assertThat(cleared).isTrue()
+    }
+
+    @Test
+    fun `test that screen event is tracked when the screen is displayed`() {
+        setContent(items = listOf(fileLinkItem))
+
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events).containsExactly(ViewedLinksScreenEvent)
+    }
+
+    @Test
+    fun `test that file link event is tracked when a file link item is clicked`() {
+        setContent(items = listOf(fileLinkItem))
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_ITEM_TEST_TAG)[0].performClick()
+
+        assertThat(analyticsRule.events).containsExactly(ViewedLinksFileLinkItemSelectedEvent)
+    }
+
+    @Test
+    fun `test that folder link event is tracked when a grid folder link item is clicked`() {
+        setContent(
+            items = listOf(folderLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+        )
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_GRID_ITEM_TEST_TAG)[0].performClick()
+
+        assertThat(analyticsRule.events).containsExactly(ViewedLinksFolderLinkItemSelectedEvent)
+    }
+
+    @Test
+    fun `test that no link event is tracked when an item is clicked in selection mode`() {
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(selectedNodeHandles = setOf(999L)),
+        )
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_ITEM_TEST_TAG)[0].performClick()
+
+        assertThat(analyticsRule.events).isEmpty()
+    }
+
+    @Test
+    fun `test that clear history menu item event is tracked when clear history is clicked`() {
+        setContent(items = listOf(fileLinkItem))
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        openClearHistoryDialog()
+
+        assertThat(analyticsRule.events).contains(ViewedLinksClearHistoryMenuItemEvent)
+    }
+
+    @Test
+    fun `test that clear history dialog event is tracked when the clear history dialog is displayed`() {
+        setContent(items = listOf(fileLinkItem))
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        openClearHistoryDialog()
+
+        composeRule.onNodeWithTag(CLEAR_HISTORY_DIALOG_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+        assertThat(analyticsRule.events).containsExactly(
+            ViewedLinksClearHistoryMenuItemEvent,
+            ViewedLinksClearHistoryDialogEvent,
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that clear history dialog event is not tracked when the options sheet is opened`() {
+        setContent(items = listOf(fileLinkItem))
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        composeRule.onNodeWithTag(CommonMenuAction.More.testTag).performClick()
+        composeRule.waitForIdle()
+
+        assertThat(analyticsRule.events).doesNotContain(ViewedLinksClearHistoryDialogEvent)
+    }
+
+    @Test
+    fun `test that clear history confirm event is tracked when the clear history dialog is confirmed`() {
+        var cleared = false
+        setContent(
+            items = listOf(fileLinkItem),
+            onClearAllLinks = { cleared = true },
+        )
+        composeRule.waitForIdle()
+        openClearHistoryDialog()
+        analyticsRule.events.clear()
+
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_clear))
+            .performClick()
+
+        assertThat(cleared).isTrue()
+        assertThat(analyticsRule.events)
+            .containsExactly(ViewedLinksClearHistoryConfirmButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that remove selected toolbar event is tracked when the selection clear action is clicked`() {
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(selectedNodeHandles = setOf(fileLinkItem.viewedLink.nodeHandle)),
+        )
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        composeRule.onNodeWithTag(CommonMenuAction.Clear.testTag).performClick()
+
+        assertThat(analyticsRule.events).containsExactly(ViewedLinksRemoveSelectedMenuToolbarEvent)
+    }
+
+    @Test
+    fun `test that remove selected confirm event is tracked when the remove selected dialog is confirmed`() {
+        var deleted = false
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(selectedNodeHandles = setOf(fileLinkItem.viewedLink.nodeHandle)),
+            onDeleteSelectedLinks = { deleted = true },
+        )
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(CommonMenuAction.Clear.testTag).performClick()
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_clear))
+            .performClick()
+
+        assertThat(deleted).isTrue()
+        assertThat(analyticsRule.events)
+            .containsExactly(ViewedLinksRemoveSelectedConfirmButtonPressedEvent)
+    }
+
+    private fun openClearHistoryDialog() {
+        composeRule.onNodeWithTag(CommonMenuAction.More.testTag).performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(CLEAR_HISTORY_TAG, useUnmergedTree = true).performClick()
+        composeRule.waitForIdle()
     }
 
     /**

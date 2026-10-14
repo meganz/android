@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -55,12 +56,14 @@ import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
@@ -79,6 +82,14 @@ import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ViewedLinksClearHistoryConfirmButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksClearHistoryDialogEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksClearHistoryMenuItemEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksFileLinkItemSelectedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksFolderLinkItemSelectedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksRemoveSelectedConfirmButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksRemoveSelectedMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ViewedLinksScreenEvent
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkGridLoadingItem
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkListLoadingItem
 
@@ -112,6 +123,10 @@ internal fun ViewedLinksScreen(
     val isRefreshing = lazyItems.loadState.refresh is LoadState.Loading
     val isInSelectionMode = uiState.isInSelectionMode
 
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(ViewedLinksScreenEvent)
+    }
+
     BackHandler(enabled = isInSelectionMode) { onClearSelection() }
 
     val onItemClick = { item: ViewedLinkUiItem ->
@@ -119,11 +134,15 @@ internal fun ViewedLinksScreen(
             onToggleSelection(item.viewedLink.nodeHandle)
         } else {
             when (item.viewedLink.type) {
-                RecentlyViewedLinkType.FolderLink ->
+                RecentlyViewedLinkType.FolderLink -> {
+                    Analytics.tracker.trackEvent(ViewedLinksFolderLinkItemSelectedEvent)
                     onFolderLinkClicked(item.viewedLink.linkUrl)
+                }
 
-                else ->
+                else -> {
+                    Analytics.tracker.trackEvent(ViewedLinksFileLinkItemSelectedEvent)
                     onFileLinkClicked(item.viewedLink.linkUrl)
+                }
             }
         }
     }
@@ -140,6 +159,7 @@ internal fun ViewedLinksScreen(
                     navigationType = AppBarNavigationType.Close(onClearSelection),
                     actions = listOf(
                         MenuActionWithClick(CommonMenuAction.Clear) {
+                            Analytics.tracker.trackEvent(ViewedLinksRemoveSelectedMenuToolbarEvent)
                             showDeleteSelectedDialog = true
                         }
                     ),
@@ -235,6 +255,7 @@ internal fun ViewedLinksScreen(
                 text = stringResource(sharedR.string.home_widget_viewed_links_clear_history),
                 icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
                 onActionClicked = {
+                    Analytics.tracker.trackEvent(ViewedLinksClearHistoryMenuItemEvent)
                     showOptionsSheet = false
                     showClearConfirmationDialog = true
                 },
@@ -244,6 +265,10 @@ internal fun ViewedLinksScreen(
     }
 
     if (showClearConfirmationDialog) {
+        LaunchedEffect(Unit) {
+            Analytics.tracker.trackEvent(ViewedLinksClearHistoryDialogEvent)
+        }
+
         BasicDialog(
             modifier = Modifier.testTag(CLEAR_HISTORY_DIALOG_TAG),
             title = stringResource(sharedR.string.home_widget_viewed_links_clear_history),
@@ -253,6 +278,7 @@ internal fun ViewedLinksScreen(
             positiveButtonText = stringResource(sharedR.string.general_clear),
             negativeButtonText = stringResource(sharedR.string.general_dismiss_dialog),
             onPositiveButtonClicked = {
+                Analytics.tracker.trackEvent(ViewedLinksClearHistoryConfirmButtonPressedEvent)
                 showClearConfirmationDialog = false
                 onClearAllLinks()
             },
@@ -272,6 +298,7 @@ internal fun ViewedLinksScreen(
             positiveButtonText = stringResource(sharedR.string.general_clear),
             negativeButtonText = stringResource(sharedR.string.general_dismiss_dialog),
             onPositiveButtonClicked = {
+                Analytics.tracker.trackEvent(ViewedLinksRemoveSelectedConfirmButtonPressedEvent)
                 showDeleteSelectedDialog = false
                 onDeleteSelectedLinks()
             },
