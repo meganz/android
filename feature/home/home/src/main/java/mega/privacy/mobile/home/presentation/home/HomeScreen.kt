@@ -36,6 +36,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.prompt.ErrorPrompt
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.LaunchedOncePerAppEffect
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.android.core.ui.theme.values.IconColor
@@ -71,6 +72,8 @@ import mega.privacy.android.shared.transfers.components.UploadingFiles
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 import mega.privacy.mobile.analytics.event.HomeFabOptionsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.HomeSearchBarPressedEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationActiveEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationToolbarButtonPressedEvent
 import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
 import mega.privacy.mobile.home.presentation.home.actions.HomeScreenAction
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
@@ -210,6 +213,9 @@ internal fun HomeScreen(
                                     },
                                 onClick = {
                                     if (!isOfflineMode) {
+                                        Analytics.tracker.trackEvent(
+                                            WidgetCustomisationToolbarButtonPressedEvent
+                                        )
                                         onHomeConfigurationTooltipDismissed()
                                         navigationHandler.navigate(HomeConfiguration)
                                     } else {
@@ -287,6 +293,12 @@ internal fun HomeScreen(
         }
     }
 
+    if (state is HomeUiState.Data && state.isCustomisedArrangement) {
+        LaunchedOncePerAppEffect(WIDGET_CUSTOMISATION_ACTIVE_EFFECT_KEY) {
+            Analytics.tracker.trackEvent(WidgetCustomisationActiveEvent)
+        }
+    }
+
     HomeConfigurationTooltip(
         state = state,
         iconCoordinates = homeConfigurationIconCoordinates,
@@ -337,3 +349,4 @@ private fun HomeToolbarIcon(
 internal const val HOME_FAB_TAG = "home_screen:add_content_fab"
 internal const val HOME_MAIN_APP_BAR_TAG = "home_screen:main_app_bar"
 internal const val HOME_NO_CONNECTION_PROMPT_TAG = "home_screen:no_connection_prompt"
+internal const val WIDGET_CUSTOMISATION_ACTIVE_EFFECT_KEY = "widget_customisation_active"

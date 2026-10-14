@@ -201,6 +201,88 @@ class HomeViewModelTest {
         }
     }
 
+    @Test
+    fun `test that isCustomisedArrangement is false when no configurations exist`() = runTest {
+        stubConfigurations(emptyList())
+        stubArrangementWidgets()
+
+        underTest.state.test {
+            val actual = awaitItem() as HomeUiState.Data
+            assertThat(actual.isCustomisedArrangement).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isCustomisedArrangement is false when configurations match the default arrangement`() =
+        runTest {
+            stubConfigurations(
+                listOf(
+                    HomeWidgetConfiguration(DYNAMIC_IDENTIFIER, widgetOrder = 0, enabled = true),
+                    HomeWidgetConfiguration(STATIC_IDENTIFIER, widgetOrder = 1, enabled = true),
+                )
+            )
+            stubArrangementWidgets()
+
+            underTest.state.test {
+                val actual = awaitItem() as HomeUiState.Data
+                assertThat(actual.isCustomisedArrangement).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isCustomisedArrangement is true when a widget is disabled`() = runTest {
+        stubConfigurations(
+            listOf(
+                HomeWidgetConfiguration(DYNAMIC_IDENTIFIER, widgetOrder = 0, enabled = true),
+                HomeWidgetConfiguration(STATIC_IDENTIFIER, widgetOrder = 1, enabled = false),
+            )
+        )
+        stubArrangementWidgets()
+
+        underTest.state.test {
+            val actual = awaitItem() as HomeUiState.Data
+            assertThat(actual.isCustomisedArrangement).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isCustomisedArrangement is true when widgets are reordered`() = runTest {
+        stubConfigurations(
+            listOf(
+                HomeWidgetConfiguration(DYNAMIC_IDENTIFIER, widgetOrder = 1, enabled = true),
+                HomeWidgetConfiguration(STATIC_IDENTIFIER, widgetOrder = 0, enabled = true),
+            )
+        )
+        stubArrangementWidgets()
+
+        underTest.state.test {
+            val actual = awaitItem() as HomeUiState.Data
+            assertThat(actual.isCustomisedArrangement).isTrue()
+        }
+    }
+
+    private fun stubConfigurations(configurations: List<HomeWidgetConfiguration>) {
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(configurations)
+                awaitCancellation()
+            }
+        }
+    }
+
+    private fun stubArrangementWidgets() {
+        val dynamicWidget =
+            stubWidget(identifier = DYNAMIC_IDENTIFIER, defaultOrder = HomeWidgetOrder.Shortcuts)
+        dynamicWidgetsProvider.stub {
+            on { getWidgets() } doReturn setOf(dynamicWidget)
+        }
+        val staticWidget =
+            stubWidget(identifier = STATIC_IDENTIFIER, defaultOrder = HomeWidgetOrder.Banner)
+        staticWidgetsProvider.stub {
+            on { getWidgets() } doReturn setOf(staticWidget)
+        }
+    }
+
     private fun stubOfflineMode(isOfflineMode: Boolean) {
         monitorOfflineModeUseCase.stub {
             on { invoke() } doReturn flow {
@@ -504,4 +586,9 @@ class HomeViewModelTest {
                 assertThat(awaitItem()).isInstanceOf(HomeUiState.Data::class.java)
             }
         }
+
+    private companion object {
+        const val DYNAMIC_IDENTIFIER = "dynamic1"
+        const val STATIC_IDENTIFIER = "static1"
+    }
 }

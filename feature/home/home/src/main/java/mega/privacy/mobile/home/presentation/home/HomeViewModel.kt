@@ -42,26 +42,30 @@ class HomeViewModel @Inject constructor(
             monitorHomeWidgetConfigurationUseCase()
                 .map { it.associateBy { config -> config.widgetIdentifier } }
                 .mapLatest { configuration ->
-                    val list: List<HomeWidgetItem> =
-                        widgetProviders.map { it.getWidgets() }.flatten().filter { widget ->
-                            configuration[widget.identifier]?.enabled
-                                ?: true
-                        }.sortedBy { widget ->
-                            configuration[widget.identifier]?.widgetOrder
-                                ?: widget.defaultOrder.ordinal
-                        }.map {
-                            HomeWidgetItem(
-                                it.identifier,
-                                { modifier, navigationHandler, transferHandler ->
-                                    it.DisplayWidget(
-                                        modifier = modifier,
-                                        navigationHandler = navigationHandler,
-                                        transferHandler = transferHandler
-                                    )
-                                }
-                            )
-                        }
-                    list
+                    val allWidgets = widgetProviders.map { it.getWidgets() }.flatten()
+                    val visibleWidgets = allWidgets.filter { widget ->
+                        configuration[widget.identifier]?.enabled
+                            ?: true
+                    }.sortedBy { widget ->
+                        configuration[widget.identifier]?.widgetOrder
+                            ?: widget.defaultOrder.ordinal
+                    }
+                    val defaultArrangement = allWidgets
+                        .sortedBy { it.defaultOrder.ordinal }
+                        .map { it.identifier }
+                    val items = visibleWidgets.map {
+                        HomeWidgetItem(
+                            it.identifier,
+                            { modifier, navigationHandler, transferHandler ->
+                                it.DisplayWidget(
+                                    modifier = modifier,
+                                    navigationHandler = navigationHandler,
+                                    transferHandler = transferHandler
+                                )
+                            }
+                        )
+                    }
+                    items to (visibleWidgets.map { it.identifier } != defaultArrangement)
                 },
             monitorOfflineModeUseCase().catch { Timber.e(it) },
             monitorHomeConfigurationTooltipShownUseCase().catch { Timber.e(it) },
@@ -70,7 +74,7 @@ class HomeViewModel @Inject constructor(
                     Timber.e(it)
                     emit(false)
                 },
-        ) { widgets, isOffline, isTooltipShown, isOfflineModeEnabled ->
+        ) { (widgets, isCustomisedArrangement), isOffline, isTooltipShown, isOfflineModeEnabled ->
             if (isOffline && !isOfflineModeEnabled) {
                 val hasOfflineFiles =
                     runCatching { hasOfflineFilesUseCase() }.getOrDefault(false)
@@ -80,6 +84,7 @@ class HomeViewModel @Inject constructor(
                     widgets = widgets,
                     isOfflineMode = isOffline,
                     showHomeConfigurationTooltip = !isOffline && !isTooltipShown,
+                    isCustomisedArrangement = isCustomisedArrangement,
                 )
             }
         }.asUiStateFlow(

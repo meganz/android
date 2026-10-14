@@ -15,7 +15,12 @@ import androidx.lifecycle.compose.currentStateAsState
 import mega.android.core.ui.components.tooltip.direction.TooltipDirection
 import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTooltipButtonProperties
 import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTopDirectionTooltipPopup
+import mega.android.core.ui.extensions.LaunchedOnceEffect
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.WidgetCustomisationTooltipDismissButtonPressedEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationTooltipDisplayedEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationTooltipExploreButtonPressedEvent
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 
 /**
@@ -42,6 +47,9 @@ internal fun HomeConfigurationTooltip(
     if (!showTooltip) return
 
     iconCoordinates?.takeIf { it.isAttached }?.let { coordinates ->
+        LaunchedOnceEffect {
+            Analytics.tracker.trackEvent(WidgetCustomisationTooltipDisplayedEvent)
+        }
         InteractiveTopDirectionTooltipPopup(
             modifier = Modifier
                 .testTag(HOME_CONFIGURATION_TOOLTIP_TAG)
@@ -56,12 +64,18 @@ internal fun HomeConfigurationTooltip(
             body = stringResource(sharedR.string.home_configuration_tooltip_description),
             primaryButton = InteractiveTooltipButtonProperties(
                 text = stringResource(sharedR.string.home_configuration_tooltip_action),
-                onClick = onNavigateToConfiguration,
+                onClick = {
+                    Analytics.tracker.trackEvent(WidgetCustomisationTooltipExploreButtonPressedEvent)
+                    onNavigateToConfiguration()
+                },
             ),
             needCloseIcon = true,
             needDivider = true,
             anchorViewCoordinates = coordinates,
-            onDismissRequest = onDismiss,
+            onDismissRequest = {
+                Analytics.tracker.trackEvent(WidgetCustomisationTooltipDismissButtonPressedEvent)
+                onDismiss()
+            },
         )
     }
 }

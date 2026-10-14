@@ -35,11 +35,21 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.WidgetCustomisationChooseDefaultStartScreenMenuItemEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationLastWidgetSnackbarDisplayedEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationMoreMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationResetToDefaultMenuItemEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationScreenEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationWidgetDisabledEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationWidgetEnabledEvent
+import mega.privacy.mobile.analytics.event.WidgetCustomisationWidgetsReorderedEvent
 import mega.privacy.mobile.home.presentation.configuration.model.HomeConfigurationUiState
 import mega.privacy.mobile.home.presentation.configuration.model.WidgetConfigurationItem
 
@@ -60,6 +70,10 @@ fun HomeConfigurationScreen(
     val minimumWidgetErrorMessage =
         stringResource(sharedR.string.home_configuration_widget_removal_not_allowed_message)
 
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(WidgetCustomisationScreenEvent)
+    }
+
     MegaScaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -71,6 +85,7 @@ fun HomeConfigurationScreen(
                     if (state is HomeConfigurationUiState.Data) {
                         add(
                             MenuActionWithClick(CommonMenuAction.More) {
+                                Analytics.tracker.trackEvent(WidgetCustomisationMoreMenuToolbarEvent)
                                 showMenuBottomSheet = true
                             }
                         )
@@ -88,6 +103,9 @@ fun HomeConfigurationScreen(
                     onWidgetEnabledChange = onWidgetEnabledChange,
                     onWidgetOrderChange = onWidgetOrderChange,
                     onWidgetStateChangeFailed = {
+                        Analytics.tracker.trackEvent(
+                            WidgetCustomisationLastWidgetSnackbarDisplayedEvent
+                        )
                         showSnackbarMessage(minimumWidgetErrorMessage)
                     }
                 )
@@ -109,12 +127,22 @@ fun HomeConfigurationScreen(
                         OneLineListItem(
                             modifier = Modifier.testTag(TEST_TAG_MENU_RESET_TO_DEFAULT),
                             text = stringResource(sharedR.string.home_configuration_screen_menu_reset_to_default),
-                            onClickListener = { dismissSheet(onResetToDefault) },
+                            onClickListener = {
+                                Analytics.tracker.trackEvent(
+                                    WidgetCustomisationResetToDefaultMenuItemEvent
+                                )
+                                dismissSheet(onResetToDefault)
+                            },
                         )
                         OneLineListItem(
                             modifier = Modifier.testTag(TEST_TAG_MENU_CHOOSE_DEFAULT_START_SCREEN),
                             text = stringResource(sharedR.string.home_configuration_screen_menu_choose_default_start_screen),
-                            onClickListener = { dismissSheet(onChooseDefaultStartScreen) },
+                            onClickListener = {
+                                Analytics.tracker.trackEvent(
+                                    WidgetCustomisationChooseDefaultStartScreenMenuItemEvent
+                                )
+                                dismissSheet(onChooseDefaultStartScreen)
+                            },
                         )
                     }
                 }
@@ -133,6 +161,7 @@ fun HomeConfigurationContentView(
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
     var draggableItems by remember(state.draggableWidgets) { mutableStateOf(state.draggableWidgets) }
+    var orderAtDragStart by remember { mutableStateOf<List<String>?>(null) }
 
     Column(modifier = modifier.fillMaxSize()) {
         state.fixedWidgets.forEach { item ->
@@ -158,6 +187,15 @@ fun HomeConfigurationContentView(
                     add(to.index, removeAt(from.index))
                 }
                 onWidgetOrderChange(draggableItems)
+            },
+            onDragStarted = { _, _ ->
+                orderAtDragStart = draggableItems.map { it.identifier }
+            },
+            onDragStopped = {
+                if (orderAtDragStart != draggableItems.map { it.identifier }) {
+                    Analytics.tracker.trackEvent(WidgetCustomisationWidgetsReorderedEvent)
+                }
+                orderAtDragStart = null
             },
         ) { item ->
             if (item.isConfigurable) {
@@ -205,6 +243,13 @@ private fun WidgetConfigurationRow(
             modifier = Modifier.testTag(TEST_TAG_WIDGET_CONFIGURATION_ITEM_TOGGLE + item.identifier),
             onCheckedChange = {
                 if (allowRemoval || !item.enabled) {
+                    Analytics.tracker.trackEvent(
+                        if (it) {
+                            WidgetCustomisationWidgetEnabledEvent(item.identifier)
+                        } else {
+                            WidgetCustomisationWidgetDisabledEvent(item.identifier)
+                        }
+                    )
                     onEnabledChange(item, it)
                 } else {
                     onStateChangeFailed()
