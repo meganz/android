@@ -237,27 +237,36 @@ internal class MegaNavigatorImpl @Inject constructor(
         isOverQuota: Int?,
         flags: Int,
     ) {
-        navigateIfInSingleActivity(
-            singleActivityDestination = ChatNavKey(
-                chatId = chatId,
-                action = action,
-                link = link,
-                snackbarText = text,
-                messageId = messageId,
-                isOverQuota = isOverQuota,
-            )
-        ) {
-            val intent = getChatActivityIntent(
-                context = context,
-                action = action,
-                link = link,
-                text = text,
-                chatId = chatId,
-                messageId = messageId,
-                isOverQuota = isOverQuota,
-                flags = flags
-            )
-            context.startActivity(intent)
+        val chatNavKey = ChatNavKey(
+            chatId = chatId,
+            action = action,
+            link = link,
+            snackbarText = text,
+            messageId = messageId,
+            isOverQuota = isOverQuota,
+        )
+        navigateIfInSingleActivity(singleActivityDestination = chatNavKey) {
+            val isSingleActivityChatRoomEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.SingleActivityChatRoom)
+            }.getOrDefault(false)
+            if (isSingleActivityChatRoomEnabled) {
+                navigateForSingleActivity(
+                    context = context,
+                    singleActivityDestination = chatNavKey,
+                )
+            } else {
+                val intent = getChatActivityIntent(
+                    context = context,
+                    action = action,
+                    link = link,
+                    text = text,
+                    chatId = chatId,
+                    messageId = messageId,
+                    isOverQuota = isOverQuota,
+                    flags = flags
+                )
+                context.startActivity(intent)
+            }
         }
     }
 

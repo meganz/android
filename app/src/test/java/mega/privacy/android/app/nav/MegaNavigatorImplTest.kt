@@ -28,6 +28,7 @@ import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
@@ -524,6 +525,84 @@ class MegaNavigatorImplTest {
 
             verify(context, atLeastOnce()).startActivity(any())
         }
+
+    @Test
+    fun `test that openChat emits the ChatNavKey when in single activity`() = runTest {
+        whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+        openChatWithAllFields()
+
+        verify(navigationQueue).emit(
+            argThat<NavKey> { navKey -> navKey == expectedChatNavKey },
+            eq(NavPriority.Default),
+            isNull(),
+        )
+        verify(context, never()).startActivity(any())
+    }
+
+    @Test
+    fun `test that openChat launches MegaActivity before emitting the ChatNavKey when not in single activity and SingleActivityChatRoom is enabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.SingleActivityChatRoom)).thenReturn(true)
+
+            openChatWithAllFields()
+
+            val inOrder = inOrder(context, navigationQueue)
+            inOrder.verify(context).startActivity(any())
+            inOrder.verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 && navKeys[0] == expectedChatNavKey
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+        }
+
+    @Test
+    fun `test that openChat starts the legacy activity when not in single activity and SingleActivityChatRoom is disabled`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.SingleActivityChatRoom)).thenReturn(false)
+
+            openChatWithAllFields()
+
+            verify(context).startActivity(any())
+            verify(navigationQueue, never()).emit(any<List<NavKey>>(), any(), anyOrNull())
+            verify(navigationQueue, never()).emit(any<NavKey>(), any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that openChat starts the legacy activity when not in single activity and the flag read fails`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.SingleActivityChatRoom))
+                .thenThrow(RuntimeException())
+
+            openChatWithAllFields()
+
+            verify(context).startActivity(any())
+            verify(navigationQueue, never()).emit(any<List<NavKey>>(), any(), anyOrNull())
+        }
+
+    private val expectedChatNavKey = ChatNavKey(
+        chatId = 123L,
+        action = "action",
+        link = "https://mega.nz/chat/link",
+        snackbarText = "snackbar",
+        messageId = 456L,
+        isOverQuota = 1,
+    )
+
+    private fun openChatWithAllFields() = underTest.openChat(
+        context = context,
+        chatId = expectedChatNavKey.chatId,
+        action = expectedChatNavKey.action,
+        link = expectedChatNavKey.link,
+        text = expectedChatNavKey.snackbarText,
+        messageId = expectedChatNavKey.messageId,
+        isOverQuota = expectedChatNavKey.isOverQuota,
+    )
 
     @Test
     fun `test that openContactInfoActivity by email emits nav key when in single activity`() =
