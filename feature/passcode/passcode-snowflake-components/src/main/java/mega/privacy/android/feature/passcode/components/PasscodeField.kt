@@ -33,7 +33,8 @@ internal const val PASSCODE_FIELD_TAG = "passcode_field:text_field"
  * Passcode field
  *
  * @param onComplete Function to call once full passcode has been entered
- * @param modifier
+ * @param modifier applied to the text field itself, so a test tag on it replaces
+ * [PASSCODE_FIELD_TAG] and semantics on it belong to the field the keyboard writes into.
  * @param keyboardOptions Default is NumberPassword, make sure to match the expected input type
  * @param numberOfCharacters Number of expected characters
  * @param maskCharacter Character with which to mask the input, null to not mask
@@ -75,14 +76,13 @@ fun PasscodeField(
             }
         },
         keyboardOptions = keyboardOptions,
-        modifier = Modifier
+        // The caller's modifier comes first so that a test tag or semantics on it apply to the
+        // field. Semantics of the same key collapse to the outermost value.
+        modifier = modifier
             .testTag(PASSCODE_FIELD_TAG)
             .focusRequester(focusRequester),
         decorationBox = {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = modifier
-            ) {
+            Row(horizontalArrangement = Arrangement.Center) {
                 repeat(numberOfCharacters) { index ->
                     val char = when {
                         index >= passcodeValue.length -> ""

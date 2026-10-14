@@ -4,9 +4,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasAnyDescendant
-import androidx.compose.ui.test.hasSetTextAction
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -278,14 +275,7 @@ class SetupPasscodeScreenTest {
         assertThat(entered).containsExactly("3456")
     }
 
-    /**
-     * The screen's own tag sits on the cell row, whose merged semantics hide the focus action that
-     * text input needs, so typing has to target the text field wrapping it.
-     */
-    private fun passcodeInput() = composeRule.onNode(
-        hasSetTextAction() and hasAnyDescendant(hasTestTag(SETUP_PASSCODE_FIELD_TAG)),
-        useUnmergedTree = true,
-    )
+    private fun passcodeInput() = composeRule.onNodeWithTag(SETUP_PASSCODE_FIELD_TAG)
 
     private fun confirmation(showMismatchError: Boolean = false) =
         PasscodeEntryStage.Confirmation(firstEntry = "1234", showMismatchError = showMismatchError)
