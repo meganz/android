@@ -772,7 +772,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Dosya uzantısı gerekli</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">Bu dosya MEGA\’da ön izlenemez. Başka bir uygulamada açmak için dosyayı (%1$s) indirin.</string>
+    <string name="alert_larger_file_preview">Bu dosya MEGA’da ön izlenemez. Başka bir uygulamada açmak için dosyayı (%1$s) indirin.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">İşlem tamamlanıyor: %%%1$d</string>
     <!-- Add to album files existed message -->
@@ -2105,7 +2105,7 @@
     <string name="general_upload_label">Yükle</string>
     <string name="offline_screen_empty_state_description">Çevrim dışı kullanım için kaydedilmiş dosya yok</string>
     <string name="empty_file_browser_folder">Boş klasör</string>
-    <string name="logout_offline_content_deletion_warning">Hesaptan çıkış yaptığınız zaman çevrim dışı içeriğiniz iptal olur.</string>
+    <string name="logout_offline_content_deletion_warning">Çıkış yaptığınızda çevrim dışı içeriğiniz kaybolur.</string>
     <string name="offline_screen_title">Çevrim dışı</string>
     <string name="offline_screen_remove_from_offline_selection_menu">Çevrim dışından kaldır</string>
     <string name="offline_item_deletion_confirmation_title">Çevrim dışından kaldırılsın mı?</string>
@@ -2566,7 +2566,7 @@
     <string name="park_account_screen_acknowledge">Yeni ve boş bir hesap başlattığımı ve şifremi hatırlayamadığım veya dışa aktarılmış bir Kurtarma anahtarı bulamadığım sürece, mevcut hesabımdaki tüm verileri kaybedeceğimi kabul ediyorum.</string>
     <string name="park_account_screen_start_button">Yeni bir hesap başlat</string>
     <string name="park_account_success_message">Eski hesabınız park edildi. Artık yeni hesabınıza giriş yapabilirsiniz.</string>
-    <string name="meetings_add_participants_user_limit_warning">Bu arama 100 katılımcı ile sınırlıdır. Bu sayıyı aşan kişiler yalnızca sohbet edebilir. Düzenleyici, bu sınırı kaldırmak için hesabını Pro\’ya yükseltebilir.</string>
+    <string name="meetings_add_participants_user_limit_warning">Bu arama 100 katılımcı ile sınırlıdır. Bu sayıyı aşan kişiler yalnızca sohbet edebilir. Düzenleyici, bu sınırı kaldırmak için hesabını Pro’ya yükseltebilir.</string>
     <string name="email_confirmation_resend_button_countdown">%1$s içinde tekrar gönder</string>
     <string name="document_scanner_prepare_title">Belge tarayıcısı ayarlanıyor</string>
     <string name="document_scanner_prepare_message">Bu işlem yalnızca bir kez gerçekleşecek. İndirme devam ederken cihazınızı kullanmaya devam edebilirsiniz.</string>
@@ -3117,7 +3117,7 @@
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <string name="audio_player_not_allowed_during_call">Arama sırasında medya oynatamazsınız</string>
     <string name="invite_contacts">Davet et</string>
-    <string name="first_paragraph_achievement_invite_friends">Arkadaşlarınızı ücretsiz bir MEGA hesabı oluşturmaya ve MEGA Mobil Uygulaması’nı yüklemeye davet edin. Her kaydolma ve uygulama yüklemesi için bonus olarak ücretsiz depolama alanı kazanın.</string>
+    <string name="first_paragraph_achievement_invite_friends">Arkadaşlarınızı ücretsiz bir MEGA hesabı oluşturmaya ve MEGA Mobil Uygulamasını yüklemeye davet edin. Her kaydolma ve uygulama yüklemesi için bonus olarak ücretsiz depolama alanı kazanın.</string>
     <string name="second_paragraph_achievement_invite_friends">Ücretsiz depolama bonusu yalnızca yeni davetiyeler için ve MEGA Mobil Uygulamasının veya MEGA Masaüstü Uygulamasının yüklü olduğu durumlarda geçerlidir.</string>
     <string name="subtitle_confirmation_invite_friends">Davetiye gönderildi</string>
     <string name="invite_sent_text">Kullanıcı davet edildi ve kabul edildikten sonra kişi listenizde görünecek.</string>
@@ -3246,13 +3246,167 @@
         <item quantity="one">%1$d yıl</item>
         <item quantity="other">%1$d yıl</item>
     </plurals>
+    <string name="sync_exclusions_manage_save">Kaydet</string>
+    <string name="sync_exclusions_manage_title">Hariç tutmaları yönet</string>
+    <string name="sync_exclusions_manage_section_extensions">Dosya uzantıları</string>
+    <string name="sync_exclusions_manage_section_names">Dosya ve klasör adları</string>
+    <string name="sync_exclusions_manage_section_size">Dosya boyutu</string>
+    <string name="sync_exclusions_manage_add">Hariç tutma ekle</string>
+    <string name="sync_exclusions_manage_empty_title">İlk hariç tutmanızı ekleyin</string>
+    <string name="sync_exclusions_manage_empty_body">Bu klasördeki her şey senkronize edilir. Belirli dosya ve klasörlerin senkronize edilmesini önlemek için bir hariç tutma ekleyin.</string>
+    <string name="sync_exclusions_manage_empty_body_unshown">Bu klasörde, başka bir yerde ayarlanmış ve burada gösterilemeyen hariç tutmalar var. Daha fazla dosya ve klasörün senkronize edilmesini önlemek için bir hariç tutma ekleyin.</string>
+    <string name="sync_exclusions_manage_rejected_title">Hariç tutmalar uygulanmıyor</string>
+    <string name="sync_exclusions_manage_rejected_body">Senkronizasyon bu klasörün hariç tutmalarını okuyamadı, bu nedenle klasördeki her şey senkronize ediliyor.</string>
+    <string name="sync_exclusions_manage_size_bigger_than">%1$s’den büyük dosyalar</string>
+    <string name="sync_exclusions_manage_size_smaller_than">%1$s’den küçük dosyalar</string>
+    <string name="sync_exclusions_manage_size_not_between">%1$s ile %2$s arasında olmayan dosyalar</string>
+    <string name="sync_exclusions_manage_size_between">%1$s ile %2$s arasında olan dosyalar</string>
+    <string name="sync_exclusions_manage_snackbar_added">Hariç tutma eklendi</string>
+    <string name="sync_exclusions_manage_remove_extension">%1$s uzantısını hariç tutmayı bırak</string>
+    <string name="sync_exclusions_manage_load_error_title">Hariç tutmalar yüklenemedi</string>
+    <string name="sync_exclusions_manage_load_error_body">Klasörün hâlâ bu cihazda olduğundan emin olun ve tekrar deneyin.</string>
+    <string name="sync_exclusions_manage_load_error_retry">Tekrar dene</string>
+    <string name="sync_exclusions_manage_save_failed">Değişiklikleriniz kaydedilemedi. Tekrar deneyin.</string>
+    <string name="sync_exclusions_card_action">Hariç tutmalar</string>
+    <string name="sync_exclusions_manage_restore_defaults">Varsayılanları geri yükle</string>
+    <string name="sync_exclusions_manage_snackbar_defaults_restored">Varsayılan hariç tutmalar geri yüklendi</string>
+    <string name="sync_exclusions_manage_snackbar_size_conflict">Bu boyuttaki dosyaları zaten hariç tuttunuz</string>
+    <string name="text_editor_format_link">Bağlantı</string>
+    <string name="text_editor_link_dialog_url_label">Bağlantı</string>
+    <string name="text_editor_link_dialog_remove">Bağlantıyı kaldır</string>
+    <string name="text_editor_format_bold">Kalın</string>
+    <string name="text_editor_format_italic">İtalik</string>
+    <string name="text_editor_format_underline">Altı çizik</string>
+    <string name="text_editor_format_strikethrough">Üstü çizik</string>
+    <string name="text_editor_format_checklist">Kontrol listesi</string>
+    <string name="text_editor_format_bulleted_list">Noktalı liste</string>
+    <string name="text_editor_format_numbered_list">Numaralı liste</string>
+    <string name="text_editor_format_quote">Alıntı</string>
+    <string name="text_editor_format_code">Kod</string>
+    <string name="text_editor_text_style_body">Gövde</string>
+    <string name="text_editor_text_style_heading">Başlık %1$d</string>
+    <string name="text_editor_menu_option_selected">Seçili</string>
+    <string name="text_editor_edit_mode_menu">Metin düzenleme modu</string>
+    <string name="text_editor_edit_mode_plain_text">Düz metin</string>
+    <string name="text_editor_edit_mode_rich_text">Zengin metin</string>
+    <string name="text_editor_link_dialog_title">Bağlantı ekle</string>
+    <string name="text_editor_link_dialog_text_label">Metin</string>
+    <string name="sync_exclusions_setup_subtitle">Nelerin senkronize edilmeyeceğini seç</string>
+    <string name="title_duplicated_items">Aynı adlı öğeler</string>
+    <string name="file_already_exists_in_location">Hedefte [B]%1$s[/B] adlı bir dosya zaten mevcut.</string>
+    <string name="folder_already_exists_in_location">[B]%1$s[/B] adında bir klasör bu hedefte zaten mevcut.</string>
+    <string name="choose_file">Tutmak istediğiniz dosyayı seçin</string>
+    <string name="choose_folder">Klasörleri birleştirmek isteyip istemediğinizi seçin</string>
+    <string name="skip_file">Hiçbir dosya değiştirilmeyecek. Aşağıdaki dosyayı tutacaksınız:</string>
+    <string name="skip_folder">Bu klasörü atla</string>
+    <string name="do_not_upload">Yükleme</string>
+    <string name="do_not_copy">Kopyalama</string>
+    <string name="do_not_move">Taşıma</string>
+    <string name="warning_upload_and_rename">Yüklediğiniz dosya şu şekilde yeniden adlandırılacaktır:</string>
+    <string name="upload_and_rename">Yükle ve yeniden adlandır</string>
+    <string name="warning_copy_and_rename">Kopyaladığınız dosya şu şekilde yeniden adlandırılacaktır:</string>
+    <string name="copy_and_rename">Kopyala ve yeniden adlandır</string>
+    <string name="warning_move_and_rename">Taşıdığınız dosya şu şekilde yeniden adlandırılır:</string>
+    <string name="move_and_rename">Taşı ve yeniden adlandır</string>
+    <string name="warning_upload_and_replace">Dosyanın mevcut sürümü, yüklediğiniz dosya ile değiştirilecektir.</string>
+    <string name="upload_and_replace">Yükle ve değiştir</string>
+    <string name="warning_versioning_upload_and_update">Dosya, sürüm geçmişiyle güncellenecektir:</string>
+    <string name="upload_and_update">Yükle ve güncelle</string>
+    <string name="warning_upload_and_merge">Hedefteki klasör, yüklediğiniz klasörle birleştirilecektir.</string>
+    <string name="upload_and_merge">Yükle ve birleştir</string>
+    <string name="warning_copy_and_replace">Hedef klasördeki dosya, kopyaladığınız dosyayla değiştirilecektir.</string>
+    <string name="copy_and_replace">Kopyala ve değiştir</string>
+    <string name="warning_copy_and_merge">Hedefteki klasör, kopyaladığınız klasörle birleştirilecektir.</string>
+    <string name="copy_and_merge">Kopyala ve birleştir</string>
+    <string name="warning_move_and_replace">Hedef klasördeki dosya, taşıdığınız dosyayla değiştirilecektir.</string>
+    <string name="move_and_replace">Taşı ve değiştir</string>
+    <string name="warning_move_and_merge">Hedefteki klasör, taşıdığınız klasörle birleştirilecektir.</string>
+    <string name="move_and_merge">Taşı ve birleştir</string>
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="one">Aynı adlı öğeye uygula</item>
+        <item quantity="other">%1$d aynı adlı öğeye uygula</item>
+    </plurals>
+    <string name="sync_exclusions_manage_snackbar_updated">Hariç tutma güncellendi</string>
+    <string name="chat_notification_reply_action">Yanıtla</string>
+    <string name="chat_list_notifications_muted_message">Sohbet bildirimleri zaten sessize alınmış</string>
+    <string name="account_over_disk_quota_paywall_upgrade_now_button">Hemen yükselt</string>
+    <string name="account_over_disk_quota_paywall_title">Hesap kilitlendi</string>
+    <plurals name="account_over_disk_quota_paywall_body_no_warning_dates">
+        <item quantity="one">Depolama alanınız hakkında sizinle e-posta yoluyla iletişime geçtik. %2$s yer kaplayan %1$d dosyanız var ve hesabınız kilitlendi. Depolama alanınızı artırmak ve hesabınızın kilidini açmak için hesabınızı %3$s planına yükseltin. Yakında işlem yapmazsanız verileriniz silinebilir. [A]Depolama sınırlarınız hakkında daha fazlasını öğrenin[/A]</item>
+        <item quantity="other">Depolama alanınız hakkında sizinle e-posta yoluyla iletişime geçtik. Toplamda %2$s yer kaplayan %1$d dosyanız var ve hesabınız kilitlendi. Depolama alanınızı artırmak ve hesabınızın kilidini açmak için hesabınızı %3$s planına yükseltin. Yakında işlem yapmazsanız verileriniz silinebilir. [A]Depolama sınırlarınız hakkında daha fazlasını öğrenin[/A]</item>
+    </plurals>
+    <plurals name="account_over_disk_quota_paywall_body_single_warning_date">
+        <item quantity="one">Depolama alanınız hakkında size %1$s tarihinde e-posta gönderdik, ancak alanınız hâlâ dolu. %3$s yer kaplayan %2$d dosyanız var ve hesabınız kilitlendi. Depolama alanınızı artırmak ve hesabınızın kilidini açmak için hesabınızı %4$s planına yükseltin. Yakında işlem yapmazsanız verileriniz silinebilir. [A]Depolama sınırlarınız hakkında daha fazlasını öğrenin[/A]</item>
+        <item quantity="other">Depolama alanınız hakkında size %1$s tarihinde e-posta gönderdik, ancak alanınız hâlâ dolu. Toplamda %3$s yer kaplayan %2$d dosyanız var ve hesabınız kilitlendi. Depolama alanınızı artırmak ve hesabınızın kilidini açmak için hesabınızı %4$s planına yükseltin. Yakında işlem yapmazsanız verileriniz silinebilir. [A]Depolama sınırlarınız hakkında daha fazlasını öğrenin[/A]</item>
+    </plurals>
+    <plurals name="account_over_disk_quota_paywall_body_multiple_warning_dates">
+        <item quantity="one">Depolama alanınız hâlâ dolu ve hesabınız kilitlendi. Bu konuda size birden fazla kez e-posta gönderdik. %2$s yer kaplayan %1$d dosyanız var. Depolama alanınızı artırmak ve hesabınızın kilidini açmak için %3$s planına yükseltin. Yakında işlem yapmazsanız verileriniz silinebilir. [A]Depolama sınırlarınız hakkında daha fazlasını öğrenin[/A]</item>
+        <item quantity="other">Depolama alanınız hâlâ dolu ve hesabınız kilitlendi. Bu konuda size birden fazla kez e-posta gönderdik. Toplamda %2$s yer kaplayan %1$d dosyanız var. Depolama alanınızı artırmak ve hesabınızın kilidini açmak için %3$s planına yükseltin. Yakında işlem yapmazsanız verileriniz silinebilir. [A]Depolama sınırlarınız hakkında daha fazlasını öğrenin[/A]</item>
+    </plurals>
+    <string name="name_collision_folder_exists_title">Klasör zaten mevcut</string>
+    <string name="name_collision_file_exists_title">Dosya zaten mevcut</string>
+    <string name="name_collision_duplicate_counter">Aynı adlı öğe %1$d / %2$d</string>
+    <string name="name_collision_already_exists_body">“%1$s” bu konumda zaten mevcut.</string>
+    <string name="name_collision_option_replace_file">Mevcut dosyayı değiştir</string>
+    <string name="name_collision_option_replace_file_subtitle">Mevcut dosyanın üzerine yazılır</string>
+    <string name="name_collision_option_replace_file_versioning_subtitle">Mevcut dosya önceki sürüm olarak kaydedilir</string>
+    <string name="name_collision_option_keep_both_files">Her iki dosyayı da sakla</string>
+    <string name="name_collision_option_keep_both_files_subtitle">Yeni dosya “%1$s” olarak yeniden adlandırılır</string>
+    <string name="name_collision_option_keep_both_files_move_subtitle">Taşınan dosya “%1$s” olarak yeniden adlandırılır</string>
+    <string name="name_collision_option_skip_file">Bu dosyayı atla</string>
+    <string name="name_collision_option_skip_file_subtitle">Mevcut dosya değiştirilmez</string>
+    <string name="name_collision_option_merge_folders">Klasörleri birleştir</string>
+    <string name="name_collision_option_merge_folders_subtitle">Her iki klasörden öğeler birleştirilir</string>
+    <string name="name_collision_option_keep_both_folders">Her iki klasörü de sakla</string>
+    <string name="name_collision_option_keep_both_folders_subtitle">Yeni klasör “%1$s” olarak yeniden adlandırılır</string>
+    <string name="name_collision_option_skip_folder_subtitle">Mevcut klasör değiştirilmez</string>
+    <string name="name_collision_import_button">İçe aktar</string>
+    <plurals name="name_collision_apply_to_all">
+        <item quantity="one">%1$d aynı adlı öğeye de uygula</item>
+        <item quantity="other">Tüm %1$d aynı adlı öğeye de uygula</item>
+    </plurals>
+    <string name="general_save_to_cloud_drive">Bulut depolamaya kaydet</string>
     <string name="more_than_meeting">Toplantılardan daha fazlası</string>
     <string name="left_meeting_join_title">Gizliliğiniz önemlidir</string>
-    <string name="left_meeting_join_content">Dünyanın en büyük güvenli bulut depolama ve iş birliği platformuna katılın.</string>
     <string name="left_meeting_bonus_content">Hemen kaydolun ve gelişmiş iş birliği özelliklerinin keyfini ücretsiz çıkarın.</string>
     <string name="create_account">Kaydol</string>
     <string name="call_error_too_many_participants">Maksimum katılımcı sayısı aşıldığı için aramaya katılamazsınız.</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Katılınamıyor</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Bu arama yalnızca 100 katılımcıyı destekleyebilir. Düzenleyiciden bu kısıtlamayı kaldırmasını isteyin.</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Tamam</string>
+    <string name="left_meeting_join_content">Dosyalarınızı ve toplantılarınızı uçtan uca şifreleme ile gizli tutmak için MEGA\’ya katılın.</string>
+    <string name="chat_manage_history_title">Sohbet geçmişini yönet</string>
+    <string name="chat_manage_history_meeting_title">Toplantı geçmişini yönet</string>
+    <string name="chat_manage_history_clear_action">Sohbet geçmişini temizle</string>
+    <string name="chat_manage_history_clear_meeting_action">Toplantı geçmişi temizlensin mi?</string>
+    <string name="chat_manage_history_retention_option_disabled">Kapalı</string>
+    <string name="chat_manage_history_retention_option_custom">Özel</string>
+    <string name="chat_manage_history_retention_next_button">Sonraki</string>
+    <string name="chat_manage_history_picker_year">yıl</string>
+    <plurals name="chat_manage_history_picker_hours">
+        <item quantity="one">saat</item>
+        <item quantity="other">saat</item>
+    </plurals>
+    <plurals name="chat_manage_history_picker_days">
+        <item quantity="one">gün</item>
+        <item quantity="other">gün</item>
+    </plurals>
+    <plurals name="chat_manage_history_picker_weeks">
+        <item quantity="one">hafta</item>
+        <item quantity="other">hafta</item>
+    </plurals>
+    <plurals name="chat_manage_history_picker_months">
+        <item quantity="one">ay</item>
+        <item quantity="other">ay</item>
+    </plurals>
+    <string name="chat_manage_history_clearing_title">Sohbet geçmişini otomatik temizle</string>
+    <string name="chat_manage_history_clearing_subtitle">Belirlenen süreden eski mesajları sil.</string>
+    <string name="chat_manage_history_retention_period_title">Şu süreden eski mesajları sil:</string>
+    <string name="chat_manage_history_clear_action_subtitle">Bu sohbette paylaşılan tüm mesajları ve dosyaları sil. Bu işlem geri alınamaz.</string>
+    <string name="chat_manage_history_retention_option_one_day">1 gün</string>
+    <string name="chat_manage_history_retention_option_one_week">1 hafta</string>
+    <string name="chat_manage_history_retention_option_one_month">1 ay</string>
+    <string name="chat_manage_history_clear_meeting_confirmation_title">Toplantı geçmişi temizlensin mi?</string>
+    <string name="chat_manage_history_clear_meeting_confirmation_message">Bu toplantının tüm mesaj geçmişi silinecektir. Bu işlem geri alınamaz.</string>
+    <string name="app_bar_selection_mode_count_of_total">%1$s / %2$s seçildi</string>
 </resources>

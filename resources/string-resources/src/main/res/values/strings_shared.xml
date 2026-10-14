@@ -1263,8 +1263,6 @@
     <string name="audio_playback_position_dialog_restart_button">Restart</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
     <string name="general_save_to_device">Download</string>
-    <!-- General button text to save selected items to cloud drive -->
-    <string name="general_save_to_cloud_drive">Save to Cloud drive</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Hide</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -1649,8 +1647,6 @@
     <string name="share_folder_dialog_read_write_radio_option">Read and write</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
     <string name="app_bar_selection_mode_description">Selecting</string>
-    <!-- App bar title in selection mode of a paged folder: number of selected nodes out of the folder's total, both numbers formatted for the locale, e.g. "500 of 213,456 selected" -->
-    <string name="app_bar_selection_mode_count_of_total">%1$s of %2$s selected</string>
     <!-- success message when moving a node -->
     <string name="node_moved_success_message">Item moved</string>
     <!-- success message when a node was restore from Rubbish bin to a location -->
@@ -1743,12 +1739,14 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1785,9 +1783,11 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -3251,8 +3251,6 @@
     <string name="contacts_qr_invitation_not_sent_dialog_title">Invitation not sent</string>
     <!-- Body of the dialog shown when the scanned contact QR code belongs to someone who is already in the user's contact list. %1$s is the contact's email address. -->
     <string name="contacts_qr_already_contact_dialog_body">The invitation has not been sent. %1$s is already in your contacts list.</string>
-    <!-- Title of the dialog shown after scanning a contact QR code that belongs to someone who is not yet a contact, asking the user to confirm sending them a contact invitation. The scanned contact's avatar, name and email are shown below the title. -->
-    <string name="contacts_qr_invite_contact_dialog_title">Invite contact?</string>
     <!-- Body of the dialog shown when the scanned QR code or contact link is not a valid MEGA contact link -->
     <string name="contacts_qr_invalid_code_dialog_body">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <!-- Title of the dialog shown when the QR scanner needs a one-time download that has not finished yet -->
@@ -4502,6 +4500,8 @@
     <string name="name_collision_option_keep_both_files_move_subtitle">Moved file is renamed “%1$s”</string>
     <!-- Title of the option, in the duplicate items screen, to leave the existing file as it is and not upload, copy or move the new one. -->
     <string name="name_collision_option_skip_file">Skip this file</string>
+    <!-- Description under the “Skip this file” option of the duplicate items screen. -->
+    <string name="name_collision_option_skip_file_subtitle">Existing file isn’t changed</string>
     <!-- Title of the option, in the duplicate items screen, to merge the folder being uploaded, copied or moved into the existing folder. -->
     <string name="name_collision_option_merge_folders">Merge folders</string>
     <!-- Description under the “Merge folders” option of the duplicate items screen. -->
@@ -4510,6 +4510,8 @@
     <string name="name_collision_option_keep_both_folders">Keep both folders</string>
     <!-- Description under the “Keep both folders” option of the duplicate items screen. %1$s is the new name the folder will be given, shown between quotation marks. -->
     <string name="name_collision_option_keep_both_folders_subtitle">New folder is renamed “%1$s”</string>
+    <!-- Description under the “Skip this folder” option of the duplicate items screen. -->
+    <string name="name_collision_option_skip_folder_subtitle">Existing folder isn’t changed</string>
     <!-- Main button of the duplicate items screen when the file is being imported from a chat message or a file link, confirming the chosen option. -->
     <string name="name_collision_import_button">Import</string>
     <!-- Checkbox row at the bottom of the duplicate items screen, applying the chosen option to every remaining duplicate of the same kind (files or folders). %1$d is the number of duplicates the choice will apply to, including the one being shown, and also drives the plural form. -->
@@ -4517,34 +4519,60 @@
         <item quantity="one">Apply to all %1$d duplicate</item>
         <item quantity="other">Apply to all %1$d duplicates</item>
     </plurals>
+    <!-- General button text to save selected items to cloud drive -->
+    <string name="general_save_to_cloud_drive">Save to Cloud drive</string>
+    <!-- Headline of the screen a guest lands on after leaving a meeting, introducing MEGA as more than a meeting app -->
+    <string name="more_than_meeting">More than just meetings</string>
+    <!-- Title of the privacy section on the screen a guest lands on after leaving a meeting -->
+    <string name="left_meeting_join_title">Your privacy matters</string>
+    <!-- Body of the privacy section on the screen a guest lands on after leaving a meeting -->
+    <string name="left_meeting_join_content">Join MEGA to keep your files and meetings private with end-to-end encryption.</string>
+    <!-- Body of the free storage section on the screen a guest lands on after leaving a meeting -->
+    <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
+    <!-- Label of the button that takes the user to the sign up screen -->
+    <string name="create_account">Sign up</string>
+    <!-- Snackbar message shown when a call cannot be joined because it already holds the maximum number of participants -->
+    <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
+    <!-- Title of the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Cannot join</string>
+    <!-- Description of the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">This call can only support 100 participants. Ask the organiser to remove this restriction.</string>
+    <!-- Label of the acknowledge button on the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, got it</string>
     <!-- Title of the manage chat history screen, where the user controls how long a chat's messages are kept. -->
     <string name="chat_manage_history_title">Manage chat history</string>
     <!-- Title of the manage chat history screen when the conversation is a meeting rather than a chat. -->
     <string name="chat_manage_history_meeting_title">Manage meeting history</string>
     <!-- Manage chat history: title of the row that turns automatic message deletion on and off. -->
-    <string name="chat_manage_history_clearing_title">History clearing</string>
+    <string name="chat_manage_history_clearing_title">Automatically clear chat history</string>
     <!-- Manage chat history: subtitle of the history clearing row while automatic deletion is off. -->
-    <string name="chat_manage_history_clearing_subtitle">Automatically delete messages older than a certain amount of time.</string>
+    <string name="chat_manage_history_clearing_subtitle">Delete messages older than a set period.</string>
     <!-- Manage chat history: title of the row showing how long messages are kept, shown while automatic deletion is on. The period itself, for example "1 day", is shown underneath. -->
-    <string name="chat_manage_history_retention_period_title">Automatically delete messages older than:</string>
+    <string name="chat_manage_history_retention_period_title">Delete messages older than:</string>
     <!-- Manage chat history: the row that deletes every message in the conversation. -->
     <string name="chat_manage_history_clear_action">Clear chat history</string>
     <!-- Manage chat history: the row that deletes every message in the conversation, when it is a meeting rather than a chat. -->
     <string name="chat_manage_history_clear_meeting_action">Clear meeting history</string>
     <!-- Manage chat history: subtitle of the row that deletes every message in the conversation. -->
-    <string name="chat_manage_history_clear_action_subtitle">Delete all messages and files shared in this conversation. This action is irreversible.</string>
+    <string name="chat_manage_history_clear_action_subtitle">Delete all messages and files shared in this conversation. This can’t be undone.</string>
     <!-- Manage chat history: option in the history clearing dialog that keeps messages indefinitely. -->
-    <string name="chat_manage_history_retention_option_disabled">Disabled</string>
+    <string name="chat_manage_history_retention_option_disabled">Off</string>
     <!-- Manage chat history: option in the history clearing dialog that deletes messages older than one day. -->
-    <string name="chat_manage_history_retention_option_one_day">One day</string>
+    <string name="chat_manage_history_retention_option_one_day">1 day</string>
     <!-- Manage chat history: option in the history clearing dialog that deletes messages older than one week. -->
-    <string name="chat_manage_history_retention_option_one_week">One week</string>
+    <string name="chat_manage_history_retention_option_one_week">1 week</string>
     <!-- Manage chat history: option in the history clearing dialog that deletes messages older than one month. -->
-    <string name="chat_manage_history_retention_option_one_month">One month</string>
+    <string name="chat_manage_history_retention_option_one_month">1 month</string>
     <!-- Manage chat history: option in the history clearing dialog that lets the user pick their own period. -->
     <string name="chat_manage_history_retention_option_custom">Custom</string>
     <!-- Manage chat history: button that moves on to the custom period picker after the Custom option is chosen. -->
     <string name="chat_manage_history_retention_next_button">Next</string>
+    <!-- Manage chat history: the longest period the custom picker offers, always exactly one year, so it is never pluralised. -->
+    <string name="chat_manage_history_picker_year">year</string>
+    <!-- Manage chat history: title of the dialog confirming that every message in a meeting will be deleted. -->
+    <string name="chat_manage_history_clear_meeting_confirmation_title">Clear meeting history?</string>
+    <!-- Manage chat history: body of the dialog confirming that every message in a meeting will be deleted. -->
+    <string name="chat_manage_history_clear_meeting_confirmation_message">This will delete the full message history of this meeting. This can’t be undone.</string>
     <!-- Manage chat history: unit shown in the custom period picker beside the number of hours the user picked, for example the "hour" in "3 hours". The number is on a separate wheel, so it is not part of this text; it only decides which plural form is used. -->
     <plurals name="chat_manage_history_picker_hours">
         <item quantity="one">hour</item>
@@ -4565,30 +4593,12 @@
         <item quantity="one">month</item>
         <item quantity="other">months</item>
     </plurals>
-    <!-- Manage chat history: the longest period the custom picker offers, always exactly one year, so it is never pluralised. -->
-    <string name="chat_manage_history_picker_year">year</string>
-    <!-- Manage chat history: title of the dialog confirming that every message in a meeting will be deleted. -->
-    <string name="chat_manage_history_clear_meeting_confirmation_title">Clear meeting history</string>
-    <!-- Manage chat history: body of the dialog confirming that every message in a meeting will be deleted. -->
-    <string name="chat_manage_history_clear_meeting_confirmation_message">Are you sure you want to clear the full message history of this meeting?</string>
-    <!-- Headline of the screen a guest lands on after leaving a meeting, introducing MEGA as more than a meeting app -->
-    <string name="more_than_meeting">More than just meetings</string>
-    <!-- Title of the privacy section on the screen a guest lands on after leaving a meeting -->
-    <string name="left_meeting_join_title">Your privacy matters</string>
-    <!-- Body of the privacy section on the screen a guest lands on after leaving a meeting -->
-    <string name="left_meeting_join_content">Join the largest secure cloud storage and collaboration platform in the world.</string>
-    <!-- Body of the free storage section on the screen a guest lands on after leaving a meeting -->
-    <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
-    <!-- Label of the button that takes the user to the sign up screen -->
-    <string name="create_account">Sign up</string>
-    <!-- Snackbar message shown when a call cannot be joined because it already holds the maximum number of participants -->
-    <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
-    <!-- Title of the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Cannot join</string>
-    <!-- Description of the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">This call can only support 100 participants. Ask the organiser to remove this restriction.</string>
-    <!-- Label of the acknowledge button on the dialog shown when a call ends because the organiser free plan caps it at 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, got it</string>
+    <!-- App bar title in selection mode of a paged folder: number of selected nodes out of the folder's total, both numbers formatted for the locale, e.g. "500 of 213,456 selected" -->
+    <string name="app_bar_selection_mode_count_of_total">%1$s of %2$s selected</string>
+    <!-- Body of the dialog shown after scanning a contact QR code that belongs to someone who is not yet a contact, asking the user to confirm the invitation. %1$s is the scanned contact's email address. -->
+    <string name="contacts_qr_invite_contact_dialog_body">Add %1$s to your contacts?</string>
+    <!-- Title of the dialog shown after scanning a contact QR code that belongs to someone who is not yet a contact, asking the user to confirm sending them a contact invitation. The scanned contact's avatar, name and email are shown below the title. -->
+    <string name="contacts_qr_invite_contact_dialog_title">Invite contact?</string>
     <!-- Title of the screen to pick a GIF from GIPHY, also used as the hint of its search field -->
     <string name="chat_giphy_picker_title">Search GIPHY</string>
     <!-- Label shown when a GIF search returns no results. [A] and [/A] mark the part shown in a different colour. -->

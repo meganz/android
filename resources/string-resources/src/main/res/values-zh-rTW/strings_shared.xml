@@ -2857,7 +2857,7 @@
     <string name="audio_player_continuous_playback_description">自動播放佇列中的下一首</string>
     <string name="audio_player_playing_from_label">正在播放[A]%s[/A]的歌曲</string>
     <string name="password_strength_moderate">中強度密碼</string>
-    <string name="media_timeline_sort_option_date_added">新增日期</string>
+    <string name="media_timeline_sort_option_date_added">修改日期</string>
     <plurals name="remove_link_dialog_title">
         <item quantity="other">移除連結？</item>
     </plurals>
@@ -3092,13 +3092,141 @@
     <string name="reset_pin_title_2">重新輸入新密碼</string>
     <string name="settings_passcode_option">密碼選項</string>
     <string name="AN_pin_lock">字母與數字混合</string>
+    <string name="sync_exclusions_manage_save">儲存</string>
+    <plurals name="chat_list_chats_archived_message">
+        <item quantity="other">已將%1$d個對話封存</item>
+    </plurals>
+    <string name="text_editor_format_link">連結</string>
+    <string name="text_editor_link_dialog_url_label">連結</string>
+    <string name="text_editor_link_dialog_remove">移除連結</string>
+    <plurals name="chat_list_chats_unarchived_message">
+        <item quantity="other">已將%1$d個對話取消封存</item>
+    </plurals>
+    <string name="sync_exclusions_add_size_range_error">第一個檔案大小必須小於第二個檔案大小</string>
+    <string name="sync_exclusions_edit_title">編輯排除項目</string>
+    <string name="four_pin_lock">4位數字</string>
+    <string name="six_pin_lock">6位數字</string>
+    <string name="pin_lock_not_match">密碼不相符。請再試一次。</string>
+    <plurals name="contact_info_retention_time_years">
+        <item quantity="other">%1$d年</item>
+    </plurals>
+    <string name="sync_exclusions_manage_title">管理排除項目</string>
+    <string name="sync_exclusions_manage_section_extensions">副檔名</string>
+    <string name="sync_exclusions_manage_section_names">檔案和資料夾名稱</string>
+    <string name="sync_exclusions_manage_section_size">檔案大小</string>
+    <string name="sync_exclusions_manage_add">新增排除項目</string>
+    <string name="sync_exclusions_manage_empty_title">新增第一個排除項目</string>
+    <string name="sync_exclusions_manage_empty_body">此資料夾中的所有項目都會進行同步。新增排除項目以避免特定檔案與資料夾同步。</string>
+    <string name="sync_exclusions_manage_empty_body_unshown">此資料夾已在其它地方設定了無法在此顯示的排除項目。新增排除項目以避免更多檔案與資料夾同步。</string>
+    <string name="sync_exclusions_manage_rejected_title">排除項目未套用</string>
+    <string name="sync_exclusions_manage_rejected_body">同步作業無法讀取此資料夾的排除項目，因此此資料夾中的所有項目都會進行同步。</string>
+    <string name="sync_exclusions_manage_size_bigger_than">大於%1$s的檔案</string>
+    <string name="sync_exclusions_manage_size_smaller_than">小於%1$s的檔案</string>
+    <string name="sync_exclusions_manage_size_not_between">不介於%1$s與%2$s之間的檔案</string>
+    <string name="sync_exclusions_manage_size_between">介於%1$s與%2$s之間的檔案</string>
+    <string name="sync_exclusions_manage_snackbar_added">已新增排除項目</string>
+    <string name="sync_exclusions_manage_remove_extension">取消排除%1$s</string>
+    <string name="sync_exclusions_manage_load_error_title">無法載入排除項目</string>
+    <string name="sync_exclusions_manage_load_error_body">請確認該資料夾仍在此裝置上，然後再試一次。</string>
+    <string name="sync_exclusions_manage_load_error_retry">再試一次</string>
+    <string name="sync_exclusions_manage_save_failed">無法儲存您的變更。請再試一次。</string>
+    <string name="sync_exclusions_card_action">排除項目</string>
+    <string name="sync_exclusions_manage_restore_defaults">恢復預設值</string>
+    <string name="sync_exclusions_manage_snackbar_defaults_restored">已恢復預設排除項目</string>
+    <string name="sync_exclusions_manage_snackbar_size_conflict">您已排除此大小的檔案</string>
+    <string name="text_editor_format_bold">粗體</string>
+    <string name="text_editor_format_italic">斜體</string>
+    <string name="text_editor_format_underline">底線</string>
+    <string name="text_editor_format_strikethrough">刪除線</string>
+    <string name="text_editor_format_checklist">核取方塊清單</string>
+    <string name="text_editor_format_bulleted_list">項目符號清單</string>
+    <string name="text_editor_format_numbered_list">編號清單</string>
+    <string name="text_editor_format_quote">引言</string>
+    <string name="text_editor_format_code">程式碼</string>
+    <string name="text_editor_text_style_body">內文</string>
+    <string name="text_editor_text_style_heading">標題%1$d</string>
+    <string name="text_editor_menu_option_selected">已選取</string>
+    <string name="text_editor_edit_mode_menu">文字編輯模式</string>
+    <string name="text_editor_edit_mode_plain_text">純文字</string>
+    <string name="text_editor_edit_mode_rich_text">格式化文字</string>
+    <string name="text_editor_link_dialog_title">新增連結</string>
+    <string name="text_editor_link_dialog_text_label">連結文字</string>
+    <string name="sync_exclusions_setup_subtitle">選擇不要同步的項目</string>
+    <string name="title_duplicated_items">重複的項目</string>
+    <string name="file_already_exists_in_location">此目的地已存在名稱為[B]%1$s[/B]的檔案。</string>
+    <string name="folder_already_exists_in_location">此目的地已存在名稱為[B]%1$s[/B]的資料夾。</string>
+    <string name="choose_file">選擇您要保留的檔案</string>
+    <string name="choose_folder">選擇是否要合併資料夾</string>
+    <string name="skip_file">將不會更動任何檔案。您將保留以下檔案：</string>
+    <string name="skip_folder">略過此資料夾</string>
+    <string name="do_not_upload">不要上傳</string>
+    <string name="do_not_copy">不要複製</string>
+    <string name="do_not_move">不要移動</string>
+    <string name="warning_upload_and_rename">您上傳的檔案將重新命名為：</string>
+    <string name="upload_and_rename">上傳並重新命名</string>
+    <string name="warning_copy_and_rename">您複製的檔案將重新命名為：</string>
+    <string name="copy_and_rename">複製並重新命名</string>
+    <string name="warning_move_and_rename">您移動的檔案將重新命名為：</string>
+    <string name="move_and_rename">移動並重新命名</string>
+    <string name="warning_upload_and_replace">檔案的當前版本將被您上傳的檔案所取代。</string>
+    <string name="upload_and_replace">上傳並取代</string>
+    <string name="warning_versioning_upload_and_update">檔案將被更新同時保留歷史版本：</string>
+    <string name="upload_and_update">上傳並更新</string>
+    <string name="warning_upload_and_merge">將目的地資料夾與您上傳的資料夾合併。</string>
+    <string name="upload_and_merge">上傳並且合併</string>
+    <string name="warning_copy_and_replace">您複製的檔案將取代目的地資料夾中的檔案。</string>
+    <string name="copy_and_replace">複製並取代</string>
+    <string name="warning_copy_and_merge">將目的地資料夾與您複製的資料夾合併。</string>
+    <string name="copy_and_merge">複製並合併</string>
+    <string name="warning_move_and_replace">您移動的檔案將取代目的地資料夾中的檔案。</string>
+    <string name="move_and_replace">移動並取代</string>
+    <string name="warning_move_and_merge">將目的地資料夾與您移動的資料夾合併。</string>
+    <string name="move_and_merge">移動並且合併</string>
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="other">套用至所有%1$d個重複的項目</item>
+    </plurals>
+    <string name="chat_list_notifications_muted_message">對話通知已靜音</string>
+    <string name="account_over_disk_quota_paywall_upgrade_now_button">立即升級</string>
+    <string name="sync_exclusions_manage_snackbar_updated">排除條件已更新</string>
+    <string name="chat_notification_reply_action">回覆</string>
+    <string name="account_over_disk_quota_paywall_title">帳戶已鎖定</string>
+    <plurals name="account_over_disk_quota_paywall_body_no_warning_dates">
+        <item quantity="other">我們已透過電子郵件與您聯繫，說明您的儲存空間狀況。您有%1$d個檔案共使用了%2$s，且您的帳戶已被鎖定。請升級至%3$s以增加您的儲存空間並解鎖您的帳戶。若您未儘速處理，您的資料可能會被刪除。[A]深入瞭解您的儲存空間限制[/A]</item>
+    </plurals>
+    <plurals name="account_over_disk_quota_paywall_body_single_warning_date">
+        <item quantity="other">我們已於%1$s透過電子郵件與您聯繫說明您的儲存空間狀況，但空間目前依然已滿。您有%2$d個檔案共使用了%3$s，且您的帳戶已被鎖定。請升級至%4$s以增加您的儲存空間並解鎖您的帳戶。若您未儘速處理，您的資料可能會被刪除。[A]深入瞭解您的儲存空間限制[/A]</item>
+    </plurals>
+    <plurals name="account_over_disk_quota_paywall_body_multiple_warning_dates">
+        <item quantity="other">您的儲存空間依然已滿，您的帳戶已被鎖定。我們已就此問題不只一次寄信通知您。您目前有%1$d個檔案，共使用了%2$s。請升級至%3$s以擴充儲存空間並解鎖帳戶。若您未儘速採取行動，您的資料可能會被刪除。[A]瞭解更多關於您的儲存空間限制[/A]</item>
+    </plurals>
+    <string name="name_collision_folder_exists_title">資料夾已存在</string>
+    <string name="general_save_to_cloud_drive">儲存到雲端硬碟</string>
     <string name="more_than_meeting">不僅僅是會議</string>
     <string name="left_meeting_join_title">您的隱私非常重要</string>
-    <string name="left_meeting_join_content">加入世界上最大的安全雲端空間與協作平台。</string>
     <string name="left_meeting_bonus_content">立即註冊並免費享有進階的協作功能。</string>
     <string name="create_account">註冊</string>
     <string name="call_error_too_many_participants">已超過最大與會人數，無法加入通話。</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">無法登入</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">此通話僅支援100位與會者。請會議召集人移除此限制。</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">好的，明白了</string>
+    <string name="chat_manage_history_title">管理對話記錄</string>
+    <string name="chat_manage_history_meeting_title">管理會議記錄</string>
+    <string name="chat_manage_history_clear_action">清除對話紀錄</string>
+    <string name="chat_manage_history_clear_meeting_action">清空會議記錄</string>
+    <string name="chat_manage_history_retention_option_disabled">關閉</string>
+    <string name="chat_manage_history_retention_option_custom">自訂</string>
+    <string name="chat_manage_history_retention_next_button">接下來</string>
+    <string name="chat_manage_history_picker_year">年</string>
+    <plurals name="chat_manage_history_picker_hours">
+        <item quantity="other">小時</item>
+    </plurals>
+    <plurals name="chat_manage_history_picker_days">
+        <item quantity="other">日</item>
+    </plurals>
+    <plurals name="chat_manage_history_picker_weeks">
+        <item quantity="other">週</item>
+    </plurals>
+    <plurals name="chat_manage_history_picker_months">
+        <item quantity="other">個月</item>
+    </plurals>
 </resources>

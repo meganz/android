@@ -218,6 +218,10 @@
     <string name="dialog_select_permissions">Quyền hạn được chia sẻ</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Đổi quyền&#160;hạn</string>
+    <!-- when listing all the contacts that shares a folder -->
+    <string name="file_properties_shared_folder_select_contact">Được chia&#160;sẻ với</string>
+    <!-- shows the owner of an incoming shared folder -->
+    <string name="file_properties_owner">Chủ sở hữu</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">Mời</string>
     <!-- option to reinvite a contact -->
@@ -276,6 +280,8 @@
     <string name="context_copying">Đang sao chép</string>
     <!-- menu item -->
     <string name="context_move_to_trash">Chuyển vào Thùng Rác</string>
+    <!-- menu item -->
+    <string name="context_delete_from_mega">Loại bỏ khỏi MEGA</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Đang tạo thư mục</string>
     <!-- Menu option title -->
@@ -332,8 +338,12 @@
     <string name="context_no_moved">Lỗi. Chưa di chuyển được</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Đã chia sẻ</string>
+    <!-- error message -->
+    <string name="context_no_removed_shared">Lỗi. Loại bỏ mục chia&#160;sẻ thất&#160;bại</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Mục đã bị xóa</string>
+    <!-- error message -->
+    <string name="context_no_removed">Lỗi. Chưa xóa được</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d mục đã được sao&#160;chép</string>
     <!-- error message when sending multiple files -->
@@ -736,6 +746,8 @@
     <plurals name="remove_multiple_contacts_shared_folder">
         <item quantity="other">%d tên liên lạc sẽ bị xóa khỏi thư mục chia sẻ này.</item>
     </plurals>
+    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
+    <string name="number_permission_incorrectly_changed_from_shared">Thay đổi quyền hạn cho %d tên liên lạc bị thất bại</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Đang tải danh bạ từ điện thoại&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
@@ -795,7 +807,7 @@
     <!-- Button to clear the chat history -->
     <string name="general_clear">Dọn sạch</string>
     <!-- Message show when the history of a chat has been successfully deleted -->
-    <string name="clear_history_success">Lịch sử chat đã được dọn sạch</string>
+    <string name="clear_history_success">Lịch&#160;sử chat đã được dọn sạch</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
     <string name="clear_history_error">Có lỗi phát sinh. Lịch sử cuộc chat chưa xóa sạch được</string>
     <!-- Menu item to add participants to a chat -->
@@ -823,7 +835,7 @@
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="away_status">Vắng mặt</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string name="busy_status">Đang bận</string>
+    <string name="busy_status">Bận</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">Tin nhắn này đã bị xóa</string>
     <!-- Confirmation before deleting messages -->
@@ -1111,7 +1123,7 @@
     <!-- header of a status field for what content a user has shared to you -->
     <string name="file_properties_info_content">Chứa đựng</string>
     <!--  -->
-    <string name="file_properties_shared_folder_public_link_name">Đường liên kết</string>
+    <string name="file_properties_shared_folder_public_link_name">Đường liên&#160;kết</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">Toàn diện</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1140,8 +1152,16 @@
     <string name="title_properties_chat_notifications_contact">Âm báo chat</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] đã xóa lịch sử nội dung chat[/B]</string>
+    <!-- Item menu option upon clicking on one or multiple files. -->
+    <string name="context_permissions_changing_folder">Đang thay&#160;đổi quyền&#160;hạn</string>
+    <!-- Item menu option upon clicking on one or multiple files. -->
+    <string name="context_removing_contact_folder">Đang loại bỏ tên liên lạc khỏi mục chia sẻ</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Chuyển vào Thùng Rác?</string>
+    <!-- confirmation message before removing CU folder -->
+    <string name="confirmation_move_cu_folder_to_rubbish">Bạn có muốn di&#160;chuyển thư&#160;mục này vào Thùng&#160;Rác không? Một thư&#160;mục mới sẽ được tự&#160;động tạo ra cho Đăng&#160;Tải Camêra.</string>
+    <!-- Confirmation message before removing MU folder -->
+    <string name="confirmation_move_mu_folder_to_rubbish">Bạn có muốn di&#160;chuyển thư&#160;mục này vào Thùng&#160;Rác không? Một thư&#160;mục mới sẽ được tự&#160;động tạo ra cho Đăng&#160;tải phương&#160;tiện.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Bỏ vào Thùng Rác?</string>
     <!-- confirmation message before removing a file -->
@@ -1263,7 +1283,7 @@
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">Đối tượng đã được mời và sẽ xuất hiện trong sổ liên lạc sau khi họ chấp nhận lời mời.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
-    <string name="invite_sent_text_multi">Tên của những người quý khách vừa mời sẽ xuất hiện trong sổ liên lạc sau khi họ dùng lời mời của quý khách để tạo tài khoản.</string>
+    <string name="invite_sent_text_multi">Những người mà bạn vừa mời sẽ xuất&#160;hiện trong sổ liên&#160;lạc của&#160;bạn khi họ chấp&#160;nhận lời&#160;mời.</string>
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
     <string name="error_share_qr">Lỗi phát sinh trong quá trình chia sẻ tệp tin ảnh mã QR. Có thể tệp tin không còn tồn tại nữa. Xin thử lại sau.</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
@@ -1366,6 +1386,10 @@
     <string name="label_file_speed_tera_byte">%s&#160;TB/giây</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
+    <!-- Number of versions of a file shown on the screen info of the file, version items -->
+    <plurals name="number_of_versions">
+        <item quantity="other">%1$d phiên bản lưu</item>
+    </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">Phiên bản lưu</string>
     <!-- Header of the item to show the current version of a file in a list -->
@@ -1402,8 +1426,14 @@
     <string name="missed_call_notification_title">Cuộc gọi nhỡ</string>
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">Vị&#160;trí</string>
+    <!-- Title of the label to show the size of the current files inside a folder -->
+    <string name="file_properties_folder_current_versions">Phiên bản hiện tại</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
     <string name="file_properties_folder_previous_versions">Các phiên bản trước</string>
+    <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
+    <plurals name="number_of_versions_inside_folder">
+        <item quantity="other">%1$d têp tin có phiên bản</item>
+    </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">Lỗi. %1$d tin&#160;nhắn chưa được chuyển&#160;tiếp</item>
@@ -2146,7 +2176,7 @@
     </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="other">%d&#160;videos</item>
+        <item quantity="other">%d videos</item>
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
@@ -2177,7 +2207,7 @@
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">Yêu cầu giải quyết thanh toán</string>
     <!-- Business expired account Overdue payment page header. -->
-    <string name="payment_overdue_label">Thánh toán bị quá hạn</string>
+    <string name="payment_overdue_label">Thanh&#160;toán bị quá hạn</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">Bộ quản lý nhân viên cỉ hỗ trợ trên phiên bản trình duyệt web dành cho máy tính.</string>
     <!-- Title of usage storage details section in My Account -->
@@ -2248,6 +2278,8 @@
     <string name="alert_not_enough_permissions_revert">Bạn không có quyền hạn phù hợp để sửa đổi tệp tin này. Bạn có muốn tạo một tệp tin mới không?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Phiên&#160;bản đã được chuyển&#160;thành một tệp&#160;tin mới toàn vẹn</string>
+    <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
+    <string name="general_date_label">vào ngày %1$s</string>
     <!-- Download location label -->
     <string name="download_location">Vị trí tải xuống</string>
     <!-- Action to show any file in its location -->
@@ -2479,11 +2511,11 @@
     <!-- A user can mark a folder or file with green colour. -->
     <string name="label_green">Màu lục</string>
     <!-- A user can mark a folder or file with blue colour. -->
-    <string name="label_blue">Màu lam</string>
+    <string name="label_blue">Lam</string>
     <!-- A user can mark a folder or file with purple colour. -->
     <string name="label_purple">Màu tím</string>
     <!-- A user can mark a folder or file with grey colour. -->
-    <string name="label_grey">Màu xám</string>
+    <string name="label_grey">Xám</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Hiện đang phát</string>
     <!-- Text that indicates the song is now playing, but paused -->
@@ -2699,7 +2731,7 @@
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">Bạn đã được mời tham gia một cuộc gọi họp mặt.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_guest_instruction">Chạm vào Đường liên kết Họp Mặt được gửi cho bạn hoặc nhập nó vào đây</string>
+    <string name="paste_meeting_link_guest_instruction">Chạm vào đường liên&#160;kết Họp được gửi cho bạn hoặc nhập nó vào đây</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Cuộc họp mặt đã kết thúc</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -2731,7 +2763,7 @@
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Đăng ký ngay và tận hưởng các tính năng cộng tác hữu dụng và miễn phí.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
-    <string name="ongoing_call_content">Đang có một cuộc gọi đang giang dở. Xin chấm dứt cuộc gọi đó trước khi tham gia vào cuộc khác.</string>
+    <string name="ongoing_call_content">Đang có một cuộc gọi đang dang&#160;dở. Xin chấm&#160;dứt cuộc gọi đó trước khi gọi cuộc khác.</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">Tên mới cho cuộc họp mặt</string>
     <!-- The content of dialog when failed for creating meeting-->
@@ -3655,7 +3687,7 @@
     <!-- In app notification description text representing the meeting repeats every Saturday. This text is used at the start of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_start_sat">Thứ7</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used at the start of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_start_sun">Cnhật</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sun">CN</string>
     <!-- In app notification description text representing the meeting repeats every Monday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_mon">Thứ2</string>
     <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used in the middle of the sentence. -->
@@ -3680,6 +3712,10 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Bạn không thể xác thực %s vì họ không có trong sổ liên&#160;lạc của bạn. Hãy chờ đến khi họ chấp&#160;nhận lời mời của bạn trước.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Bắt&#160;đầu</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">Tệp tin này đã bị tháo gỡ theo quy&#160;định có trong [A]Chính&#160;Sách Xử&#160;Lý Gỡ Bỏ Nội&#160;Dung[/A].</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">Thư mục này đã bị tháo gỡ theo quy định có trong [A]Chính Sách Xử Lý Gỡ Bỏ Nội Dung[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Tham gia</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4508,6 +4544,10 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">Có các mục ẩn trong album này. Việc thực&#160;hiện chia&#160;sẻ album sẽ làm các mục ẩn hiển&#160;thị cho những người bạn chia&#160;sẻ. Các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
+    <!-- Image or Video map location title-->
+    <string name="file_properties_info_map_location">Vị&#160;trí</string>
+    <!-- Image or Video no map location info-->
+    <string name="file_properties_info_map_location_no_location_info">Không có thông&#160;tin vị&#160;trí</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
     <string name="logout_warning_dialog_title">Việc đăng&#160; xuất ngay bây giờ sẽ làm mất đi&#160;dữ liệu</string>
     <!-- Logout warning dialog positive button text -->
@@ -4528,4 +4568,7 @@
     <string name="location_not_exist">Vị trí này không còn tồn tại.</string>
     <string name="invalid_input">Nhập liệu không hợp lệ</string>
     <string name="invalid_link">Liên kết không hợp lệ. Vui lòng thử lại hoặc yêu cầu một liên kết mới.</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="other">%1$d năm</item>
+    </plurals>
 </resources>

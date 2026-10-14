@@ -221,6 +221,10 @@
     <string name="dialog_select_permissions">Paylaşım izinleri</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">İzinleri değiştir</string>
+    <!-- when listing all the contacts that shares a folder -->
+    <string name="file_properties_shared_folder_select_contact">Paylaşılan kişi</string>
+    <!-- shows the owner of an incoming shared folder -->
+    <string name="file_properties_owner">Sahibi</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">Davet et</string>
     <!-- option to reinvite a contact -->
@@ -279,6 +283,8 @@
     <string name="context_copying">Kopyalanıyor</string>
     <!-- menu item -->
     <string name="context_move_to_trash">Çöp kutusuna taşı</string>
+    <!-- menu item -->
+    <string name="context_delete_from_mega">MEGA’dan kaldır</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Klasör oluşturuluyor</string>
     <!-- Menu option title -->
@@ -335,8 +341,12 @@
     <string name="context_no_moved">Hata. Taşınamadı</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Paylaşıldı</string>
+    <!-- error message -->
+    <string name="context_no_removed_shared">Hata. Paylaşım kaldırılamadı</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Öğe silindi</string>
+    <!-- error message -->
+    <string name="context_no_removed">Hata. Silme işlemi başarısız oldu</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d öğe kopyalandı</string>
     <!-- error message when sending multiple files -->
@@ -745,6 +755,8 @@
         <item quantity="one">%d kişi paylaşılan klasörden kaldırılacak.</item>
         <item quantity="other">%d kişi paylaşılan klasörden kaldırılacak.</item>
     </plurals>
+    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
+    <string name="number_permission_incorrectly_changed_from_shared">%d kişinin izinleri güncellenemedi.</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Telefondan kişiler yükleniyor&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
@@ -1165,8 +1177,16 @@
     <string name="title_properties_chat_notifications_contact">Sohbet bildirimleri</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] sohbet geçmişini temizledi[/B]</string>
+    <!-- Item menu option upon clicking on one or multiple files. -->
+    <string name="context_permissions_changing_folder">İzinler değiştiriliyor</string>
+    <!-- Item menu option upon clicking on one or multiple files. -->
+    <string name="context_removing_contact_folder">Kişi paylaşılan klasörden kaldırılıyor</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Çöp kutusuna taşınsın mı?</string>
+    <!-- confirmation message before removing CU folder -->
+    <string name="confirmation_move_cu_folder_to_rubbish">Bu klasör Çöp kutusuna taşınsın mı? Kamera yüklemeleri için otomatik olarak yeni bir klasör oluşturulacak.</string>
+    <!-- Confirmation message before removing MU folder -->
+    <string name="confirmation_move_mu_folder_to_rubbish">Bu klasör Çöp kutusuna taşınsın mı? Medya yüklemeleri için otomatik olarak yeni bir klasör oluşturulacak.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Çöp kutusuna taşınsın mı?</string>
     <!-- confirmation message before removing a file -->
@@ -1198,7 +1218,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Nasıl işliyor?</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Arkadaşlarınızı ücretsiz bir MEGA hesabı oluşturmaya ve MEGA Mobil Uygulaması’nı yüklemeye davet edin. Her kaydolma ve uygulama yüklemesi için bonus olarak ücretsiz depolama alanı kazanın.</string>
+    <string name="first_paragraph_achievement_invite_friends">Arkadaşlarınızı ücretsiz bir MEGA hesabı oluşturmaya ve MEGA Mobil Uygulamasını yüklemeye davet edin. Her kaydolma ve uygulama yüklemesi için bonus olarak ücretsiz depolama alanı kazanın.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Ücretsiz depolama bonusu yalnızca yeni davetiyeler için ve MEGA Mobil Uygulamasının veya MEGA Masaüstü Uygulamasının yüklü olduğu durumlarda geçerlidir.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1395,6 +1415,11 @@
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
+    <!-- Number of versions of a file shown on the screen info of the file, version items -->
+    <plurals name="number_of_versions">
+        <item quantity="one">%1$d sürüm</item>
+        <item quantity="other">%1$d sürüm</item>
+    </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">Sürümler</string>
     <!-- Header of the item to show the current version of a file in a list -->
@@ -1433,8 +1458,15 @@
     <string name="missed_call_notification_title">Cevapsız arama</string>
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">Konum</string>
+    <!-- Title of the label to show the size of the current files inside a folder -->
+    <string name="file_properties_folder_current_versions">Güncel sürümler</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
     <string name="file_properties_folder_previous_versions">Önceki sürümler</string>
+    <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
+    <plurals name="number_of_versions_inside_folder">
+        <item quantity="one">%1$d sürümlü dosya</item>
+        <item quantity="other">%1$d sürümlü dosya</item>
+    </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Hata. %1$d mesaj iletilemedi</item>
@@ -2304,6 +2336,8 @@
     <string name="alert_not_enough_permissions_revert">Bu dosyayı değiştirmek için doğru izinlere sahip değilsiniz. Yeni bir dosya oluşturulsun mu?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Sürüm yeni bir dosya olarak oluşturuldu</string>
+    <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
+    <string name="general_date_label">%1$s</string>
     <!-- Download location label -->
     <string name="download_location">İndirme konumu</string>
     <!-- Action to show any file in its location -->
@@ -2812,7 +2846,7 @@
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Ana görünüm</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
-    <string name="offline_warning">Hesaptan çıkış yaptığınız zaman çevrim dışı içeriğiniz iptal olur.</string>
+    <string name="offline_warning">Çıkış yaptığınızda çevrim dışı içeriğiniz kaybolur.</string>
     <!-- Settings category which contains all preferences related to user interface. -->
     <string name="user_interface_setting">Kullanıcı arayüzü</string>
     <!-- Setting which allows to choose the start screen. -->
@@ -3842,6 +3876,10 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">%s kişisi, kişiler listenizde olmadığı için doğrulanamıyor. Önce davetinizi kabul etmelerini bekleyin.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Başlat</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">Bu dosya, [A]İçerik Kaldırma Politikamız[/A] uyarınca yayından kaldırılmıştır.</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">Bu klasör, [A]İçerik Kaldırma Politikamız[/A] uyarınca yayından kaldırılmıştır.</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Katıl</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4722,12 +4760,16 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">Bu albümde gizli öğeler var. Albümü paylaşmak, gizli öğelerin paylaştığınız kişiler tarafından görülebileceği anlamına gelir. Öğeler bulut depolamanızda gizli kalmaya devam edecektir.</string>
+    <!-- Image or Video map location title-->
+    <string name="file_properties_info_map_location">Konum</string>
+    <!-- Image or Video no map location info-->
+    <string name="file_properties_info_map_location_no_location_info">Konum bilgisi yok</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
     <string name="logout_warning_dialog_title">Şu anda çıkış yapmak veri kaybına neden olur</string>
     <!-- Logout warning dialog positive button text -->
     <string name="logout_warning_dialog_positive_button">Yine de çıkış yap</string>
     <!-- Logout warning dialog message if offline files exists -->
-    <string name="logout_warning_dialog_offline_message">Şu anda çıkış yaparsanız çevrim dışı dosyalarınız iptal olur</string>
+    <string name="logout_warning_dialog_offline_message">Şu anda çıkış yaparsanız çevrim dışı dosyalarınız kaybolacak</string>
     <!-- Logout warning dialog message if user has transfers in progress. -->
     <string name="logout_warning_dialog_transfers_message">Şimdi çıkış yaparsanız aktarımlarınız tamamlanmayacak ve veriler silinecektir.</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->

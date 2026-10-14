@@ -3052,13 +3052,74 @@
     <string name="AN_pin_lock">Alphanumeric</string>
     <string name="reset_pin_title_2">Masukkan kembali passcode baru anda</string>
     <string name="title_change_passcode">Ganti passcode</string>
+    <string name="sync_exclusions_manage_save">Simpan</string>
+    <string name="sync_exclusions_manage_load_error_retry">Coba lagi</string>
+    <string name="text_editor_format_link">Link</string>
+    <string name="text_editor_link_dialog_url_label">Link</string>
+    <string name="text_editor_link_dialog_remove">Hapus tautan</string>
+    <string name="title_duplicated_items">Item duplikat</string>
+    <string name="choose_file">Pilih file yang ingin anda simpan</string>
+    <string name="skip_file">Tidak ada file yang akan diubah. Anda akan menyimpan file di bawah ini:</string>
+    <string name="file_already_exists_in_location">Sebuah file bernama [B]%1$s[/B] sudah ada di tujuan ini.</string>
+    <string name="do_not_upload">Jangan upload</string>
+    <string name="warning_upload_and_rename">File yang Anda upload akan diganti namanya menjadi:</string>
+    <string name="upload_and_rename">Unggah dan ganti nama</string>
+    <string name="warning_upload_and_replace">Versi file saat ini akan diganti dengan file yang anda unggah.</string>
+    <string name="upload_and_replace">Unggah dan ganti</string>
+    <string name="warning_versioning_upload_and_update">File akan diperbarui dengan riwayat versi:</string>
+    <string name="upload_and_update">Unggah dan perbarui</string>
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="other">Terapkan ke semua %1$d duplikat</item>
+    </plurals>
+    <string name="do_not_copy">Jangan salin</string>
+    <string name="warning_copy_and_rename">File yang anda salin akan diganti namanya menjadi:</string>
+    <string name="copy_and_rename">Salin dan ganti nama</string>
+    <string name="warning_copy_and_replace">Ganti file di folder tujuan dengan file yang anda salin.</string>
+    <string name="copy_and_replace">Copy dan ganti</string>
+    <string name="do_not_move">Jangan pindahkan</string>
+    <string name="warning_move_and_rename">File yang anda pindahkan akan diganti namanya menjadi:</string>
+    <string name="move_and_rename">Pindahkan dan ganti nama</string>
+    <string name="warning_move_and_replace">Ganti file di folder tujuan dengan file yang anda pindahkan.</string>
+    <string name="move_and_replace">Pindahkan dan ganti</string>
+    <string name="folder_already_exists_in_location">Sebuah folder bernama [B]%1$s[/B] sudah ada di tujuan ini.</string>
+    <string name="warning_upload_and_merge">Gabungkan folder di tujuan dengan folder yang anda unggah.</string>
+    <string name="upload_and_merge">Unggah dan gabungkan</string>
+    <string name="choose_folder">Pilih apakah anda ingin menggabungkan folder</string>
+    <string name="skip_folder">Lewati folder ini</string>
+    <string name="warning_copy_and_merge">Gabungkan folder di tujuan dengan folder yang anda salin.</string>
+    <string name="copy_and_merge">Salin dan gabungkan</string>
+    <string name="warning_move_and_merge">Gabungkan folder di tempat tujuan dengan folder yang anda pindahkan.</string>
+    <string name="move_and_merge">Pindah dan gabungkan</string>
+    <string name="chat_list_notifications_muted_message">Notifikasi obrolan dimatikan</string>
+    <string name="account_over_disk_quota_paywall_upgrade_now_button">Tingkatkan sekarang</string>
+    <string name="name_collision_folder_exists_title">Folder sudah ada</string>
+    <string name="general_save_to_cloud_drive">Simpan ke drive Cloud</string>
     <string name="more_than_meeting">Lebih dari sekedar pertemuan</string>
     <string name="left_meeting_join_title">Privasi anda penting</string>
-    <string name="left_meeting_join_content">Bergabunglah dengan platform kolaborasi dan penyimpanan cloud aman terbesar di dunia.</string>
+    <string name="create_account">Daftar</string>
     <string name="left_meeting_bonus_content">Daftar sekarang dan nikmati fitur kolaborasi lanjutan secara gratis.</string>
-    <string name="create_account">Buat akun MEGA</string>
-    <string name="call_error_too_many_participants">Panggilan tidak dapat disambungkan karena jumlah peserta telah terlampaui.</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Tidak dapat bergabung</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Panggilan ini hanya dapat mendukung 100 peserta. Minta penyelenggara untuk menghapus batasan ini.</string>
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, mengerti</string>
+    <string name="call_error_too_many_participants">Panggilan tidak dapat disambungkan karena jumlah peserta telah terlampaui.</string>
+    <string name="chat_manage_history_title">Kelola riwayat obrolan</string>
+    <string name="chat_manage_history_clear_action">Hapus riwayat ngobrol</string>
+    <string name="chat_manage_history_meeting_title">Kelola riwayat rapat</string>
+    <string name="chat_manage_history_clear_meeting_action">Hapus riwayat rapat</string>
+    <string name="chat_manage_history_retention_option_disabled">Mati</string>
+    <string name="chat_manage_history_retention_option_custom">Kustom</string>
+    <string name="chat_manage_history_retention_next_button">Berikutnya</string>
+    <plurals name="chat_manage_history_picker_hours">
+        <item quantity="other">jam</item>
+    </plurals>
+    <plurals name="chat_manage_history_picker_days">
+        <item quantity="other">hari</item>
+    </plurals>
+    <plurals name="chat_manage_history_picker_weeks">
+        <item quantity="other">minggu</item>
+    </plurals>
+    <string name="chat_manage_history_picker_year">tahun</string>
+    <plurals name="chat_manage_history_picker_months">
+        <item quantity="other">bulan</item>
+    </plurals>
 </resources>
