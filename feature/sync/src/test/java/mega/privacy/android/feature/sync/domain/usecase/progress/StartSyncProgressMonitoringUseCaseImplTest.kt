@@ -44,6 +44,7 @@ class StartSyncProgressMonitoringUseCaseImplTest {
     private val resetSyncRunSnapshotUseCase = mock<ResetSyncRunSnapshotUseCase>()
     private val runSyncTransferStoreUseCase = mock<RunSyncTransferStoreUseCase>()
     private val resetSyncTransferStoreUseCase = mock<ResetSyncTransferStoreUseCase>()
+    private val reconcileSyncTransfersUseCase = mock<ReconcileSyncTransfersUseCase>()
 
     private val rootA = NodeId(1L)
     private val rootB = NodeId(2L)
@@ -51,6 +52,7 @@ class StartSyncProgressMonitoringUseCaseImplTest {
     private lateinit var session: MutableStateFlow<NodeId?>
     private lateinit var runSnapshotRun: SuspendedRun
     private lateinit var storeRun: SuspendedRun
+    private lateinit var reconcilerRun: SuspendedRun
 
     @BeforeAll
     fun setUp() {
@@ -61,6 +63,7 @@ class StartSyncProgressMonitoringUseCaseImplTest {
             resetSyncRunSnapshotUseCase = resetSyncRunSnapshotUseCase,
             runSyncTransferStoreUseCase = runSyncTransferStoreUseCase,
             resetSyncTransferStoreUseCase = resetSyncTransferStoreUseCase,
+            reconcileSyncTransfersUseCase = reconcileSyncTransfersUseCase,
         )
     }
 
@@ -73,14 +76,17 @@ class StartSyncProgressMonitoringUseCaseImplTest {
             resetSyncRunSnapshotUseCase,
             runSyncTransferStoreUseCase,
             resetSyncTransferStoreUseCase,
+            reconcileSyncTransfersUseCase,
         )
         session = MutableStateFlow(null)
         runSnapshotRun = SuspendedRun()
         storeRun = SuspendedRun()
+        reconcilerRun = SuspendedRun()
         whenever(monitorLoggedInRootNodeUseCase()).thenReturn(session)
         wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.SyncProgress) }.thenReturn(true)
         wheneverBlocking { runSyncRunSnapshotUseCase() }.doSuspendableAnswer { runSnapshotRun.await() }
         wheneverBlocking { runSyncTransferStoreUseCase() }.doSuspendableAnswer { storeRun.await() }
+        wheneverBlocking { reconcileSyncTransfersUseCase() }.doSuspendableAnswer { reconcilerRun.await() }
     }
 
     @Test
@@ -462,6 +468,85 @@ class StartSyncProgressMonitoringUseCaseImplTest {
         verify(resetSyncTransferStoreUseCase, times(2)).invoke()
         assertThat(runningAtRunSnapshotReset).containsExactly(false, false).inOrder()
         assertThat(runningAtStoreReset).containsExactly(false, false).inOrder()
+    }
+
+    @Test
+    fun `test that invoke runs the reconciler after both resets when an account logs in with the flag enabled`() =
+        runTest {
+            backgroundScope.launch { underTest() }
+            runCurrent()
+
+            session.value = rootA
+            runCurrent()
+
+            val order = inOrder(
+                resetSyncRunSnapshotUseCase,
+                resetSyncTransferStoreUseCase,
+                reconcileSyncTransfersUseCase,
+            )
+            order.verify(resetSyncRunSnapshotUseCase).invoke()
+            order.verify(resetSyncTransferStoreUseCase).invoke()
+            order.verify(reconcileSyncTransfersUseCase).invoke()
+            assertThat(reconcilerRun.starts).isEqualTo(1)
+        }
+
+    @Test
+    fun `test that invoke does not run the reconciler when the flag is disabled`() = runTest {
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.SyncProgress) }.thenReturn(false)
+        backgroundScope.launch { underTest() }
+        runCurrent()
+
+        session.value = rootA
+        runCurrent()
+
+        verifyNoInteractions(reconcileSyncTransfersUseCase)
+    }
+
+    @Test
+    fun `test that invoke cancels the reconciler when the account logs out`() = runTest {
+        backgroundScope.launch { underTest() }
+        runCurrent()
+        session.value = rootA
+        runCurrent()
+
+        session.value = null
+        runCurrent()
+
+        assertThat(reconcilerRun.starts).isEqualTo(1)
+        assertThat(reconcilerRun.cancellations).isEqualTo(1)
+        verify(resetSyncRunSnapshotUseCase, times(2)).invoke()
+        verify(resetSyncTransferStoreUseCase, times(2)).invoke()
+    }
+
+    @Test
+    fun `test that invoke runs a new reconciler for the next account`() = runTest {
+        backgroundScope.launch { underTest() }
+        runCurrent()
+        session.value = rootA
+        runCurrent()
+
+        session.value = rootB
+        runCurrent()
+
+        verify(reconcileSyncTransfersUseCase, times(2)).invoke()
+    }
+
+    @Test
+    fun `test that a failing reconciler does not stop the run snapshot and store runs`() = runTest {
+        doThrow(RuntimeException("boom")).whenever(reconcileSyncTransfersUseCase).invoke()
+        val runner = backgroundScope.launch { underTest() }
+        runCurrent()
+
+        session.value = rootA
+        runCurrent()
+
+        verify(reconcileSyncTransfersUseCase).invoke()
+        assertThat(reconcilerRun.starts).isEqualTo(0)
+        assertThat(runSnapshotRun.isRunning).isTrue()
+        assertThat(storeRun.isRunning).isTrue()
+        verify(resetSyncRunSnapshotUseCase, times(1)).invoke()
+        verify(resetSyncTransferStoreUseCase, times(1)).invoke()
+        assertThat(runner.isActive).isTrue()
     }
 
     private class SuspendedRun(private val cancellationDelayMillis: Long = 0) {

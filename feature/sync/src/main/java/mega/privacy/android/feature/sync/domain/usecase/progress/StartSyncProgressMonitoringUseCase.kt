@@ -33,6 +33,7 @@ internal class StartSyncProgressMonitoringUseCaseImpl @Inject constructor(
     private val resetSyncRunSnapshotUseCase: ResetSyncRunSnapshotUseCase,
     private val runSyncTransferStoreUseCase: RunSyncTransferStoreUseCase,
     private val resetSyncTransferStoreUseCase: ResetSyncTransferStoreUseCase,
+    private val reconcileSyncTransfersUseCase: ReconcileSyncTransfersUseCase,
 ) : StartSyncProgressMonitoringUseCase {
 
     override suspend fun invoke() {
@@ -59,6 +60,7 @@ internal class StartSyncProgressMonitoringUseCaseImpl @Inject constructor(
             coroutineScope {
                 launch { runCatching { runSyncRunSnapshotUseCase() }.logAndSwallowExceptions() }
                 launch { runCatching { runSyncTransferStoreUseCase() }.logAndSwallowExceptions() }
+                launch { runCatching { reconcileSyncTransfersUseCase() }.logAndSwallowExceptions() }
             }
         } finally {
             withContext(NonCancellable) {

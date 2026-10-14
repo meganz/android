@@ -12,6 +12,15 @@ internal data class SyncRunSnapshot(
     val syncs: List<SyncWorkState>,
     val progress: SyncEpisodeProgress,
 ) {
+    /**
+     * True while not seeded, or while any sync has work, except a running sync that has an error,
+     * because the SDK skips such a sync, so its stats are not transfer work.
+     */
+    val hasTransferWork: Boolean
+        get() = !isSeeded || syncs.any { sync ->
+            sync.hasWork && !(sync.runState == SyncRunState.Running && sync.hasError)
+        }
+
     companion object {
         val NotSeeded = SyncRunSnapshot(
             isSeeded = false,
