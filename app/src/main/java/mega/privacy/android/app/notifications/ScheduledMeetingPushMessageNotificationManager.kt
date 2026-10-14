@@ -11,16 +11,15 @@ import androidx.core.app.PendingIntentCompat
 import androidx.core.content.ContextCompat
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHAT_ID_OF_INCOMING_CALL
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.domain.entity.pushes.PushMessage.ScheduledMeetingPushMessage
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationJoinButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationMessageButtonEvent
 import javax.inject.Inject
@@ -101,14 +100,10 @@ class ScheduledMeetingPushMessageNotificationManager @Inject constructor(
     private fun getShowChatIntent(context: Context, chatId: Long): PendingIntent? {
         Analytics.initialise(context)
         Analytics.tracker.trackEvent(ScheduledMeetingReminderNotificationMessageButtonEvent)
-        val intent = Intent(
+        val intent = MegaActivity.getIntentWithExtraDestinations(
             context,
-            ChatActivity::class.java
-        ).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
-        }
+            listOf(ShowChatMessagesNavKey(chatId = chatId)),
+        )
         return PendingIntentCompat.getActivity(
             context,
             chatId.toInt(),

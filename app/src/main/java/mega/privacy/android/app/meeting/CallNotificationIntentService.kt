@@ -10,9 +10,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
-import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
 import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
 import mega.privacy.android.app.utils.CallUtil.openMeetingRinging
@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartScheduledMeetingUseCase
-import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -433,15 +433,16 @@ class CallNotificationIntentService : Service() {
     }
 
     /**
-     * Open the waiting room
+     * Open the chat room
      *
      * @param chatId    Meeting's Chat ID
      */
     private fun openChatRoom(chatId: Long) {
-        val intent = Intent(applicationContext, ChatActivity::class.java).apply {
-            putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
-            action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val intent = MegaActivity.getIntentWithExtraDestinations(
+            applicationContext,
+            listOf(ShowChatMessagesNavKey(chatId = chatId)),
+        ).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         applicationContext.startActivity(intent)
     }
