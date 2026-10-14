@@ -361,7 +361,6 @@ internal fun OfflineScreen(
                             modifier = Modifier
                                 .testTag(OFFLINE_SCREEN_LOADING_TAG)
                                 .fillMaxSize(),
-                            contentPadding = PaddingValues(),
                             isListView = uiState.currentViewType == ViewType.LIST,
                         )
                     }

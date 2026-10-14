@@ -203,7 +203,6 @@ fun SelectVideosSearchScreen(
                     modifier = Modifier
                         .padding(contentPadding)
                         .testTag(SELECT_VIDEOS_SEARCH_LOADING_VIEW_TEST_TAG),
-                    contentPadding = PaddingValues(top = 8.dp),
                     isListView = dataState?.currentViewType == ViewType.LIST
                 )
             }

@@ -47,7 +47,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun NodesViewSkeleton(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
+    contentPadding: PaddingValues = PaddingValues(top = 4.dp),
     isListView: Boolean = true,
     spanCount: Int = 2,
     delay: Duration = Duration.ZERO,
@@ -78,7 +78,7 @@ object NodeSkeletons {
  * Matches exact NodeListViewItem layout and spacing.
  */
 @Composable
-private fun NodeListViewSkeleton(
+internal fun NodeListViewSkeleton(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -92,7 +92,7 @@ private fun NodeListViewSkeleton(
             NodeHeaderItemSkeleton(
                 modifier = Modifier
                     .padding(start = DSTokens.spacings.s2, end = DSTokens.spacings.s3)
-                    .padding(bottom = DSTokens.spacings.s3)
+                    .padding(bottom = DSTokens.spacings.s1)
             )
         }
 
@@ -122,7 +122,7 @@ fun NodeGridViewSkeleton(
                 .padding(horizontal = DSTokens.spacings.s3)
                 .semantics { testTagsAsResourceId = true },
             horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
-            verticalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
+            verticalArrangement = Arrangement.spacedBy(DSTokens.spacings.s2),
         ) {
             // Header skeleton (spans full width)
             item(span = { GridItemSpan(spanCount) }) {

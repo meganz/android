@@ -78,7 +78,6 @@ fun LinksContent(
                     isListView = isListView,
                     spanCount = spanCount,
                     delay = NodeSkeletons.defaultDelay,
-                    contentPadding = PaddingValues(top = 4.dp)
                 )
             }
 

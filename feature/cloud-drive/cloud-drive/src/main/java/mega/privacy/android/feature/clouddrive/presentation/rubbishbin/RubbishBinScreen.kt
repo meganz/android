@@ -231,7 +231,6 @@ internal fun RubbishBinScreen(
             when {
                 uiState.isLoading -> {
                     NodesViewSkeleton(
-                        contentPadding = PaddingValues(),
                         isListView = uiState.currentViewType == ViewType.LIST,
                         spanCount = spanCount,
                         delay = NodeSkeletons.defaultDelay,
