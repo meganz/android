@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message.pendingmessages
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Progress
@@ -222,6 +223,41 @@ class CompressPendingMessagesUseCaseTest {
             )
         )
     }
+
+    @Test
+    fun `test that the original file is set to ready to upload state and other files are still compressed when a compression fails`() =
+        runTest {
+            val failedPendingMessage = stubPendingMessage(id = 1L)
+            val succeededPendingMessage = stubPendingMessage(id = 2L)
+            val originalFile = failedPendingMessage.uriPath
+            val compressed = File("/path/compressed.mp4")
+
+            whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
+                    flowOf(listOf(failedPendingMessage, succeededPendingMessage))
+            whenever(compressFileForChatUseCase(originalFile)) doReturn
+                    flow { throw IllegalArgumentException() }
+            whenever(compressFileForChatUseCase(succeededPendingMessage.uriPath)) doReturn
+                    flowOf(ChatUploadCompressionState.Compressed(compressed))
+
+            underTest().test {
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(updatePendingMessageUseCase)(
+                UpdatePendingMessageStateAndPathRequest(
+                    failedPendingMessage.id,
+                    PendingMessageState.READY_TO_UPLOAD,
+                    originalFile.value,
+                )
+            )
+            verify(updatePendingMessageUseCase)(
+                UpdatePendingMessageStateAndPathRequest(
+                    succeededPendingMessage.id,
+                    PendingMessageState.READY_TO_UPLOAD,
+                    compressed.path,
+                )
+            )
+        }
 
     private fun stubPendingMessage(
         id: Long = 12L,

@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.chat.message.pendingmessages
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.firstOrNull
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.entity.transfer.ChatCompressionState
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
+import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.file.FileResult
@@ -69,8 +71,15 @@ class CompressPendingMessagesUseCase @Inject constructor(
                                         val totalSize =
                                             pathsToSizeAndProgress.values.sumOf { it.size }
                                         val compressed = compressFileForChatUseCase(uriPath)
+                                            // If the compression of this file fails, upload the original file and do not stop the other compressions
+                                            .catch {
+                                                emit(
+                                                    ChatUploadCompressionState.NotCompressed(
+                                                        ChatUploadNotCompressedReason.FailedToCompress
+                                                    )
+                                                )
+                                            }
                                             .onEach { chatUploadCompressionState ->
-                                                println("TRAN-833 compression state $chatUploadCompressionState")
                                                 val newProgress =
                                                     when (chatUploadCompressionState) {
                                                         is ChatUploadCompressionState.Compressing -> {

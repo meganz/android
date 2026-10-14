@@ -452,8 +452,10 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     outputSurface.drawImage()
                     inputSurface.setPresentationTime(videoDecoderOutputBufferInfo.presentationTimeUs * 1000)
                     inputSurface.swapBuffers()
+                    // The metadata duration can be shorter than the last frame time, so the progress can be above 1
                     val progress =
-                        (videoDecoderOutputBufferInfo.presentationTimeUs.toFloat() / video.totalDuration.toFloat()) / 1000
+                        ((videoDecoderOutputBufferInfo.presentationTimeUs.toFloat() / video.totalDuration.toFloat()) / 1000)
+                            .coerceIn(0f, 1f)
                     video.currentDuration = videoDecoderOutputBufferInfo.presentationTimeUs
                     block(progress)
                 }
