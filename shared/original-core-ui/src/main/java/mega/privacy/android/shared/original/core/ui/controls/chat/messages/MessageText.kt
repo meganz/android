@@ -3,19 +3,17 @@ package mega.privacy.android.shared.original.core.ui.controls.chat.messages
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -116,17 +114,25 @@ private fun MessageTextView(
     maxLines: Int = Int.MAX_VALUE,
     style: TextStyle = LocalTextStyle.current,
 ) {
-    var clickedLink by rememberSaveable { mutableStateOf<String?>(null) }
-
-    clickedLink?.let {
-        OpenMessageLink(link = it)
-        clickedLink = null
-    }
+    val uriHandler = LocalUriHandler.current
+    val snackbarHostState = LocalSnackBarHostStateOriginal.current
+    val failureMessage = stringResource(id = R.string.chat_click_link_in_message_intent_not_available)
+    val coroutineScope = rememberCoroutineScope()
 
     with(message.getMessageText(isEdited = isEdited, links = links)) {
         val onClick: (Int) -> Unit = {
             getStringAnnotations(URL_TAG, it, it).firstOrNull()
-                ?.let { link -> clickedLink = onLinkClicked(link.item) }
+                ?.let { annotation -> onLinkClicked(annotation.item) }
+                ?.let { link ->
+                    coroutineScope.launch {
+                        openMessageLink(
+                            link = link,
+                            uriHandler = uriHandler,
+                            snackbarHostState = snackbarHostState,
+                            failureMessage = failureMessage,
+                        )
+                    }
+                }
         }
         val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
         val pressIndicator = Modifier.pointerInput(onClick) {
@@ -241,7 +247,7 @@ fun String.toFormattedText(
             }
         }
         addAll(getFormatsFromLinks(links))
-    }.filterInvalidFormats().compactInnerFormats()
+    }.sortedBy { it.formatStart }.filterInvalidFormats().compactInnerFormats()
 
     return buildAnnotatedString {
         if (formatList.isEmpty()) {
@@ -282,39 +288,47 @@ fun String.toFormattedText(
     }
 }
 
+/**
+ * Removes the first pair of formats where the second format starts directly after the opening
+ * tag of the first one, because [compactInnerFormats] cannot merge such a pair.
+ * A link that a tag wraps also starts directly after the tag, but it is valid, so pairs with a
+ * link are kept.
+ */
 private fun List<Format>.filterInvalidFormats(): List<Format> {
-    if (size <= 1) return this
+    val (currentFormat, nextFormat) = zipWithNext().firstOrNull { (current, next) ->
+        current.sentenceStart == next.formatStart
+                && FormatType.Link !in current.type
+                && FormatType.Link !in next.type
+    } ?: return this
 
-    for (i in 0 until size - 2) {
-        val currentFormat = this[i]
-        val nextFormat = this[i + 1]
-
-        if (currentFormat.sentenceStart == nextFormat.formatStart) {
-            return filter { it != currentFormat && it != nextFormat }
-        }
-    }
-
-    return this
+    return filter { it != currentFormat && it != nextFormat }
 }
 
 private fun List<Format>.compactInnerFormats(): List<Format> {
-    if (size <= 1) return this
+    var compactedList = this
 
-    var updatedList = findInnerFormat()
-    var newUpdatedList = updatedList.findInnerFormat()
-
-    while (updatedList.size < newUpdatedList.size) {
-        updatedList = newUpdatedList
-        newUpdatedList = newUpdatedList.findInnerFormat()
+    // A merge can make the list smaller, so continue until a pass changes nothing.
+    // Each pass merges or removes one inner format, so the pass count is limited to the format
+    // count. The limit prevents an endless loop on the main thread.
+    repeat(size) {
+        val nextList = compactedList.findInnerFormat()
+        if (nextList == compactedList) return compactedList
+        compactedList = nextList
     }
 
-    return updatedList
+    return compactedList
 }
 
 private fun List<Format>.findInnerFormat(): List<Format> {
     forEachIndexed { index, innerFormat ->
         runCatching {
-            first { innerFormat.formatStart >= it.sentenceStart && innerFormat.formatStart < it.sentenceEnd }
+            // A link starts at its own sentence start. If it can be its own parent, a link at the
+            // start of the list stops the compaction of all the formats after it.
+            first {
+                it != innerFormat
+                        && innerFormat.formatStart >= it.sentenceStart
+                        && innerFormat.formatStart < it.sentenceEnd
+            }
         }.onSuccess { parentFormat ->
             return if (innerFormat.formatStart >= parentFormat.sentenceStart && innerFormat.formatEnd <= parentFormat.sentenceEnd) {
                 compactFormats(this, innerFormat, parentFormat)
@@ -335,7 +349,7 @@ private fun compactFormats(
     if (innerFormat == parentFormat) return initialList
 
     val isOnlyLink = innerFormat.type.size == 1 && innerFormat.type.first() == FormatType.Link
-    val isParentMultiQuote = parentFormat.type.first() == FormatType.MultiQuote
+    if (isOnlyLink) return compactLinkFormat(initialList, innerFormat, parentFormat)
 
     with(initialList.toMutableList()) {
         remove(innerFormat)
@@ -353,15 +367,11 @@ private fun compactFormats(
         }
         add(
             Format(
-                formatStart = if (isOnlyLink) parentFormat.formatStart else innerFormat.formatStart,
+                formatStart = innerFormat.formatStart,
                 formatEnd = innerFormat.formatEnd,
                 type = parentFormat.type.toMutableList().apply { addAll(innerFormat.type) },
-                sentenceStart =
-                if (isOnlyLink) parentFormat.formatStart + if (isParentMultiQuote) 3 else parentFormat.type.size
-                else innerFormat.formatStart + innerFormat.type.size,
-                sentenceEnd =
-                if (isOnlyLink) parentFormat.formatEnd - (parentFormat.type.size - 1)
-                else innerFormat.formatEnd - (innerFormat.type.size - 1),
+                sentenceStart = innerFormat.formatStart + innerFormat.type.size,
+                sentenceEnd = innerFormat.formatEnd - (innerFormat.type.size - 1),
             )
         )
         if (innerFormat.formatEnd < parentFormat.sentenceEnd) {
@@ -370,9 +380,64 @@ private fun compactFormats(
                     formatStart = innerFormat.formatEnd,
                     formatEnd = parentFormat.formatEnd,
                     type = parentFormat.type,
-                    sentenceStart = (if (isOnlyLink) parentFormat.formatEnd else innerFormat.formatEnd) + 1,
+                    sentenceStart = innerFormat.formatEnd + 1,
                     sentenceEnd = parentFormat.sentenceEnd
                 ),
+            )
+        }
+
+        return sortedBy { it.formatStart }
+    }
+}
+
+/**
+ * Merges a link into the format that contains it.
+ *
+ * A link has no tags, so its sentence is the same as its format range. The link can fill all of
+ * the parent sentence or only a part of it. The parts of the parent sentence before and after the
+ * link keep the parent format. The format at each outer edge of the parent sentence keeps the
+ * parent tag position, so the text after the parent tags starts at the correct index.
+ */
+private fun compactLinkFormat(
+    initialList: List<Format>,
+    linkFormat: Format,
+    parentFormat: Format,
+): List<Format> {
+    val linkStartsParentSentence = linkFormat.formatStart == parentFormat.sentenceStart
+    val linkEndsParentSentence = linkFormat.formatEnd == parentFormat.sentenceEnd
+
+    with(initialList.toMutableList()) {
+        remove(linkFormat)
+        remove(parentFormat)
+        if (!linkStartsParentSentence) {
+            add(
+                Format(
+                    formatStart = parentFormat.formatStart,
+                    formatEnd = linkFormat.formatStart,
+                    type = parentFormat.type,
+                    sentenceStart = parentFormat.sentenceStart,
+                    sentenceEnd = linkFormat.formatStart,
+                )
+            )
+        }
+        add(
+            Format(
+                formatStart = if (linkStartsParentSentence) parentFormat.formatStart else linkFormat.formatStart,
+                formatEnd = if (linkEndsParentSentence) parentFormat.formatEnd else linkFormat.formatEnd,
+                type = parentFormat.type + linkFormat.type,
+                sentenceStart = linkFormat.formatStart,
+                sentenceEnd = linkFormat.formatEnd,
+            )
+        )
+        if (!linkEndsParentSentence) {
+            add(
+                Format(
+                    formatStart = linkFormat.formatEnd,
+                    formatEnd = parentFormat.formatEnd,
+                    type = parentFormat.type,
+                    sentenceStart = linkFormat.formatEnd,
+                    sentenceEnd = parentFormat.sentenceEnd,
+                )
             )
         }
 
@@ -484,6 +549,8 @@ private fun List<Format>.isAlreadyPartOfAFormat(index: Int) =
 private fun String.getFormatsFromLinks(links: List<String>): List<Format> = buildList {
     links.forEach {
         val link = it.getLinkWithoutFormatTags()
+        // An empty link matches at index 0 and has no text to annotate.
+        if (link.isEmpty()) return@forEach
         val startIndex = this@getFormatsFromLinks.indexOf(link)
         if (startIndex < 0) return@forEach
         val endIndex = startIndex + link.length
@@ -503,34 +570,34 @@ private fun String.getLinkWithoutFormatTags(): String {
     var first = 0
     var last = length - 1
 
-    while (FormatTag.entries.any { it.tag == this[first] }) {
+    while (first <= last && FormatTag.entries.any { it.tag == this[first] }) {
         first += 1
     }
 
-    while (FormatTag.entries.any { it.tag == this[last] }) {
+    while (first <= last && FormatTag.entries.any { it.tag == this[last] }) {
         last -= 1
     }
 
-    return substring(first, last + 1)
+    return if (first <= last) substring(first, last + 1) else ""
 }
 
 /**
- * Tries to open a link using the URI handler.
- * If the link cannot be opened, it will show a warning.
+ * Tries to open a link with the [uriHandler].
+ * If the link cannot be opened, it shows [failureMessage] in a snackbar.
+ *
+ * This function suspends until the snackbar is dismissed, thus call it from a coroutine that
+ * does not depend on composition state, for example a scope from rememberCoroutineScope.
  */
-@Composable
-fun OpenMessageLink(link: String) {
-    val uriHandler = LocalUriHandler.current
-    val resources = LocalResources.current
-    val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackBarHostStateOriginal.current
-
+suspend fun openMessageLink(
+    link: String,
+    uriHandler: UriHandler,
+    snackbarHostState: SnackbarHostState?,
+    failureMessage: String,
+) {
     runCatching {
         uriHandler.openUri(link.completeURLProtocol())
     }.onFailure {
-        coroutineScope.launch {
-            snackbarHostState?.showAutoDurationSnackbar(resources.getString(R.string.chat_click_link_in_message_intent_not_available))
-        }
+        snackbarHostState?.showAutoDurationSnackbar(failureMessage)
     }
 }
 
