@@ -42,6 +42,7 @@ class VideoPlayerService : MediaSessionService() {
             .build()
         player = exoPlayer
         mediaSession = MediaSession.Builder(this, exoPlayer)
+            .setId(SESSION_ID)
             .setCallback(object : MediaSession.Callback {
                 override fun onConnect(
                     session: MediaSession,
@@ -78,6 +79,17 @@ class VideoPlayerService : MediaSessionService() {
     }
 
     private companion object {
+        /**
+         * Distinguishes this session from the audio player's.
+         *
+         * Media3 requires session IDs to be unique within a process and defaults them to the
+         * empty string, so two services that both take the default cannot coexist: the second
+         * one throws in its constructor. `AudioPlayerService` is already created before this
+         * one whenever the Compose mini player is on screen, because its `MediaController`
+         * binds with `BIND_AUTO_CREATE` even with nothing playing.
+         */
+        private const val SESSION_ID = "video_player"
+
         /**
          * What the live player's rewind and fast-forward buttons move by.
          *
