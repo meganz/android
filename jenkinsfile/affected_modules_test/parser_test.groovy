@@ -151,5 +151,25 @@ check("no failures means no misses", nothing.missed == [], nothing.missed)
 def green = common.compareAffectedModules(["app", "domain"], ["app"], [])
 check("a green build reports no misses", green.missed == [], green.missed)
 
+
+// Once the stage acts on the detector, an unselected module does not run, so an empty miss list is
+// a structural fact rather than evidence. The report has to say which reading applies.
+def enforced = new groovy.json.JsonSlurper().parseText(common.affectedModuleShadowJson(
+    "9", "17805", [available: true, mode: "selected (3 of 80 modules)"],
+    ["app", "domain", "feature/sync"], ["app"], ["domain", "feature/sync"], [], [],
+))
+check("an enforcing build is marked as such", enforced.enforcing == true)
+check("an enforcing build records what it ran", enforced.wouldRun == ["app"], enforced.wouldRun)
+check("an enforcing build records what it skipped",
+      enforced.wouldSkip == ["domain", "feature/sync"], enforced.wouldSkip)
+
+def fellBack = new groovy.json.JsonSlurper().parseText(common.affectedModuleShadowJson(
+    "9", "17805", common.unavailableAffectedModules("detector produced no result"),
+    ["app", "domain"], ["app", "domain"], [], [], [],
+))
+check("a fallback build is not marked as enforcing", fellBack.enforcing == false)
+check("a fallback build still names the reason",
+      fellBack.unavailableReason.contains("no result"), fellBack.unavailableReason)
+
 println failed == 0 ? "\nALL PASSED" : "\n${failed} FAILED"
 System.exit(failed)

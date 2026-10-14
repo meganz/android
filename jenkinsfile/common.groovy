@@ -879,8 +879,12 @@ Map compareAffectedModules(
 }
 
 /**
- * Renders the affected-module shadow report as JSON, so a sample of builds can be aggregated later
- * without re-parsing console logs.
+ * Renders the affected-module report as JSON, so a sample of builds can be aggregated later without
+ * re-parsing console logs.
+ *
+ * `enforcing` says whether the stage acted on the detector for this build. When it did, `missed` is
+ * empty because an unselected module did not run, not because nothing was missed — the two readings
+ * are indistinguishable from the numbers alone, so the flag records which one this is.
  */
 String affectedModuleShadowJson(
         String buildNumber,
@@ -896,6 +900,7 @@ String affectedModuleShadowJson(
   "build": "${buildNumber}",
   "mrNumber": "${mrNumber}",
   "detectorAvailable": ${detection.available},
+  "enforcing": ${detection.available},
   "unavailableReason": "${jsonEscape(detection.reason)}",
   "mode": "${detection.mode}",
   "unitTestModuleCount": ${unitTestModules.size()},

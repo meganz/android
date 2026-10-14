@@ -87,10 +87,14 @@ allprojects {
 /**
  * Which modules CI has to verify for a given merge request.
  *
- * Paths listed here are the ones whose blast radius is the whole build; everything else is either
- * owned by a declared module or, if it belongs to no module at all, forces a full run anyway. That
- * fail-safe is deliberate: selecting too many modules only costs time, while selecting too few
- * silently skips tests that would have failed.
+ * Paths in alwaysFullPaths are the ones whose blast radius is the whole build. Paths in
+ * ignoredPaths change nothing the build produces. Everything else is owned by a declared module
+ * or, belonging to no module, forces a full run anyway.
+ *
+ * ignoredPaths is the only list here that can select too *few* modules, so an entry must be unable
+ * to change a build output; anything arguable belongs in alwaysFullPaths, which costs time and
+ * nothing else. The other direction is deliberate: selecting too many modules only costs time,
+ * while selecting too few silently skips tests that would have failed.
  *
  * AffectedModulesConfigTest in build-logic keeps this list honest against the repository layout.
  */
@@ -115,6 +119,19 @@ affectedModules {
     releaseBranchPrefixes = listOf("release/")
     excludedModules = listOf(":baselineprofile")
     narrowableResourceModules = listOf(":resources:string-resources")
+    ignoredPaths = listOf(
+        ".claude",
+        ".cursor",
+        ".github",
+        ".gitignore",
+        ".gitleaks",
+        ".gitleaksignore",
+        ".idea",
+        ".testrail",
+        "CREDITS.md",
+        "LICENCE.md",
+        "README.md",
+    )
 }
 
 tasks.register("clean", Delete::class) {
@@ -180,6 +197,38 @@ tasks.register("runAllAccessibilityChecks") {
     }.distinct()
     println("Running Accessibility Check Tasks: $checkTasks")
     dependsOn(checkTasks)
+}
+
+tasks.register("runAffectedUnitTestsWithCoverage") {
+    group = "Verification"
+    description = "Runs unit tests for the modules listed in -PaffectedModules, as CI does for a selective build"
+
+    // An absent property is a caller mistake, and the safe reading of "I do not know which modules"
+    // is never "run none of them". An empty property is different and legitimate: it is what the
+    // detector reports for a change that touches no module, such as documentation only.
+    val requested = providers.gradleProperty("affectedModules").orNull
+    requireNotNull(requested) {
+        "runAffectedUnitTestsWithCoverage needs -PaffectedModules=<comma separated module paths>. " +
+                "Use runAllUnitTestsWithCoverage to run everything."
+    }
+
+    val directories = requested.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+    val selected = rootProject.subprojects
+        .filter { directories.contains(it.path.removePrefix(":").replace(":", "/")) }
+    val testTasks = selected.flatMap { sub ->
+        listOfNotNull(
+            sub.tasks.findByName("testDebugUnitTestCoverage")?.path
+                ?: sub.tasks.findByName("createUnitTestCoverageReport")?.path
+                ?: sub.tasks.findByName("jacocoTestReport")?.path
+        )
+    }.distinct()
+
+    val unknown = directories - selected.map { it.path.removePrefix(":").replace(":", "/") }.toSet()
+    if (unknown.isNotEmpty()) {
+        logger.warn("runAffectedUnitTestsWithCoverage: no such module(s): ${unknown.sorted()}")
+    }
+    println("Running ${testTasks.size} test task(s) for ${directories.size} selected module(s): $testTasks")
+    dependsOn(testTasks)
 }
 
 tasks.register("printModulesWithUnitTest") {

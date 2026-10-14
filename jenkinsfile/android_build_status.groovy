@@ -333,13 +333,30 @@ pipeline {
                                     def moduleList = common.getUnitTestModuleList()
                                     def failedModules = []
 
+                                    // Detected once, before anything runs: the same result decides
+                                    // what the stage executes and what the report records, so the
+                                    // two can never disagree about which build this was.
+                                    Map detection = common.getAffectedModules(
+                                            env.CHANGE_BRANCH ?: env.gitlabSourceBranch ?: env.GIT_BRANCH,
+                                            env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET ?: env.gitlabTargetBranch ?: 'develop',
+                                            env.GIT_COMMIT
+                                    )
+                                    List<String> modulesToRun = unitTestModulesToRun(moduleList, detection)
+
                                     try {
-                                        sh "${GRADLE_CI} runAllUnitTestsWithCoverage"
+                                        if (detection.available) {
+                                            sh "${GRADLE_CI} runAffectedUnitTestsWithCoverage -PaffectedModules=\"${modulesToRun.join(",")}\""
+                                        } else {
+                                            // No usable detector result means the blast radius is
+                                            // unknown, which can only ever mean everything.
+                                            println("AFFECTED-MODULES: ${detection.reason} - running the full suite")
+                                            sh "${GRADLE_CI} runAllUnitTestsWithCoverage"
+                                        }
                                     } finally {
 
-                                        failedModules = detectFailedTestModules(moduleList)
+                                        failedModules = detectFailedTestModules(modulesToRun)
 
-                                        recordAffectedModuleShadowReport(moduleList, failedModules)
+                                        recordAffectedModuleShadowReport(moduleList, modulesToRun, failedModules, detection)
 
                                         if (!failedModules.isEmpty()) {
                                             for (int i = 0; i < failedModules.size(); i++) {
@@ -353,7 +370,7 @@ pipeline {
                                     }
 
                                     String htmlOutput = "coverage.html"
-                                    sh "${GRADLE_CI} collectCoverage --modules \"${common.getCoverageModuleList(moduleList).join(",")}\" --html-output ${htmlOutput}"
+                                    sh "${GRADLE_CI} collectCoverage --modules \"${common.getCoverageModuleList(modulesToRun).join(",")}\" --html-output ${htmlOutput}"
                                     COVERAGE_SUMMARY = getHtmlReport(htmlOutput, "No coverage report found")
                                 }
                             }
@@ -758,79 +775,80 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
  * @param unitTestModules every module with unit tests, as reported by printModulesWithUnitTest
  * @param failedModules modules whose tests actually failed in this build
  */
-def recordAffectedModuleShadowReport(List<String> unitTestModules, List<String> failedModules) {
-    Map detection = [available: false, mode: "", modules: [], reason: "shadow detection did not run"]
-    List<String> selected = []
-    List<String> skipped = []
-    List<String> missed = []
-
-    try {
-        // `common` is declared with `def` in the pipeline body, so it is not visible from a
-        // top-level method; load it here as unitTestArchiveLink does.
-        common = load('jenkinsfile/common.groovy')
-
-        String currentBranch = env.CHANGE_BRANCH ?: env.gitlabSourceBranch ?: env.GIT_BRANCH
-        String targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET ?: env.gitlabTargetBranch ?: 'develop'
-
-        detection = common.getAffectedModules(currentBranch, targetBranch, env.GIT_COMMIT)
-    } catch (Exception e) {
-        detection = [available: false, mode: "", modules: [], reason: "shadow detection threw: ${e}".toString()]
-    }
-
-    // Comparing is kept apart from detecting so that a fault in the arithmetic cannot erase a
-    // detection that actually worked, which is how a successful run first came back reported as a
-    // failed one.
-    if (detection.available) {
-        try {
-            Map comparison = common.compareAffectedModules(
-                unitTestModules, detection.modules, failedModules
-            )
-            selected = comparison.selected
-            skipped = comparison.skipped
-            missed = comparison.missed
-        } catch (Exception e) {
-            println("AFFECTED-MODULES: comparison failed: ${e}")
-        }
-    }
-
-    println("========== AFFECTED-MODULE SHADOW REPORT ==========")
-    println("Observational only. The full unit-test suite ran; nothing was skipped.")
+/**
+ * The unit-test modules this build will execute.
+ *
+ * A detector result that is not available means the blast radius is unknown, and the only safe
+ * reading of unknown is everything. A result that *is* available but selected nothing is a
+ * different thing entirely and is honoured: a change confined to ignored paths genuinely affects
+ * no module.
+ */
+List<String> unitTestModulesToRun(List<String> unitTestModules, Map detection) {
     if (!detection.available) {
-        println("AFFECTED-MODULES: no comparison made - ${detection.reason}")
+        return unitTestModules
+    }
+    common = load('jenkinsfile/common.groovy')
+    return common.compareAffectedModules(unitTestModules, detection.modules, []).selected
+}
+
+/**
+ * Records what this build verified and what it left out.
+ *
+ * While the stage ran everything, this compared the detector against reality and the miss list was
+ * the point. Now that the stage acts on the detector, a module it did not select does not run, so a
+ * failure there cannot be observed here and the miss list is empty by construction rather than by
+ * evidence. The net moved rather than disappeared: every push to develop runs the full suite in
+ * android_upload.groovy and alerts the team, so a miss surfaces one merge later instead of never.
+ *
+ * The report still publishes on every build, because what was skipped is exactly what someone will
+ * want to know when a develop build breaks.
+ *
+ * Any failure here is swallowed: it must never fail a build, and it runs inside the unit-test
+ * stage's finally block where a throw would mask a real test failure.
+ */
+def recordAffectedModuleShadowReport(
+        List<String> unitTestModules,
+        List<String> modulesRun,
+        List<String> failedModules,
+        Map detection
+) {
+    List<String> skipped = []
+    try {
+        common = load('jenkinsfile/common.groovy')
+        skipped = common.compareAffectedModules(unitTestModules, modulesRun, []).skipped
+    } catch (Exception e) {
+        println("AFFECTED-MODULES: could not work out what was skipped: ${e}")
+    }
+
+    println("========== AFFECTED-MODULE REPORT ==========")
+    if (!detection.available) {
+        println("AFFECTED-MODULES: full suite ran - ${detection.reason}")
     } else {
         println("AFFECTED-MODULES: mode ${detection.mode}")
-        println("AFFECTED-MODULES: would have run ${selected.size()} of ${unitTestModules.size()} unit-test modules")
-        println("AFFECTED-MODULES: would have skipped ${skipped.size()}")
-        println("AFFECTED-MODULES: modules that actually failed: ${failedModules}")
-        if (missed.isEmpty()) {
-            println("AFFECTED-MODULES: MISSES none")
-        } else {
-            println("AFFECTED-MODULES: *** MISSES: ${missed} ***")
-            println("AFFECTED-MODULES: those modules failed but would NOT have been selected.")
-        }
+        println("AFFECTED-MODULES: ran ${modulesRun.size()} of ${unitTestModules.size()} unit-test modules")
+        println("AFFECTED-MODULES: skipped ${skipped.size()}")
+        println("AFFECTED-MODULES: modules that failed: ${failedModules}")
+        println("AFFECTED-MODULES: a module that was not selected did not run, so a failure in one")
+        println("AFFECTED-MODULES: cannot be seen here. develop runs the full suite on every push.")
     }
-    println("==================================================")
+    println("============================================")
 
-    // Publishing is deliberately separate from detecting, and runs whatever detection did. A build
-    // that uploads no report at all is indistinguishable from a stage that never ran, which is the
-    // one thing a shadow phase cannot afford to be ambiguous about.
     try {
         writeFile(
             file: AFFECTED_MODULES_SHADOW_REPORT_FILE,
             text: common.affectedModuleShadowJson(
                 env.BUILD_NUMBER, common.getMrNumber(), detection,
-                unitTestModules, selected, skipped, failedModules, missed
+                unitTestModules, modulesRun, skipped, failedModules, []
             )
         )
         println("AFFECTED-MODULES: report uploaded to ${common.uploadFileToArtifactory(AFFECTED_MODULES_SHADOW_REPORT_FILE)}")
 
-        // While the detector is still failing, the tail in the report is rarely the whole story.
         if (!detection.available && fileExists(common.AFFECTED_MODULES_DETECTOR_LOG)) {
             println("AFFECTED-MODULES: detector output uploaded to " +
                     "${common.uploadFileToArtifactory(common.AFFECTED_MODULES_DETECTOR_LOG)}")
         }
     } catch (Exception e) {
-        println("AFFECTED-MODULES: could not publish the shadow report: ${e}")
+        println("AFFECTED-MODULES: could not publish the report: ${e}")
     }
 }
 

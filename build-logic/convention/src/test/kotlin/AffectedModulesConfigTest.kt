@@ -24,24 +24,11 @@ class AffectedModulesConfigTest {
         .first { File(it, "settings.gradle.kts").isFile && File(it, "app").isDirectory }
 
     /**
-     * Top-level entries that change nothing the build produces: editor and agent configuration,
-     * licences, documentation, secret-scanning and reporting helpers. A change to one of these
-     * still forces a full run today, because it belongs to no module — listing it here records
-     * that we know, and is the hook for skipping it once the detector supports ignored paths.
+     * Top-level entries the build file declares as changing nothing it produces. Read from the
+     * configuration rather than restated here, so the test cannot quietly agree with a list it is
+     * supposed to be checking.
      */
-    private val noBuildImpact = setOf(
-        ".claude",
-        ".cursor",
-        ".github",
-        ".gitignore",
-        ".gitleaks",
-        ".gitleaksignore",
-        ".idea",
-        ".testrail",
-        "CREDITS.md",
-        "LICENCE.md",
-        "README.md",
-    )
+    private val ignoredPaths: Set<String> by lazy { listFromRootBuildFile("ignoredPaths") }
 
     private val declaredModuleRoots: Set<String> by lazy {
         val includes = Regex("""include\("(:[^"]+)"\)""")
@@ -50,13 +37,15 @@ class AffectedModulesConfigTest {
             .toSet()
     }
 
-    private val alwaysFullPaths: Set<String> by lazy {
-        val block = Regex("""alwaysFullPaths\s*=\s*listOf\(([^)]*)\)""", RegexOption.DOT_MATCHES_ALL)
+    private val alwaysFullPaths: Set<String> by lazy { listFromRootBuildFile("alwaysFullPaths") }
+
+    private fun listFromRootBuildFile(property: String): Set<String> {
+        val block = Regex("""$property\s*=\s*listOf\(([^)]*)\)""", RegexOption.DOT_MATCHES_ALL)
             .find(File(repoRoot, "build.gradle.kts").readText())
             ?.groupValues
             ?.get(1)
             .orEmpty()
-        Regex("\"([^\"]+)\"").findAll(block).map { it.groupValues[1] }.toSet()
+        return Regex("\"([^\"]+)\"").findAll(block).map { it.groupValues[1] }.toSet()
     }
 
     /**
@@ -93,8 +82,28 @@ class AffectedModulesConfigTest {
     }
 
     @Test
+    fun `test that the ignore list parses out of the root build file`() {
+        assertThat(ignoredPaths).containsAtLeast("README.md", ".idea", ".claude")
+    }
+
+    @Test
+    fun `test that no path is both ignored and always-full`() {
+        assertThat(ignoredPaths intersect alwaysFullPaths).isEmpty()
+    }
+
+    @Test
+    fun `test that every ignored path exists`() {
+        assertThat(ignoredPaths.filterNot { File(repoRoot, it).exists() }).isEmpty()
+    }
+
+    @Test
+    fun `test that no ignored path is owned by a module`() {
+        assertThat(ignoredPaths intersect declaredModuleRoots).isEmpty()
+    }
+
+    @Test
     fun `test that every top-level path is classified`() {
-        val unclassified = topLevelEntries - declaredModuleRoots - alwaysFullPaths - noBuildImpact
+        val unclassified = topLevelEntries - declaredModuleRoots - alwaysFullPaths - ignoredPaths
 
         assertThat(unclassified).isEmpty()
     }
