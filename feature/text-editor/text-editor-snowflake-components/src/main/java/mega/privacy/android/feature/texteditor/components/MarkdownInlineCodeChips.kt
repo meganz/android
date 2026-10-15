@@ -75,11 +75,17 @@ internal fun DrawScope.drawInlineCodeChips(
     val strokeWidth = ChipBorderWidth.toPx()
     val padding = ChipHorizontalPadding.toPx()
     val margin = ChipHorizontalMargin.toPx()
-    val textLength = layout.layoutInput.text.length
+    val text = layout.layoutInput.text
+    val textLength = text.length
 
     ranges.forEach { range ->
-        val start = range.min.coerceIn(0, textLength)
-        val end = range.max.coerceIn(start, textLength)
+        var start = range.min.coerceIn(0, textLength)
+        var end = range.max.coerceIn(start, textLength)
+        // The box hugs the visible glyphs. Typing a space while the code style is active
+        // extends the span over that space, and a box drawn across it shows an empty strip
+        // that reads as the style having stopped.
+        while (start < end && text[start].isWhitespace()) start++
+        while (end > start && text[end - 1].isWhitespace()) end--
         if (start == end) return@forEach
 
         for (line in layout.getLineForOffset(start)..layout.getLineForOffset(end - 1)) {
@@ -89,22 +95,31 @@ internal fun DrawScope.drawInlineCodeChips(
             val lineEnd = minOf(end, lastOnLine)
             if (lineEnd <= lineStart) continue
 
-            val startX = layout.getHorizontalPosition(lineStart, usePrimaryDirection = true)
-            val endX = layout.getHorizontalPosition(lineEnd, usePrimaryDirection = true)
-            val glyphLeft = minOf(startX, endX)
-            val glyphRight = maxOf(startX, endX)
-            // The box grows by the padding, but a word space is narrower than that, so it is
-            // also held back from the neighbouring glyph by the margin. The padding is what
-            // it can be, the margin is what it must be.
+            // A soft line break offset is ambiguous, because it is both the end of one line
+            // and the start of the next, and it resolves to the next line. A glyph bounding
+            // box is always on the line that draws the glyph, so it must be used here.
+            val firstGlyph = layout.getBoundingBox(lineStart)
+            val lastGlyph = layout.getBoundingBox(lineEnd - 1)
+            val glyphLeft = minOf(firstGlyph.left, lastGlyph.left)
+            val glyphRight = maxOf(firstGlyph.right, lastGlyph.right)
+            // The padding may grow into whitespace, but never over a neighbouring glyph,
+            // because a box drawn across the next letter reads as having no spacing at all.
+            // In whitespace the box also keeps the margin clear of the next word.
             var left = glyphLeft - padding
             var right = glyphRight + padding
             if (lineStart > firstOnLine) {
-                val before = layout.getHorizontalPosition(lineStart - 1, usePrimaryDirection = true)
-                left = maxOf(left, minOf(before, glyphLeft) + margin)
+                left = if (text[lineStart - 1].isWhitespace()) {
+                    maxOf(left, layout.getBoundingBox(lineStart - 1).left + margin)
+                } else {
+                    maxOf(left, glyphLeft)
+                }
             }
             if (lineEnd < lastOnLine) {
-                val after = layout.getHorizontalPosition(lineEnd + 1, usePrimaryDirection = true)
-                right = minOf(right, maxOf(after, glyphRight) - margin)
+                right = if (text[lineEnd].isWhitespace()) {
+                    minOf(right, layout.getBoundingBox(lineEnd).right - margin)
+                } else {
+                    minOf(right, glyphRight)
+                }
             }
             if (right <= left) continue
             val top = layout.getLineTop(line)

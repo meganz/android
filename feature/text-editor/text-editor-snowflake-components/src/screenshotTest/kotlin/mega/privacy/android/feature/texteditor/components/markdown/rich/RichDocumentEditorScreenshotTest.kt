@@ -13,6 +13,12 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
  */
 class RichDocumentEditorScreenshotTest {
 
+    private val wrappingCodeToken = "djdhdhhdhdhdhdhdhehhdhehdhdhdhdhdhdhdhhdhdddhhdhdhdhdhdhdhdhdhdsh"
+
+    private val adjacentCodeText = "dhdhdhdhdhdhhdhdhdhdhdhdhdhdhdhdhdhdhhdhdhdhdhdhdhdhdhdhdhdhddhdhdhdhdhdhdhdhdhh"
+    private val adjacentCodeStart = 6
+    private val adjacentCodeEnd = 61
+
     private val document = RichDocument(
         listOf(
             RichBlock.Heading(1, RichText("Trip notes")),
@@ -24,6 +30,31 @@ class RichDocumentEditorScreenshotTest {
                         RichSpan(30, 38, RichSpanStyle.Italic),
                         RichSpan(39, 44, RichSpanStyle.Underline),
                         RichSpan(50, 61, RichSpanStyle.Code),
+                    ),
+                ),
+            ),
+            // A single unbroken token, so the code run wraps mid-word, where a line break
+            // offset is ambiguous between the end of one line and the start of the next.
+            RichBlock.Paragraph(
+                RichText(
+                    wrappingCodeToken,
+                    listOf(RichSpan(0, wrappingCodeToken.length, RichSpanStyle.Code)),
+                ),
+            ),
+            // The code span runs over the trailing space, as it does when a space is typed
+            // while the code style is still active.
+            RichBlock.Paragraph(
+                RichText(
+                    "spaced code run here",
+                    listOf(RichSpan(0, 7, RichSpanStyle.Code)),
+                ),
+            ),
+            // Code butted straight against plain text, with no space on either side.
+            RichBlock.Paragraph(
+                RichText(
+                    adjacentCodeText,
+                    listOf(
+                        RichSpan(adjacentCodeStart, adjacentCodeEnd, RichSpanStyle.Code),
                     ),
                 ),
             ),

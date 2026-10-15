@@ -15,6 +15,25 @@ internal class RichSpanAdjusterTest {
     private fun insertion(at: Int, length: Int) = TextChange(at, at, at, at + length)
 
     // ---- adjust: insertions ----
+    @Test
+    fun `test that adjust keeps one span when a space is typed inside an active style`() {
+        val code = RichSpanStyle.Code
+        // "abc" already styled, caret at its end, Code still the active typing style.
+        val afterSpace = RichSpanAdjuster.adjust(
+            listOf(RichSpan(0, 3, code)),
+            listOf(insertion(at = 3, length = 1)),
+            typingStyles = setOf(code),
+        )
+        assertThat(afterSpace).containsExactly(RichSpan(0, 4, code))
+
+        val afterWord = RichSpanAdjuster.adjust(
+            afterSpace,
+            listOf(insertion(at = 4, length = 3)),
+            typingStyles = setOf(code),
+        )
+        assertThat(afterWord).containsExactly(RichSpan(0, 7, code))
+    }
+
 
     // ---- adjust: links ----
 
