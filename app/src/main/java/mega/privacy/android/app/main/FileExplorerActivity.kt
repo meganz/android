@@ -446,6 +446,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (needLogin) {
             val targetIntent = Intent(intent).apply {
                 setClass(this@FileExplorerActivity, FileExplorerActivity::class.java)
+                // MegaActivity receives only the read grant, so it cannot pass on a write grant.
+                removeFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             }
             val loginIntent = MegaActivityInternalLauncher.getIntent(
                 context = this@FileExplorerActivity,
