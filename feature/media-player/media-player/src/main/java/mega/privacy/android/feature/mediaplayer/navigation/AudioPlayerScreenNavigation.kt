@@ -41,6 +41,7 @@ import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQu
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
 import mega.privacy.android.feature.mediaplayer.presentation.model.PlaybackSpeedSource
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -49,10 +50,16 @@ import mega.privacy.android.shared.resources.R as sharedR
  *
  * Only carries a [launchId] to look up the full launch payload from
  * [AudioPlayerLaunchSourceHolder], avoiding [android.os.TransactionTooLargeException].
+ *
+ * It is a [NoSessionNavKey.Optional] because a public folder or file link plays audio without a
+ * session, and the navigation handler holds back any destination that is not marked, which leaves
+ * the player waiting for a login that the user never needs to make. Optional rather than
+ * Mandatory, because a logged in user opens the same screen.
  */
 @Serializable
 @Parcelize
-data class AudioPlayerScreenNavKey(val launchId: String) : NavKey, Parcelable {
+data class AudioPlayerScreenNavKey(val launchId: String) : NavKey, Parcelable,
+    NoSessionNavKey.Optional {
     companion object {
         /** Sentinel [launchId] used when resuming a running player without starting new playback. */
         const val RESUME_LAUNCH_ID = "audio_player_resume"
