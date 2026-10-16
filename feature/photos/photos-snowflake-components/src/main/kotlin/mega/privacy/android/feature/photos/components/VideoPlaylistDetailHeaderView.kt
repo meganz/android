@@ -6,8 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -69,7 +70,9 @@ fun VideoPlaylistDetailHeaderView(
                 numberOfVideos = numberOfVideos ?: 0,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
+                    // The height must follow the text, so that the info line below the title
+                    // keeps its full height at every font scale.
+                    .heightIn(min = VIDEO_PLAYLIST_DETAIL_HEADER_INFO_MIN_HEIGHT)
                     .testTag(VIDEO_PLAYLIST_DETAIL_HEADER_INFO_TEST_TAG)
             )
         }
@@ -93,7 +96,7 @@ internal fun PlayAllButtonView(
 ) {
     Row(
         modifier = modifier
-            .height(48.dp)
+            .defaultMinSize(minHeight = VIDEO_PLAYLIST_DETAIL_HEADER_PLAY_ALL_MIN_HEIGHT)
             .background(color = DSTokens.colors.button.secondary, shape = RoundedCornerShape(10.dp))
             .clickable(enabled = enabled, onClick = onPlayAllClicked)
             .testTag(VIDEO_PLAYLIST_DETAIL_HEADER_PLAY_ALL_TEST_TAG)
@@ -151,6 +154,21 @@ private fun VideoPlaylistDetailHeaderViewNoThumbnailPreview() {
 
 @CombinedThemePreviews
 @Composable
+private fun VideoPlaylistDetailHeaderViewLongTitlePreview() {
+    AndroidThemeForPreviews {
+        VideoPlaylistDetailHeaderView(
+            thumbnailList = listOf(Any(), Any(), Any(), Any()),
+            title = "A video playlist name long enough to wrap onto a second line",
+            totalDuration = "1:30:45",
+            numberOfVideos = 10,
+            enabled = true,
+            onPlayAllClicked = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
 private fun VideoPlaylistDetailHeaderViewPreview() {
     AndroidThemeForPreviews {
         VideoPlaylistDetailHeaderView(
@@ -163,6 +181,13 @@ private fun VideoPlaylistDetailHeaderViewPreview() {
         )
     }
 }
+
+// The previous fixed header height, kept as the floor so short text keeps the old layout.
+internal val VIDEO_PLAYLIST_DETAIL_HEADER_INFO_MIN_HEIGHT = 80.dp
+
+// The accessibility touch target size. The only call site passes no height, so the
+// button keeps this size; it is a default, not a constraint the caller cannot change.
+internal val VIDEO_PLAYLIST_DETAIL_HEADER_PLAY_ALL_MIN_HEIGHT = 48.dp
 
 /**
  * Test tag for video playlist detail header info
