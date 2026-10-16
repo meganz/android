@@ -26,7 +26,7 @@ class GetActiveOfflineDownloadTransfersUseCase @Inject constructor(
     suspend operator fun invoke(node: TypedNode): List<Transfer> {
         val transfers = transferRepository.getActiveTransfersByType(TransferType.DOWNLOAD)
             .filterIsInstance<Transfer>()
-            .filter { !it.isCancelled && !it.finishedWithErrors() }
+            .filter { !it.isCancelled && !it.isFinished }
         if (transfers.isEmpty()) return emptyList()
 
         val ownTransfers = transfers.filter {
@@ -41,13 +41,6 @@ class GetActiveOfflineDownloadTransfersUseCase @Inject constructor(
 
         return ownTransfers + fileTransfers.filter { it.localPath.isInside(offlinePath) }
     }
-
-    /**
-     * A folder transfer does not transfer bytes itself, so its transferred bytes never reach its
-     * total and cannot tell whether it failed.
-     */
-    private fun Transfer.finishedWithErrors() =
-        isFinished && !isAlreadyTransferred && !isFolderTransfer && transferredBytes != totalBytes
 
     private fun String.isInside(path: String) =
         this == path || startsWith(path.ensureEndsWithFileSeparator())
