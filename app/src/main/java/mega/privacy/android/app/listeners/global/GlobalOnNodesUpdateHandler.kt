@@ -35,8 +35,10 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
     private val checkIfShouldDeleteLastPageViewedInPdfUseCase: CheckIfShouldDeleteLastPageViewedInPdfUseCase,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaNavigator: MegaNavigator,
+    private val ratingHandler: RatingHandlerImpl,
 ) {
     operator fun invoke(nodeList: ArrayList<MegaNode>?) {
+        var hasNewPublicLink = false
         nodeList?.toList()?.forEach { node ->
             when {
                 node.isInShare && node.hasChanged(MegaNode.CHANGE_TYPE_INSHARE.toLong()) -> {
@@ -46,8 +48,7 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
                 }
 
                 node.hasChanged(MegaNode.CHANGE_TYPE_PUBLIC_LINK.toLong()) && node.publicLink != null -> {
-                    // when activated share, will show rating if it matches the condition
-                    RatingHandlerImpl(appContext).showRatingBaseOnSharing()
+                    hasNewPublicLink = true
                 }
 
                 node.hasChanged(MegaNode.CHANGE_TYPE_REMOVED.toLong()) && node.isFile -> {
@@ -61,6 +62,13 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
                         }.onFailure { Timber.e(it) }
                     }
                 }
+            }
+        }
+
+        if (hasNewPublicLink) {
+            applicationScope.launch {
+                runCatching { ratingHandler.showRatingBaseOnSharing() }
+                    .onFailure { Timber.e(it) }
             }
         }
     }
