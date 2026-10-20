@@ -250,12 +250,18 @@ internal class SyncExclusionPatternMapperTest {
         assertThat(result).isEqualTo(condition(SyncExclusionCondition.EndingWith, ".tmp"))
     }
 
+    @Test
+    fun `test that a plain exclusion of files only can be a chip`() {
+        assertThat(underTest(rule("*.zip", target = SyncExclusionTarget.Files)))
+            .isEqualTo(SyncExclusionDisplay.Extension("zip"))
+    }
+
     @ParameterizedTest(name = "{0}")
     @EnumSource(
         value = SyncExclusionTarget::class,
-        names = ["Directories", "Files", "Symlinks"],
+        names = ["Directories", "Symlinks"],
     )
-    fun `test that a narrower target is never a chip`(target: SyncExclusionTarget) {
+    fun `test that a target without files is never a chip`(target: SyncExclusionTarget) {
         val result = underTest(rule("*.tmp", target = target))
 
         assertThat(result).isEqualTo(condition(SyncExclusionCondition.EndingWith, ".tmp"))

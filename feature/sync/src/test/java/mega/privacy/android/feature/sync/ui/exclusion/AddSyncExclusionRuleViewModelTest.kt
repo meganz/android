@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreDefaults
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionMatchType
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionTarget
@@ -554,6 +555,34 @@ internal class AddSyncExclusionRuleViewModelTest {
         assertThat(state.byExtension.error).isEqualTo(AddExclusionExtensionError.Duplicate("mp3"))
         assertThat(state.canConfirm).isFalse()
     }
+
+    /** The extension form writes files only, which a default of every node type already covers. */
+    @Test
+    fun `test that onExtensionValueChanged shows the duplicate error for a default extension`() =
+        runTest {
+            underTest = createViewModel(staged = MegaIgnoreDefaults.RULES)
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+
+            underTest.onExtensionValueChanged("tmp")
+
+            val state = underTest.uiState.value
+            assertThat(state.byExtension.error)
+                .isEqualTo(AddExclusionExtensionError.Duplicate("tmp"))
+            assertThat(state.canConfirm).isFalse()
+        }
+
+    @Test
+    fun `test that onExtensionValueChanged shows no error when the extension holds folders only`() =
+        runTest {
+            underTest = createViewModel(
+                staged = listOf(extensionRule("mp3").copy(target = SyncExclusionTarget.Directories)),
+            )
+            underTest.onTypeOptionSelected(SyncExclusionTypeOption.Extensions)
+
+            underTest.onExtensionValueChanged("mp3")
+
+            assertThat(underTest.uiState.value.byExtension.error).isNull()
+        }
 
     @Test
     fun `test that onExtensionValueChanged shows no error for an extension that is switched off`() =

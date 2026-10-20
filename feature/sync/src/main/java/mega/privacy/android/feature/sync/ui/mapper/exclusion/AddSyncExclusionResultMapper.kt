@@ -42,14 +42,14 @@ internal class AddSyncExclusionResultMapper @Inject constructor(
     /**
      * The rule one typed [extension] stands for, or null when no pattern can be built from it.
      *
-     * Left at every node type so that it is the same shape as a predefined extension: a narrower
-     * target is shown as a row rather than a chip, and no longer folds into the default holding
-     * that pattern, which leaves the file saying it twice.
+     * Narrowed to files because the SDK applies a rule with no target letter to folders too, so
+     * the extension "zip" would also exclude a folder named "clips.zip".
      */
     fun extensionRule(extension: String): SyncExclusionRule? =
         patternMapper.extensionPattern(extension)?.let {
             SyncExclusionRule(
                 pattern = it,
+                target = SyncExclusionTarget.Files,
                 matchType = SyncExclusionMatchType.SubtreeName,
             )
         }

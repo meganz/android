@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionMatchType
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
+import mega.privacy.android.feature.sync.domain.entity.SyncExclusionTarget
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionValidation
 import mega.privacy.android.feature.sync.domain.entity.equalsIgnoringEnabled
 import mega.privacy.android.feature.sync.domain.usecase.exclusion.ValidateSyncExclusionValueUseCase
@@ -174,11 +175,15 @@ internal class AddSyncExclusionRuleViewModel @AssistedInject constructor(
     /**
      * Compared as the SDK will read the rule back, which drops trailing whitespace from the
      * pattern: otherwise the space a keyboard adds after a suggestion lets a second copy of a rule
-     * in force through.
+     * in force through. A rule of every node type also covers the same rule narrowed to one target,
+     * so a typed extension (files only) is already in force under a default such as `-:*.tmp`.
      */
     private fun SyncExclusionRule.isInForce(): Boolean {
         val readBack = copy(pattern = pattern.trimEnd(*SDK_WHITESPACE))
-        return inForce.any { it.equalsIgnoringEnabled(readBack) }
+        return inForce.any {
+            (it.target == SyncExclusionTarget.All || it.target == readBack.target) &&
+                    it.equalsIgnoringEnabled(readBack.copy(target = it.target))
+        }
     }
 
     private val AddSyncExclusionRuleUiState.showsError: Boolean

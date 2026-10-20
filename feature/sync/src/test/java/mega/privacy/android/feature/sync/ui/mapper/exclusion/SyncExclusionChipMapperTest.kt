@@ -108,6 +108,15 @@ internal class SyncExclusionChipMapperTest {
     }
 
     @Test
+    fun `test that an extension rule of every node type and one of files only both yield a chip`() {
+        val parsed = parsed(
+            listOf(rule("*.tmp"), rule("*.zip", target = SyncExclusionTarget.Files)),
+        )
+
+        assertThat(underTest(parsed).map { it.extension }).containsExactly("tmp", "zip").inOrder()
+    }
+
+    @Test
     fun `test that an extension rule narrowed to directories is not shown as a chip`() {
         val parsed = parsed(listOf(rule("*.tmp", target = SyncExclusionTarget.Directories)))
 

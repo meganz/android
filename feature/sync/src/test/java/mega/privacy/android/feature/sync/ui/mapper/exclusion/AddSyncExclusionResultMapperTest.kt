@@ -135,17 +135,17 @@ internal class AddSyncExclusionResultMapperTest {
         val rules = (actual as AddSyncExclusionResult.Rules).rules
         assertThat(rules.map { it.pattern }).containsExactly("*.mp3", "*.tar.gz").inOrder()
         assertThat(rules.map { it.target }).containsExactly(
-            SyncExclusionTarget.All,
-            SyncExclusionTarget.All,
+            SyncExclusionTarget.Files,
+            SyncExclusionTarget.Files,
         )
     }
 
     /**
-     * A predefined extension is held at every node type, and only a rule of that shape is shown as
-     * a chip and folded into the default holding the same pattern.
+     * The SDK applies a rule with no target letter to folders as well, so a folder named
+     * "clips.zip" would otherwise be excluded by the extension "zip".
      */
     @Test
-    fun `test that invoke builds an extension the same way as a predefined one`() {
+    fun `test that invoke builds an extension that matches files only`() {
         val actual = underTest(
             state(
                 byName = extensionsSelected,
@@ -155,7 +155,8 @@ internal class AddSyncExclusionResultMapperTest {
 
         val rule = (actual as AddSyncExclusionResult.Rules).rules.single()
         assertThat(rule).isEqualTo(
-            MegaIgnoreDefaults.RULES.single { it.pattern == "*.tmp" },
+            MegaIgnoreDefaults.RULES.single { it.pattern == "*.tmp" }
+                .copy(target = SyncExclusionTarget.Files),
         )
     }
 
@@ -202,15 +203,15 @@ internal class AddSyncExclusionResultMapperTest {
     }
 
     /**
-     * Files and folders ending in `.mp3` builds the very rule the `mp3` extension does, so only the
-     * form that authored it can tell the two apart.
+     * The name rule "Files ending with `.mp3`" builds the same rule as the `mp3` extension, so only
+     * the form that wrote the rule can distinguish the two.
      */
     @Test
     fun `test that invoke does not mark a name rule that builds an extension pattern`() {
         val actual = underTest(
             state(
                 byName = AddExclusionByNameFormState(
-                    typeOption = SyncExclusionTypeOption.FilesAndFolders,
+                    typeOption = SyncExclusionTypeOption.Files,
                     condition = SyncExclusionCondition.EndingWith,
                     value = ".mp3",
                 ),
@@ -312,7 +313,7 @@ internal class AddSyncExclusionResultMapperTest {
         assertThat(underTest.extensionRule(".tar.gz")).isEqualTo(
             SyncExclusionRule(
                 pattern = "*.tar.gz",
-                target = SyncExclusionTarget.All,
+                target = SyncExclusionTarget.Files,
                 matchType = SyncExclusionMatchType.SubtreeName,
             ),
         )

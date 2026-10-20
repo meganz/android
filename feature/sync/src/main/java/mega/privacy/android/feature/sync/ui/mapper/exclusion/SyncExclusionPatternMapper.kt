@@ -17,13 +17,15 @@ import javax.inject.Inject
 internal class SyncExclusionPatternMapper @Inject constructor() {
 
     /**
-     * How [rule] is shown. Only a plain exclusion of every node type can become a chip, because a
-     * chip carries an extension and nothing else: on a re-include or a narrower target it would
-     * state the opposite of, or more than, what the rule does.
+     * How [rule] is shown. Only a plain exclusion of every node type or of files can become a
+     * chip, because a chip carries an extension and nothing else: on a re-include, or a target
+     * without files, the chip would state the opposite of, or more than, what the rule does. Files
+     * and every node type both qualify because the predefined extensions target every node type
+     * while the extension form writes files only, and both must show as the same chip.
      */
     operator fun invoke(rule: SyncExclusionRule): SyncExclusionDisplay =
         if (rule.exclusionClass == SyncExclusionClass.Exclude &&
-            rule.target == SyncExclusionTarget.All
+            rule.target in CHIP_TARGETS
         ) {
             invoke(rule.pattern)
         } else {
@@ -107,5 +109,6 @@ internal class SyncExclusionPatternMapper @Inject constructor() {
         const val DOT = "."
         const val EXTENSION_PREFIX = "$ANY$DOT"
         val WILDCARDS = charArrayOf('*', '?')
+        val CHIP_TARGETS = setOf(SyncExclusionTarget.All, SyncExclusionTarget.Files)
     }
 }

@@ -433,6 +433,7 @@ internal class MegaIgnoreLineMapperTest {
             "+:temp",
             "-d:temp",
             "-f:temp",
+            "-f:*.zip",
             "-s:temp",
             "-N:temp",
             "-n:a/b",
