@@ -1,8 +1,10 @@
 package mega.privacy.android.feature.sync.ui.exclusion
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -89,7 +91,8 @@ internal fun AddSyncExclusionRuleScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(paddingValues)
+                    .consumeWindowInsets(paddingValues),
             ) {
                 MegaScrollableTabRow(
                     modifier = Modifier.testTag(ADD_EXCLUSION_TAB_ROW_TAG),
@@ -104,6 +107,7 @@ internal fun AddSyncExclusionRuleScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
+                        .imePadding()
                         .verticalScroll(rememberScrollState())
                         .padding(top = 16.dp),
                 ) {
