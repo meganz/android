@@ -3514,4 +3514,20 @@
         <item quantity="other">meses</item>
     </plurals>
     <string name="contacts_qr_invite_contact_dialog_body">¿Añadir a %1$s a tus contactos?</string>
+    <string name="chat_giphy_picker_end_of_results">[A]Fin[/A] de los resultados</string>
+    <string name="chat_giphy_picker_no_results">No hay [A]GIF[/A]</string>
+    <string name="chat_giphy_picker_title">Buscar GIPHY</string>
+    <string name="chat_manage_history_clear_meeting_confirmation_title">¿Borrar el historial de la reunión?</string>
+    <string name="chat_manage_history_clear_meeting_confirmation_message">Se eliminará todo el historial de mensajes de esta reunión. Esto no se puede deshacer.</string>
+    <string name="app_bar_selection_mode_count_of_total">%1$s de %2$s seleccionados</string>
+    <string name="contacts_qr_invite_contact_dialog_title">¿Invitar contacto?</string>
+    <string name="chat_giphy_picker_server_down">Los GIFs no están disponibles. Inténtalo de nuevo más tarde.</string>
+    <string name="text_editor_format_code_block">Bloque de código</string>
+    <string name="recording_less_than_second">Mantén presionado para grabar</string>
+    <string name="slide_to_cancel">Desliza para cancelar</string>
+    <string name="edited_message_text">(editado)</string>
+    <string name="manual_retry_alert">Mensaje no enviado. Toca para ver las opciones</string>
+    <string name="manual_resume_alert">Las transferencias están pausadas. Toca para reanudar.</string>
+    <string name="edit_chat_message">Editar mensaje</string>
+    <string name="chat_message_forward_content_description">Reenviar</string>
 </resources>

@@ -3252,4 +3252,16 @@
     <string name="app_bar_selection_mode_count_of_total">%2$s 중 %1$s 선택됨</string>
     <string name="contacts_qr_invite_contact_dialog_body">%1$s 님을 연락처에 추가할까요?</string>
     <string name="contacts_qr_invite_contact_dialog_title">연락처를 초대할까요?</string>
+    <string name="chat_giphy_picker_title">GIPHY 검색</string>
+    <string name="chat_giphy_picker_no_results">[A]GIF[/A] 찾지 못함</string>
+    <string name="chat_giphy_picker_end_of_results">결과의 [A]끝[/A]</string>
+    <string name="chat_giphy_picker_server_down">GIF를 이용할 수 없습니다. 나중에 다시 시도하세요.</string>
+    <string name="text_editor_format_code_block">코드 블록</string>
+    <string name="edited_message_text">수정됨</string>
+    <string name="manual_retry_alert">메시지가 발송되지 않았습니다. 옵션을 보려면 탭하세요</string>
+    <string name="manual_resume_alert">전송 일시중단됨. 재개하려면 탭하세요.</string>
+    <string name="edit_chat_message">메시지 편집</string>
+    <string name="slide_to_cancel">취소하려면 슬라이드하세요</string>
+    <string name="recording_less_than_second">녹음하려면 탭하고 유지하세요</string>
+    <string name="chat_message_forward_content_description">전달</string>
 </resources>

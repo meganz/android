@@ -3510,4 +3510,14 @@
         <item quantity="many">mois</item>
         <item quantity="other">mois</item>
     </plurals>
+    <string name="chat_giphy_picker_end_of_results">[A]Fin[/A] des résultats</string>
+    <string name="chat_giphy_picker_no_results">Aucun [A]GIF[/A] n’a été trouvé</string>
+    <string name="chat_giphy_picker_title">Chercher dans GIPHY</string>
+    <string name="recording_less_than_second">Toucher et maintenir pour enregistrer</string>
+    <string name="slide_to_cancel">Faire glisser pour annuler</string>
+    <string name="edited_message_text">(modifié)</string>
+    <string name="manual_retry_alert">Le message n’a pas été envoyé. Touchez pour accéder aux options</string>
+    <string name="manual_resume_alert">Les transferts sont en pause. Touchez pour les reprendre.</string>
+    <string name="edit_chat_message">Modifier le message</string>
+    <string name="chat_message_forward_content_description">Transférer</string>
 </resources>

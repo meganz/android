@@ -3211,4 +3211,68 @@
     <plurals name="chat_manage_history_picker_months">
         <item quantity="other">เดือน</item>
     </plurals>
+    <string name="chat_giphy_picker_title">ค้นหาใน GIPHY</string>
+    <string name="chat_giphy_picker_no_results">ไม่พบ [A]GIF[/A]</string>
+    <string name="chat_giphy_picker_end_of_results">[A]สิ้นสุด[/A]ผลลัพธ์</string>
+    <string name="edited_message_text">(มีการแก้ไข)</string>
+    <string name="manual_retry_alert">ไม่ได้ส่งข้อความ แตะเพื่อดูตัวเลือก</string>
+    <string name="manual_resume_alert">หยุดการถ่ายโอนชั่วคราว แตะเพื่อดำเนินการต่อ</string>
+    <string name="edit_chat_message">แก้ไขข้อความ</string>
+    <string name="slide_to_cancel">สไลด์เพื่อยกเลิก</string>
+    <string name="recording_less_than_second">แตะค้างไว้เพื่อบันทึก</string>
+    <string name="chat_message_forward_content_description">ส่งต่อ</string>
+    <string name="account_over_disk_quota_paywall_title">บัญชีถูกล็อก</string>
+    <plurals name="account_over_disk_quota_paywall_body_no_warning_dates">
+        <item quantity="other">เราได้ส่งอีเมลแจ้งเกี่ยวกับพื้นที่จัดเก็บข้อมูลของคุณแล้ว ขณะนี้คุณมี %1$d ไฟล์ ซึ่งใช้พื้นที่ไป %2$s ส่งผลให้บัญชีของคุณถูกล็อก กรุณาอัปเกรดเป็น %3$s เพื่อเพิ่มพื้นที่จัดเก็บข้อมูลและปลดล็อกบัญชี หากไม่ดำเนินการในเร็วๆ นี้ ข้อมูลของคุณอาจถูกลบ [A]เรียนรู้เพิ่มเติมเกี่ยวกับขีดจำกัดพื้นที่จัดเก็บข้อมูลของคุณ[/A]</item>
+    </plurals>
+    <plurals name="account_over_disk_quota_paywall_body_single_warning_date">
+        <item quantity="other">เราส่งอีเมลแจ้งเรื่องพื้นที่จัดเก็บข้อมูลถึงคุณเมื่อ %1$s แต่พื้นที่จัดเก็บข้อมูลยังคงเต็ม ขณะนี้คุณมี %2$d ไฟล์ ซึ่งใช้พื้นที่ไป %3$s ส่งผลให้บัญชีของคุณถูกล็อก กรุณาอัปเกรดเป็น %4$s เพื่อเพิ่มพื้นที่จัดเก็บข้อมูลและปลดล็อกบัญชี หากไม่ดำเนินการในเร็วๆ นี้ ข้อมูลของคุณอาจถูกลบ [A]เรียนรู้เพิ่มเติมเกี่ยวกับขีดจำกัดพื้นที่จัดเก็บข้อมูลของคุณ[/A]</item>
+    </plurals>
+    <plurals name="account_over_disk_quota_paywall_body_multiple_warning_dates">
+        <item quantity="other">พื้นที่จัดเก็บข้อมูลของคุณยังคงเต็มและบัญชีถูกล็อก เราได้ส่งอีเมลแจ้งเรื่องนี้ไปแล้วหลายครั้ง ขณะนี้คุณมี %1$d ไฟล์ ซึ่งใช้พื้นที่ไป %2$s กรุณาอัปเกรดเป็น %3$s เพื่อเพิ่มพื้นที่จัดเก็บข้อมูลและปลดล็อกบัญชี หากไม่ดำเนินการในเร็วๆ นี้ ข้อมูลของคุณอาจถูกลบ [A]เรียนรู้เพิ่มเติมเกี่ยวกับขีดจำกัดพื้นที่จัดเก็บข้อมูลของคุณ[/A]</item>
+    </plurals>
+    <string name="name_collision_file_exists_title">มีไฟล์นี้อยู่แล้ว</string>
+    <string name="name_collision_duplicate_counter">รายการซ้ำที่ %1$d จาก %2$d</string>
+    <string name="name_collision_already_exists_body">มี “%1$s” อยู่แล้วในตำแหน่งที่ตั้งนี้</string>
+    <string name="name_collision_option_replace_file">แทนที่ไฟล์เดิม</string>
+    <string name="name_collision_option_replace_file_subtitle">เขียนทับไฟล์เดิม</string>
+    <string name="name_collision_option_replace_file_versioning_subtitle">บันทึกไฟล์เดิมเป็นเวอร์ชันก่อนหน้า</string>
+    <string name="name_collision_option_keep_both_files">เก็บไฟล์ไว้ทั้งสองไฟล์</string>
+    <string name="name_collision_option_keep_both_files_subtitle">เปลี่ยนชื่อไฟล์ใหม่เป็น “%1$s”</string>
+    <string name="name_collision_option_keep_both_files_move_subtitle">เปลี่ยนชื่อไฟล์ที่ย้ายเป็น “%1$s”</string>
+    <string name="name_collision_option_skip_file">ข้ามไฟล์นี้</string>
+    <string name="name_collision_option_skip_file_subtitle">คงไฟล์เดิมไว้โดยไม่มีการเปลี่ยนแปลง</string>
+    <string name="name_collision_option_merge_folders">ผสานรวมโฟลเดอร์</string>
+    <string name="name_collision_option_merge_folders_subtitle">รวมรายการจากทั้งสองโฟลเดอร์เข้าด้วยกัน</string>
+    <string name="name_collision_option_keep_both_folders">เก็บโฟลเดอร์ไว้ทั้งสองโฟลเดอร์</string>
+    <string name="name_collision_option_keep_both_folders_subtitle">เปลี่ยนชื่อโฟลเดอร์ใหม่เป็น “%1$s”</string>
+    <string name="name_collision_option_skip_folder_subtitle">คงโฟลเดอร์เดิมไว้โดยไม่มีการเปลี่ยนแปลง</string>
+    <string name="name_collision_import_button">นำเข้า</string>
+    <plurals name="name_collision_apply_to_all">
+        <item quantity="other">นำไปใช้กับรายการซ้ำทั้งหมด %1$d รายการ</item>
+    </plurals>
+    <string name="left_meeting_join_content">เข้าร่วม MEGA เพื่อรักษาความเป็นส่วนตัวของไฟล์และการประชุมด้วยการเข้ารหัสลับแบบต้นทางถึงปลายทาง</string>
+    <string name="chat_manage_history_clearing_title">ล้างประวัติการแชทอัตโนมัติ</string>
+    <string name="chat_manage_history_clearing_subtitle">ลบข้อความที่เก่ากว่าระยะเวลาที่กำหนด</string>
+    <string name="chat_manage_history_retention_period_title">ลบข้อความที่เก่ากว่า:</string>
+    <string name="chat_manage_history_clear_action_subtitle">ลบข้อความและไฟล์ทั้งหมดที่แชร์ในการสนทนานี้ โดยไม่สามารถยกเลิกการดำเนินการได้</string>
+    <string name="chat_manage_history_retention_option_one_day">1 วัน</string>
+    <string name="chat_manage_history_retention_option_one_week">1 สัปดาห์</string>
+    <string name="chat_manage_history_retention_option_one_month">1 เดือน</string>
+    <string name="chat_manage_history_clear_meeting_confirmation_title">ล้างประวัติการประชุมหรือไม่</string>
+    <string name="chat_manage_history_clear_meeting_confirmation_message">ระบบจะลบประวัติข้อความทั้งหมดของการประชุมนี้ โดยไม่สามารถยกเลิกการดำเนินการได้</string>
+    <string name="app_bar_selection_mode_count_of_total">เลือก %1$s จาก %2$s รายการ</string>
+    <string name="contacts_qr_invite_contact_dialog_body">ต้องการเพิ่ม %1$s ไปยังรายชื่อผู้ติดต่อหรือไม่</string>
+    <string name="contacts_qr_invite_contact_dialog_title">ต้องการเชิญผู้ติดต่อหรือไม่</string>
+    <string name="chat_giphy_picker_server_down">ไม่สามารถใช้งาน GIF ได้ในขณะนี้ กรุณาลองใหม่อีกครั้งในภายหลัง</string>
+    <string name="text_editor_format_code_block">บล็อกโค้ด</string>
+    <string name="chat_scroll_to_bottom_content_description">เลื่อนลงล่างสุด</string>
+    <string name="chat_add_more_reactions_content_description">เพิ่มรีแอ็กชัน</string>
+    <string name="chat_file_message_preview_content_description">ตัวอย่างไฟล์</string>
+    <string name="chat_file_message_play_video_content_description">เล่นวิดีโอ</string>
+    <string name="chat_voice_clip_message_play_content_description">เล่นคลิปเสียง</string>
+    <string name="chat_voice_clip_message_pause_content_description">หยุดคลิปเสียงชั่วคราว</string>
+    <string name="chat_contact_attachment_verified_content_description">ผู้ติดต่อที่ผ่านการตรวจสอบแล้ว</string>
+    <string name="chat_composer_record_voice_clip_content_description">บันทึกคลิปเสียง</string>
+    <string name="chat_composer_emoji_content_description">อีโมจิ</string>
 </resources>

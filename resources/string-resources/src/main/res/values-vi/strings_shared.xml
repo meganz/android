@@ -3221,4 +3221,15 @@
     <string name="chat_manage_history_retention_option_one_month">một tháng</string>
     <string name="app_bar_selection_mode_count_of_total">%1$s trong&#160;tổng %2$s được chọn</string>
     <string name="name_collision_option_keep_both_files_subtitle">Tệp mới đã đổi tên thành “%1$s”</string>
+    <string name="contacts_qr_invite_contact_dialog_body">Thêm %1$s vào sổ liên&#160;lạc?</string>
+    <string name="chat_giphy_picker_title">Tìm trong GIPHY</string>
+    <string name="chat_giphy_picker_no_results">Không có [A]ảnh GIF[/A] nào</string>
+    <string name="chat_giphy_picker_end_of_results">[A]Hết[/A] kết quả</string>
+    <string name="edited_message_text">(đã chỉnh sửa)</string>
+    <string name="manual_retry_alert">Tin nhắn không gửi được. Chạm để hiện lựa chọn</string>
+    <string name="manual_resume_alert">Truyền tải bị tạm dừng. Chạm để tiếp tục.</string>
+    <string name="edit_chat_message">Sửa tin nhắn</string>
+    <string name="slide_to_cancel">Trượt để hủy bỏ</string>
+    <string name="recording_less_than_second">Chạm và giữ để ghi âm</string>
+    <string name="chat_message_forward_content_description">Chuyển tiếp</string>
 </resources>

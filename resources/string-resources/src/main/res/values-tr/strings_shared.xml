@@ -3409,4 +3409,18 @@
     <string name="chat_manage_history_clear_meeting_confirmation_title">Toplantı geçmişi temizlensin mi?</string>
     <string name="chat_manage_history_clear_meeting_confirmation_message">Bu toplantının tüm mesaj geçmişi silinecektir. Bu işlem geri alınamaz.</string>
     <string name="app_bar_selection_mode_count_of_total">%1$s / %2$s seçildi</string>
+    <string name="chat_giphy_picker_title">GIPHY’de ara</string>
+    <string name="chat_giphy_picker_no_results">[A]GIF’ler[/A] bulunamadı</string>
+    <string name="chat_giphy_picker_end_of_results">[A]Sonuçlar[/A] bitti</string>
+    <string name="contacts_qr_invite_contact_dialog_body">%1$s kişilerinize eklensin mi?</string>
+    <string name="contacts_qr_invite_contact_dialog_title">Kişi davet edilsin mi?</string>
+    <string name="chat_giphy_picker_server_down">GIF’ler kullanılamıyor. Daha sonra tekrar deneyin.</string>
+    <string name="text_editor_format_code_block">Kod bloğu</string>
+    <string name="edited_message_text">(düzenlendi)</string>
+    <string name="manual_retry_alert">Mesaj gönderilemedi. Seçenekler için dokunun.</string>
+    <string name="manual_resume_alert">Aktarımlar duraklatıldı. Devam etmek için dokunun.</string>
+    <string name="edit_chat_message">Mesajı düzenle</string>
+    <string name="slide_to_cancel">İptal etmek için kaydırın</string>
+    <string name="recording_less_than_second">Kaydetmek için dokunup basılı tutun</string>
+    <string name="chat_message_forward_content_description">İlet</string>
 </resources>

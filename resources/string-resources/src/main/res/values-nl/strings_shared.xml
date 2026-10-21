@@ -3153,13 +3153,13 @@
     <string name="sync_exclusions_add_condition_matching_exactly">Precies overeenkomend</string>
     <string name="sync_exclusions_add_condition_matching_wildcard">Bijpassend patroon</string>
     <string name="sync_exclusions_add_name_wildcard_helper">Gebruik “*” voor willekeurige tekens en “?” voor één teken</string>
-    <string name="sync_exclusions_add_name_duplicate_error">U heeft deze naam al uitgesloten</string>
+    <string name="sync_exclusions_add_name_duplicate_error">Deze uitsluiting bestaat al</string>
     <string name="file_preview_error_title">Kan geen voorbeeld van dit bestand weergeven</string>
     <string name="file_preview_error_description">Er is iets misgegaan bij het laden van dit voorbeeld</string>
     <string name="general_try_again">Probeer nogmaals</string>
     <string name="sync_exclusions_add_description_extensions">Bestanden met deze extensies worden niet gesynchroniseerd</string>
     <string name="sync_exclusions_add_extension_helper">Scheid extensies met een komma</string>
-    <string name="sync_exclusions_add_extension_invalid_error">Extensies mogen geen spaties, punten of schuine strepen bevatten</string>
+    <string name="sync_exclusions_add_extension_invalid_error">Extensies mogen geen spaties of deze tekens bevattenm: / * ? :</string>
     <string name="sync_exclusions_add_extension_duplicate_error">U heeft %1$s al uitgesloten</string>
     <string name="contacts_qr_screen_title">QR-code</string>
     <string name="contacts_qr_create_action">QR-code Creëren</string>
@@ -3392,7 +3392,7 @@
     <string name="name_collision_option_skip_folder_subtitle">De bestaande map wordt niet gewijzigd</string>
     <string name="name_collision_import_button">Importeren</string>
     <plurals name="name_collision_apply_to_all">
-        <item quantity="one">Toepassing op %1$d duplicaat</item>
+        <item quantity="one">Toepassen op %1$d duplicaat</item>
         <item quantity="other">Toepassen op alle %1$d duplicaten</item>
     </plurals>
     <string name="left_meeting_join_content">Word lid van MEGA en houd uw bestanden en vergaderingen privé dankzij end-to-end-codering.</string>
@@ -3406,4 +3406,30 @@
     <string name="chat_manage_history_clear_meeting_confirmation_title">Vergadergeschiedenis wissen?</string>
     <string name="chat_manage_history_clear_meeting_confirmation_message">Hiermee wordt de volledige berichtgeschiedenis van deze vergadering verwijderd. Dit kan niet ongedaan worden gemaakt.</string>
     <string name="app_bar_selection_mode_count_of_total">%1$s van %2$s geselecteerd</string>
+    <string name="chat_giphy_picker_title">Zoek GIPHY</string>
+    <string name="chat_giphy_picker_no_results">Geen [A]GIF[/A] gevonden</string>
+    <string name="chat_giphy_picker_end_of_results">[A]Eind van[/A] resultaten</string>
+    <string name="contacts_qr_invite_contact_dialog_body">%1$s aan uw contacten toevoegen?</string>
+    <string name="contacts_qr_invite_contact_dialog_title">Contact uitnodigen?</string>
+    <string name="chat_giphy_picker_server_down">GIF\’s zijn niet beschikbaar. Probeer het later opnieuw.</string>
+    <string name="text_editor_format_code_block">Codeblok</string>
+    <string name="edited_message_text">(bijgewerkt)</string>
+    <string name="manual_retry_alert">Bericht niet verzonden. Tik voor opties</string>
+    <string name="manual_resume_alert">Overdrachten gepauzeerd. Tik om te hervatten.</string>
+    <string name="edit_chat_message">Bericht wijzigen</string>
+    <string name="slide_to_cancel">Slepen om te annuleren</string>
+    <string name="recording_less_than_second">Tik en vasthouden om op te nemen</string>
+    <string name="chat_message_forward_content_description">Doorversturen</string>
+    <string name="chat_scroll_to_bottom_content_description">Scroll naar onderen</string>
+    <string name="chat_add_more_reactions_content_description">Meer reacties toevoegen</string>
+    <string name="chat_file_message_preview_content_description">Bestandsvoorbeeld</string>
+    <string name="chat_file_message_play_video_content_description">Video afspelen</string>
+    <string name="chat_voice_clip_message_play_content_description">Speel geluidsfragment af</string>
+    <string name="chat_voice_clip_message_pause_content_description">Spraakfragment pauzeren</string>
+    <string name="chat_contact_attachment_verified_content_description">Geverifieerd contact</string>
+    <string name="chat_composer_record_voice_clip_content_description">Spraakfragment opnemen</string>
+    <string name="chat_composer_emoji_content_description">Emoji</string>
+    <string name="node_list_load_error_title">Kan deze map niet laden</string>
+    <string name="node_list_load_more_error_message">Kon geen verdere items laden</string>
+    <string name="file_not_available_offline_message">Bestand is niet offline beschikbaar</string>
 </resources>

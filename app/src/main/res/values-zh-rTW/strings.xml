@@ -1549,7 +1549,7 @@
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">為什麼需要雙重驗證？</string>
     <!--  -->
-    <string name="two_factor_authentication_explain">雙重驗證是您帳戶的第二層安全保護。這代表即使某人持有您的密碼，如果他無法知道只有您才知道的6位數字密碼，也無法登入您的帳戶。</string>
+    <string name="two_factor_authentication_explain">雙重驗證是您帳戶的第二層安全保護。這代表即使某人持有您的密碼，如果他無法獲得您專屬的6位數代碼，也無法登入您的帳戶。</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">開始設定</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
@@ -1557,7 +1557,7 @@
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">請務必將此種子金鑰備份於安全的地方，以防您的裝置遺失。</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">請輸入您身份驗證器應用程式所生成的6位數字代碼。</string>
+    <string name="explain_confirm_2fa">請輸入您身份驗證器應用程式所生成的6位數代碼。</string>
     <!-- Text button -->
     <string name="general_next">下一步</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -1565,7 +1565,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">已啟用雙重驗證</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>
+    <string name="description_2fa_enabled">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數代碼。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">為避免在您無法存取應用程式或想要停用雙重驗證時出現問題，請將您的<b>還原金鑰</b>儲存在一個安全地方。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->

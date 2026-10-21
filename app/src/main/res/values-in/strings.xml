@@ -4565,4 +4565,7 @@
     <string name="invalid_link">Tautan tidak valid. Silakan coba lagi atau minta tautan baru.</string>
     <string name="dialog_taken_down_folder_description">Folder ini telah dihapus sesuai dengan [A]Kebijakan Panduan Penghapusan[/A] kami. Anda dapat mengajukan keberatan atas penghapusan ini jika anda yakin kami telah melakukan kesalahan.</string>
     <string name="dialog_taken_down_file_description">File ini telah dihapus sesuai dengan [A]Kebijakan Panduan Penghapusan Konten[/A] kami. Anda dapat mengajukan keberatan atas penghapusan ini jika anda yakin kami telah melakukan kesalahan.</string>
+    <plurals name="subtitle_properties_manage_chat_label_years">
+        <item quantity="other">%1$d tahun</item>
+    </plurals>
 </resources>

@@ -3431,4 +3431,14 @@
         <item quantity="few">luni</item>
         <item quantity="other">de luni</item>
     </plurals>
+    <string name="chat_giphy_picker_title">Caută pe GIPHY</string>
+    <string name="chat_giphy_picker_no_results">Niciun [A]GIF[/A] găsit</string>
+    <string name="chat_giphy_picker_end_of_results">[A]Sfârșitul[/A] rezultatelor</string>
+    <string name="edited_message_text">(editat)</string>
+    <string name="manual_retry_alert">Mesaj netrimis. Apasă pentru opțiuni</string>
+    <string name="manual_resume_alert">Transferuri puse pe pauză. Atinge pentru a relua.</string>
+    <string name="edit_chat_message">Editează mesajul</string>
+    <string name="slide_to_cancel">Glisează pentru a anula</string>
+    <string name="recording_less_than_second">Atinge și ține pentru a înregistra</string>
+    <string name="chat_message_forward_content_description">Redirecționează</string>
 </resources>
