@@ -31,7 +31,8 @@ import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
 import androidx.media3.session.CommandButton
@@ -279,10 +280,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private fun initializePlayer() {
         player = ExoPlayer.Builder(this)
             .setMediaSourceFactory(
-                DefaultMediaSourceFactory(buildDataSourceFactory())
-                    .setLoadErrorHandlingPolicy(
-                        DefaultLoadErrorHandlingPolicy(LOAD_ERROR_RETRY_COUNT)
-                    )
+                buildAudioMediaSourceFactory(buildDataSourceFactory(), LOAD_ERROR_RETRY_COUNT)
             )
             .setLoadControl(buildLoadControl())
             .setAudioAttributes(AudioAttributes.DEFAULT, true)
@@ -1562,3 +1560,21 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         }
     }
 }
+
+/**
+ * Builds the factory that turns a queue item into a playable source.
+ *
+ * Progressive rather than `DefaultMediaSourceFactory`, matching the legacy player: every item is a
+ * whole file, so there is no adaptive manifest to parse. `DefaultMediaSourceFactory` infers the
+ * content type from the URI's last path segment and reflectively loads an adaptive factory for a
+ * `.m3u8`, `.mpd` or `.ism` name; those media3 modules are not dependencies, so the reflection
+ * fails and the exception ends the process out of `Player.setMediaItems`.
+ */
+@OptIn(UnstableApi::class)
+@VisibleForTesting
+internal fun buildAudioMediaSourceFactory(
+    dataSourceFactory: DataSource.Factory,
+    loadErrorRetryCount: Int,
+): MediaSource.Factory =
+    ProgressiveMediaSource.Factory(dataSourceFactory)
+        .setLoadErrorHandlingPolicy(DefaultLoadErrorHandlingPolicy(loadErrorRetryCount))
