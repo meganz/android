@@ -59,6 +59,68 @@ class AppShellLocalsTest {
     }
 
     @Test
+    fun `test that content sees no top banner but still sees the mini audio player when the banner is off`() {
+        composeRule.setContent {
+            ProvideAppShellLocals(
+                topBanner = null,
+                miniAudioPlayer = { modifier, _ -> Box(modifier.testTag(MINI_PLAYER_TAG)) },
+            ) {
+                LocalMegaScaffoldTopBanner.current?.invoke()
+                LocalMiniAudioPlayer.current(Modifier, false)
+            }
+        }
+
+        composeRule.onNodeWithTag(BANNER_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(MINI_PLAYER_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that content scaffold does not display the return to call banner when the banner is off`() {
+        val monitorOngoingCallUseCase = mock<MonitorOngoingCallUseCase> {
+            on { invoke() }.thenReturn(flowOf(ChatCall(chatId = 1L, callId = 2L)))
+        }
+        val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
+        whenever(monitorThemeModeUseCase()).thenReturn(flowOf(ThemeMode.System))
+        val viewModel = OngoingCallBannerViewModel(
+            monitorOngoingCallUseCase = monitorOngoingCallUseCase,
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
+        )
+        val viewModelStoreOwner = object : ViewModelStoreOwner {
+            override val viewModelStore = ViewModelStore().apply {
+                put(
+                    "androidx.lifecycle.ViewModelProvider.DefaultKey:" +
+                            OngoingCallBannerViewModel::class.java.canonicalName,
+                    viewModel,
+                )
+            }
+        }
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
+                    ProvideAppShellLocals(showTopBanner = false) {
+                        MegaScaffold(
+                            topBar = {
+                                Box(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp)
+                                )
+                            },
+                            contentWindowInsets = WindowInsets(0.dp),
+                        ) {
+                            Box(Modifier.fillMaxSize())
+                        }
+                    }
+                }
+            }
+        }
+
+        composeRule.onNodeWithTag(RETURN_TO_CALL_BANNER_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun `test that content scaffold displays the return to call banner when a call is in progress`() {
         val monitorOngoingCallUseCase = mock<MonitorOngoingCallUseCase> {
             on { invoke() }.thenReturn(flowOf(ChatCall(chatId = 1L, callId = 2L)))

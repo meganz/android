@@ -89,6 +89,7 @@ class PdfViewerActivity : AppCompatActivity() {
                     )
                 },
                 initialKey = startKey,
+                showTopBanner = false,
                 navigationResultManager = navigationResultManager,
                 featureDestinations = featureDestinations,
                 appDialogDestinations = appDialogDestinations,

@@ -227,6 +227,7 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
                     )
                 },
                 initialKey = VideoPlayerScreenNavKey,
+                showTopBanner = false,
                 navigationResultManager = navigationResultManager,
                 featureDestinations = featureDestinations,
                 appDialogDestinations = appDialogDestinations,

@@ -15,12 +15,18 @@ import mega.privacy.android.navigation.contract.state.MiniAudioPlayerSlot
  * the standalone activities alike. A host that provides the locals itself, or not at all, leaves
  * its screens on the no-op defaults, so they silently lose the banner and the mini player.
  *
+ * @param showTopBanner whether the return-to-call banner is offered to the content. False for the
+ * immersive viewers, which never had a return-to-call affordance and whose chrome is meant to
+ * stay out of the way.
  * @param content content that can read the shell locals.
  */
 @Composable
-fun ProvideAppShellLocals(content: @Composable () -> Unit) {
+fun ProvideAppShellLocals(
+    showTopBanner: Boolean = true,
+    content: @Composable () -> Unit,
+) {
     ProvideAppShellLocals(
-        topBanner = rememberOngoingCallBanner(),
+        topBanner = if (showTopBanner) rememberOngoingCallBanner() else null,
         miniAudioPlayer = { modifier, applyNavigationBarsPadding ->
             MiniAudioPlayerHost(
                 modifier = modifier,
@@ -33,7 +39,7 @@ fun ProvideAppShellLocals(content: @Composable () -> Unit) {
 
 @Composable
 internal fun ProvideAppShellLocals(
-    topBanner: @Composable () -> Unit,
+    topBanner: (@Composable () -> Unit)?,
     miniAudioPlayer: MiniAudioPlayerSlot,
     content: @Composable () -> Unit,
 ) {

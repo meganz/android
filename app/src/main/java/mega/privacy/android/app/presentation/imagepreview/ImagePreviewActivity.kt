@@ -232,6 +232,7 @@ class ImagePreviewActivity : BaseActivity() {
                     )
                 },
                 initialKey = ImagePreviewNavKey,
+                showTopBanner = false,
                 navigationResultManager = navigationResultManager,
                 featureDestinations = featureDestinations,
                 appDialogDestinations = appDialogDestinations,

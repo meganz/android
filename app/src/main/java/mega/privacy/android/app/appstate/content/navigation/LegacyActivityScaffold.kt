@@ -60,6 +60,8 @@ import kotlin.reflect.KClass
  * @param onEmptyBackStack invoked when a back op would leave the back stack empty.
  * @param excludeOwnDestination feature destination class whose `navigationGraph` should NOT be
  * registered — the activity provides its own entry in [entryContent].
+ * @param showTopBanner whether the return-to-call banner is offered to the hosted destinations.
+ * False for the immersive viewers, which never had a return-to-call affordance.
  * @param overlayContent composed inside the [LocalSnackBarHostState] provider, after (i.e. on
  * top of) the `NavDisplay`. Use it for activity-level side-effects that need the snackbar host,
  * or to render UI that should overlay the navigation content (e.g. a snackbar host).
@@ -77,6 +79,7 @@ fun LegacyActivityScaffold(
     featureDestinations: Set<FeatureDestination> = emptySet(),
     onEmptyBackStack: () -> Unit = {},
     excludeOwnDestination: KClass<out FeatureDestination>? = null,
+    showTopBanner: Boolean = true,
     overlayContent: @Composable (handler: NavigationHandler) -> Unit = {},
     transitionSpec: AnimatedContentTransitionScope<*>.() -> ContentTransform = { fadeTransition },
     popTransitionSpec: AnimatedContentTransitionScope<*>.() -> ContentTransform = { fadeTransition },
@@ -117,7 +120,7 @@ fun LegacyActivityScaffold(
         val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
         CompositionLocalProvider(LocalSnackBarHostState provides snackbarHostState) {
-            ProvideAppShellLocals {
+            ProvideAppShellLocals(showTopBanner = showTopBanner) {
                 SnackbarLifetimeController()
 
                 // The global snackbar queue is consumed by the foreground activity; without

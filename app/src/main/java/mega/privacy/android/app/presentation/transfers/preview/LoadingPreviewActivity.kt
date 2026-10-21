@@ -86,6 +86,7 @@ class LoadingPreviewActivity : AppCompatActivity() {
                     )
                 },
                 initialKey = LoadingPreviewNavKey,
+                showTopBanner = false,
                 navigationResultManager = navigationResultManager,
                 featureDestinations = featureDestinations,
                 appDialogDestinations = appDialogDestinations,
