@@ -1,7 +1,12 @@
 package mega.privacy.android.feature.pdfviewer.presentation
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -14,6 +19,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.android.core.ui.components.LocalMegaScaffoldTopBanner
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
@@ -103,29 +109,32 @@ class PdfViewerScreenTest {
         bottomBarActions: List<MenuActionWithIcon> = emptyList(),
         singleNodeActionHandler: SingleNodeActionHandler = SingleNodeActionHandler { _, _ -> },
         onShare: (() -> Unit)? = null,
+        topBanner: (@Composable () -> Unit)? = null,
     ) {
         composeTestRule.setContent {
-            PdfViewerScreen(
-                uiState = uiState,
-                onBack = onBack,
-                onMoreClicked = onMoreClicked,
-                onPageChanged = onPageChanged,
-                onLoadComplete = onLoadComplete,
-                onError = onError,
-                onSubmitPassword = onSubmitPassword,
-                onDismissPasswordDialog = onDismissPasswordDialog,
-                onPasswordInputChanged = onPasswordInputChanged,
-                onRetry = onRetry,
-                onUploadToCloudDrive = onUploadToCloudDrive,
-                onActivateSearch = onActivateSearch,
-                onDeactivateSearch = onDeactivateSearch,
-                onSearchQueryChanged = onSearchQueryChanged,
-                onNavigateToNextMatch = onNavigateToNextMatch,
-                onNavigateToPreviousMatch = onNavigateToPreviousMatch,
-                bottomBarActions = bottomBarActions,
-                singleNodeActionHandler = singleNodeActionHandler,
-                onShare = onShare,
-            )
+            CompositionLocalProvider(LocalMegaScaffoldTopBanner provides topBanner) {
+                PdfViewerScreen(
+                    uiState = uiState,
+                    onBack = onBack,
+                    onMoreClicked = onMoreClicked,
+                    onPageChanged = onPageChanged,
+                    onLoadComplete = onLoadComplete,
+                    onError = onError,
+                    onSubmitPassword = onSubmitPassword,
+                    onDismissPasswordDialog = onDismissPasswordDialog,
+                    onPasswordInputChanged = onPasswordInputChanged,
+                    onRetry = onRetry,
+                    onUploadToCloudDrive = onUploadToCloudDrive,
+                    onActivateSearch = onActivateSearch,
+                    onDeactivateSearch = onDeactivateSearch,
+                    onSearchQueryChanged = onSearchQueryChanged,
+                    onNavigateToNextMatch = onNavigateToNextMatch,
+                    onNavigateToPreviousMatch = onNavigateToPreviousMatch,
+                    bottomBarActions = bottomBarActions,
+                    singleNodeActionHandler = singleNodeActionHandler,
+                    onShare = onShare,
+                )
+            }
         }
     }
 
@@ -178,6 +187,15 @@ class PdfViewerScreenTest {
         setContent(defaultState(title = "My Document.pdf"))
 
         composeTestRule.onNodeWithText("My Document.pdf").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the top banner is not displayed when the host provides one`() {
+        setContent(
+            topBanner = { Box(modifier = Modifier.testTag(TOP_BANNER_TAG)) },
+        )
+
+        composeTestRule.onNodeWithTag(TOP_BANNER_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -710,3 +728,5 @@ class PdfViewerScreenTest {
     }
     // endregion top bar share
 }
+
+private const val TOP_BANNER_TAG = "pdf_viewer_screen_test:top_banner"

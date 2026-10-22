@@ -282,6 +282,9 @@ internal fun PdfViewerScreen(
                     }
                 }
             },
+            // The viewer is immersive, so it must not show the top banner (for example, the
+            // return-to-call banner) that a host provides through `LocalMegaScaffoldTopBanner`.
+            showTopBanner = false,
             content = { innerPadding ->
                 Box(modifier = Modifier.fillMaxSize()) {
 
