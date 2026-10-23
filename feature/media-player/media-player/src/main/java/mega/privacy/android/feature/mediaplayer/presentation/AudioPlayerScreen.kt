@@ -387,6 +387,11 @@ private fun AudioPlayerQueueOverlay(
  * in the row (right under LTR, left under RTL). When the bar is on the opposite edge — the device
  * rotated the other way — that side's inset is zero here and the player, which borders it, insets
  * it instead. The gradient still fills the full pane in every case.
+ *
+ * The background is opaque because the gradient colours are not, and nothing of the player's own
+ * is painted behind this pane: the player draws its background in the half of the row it occupies.
+ * The player entry is drawn over the screen it was opened from, so a translucent pane shows that
+ * screen rather than the player.
  */
 @Composable
 private fun AudioPlayerQueuePane(
@@ -396,6 +401,7 @@ private fun AudioPlayerQueuePane(
     AudioPlayerGradientBackground(
         modifier = modifier,
         reversed = true,
+        opaque = true,
     ) {
         queueContent(
             Modifier
