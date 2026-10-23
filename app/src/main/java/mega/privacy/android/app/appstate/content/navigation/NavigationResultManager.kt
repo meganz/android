@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.getAndUpdate
 import mega.privacy.android.navigation.contract.NavigationResultsHandler
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,6 +43,19 @@ class NavigationResultManager @Inject constructor() : NavigationResultsHandler {
     override fun clearResult(key: String) {
         resultFlows[key]?.value = null
     }
+
+    /**
+     * Claims the result for a given key: returns it and clears it in one step.
+     *
+     * The read and the clear are a single atomic update, so when several screens are composed at
+     * once only the first caller receives the value.
+     *
+     * @param key The key to claim the result for
+     * @return the stored result, or null when nothing is stored or another caller claimed it
+     */
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> takeResult(key: String): T? =
+        resultFlows[key]?.getAndUpdate { null } as T?
 
     /**
      * Clears all stored results. Useful for cleanup or when starting fresh.

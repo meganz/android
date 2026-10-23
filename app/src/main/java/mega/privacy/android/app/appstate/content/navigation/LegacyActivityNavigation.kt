@@ -125,6 +125,8 @@ class LegacyActivityNavigationHandler(
         navigationResultManager.clearResult(key)
     }
 
+    override fun <T> takeResult(key: String): T? = navigationResultManager.takeResult(key)
+
     override fun <T> monitorResult(key: String): Flow<T?> {
         return navigationResultManager.monitorResult(key)
     }

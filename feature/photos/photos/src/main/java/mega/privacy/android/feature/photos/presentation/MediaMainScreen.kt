@@ -1182,6 +1182,7 @@ private fun PhotosMainScreenPreview() {
                 override fun <T> returnResult(key: String, value: T) {}
                 override fun clearResult(key: String) {}
                 override fun <T> monitorResult(key: String): Flow<T?> = flowOf(null)
+                override fun <T> takeResult(key: String): T? = null
                 override fun clearAllResults() {}
             },
             handleCameraUploadsPermissionsResult = {},

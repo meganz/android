@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalResources
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.SnackbarDuration
@@ -53,9 +54,6 @@ fun HandleNodeOptionsActionResult(
     val coroutineScope = rememberCoroutineScope()
     val snackbarQueue = rememberSnackBarQueue()
     val localResources = LocalResources.current
-    val nodeBottomSheetResult by navigationHandler
-        .monitorResult<NodeOptionsBottomSheetResult?>(NodeOptionsBottomSheetNavKey.RESULT)
-        .collectAsStateWithLifecycle(null)
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     // Monitor share folder dialog result (moved from bottom sheet)
@@ -185,10 +183,24 @@ fun HandleNodeOptionsActionResult(
         consumeRestoreSuccess = nodeOptionsActionViewModel::resetRestoreSuccessEvent,
     )
 
-    LaunchedEffect(nodeBottomSheetResult) {
-        val result = nodeBottomSheetResult ?: return@LaunchedEffect
-        nodeActionHandler(result.action, result.node)
-        onNavResultConsumed?.invoke(result)
-        navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
+    // Screens stay composed under one that is drawn over them, and each holds its own copy of the
+    // collected result, so acting on that copy runs the action once per screen. Claiming is
+    // atomic, which keeps it to once.
+    //
+    // The result is collected here rather than used as the effect key, because claiming clears
+    // the flow: keyed on the result, the effect would restart on that clear and cancel the action
+    // it had just started. Keyed on the handler, the collector outlives the clear and the action
+    // may suspend.
+    LaunchedEffect(nodeActionHandler, onNavResultConsumed) {
+        navigationHandler
+            .monitorResult<NodeOptionsBottomSheetResult?>(NodeOptionsBottomSheetNavKey.RESULT)
+            .filterNotNull()
+            .collect {
+                val result = navigationHandler
+                    .takeResult<NodeOptionsBottomSheetResult>(NodeOptionsBottomSheetNavKey.RESULT)
+                    ?: return@collect
+                nodeActionHandler(result.action, result.node)
+                onNavResultConsumed?.invoke(result)
+            }
     }
 }
