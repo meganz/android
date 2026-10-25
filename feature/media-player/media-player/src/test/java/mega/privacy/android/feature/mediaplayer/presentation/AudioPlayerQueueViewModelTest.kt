@@ -266,6 +266,105 @@ class AudioPlayerQueueViewModelTest {
         }
 
     @Test
+    fun `test that uiState gives the current queue item the controller duration when it has none`() =
+        runTest {
+            val items = listOf(
+                AudioQueueItem(mediaId = "a", title = "A", artist = null),
+                AudioQueueItem(mediaId = "b", title = "B", artist = null),
+            )
+            underTest.uiState.test {
+                awaitItem() // Loading state
+
+                playerStateFlow.emit(
+                    AudioControllerState(
+                        queueItems = items,
+                        currentQueueIndex = 1,
+                        durationMs = 295_000L,
+                    )
+                )
+
+                val state = awaitDataState()
+                assertThat(state.items[1].durationMs).isEqualTo(295_000L)
+                assertThat(state.items[0].durationMs).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that uiState keeps the queue item duration when the controller reports none`() =
+        runTest {
+            val items = listOf(
+                AudioQueueItem(mediaId = "a", title = "A", artist = null, durationMs = 184_000L),
+            )
+            underTest.uiState.test {
+                awaitItem() // Loading state
+
+                playerStateFlow.emit(
+                    AudioControllerState(queueItems = items, currentQueueIndex = 0)
+                )
+
+                val state = awaitDataState()
+                assertThat(state.items[0].durationMs).isEqualTo(184_000L)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that uiState prefers the controller duration over the current item's own`() =
+        runTest {
+            val items = listOf(
+                AudioQueueItem(mediaId = "a", title = "A", artist = null, durationMs = 295_000L),
+            )
+            underTest.uiState.test {
+                awaitItem() // Loading state
+
+                playerStateFlow.emit(
+                    AudioControllerState(
+                        queueItems = items,
+                        currentQueueIndex = 0,
+                        durationMs = 295_400L,
+                    )
+                )
+
+                // The position shown beside the length comes from the player, so a metadata
+                // length rounded down to the second would make the row read past the end.
+                val state = awaitDataState()
+                assertThat(state.items[0].durationMs).isEqualTo(295_400L)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that uiState truncates the current position to the second`() = runTest {
+        underTest.uiState.test {
+            awaitItem() // Loading state
+
+            playerStateFlow.emit(AudioControllerState(currentPositionMs = 13_750L))
+
+            val state = awaitDataState()
+            assertThat(state.currentPositionMs).isEqualTo(13_000L)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that uiState maps the current position and duration from controller state`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading state
+
+                playerStateFlow.emit(
+                    AudioControllerState(currentPositionMs = 13_000L, durationMs = 295_000L)
+                )
+
+                val state = awaitDataState()
+                assertThat(state.currentPositionMs).isEqualTo(13_000L)
+                assertThat(state.currentDurationMs).isEqualTo(295_000L)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that uiState maps currentThumbnailData from current media item handle`() = runTest {
         underTest.uiState.test {
             awaitItem() // Loading state

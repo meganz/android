@@ -23,10 +23,12 @@ internal class AudioQueueItemFactoryTest {
         title: String? = null,
         displayTitle: String? = null,
         artist: String? = null,
+        durationMs: Long? = null,
     ): MediaMetadata = MediaMetadata.Builder()
         .setTitle(title)
         .setDisplayTitle(displayTitle)
         .setArtist(artist)
+        .setDurationMs(durationMs)
         .build()
 
     private fun mediaItem(
@@ -34,9 +36,10 @@ internal class AudioQueueItemFactoryTest {
         title: String? = null,
         displayTitle: String? = null,
         artist: String? = null,
+        durationMs: Long? = null,
     ): MediaItem = MediaItem.Builder()
         .setMediaId(mediaId)
-        .setMediaMetadata(metadata(title, displayTitle, artist))
+        .setMediaMetadata(metadata(title, displayTitle, artist, durationMs))
         .build()
 
     @Test
@@ -87,6 +90,31 @@ internal class AudioQueueItemFactoryTest {
         assertThat(result[0].title).isEqualTo("Song")
         assertThat(result[0].artist).isEqualTo("Artist")
         assertThat(result[0].handle).isEqualTo(42L)
+    }
+
+    @Test
+    fun `test that buildQueueItems maps the item duration`() {
+        val result = underTest.buildQueueItems(
+            listOf(mediaItem(mediaId = "id-1", durationMs = 295_000L))
+        )
+
+        assertThat(result[0].durationMs).isEqualTo(295_000L)
+    }
+
+    @Test
+    fun `test that buildQueueItems leaves the duration null when the item has none`() {
+        val result = underTest.buildQueueItems(listOf(mediaItem(mediaId = "id-1")))
+
+        assertThat(result[0].durationMs).isNull()
+    }
+
+    @Test
+    fun `test that buildQueueItems leaves the duration null when the item reports a non positive one`() {
+        val result = underTest.buildQueueItems(
+            listOf(mediaItem(mediaId = "id-1", durationMs = 0L))
+        )
+
+        assertThat(result[0].durationMs).isNull()
     }
 
     @Test

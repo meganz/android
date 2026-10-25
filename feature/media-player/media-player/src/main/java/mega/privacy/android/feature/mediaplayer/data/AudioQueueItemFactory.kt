@@ -49,6 +49,7 @@ class AudioQueueItemFactory @Inject constructor(
                 mediaId = item.mediaId,
                 title = parsed?.title ?: resolveTitle(item.mediaMetadata),
                 artist = parsed?.artist ?: item.mediaMetadata.artist?.toString(),
+                durationMs = item.mediaMetadata.durationMs?.takeIf { it > 0 },
                 handle = mediaHandleStore.getHandle(item.mediaId),
                 playerIndex = playerIndex,
             )

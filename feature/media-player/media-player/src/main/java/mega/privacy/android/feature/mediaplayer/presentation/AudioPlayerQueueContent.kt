@@ -34,6 +34,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -50,6 +52,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.mediaplayer.components.MediaPlayerLoadingIndicator
+import mega.privacy.android.feature.mediaplayer.components.formatPlaybackTime
 import mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
 import mega.privacy.android.feature.mediaplayer.presentation.model.PlayingFromSection
@@ -206,6 +209,7 @@ private fun QueueContent(
             QueueRowModel.NowPlaying -> CurrentlyPlayingRow(
                 title = uiState.currentTitle,
                 artist = uiState.currentArtist,
+                durationMs = uiState.currentDurationMs,
                 artworkUri = uiState.currentArtworkUri,
                 thumbnailData = uiState.currentThumbnailData,
             )
@@ -215,11 +219,17 @@ private fun QueueContent(
                 playingFromSection = uiState.playingFromSection,
             )
 
-            is QueueRowModel.Track -> QueueItemRow(
-                item = row.item,
-                isCurrentlyPlaying = row.item.mediaId == currentMediaId,
-                onClick = { onQueueItemClick(row.item.playerIndex) },
-            )
+            is QueueRowModel.Track -> {
+                val isCurrentItem = row.item.mediaId == currentMediaId
+                QueueItemRow(
+                    item = row.item,
+                    isCurrentlyPlaying = isCurrentItem,
+                    // Only the current row reads this, so the others stay stable across the
+                    // position advancing.
+                    positionMs = uiState.currentPositionMs.takeIf { isCurrentItem },
+                    onClick = { onQueueItemClick(row.item.playerIndex) },
+                )
+            }
 
             QueueRowModel.BottomInset -> Spacer(
                 modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars),
@@ -265,6 +275,7 @@ private fun ContinuousPlaybackRow(
 private fun CurrentlyPlayingRow(
     title: String?,
     artist: String?,
+    durationMs: Long,
     artworkUri: String?,
     thumbnailData: ThumbnailData?,
     modifier: Modifier = Modifier,
@@ -313,14 +324,54 @@ private fun CurrentlyPlayingRow(
                 maxLines = 1,
                 modifier = Modifier.basicMarquee(),
             )
-            if (!artist.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                MegaText(
-                    text = artist,
-                    style = MaterialTheme.typography.titleSmall,
-                    textColor = TextColor.Secondary,
-                )
-            }
+            SecondaryLine(
+                artist = artist,
+                trailingText = formatPlaybackTime(durationMs).takeIf { durationMs > 0 },
+                style = MaterialTheme.typography.titleSmall,
+            )
+        }
+    }
+}
+
+/**
+ * Second line of a queue row: the artist, followed by the track length, which for the row of the
+ * item being played is preceded by the position reached within it.
+ *
+ * The artist yields its width first so a long one never pushes the time off the row, and either
+ * part may be missing: items built without a node have no length until they are played, and not
+ * every track carries an artist tag.
+ */
+@Composable
+private fun SecondaryLine(
+    artist: String?,
+    trailingText: String?,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+) {
+    val hasArtist = !artist.isNullOrBlank()
+    if (!hasArtist && trailingText == null) return
+    Spacer(modifier = Modifier.height(2.dp))
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (hasArtist) {
+            MegaText(
+                text = artist.orEmpty(),
+                style = style,
+                textColor = TextColor.Secondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+        }
+        if (trailingText != null) {
+            MegaText(
+                text = if (hasArtist) " • $trailingText" else trailingText,
+                style = style,
+                textColor = TextColor.Secondary,
+                maxLines = 1,
+            )
         }
     }
 }
@@ -353,6 +404,7 @@ private fun PlayingFromHeader(
 private fun QueueItemRow(
     item: AudioQueueItem,
     isCurrentlyPlaying: Boolean,
+    positionMs: Long?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -400,14 +452,18 @@ private fun QueueItemRow(
                     modifier = Modifier.basicMarquee(),
                 )
             }
-            if (!item.artist.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                MegaText(
-                    text = item.artist,
-                    style = MaterialTheme.typography.bodySmall,
-                    textColor = TextColor.Secondary,
-                )
-            }
+            SecondaryLine(
+                artist = item.artist,
+                trailingText = item.durationMs?.let { duration ->
+                    val length = formatPlaybackTime(duration)
+                    if (positionMs == null) {
+                        length
+                    } else {
+                        "${formatPlaybackTime(positionMs)}/$length"
+                    }
+                },
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -433,10 +489,22 @@ private fun AudioPlayerQueueContentPreview() {
                 isContinuousPlayback = true,
                 currentQueueIndex = 0,
                 currentArtworkUri = null,
+                currentPositionMs = 13_000L,
+                currentDurationMs = 295_000L,
                 currentThumbnailData = null,
                 items = listOf(
-                    AudioQueueItem(mediaId = "a", title = "Track A", artist = "Artist A"),
-                    AudioQueueItem(mediaId = "b", title = "Track B", artist = "Artist B"),
+                    AudioQueueItem(
+                        mediaId = "a",
+                        title = "Track A",
+                        artist = "Artist A",
+                        durationMs = 295_000L,
+                    ),
+                    AudioQueueItem(
+                        mediaId = "b",
+                        title = "Track B",
+                        artist = "An artist with a name long enough to run out of room",
+                        durationMs = 184_000L,
+                    ),
                     AudioQueueItem(mediaId = "c", title = "Track C", artist = null),
                 ),
             ),
@@ -452,8 +520,14 @@ private fun AudioPlayerQueueContentPreview() {
 private fun QueueItemRowPlayingPreview() {
     AndroidTheme(isDark = true) {
         QueueItemRow(
-            item = AudioQueueItem(mediaId = "a", title = "Track A", artist = "Artist A"),
+            item = AudioQueueItem(
+                mediaId = "a",
+                title = "Track A",
+                artist = "Artist A",
+                durationMs = 295_000L,
+            ),
             isCurrentlyPlaying = true,
+            positionMs = 20_000L,
             onClick = {},
         )
     }
@@ -466,6 +540,7 @@ private fun QueueItemRowIdlePreview() {
         QueueItemRow(
             item = AudioQueueItem(mediaId = "b", title = "Track B", artist = null),
             isCurrentlyPlaying = false,
+            positionMs = null,
             onClick = {},
         )
     }

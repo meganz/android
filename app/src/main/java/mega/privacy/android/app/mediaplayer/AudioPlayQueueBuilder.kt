@@ -230,7 +230,9 @@ class AudioPlayQueueBuilder @Inject constructor(
             }
 
             currentIndex != null -> {
-                mediaItems = rawMediaItems.toMutableList().also { it[currentIndex] = firstMediaItem }
+                mediaItems = rawMediaItems.toMutableList().also { list ->
+                    list[currentIndex] = firstMediaItem.withDurationFrom(list[currentIndex])
+                }
                 newIndexForCurrentItem = currentIndex
             }
 
@@ -343,6 +345,10 @@ class AudioPlayQueueBuilder @Inject constructor(
                             handle = item.handle.toLong(),
                             uri = uri,
                             displayName = item.name,
+                            durationMs = (item.fileTypeInfo as? AudioFileTypeInfo)
+                                ?.duration
+                                ?.inWholeMilliseconds
+                                ?.takeIf { it > 0 },
                         )
                     )
                 }
@@ -544,4 +550,19 @@ class AudioPlayQueueBuilder @Inject constructor(
     @Suppress("DEPRECATION")
     private fun isAudioFile(name: String): Boolean =
         MimeTypeList.typeForName(name).let { mime -> mime.isAudio && !mime.isAudioNotSupported }
+
+    /**
+     * Copies the track length of [resolved] onto this item.
+     *
+     * The first-emit item is built from the launch parameters, which carry no length, and it
+     * replaces the resolved item at the tapped position so that the media id stays stable. Without
+     * this the tapped track would be the one item in the queue with no length, because the player
+     * reports a length only for the item it is decoding.
+     */
+    private fun MediaItem.withDurationFrom(resolved: MediaItem): MediaItem {
+        val durationMs = resolved.mediaMetadata.durationMs ?: return this
+        return buildUpon()
+            .setMediaMetadata(mediaMetadata.buildUpon().setDurationMs(durationMs).build())
+            .build()
+    }
 }

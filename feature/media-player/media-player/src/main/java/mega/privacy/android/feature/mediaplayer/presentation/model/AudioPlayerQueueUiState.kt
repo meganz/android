@@ -23,6 +23,10 @@ sealed interface AudioPlayerQueueUiState {
      * @property currentTitle Title of the currently playing item.
      * @property currentArtist Artist of the currently playing item.
      * @property currentArtworkUri Artwork URI of the currently playing item.
+     * @property currentPositionMs Playback position of the currently playing item, in
+     * milliseconds truncated to the second the queue displays.
+     * @property currentDurationMs Length of the currently playing item in milliseconds; `0` until
+     * the player reports one.
      * @property currentThumbnailData Thumbnail data for the currently playing node.
      * @property isContinuousPlayback Whether playback moves on to the next queue item automatically.
      * @property playingFromName Name of the folder the queue is playing from; null when the
@@ -38,6 +42,8 @@ sealed interface AudioPlayerQueueUiState {
         val currentTitle: String?,
         val currentArtist: String?,
         val currentArtworkUri: String?,
+        val currentPositionMs: Long = 0L,
+        val currentDurationMs: Long = 0L,
         val currentThumbnailData: ThumbnailData?,
         val isContinuousPlayback: Boolean,
         val isShuffleEnabled: Boolean = false,

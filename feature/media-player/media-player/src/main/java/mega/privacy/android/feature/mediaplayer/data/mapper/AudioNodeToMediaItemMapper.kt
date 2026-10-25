@@ -25,22 +25,39 @@ class AudioNodeToMediaItemMapper @Inject constructor(
 ) {
 
     operator fun invoke(node: TypedAudioNode, uri: Uri): MediaItem =
-        invoke(handle = node.id.longValue, uri = uri, displayName = node.name)
+        invoke(
+            handle = node.id.longValue,
+            uri = uri,
+            displayName = node.name,
+            durationMs = node.duration.inWholeMilliseconds.takeIf { it > 0 },
+        )
 
     /**
      * Create a [MediaItem] directly from raw fields (for offline items and the fast first-emit).
      *
      * @param displayName optional file name shown before embedded metadata is extracted
+     * @param durationMs optional track length, so the play queue can label every item before the
+     * player has reached it; the player only reports a duration for the item it is decoding
      */
-    operator fun invoke(handle: Long, uri: Uri, displayName: String? = null): MediaItem {
+    operator fun invoke(
+        handle: Long,
+        uri: Uri,
+        displayName: String? = null,
+        durationMs: Long? = null,
+    ): MediaItem {
         val mediaId = UUID.randomUUID().toString()
         mediaHandleStore.register(mediaId, handle)
         return MediaItem.Builder()
             .setUri(uri)
             .setMediaId(mediaId)
             .apply {
-                if (displayName != null) {
-                    setMediaMetadata(MediaMetadata.Builder().setDisplayTitle(displayName).build())
+                if (displayName != null || durationMs != null) {
+                    setMediaMetadata(
+                        MediaMetadata.Builder()
+                            .setDisplayTitle(displayName)
+                            .setDurationMs(durationMs)
+                            .build()
+                    )
                 }
             }
             .build()

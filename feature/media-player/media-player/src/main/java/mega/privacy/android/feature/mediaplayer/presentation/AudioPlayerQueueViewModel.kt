@@ -131,6 +131,12 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
                     item.copy(
                         title = state.title ?: item.title,
                         artist = state.artist ?: item.artist,
+                        // The decoded length wins over the one the metadata carries, so that the
+                        // row, the header and the seek bar all show the same length for the item
+                        // being played; the position beside it comes from the player too, and a
+                        // metadata length rounded down to the second would make it read past the
+                        // end. It also covers the items built without a node, which carry none.
+                        durationMs = state.durationMs.takeIf { it > 0 } ?: item.durationMs,
                     )
                 } else {
                     item
@@ -142,6 +148,11 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
                 currentTitle = state.title,
                 currentArtist = state.artist,
                 currentArtworkUri = state.artworkUri,
+                // Truncated to the second the queue displays, so that the twice-a-second
+                // position poll produces an equal state and the list is not recomposed for a
+                // change no one can see.
+                currentPositionMs = state.currentPositionMs / 1000 * 1000,
+                currentDurationMs = state.durationMs,
                 currentThumbnailData = state.currentMediaItemHandle?.let {
                     ThumbnailRequest.fromHandle(it)
                 },

@@ -2,8 +2,11 @@ package mega.privacy.android.app.mediaplayer
 
 import android.net.Uri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,11 +19,14 @@ import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
@@ -62,6 +68,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
@@ -130,6 +137,7 @@ class AudioPlayQueueBuilderTest {
             audioNodeToMediaItemMapper(
                 any<Long>(),
                 any<Uri>(),
+                anyOrNull(),
                 anyOrNull(),
             )
         ).thenReturn(mock())
@@ -203,6 +211,53 @@ class AudioPlayQueueBuilderTest {
             verify(megaApiHttpServerStartUseCase, never()).invoke()
             verify(megaApiFolderHttpServerStartUseCase, never()).invoke()
         }
+
+    @Test
+    fun `test that an offline item passes the duration from its file type info to the mapper`() =
+        runTest {
+            whenever(getOfflineNodesByParentIdUseCase(any<Int>(), anyOrNull()))
+                .thenReturn(listOf(offlineAudioItem(duration = 295.seconds)))
+            val params = buildParams(adapterType = OFFLINE_ADAPTER, isPlayQueue = true)
+
+            // The offline branch resolves each item's absolute path through Uri.parse, which is
+            // unavailable in JVM unit tests; without the static mock every item is skipped.
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                whenever(Uri.parse(any())).thenReturn(mock())
+
+                underTest(params).test { cancelAndIgnoreRemainingEvents() }
+            }
+
+            val durationCaptor = argumentCaptor<Long?>()
+            verify(audioNodeToMediaItemMapper, atLeastOnce()).invoke(
+                any<Long>(),
+                any<Uri>(),
+                anyOrNull(),
+                durationCaptor.capture(),
+            )
+            assertThat(durationCaptor.allValues).contains(295_000L)
+        }
+
+    @Test
+    fun `test that an offline item with no length leaves the duration unset`() = runTest {
+        whenever(getOfflineNodesByParentIdUseCase(any<Int>(), anyOrNull()))
+            .thenReturn(listOf(offlineAudioItem(duration = Duration.ZERO)))
+        val params = buildParams(adapterType = OFFLINE_ADAPTER, isPlayQueue = true)
+
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            whenever(Uri.parse(any())).thenReturn(mock())
+
+            underTest(params).test { cancelAndIgnoreRemainingEvents() }
+        }
+
+        val durationCaptor = argumentCaptor<Long?>()
+        verify(audioNodeToMediaItemMapper, atLeastOnce()).invoke(
+            any<Long>(),
+            any<Uri>(),
+            anyOrNull(),
+            durationCaptor.capture(),
+        )
+        assertThat(durationCaptor.allValues.filterNotNull()).isEmpty()
+    }
 
     @Test
     fun `test that invoke does not start streaming server when adapter is ZIP_ADAPTER`() =
@@ -360,6 +415,7 @@ class AudioPlayQueueBuilderTest {
             any<Long>(),
             any<Uri>(),
             anyOrNull(),
+            anyOrNull(),
         )
     }
 
@@ -375,7 +431,7 @@ class AudioPlayQueueBuilderTest {
             val handle = 123L
             val firstMediaItem = mock<MediaItem>()
             val secondCallItem = mock<MediaItem>()
-            whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull()))
+            whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull(), anyOrNull()))
                 .thenReturn(firstMediaItem, secondCallItem)
             val params = buildParams(
                 adapterType = AUDIO_BROWSE_ADAPTER,
@@ -409,8 +465,10 @@ class AudioPlayQueueBuilderTest {
                 whenever(getLocalLinkFromMegaApiUseCase(1L)).thenReturn(null)
                 whenever(getLocalLinkFromMegaApiUseCase(2L)).thenReturn("http://server/2")
                 whenever(getLocalLinkFromMegaApiUseCase(3L)).thenReturn("http://server/3")
+                // Real items rather than mocks: mediaMetadata is a field, and the substitution
+                // of the first-emit item reads it to carry the resolved length over.
                 whenever(audioNodeToMediaItemMapper(any<TypedAudioNode>(), any<Uri>()))
-                    .thenReturn(mock())
+                    .thenReturn(MediaItem.Builder().setMediaId("sibling").build())
                 val params = buildParams(
                     adapterType = AUDIO_BROWSE_ADAPTER,
                     handle = 2L,
@@ -439,11 +497,13 @@ class AudioPlayQueueBuilderTest {
                 val node3 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(3L)) }
                 whenever(getAudioNodesUseCase(any())).thenReturn(listOf(node1, node2, node3))
                 whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn("http://server/track")
-                val firstMediaItem = mock<MediaItem>()
-                whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull()))
+                // Real items rather than mocks: mediaMetadata is a field, and the substitution
+                // reads it to carry the resolved length over.
+                val firstMediaItem = MediaItem.Builder().setMediaId("first-emit").build()
+                whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull(), anyOrNull()))
                     .thenReturn(firstMediaItem)
                 whenever(audioNodeToMediaItemMapper(any<TypedAudioNode>(), any<Uri>()))
-                    .thenReturn(mock())
+                    .thenReturn(MediaItem.Builder().setMediaId("sibling").build())
                 val params = buildParams(
                     adapterType = AUDIO_BROWSE_ADAPTER,
                     handle = 2L,
@@ -464,6 +524,50 @@ class AudioPlayQueueBuilderTest {
         }
 
     @Test
+    fun `test that the substituted first-emit item keeps the length the full queue resolved`() =
+        runTest {
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                whenever(Uri.parse(any())).thenReturn(mock())
+                val node1 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(1L)) }
+                val node2 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(2L)) }
+                whenever(getAudioNodesUseCase(any())).thenReturn(listOf(node1, node2))
+                whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn("http://server/track")
+                // Real items rather than mocks: mediaMetadata is a field, so a mock always
+                // reports it as null and the substitution could not be observed.
+                val firstMediaItem = MediaItem.Builder().setMediaId("first-emit").build()
+                whenever(
+                    audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull(), anyOrNull())
+                ).thenReturn(firstMediaItem)
+                whenever(audioNodeToMediaItemMapper(any<TypedAudioNode>(), any<Uri>()))
+                    .thenReturn(
+                        MediaItem.Builder()
+                            .setMediaId("resolved")
+                            .setMediaMetadata(
+                                MediaMetadata.Builder().setDurationMs(295_000L).build()
+                            )
+                            .build()
+                    )
+                val params = buildParams(
+                    adapterType = AUDIO_BROWSE_ADAPTER,
+                    handle = 2L,
+                    isPlayQueue = true,
+                )
+
+                underTest(params).test {
+                    awaitItem() // fast single-item emission
+
+                    val full = awaitItem()
+
+                    // The tapped track keeps the first emit's media id, so the player expands the
+                    // queue instead of resetting it, and still carries the resolved length.
+                    assertThat(full.mediaItems[1].mediaId).isEqualTo("first-emit")
+                    assertThat(full.mediaItems[1].mediaMetadata.durationMs).isEqualTo(295_000L)
+                    awaitComplete()
+                }
+            }
+        }
+
+    @Test
     fun `test that the full queue keeps every sibling when the tapped track is not among them`() =
         runTest {
             Mockito.mockStatic(Uri::class.java).use { _ ->
@@ -475,7 +579,7 @@ class AudioPlayQueueBuilderTest {
                 val firstMediaItem = mock<MediaItem>()
                 val sibling1 = mock<MediaItem>()
                 val sibling2 = mock<MediaItem>()
-                whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull()))
+                whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull(), anyOrNull()))
                     .thenReturn(firstMediaItem)
                 whenever(audioNodeToMediaItemMapper(any<TypedAudioNode>(), any<Uri>()))
                     .thenReturn(sibling1, sibling2)
@@ -538,6 +642,24 @@ class AudioPlayQueueBuilderTest {
                 awaitComplete()
             }
         }
+
+    private fun offlineAudioItem(duration: Duration) = OfflineFileInformation(
+        nodeInfo = OtherOfflineNodeInformation(
+            id = 1,
+            path = "/offline",
+            name = "track.mp3",
+            handle = "123",
+            isFolder = false,
+            lastModifiedTime = null,
+            parentId = -1,
+        ),
+        fileTypeInfo = AudioFileTypeInfo(
+            mimeType = "audio/mpeg",
+            extension = "mp3",
+            duration = duration,
+        ),
+        absolutePath = "/offline/track.mp3",
+    )
 
     private fun buildParams(
         adapterType: Int = AUDIO_BROWSE_ADAPTER,

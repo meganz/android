@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class AudioNodeToMediaItemMapperTest {
@@ -31,6 +32,7 @@ internal class AudioNodeToMediaItemMapperTest {
         val node = mock<TypedAudioNode>().also {
             whenever(it.id).thenReturn(NodeId(handle))
             whenever(it.name).thenReturn(null)
+            whenever(it.duration).thenReturn(0.seconds)
         }
 
         val result = underTest(node, uri)
@@ -45,6 +47,7 @@ internal class AudioNodeToMediaItemMapperTest {
     fun `test that invoke with node sets uri correctly`() {
         val node = mock<TypedAudioNode>().also {
             whenever(it.id).thenReturn(NodeId(1L))
+            whenever(it.duration).thenReturn(0.seconds)
         }
 
         val result = underTest(node, uri)
@@ -76,6 +79,7 @@ internal class AudioNodeToMediaItemMapperTest {
         val node = mock<TypedAudioNode>().also {
             whenever(it.id).thenReturn(NodeId(1L))
             whenever(it.name).thenReturn("my song.mp3")
+            whenever(it.duration).thenReturn(0.seconds)
         }
 
         val result = underTest(node, uri)
@@ -98,5 +102,32 @@ internal class AudioNodeToMediaItemMapperTest {
 
         assertThat(result.mediaMetadata.title).isNull()
         assertThat(result.mediaMetadata.displayTitle).isNull()
+    }
+
+    @Test
+    fun `test that invoke with node sets the node duration on the media item`() {
+        val node = mock<TypedAudioNode>().also {
+            whenever(it.id).thenReturn(NodeId(1L))
+            whenever(it.name).thenReturn("my song.mp3")
+            whenever(it.duration).thenReturn(295.seconds)
+        }
+
+        val result = underTest(node, uri)
+
+        assertThat(result.mediaMetadata.durationMs).isEqualTo(295_000L)
+    }
+
+    @Test
+    fun `test that invoke with raw fields sets the given duration on the media item`() {
+        val result = underTest(handle = 1L, uri = uri, durationMs = 184_000L)
+
+        assertThat(result.mediaMetadata.durationMs).isEqualTo(184_000L)
+    }
+
+    @Test
+    fun `test that invoke with raw fields leaves the duration unset when none is given`() {
+        val result = underTest(handle = 1L, uri = uri, displayName = "track.mp3")
+
+        assertThat(result.mediaMetadata.durationMs).isNull()
     }
 }
