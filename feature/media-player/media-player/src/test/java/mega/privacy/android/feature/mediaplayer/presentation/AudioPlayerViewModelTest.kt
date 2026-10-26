@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.thumbnail.PreviewRequest
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
@@ -756,6 +757,9 @@ class AudioPlayerViewModelTest {
             val state = awaitItem() as AudioPlayerUiState.Data
             assertThat(state.currentPlayingHandle).isEqualTo(123456L)
             assertThat(state.thumbnailData).isNotNull()
+            // The player draws the preview over the thumbnail, so the playing track carries
+            // both: the thumbnail is already cached and the preview has to be fetched.
+            assertThat(state.previewData).isEqualTo(PreviewRequest(NodeId(123456L)))
         }
     }
 

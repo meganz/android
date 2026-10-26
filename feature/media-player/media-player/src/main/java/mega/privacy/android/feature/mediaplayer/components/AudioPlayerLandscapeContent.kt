@@ -37,10 +37,11 @@ import mega.privacy.android.icon.pack.R as iconPackR
 /**
  * Landscape layout for the audio player.
  *
- * When [artworkUri] or [thumbnailData] is available the image fills the entire screen as a
- * backdrop with a dark gradient overlay so the controls remain readable ([artworkUri] takes
- * priority). When neither is available the standard gradient background is used and the default
- * audio icon is centred above the controls.
+ * When an image is available it fills the entire screen as a backdrop with a dark gradient
+ * overlay so the controls remain readable. The thumbnail is drawn first because it is already
+ * in the image cache, and [artworkUri] or [previewData] is drawn over it once fetched. When no
+ * image is available the standard gradient background is used and the default audio icon is
+ * centred above the controls.
  *
  * The landscape layout differs from portrait in that playback controls are vertically centred
  * in the available space while the seek bar and primary actions are pinned at the bottom.
@@ -57,6 +58,7 @@ fun AudioPlayerLandscapeContent(
     duration: Long,
     artworkUri: String?,
     thumbnailData: ThumbnailData?,
+    previewData: ThumbnailData?,
     repeatMode: Int,
     shuffleEnabled: Boolean,
     isPodcastMode: Boolean,
@@ -79,26 +81,18 @@ fun AudioPlayerLandscapeContent(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    // True only after the background image (artworkUri or thumbnailData) actually loads.
-    // Starts false so the default icon shows immediately; hides when the image succeeds.
-    var backgroundLoaded by remember(artworkUri, thumbnailData) { mutableStateOf(false) }
+    val topModel: Any? = artworkUri ?: previewData
+
+    // Tracked per image so that a failure of one does not hide a backdrop the other has drawn.
+    // Both start false so the default icon shows immediately.
+    var thumbnailLoaded by remember(thumbnailData) { mutableStateOf(false) }
+    var topLoaded by remember(topModel) { mutableStateOf(false) }
+    val backgroundLoaded = thumbnailLoaded || topLoaded
 
     Box(modifier = modifier.fillMaxSize()) {
         AudioPlayerGradientBackground(modifier = Modifier.fillMaxSize())
 
-        if (artworkUri != null) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(artworkUri)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-                onSuccess = { backgroundLoaded = true },
-                onError = { backgroundLoaded = false },
-            )
-        } else if (thumbnailData != null) {
+        if (thumbnailData != null) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(thumbnailData)
@@ -107,8 +101,22 @@ fun AudioPlayerLandscapeContent(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
-                onSuccess = { backgroundLoaded = true },
-                onError = { backgroundLoaded = false },
+                onSuccess = { thumbnailLoaded = true },
+                onError = { thumbnailLoaded = false },
+            )
+        }
+
+        if (topModel != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(topModel)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+                onSuccess = { topLoaded = true },
+                onError = { topLoaded = false },
             )
         }
 
@@ -221,6 +229,7 @@ private fun PreviewAudioPlayerLandscapeContent() {
             duration = 240_000L,
             artworkUri = null,
             thumbnailData = null,
+            previewData = null,
             repeatMode = Player.REPEAT_MODE_OFF,
             shuffleEnabled = false,
             isPodcastMode = false,

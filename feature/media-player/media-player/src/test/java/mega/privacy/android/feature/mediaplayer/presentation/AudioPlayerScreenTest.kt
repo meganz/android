@@ -67,6 +67,7 @@ class AudioPlayerScreenTest {
         hasNext = hasNext,
         currentAdapterType = -1,
         thumbnailData = null,
+        previewData = null,
         nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
         fileLinkUrl = null,
         localFilePath = null,

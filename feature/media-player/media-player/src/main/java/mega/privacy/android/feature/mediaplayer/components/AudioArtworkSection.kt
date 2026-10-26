@@ -23,33 +23,41 @@ import coil3.request.crossfade
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.R as iconPackR
 
+/**
+ * The artwork of the playing track, drawn in three layers.
+ *
+ * The default audio icon is at the bottom, the thumbnail over it, and [artworkUri] or
+ * [previewData] over that. The thumbnail is already in the image cache from the screen the
+ * player was opened from, so it appears at once and holds the space while the sharper image
+ * is fetched.
+ */
 @Composable
 internal fun AudioArtworkSection(
     artworkUri: String?,
     thumbnailData: ThumbnailData?,
+    previewData: ThumbnailData?,
     modifier: Modifier = Modifier,
 ) {
-    var imageLoaded by remember(artworkUri, thumbnailData) { mutableStateOf(false) }
+    val topModel: Any? = artworkUri ?: previewData
+
+    // Tracked per image so that a failure of one does not hide an image the other has drawn.
+    var thumbnailLoaded by remember(thumbnailData) { mutableStateOf(false) }
+    var topLoaded by remember(topModel) { mutableStateOf(false) }
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
-        if (artworkUri != null) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(artworkUri)
-                    .crossfade(true)
-                    .build(),
+        if (!thumbnailLoaded && !topLoaded) {
+            Image(
+                painter = painterResource(iconPackR.drawable.ic_audio_medium_solid),
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
-                onSuccess = { imageLoaded = true },
-                onError = { imageLoaded = false },
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp)),
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit,
             )
-        } else if (thumbnailData != null) {
+        }
+
+        if (thumbnailData != null) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(thumbnailData)
@@ -57,20 +65,27 @@ internal fun AudioArtworkSection(
                     .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                onSuccess = { imageLoaded = true },
-                onError = { imageLoaded = false },
+                onSuccess = { thumbnailLoaded = true },
+                onError = { thumbnailLoaded = false },
                 modifier = Modifier
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(12.dp)),
             )
         }
 
-        if (!imageLoaded) {
-            Image(
-                painter = painterResource(iconPackR.drawable.ic_audio_medium_solid),
+        if (topModel != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(topModel)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.Crop,
+                onSuccess = { topLoaded = true },
+                onError = { topLoaded = false },
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(12.dp)),
             )
         }
     }

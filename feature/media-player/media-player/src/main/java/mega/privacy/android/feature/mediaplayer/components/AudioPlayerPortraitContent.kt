@@ -36,6 +36,7 @@ fun AudioPlayerPortraitContent(
     artist: String?,
     artworkUri: String?,
     thumbnailData: ThumbnailData?,
+    previewData: ThumbnailData?,
     repeatMode: Int,
     shuffleEnabled: Boolean,
     isPodcastMode: Boolean,
@@ -71,6 +72,7 @@ fun AudioPlayerPortraitContent(
             AudioArtworkSection(
                 artworkUri = artworkUri,
                 thumbnailData = thumbnailData,
+                previewData = previewData,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -131,6 +133,7 @@ private fun PreviewAudioPlayerPortraitContent() {
             artist = "Artist Name",
             artworkUri = null,
             thumbnailData = null,
+            previewData = null,
             repeatMode = Player.REPEAT_MODE_OFF,
             shuffleEnabled = false,
             isPodcastMode = false,

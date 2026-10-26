@@ -30,7 +30,10 @@ sealed interface AudioPlayerUiState {
      * @property hasPlaylist Whether there is more than one item in the queue.
      * @property hasNext Whether skip-next can advance to another item; drives the next button's enabled state.
      * @property currentAdapterType The adapter type from the launch intent.
-     * @property thumbnailData Thumbnail data for the currently playing node.
+     * @property thumbnailData Thumbnail data for the currently playing node. It holds 200x200
+     * pixels, which the player draws far larger, so it is shown only until [previewData] arrives.
+     * @property previewData Preview of the playing node, which holds enough pixels for a
+     * full-screen image where [thumbnailData] holds 200x200.
      * @property nodeSourceType The node source type derived from the adapter type.
      * @property fileLinkUrl Public file-link URL; non-null only for file-link launches.
      * @property localFilePath Local file path; non-null only for zip-file launches.
@@ -54,6 +57,7 @@ sealed interface AudioPlayerUiState {
         val hasNext: Boolean,
         val currentAdapterType: Int,
         val thumbnailData: ThumbnailData?,
+        val previewData: ThumbnailData?,
         val nodeSourceType: NodeSourceType,
         val fileLinkUrl: String?,
         val localFilePath: String?,

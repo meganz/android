@@ -228,6 +228,7 @@ class AudioPlayerScreenshotTest {
         hasNext = true,
         currentAdapterType = -1,
         thumbnailData = null,
+        previewData = null,
         currentPlaybackSpeed = 1f,
         nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
         fileLinkUrl = null,

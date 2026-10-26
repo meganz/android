@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.node.thumbnail.PreviewRequest
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
@@ -468,6 +469,7 @@ class AudioPlayerViewModel @Inject constructor(
             artworkUri = state.artworkUri,
             currentPlayingHandle = state.currentMediaItemHandle,
             thumbnailData = state.currentMediaItemHandle?.let { ThumbnailRequest.fromHandle(it) },
+            previewData = state.currentMediaItemHandle?.let { PreviewRequest.fromHandle(it) },
             currentPlayingItemName = existing?.currentPlayingItemName,
             currentAdapterType = data?.adapterType ?: INVALID_VALUE,
             nodeSourceType = data?.nodeSourceType ?: NodeSourceType.MEDIA_PLAYER_DEFAULT,

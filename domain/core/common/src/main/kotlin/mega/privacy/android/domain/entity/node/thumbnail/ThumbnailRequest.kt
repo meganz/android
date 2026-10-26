@@ -36,3 +36,20 @@ data class ChatThumbnailRequest(val chatId: Long, val messageId: Long) : Thumbna
  * Thumbnail from Uri request
  */
 data class ThumbnailUriRequest(val uri: UriPath) : ThumbnailData
+
+/**
+ * Preview request
+ *
+ * Loads the node preview instead of its thumbnail, for screens that draw the image far larger
+ * than the 200x200 pixels a thumbnail holds.
+ *
+ * @property id handle of node
+ */
+data class PreviewRequest(val id: NodeId) : ThumbnailData {
+    companion object {
+        /**
+         * Create a PreviewRequest from a handle
+         */
+        fun fromHandle(handle: Long) = PreviewRequest(NodeId(handle))
+    }
+}

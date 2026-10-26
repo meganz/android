@@ -200,6 +200,7 @@ fun AudioPlayerScreen(
                     val contentArtist: String?
                     val contentArtworkUri: String?
                     val contentThumbnailData: ThumbnailData?
+                    val contentPreviewData: ThumbnailData?
                     val contentRepeatMode: Int
                     val contentShuffleEnabled: Boolean
                     val contentSpeed: Float
@@ -216,6 +217,7 @@ fun AudioPlayerScreen(
                             contentArtist = null
                             contentArtworkUri = null
                             contentThumbnailData = null
+                            contentPreviewData = null
                             contentRepeatMode = Player.REPEAT_MODE_OFF
                             contentShuffleEnabled = false
                             contentSpeed = 1f
@@ -232,6 +234,7 @@ fun AudioPlayerScreen(
                             contentArtist = uiState.artist
                             contentArtworkUri = uiState.artworkUri
                             contentThumbnailData = uiState.thumbnailData
+                            contentPreviewData = uiState.previewData
                             contentRepeatMode = uiState.repeatMode
                             contentShuffleEnabled = uiState.shuffleEnabled
                             contentSpeed = uiState.currentPlaybackSpeed
@@ -250,6 +253,7 @@ fun AudioPlayerScreen(
                         artist = contentArtist,
                         artworkUri = contentArtworkUri,
                         thumbnailData = contentThumbnailData,
+                        previewData = contentPreviewData,
                         repeatMode = contentRepeatMode,
                         shuffleEnabled = contentShuffleEnabled,
                         isPodcastMode = isPodcastMode,
@@ -428,6 +432,7 @@ private fun AudioPlayerContent(
     artist: String?,
     artworkUri: String?,
     thumbnailData: ThumbnailData?,
+    previewData: ThumbnailData?,
     repeatMode: Int,
     shuffleEnabled: Boolean,
     isPodcastMode: Boolean,
@@ -470,6 +475,7 @@ private fun AudioPlayerContent(
             duration = duration,
             artworkUri = artworkUri,
             thumbnailData = thumbnailData,
+            previewData = previewData,
             repeatMode = repeatMode,
             shuffleEnabled = shuffleEnabled,
             isPodcastMode = isPodcastMode,
@@ -504,6 +510,7 @@ private fun AudioPlayerContent(
             artist = artist,
             artworkUri = artworkUri,
             thumbnailData = thumbnailData,
+            previewData = previewData,
             repeatMode = repeatMode,
             shuffleEnabled = shuffleEnabled,
             isPodcastMode = isPodcastMode,
@@ -572,6 +579,7 @@ private fun PreviewAudioPlayerScreenPodcastMode() {
             currentPlayingItemName = null,
             currentAdapterType = -1,
             thumbnailData = null,
+            previewData = null,
             nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
             fileLinkUrl = null,
             localFilePath = null,
@@ -617,6 +625,7 @@ private fun PreviewAudioPlayerScreenMusicMode() {
             currentPlayingItemName = null,
             currentAdapterType = -1,
             thumbnailData = null,
+            previewData = null,
             nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
             fileLinkUrl = null,
             localFilePath = null,
@@ -662,6 +671,7 @@ private fun PreviewAudioPlayerScreenPaused() {
             hasNext = false,
             currentAdapterType = -1,
             thumbnailData = null,
+            previewData = null,
             nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
             fileLinkUrl = null,
             localFilePath = null,

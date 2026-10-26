@@ -3,6 +3,7 @@ package mega.privacy.android.app.fetcher
 import coil3.key.Keyer
 import coil3.request.Options
 import mega.privacy.android.domain.entity.node.thumbnail.ChatThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.PreviewRequest
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
@@ -16,5 +17,6 @@ internal object MegaThumbnailKeyer : Keyer<ThumbnailData> {
         is ThumbnailRequest -> "${data.id.longValue}-${options.size}"
         is ChatThumbnailRequest -> "${data.chatId}-${data.messageId}-${options.size}"
         is ThumbnailUriRequest -> data.uri.value
+        is PreviewRequest -> "preview-${data.id.longValue}-${options.size}"
     }
 }
