@@ -100,6 +100,9 @@ fun richTableCellTag(block: Int, row: Int, column: Int): String =
 
 private val TailTapAreaHeight = 160.dp
 
+/** Frames to wait for a scrolled-to block to compose and register its focus requester. */
+private const val FocusComposeFrames = 5
+
 /** Idle time after which a typing burst is checkpointed for undo. */
 private val UndoCheckpointDebounce = 1.seconds
 
@@ -149,6 +152,21 @@ fun RichDocumentEditor(
         ) {
             state.pendingFocus = RichFocusRequest(0, TextRange.Zero)
         }
+    }
+
+    // A configuration change rebuilds the composition with new focus requesters, so the
+    // edited field loses focus and the keyboard closes. The document state survives in the
+    // ViewModel, so focus and caret are restored from it. A table cell has no focus
+    // requester, so a focused cell is not restored.
+    LaunchedEffect(state) {
+        if (state.focusedCell != null) return@LaunchedEffect
+        val index = state.focusedIndex ?: return@LaunchedEffect
+        val selection = when (val block = state.blocks.getOrNull(index)) {
+            is RichTextBlockEditState -> block.text.textFieldState.selection
+            is CodeBlockEditState -> block.code.selection
+            else -> null
+        } ?: return@LaunchedEffect
+        state.pendingFocus = RichFocusRequest(index, selection)
     }
 
     // Enter is only recorded by the input transformation (which runs in the text input
@@ -222,6 +240,19 @@ fun RichDocumentEditor(
                     request.selection.start.coerceIn(0, length),
                     request.selection.end.coerceIn(0, length),
                 )
+            }
+            // A block outside the viewport is not composed and has no focus requester, so
+            // it must be scrolled into the list first.
+            if (focusRequesters[request.index] == null &&
+                request.index in state.blocks.indices
+            ) {
+                runCatching { listState.scrollToItem(request.index) }
+                    .onFailure { Timber.w(it, "Scroll to the focus target failed") }
+                var frames = 0
+                while (focusRequesters[request.index] == null && frames < FocusComposeFrames) {
+                    withFrameNanos { }
+                    frames++
+                }
             }
             runCatching { focusRequesters[request.index]?.requestFocus() }
                 .onFailure { Timber.w(it, "Pending focus request failed") }

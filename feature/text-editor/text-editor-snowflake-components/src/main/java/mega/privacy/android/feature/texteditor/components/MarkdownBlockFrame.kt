@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.DisableSelection
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing.listOrQuoteRow
 import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing.taskRow
 
@@ -154,8 +154,10 @@ internal fun MarkdownListItemChrome(
                         // toggleable. Always rendered with enabled colors — the disabled
                         // tint is illegible in dark mode, and the read-only preview should
                         // show the task state clearly, just not accept taps.
-                        onCheckedChange = null,
+                        onCheckStateChanged = {},
                         enabled = true,
+                        clickable = false,
+                        tapTargetArea = false,
                     )
                 }
             }

@@ -1,5 +1,9 @@
 package mega.privacy.android.feature.texteditor.components.markdown.rich
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsFocused
@@ -11,6 +15,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.test.pressKey
@@ -74,6 +79,68 @@ class RichDocumentEditorTest {
     @Test
     fun `test that an empty document is not focused by default`() {
         setEditor(RichDocument(listOf(RichBlock.Paragraph(RichText("")))))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsNotFocused()
+    }
+
+    /** A configuration change disposes the editor and composes it again with the same state. */
+    private fun setRecreatableEditor(document: RichDocument): () -> Unit {
+        state = RichDocumentState(document)
+        var generation by mutableStateOf(0)
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                key(generation) {
+                    RichDocumentEditor(state = state)
+                }
+            }
+        }
+        return { generation++ }
+    }
+
+    @Test
+    fun `test that focus and caret are restored when the editor is recreated`() {
+        val recreate = setRecreatableEditor(
+            RichDocument(listOf(RichBlock.Paragraph(RichText("hello world")))),
+        )
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).requestFocus()
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInputSelection(TextRange(5))
+        composeRule.waitForIdle()
+
+        recreate()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsFocused()
+        assertThat(
+            (state.blocks[0] as RichTextBlockEditState).text.textFieldState.selection,
+        ).isEqualTo(TextRange(5))
+    }
+
+    @Test
+    fun `test that focus is restored when the focused block is outside the viewport`() {
+        val recreate = setRecreatableEditor(
+            RichDocument((0 until 30).map { RichBlock.Paragraph(RichText("line $it")) }),
+        )
+        composeRule.onNodeWithTag(RICH_DOCUMENT_EDITOR_TAG).performScrollToIndex(29)
+        composeRule.onNodeWithTag(richBlockFieldTag(29)).requestFocus()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(RICH_DOCUMENT_EDITOR_TAG).performScrollToIndex(0)
+        composeRule.waitForIdle()
+
+        recreate()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(richBlockFieldTag(29)).assertIsFocused()
+    }
+
+    @Test
+    fun `test that an editor that was never focused does not grab focus when it is recreated`() {
+        val recreate = setRecreatableEditor(
+            RichDocument(listOf(RichBlock.Paragraph(RichText("hello world")))),
+        )
+        composeRule.waitForIdle()
+
+        recreate()
+        composeRule.waitForIdle()
 
         composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsNotFocused()
     }
