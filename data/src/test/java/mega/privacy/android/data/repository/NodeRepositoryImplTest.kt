@@ -1409,37 +1409,23 @@ internal class NodeRepositoryImplTest {
         }
 
     @Test
-    fun `test that isNodeUnderOfflineRoot returns true when the node itself is an offline root`() =
+    fun `test that isNodeUnderOfflineRoot returns true when the gateway finds an offline root`() =
         runTest {
             val handle = 55L
-            whenever(megaLocalRoomGateway.getOfflineInformation(handle))
-                .thenReturn(offlineNode(id = 1, isOfflineRoot = true))
+            val offline = offlineNode(id = 3, isOfflineRoot = false, parentId = 2)
+            whenever(megaLocalRoomGateway.getOfflineInformation(handle)).thenReturn(offline)
+            whenever(megaLocalRoomGateway.isUnderOfflineRoot(offline)).thenReturn(true)
 
             assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isTrue()
         }
 
     @Test
-    fun `test that isNodeUnderOfflineRoot returns true when an ancestor is an offline root`() =
+    fun `test that isNodeUnderOfflineRoot returns false when the gateway finds no offline root`() =
         runTest {
             val handle = 55L
-            whenever(megaLocalRoomGateway.getOfflineInformation(handle))
-                .thenReturn(offlineNode(id = 3, isOfflineRoot = false, parentId = 2))
-            whenever(megaLocalRoomGateway.getOfflineLineById(2))
-                .thenReturn(offlineNode(id = 2, isOfflineRoot = false, parentId = 1))
-            whenever(megaLocalRoomGateway.getOfflineLineById(1))
-                .thenReturn(offlineNode(id = 1, isOfflineRoot = true))
-
-            assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isTrue()
-        }
-
-    @Test
-    fun `test that isNodeUnderOfflineRoot returns false when no ancestor is an offline root`() =
-        runTest {
-            val handle = 55L
-            whenever(megaLocalRoomGateway.getOfflineInformation(handle))
-                .thenReturn(offlineNode(id = 2, isOfflineRoot = false, parentId = 1))
-            whenever(megaLocalRoomGateway.getOfflineLineById(1))
-                .thenReturn(offlineNode(id = 1, isOfflineRoot = false))
+            val offline = offlineNode(id = 2, isOfflineRoot = false, parentId = 1)
+            whenever(megaLocalRoomGateway.getOfflineInformation(handle)).thenReturn(offline)
+            whenever(megaLocalRoomGateway.isUnderOfflineRoot(offline)).thenReturn(false)
 
             assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isFalse()
         }
@@ -1449,20 +1435,6 @@ internal class NodeRepositoryImplTest {
         runTest {
             val handle = 55L
             whenever(megaLocalRoomGateway.getOfflineInformation(handle)).thenReturn(null)
-
-            assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isFalse()
-        }
-
-    @Test
-    fun `test that isNodeUnderOfflineRoot returns false when the parent chain contains a cycle`() =
-        runTest {
-            val handle = 55L
-            whenever(megaLocalRoomGateway.getOfflineInformation(handle))
-                .thenReturn(offlineNode(id = 1, isOfflineRoot = false, parentId = 2))
-            whenever(megaLocalRoomGateway.getOfflineLineById(2))
-                .thenReturn(offlineNode(id = 2, isOfflineRoot = false, parentId = 1))
-            whenever(megaLocalRoomGateway.getOfflineLineById(1))
-                .thenReturn(offlineNode(id = 1, isOfflineRoot = false, parentId = 2))
 
             assertThat(underTest.isNodeUnderOfflineRoot(NodeId(handle))).isFalse()
         }

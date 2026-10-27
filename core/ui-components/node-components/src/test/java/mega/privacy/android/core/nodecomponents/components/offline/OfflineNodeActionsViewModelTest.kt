@@ -204,7 +204,7 @@ class OfflineNodeActionsViewModelTest {
         val content = NodeContentUri.LocalContentUri(file)
         whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
 
-        underTest.handleOpenOfflineFile(nodeFileInfo)
+        underTest.handleOpenOfflineFile(nodeFileInfo, parentId = -1)
 
         when (type) {
             is UrlFileTypeInfo -> {
@@ -246,7 +246,7 @@ class OfflineNodeActionsViewModelTest {
             }
             whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
 
-            underTest.handleOpenOfflineFile(nodeFileInfo)
+            underTest.handleOpenOfflineFile(nodeFileInfo, parentId = -1)
 
             underTest.uiState.test {
                 val res = awaitItem()
@@ -274,7 +274,7 @@ class OfflineNodeActionsViewModelTest {
             val file = mock<File>()
             whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
 
-            underTest.handleOpenOfflineFile(nodeFileInfo)
+            underTest.handleOpenOfflineFile(nodeFileInfo, parentId = -1)
 
             verify(getPathFromNodeContentUseCase).invoke(NodeContentUri.LocalContentUri(file))
             underTest.uiState.test {
@@ -283,6 +283,33 @@ class OfflineNodeActionsViewModelTest {
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
                 assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(OfflineNodeActionUiEntity.Uri::class.java)
+            }
+        }
+
+    @Test
+    fun `test that handleOpenOfflineFile uses the listed folder as the media parent when the stored parent differs`() =
+        runTest {
+            val listedParentId = -1
+            val nodeInfo = mock<OtherOfflineNodeInformation>()
+            val nodeFileInfo = mock<OfflineFileInformation>().stub {
+                on { this.nodeInfo } doReturn nodeInfo
+                on { fileTypeInfo } doReturn AudioFileTypeInfo(
+                    extension = "mp3",
+                    mimeType = "audio",
+                    duration = Duration.INFINITE
+                )
+                on { handle } doReturn "123"
+                on { path } doReturn "path"
+                on { parentId } doReturn 7
+            }
+            whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(File("path"))
+
+            underTest.handleOpenOfflineFile(nodeFileInfo, parentId = listedParentId)
+
+            underTest.uiState.test {
+                val content = (awaitItem().openFileEvent as StateEventWithContentTriggered).content
+                assertThat((content as OfflineNodeActionUiEntity.AudioOrVideo).parentId)
+                    .isEqualTo(listedParentId)
             }
         }
 

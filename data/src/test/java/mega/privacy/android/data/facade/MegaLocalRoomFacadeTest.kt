@@ -30,6 +30,7 @@ import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
 import mega.privacy.android.data.database.entity.NonContactEntity
+import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
@@ -65,6 +66,7 @@ import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -241,6 +243,8 @@ internal class MegaLocalRoomFacadeTest {
             homePinnedItemDao,
             homePinnedItemMapper,
             deviceGateway,
+            offlineDao,
+            offlineModelMapper,
         )
         whenever(deviceGateway.getCurrentTimeInMillis()).thenReturn(testUpdatedAt)
     }
@@ -1212,6 +1216,70 @@ internal class MegaLocalRoomFacadeTest {
             val actual = underTest.getMediaPlaybackInfo(testHandle)
             assertThat(actual).isNull()
         }
+
+    @Test
+    fun `test that isUnderOfflineRoot returns true when the offline node is an offline root`() =
+        runTest {
+            val offline = offlineNode(id = 1, isOfflineRoot = true)
+
+            assertThat(underTest.isUnderOfflineRoot(offline)).isTrue()
+        }
+
+    @Test
+    fun `test that isUnderOfflineRoot returns true when an ancestor is an offline root`() =
+        runTest {
+            stubStoredOfflineNodes(
+                offlineNode(id = 2, isOfflineRoot = false, parentId = 1),
+                offlineNode(id = 1, isOfflineRoot = true),
+            )
+
+            val offline = offlineNode(id = 3, isOfflineRoot = false, parentId = 2)
+
+            assertThat(underTest.isUnderOfflineRoot(offline)).isTrue()
+        }
+
+    @Test
+    fun `test that isUnderOfflineRoot returns false when no ancestor is an offline root`() =
+        runTest {
+            stubStoredOfflineNodes(offlineNode(id = 1, isOfflineRoot = false))
+
+            val offline = offlineNode(id = 2, isOfflineRoot = false, parentId = 1)
+
+            assertThat(underTest.isUnderOfflineRoot(offline)).isFalse()
+        }
+
+    @Test
+    fun `test that isUnderOfflineRoot returns false when the parent chain contains a cycle`() =
+        runTest {
+            stubStoredOfflineNodes(
+                offlineNode(id = 2, isOfflineRoot = false, parentId = 1),
+                offlineNode(id = 1, isOfflineRoot = false, parentId = 2),
+            )
+
+            val offline = offlineNode(id = 1, isOfflineRoot = false, parentId = 2)
+
+            assertThat(underTest.isUnderOfflineRoot(offline)).isFalse()
+        }
+
+    private suspend fun stubStoredOfflineNodes(vararg offlineNodes: Offline) {
+        offlineNodes.forEach { offline ->
+            val entity = mock<OfflineEntity>()
+            whenever(offlineDao.getOfflineById(offline.id)).thenReturn(entity)
+            whenever(offlineModelMapper(entity)).thenReturn(offline)
+        }
+    }
+
+    private fun offlineNode(id: Int, isOfflineRoot: Boolean, parentId: Int = -1) = Offline(
+        id = id,
+        handle = "$id",
+        path = "path",
+        name = "name",
+        parentId = parentId,
+        type = Offline.FOLDER,
+        origin = Offline.OTHER,
+        handleIncoming = "",
+        isOfflineRoot = isOfflineRoot,
+    )
 
     private companion object {
         const val NON_CONTACT_HANDLE = 1234L

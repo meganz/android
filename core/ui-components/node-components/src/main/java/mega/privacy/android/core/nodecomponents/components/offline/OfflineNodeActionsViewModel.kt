@@ -147,8 +147,14 @@ class OfflineNodeActionsViewModel @Inject constructor(
 
     /**
      * Handle open offline file action
+     *
+     * @param info the offline file to open
+     * @param parentId id of the Offline folder that lists [info], or -1 for the root of the Offline
+     * section. The media player builds its queue from this folder, so the queue must match the
+     * list the user sees. Do not use the parent of [info] instead, because that parent can be a
+     * folder that is stored only as an ancestor and is not shown.
      */
-    fun handleOpenOfflineFile(info: OfflineFileInformation) {
+    fun handleOpenOfflineFile(info: OfflineFileInformation, parentId: Int) {
         viewModelScope.launch {
             runCatching {
                 val localFile = getOfflineFileUseCase(info.nodeInfo)
@@ -184,7 +190,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
                             nodeId = nodeId,
                             fileTypeInfo = fileType,
                             file = localFile,
-                            parentId = info.parentId
+                            parentId = parentId
                         )
                     }
 

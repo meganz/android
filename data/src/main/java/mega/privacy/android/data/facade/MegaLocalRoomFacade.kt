@@ -496,6 +496,16 @@ internal class MegaLocalRoomFacade @Inject constructor(
             offlineModelMapper(it)
         }
 
+    override suspend fun isUnderOfflineRoot(offline: Offline): Boolean {
+        var current: Offline? = offline
+        val visited = mutableSetOf<Int>()
+        while (current != null && visited.add(current.id)) {
+            if (current.isOfflineRoot) return true
+            current = getOfflineLineById(current.parentId)
+        }
+        return false
+    }
+
     override suspend fun removeOfflineInformationById(id: Int) {
         offlineDao.get().deleteOfflineById(id)
     }

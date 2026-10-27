@@ -100,9 +100,33 @@ class NodeMapperTest {
                 fetChildrenMapper = fetChildrenMapper,
                 stringListMapper = stringListMapper,
                 nodeLabelMapper = nodeLabelMapper,
-            )
+            ),
+            megaLocalRoomGateway = megaLocalRoomGateway,
         )
     }
+
+    @ParameterizedTest(name = "under offline root: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that folder isAvailableOffline matches whether it is under an offline root`(
+        isUnderOfflineRoot: Boolean,
+    ) = runTest {
+        val megaNode = getMockNode(isFile = false)
+        whenever(megaLocalRoomGateway.isUnderOfflineRoot(offline)).thenReturn(isUnderOfflineRoot)
+
+        val actual = underTest(megaNode = megaNode, offline = offline)
+
+        assertThat(actual?.isAvailableOffline).isEqualTo(isUnderOfflineRoot)
+    }
+
+    @Test
+    fun `test that folder isAvailableOffline is false when the folder is not stored offline`() =
+        runTest {
+            val megaNode = getMockNode(isFile = false)
+
+            val actual = underTest(megaNode = megaNode, offline = null)
+
+            assertThat(actual?.isAvailableOffline).isFalse()
+        }
 
     @Test
     fun `test that files are mapped if isFile is true`() = runTest {

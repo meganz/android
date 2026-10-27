@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.node
 
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
@@ -10,11 +11,13 @@ import javax.inject.Inject
  *
  * @property folderNodeMapper
  * @property fileNodeMapper
+ * @property megaLocalRoomGateway
  * @constructor Create empty Node mapper
  */
 internal class NodeMapper @Inject constructor(
     private val folderNodeMapper: FolderNodeMapper,
     private val fileNodeMapper: FileNodeMapper,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) {
     /**
      * Invoke
@@ -38,7 +41,8 @@ internal class NodeMapper @Inject constructor(
             megaNode = megaNode,
             fromFolderLink = fromFolderLink,
             requireSerializedData = requireSerializedData,
-            isAvailableOffline = offline != null,
+            isAvailableOffline = offline?.let { megaLocalRoomGateway.isUnderOfflineRoot(it) }
+                ?: false,
             syncedNodeIds = syncedNodeIds
         )
     } else {

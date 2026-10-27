@@ -118,7 +118,7 @@ fun OfflineScreen(
         deselectAll = viewModel::clearSelection,
         onItemClicked = viewModel::onItemClicked,
         onItemLongClicked = viewModel::onLongItemClicked,
-        onOpenFile = actionViewModel::handleOpenOfflineFile,
+        onOpenFile = { actionViewModel.handleOpenOfflineFile(it, uiState.nodeId) },
         onOpenWithFile = actionViewModel::handleOpenWithIntent,
         onDismissOfflineWarning = viewModel::dismissOfflineWarning,
         onNavigateToFolder = onNavigateToFolder,

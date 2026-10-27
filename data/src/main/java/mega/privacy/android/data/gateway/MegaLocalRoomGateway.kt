@@ -477,6 +477,17 @@ interface MegaLocalRoomGateway {
     suspend fun getOfflineLineById(id: Int): Offline?
 
     /**
+     * Check whether an offline node is an offline root or is stored below one
+     *
+     * Folders are also stored to mirror the cloud structure above an offline root. Those folders
+     * are not available offline themselves, so this returns false for them.
+     *
+     * @param offline the offline information to check
+     * @return true if [offline] or one of its stored ancestors is an offline root
+     */
+    suspend fun isUnderOfflineRoot(offline: Offline): Boolean
+
+    /**
      * Remove offline info by ID
      */
     suspend fun removeOfflineInformationById(id: Int)

@@ -511,14 +511,8 @@ internal class NodeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isNodeUnderOfflineRoot(nodeId: NodeId) = withContext(ioDispatcher) {
-        var current = getOfflineNode(nodeId.longValue)
-        val visited = mutableSetOf<Int>()
-        while (current != null && visited.add(current.id)) {
-            if (current.isOfflineRoot) return@withContext true
-            if (current.parentId == ROOT_OFFLINE_PARENT_ID) break
-            current = megaLocalRoomGateway.getOfflineLineById(current.parentId)
-        }
-        false
+        getOfflineNode(nodeId.longValue)?.let { megaLocalRoomGateway.isUnderOfflineRoot(it) }
+            ?: false
     }
 
     override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
