@@ -8,6 +8,7 @@ import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase.Companion.requiresSession
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.CustomTabNavKey
 import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import mega.privacy.android.shared.resources.R
@@ -33,8 +34,9 @@ class WebViewDeepLinkHandler @Inject constructor(
         RegexPatternType.REVERT_CHANGE_PASSWORD_LINK,
         RegexPatternType.MEGA_BLOG_LINK,
         RegexPatternType.PURCHASE_LINK,
-        RegexPatternType.AUTOPLAY_LINK,
             -> listOf(WebSiteNavKey(uri.toString()))
+
+        RegexPatternType.AUTOPLAY_LINK -> listOf(CustomTabNavKey(uri.toString()))
 
         RegexPatternType.INSTALLER_DOWNLOAD_LINK ->
             listOf(WebSiteNavKey(uri.toString(), true))

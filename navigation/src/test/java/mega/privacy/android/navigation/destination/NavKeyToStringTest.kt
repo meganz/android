@@ -133,6 +133,7 @@ class NavKeyToStringTest {
         SelectVideosSearchNavKey(nodeName = SENSITIVE),
         MyAccountNavKey(link = SENSITIVE),
         WebSiteNavKey(url = SENSITIVE),
+        CustomTabNavKey(url = SENSITIVE),
         ChatNavKey(chatId = 1L, link = SENSITIVE, snackbarText = SENSITIVE),
         FileContactInfoNavKey(folderHandle = 1L, folderName = SENSITIVE),
         SyncNewFolderNavKey(remoteFolderName = SENSITIVE),

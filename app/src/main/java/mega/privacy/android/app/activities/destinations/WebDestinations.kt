@@ -12,8 +12,10 @@ import androidx.core.net.toUri
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.extensions.launchUrl
+import mega.privacy.android.app.presentation.browser.launchInBrowser
 import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.CustomTabNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 
 fun EntryProviderScope<NavKey>.webDestinations(removeDestination: () -> Unit) {
@@ -25,6 +27,19 @@ fun EntryProviderScope<NavKey>.webDestinations(removeDestination: () -> Unit) {
             if (key.isBrowserLink) {
                 openWebLinkInBrowser(key.url, context)
             } else {
+                context.launchUrl(key.url)
+            }
+
+            removeDestination()
+        }
+    }
+
+    entry<CustomTabNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
+        val context = LocalContext.current
+        LaunchedEffect(Unit) {
+            if (!launchInBrowser(context, key.url)) {
                 context.launchUrl(key.url)
             }
 

@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.CustomTabNavKey
 import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import mega.privacy.android.shared.resources.R
@@ -62,10 +63,10 @@ class WebViewDeepLinkHandlerTest {
         regexPatternType: RegexPatternType?,
     ) = runTest {
         val uriString = "https://mega.app/whatever"
-        val expected = if (regexPatternType == RegexPatternType.INSTALLER_DOWNLOAD_LINK) {
-            WebSiteNavKey(uriString, true)
-        } else {
-            WebSiteNavKey(uriString)
+        val expected = when (regexPatternType) {
+            RegexPatternType.INSTALLER_DOWNLOAD_LINK -> WebSiteNavKey(uriString, true)
+            RegexPatternType.AUTOPLAY_LINK -> CustomTabNavKey(uriString)
+            else -> WebSiteNavKey(uriString)
         }
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
@@ -86,10 +87,10 @@ class WebViewDeepLinkHandlerTest {
         regexPatternType: RegexPatternType?,
     ) = runTest {
         val uriString = "https://mega.app/whatever"
-        val expected = if (regexPatternType == RegexPatternType.INSTALLER_DOWNLOAD_LINK) {
-            WebSiteNavKey(uriString, true)
-        } else {
-            WebSiteNavKey(uriString)
+        val expected = when (regexPatternType) {
+            RegexPatternType.INSTALLER_DOWNLOAD_LINK -> WebSiteNavKey(uriString, true)
+            RegexPatternType.AUTOPLAY_LINK -> CustomTabNavKey(uriString)
+            else -> WebSiteNavKey(uriString)
         }
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString

@@ -43,6 +43,17 @@ data class WebSiteNavKey(
     override fun toString() = "WebSiteNavKey(isBrowserLink=$isBrowserLink)"
 }
 
+/**
+ * Opens a MEGA web link in a Custom Tab, or in a browser if no browser supports Custom Tabs.
+ * If no browser can open the link, the link opens in the in-app web view.
+ *
+ * @property url MEGA web link. It can contain a link key.
+ */
+@Serializable
+data class CustomTabNavKey(val url: String) : NoSessionNavKey.Optional {
+    override fun toString() = "CustomTabNavKey"
+}
+
 @Serializable
 @Parcelize
 data object ContactsNavKey : NavKey, Parcelable
