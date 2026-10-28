@@ -3246,4 +3246,23 @@
     <string name="node_list_load_error_title">Folder ini tidak dapat dimuat</string>
     <string name="node_list_load_more_error_message">Tidak dapat memuat lebih banyak item</string>
     <string name="file_not_available_offline_message">File tidak tersedia secara offline</string>
+    <string name="general_mic">Mikrofon</string>
+    <string name="general_camera">Kamera</string>
+    <string name="general_speaker">Suara</string>
+    <string name="general_headphone">Headphone</string>
+    <string name="meeting_permission_info">Izin akses diperlukan untuk MEGA</string>
+    <string name="meeting_permission_info_message">MEGA membutuhkan akses ke mikrofon dan kamera anda untuk rapat.</string>
+    <string name="meeting_required_permissions_warning">Buka Pengaturan untuk mengizinkan MEGA mengakses kamera dan mikrofon anda.</string>
+    <string name="general_headphone_on">Headphone sedang aktif</string>
+    <string name="general_speaker_on">Speaker anda dihidupkan</string>
+    <string name="general_speaker_off">Speaker anda dimatikan</string>
+    <string name="navigation_label_shared">Berbagi</string>
+    <string name="navigation_label_offline">Offline</string>
+    <string name="new_meeting">Buat pertemuan</string>
+    <string name="btn_start_meeting">Mulai pertemuan</string>
+    <string name="type_meeting_name">Pertemuan %s</string>
+    <string name="zip_browser_password_dialog_title">Masukkan password</string>
+    <string name="zip_browser_password_dialog_error_incorrect">Kata sandi salah</string>
+    <string name="zip_browser_error_offline_description">Periksa koneksi internet anda dan coba lagi</string>
+    <string name="sync_card_status_scanning">Memindai&#8230;</string>
 </resources>

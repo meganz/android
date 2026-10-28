@@ -3275,4 +3275,21 @@
     <string name="chat_contact_attachment_verified_content_description">ผู้ติดต่อที่ผ่านการตรวจสอบแล้ว</string>
     <string name="chat_composer_record_voice_clip_content_description">บันทึกคลิปเสียง</string>
     <string name="chat_composer_emoji_content_description">อีโมจิ</string>
+    <string name="general_mic">ไมค์</string>
+    <string name="general_camera">กล้อง</string>
+    <string name="general_speaker">ลำโพง</string>
+    <string name="general_headphone">หูฟัง</string>
+    <string name="meeting_permission_info">MEGA จำเป็นต้องใช้สิทธิ์ในการเข้าถึง</string>
+    <string name="meeting_permission_info_message">MEGA ต้องการเข้าถึงไมโครโฟนและกล้องสำหรับการประชุม</string>
+    <string name="meeting_required_permissions_warning">ไปที่การตั้งค่าเพื่ออนุญาตให้ MEGA เข้าถึงกล้องและไมโครโฟนของคุณ</string>
+    <string name="general_headphone_on">หูฟังเปิดใช้งานอยู่</string>
+    <string name="general_speaker_on">ลำโพงของคุณเปิดอยู่</string>
+    <string name="general_speaker_off">ลำโพงของคุณปิดอยู่</string>
+    <string name="navigation_label_shared">แชร์เรียบร้อยแล้ว</string>
+    <string name="navigation_label_offline">ออฟไลน์</string>
+    <string name="new_meeting">ประชุมใหม่</string>
+    <string name="btn_start_meeting">เริ่มการประชุม</string>
+    <string name="type_meeting_name">กำลังประชุมกับ %s</string>
+    <string name="zip_browser_password_dialog_title">กรอกรหัสผ่าน</string>
+    <string name="sync_card_status_scanning">กำลังสแกน&#8230;</string>
 </resources>

@@ -3441,4 +3441,21 @@
     <string name="slide_to_cancel">Glisează pentru a anula</string>
     <string name="recording_less_than_second">Atinge și ține pentru a înregistra</string>
     <string name="chat_message_forward_content_description">Redirecționează</string>
+    <string name="general_mic">Microfon</string>
+    <string name="general_camera">Cameră</string>
+    <string name="general_speaker">Difuzor</string>
+    <string name="general_headphone">Căști</string>
+    <string name="meeting_permission_info">Permisiuni de acces necesare pentru MEGA</string>
+    <string name="meeting_permission_info_message">MEGA are nevoie de acces la microfon și cameră pentru întâlniri.</string>
+    <string name="meeting_required_permissions_warning">Mergi la Setări pentru a permite MEGA să acceseze camera și microfonul.</string>
+    <string name="general_headphone_on">Căștile sunt active</string>
+    <string name="general_speaker_on">Difuzorul este pornit.</string>
+    <string name="general_speaker_off">Difuzorul este oprit</string>
+    <string name="navigation_label_shared">Partajate</string>
+    <string name="navigation_label_offline">Offline</string>
+    <string name="new_meeting">Întâlnire nouă</string>
+    <string name="btn_start_meeting">Începe o întâlnire</string>
+    <string name="type_meeting_name">Întâlnirea lui %s</string>
+    <string name="zip_browser_password_dialog_title">Introduceți parola</string>
+    <string name="sync_card_status_scanning">Se scanează&#8230;</string>
 </resources>

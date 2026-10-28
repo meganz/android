@@ -3423,4 +3423,21 @@
     <string name="slide_to_cancel">İptal etmek için kaydırın</string>
     <string name="recording_less_than_second">Kaydetmek için dokunup basılı tutun</string>
     <string name="chat_message_forward_content_description">İlet</string>
+    <string name="general_mic">Mikrofon</string>
+    <string name="general_camera">Kamera</string>
+    <string name="general_speaker">Hoparlör</string>
+    <string name="general_headphone">Kulaklık</string>
+    <string name="meeting_permission_info">MEGA için gerekli erişim izinleri</string>
+    <string name="meeting_permission_info_message">MEGA’nın, toplantılar için mikrofonunuza ve kameranıza erişmesi gerekir.</string>
+    <string name="meeting_required_permissions_warning">MEGA’nın kameranıza ve mikrofonunuza erişmesine izin vermek için Ayarlar’a gidin.</string>
+    <string name="general_headphone_on">Kulaklık etkin</string>
+    <string name="general_speaker_on">Hoparlörünüz açık</string>
+    <string name="general_speaker_off">Hoparlörünüz kapalı</string>
+    <string name="navigation_label_shared">Paylaşıldı</string>
+    <string name="navigation_label_offline">Çevrim dışı</string>
+    <string name="new_meeting">Yeni toplantı</string>
+    <string name="btn_start_meeting">Toplantıyı başlat</string>
+    <string name="type_meeting_name">%s toplantısı</string>
+    <string name="zip_browser_password_dialog_title">Şifreyi girin</string>
+    <string name="sync_card_status_scanning">Taranıyor&#8230;</string>
 </resources>

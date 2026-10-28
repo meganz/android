@@ -3432,4 +3432,42 @@
     <string name="node_list_load_error_title">Kan deze map niet laden</string>
     <string name="node_list_load_more_error_message">Kon geen verdere items laden</string>
     <string name="file_not_available_offline_message">Bestand is niet offline beschikbaar</string>
+    <string name="general_mic">Microfoon</string>
+    <string name="general_camera">Camera</string>
+    <string name="general_speaker">Luidspreker</string>
+    <string name="general_headphone">Koptelefoon</string>
+    <string name="meeting_permission_info">Toegang toestemming nodig voor MEGA</string>
+    <string name="meeting_permission_info_message">MEGA heeft toegang tot uw microfoon en camera nodig voor vergaderingen.</string>
+    <string name="meeting_required_permissions_warning">Ga naar Instellingen om MEGA toegang te geven tot uw camera en microfoon.</string>
+    <string name="general_headphone_on">Koptelefoon is actief</string>
+    <string name="general_speaker_on">Uw speaker is ingeschakeld</string>
+    <string name="general_speaker_off">Uw speaker is uitgeschakeld</string>
+    <string name="node_menu_action_copy_to_offline">Kopiëren naar offline</string>
+    <string name="node_options_add_to_home_screen">Toevoegen aan Beginscherm</string>
+    <string name="add_to_home_screen_error">Kon geen snelkoppeling toevoegen aan het startscherm</string>
+    <string name="add_to_home_screen_success">Toegevoegd aan uw beginscherm</string>
+    <string name="folder_shortcut_unavailable">Deze map is niet langer beschikbaar</string>
+    <string name="folder_shortcut_other_account">Deze map hoort bij een ander MEGA-account. Meld u af en meld aan bij dat account om de map te openen.</string>
+    <string name="home_screen_shortcut_permission_dialog_title">Snelkoppelingen op het startscherm toestaan</string>
+    <string name="home_screen_shortcut_permission_dialog_message">Uw apparaat staat niet toe dat MEGA snelkoppelingen toevoegt aan het startscherm. Verleen deze toestemming voor MEGA in de instellingen en probeer het opnieuw.</string>
+    <string name="home_screen_shortcut_permission_dialog_open_settings">Instellingen openen</string>
+    <string name="navigation_label_shared">Gedeeld</string>
+    <string name="navigation_label_offline">Offline</string>
+    <string name="sync_card_panel_checking">Controleren op wijzigingen&#8230;</string>
+    <string name="sync_card_panel_review_issues">Beoordeel kwesties</string>
+    <string name="sync_card_panel_upgrade">Upgrade om te blijven synchroniseren</string>
+    <string name="sync_card_panel_open_description">Voortgang van synchronisatie openen</string>
+    <plurals name="sync_card_panel_items_left">
+        <item quantity="one">%1$s item over</item>
+        <item quantity="other">%1$s items over</item>
+    </plurals>
+    <plurals name="sync_card_panel_items_left_with_speed">
+        <item quantity="one">%1$s item over · %2$s</item>
+        <item quantity="other">%1$s items over · %2$s</item>
+    </plurals>
+    <string name="new_meeting">Nieuwe vergadering</string>
+    <string name="btn_start_meeting">Begin vergadering</string>
+    <string name="type_meeting_name">%s\’s vergadering</string>
+    <string name="zip_browser_password_dialog_title">Wachtwoord invoeren</string>
+    <string name="sync_card_status_scanning">Scannen&#8230;</string>
 </resources>

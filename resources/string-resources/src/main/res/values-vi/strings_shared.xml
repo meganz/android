@@ -3042,7 +3042,7 @@
     <string name="file_preview_error_description">Đã xảy&#160;ra sự&#160;cố khi tải bản xem&#160;trước này</string>
     <string name="sync_exclusions_add_description_extensions">Các tệp&#160;tin có phần mở&#160;rộng sau&#160;đây sẽ không được đồng&#160;bộ</string>
     <string name="sync_exclusions_add_extension_helper">Liệt&#160;kê các phần bằng dấu&#160;phẩy</string>
-    <string name="sync_exclusions_add_extension_invalid_error">Phần mở&#160;rộng không được chứa dấu&#160;cách, dấu&#160;chấm hoặc dấu gạch&#160;chéo</string>
+    <string name="sync_exclusions_add_extension_invalid_error">Phần mở&#160;rộng không&#160;được chứa dấu&#160;cách hoặc các ký&#160;tự sau đây: / * ? :</string>
     <string name="sync_exclusions_add_extension_duplicate_error">Bạn&#160;có quy&#160;tắc loại trừ %1$s rồi</string>
     <string name="sync_exclusions_add_tab_by_name">Theo tên</string>
     <string name="success_archive_chat">%s đã được bảo&#160;lưu</string>
@@ -3232,4 +3232,36 @@
     <string name="slide_to_cancel">Trượt để hủy bỏ</string>
     <string name="recording_less_than_second">Chạm và giữ để ghi âm</string>
     <string name="chat_message_forward_content_description">Chuyển tiếp</string>
+    <string name="general_mic">Micrô</string>
+    <string name="general_camera">Camêra</string>
+    <string name="general_speaker">Loa ngoài</string>
+    <string name="general_headphone">Tai nghe</string>
+    <string name="meeting_permission_info">Cần cấp quyền hạn truy cập cho MEGA</string>
+    <string name="meeting_permission_info_message">MEGA cần quyền truy cập vào micrô và camêra để dùng cho các cuộc gọi họp mặt.</string>
+    <string name="meeting_required_permissions_warning">Vào phần Thiết Đặt và cho phép MEGA truy cập vào camêra và micrô.</string>
+    <string name="general_headphone_on">Tai nghe hiện đang hoạt động</string>
+    <string name="general_speaker_on">Loa hiện đang được bật</string>
+    <string name="general_speaker_off">Loa hiện đang bị tắt</string>
+    <string name="navigation_label_shared">Đã chia sẻ</string>
+    <string name="navigation_label_offline">Ngoại Tuyến</string>
+    <string name="new_meeting">Cuộc meeting mới</string>
+    <string name="btn_start_meeting">Bắt đầu cuộc họp</string>
+    <string name="type_meeting_name">Cuộc họp của %s</string>
+    <string name="zip_browser_password_dialog_title">Nhập mật khẩu</string>
+    <string name="sync_card_status_scanning">Đang quét&#8230;</string>
+    <string name="name_collision_option_replace_file_versioning_subtitle">Tệp hiện&#160;tại được lưu lại bằng phiên&#160;bản trước</string>
+    <string name="zip_browser_error_offline_title">Đã không&#160;thể tải tệp ZIP được</string>
+    <string name="node_list_load_more_error_message">Đã không&#160;thể tải thêm mục</string>
+    <string name="node_list_load_error_title">Đã không&#160;thể tải thư&#160;mục này</string>
+    <plurals name="sync_card_panel_items_left_with_speed">
+        <item quantity="other">Còn %1$s mục · %2$s</item>
+    </plurals>
+    <string name="folder_shortcut_unavailable">Thư&#160;mục này không còn khả&#160;dụng nữa</string>
+    <string name="zip_browser_error_damaged_title">Không mở tệp ZIP được</string>
+    <plurals name="sync_card_status_cant_sync">
+        <item quantity="other">Không đồng&#160;bộ được %1$d&#160;mục</item>
+    </plurals>
+    <string name="chat_manage_history_clear_meeting_confirmation_title">Dọn lịch&#160;sử cuộc&#160;họp?</string>
+    <string name="text_editor_format_code_block">Khối mã</string>
+    <string name="chat_composer_emoji_content_description">Εmoji</string>
 </resources>

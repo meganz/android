@@ -1783,7 +1783,7 @@
         <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
     </plurals>
     <!-- Timeline tab screen grid size menu title -->
-    <string name="timeline_tab_grid_size_menu_title">網格尺寸</string>
+    <string name="timeline_tab_grid_size_menu_title">網格大小</string>
     <!-- Timeline tab screen compact grid size menu item -->
     <string name="timeline_tab_grid_size_compact">精簡</string>
     <!-- Timeline tab screen default grid size menu item -->
@@ -3041,13 +3041,13 @@
     <string name="sync_exclusions_add_condition_matching_exactly">完全符合</string>
     <string name="sync_exclusions_add_condition_matching_wildcard">符合樣式</string>
     <string name="sync_exclusions_add_name_wildcard_helper">使用「*」代表任意多個字元，使用「?」代表單一字元</string>
-    <string name="sync_exclusions_add_name_duplicate_error">此名稱已在排除清單中</string>
+    <string name="sync_exclusions_add_name_duplicate_error">此排除規則已經存在</string>
     <string name="file_preview_error_title">無法預覽此檔案</string>
     <string name="file_preview_error_description">載入此預覽時發生錯誤</string>
     <string name="general_try_again">重試</string>
     <string name="sync_exclusions_add_description_extensions">具有這些副檔名的檔案不會進行同步</string>
     <string name="sync_exclusions_add_extension_helper">請以逗號分隔各個副檔名</string>
-    <string name="sync_exclusions_add_extension_invalid_error">副檔名不能包含空格、句點或斜線</string>
+    <string name="sync_exclusions_add_extension_invalid_error">副檔名不能包含空格或以下字元：/ * ? :</string>
     <string name="sync_exclusions_add_extension_duplicate_error">您已排除%1$s</string>
     <string name="contacts_qr_reset_error">無法重設您的QR code。請重試</string>
     <string name="contacts_qr_delete_error">無法刪除您的QR code。請重試</string>
@@ -3274,4 +3274,31 @@
     <string name="slide_to_cancel">滑動以取消</string>
     <string name="recording_less_than_second">長按即可錄製</string>
     <string name="chat_message_forward_content_description">轉寄</string>
+    <string name="general_mic">麥克風</string>
+    <string name="general_camera">相機</string>
+    <string name="general_speaker">喇叭</string>
+    <string name="general_headphone">耳機</string>
+    <string name="meeting_permission_info">MEGA需要存取權限</string>
+    <string name="meeting_permission_info_message">MEGA需要存取您麥克風與相機以進行會議。</string>
+    <string name="meeting_required_permissions_warning">請至設定來允許MEGA存取您的相機與麥克風。</string>
+    <string name="general_headphone_on">耳機已開啟</string>
+    <string name="general_speaker_on">您的喇叭已開啟</string>
+    <string name="general_speaker_off">您的喇叭已關閉</string>
+    <string name="navigation_label_shared">共享</string>
+    <string name="navigation_label_offline">離線</string>
+    <string name="home_screen_shortcut_permission_dialog_open_settings">打開設定</string>
+    <string name="home_screen_shortcut_permission_dialog_message">您的裝置不允許MEGA新增捷徑至主畫面。請在裝置的設定中開啟MEGA的此項權限，然後重試。</string>
+    <string name="home_screen_shortcut_permission_dialog_title">允許在主畫面新增捷徑</string>
+    <string name="folder_shortcut_other_account">此資料夾屬於另一個MEGA帳戶。請登出並登入該帳戶以開啟此資料夾。</string>
+    <string name="folder_shortcut_unavailable">此資料夾已無法使用</string>
+    <string name="add_to_home_screen_success">已新增至主畫面</string>
+    <string name="add_to_home_screen_error">無法新增捷徑至主畫面</string>
+    <string name="node_options_add_to_home_screen">新增至主畫面</string>
+    <string name="node_menu_action_copy_to_offline">複製到離線存取</string>
+    <string name="file_not_available_offline_message">檔案無法離線使用</string>
+    <string name="new_meeting">新的會議</string>
+    <string name="btn_start_meeting">開始會議</string>
+    <string name="type_meeting_name">%s的會議</string>
+    <string name="zip_browser_password_dialog_title">輸入密碼</string>
+    <string name="sync_card_status_scanning">正在掃描⋯</string>
 </resources>
