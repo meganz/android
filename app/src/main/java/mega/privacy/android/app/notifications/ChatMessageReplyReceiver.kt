@@ -41,8 +41,13 @@ class ChatMessageReplyReceiver : BroadcastReceiver() {
             ?.toString()
             ?.trim()
 
-        if (chatId == MegaApiJava.INVALID_HANDLE || reply.isNullOrEmpty()) {
-            Timber.w("Ignoring notification reply for chat $chatId")
+        if (chatId == MegaApiJava.INVALID_HANDLE) {
+            Timber.w("Ignoring notification reply without a chat id")
+            return
+        }
+        if (reply.isNullOrEmpty()) {
+            Timber.d("Blank reply for chat $chatId, clearing the reply indicator only")
+            chatMessageNotificationManager.dismissReplyProgress(context, notificationId)
             return
         }
 

@@ -144,13 +144,16 @@ class ChatMessageNotificationManager @Inject constructor(
         // Without its own icon the system falls back to the large icon, i.e. the sender's avatar,
         // for the replies typed in the notification.
         val meLabel = context.getString(R.string.chat_last_message_sender_me)
-        val myAvatarIcon = getMyAvatarIcon(myAvatar, myAvatarColor, meLabel)
+        val myAvatarIcon = getPersonIcon(myAvatar, myAvatarColor, myName.ifBlank { meLabel })
 
         // In a one to one chat the system draws the large icon for the other party, so only group
-        // chats need the sender on every message
-        val senderIcon = largeIcon
-            ?.takeIf { chat.isGroup }
-            ?.let { IconCompat.createWithBitmap(it) }
+        // chats need the sender on every message. The large icon of a group shows the group, so it
+        // cannot be reused for the sender.
+        val senderIcon = if (chat.isGroup) {
+            getPersonIcon(senderAvatar, senderAvatarColor, senderName)
+        } else {
+            null
+        }
         val message = NotificationCompat.MessagingStyle.Message(
             if (isNormalTypeMsg) msgContent.stripChatFormatTags() else msgContent,
             msg.timestamp * 1000,
@@ -229,6 +232,18 @@ class ChatMessageNotificationManager @Inject constructor(
             val messageIds = shown.messageIds() + MegaApiJava.INVALID_HANDLE
             addExtras(messageIdsExtras(messageIds.matching(style)))
         }
+
+    /**
+     * Posts the notification again unchanged. The system shows the in-progress indicator of the
+     * reply action until the notification is posted again, so a reply that is not sent, for
+     * example a blank one, also needs a new post of the notification.
+     *
+     * @param context           [Context]
+     * @param notificationId    Id of the message notification the reply was typed in
+     */
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    fun dismissReplyProgress(context: Context, notificationId: Int) =
+        updateMessagingNotification(context, notificationId) { _, _ -> }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun removeMessage(
@@ -386,11 +401,11 @@ class ChatMessageNotificationManager @Inject constructor(
         }
     }
 
-    private fun getMyAvatarIcon(myAvatar: File?, myAvatarColor: Int, name: String) =
-        if (myAvatar?.exists() == true && myAvatar.length() > 0) {
-            BitmapFactory.decodeFile(myAvatar.absolutePath, BitmapFactory.Options())
+    private fun getPersonIcon(avatar: File?, avatarColor: Int, name: String) =
+        if (avatar?.exists() == true && avatar.length() > 0) {
+            BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options())
         } else {
-            AvatarUtil.getDefaultAvatar(myAvatarColor, name, Constants.AVATAR_SIZE, true, true)
+            AvatarUtil.getDefaultAvatar(avatarColor, name, Constants.AVATAR_SIZE, true, true)
         }?.let { IconCompat.createWithBitmap(Util.getCircleBitmap(it)) }
 
     private fun getAvatar(

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationD
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
@@ -26,6 +27,7 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
     private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
+    private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getChatMessageNotificationBehaviourUseCase: GetChatMessageNotificationBehaviourUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -70,6 +72,9 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
                     val myAvatar = async {
                         runCatching { getMyAvatarFileUseCase(isForceRefresh = false) }.getOrNull()
                     }
+                    val myName = async {
+                        runCatching { getUserFullNameUseCase(forceRefresh = false) }.getOrNull()
+                    }
                     val senderAvatarColor = getUserAvatarColorUseCase(message.userHandle)
                     val myAvatarColor = runCatching { getMyAvatarColorUseCase() }.getOrDefault(0)
                     val notificationBehaviour =
@@ -84,6 +89,7 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
                         notificationBehaviour = notificationBehaviour,
                         myAvatar = myAvatar.await(),
                         myAvatarColor = myAvatarColor,
+                        myName = myName.await().orEmpty(),
                     )
                 }
             }

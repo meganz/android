@@ -2,6 +2,7 @@ package mega.privacy.android.app.notifications
 
 import android.app.Notification
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Process
@@ -15,6 +16,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.NotificationBehaviour
@@ -26,8 +28,10 @@ import nz.mega.sdk.MegaApiJava
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.MockedStatic
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -69,6 +73,7 @@ class ChatMessageNotificationManagerTest {
         notificationBehaviour = NotificationBehaviour(),
         myAvatar = null,
         myAvatarColor = Color.BLUE,
+        myName = MY_NAME,
     )
 
     @Before
@@ -288,6 +293,73 @@ class ChatMessageNotificationManagerTest {
     }
 
     @Test
+    fun `test that show draws the own default avatar with the name of the current user when there is no own avatar file`() =
+        runTest {
+            withDefaultAvatarStubbed { mockedAvatarUtil ->
+                withBase64HandleStubbed {
+                    underTest.show(context, data, fileDurationMapper)
+                }
+
+                mockedAvatarUtil.verify {
+                    AvatarUtil.getDefaultAvatar(
+                        Color.BLUE,
+                        MY_NAME,
+                        Constants.AVATAR_SIZE,
+                        true,
+                        true
+                    )
+                }
+            }
+        }
+
+    @Test
+    fun `test that show draws the own default avatar with the Me label when the name of the current user is unknown`() =
+        runTest {
+            withDefaultAvatarStubbed { mockedAvatarUtil ->
+                withBase64HandleStubbed {
+                    underTest.show(context, data.copy(myName = ""), fileDurationMapper)
+                }
+
+                mockedAvatarUtil.verify {
+                    AvatarUtil.getDefaultAvatar(
+                        Color.BLUE,
+                        context.getString(R.string.chat_last_message_sender_me),
+                        Constants.AVATAR_SIZE,
+                        true,
+                        true
+                    )
+                }
+            }
+        }
+
+    @Test
+    fun `test that show draws the default avatar of the sender with the sender name in a group chat`() =
+        runTest {
+            val groupChat = mock<ChatRoom> {
+                on { chatId } doReturn CHAT_ID
+                on { title } doReturn CHAT_TITLE
+                on { unreadCount } doReturn 1
+                on { isGroup } doReturn true
+            }
+
+            withDefaultAvatarStubbed { mockedAvatarUtil ->
+                withBase64HandleStubbed {
+                    underTest.show(context, data.copy(chat = groupChat), fileDurationMapper)
+                }
+
+                mockedAvatarUtil.verify {
+                    AvatarUtil.getDefaultAvatar(
+                        Color.RED,
+                        SENDER_NAME,
+                        Constants.AVATAR_SIZE,
+                        true,
+                        true
+                    )
+                }
+            }
+        }
+
+    @Test
     fun `test that show survives the active notifications not being readable`() = runTest {
         whenever(notificationManagerCompat.activeNotifications)
             .thenThrow(RuntimeException("dead system"))
@@ -435,6 +507,35 @@ class ChatMessageNotificationManagerTest {
         verify(notificationManagerCompat, never()).notify(any(), any())
     }
 
+    @Test
+    fun `test that dismissReplyProgress posts the shown notification again with the same messages`() {
+        whenever(notificationManagerCompat.activeNotifications)
+            .thenReturn(listOf(shownNotification(messages = listOf(INCOMING_TEXT to MESSAGE_ID))))
+
+        underTest.dismissReplyProgress(context, CONVERSATION_NOTIFICATION_ID)
+
+        verify(notificationManagerCompat).notify(
+            eq(CONVERSATION_NOTIFICATION_ID),
+            argThat { notification: Notification ->
+                val messages = NotificationCompat.MessagingStyle
+                    .extractMessagingStyleFromNotification(notification)
+                    ?.messages
+                    .orEmpty()
+                val ids = notification.extras
+                    .getLongArray(ChatMessageNotificationManager.EXTRA_MESSAGE_IDS)?.toList()
+                messages.map { it.text.toString() } == listOf(INCOMING_TEXT) &&
+                        ids == listOf(MESSAGE_ID)
+            }
+        )
+    }
+
+    @Test
+    fun `test that dismissReplyProgress posts nothing when the notification is no longer shown`() {
+        underTest.dismissReplyProgress(context, CONVERSATION_NOTIFICATION_ID)
+
+        verify(notificationManagerCompat, never()).notify(any(), any())
+    }
+
     /**
      * A conversation notification as [ChatMessageNotificationManager] would have posted it.
      *
@@ -498,6 +599,15 @@ class ChatMessageNotificationManagerTest {
         }
     }
 
+    private inline fun withDefaultAvatarStubbed(block: (MockedStatic<AvatarUtil>) -> Unit) {
+        mockStatic(AvatarUtil::class.java).use { mocked ->
+            mocked.`when`<Bitmap> {
+                AvatarUtil.getDefaultAvatar(any(), anyOrNull(), any(), any(), any())
+            }.thenReturn(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
+            block(mocked)
+        }
+    }
+
     private companion object {
         const val CHAT_ID = 123L
         const val MESSAGE_ID = 456L
@@ -505,6 +615,7 @@ class ChatMessageNotificationManagerTest {
         const val SENDER_HANDLE = 789L
         const val CHAT_TITLE = "Chat title"
         const val SENDER_NAME = "Sender"
+        const val MY_NAME = "My name"
         const val INCOMING_TEXT = "Hello"
         const val EARLIER_TEXT = "Earlier message"
         const val REPLY_TEXT = "Reply from notification"
