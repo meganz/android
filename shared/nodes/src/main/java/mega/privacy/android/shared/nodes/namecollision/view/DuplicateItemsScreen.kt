@@ -218,7 +218,9 @@ private fun DuplicateItemsOptions(
                 subtitle = stringResource(
                     when {
                         !isFile -> sharedR.string.name_collision_option_merge_folders_subtitle
-                        fileVersioningInfo.isFileVersioningEnabled ->
+                        // A move deletes the existing file, so no previous version is kept.
+                        fileVersioningInfo.isFileVersioningEnabled &&
+                                collisionType != NameCollisionType.MOVE ->
                             sharedR.string.name_collision_option_replace_file_versioning_subtitle
 
                         else -> sharedR.string.name_collision_option_replace_file_subtitle

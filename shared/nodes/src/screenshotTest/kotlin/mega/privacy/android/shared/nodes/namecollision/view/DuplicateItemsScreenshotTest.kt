@@ -110,6 +110,21 @@ class DuplicateItemsScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
+    fun FileMoveVersioningOn() {
+        Preview(
+            uiState = uiState(
+                currentCollision = nodeCollision(isFile = true, type = NodeNameCollisionType.MOVE),
+                fileVersioningInfo = fileVersioningInfo(
+                    NameCollisionType.MOVE,
+                    isFileVersioningEnabled = true,
+                ),
+            ),
+        )
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
     fun FileReplaceUnavailable() {
         Preview(
             uiState = uiState(
