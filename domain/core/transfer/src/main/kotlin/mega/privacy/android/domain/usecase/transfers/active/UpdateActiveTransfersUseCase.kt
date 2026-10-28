@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.active
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.getTransferGroup
+import mega.privacy.android.domain.entity.transfer.isDownloadBatch
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersFromSdkUseCase
 import javax.inject.Inject
@@ -10,7 +11,8 @@ import javax.inject.Inject
 /**
  * Use case to update active transfers.
  * Active transfers are only stored in memory, so after app re-start they need to be synced with:
- *  - SDK for in progress transfers, except sync and backup ones, which the sync engine owns
+ *  - SDK for in progress transfers, except sync and backup ones, which the sync engine owns, and
+ *    the download batch parent, whose finish event the global transfer events skip
  *  - Data base for completed transfers of active transfer groups (user actions)
  */
 class UpdateActiveTransfersUseCase @Inject constructor(
@@ -23,7 +25,7 @@ class UpdateActiveTransfersUseCase @Inject constructor(
      */
     suspend operator fun invoke(): Boolean {
         val inProgressTransfers: List<Transfer> = getInProgressTransfersFromSdkUseCase()
-            .filterNot { it.isSyncTransfer || it.isBackupTransfer }
+            .filterNot { it.isSyncTransfer || it.isBackupTransfer || it.isDownloadBatch() }
         val completedTransfers: List<CompletedTransfer> = transferRepository.getCompletedTransfers()
         val transferGroupIds =
             transferRepository.getActiveTransferGroups().mapNotNull { it.groupId?.toLong() }

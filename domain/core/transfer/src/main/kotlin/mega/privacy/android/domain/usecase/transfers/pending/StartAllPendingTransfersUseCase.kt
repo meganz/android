@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isAlreadyTransferredEvent
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isDownloadBatch
 import mega.privacy.android.domain.entity.transfer.isFinishScanningEvent
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.transfer.isTransferUpdated
@@ -71,8 +72,13 @@ abstract class StartAllPendingTransfersUseCase(
                         //start all transfers in parallel to get the scanning result without the need to finish previous transfer.
                         launch {
                             events.takeWhile { transferEvent ->
+                                // The global transfer events skip the parent transfer of a download
+                                // batch (isDownloadBatch), so its finish event never updates the
+                                // active transfers. If putActiveTransfer stores this parent, the
+                                // transfer workers never see all transfers finished.
                                 if (transferEvent is TransferEvent.TransferStartEvent &&
-                                    transferEvent.transfer.isBackgroundTransfer().not()
+                                    transferEvent.transfer.isBackgroundTransfer().not() &&
+                                    transferEvent.transfer.isDownloadBatch().not()
                                 ) {
                                     //to be sure that the active transfer is added before deleting the pending transfer. Transfer Workers use collectChunked to monitor transfer events
                                     transferRepository.putActiveTransfer(

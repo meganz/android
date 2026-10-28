@@ -659,6 +659,31 @@ internal class CorrectActiveTransfersUseCaseTest {
             })
         }
 
+    @Test
+    fun `test that the download batch parent not in active transfers is not added`() =
+        runTest {
+            stubTransfers()
+            val batchTransfer = mock<Transfer> {
+                on { this.uniqueId } doReturn 100L
+                on { this.transferType } doReturn TransferType.DOWNLOAD
+                on { this.isFolderTransfer } doReturn true
+                on { this.nodeHandle } doReturn -1L
+            }
+            val inProgress = buildList {
+                addAll(mockedTransfers)
+                add(batchTransfer)
+            }
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest(TransferType.DOWNLOAD)
+
+            verify(transferRepository).putActiveTransfers(argThat { transfers ->
+                transfers.none { it.uniqueId == 100L }
+            })
+        }
+
     @ParameterizedTest
     @EnumSource(TransferType::class)
     @NullSource

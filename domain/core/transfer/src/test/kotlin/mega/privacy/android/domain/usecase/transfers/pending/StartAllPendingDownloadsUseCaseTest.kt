@@ -413,6 +413,31 @@ class StartAllPendingDownloadsUseCaseTest {
             .putActiveTransfer(transfer)
     }
 
+    @Test
+    fun `test that active transfer is not inserted when a Start event of the download batch is received`() =
+        runTest {
+            val pendingTransfer = stubPendingTransfer()
+            stubNotSentPendingTransfers(listOf(pendingTransfer))
+            val typedNode = mock<DefaultTypedFileNode>()
+            val batchTransfer = mock<Transfer> {
+                on { appData } doReturn emptyList()
+                on { isFolderTransfer } doReturn true
+                on { nodeHandle } doReturn -1L
+            }
+            val transferEvent = mock<TransferEvent.TransferStartEvent> {
+                on { this.transfer } doReturn batchTransfer
+            }
+            whenever(getTypedNodeFromPendingTransferUseCase(pendingTransfer)) doReturn typedNode
+            stubBatchEvents(transferEvent)
+
+            underTest().test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(transferRepository, never()).putActiveTransfer(any())
+        }
+
 
     private fun stubPendingTransfer() = mock<PendingTransfer> {
         on { pendingTransferId } doReturn 0L

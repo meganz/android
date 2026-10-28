@@ -205,6 +205,24 @@ class UpdateActiveTransfersUseCaseTest {
     }
 
     @Test
+    fun `test that invoke does not put the download batch parent as active transfer`() = runTest {
+        val normalTransfer = mock<Transfer> {
+            on { uniqueId } doReturn 1L
+        }
+        val batchTransfer = mock<Transfer> {
+            on { uniqueId } doReturn 0L
+            on { isFolderTransfer } doReturn true
+            on { nodeHandle } doReturn -1L
+        }
+        whenever(getInProgressTransfersFromSdkUseCase())
+            .thenReturn(listOf(normalTransfer, batchTransfer))
+
+        underTest()
+
+        verify(transferRepository).putActiveTransfers(argThat { this == listOf(normalTransfer) })
+    }
+
+    @Test
     fun `test that invoke returns false when only sync transfers are in progress`() = runTest {
         val syncTransfers = (1..2).map {
             mock<Transfer> {

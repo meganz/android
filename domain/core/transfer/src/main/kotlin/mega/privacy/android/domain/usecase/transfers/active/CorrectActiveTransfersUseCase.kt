@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isDownloadBatch
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.transfer.isSafDownload
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
@@ -56,6 +57,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                         || transfer.isBackupTransfer
                         || transfer.transferType == TransferType.CU_UPLOAD
                         || transfer.isSafDownload()
+                        || transfer.isDownloadBatch()
             }
 
         //update transferred bytes for each transfer
