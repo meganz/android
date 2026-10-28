@@ -2,10 +2,10 @@ package mega.privacy.android.feature.texteditor.components.markdown
 
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.click
-import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -106,6 +106,63 @@ class MarkdownFormattingToolbarTest {
         composeRule.onNodeWithTag(MARKDOWN_TEXT_STYLE_CHIP_TAG).performClick()
         composeRule.onNodeWithTag(markdownTextStyleOptionTag(1)).performClick()
 
+        assertThat(receivedTextStyles).isEmpty()
+    }
+
+    @Test
+    fun `test that a chip click opens the menu when no dismissal preceded it`() {
+        assertThat(
+            styleMenuOpenAfterChipClick(
+                expanded = false,
+                downUptimeMs = 10_000L,
+                dismissUptimeMs = 0L,
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that a chip click does not reopen the menu that its own tap dismissed`() {
+        assertThat(
+            styleMenuOpenAfterChipClick(
+                expanded = false,
+                downUptimeMs = 10_000L,
+                dismissUptimeMs = 10_002L,
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that a chip click opens the menu when an earlier tap dismissed it`() {
+        assertThat(
+            styleMenuOpenAfterChipClick(
+                expanded = false,
+                downUptimeMs = 10_000L,
+                dismissUptimeMs = 9_000L,
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that a chip click closes a menu that is still open`() {
+        assertThat(
+            styleMenuOpenAfterChipClick(
+                expanded = true,
+                downUptimeMs = 10_000L,
+                dismissUptimeMs = 0L,
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that clicking the chip again closes the text style menu`() {
+        setToolbar()
+
+        composeRule.onNodeWithTag(MARKDOWN_TEXT_STYLE_CHIP_TAG).performClick()
+        composeRule.onNodeWithTag(MARKDOWN_TEXT_STYLE_MENU_TAG).assertExists()
+
+        composeRule.onNodeWithTag(MARKDOWN_TEXT_STYLE_CHIP_TAG).performClick()
+
+        composeRule.onNodeWithTag(MARKDOWN_TEXT_STYLE_MENU_TAG).assertDoesNotExist()
         assertThat(receivedTextStyles).isEmpty()
     }
 

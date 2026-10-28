@@ -1,7 +1,10 @@
 package mega.privacy.android.feature.texteditor.components.markdown
 
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -226,6 +231,8 @@ private fun TextStyleChip(
     onTextStyleSelected: (Int?) -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
+    var downUptimeMs by remember { mutableLongStateOf(0L) }
+    var dismissUptimeMs by remember { mutableLongStateOf(0L) }
     Box {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -234,7 +241,18 @@ private fun TextStyleChip(
                 .height(TextStyleChipHeight)
                 .clip(DSTokens.shapes.small)
                 .background(Color.Transparent)
-                .clickable(enabled = enabled) { menuExpanded = true }
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        downUptimeMs = awaitFirstDown(requireUnconsumed = false).uptimeMillis
+                    }
+                }
+                .clickable(enabled = enabled) {
+                    menuExpanded = styleMenuOpenAfterChipClick(
+                        expanded = menuExpanded,
+                        downUptimeMs = downUptimeMs,
+                        dismissUptimeMs = dismissUptimeMs,
+                    )
+                }
                 .padding(start = 10.dp, end = 6.dp)
                 .testTag(MARKDOWN_TEXT_STYLE_CHIP_TAG),
         ) {
@@ -287,7 +305,10 @@ private fun TextStyleChip(
             }
             Popup(
                 popupPositionProvider = positionProvider,
-                onDismissRequest = { menuExpanded = false },
+                onDismissRequest = {
+                    dismissUptimeMs = SystemClock.uptimeMillis()
+                    menuExpanded = false
+                },
                 properties = PopupProperties(focusable = false),
             ) {
                 Box(modifier = Modifier.padding(TextStyleMenuShadowMargin)) {
@@ -414,6 +435,20 @@ private fun ToolbarToggleButton(
     }
 }
 
+/**
+ * Whether a click on the text style chip must leave the menu open.
+ *
+ * The popup watches for touches outside its own window, so the tap that must close the menu
+ * dismisses it before [TextStyleChip] receives the click. A click whose gesture started within
+ * [TextStyleMenuDismissGraceMs] of that dismissal is the same tap, so it must not open the menu
+ * again. [downUptimeMs] and [dismissUptimeMs] are both on the [SystemClock.uptimeMillis] scale.
+ */
+internal fun styleMenuOpenAfterChipClick(
+    expanded: Boolean,
+    downUptimeMs: Long,
+    dismissUptimeMs: Long,
+): Boolean = !expanded && dismissUptimeMs - downUptimeMs !in 0..TextStyleMenuDismissGraceMs
+
 private val TextStyleLevels: List<Int?> = listOf(1, 2, 3, null)
 private val ToolbarHeight = 48.dp
 private val ToolbarShadeWidth = 16.dp
@@ -432,6 +467,9 @@ private val TextStyleMenuShadowMargin = 10.dp
 
 /** Pulls the menu's start edge slightly left of the chip's start. */
 private val TextStyleMenuStartNudge = 4.dp
+
+/** Longest gap, in milliseconds, between a tap's down event and the dismissal it caused. */
+private const val TextStyleMenuDismissGraceMs = 500L
 
 @CombinedThemePreviews
 @Composable
