@@ -137,6 +137,35 @@ class PendingBackStackNavigationHandlerTest {
     }
 
     @Test
+    fun `test that removeAll removes every instance of the class from backStack`() {
+        backStack.addAll(
+            listOf(ParameterisedDestination(1), Destination1, ParameterisedDestination(2))
+        )
+        underTest.removeAll(ParameterisedDestination::class)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1).inOrder()
+    }
+
+    @Test
+    fun `test that removeAll removes every instance of the class from pending navigations`() {
+        underTest.onRootNodeChange(RootNodeState(exists = false))
+        underTest.navigate(listOf(ParameterisedDestination(1), Destination2))
+
+        underTest.removeAll(ParameterisedDestination::class)
+        underTest.onRootNodeChange(RootNodeState(exists = true))
+
+        assertThat(backStack).doesNotContain(ParameterisedDestination(1))
+        assertThat(backStack).contains(Destination2)
+    }
+
+    @Test
+    fun `test that removeAll restores landing screen when every entry is removed`() {
+        backStack.clear()
+        backStack.add(ParameterisedDestination(1))
+        underTest.removeAll(ParameterisedDestination::class)
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
     fun `test that navigateAndClearTo clears back to parent and adds new destination`() {
         backStack.addAll(listOf(Destination1, Destination2, Destination3))
 

@@ -1,6 +1,7 @@
 package mega.privacy.android.navigation.contract
 
 import androidx.navigation3.runtime.NavKey
+import kotlin.reflect.KClass
 
 /**
  * Interface providing comprehensive navigation capabilities for feature destinations.
@@ -17,6 +18,12 @@ interface NavigationHandler : NavigationResultsHandler {
      * @param navKey The destination to remove
      */
     fun remove(navKey: NavKey)
+
+    /**
+     * Remove every destination that is an instance of [navKeyClass] from the back stack.
+     * @param navKeyClass The class of the destinations to remove
+     */
+    fun removeAll(navKeyClass: KClass<out NavKey>)
 
     /**
      * Navigate to a specific destination.

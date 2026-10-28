@@ -28,6 +28,7 @@ import mega.privacy.android.navigation.payment.QuotaWarningType
  *
  * @param onViewAllPlans navigates to the full upgrade/plan-list screen
  * @param onBack closes the screen
+ * @param onPurchaseCompleted closes the screen after a successful purchase
  */
 @Composable
 fun QuotaWarningUpgradeRoute(
@@ -35,6 +36,7 @@ fun QuotaWarningUpgradeRoute(
     trigger: QuotaWarningTrigger,
     onViewAllPlans: () -> Unit,
     onBack: () -> Unit,
+    onPurchaseCompleted: () -> Unit = onBack,
     viewModel: QuotaWarningUpgradeViewModel = hiltViewModel(),
     billingViewModel: BillingViewModel = hiltViewModel(),
 ) {
@@ -70,7 +72,7 @@ fun QuotaWarningUpgradeRoute(
         billingViewModel.billingUpdateEvent.collect {
             if (it is BillingEvent.OnPurchaseUpdate) {
                 billingViewModel.markHandleBillingEvent()
-                onBack()
+                onPurchaseCompleted()
             }
         }
     }

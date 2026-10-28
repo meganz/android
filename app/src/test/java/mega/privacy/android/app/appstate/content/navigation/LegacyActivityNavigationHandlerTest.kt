@@ -89,6 +89,33 @@ internal class LegacyActivityNavigationHandlerTest {
     }
 
     @Test
+    fun `test that removeAll removes every instance of the class when other entries remain`() {
+        backStack.add(ParameterizedDestination("1"))
+        backStack.add(Destination1)
+        backStack.add(ParameterizedDestination("2"))
+
+        underTest.removeAll(ParameterizedDestination::class)
+
+        assertThat(backStack.toList()).containsExactly(Root, Destination1).inOrder()
+        assertThat(onEmptyBackStackCalls).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that removeAll invokes onEmptyBackStack when every entry is an instance of the class`() {
+        backStack.clear()
+        backStack.add(ParameterizedDestination("1"))
+        backStack.add(ParameterizedDestination("2"))
+
+        underTest.removeAll(ParameterizedDestination::class)
+
+        assertThat(onEmptyBackStackCalls).isEqualTo(1)
+        assertThat(backStack.toList()).containsExactly(
+            ParameterizedDestination("1"),
+            ParameterizedDestination("2"),
+        ).inOrder()
+    }
+
+    @Test
     fun `test that navigate adds the destination to the stack`() {
         underTest.navigate(Destination1)
 

@@ -42,6 +42,12 @@ fun EntryProviderScope<NavKey>.upgradeScreens(
                 )
             },
             onBack = navigationHandler::back,
+            onPurchaseCompleted = {
+                navigationHandler.back()
+                // The user has a subscription now, so every upgrade screen in the back stack
+                // must close. Otherwise, the user sees an upgrade screen again after the purchase.
+                navigationHandler.removeAll(UpgradeAccountNavKey::class)
+            },
         )
     }
 

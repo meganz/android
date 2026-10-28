@@ -12,6 +12,7 @@ import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import timber.log.Timber
+import kotlin.reflect.KClass
 
 /**
  * NavigationHandler implementation that wraps pending back stack functionality.
@@ -71,6 +72,15 @@ class PendingBackStackNavigationHandler(
             navigation.removeDestinations { it == navKey }
         }
         backstack.remove(navKey)
+        ensureNotEmpty()
+    }
+
+    override fun removeAll(navKeyClass: KClass<out NavKey>) {
+        Timber.d("PendingBackStackNavigationHandler::removeAll ${navKeyClass.simpleName}")
+        backstack.pendingNavigations = backstack.pendingNavigations.mapNotNull { navigation ->
+            navigation.removeDestinations { navKeyClass.isInstance(it) }
+        }
+        backstack.removeAll { navKeyClass.isInstance(it) }
         ensureNotEmpty()
     }
 

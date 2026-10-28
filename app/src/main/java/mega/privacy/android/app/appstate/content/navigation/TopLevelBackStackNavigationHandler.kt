@@ -6,6 +6,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationResultsHandler
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import kotlin.reflect.KClass
 
 /**
  * Default implementation of NavigationHandler that wraps back stack functionality.
@@ -21,6 +22,10 @@ class TopLevelBackStackNavigationHandler(
 
     override fun remove(navKey: NavKey) {
         backStack.removeAll { it == navKey }
+    }
+
+    override fun removeAll(navKeyClass: KClass<out NavKey>) {
+        backStack.removeAll { navKeyClass.isInstance(it) }
     }
 
     override fun navigate(destination: NavKey, navOptions: NavOptions?) {

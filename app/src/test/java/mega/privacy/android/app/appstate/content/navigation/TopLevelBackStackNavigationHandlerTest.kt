@@ -46,6 +46,17 @@ class TopLevelBackStackNavigationHandlerTest {
     }
 
     @Test
+    fun `test that removeAll removes every instance of the class`() {
+        underTest.navigate(ParameterizedDestination("1"))
+        underTest.navigate(Destination1)
+        underTest.navigate(ParameterizedDestination("2"))
+
+        underTest.removeAll(ParameterizedDestination::class)
+
+        assertThat(backStack.backStack).containsExactly(StartKey, Destination1).inOrder()
+    }
+
+    @Test
     fun `test that navigate skips when destinations are already at the back stack tail`() {
         underTest.navigate(Destination1)
         underTest.navigate(Destination2)

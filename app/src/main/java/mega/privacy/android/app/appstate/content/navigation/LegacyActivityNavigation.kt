@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
+import kotlin.reflect.KClass
 
 /** Back stack + handler returned by [rememberLegacyActivityNavigation]. */
 data class LegacyActivityNavigation(
@@ -42,6 +43,14 @@ class LegacyActivityNavigationHandler(
             backStack.remove(navKey)
         } else if (backStack.lastOrNull() == navKey) {
             onEmptyBackStack()
+        }
+    }
+
+    override fun removeAll(navKeyClass: KClass<out NavKey>) {
+        if (backStack.all { navKeyClass.isInstance(it) }) {
+            if (backStack.isNotEmpty()) onEmptyBackStack()
+        } else {
+            backStack.removeAll { navKeyClass.isInstance(it) }
         }
     }
 

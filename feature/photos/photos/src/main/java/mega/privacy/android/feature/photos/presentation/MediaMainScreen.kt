@@ -112,6 +112,7 @@ import mega.privacy.android.navigation.destination.VideoRecentlyWatchedNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.VideoPlaylistCreationButtonPressedEvent
+import kotlin.reflect.KClass
 
 @SuppressLint("ComposeViewModelForwarding")
 @Composable
@@ -1154,6 +1155,7 @@ private fun PhotosMainScreenPreview() {
             navigationHandler = object : NavigationHandler {
                 override fun back() {}
                 override fun remove(navKey: NavKey) {}
+                override fun removeAll(navKeyClass: KClass<out NavKey>) {}
                 override fun navigate(destination: NavKey, navOptions: NavOptions?) {}
                 override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {}
                 override fun backTo(destination: NavKey, inclusive: Boolean) {}
