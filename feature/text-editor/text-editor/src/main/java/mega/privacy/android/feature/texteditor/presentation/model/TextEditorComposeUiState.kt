@@ -89,4 +89,12 @@ data class TextEditorComposeUiState(
      */
     val isWysiwygCapable: Boolean
         get() = isMarkdown && isWysiwygEnabled && isSingleChunkDocument
+
+    /**
+     * True when the document is Markdown that WYSIWYG editing cannot take, because it needs more
+     * than one edit chunk. Such a document edits as raw Markdown source, which the editor must
+     * say, because nothing else explains why the formatting controls are absent.
+     */
+    val isMarkdownTooLargeToFormat: Boolean
+        get() = isMarkdown && isWysiwygEnabled && !isSingleChunkDocument
 }

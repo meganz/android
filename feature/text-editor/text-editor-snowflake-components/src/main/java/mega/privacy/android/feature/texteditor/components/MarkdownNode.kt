@@ -234,10 +234,14 @@ private fun MarkdownList(
         var item = list.firstChild
         var index = start
         while (item != null) {
-            if (item is ListItem) {
+            // Held in a val because the content lambda below can run after this loop has
+            // advanced: a paused precomposition resumes it on a later frame, and a captured
+            // var would by then point at the next item or at null.
+            val listItem = item
+            if (listItem is ListItem) {
                 // A task item carries a TaskListItemMarker child; render it as a checkbox —
                 // disabled, because toggling from the read-only preview must not edit the file.
-                val taskMarker = item.firstChildOfType<TaskListItemMarker>()
+                val taskMarker = listItem.firstChildOfType<TaskListItemMarker>()
                 MarkdownListItemFrame(
                     marker = when {
                         taskMarker != null -> MarkdownListMarker.TaskCheckbox(
@@ -251,7 +255,7 @@ private fun MarkdownList(
                     colors = colors,
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        var child = item.firstChild
+                        var child = listItem.firstChild
                         while (child != null) {
                             if (child !is TaskListItemMarker) {
                                 MarkdownBlock(child, colors, nested = true)
@@ -262,7 +266,7 @@ private fun MarkdownList(
                 }
                 index++
             }
-            item = item.next
+            item = listItem.next
         }
     }
 }

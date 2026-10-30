@@ -342,6 +342,7 @@ internal class TextEditorComposeViewModelTest {
         val state = underTest.uiState.value
         assertThat(state.isWysiwygEnabled).isFalse()
         assertThat(state.isWysiwygCapable).isFalse()
+        assertThat(state.isMarkdownTooLargeToFormat).isFalse()
     }
 
     @Test
@@ -360,6 +361,7 @@ internal class TextEditorComposeViewModelTest {
             val state = underTest.uiState.value
             assertThat(state.isSingleChunkDocument).isTrue()
             assertThat(state.isWysiwygCapable).isTrue()
+            assertThat(state.isMarkdownTooLargeToFormat).isFalse()
         }
 
     @Test
@@ -379,6 +381,7 @@ internal class TextEditorComposeViewModelTest {
             val state = underTest.uiState.value
             assertThat(state.isSingleChunkDocument).isFalse()
             assertThat(state.isWysiwygCapable).isFalse()
+            assertThat(state.isMarkdownTooLargeToFormat).isTrue()
         }
 
     private suspend fun kotlinx.coroutines.test.TestScope.enterEditModeWith(vararg lines: String): TextFieldState {

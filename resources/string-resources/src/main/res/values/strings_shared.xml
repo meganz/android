@@ -1060,6 +1060,8 @@
     <string name="transfers_section_cancelled">Cancelled</string>
     <!-- Title of the tab section for active transfers -->
     <string name="transfers_section_tab_title_active_transfers">Active</string>
+    <!-- Title of the tab that lists the finished transfers of one sync on the screen that shows its progress. Same meaning as the "Completed" tab of the Transfers screen. -->
+    <string name="transfers_section_tab_title_completed_transfers">Completed</string>
     <!-- Title of the tab section for failed transfers -->
     <string name="transfers_section_tab_title_failed_transfers">Failed</string>
     <!--Text for showing the empty state when there are no transfers. The [A][/A] format marks are to put the text in a different color and style.-->
@@ -1683,6 +1685,39 @@
         <item quantity="one">Uploading: %1$d item left</item>
         <item quantity="other">Uploading: %1$d items left</item>
     </plurals>
+    <!-- Sync progress -->
+    <!-- Item of the menu on the screen that shows the progress of one sync or backup. Removes the finished transfers of this sync from its Completed tab. Other syncs and the Transfers screen are not changed. -->
+    <string name="sync_progress_menu_clear_completed">Clear completed</string>
+    <!-- Item of the menu on the screen that shows the progress of one sync or backup. Opens the settings of syncs and backups. -->
+    <string name="sync_progress_menu_sync_settings">Sync settings</string>
+    <!-- Banner on the progress screen of one sync. The user paused this sync. A "Resume" link follows the text. -->
+    <string name="sync_progress_banner_paused_by_user">This sync is paused</string>
+    <!-- Banner on the progress screen of one sync. Syncing is set to Wi-Fi only and the device has no Wi-Fi. An "Allow mobile data" link follows the text. -->
+    <string name="sync_progress_banner_paused_no_wifi">Sync paused. Connect to Wi-Fi or allow mobile data.</string>
+    <!-- Banner on the progress screen of one sync. The MEGA storage is full, so the sync cannot upload. An "Upgrade" link follows the text. -->
+    <string name="sync_progress_banner_storage_full">Your storage is full, so uploads are paused</string>
+    <!-- Banner on the progress screen of one sync. The user chose to sync only while the device is charging, and it is not charging. -->
+    <string name="sync_progress_banner_not_charging">Syncing paused until your device is charging</string>
+    <!-- Body of a sync's progress screen while files are waiting to sync but none is transferring yet. %1$s is the number of files, formatted with the locale's digit grouping (for example “1,309”). -->
+    <plurals name="sync_progress_preparing_title">
+        <item quantity="one">Preparing %1$s file</item>
+        <item quantity="other">Preparing %1$s files</item>
+    </plurals>
+    <!-- Header of the group of files that are transferring now, in the Active tab of a sync's progress screen. %1$s is the number of files, formatted with the locale's digit grouping (for example “1,309”). -->
+    <string name="sync_progress_in_progress_header">In progress (%1$s)</string>
+    <!-- Header of the group of files that wait their turn to transfer, in the Active tab of a sync's progress screen. %1$s is the number of files, formatted with the locale's digit grouping (for example “167”). -->
+    <string name="sync_progress_queued_header">Queued (%1$s)</string>
+    <!-- Last line of the list of waiting files in a sync's progress screen. %1$s is the number of waiting files that are not listed above, formatted with the locale's digit grouping (for example “4,793”). -->
+    <plurals name="sync_progress_more_files_waiting">
+        <item quantity="one">and %1$s more file waiting</item>
+        <item quantity="other">and %1$s more files waiting</item>
+    </plurals>
+    <!-- Header of the list of sync issues that still need the user to act, on the progress screen of one sync. -->
+    <string name="sync_progress_issues_needs_attention_header">Needs your attention</string>
+    <!-- Header of the list of sync issues that were fixed, on the progress screen of one sync. -->
+    <string name="sync_progress_issues_resolved_header">Resolved</string>
+    <!-- Second line of a fixed sync issue. %1$s says how it was fixed (for example “Rename all items”). %2$s is the day (for example “Yesterday”). The middle dot may be replaced by the separator of the language. -->
+    <string name="sync_progress_issue_resolved_line">%1$s · %2$s</string>
     <!-- Text of the button to start a video call -->
     <string name="start_video_call_button_text">Video</string>
     <!-- Text of the button for recording a video -->
@@ -2486,6 +2521,8 @@
     <string name="upload_bottom_sheet_action_upload_files">Upload files</string>
     <!--Upload bottom sheet actions to upload folder-->
     <string name="upload_bottom_sheet_action_upload_folder">Upload folder</string>
+    <!--Add menu (Home and Cloud Drive) action that opens the migration tool in the browser, to import files from another cloud storage service such as Google Drive-->
+    <string name="upload_bottom_sheet_action_import_from_another_cloud">Import from another cloud</string>
     <!--Upload bottom sheet actions to scan document-->
     <string name="upload_bottom_sheet_action_menu_scan_document">Scan document</string>
     <!--Upload bottom sheet actions to capture image-->
@@ -4126,7 +4163,7 @@
     <!-- Sync exclusions Add form: helper line under the name field explaining the two wildcard characters. Keep the asterisk and the question mark exactly as they are, they are typed by the user. -->
     <string name="sync_exclusions_add_name_wildcard_helper">Use “*” for any characters and “?” for one character</string>
     <!-- Sync exclusions Add form: error under the name field when an existing rule already excludes the typed name. -->
-    <string name="sync_exclusions_add_name_duplicate_error">You’ve already excluded this name</string>
+    <string name="sync_exclusions_add_name_duplicate_error">This exclusion rule already exists</string>
     <!-- Title of the error shown in place of the file content when a preview cannot be loaded -->
     <string name="file_preview_error_title">Can’t preview this file</string>
     <!-- Description of the error shown in place of the file content when a preview cannot be loaded -->
@@ -4362,8 +4399,6 @@
     <string name="text_editor_format_quote">Quote</string>
     <!-- Content description for the code button in the rich text editor's formatting toolbar, which styles the selected text as a snippet of computer code -->
     <string name="text_editor_format_code">Code</string>
-    <!-- Content description for the code block button in the rich text editor's formatting toolbar, which turns the current line into a block of computer code set apart from the surrounding text -->
-    <string name="text_editor_format_code_block">Code block</string>
     <!-- Content description for the link button in the rich text editor's formatting toolbar, which opens the dialog for adding a web link -->
     <string name="text_editor_format_link">Link</string>
     <!-- Label of the text style chip in the rich text editor's formatting toolbar when the current line is ordinary paragraph text rather than a heading -->
@@ -4604,7 +4639,184 @@
     <!-- Label shown when a GIF search returns no results. [A] and [/A] mark the part shown in a different colour. -->
     <string name="chat_giphy_picker_no_results">No [A]GIFs[/A] found</string>
     <!-- Label shown when GIFs cannot be loaded because the GIPHY service is unavailable -->
-    <string name="chat_giphy_picker_server_down">No available GIFs. Please try again later</string>
+    <string name="chat_giphy_picker_server_down">GIFs are unavailable. Try again later.</string>
     <!-- Label shown at the bottom of the GIF list once there are no more results. [A] and [/A] mark the part shown in a different colour. -->
     <string name="chat_giphy_picker_end_of_results">[A]End of[/A] results</string>
+    <!-- Content description for the code block button in the rich text editor's formatting toolbar, which turns the current line into a block of computer code set apart from the surrounding text -->
+    <string name="text_editor_format_code_block">Code block</string>
+    <!-- Warning banner shown at the top of the text editor when the user edits a Markdown file that is too large to show with formatting. The file opens as raw Markdown source instead. -->
+    <string name="text_editor_markdown_too_large_warning">This file is too large for formatted editing. You can still edit it as plain text.</string>
+    <!-- Chat room: small italic label added after the text of a message that the sender edited after sending it -->
+    <string name="edited_message_text">(edited)</string>
+    <!-- Chat room: red text shown below a message of the user that could not be sent. A tap on the message shows the options to send it again or delete it. -->
+    <string name="manual_retry_alert">Message not sent. Tap for options</string>
+    <!-- Chat room: text shown below a file or voice clip message of the user while it uploads and the transfers queue is paused. A tap on the message resumes the transfers. -->
+    <string name="manual_resume_alert">Transfers paused. Tap to resume.</string>
+    <!-- Chat room message composer: title of the header above the text field while the user edits one of their messages -->
+    <string name="edit_chat_message">Edit message</string>
+    <!-- Chat room message composer: hint shown while the user records a voice clip, telling them to slide their finger towards the start of the screen to cancel the recording -->
+    <string name="slide_to_cancel">Slide to cancel</string>
+    <!-- Chat room message composer: tooltip shown when the user taps the voice clip record button instead of holding it. The user must keep the button pressed to record. -->
+    <string name="recording_less_than_second">Tap and hold to record</string>
+    <!-- Chat room: accessibility label of the button next to a message that forwards the message to another chat -->
+    <string name="chat_message_forward_content_description">Forward</string>
+    <!-- Chat room: accessibility label of the round button that scrolls the message list down to the latest message -->
+    <string name="chat_scroll_to_bottom_content_description">Scroll to bottom</string>
+    <!-- Chat room, message options sheet: accessibility label of the button after the quick reactions that opens the full emoji picker to add a reaction to the message -->
+    <string name="chat_add_more_reactions_content_description">Add more reactions</string>
+    <!-- Chat room: accessibility label of the preview image of an image or video sent as a file message -->
+    <string name="chat_file_message_preview_content_description">File preview</string>
+    <!-- Chat room: accessibility label of the play icon shown on the preview of a video sent as a file message -->
+    <string name="chat_file_message_play_video_content_description">Play video</string>
+    <!-- Chat room: accessibility label of the button of a voice clip message that starts playing the voice clip -->
+    <string name="chat_voice_clip_message_play_content_description">Play voice clip</string>
+    <!-- Chat room: accessibility label of the button of a voice clip message that pauses the voice clip while it plays -->
+    <string name="chat_voice_clip_message_pause_content_description">Pause voice clip</string>
+    <!-- Chat room: accessibility label of the badge with a check mark on the avatar of a shared contact whose credentials the user has verified -->
+    <string name="chat_contact_attachment_verified_content_description">Verified contact</string>
+    <!-- Chat room message composer: accessibility label of the microphone button. The user holds the button to record a voice clip. -->
+    <string name="chat_composer_record_voice_clip_content_description">Record voice clip</string>
+    <!-- Chat room message composer: accessibility label of the smiley button in the text field that shows or hides the emoji keyboard -->
+    <string name="chat_composer_emoji_content_description">Emoji</string>
+    <!-- Title of the error state shown in place of a folder's contents when the first page of the folder could not be loaded -->
+    <string name="node_list_load_error_title">Couldn’t load this folder</string>
+    <!-- Message shown at the end of a folder's list when the next page of items could not be loaded. A "Try again" button is next to it -->
+    <string name="node_list_load_more_error_message">Couldn’t load more items</string>
+    <!-- Snackbar shown when the user taps a file while the device is offline and the file has not been saved for offline use -->
+    <string name="file_not_available_offline_message">File not available offline</string>
+    <!-- Menu item to save a copy of a file or folder to the Offline section of the app, so that the user can open it without a connection -->
+    <string name="node_menu_action_copy_to_offline">Copy to offline</string>
+    <!-- Label under the button that turns the microphone on or off before the user starts or joins a meeting -->
+    <string name="general_mic">Mic</string>
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
+    <string name="general_camera">Camera</string>
+    <!-- Label under the button that turns the loudspeaker on or off before the user starts or joins a meeting -->
+    <string name="general_speaker">Speaker</string>
+    <!-- Label under the call audio button when the call audio plays through wired or Bluetooth headphones -->
+    <string name="general_headphone">Headphones</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Access permissions needed for MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA needs access to your microphone and camera for meetings.</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Go to Settings to allow MEGA to access your camera and microphone.</string>
+    <!-- Snackbar shown before or during a meeting when the call audio moves to the headphones without a tap of the user, for example when the user connects a wired or Bluetooth headset -->
+    <string name="general_headphone_on">Headphones are active</string>
+    <!-- Snackbar shown before or during a meeting when the call audio moves to the loudspeaker without a tap of the user, for example when the user disconnects a headset -->
+    <string name="general_speaker_on">Your speaker is turned on</string>
+    <!-- Snackbar shown before or during a meeting when the call audio moves to the earpiece without a tap of the user, for example when the user disconnects a headset -->
+    <string name="general_speaker_off">Your speaker is turned off</string>
+    <!-- Folder options menu item that pins a shortcut to the folder on the device Home screen -->
+    <string name="node_options_add_to_home_screen">Add to Home screen</string>
+    <!-- Error shown when the launcher refuses to add a folder shortcut to the Home screen -->
+    <string name="add_to_home_screen_error">Couldn’t add shortcut to Home screen</string>
+    <!-- Confirmation shown after the launcher has added a folder shortcut to the Home screen -->
+    <string name="add_to_home_screen_success">Added to your Home screen</string>
+    <!-- Message shown when a Home screen shortcut points to a folder that was permanently deleted or is no longer accessible -->
+    <string name="folder_shortcut_unavailable">This folder is no longer available</string>
+    <!-- Message shown when a Home screen shortcut points to a folder that belongs to a different MEGA account than the one currently logged in -->
+    <string name="folder_shortcut_other_account">This folder belongs to another MEGA account. Log out and log in to that account to open it.</string>
+    <!-- Title of the dialog shown on Xiaomi devices when the system blocks the app from adding Home screen shortcuts -->
+    <string name="home_screen_shortcut_permission_dialog_title">Allow Home screen shortcuts</string>
+    <!-- Body of the dialog shown on Xiaomi devices when the system blocks the app from adding Home screen shortcuts -->
+    <string name="home_screen_shortcut_permission_dialog_message">Your device doesn’t allow MEGA to add shortcuts to the Home screen. Allow this permission for MEGA in Settings, then try again.</string>
+    <!-- Button on the Home screen shortcut permission dialog that opens the system permission page for the app -->
+    <string name="home_screen_shortcut_permission_dialog_open_settings">Open Settings</string>
+    <!-- Short label of the Shared items destination in the bottom navigation bar. The label has little space, so the translation must be short. The full name, shown in lists, is "Shared items" -->
+    <string name="navigation_label_shared">Shared</string>
+    <!-- Short label of the Offline files destination in the bottom navigation bar. The label has little space, so the translation must be short. The full name, shown in lists, is "Offline files" -->
+    <string name="navigation_label_offline">Offline</string>
+    <!-- Text of the progress panel of a sync card in the Syncs list, shown while the sync looks for changes in its folders -->
+    <string name="sync_card_panel_checking">Checking for changes&#8230;</string>
+    <!-- Text of the panel of a sync card in the Syncs list, shown when some items of the sync have issues. Tapping the panel opens the list of issues -->
+    <string name="sync_card_panel_review_issues">Review issues</string>
+    <!-- Text of the panel of a sync card in the Syncs list, shown when the sync is paused because the MEGA account storage is full. It asks the user to upgrade the account -->
+    <string name="sync_card_panel_upgrade">Upgrade to keep syncing</string>
+    <!-- Accessibility label of the progress panel of a sync card in the Syncs list. Screen readers say it as the action of a tap on the panel, which opens the progress screen of the sync -->
+    <string name="sync_card_panel_open_description">Open sync progress</string>
+    <!-- Text of the progress panel of a sync card in the Syncs list, above a progress bar. %1$s is the number of files and folders that the sync still has to transfer, already formatted for the language, for example 1,204 -->
+    <plurals name="sync_card_panel_items_left">
+        <item quantity="one">%1$s item left</item>
+        <item quantity="other">%1$s items left</item>
+    </plurals>
+    <!-- Text of the progress panel of a sync card in the Syncs list, above a progress bar. %1$s is the number of files and folders that the sync still has to transfer, already formatted for the language, for example 172. %2$s is the transfer speed with its unit, for example 4.2 MB/s. The middle dot separates the two parts; keep the spaces around it -->
+    <plurals name="sync_card_panel_items_left_with_speed">
+        <item quantity="one">%1$s item left · %2$s</item>
+        <item quantity="other">%1$s items left · %2$s</item>
+    </plurals>
+    <!-- Title of the screen where the user names a new meeting and starts it -->
+    <string name="new_meeting">New meeting</string>
+    <!-- Button that creates a meeting and starts the call -->
+    <string name="btn_start_meeting">Start meeting</string>
+    <!-- Default name of a new meeting, shown as a hint in the meeting name field. The placeholder is the full name of the user who creates the meeting. -->
+    <string name="type_meeting_name">%s’s meeting</string>
+    <!-- Title of the dialog asking for the password of a password protected zip file. -->
+    <string name="zip_browser_password_dialog_title">Enter password</string>
+    <!-- Message of the dialog asking for the password of a password protected zip file. -->
+    <string name="zip_browser_password_dialog_message">This ZIP file is password protected. Enter the password to open its files.</string>
+    <!-- Error shown below the password field of the dialog when the password entered for a password protected zip file is not the right one. -->
+    <string name="zip_browser_password_dialog_error_incorrect">Incorrect password</string>
+    <!-- Title shown when the user opens an archive in a format the app cannot browse (any format other than zip). -->
+    <string name="zip_browser_error_unsupported_format_title">This archive format isn’t supported</string>
+    <!-- Description shown when the user opens an archive in a format the app cannot browse. Suggests opening it in another app. -->
+    <string name="zip_browser_error_unsupported_format_description">Only ZIP archives can be opened here. Use another app to open this file.</string>
+    <!-- Title shown when there is not enough free storage on the device to extract a file out of an archive. -->
+    <string name="zip_browser_error_insufficient_storage_title">Not enough space</string>
+    <!-- Description shown when there is not enough free storage on the device to extract a file out of an archive. -->
+    <string name="zip_browser_error_insufficient_storage_description">Free up space on your device, then open the zip file again</string>
+    <!-- Title shown when the contents of a zip file stored in MEGA cannot be loaded, usually because the connection was lost. -->
+    <string name="zip_browser_error_offline_title">Couldn’t load ZIP file</string>
+    <!-- Description shown when the contents of a zip file stored in MEGA cannot be loaded. A Try again button is shown below it. -->
+    <string name="zip_browser_error_offline_description">Check your internet connection and try again</string>
+    <!-- Title shown when a zip file can’t be opened because the file itself is damaged or incomplete. -->
+    <string name="zip_browser_error_damaged_title">Can’t open ZIP file</string>
+    <!-- Description shown when a zip file can’t be opened because it is damaged or incomplete. %1$s is the zip file name. -->
+    <string name="zip_browser_error_damaged_description">“%1$s” is damaged or incomplete</string>
+    <!-- Title of the dialog shown when there is not enough free space on the device to open a file from a zip file. -->
+    <string name="zip_browser_not_enough_space_title">Not enough space</string>
+    <!-- Message of the dialog shown when there is not enough free space on the device to open a file from a zip file. %1$s is the space to free up including its unit (for example “1.2 GB”), %2$s is the name of the file inside the zip file. -->
+    <string name="zip_browser_not_enough_space_message">Free up at least %1$s on your device to open “%2$s”</string>
+    <!-- Status line of a sync card in the Syncs list, shown while the sync looks for changes in its folders and has nothing to transfer yet -->
+    <string name="sync_card_status_scanning">Scanning&#8230;</string>
+    <!-- Status line of a sync card in the Syncs list, shown while the sync transfers files. %1$d is the percentage of the work done, from 0 to 99. The middle dot separates the two parts; keep the spaces around it -->
+    <string name="sync_card_status_updating_percent">Updating · %1$d%%</string>
+    <!-- Status line of a sync card in the Syncs list, shown when the user paused a sync before it finished. %1$d is the percentage of the work done, from 0 to 99. The middle dot separates the two parts; keep the spaces around it -->
+    <string name="sync_card_status_paused_percent">Paused · %1$d%%</string>
+    <!-- Status line of a sync card in the Syncs list, shown when the sync is paused because the user allows syncing on Wi-Fi only and the device is not on Wi-Fi. The middle dot separates the two parts; keep the spaces around it -->
+    <string name="sync_card_status_paused_no_wifi">Paused · Waiting for Wi-Fi</string>
+    <!-- Status line of a sync card in the Syncs list, shown when the sync is paused because the battery level is low. The middle dot separates the two parts; keep the spaces around it -->
+    <string name="sync_card_status_paused_low_battery">Paused · Low battery</string>
+    <!-- Status line of a sync card in the Syncs list, shown when the sync is paused because the device is in battery saver mode. The middle dot separates the two parts; keep the spaces around it -->
+    <string name="sync_card_status_paused_battery_saver">Paused · Battery saver on</string>
+    <!-- Status line of a sync card in the Syncs list, shown in red when the sync is paused because the MEGA account storage is full. The middle dot separates the two parts; keep the spaces around it -->
+    <string name="sync_card_status_paused_storage_full">Paused · Storage full</string>
+    <!-- Status line of a sync card in the Syncs list, shown in red when some items of the sync have issues that stop them from syncing. %1$d is the number of items with issues -->
+    <plurals name="sync_card_status_cant_sync">
+        <item quantity="one">Can’t sync %1$d item</item>
+        <item quantity="other">Can’t sync %1$d items</item>
+    </plurals>
+    <!-- Accessibility label of the info button at the end of the header of a sync card in the Syncs list, while the folder details of the card are hidden. Screen readers say it as the action of a tap on the button, which shows the details -->
+    <string name="sync_card_details_show">Show details</string>
+    <!-- Accessibility label of the info button at the end of the header of a sync card in the Syncs list, while the folder details of the card are shown. Screen readers say it as the action of a tap on the button, which hides the details -->
+    <string name="sync_card_details_hide">Hide details</string>
+    <!-- Value of the "Contains" row in the folder details of a sync card in the Syncs list. %1$s is the number of folders and files of the sync, already written out, for example "12 folders · 300 files". %2$s is the total size of the sync with its unit, for example "1.2 GB". The middle dot separates the two parts; keep the spaces around it -->
+    <string name="sync_card_details_contains_with_size">%1$s · %2$s</string>
+    <!-- Home widget section header for the files and folders the user pinned to Home -->
+    <string name="home_widget_pinned_section_header">Pinned items</string>
+    <!-- Empty state message for the pinned items home widget, shown above the "Add pin" link -->
+    <string name="home_widget_pinned_empty_state">Pin the files and folders you use most</string>
+    <!-- Link in the empty state of the pinned items home widget and button on the Pinned items page; opens the picker to choose files and folders to pin to Home -->
+    <string name="home_pinned_add_pin">Add pin</string>
+    <!-- Edit profile screen: title of the section where the user can back up the recovery key -->
+    <string name="edit_profile_recovery_key_title">Recovery key</string>
+    <!-- Edit profile screen: text below the recovery key title. It reminds the user that MEGA cannot reset a forgotten password, so the user must back up the recovery key -->
+    <string name="edit_profile_recovery_key_description">Do you remember your password?\nMEGA cannot reset your password if you forget it.</string>
+    <!-- Edit profile screen: button that opens the screen to back up (export) the recovery key -->
+    <string name="edit_profile_back_up_recovery_key_button">Back up recovery key</string>
+    <!-- Edit profile screen: warning below the "Log out" button when the user has files in the Offline section -->
+    <string name="edit_profile_logout_warning_offline">When you log out, files from your Offline section will be deleted from your device.</string>
+    <!-- Edit profile screen: warning below the "Log out" button when transfers are in progress -->
+    <string name="edit_profile_logout_warning_transfers">When you log out, ongoing transfers will be cancelled.</string>
+    <!-- Edit profile screen: warning below the "Log out" button when the user has files in the Offline section and transfers are in progress -->
+    <string name="edit_profile_logout_warning_offline_and_transfers">When you log out, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
 </resources>

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
@@ -44,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -66,6 +68,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.image.MegaIcon
@@ -194,6 +197,7 @@ fun TextEditorScreen(
         }
     }
     val isEditable = uiState.mode == TextEditorMode.Edit || uiState.mode == TextEditorMode.Create
+    var markdownWarningDismissed by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val scrollToHideBehavior =
         rememberScrollToHideBehavior(snapAnimationSpec = tween(FLING_SNAP_ANIMATION_MS))
@@ -469,113 +473,122 @@ fun TextEditorScreen(
                         LaunchedEffect(useRichText) {
                             if (useRichText) viewModel.ensureRichDocumentState()
                         }
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .then(
-                                    // Nav inset stays as editor content padding so text draws
-                                    // edge to edge behind the system bar.
-                                    if (useRichText) {
-                                        Modifier.imePadding()
-                                    } else {
-                                        Modifier
-                                    },
-                                ),
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                            ) {
-                                val richState = richDocumentState
-                                if (useRichText && richState != null) {
-                                    RichDocumentEditor(
-                                        state = richState,
-                                        autoFocusWhenEmpty =
-                                            uiState.mode == TextEditorMode.Create,
-                                        // The viewport ends at the docked toolbar's top edge
-                                        // so the cursor handle hides there, exactly like at
-                                        // the keyboard.
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .windowInsetsPadding(
-                                                WindowInsets.navigationBars
-                                                    .exclude(WindowInsets.ime),
-                                            )
-                                            .padding(bottom = RichToolbarStripHeight),
-                                    )
-                                } else if (useRichText) {
-                                    // One frame while ensureRichDocumentState builds the model.
-                                } else {
-                                    TextEditorContent(
-                                        lazyListState = lazyListState,
-                                        chunkCount = chunkCount,
-                                        totalLineCount = uiState.totalLineCount,
-                                        chunkTextProvider = chunkTextProvider,
-                                        chunkStateProvider = chunkStateProvider,
-                                        chunkStartLineProvider = chunkStartLineProvider,
-                                        onChunkDisposed = onChunkDisposed,
-                                        isChunkReadOnly = isChunkReadOnly,
-                                        onChunkFocused = onChunkFocused,
-                                        showLineNumbers = uiState.showLineNumbers,
-                                        readOnly = !isEditable,
-                                        requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
-                                        restoreScrollIndex = uiState.restoreScrollIndex,
-                                        restoreScrollOffset = uiState.restoreScrollOffset,
-                                        restoreScrollWithinChunkLine = uiState.restoreScrollWithinChunkLine,
-                                        onRestoreScrollConsumed = viewModel::consumeRestoreScrollIndex,
-                                        onTopLineChanged = viewModel::updateTopLine,
-                                        restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
-                                        onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
-                                        // Typing assist for raw Markdown editing — source mode
-                                        // and documents too large for rich mode alike, so gated
-                                        // on the flag rather than isWysiwygCapable.
-                                        inputTransformation = MarkdownEditInputTransformation
-                                            .takeIf {
-                                                uiState.isMarkdown && uiState.isWysiwygEnabled
-                                            },
-                                    )
-                                    TextEditorFastScrollbar(
-                                        state = lazyListState,
-                                        itemCount = chunkCount,
-                                        modifier = Modifier
-                                            .align(Alignment.CenterEnd)
-                                            .navigationBarsPadding()
-                                            .fillMaxHeight(),
-                                        tooltipText = { chunkIndex, fractionWithinChunk ->
-                                            val startLine =
-                                                chunkStartLineProvider(chunkIndex).coerceAtLeast(1)
-                                            // First line of the next chunk (or one past the last line) bounds this
-                                            // chunk's line range; interpolating with the in-chunk scroll fraction
-                                            // gives the actual top line even when the whole file is one chunk.
-                                            val nextStartLine = if (chunkIndex + 1 < chunkCount) {
-                                                chunkStartLineProvider(chunkIndex + 1)
-                                            } else {
-                                                uiState.totalLineCount + 1
-                                            }
-                                            val line = (startLine +
-                                                    ((nextStartLine - startLine) * fractionWithinChunk).toInt())
-                                                .coerceIn(
-                                                    1,
-                                                    uiState.totalLineCount.coerceAtLeast(1)
-                                                )
-                                            lineTooltipTemplate.format(line)
-                                        },
-                                    )
-                                }
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            if (uiState.isMarkdownTooLargeToFormat && !markdownWarningDismissed) {
+                                MarkdownTooLargeBanner(
+                                    onDismiss = { markdownWarningDismissed = true },
+                                )
                             }
-                            if (useRichText) {
-                                richDocumentState?.let { richState ->
-                                    RichEditToolbar(
-                                        viewModel = viewModel,
-                                        richState = richState,
-                                        modifier = Modifier
-                                            .align(Alignment.BottomCenter)
-                                            // Above the nav bar when the keyboard is closed; the
-                                            // container's imePadding already lifts it otherwise.
-                                            .windowInsetsPadding(
-                                                WindowInsets.navigationBars
-                                                    .exclude(WindowInsets.ime),
-                                            ),
-                                    )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                                    .then(
+                                        // Nav inset stays as editor content padding so text draws
+                                        // edge to edge behind the system bar.
+                                        if (useRichText) {
+                                            Modifier.imePadding()
+                                        } else {
+                                            Modifier
+                                        },
+                                    ),
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                ) {
+                                    val richState = richDocumentState
+                                    if (useRichText && richState != null) {
+                                        RichDocumentEditor(
+                                            state = richState,
+                                            autoFocusWhenEmpty =
+                                                uiState.mode == TextEditorMode.Create,
+                                            // The viewport ends at the docked toolbar's top edge
+                                            // so the cursor handle hides there, exactly like at
+                                            // the keyboard.
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .windowInsetsPadding(
+                                                    WindowInsets.navigationBars
+                                                        .exclude(WindowInsets.ime),
+                                                )
+                                                .padding(bottom = RichToolbarStripHeight),
+                                        )
+                                    } else if (useRichText) {
+                                        // One frame while ensureRichDocumentState builds the model.
+                                    } else {
+                                        TextEditorContent(
+                                            lazyListState = lazyListState,
+                                            chunkCount = chunkCount,
+                                            totalLineCount = uiState.totalLineCount,
+                                            chunkTextProvider = chunkTextProvider,
+                                            chunkStateProvider = chunkStateProvider,
+                                            chunkStartLineProvider = chunkStartLineProvider,
+                                            onChunkDisposed = onChunkDisposed,
+                                            isChunkReadOnly = isChunkReadOnly,
+                                            onChunkFocused = onChunkFocused,
+                                            showLineNumbers = uiState.showLineNumbers,
+                                            readOnly = !isEditable,
+                                            requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
+                                            restoreScrollIndex = uiState.restoreScrollIndex,
+                                            restoreScrollOffset = uiState.restoreScrollOffset,
+                                            restoreScrollWithinChunkLine = uiState.restoreScrollWithinChunkLine,
+                                            onRestoreScrollConsumed = viewModel::consumeRestoreScrollIndex,
+                                            onTopLineChanged = viewModel::updateTopLine,
+                                            restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
+                                            onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
+                                            // Typing assist for raw Markdown editing — source mode
+                                            // and documents too large for rich mode alike, so gated
+                                            // on the flag rather than isWysiwygCapable.
+                                            inputTransformation = MarkdownEditInputTransformation
+                                                .takeIf {
+                                                    uiState.isMarkdown && uiState.isWysiwygEnabled
+                                                },
+                                        )
+                                        TextEditorFastScrollbar(
+                                            state = lazyListState,
+                                            itemCount = chunkCount,
+                                            modifier = Modifier
+                                                .align(Alignment.CenterEnd)
+                                                .navigationBarsPadding()
+                                                .fillMaxHeight(),
+                                            tooltipText = { chunkIndex, fractionWithinChunk ->
+                                                val startLine = chunkStartLineProvider(chunkIndex)
+                                                    .coerceAtLeast(1)
+                                                // First line of the next chunk (or one past the last line) bounds this
+                                                // chunk's line range; interpolating with the in-chunk scroll fraction
+                                                // gives the actual top line even when the whole file is one chunk.
+                                                val nextStartLine =
+                                                    if (chunkIndex + 1 < chunkCount) {
+                                                        chunkStartLineProvider(chunkIndex + 1)
+                                                    } else {
+                                                        uiState.totalLineCount + 1
+                                                    }
+                                                val line = (startLine +
+                                                        ((nextStartLine - startLine) * fractionWithinChunk).toInt())
+                                                    .coerceIn(
+                                                        1,
+                                                        uiState.totalLineCount.coerceAtLeast(1)
+                                                    )
+                                                lineTooltipTemplate.format(line)
+                                            },
+                                        )
+                                    }
+                                }
+                                if (useRichText) {
+                                    richDocumentState?.let { richState ->
+                                        RichEditToolbar(
+                                            viewModel = viewModel,
+                                            richState = richState,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomCenter)
+                                                // Above the nav bar when the keyboard is closed; the
+                                                // container's imePadding already lifts it otherwise.
+                                                .windowInsetsPadding(
+                                                    WindowInsets.navigationBars
+                                                        .exclude(WindowInsets.ime),
+                                                ),
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -727,6 +740,25 @@ internal fun isBarsHidden(
     epsilon: Float = BARS_HIDDEN_EPSILON_PX,
 ): Boolean = topBarHeightPx > 0f && topBarOffsetPx <= -topBarHeightPx + epsilon
 
+
+/**
+ * Warns that the open Markdown file is shown as raw Markdown source, because it is too large to
+ * edit with formatting.
+ */
+@Composable
+internal fun MarkdownTooLargeBanner(
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopWarningBanner(
+        body = stringResource(sharedR.string.text_editor_markdown_too_large_warning),
+        showCancelButton = true,
+        onCancelButtonClick = onDismiss,
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag(TEXT_EDITOR_MARKDOWN_TOO_LARGE_BANNER_TAG),
+    )
+}
 
 @Composable
 internal fun TextEditorErrorContent(
@@ -1022,3 +1054,5 @@ private val InlineToggleStyles = setOf(
 
 internal const val TEXT_EDITOR_ERROR_CONTENT_TAG = "text_editor:error_content"
 internal const val TEXT_EDITOR_ERROR_RETRY_BUTTON_TAG = "text_editor:error_retry_button"
+internal const val TEXT_EDITOR_MARKDOWN_TOO_LARGE_BANNER_TAG =
+    "text_editor:markdown_too_large_banner"
