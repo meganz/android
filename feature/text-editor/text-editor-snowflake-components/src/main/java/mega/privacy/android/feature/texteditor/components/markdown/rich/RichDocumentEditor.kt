@@ -309,7 +309,11 @@ fun RichDocumentEditor(
         )
     }
     CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
-        Box(modifier = modifier) {
+        Box(
+            modifier = modifier.documentWideSelectAll {
+                selectWholeDocument(state, geometry, textToolbar, clipboard, scope)
+            },
+        ) {
             RichDocumentBlocks(
                 state = state,
                 visualStyles = visualStyles,

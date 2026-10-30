@@ -3,11 +3,20 @@ package mega.privacy.android.feature.texteditor.components.markdown.rich
 import android.content.ClipData
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.text.contextmenu.builder.item
+import androidx.compose.foundation.text.contextmenu.data.TextContextMenuComponent
+import androidx.compose.foundation.text.contextmenu.data.TextContextMenuKeys
+import androidx.compose.foundation.text.contextmenu.modifier.appendTextContextMenuComponents
+import androidx.compose.foundation.text.contextmenu.modifier.filterTextContextMenuComponents
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.hapticfeedback.HapticFeedback
@@ -20,6 +29,7 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.toClipEntry
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.Density
@@ -110,20 +120,28 @@ internal class RichSelectionGeometry {
     /**
      * Root-coordinate anchor rect for the selection menu: the selection's bounding box, so
      * the platform toolbar sits above the highlight (or below it when there is no room)
-     * instead of over the selected text. Falls back to whichever edge is composed.
+     * instead of over the selected text. Falls back to whichever edge is composed, and, when
+     * neither is, to the bounding box of the selected blocks that are composed, because a
+     * selection taller than the viewport must still show a menu.
      */
     fun selectionMenuRect(state: RichDocumentState): Rect? {
         val selection = state.documentSelection ?: return null
+        val selected = (selection.start.blockIndex..selection.end.blockIndex)
+            .mapNotNull { fieldBounds[it] }
         val start = edgeCursorRect(selection.start)
         val end = edgeCursorRect(selection.end)
-        if (start == null && end == null) return null
+        if (start == null && end == null) {
+            if (selected.isEmpty()) return null
+            return Rect(
+                selected.minOf { it.left },
+                selected.minOf { it.top },
+                selected.maxOf { it.right },
+                selected.maxOf { it.bottom },
+            )
+        }
         if (start == null || end == null) return start ?: end
-        val left = (selection.start.blockIndex..selection.end.blockIndex)
-            .mapNotNull { fieldBounds[it]?.left }
-            .minOrNull() ?: minOf(start.left, end.left)
-        val right = (selection.start.blockIndex..selection.end.blockIndex)
-            .mapNotNull { fieldBounds[it]?.right }
-            .maxOrNull() ?: maxOf(start.right, end.right)
+        val left = selected.minOfOrNull { it.left } ?: minOf(start.left, end.left)
+        val right = selected.maxOfOrNull { it.right } ?: maxOf(start.right, end.right)
         return Rect(left, minOf(start.top, end.top), right, maxOf(start.bottom, end.bottom))
     }
 
@@ -315,7 +333,82 @@ internal fun showDocumentSelectionMenu(
     )
 }
 
+/**
+ * Extends a block's own Select All to the whole document, then replaces the block menu with the
+ * document one so Copy and Cut act on everything that is now selected.
+ *
+ * The block menu closes when its item is clicked, and the block's field requests its own menu
+ * again when the new selection triggers a new text layout. The document menu is shown one frame
+ * later, so that it replaces both.
+ */
+internal fun selectWholeDocument(
+    state: RichDocumentState,
+    geometry: RichSelectionGeometry,
+    textToolbar: TextToolbar,
+    clipboard: Clipboard,
+    scope: CoroutineScope,
+) {
+    scope.launch {
+        val field = state.focusedIndex?.let { editableFieldStateAt(state, it) }
+        if (field != null && !field.selection.collapsed) {
+            field.edit { selection = TextRange(field.selection.max) }
+        }
+        state.selectAllBlocks()
+        withFrameNanos { }
+        showDocumentSelectionMenu(state, geometry, textToolbar, clipboard, scope)
+    }
+}
+
+/**
+ * Replaces the Select All of a block's own context menu with one that selects the whole document,
+ * through [onSelectAll].
+ *
+ * A block shows its own menu whenever the cross-block gesture does not claim the selection, for
+ * example on a long press that selects no word. That menu's Select All selects one block only,
+ * so it must be replaced here. Every other item stays native.
+ */
+@Composable
+internal fun Modifier.documentWideSelectAll(onSelectAll: () -> Unit): Modifier {
+    val label = stringResource(android.R.string.selectAll)
+    val replacement = remember { SelectAllReplacement() }
+    return filterTextContextMenuComponents(replacement::keep)
+        .appendTextContextMenuComponents {
+            item(DocumentSelectAllKey, label) {
+                close()
+                onSelectAll()
+            }
+        }
+}
+
+/**
+ * Drops a block's own Select All, and keeps the document-wide replacement only for a menu that
+ * offered one, so an empty block still offers no Select All.
+ *
+ * One menu's components are filtered in order, and a block's items are collected before the
+ * replacement, which an ancestor appends last. So the block's Select All is always seen first,
+ * and [blockOffersSelectAll], read at the replacement, decides whether the replacement is kept
+ * and is then cleared for the next menu.
+ */
+private class SelectAllReplacement {
+
+    private var blockOffersSelectAll = false
+
+    fun keep(component: TextContextMenuComponent): Boolean = when (component.key) {
+        TextContextMenuKeys.SelectAllKey -> {
+            blockOffersSelectAll = true
+            false
+        }
+
+        DocumentSelectAllKey -> blockOffersSelectAll.also { blockOffersSelectAll = false }
+
+        else -> true
+    }
+}
+
 private val markdownSerializer by lazy { RichDocumentToMarkdownConverter() }
+
+/** Menu key of the document-wide Select All that replaces the block's own. */
+private object DocumentSelectAllKey
 
 private val AutoscrollThreshold = 64.dp
 private val AutoscrollMaxStep = 12.dp
